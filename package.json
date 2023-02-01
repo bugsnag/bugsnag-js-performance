@@ -1,5 +1,5 @@
 {
-  "name": "bugsnag",
+  "name": "bugsnag-js-performance",
   "private": true,
   "workspaces": ["packages/**"],
   "scripts": {

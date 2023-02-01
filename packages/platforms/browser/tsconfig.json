@@ -1,0 +1,15 @@
+{
+  "extends": "../tsconfig.platforms-base.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "dist",
+    "rootDir": "lib"
+  },
+  "include": ["lib/*"],
+  "exclude": [
+    "node_modules",
+    "**/__tests__/*",
+    "**/__e2e__/*"
+  ]
+}
+
