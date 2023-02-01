@@ -5,7 +5,7 @@
   "author": "Ben Wilson <ben.wilson@smartbear.com>",
   "homepage": "https://github.com/bugsnag/bugsnag-js-performance#readme",
   "license": "MIT",
-  "main": "lib/browser.js",
+  "main": "dist/browser.js",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
