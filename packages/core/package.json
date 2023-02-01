@@ -1,5 +1,5 @@
 {
-  "name": "core",
+  "name": "@bugsnag/js-performance-core",
   "version": "0.0.0",
   "description": "Core performance client",
   "keywords": [
@@ -23,7 +23,6 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch",
     "test": "node ./__tests__/core.test.js"
   },
   "bugs": {
