@@ -6,7 +6,7 @@
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build",
     "clean": "lerna run --parallel clean",
-    "test": "lerna run test"
+    "test:unit": "lerna run test"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",
