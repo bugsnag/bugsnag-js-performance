@@ -1,7 +1,8 @@
-<picture>
-    <source srcset="https://assets-global.website-files.com/607f4f6df411bd01527dc7d5/63bc40cd9d502eda8ea74ce7_Bugsnag%20Full%20Color.svg">
-    <img src="https://assets-global.website-files.com/607f4f6df411bd01527dc7d5/63bc40cd9d502eda8ea74ce7_Bugsnag%20Full%20Color.svg" alt="BugSnag logo" title="BugSnag" width=60%  />
-</picture>
+<p>
+    <picture>
+        <img src="https://assets-global.website-files.com/607f4f6df411bd01527dc7d5/63bc40cd9d502eda8ea74ce7_Bugsnag%20Full%20Color.svg" alt="BugSnag logo" title="BugSnag" width=60%  />
+    </picture>
+</p>
 
 <!-- # BugsnagPerformance -->
 
