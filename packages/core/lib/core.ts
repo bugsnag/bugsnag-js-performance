@@ -1,7 +1,5 @@
-'use strict';
-
-module.exports = core;
-
-function core() {
+export function core() {
     return "Hello from core";
 }
+
+export default core

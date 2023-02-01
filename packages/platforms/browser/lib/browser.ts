@@ -1,7 +1,5 @@
-'use strict';
-
-module.exports = browser;
-
-function browser() {
+export function browser() {
     return "Hello from browser";
 }
+
+export default browser
