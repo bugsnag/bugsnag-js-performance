@@ -5,7 +5,7 @@ on:
   pull_request:
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -19,10 +19,14 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - run: npm install --no-audit --no-package-lock
+    - run: npm ci
 
     - run: npm run build
 
-    # - run: npm run test:lint
+  # lint:
+  #   steps:
+  #   - run: npm run test:lint
 
+  run:
+    steps:
     - run: npm run test:unit
