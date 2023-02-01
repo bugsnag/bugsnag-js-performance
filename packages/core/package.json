@@ -1,0 +1,32 @@
+{
+  "name": "core",
+  "version": "0.0.0",
+  "description": "Core performance client",
+  "keywords": [
+    "bugsnag",
+    "performance",
+    "javascript",
+    "typescript"
+  ],
+  "homepage": "",
+  "author": "Ben Wilson <ben.wilson@smartbear.com>",
+  "license": "MIT",
+  "main": "dist/core.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": ["lib"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "node ./__tests__/core.test.js"
+  },
+  "bugs": {
+    "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
+  }
+}

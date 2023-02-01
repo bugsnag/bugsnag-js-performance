@@ -1,0 +1,13 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+      "baseUrl": "./",
+      "composite": true,
+      "declaration": true,
+      "declarationMap": true,
+      "outDir": "dist",
+      "rootDir": "lib",
+    },
+    "include": ["lib/*"],
+    "exclude": ["node_modules", "**/__tests__/*", "**/__e2e__/*"]
+  }
