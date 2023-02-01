@@ -1,4 +1,4 @@
-![BugSnag](https://user-images.githubusercontent.com/24570483/216138010-91b35cd1-8373-4060-8030-28a9cb4faa8e.png)
+![https://www.bugsnag.com/](https://user-images.githubusercontent.com/24570483/216138010-91b35cd1-8373-4060-8030-28a9cb4faa8e.png "BugSnag")
 
 [![slack](https://img.shields.io/badge/slack-%23bugsnag--proj--perf--browser-blue?style=flat-square
 )](https://smartbear.slack.com/archives/C04E4CXB97U)
