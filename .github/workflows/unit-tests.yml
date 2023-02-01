@@ -23,10 +23,6 @@ jobs:
 
     - run: npm run build
 
-  # lint:
-  #   steps:
   #   - run: npm run test:lint
 
-  run:
-    steps:
     - run: npm run test:unit
