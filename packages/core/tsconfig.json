@@ -5,9 +5,10 @@
       "composite": true,
       "declaration": true,
       "declarationMap": true,
+      "emitDecoratorMetadata": true,
       "outDir": "dist",
       "rootDir": "lib",
     },
     "include": ["lib/*"],
-    "exclude": ["node_modules", "**/__tests__/*", "**/__e2e__/*"]
+    "exclude": ["node_modules", "dist/*", "**/__tests__/*"]
   }

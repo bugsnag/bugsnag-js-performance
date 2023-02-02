@@ -13,8 +13,9 @@
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
-    "plugins": ["@typescript-eslint"],
-    "rules": {},
-    "overrides": [],
+    "plugins": ["@typescript-eslint", "cucumber"],
+    "rules": {
+        "indent": ["warn", 2]
+    },
     "reportUnusedDisableDirectives": true
 }

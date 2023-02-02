@@ -9,7 +9,12 @@
   "exclude": [
     "node_modules",
     "**/__tests__/*",
-    "**/__e2e__/*"
+    "**/dist/*"
+  ],
+  "references": [
+    {
+      "path": "../../core"
+    }
   ]
 }
 
