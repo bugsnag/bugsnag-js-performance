@@ -13,7 +13,7 @@
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
-    "plugins": ["@typescript-eslint", "cucumber"],
+    "plugins": ["@typescript-eslint"],
     "rules": {
         "indent": ["warn", 2]
     },
