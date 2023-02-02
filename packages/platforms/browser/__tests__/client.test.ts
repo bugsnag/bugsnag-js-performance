@@ -1,7 +1,17 @@
-// import browser from '..'
+import BugsnagPerformance from '..'
 
 describe('client', () => {
-  it('returns a string', () => {
-    expect(true).toStrictEqual(true)
+  describe('start()', () => {
+    it('accepts an apiKey', () => {
+      BugsnagPerformance.start({ apiKey: 'test-api-key' })
+      expect(true).toStrictEqual(true)
+    })
+  })
+
+  describe('startSpan()', () => {
+    it('accepts a span name', () => {
+      BugsnagPerformance.startSpan('test span')
+      expect(true).toStrictEqual(true)
+    })
   })
 })
