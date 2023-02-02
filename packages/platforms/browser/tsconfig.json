@@ -10,11 +10,6 @@
     "node_modules",
     "**/__tests__/*",
     "**/dist/*"
-  ],
-  "references": [
-    {
-      "path": "../../core"
-    }
   ]
 }
 

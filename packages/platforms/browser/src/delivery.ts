@@ -5,3 +5,5 @@ export async function browserDelivery(tracePayload: TracePayload): Promise<Deliv
   console.log("Payload being delivered...", tracePayload)
   return Promise.resolve({ success: true })
 }
+
+export default browserDelivery
