@@ -4,7 +4,7 @@ describe('client', () => {
   describe('start()', () => {
     it('accepts an apiKey', () => {
       BugsnagPerformance.start({ apiKey: 'test-api-key' })
-      expect(true).toStrictEqual(true)
+      expect(true).toStrictEqual(false)
     })
   })
 
