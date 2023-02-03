@@ -1,5 +1,7 @@
-export function core () {
-  return 'Hello from core'
+interface StartParams {
+  apiKey: string
 }
 
-export default core
+export const createClient = () => ({
+  start: ({ apiKey }: StartParams) => {}
+})

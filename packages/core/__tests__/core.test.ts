@@ -1,7 +1,12 @@
-import core from '../lib/core'
+import * as Core from '..'
 
-describe('core', () => {
-  it('returns a string', () => {
-    expect(core()).toStrictEqual('Hello from core')
+describe('Core', () => {
+  describe('createClient()', () => {
+    it('returns a performance client', () => {
+      const testClient = Core.createClient()
+      expect(testClient).toMatchObject({
+        start: expect.any(Function)
+      })
+    })
   })
 })
