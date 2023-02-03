@@ -1,29 +1,27 @@
 #!/usr/bin/env ruby
-require 'net/http'
+require "pathname"
+require "net/http"
+
+decisions_url = URI("https://raw.githubusercontent.com/bugsnag/license-audit/master/config/decision_files/")
 
 # Download decision files
 File.open("config/decisions.yml", "w+") do |file|
-  file.write(Net::HTTP.get(URI("https://raw.githubusercontent.com/bugsnag/license-audit/master/config/decision_files/global.yml")))
-  file.write(Net::HTTP.get(URI("https://raw.githubusercontent.com/bugsnag/license-audit/master/config/decision_files/common-js.yml")))
-  file.write(Net::HTTP.get(URI("https://raw.githubusercontent.com/bugsnag/license-audit/master/config/decision_files/bugsnag-js.yml")))
+  file.write(Net::HTTP.get(URI.join(decisions_url, "global.yml")))
+  file.write(Net::HTTP.get(URI.join(decisions_url, "common-js.yml")))
+  file.write(Net::HTTP.get(URI.join(decisions_url, "bugsnag-js.yml")))
 end
 
 # Get each package, including the parent
-paths = ["./package.json"]
-paths += Dir.glob("packages/*/package.json")
-paths += Dir.glob("packages/platforms/*/package.json")
+paths = Pathname.glob("{package.json,packages/{core,platforms/*}/package.json}").map(&:dirname)
 
 # Check licenses for all dependencies, based on decisions file.
 all_ok = true
 paths.each do |path|
-  dir = path.delete_suffix("/package.json")
-  cmd = "license_finder --decisions-file=config/decisions.yml --enabled-package-managers=npm --project-path=#{dir}"
+  cmd = "license_finder --decisions-file=config/decisions.yml --enabled-package-managers=npm --project-path=#{path}"
   puts "Running: #{cmd}"
-  output = `#{cmd}`
-  success = $? == 0
-  all_ok = false unless success
+  success = system(cmd)
+  all_ok &&= success
 
-  puts output
   puts "Success: #{success}\n"
   puts "--------------\n"
 end
