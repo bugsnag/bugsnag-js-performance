@@ -18,8 +18,7 @@
     "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
   },
   "scripts": {
-    "build": "tsc",
-    "test": "node ./__tests__/browser.test.js"
+    "build": "tsc"
   },
   "bugs": {
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
