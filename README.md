@@ -4,6 +4,7 @@
 
 <!-- # BugsnagPerformance -->
 
+[![Build status](https://badge.buildkite.com/a1ed35adfab0cd5f2c0030cc54961209cb720aa5ed2284cb73.svg?style=flat-square)](https://buildkite.com/bugsnag/bugsnag-js-performance)
 [![slack](https://img.shields.io/badge/slack-%23bugsnag--proj--perf--browser-blue?style=flat-square
 )](https://smartbear.slack.com/archives/C04E4CXB97U)
 
