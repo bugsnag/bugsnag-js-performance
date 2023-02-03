@@ -1,0 +1,8 @@
+dist
+examples
+**/node_modules/**
+scratch
+coverage
+packages/**/features
+packages/**/fixtures
+test/browser
