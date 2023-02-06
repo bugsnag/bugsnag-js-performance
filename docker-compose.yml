@@ -1,0 +1,10 @@
+version: '3.6'
+
+services:
+
+  license-finder:
+    build:
+      dockerfile: dockerfiles/Dockerfile.license-finder
+      context: .
+    volumes:
+      - .:/scan
