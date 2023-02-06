@@ -1,11 +1,5 @@
-// TODO: Can this config be in a shared location for multiple repos?
-const ruleOverrides = {
-  // Update indenting to match editor config
-  "indent": ['warn', 2],
-
-  // Disable preferring Promise-based async tests
-  'jest/no-test-callback': 'off',
-
+// TODO: Can we publish a @bugsnag/eslint-plugin-typescript package to share all of this?
+const tsRuleOverrides = {
   // Let TypeScript inference work without being verbose
   '@typescript-eslint/explicit-function-return-type': 'off',
 
@@ -37,7 +31,11 @@ const ruleOverrides = {
   '@typescript-eslint/no-for-in-array': 'off'
 }
 
-// eslint-disable-next-line no-undef
+const jestRuleOverrides = {
+  // Disable preferring Promise-based async tests
+  'jest/no-test-callback': 'off'
+}
+
 module.exports = {
   root: true,
   reportUnusedDisableDirectives: true,
@@ -50,39 +48,40 @@ module.exports = {
     // linting for js files
     {
       files: ['**/*.js'],
-      rules: { ...ruleOverrides },
-      extends: [
-        'eslint:recommended'
-      ]
+      extends: ['standard']
+    },
+    {
+      files: ['**/*.test.js'],
+      extends: ['standard'],
+      plugins: ['eslint-plugin-jest'],
+      rules: { ...jestRuleOverrides },
+      env: { jest: true }
     },
     // linting for ts files
     {
       files: ['**/*.ts'],
-      rules: { ...ruleOverrides },
-      plugins: ['@typescript-eslint'],
-      extends: [
-        'eslint:recommended',
-        'plugin:@typescript-eslint/recommended'
-      ],
-      env: {
-        browser: true,
-        es2021: true,
-        node: true
+      extends: ['standard-with-typescript'],
+      rules: { ...tsRuleOverrides },
+      parserOptions: {
+        project: 'tsconfig.json'
       }
     },
     {
-      files: ['**/*.test.ts(x)'],
-      rules: { ...ruleOverrides },
-      plugins: ['eslint-plugin-jest'],
-      extends: [
-        // 'eslint:recommended',
-        // 'plugin:@typescript-eslint/recommended'
-        'standard-with-typescript',
-        'plugin:jest/recommended'
+      files: [
+        '**/*.test.ts?(x)'
       ],
       env: {
         jest: true,
-        browser: true 
+        browser: true
+      },
+      plugins: ['eslint-plugin-jest'],
+      extends: [
+        'standard-with-typescript',
+        'plugin:jest/recommended'
+      ],
+      rules: {
+        ...tsRuleOverrides,
+        ...jestRuleOverrides
       }
     }
   ]

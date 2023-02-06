@@ -1,5 +1,5 @@
-export function browser() {
-    return "Hello from browser";
+export function browser () {
+  return 'Hello from browser'
 }
 
 export default browser
