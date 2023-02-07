@@ -1,0 +1,10 @@
+steps:
+
+  #
+  # License audit
+  #
+  - label: ":copyright: License Audit"
+    timeout_in_minutes: 20
+    plugins:
+      - docker-compose#v3.9.0:
+          run: license-finder
