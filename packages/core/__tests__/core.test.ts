@@ -5,7 +5,8 @@ describe('Core', () => {
     it('returns a performance client', () => {
       const testClient = createClient()
       expect(testClient).toMatchObject({
-        start: expect.any(Function)
+        start: expect.any(Function),
+        startSpan: expect.any(Function)
       })
     })
 
@@ -149,6 +150,25 @@ describe('Core', () => {
           const testClient = createClient()
           // @ts-expect-error invalid configuration provided
           expect(() => { testClient.start(config) }).toThrow('No Bugsnag API Key set')
+        })
+      })
+
+      describe('startSpan()', () => {
+        it('returns a Span', () => {
+          const testClient = createClient()
+          const testSpan = testClient.startSpan('test span')
+          expect(testSpan).toMatchObject({
+            end: expect.any(Function)
+          })
+        })
+
+        it('accepts an optional startTime', () => {
+          const testClient = createClient()
+          const startTime = new Date()
+          const testSpan = testClient.startSpan('test span', startTime)
+          expect(testSpan).toMatchObject({
+            end: expect.any(Function)
+          })
         })
       })
     })
