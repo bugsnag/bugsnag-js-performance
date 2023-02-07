@@ -1,4 +1,4 @@
-import createClient from '@bugsnag/js-performance-core'
+import { createClient } from '@bugsnag/js-performance-core'
 
 const BugsnagPerformance = createClient()
 

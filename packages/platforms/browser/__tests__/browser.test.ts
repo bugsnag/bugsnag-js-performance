@@ -1,7 +1,11 @@
-import browser from '../lib/browser'
+import BugsnagPerformance from '../lib/browser'
 
-describe('browser', () => {
-  it('returns a string', () => {
-    expect(browser()).toStrictEqual('Hello from browser')
+describe('BugsnagPerformance Browser Client', () => {
+  describe('start', () => {
+    it('has a start method', () => {
+      expect(BugsnagPerformance).toMatchObject({
+        start: expect.any(Function)
+      })
+    })
   })
 })
