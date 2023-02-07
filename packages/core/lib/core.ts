@@ -1,5 +1,7 @@
+import crypto from 'crypto'
+import { isDate } from 'util/types'
 import processor from './processor'
-import type { SpanInternal, Span, Time } from './span'
+import type { Span, SpanInternal, Time } from './span'
 
 interface Logger {
   debug: (msg: string) => void
@@ -22,6 +24,7 @@ export interface BugsnagPerformance {
   startSpan: (name: string, startTime?: Time) => Span
 }
 
+// TODO: find appropriate utility type
 function isObject (obj: unknown): obj is Record<string, unknown> {
   return !!obj && typeof obj === 'object'
 }
@@ -76,6 +79,22 @@ function validate (config: unknown): InternalConfiguration {
   return cleanConfiguration
 }
 
+function sanitizeTime (time?: Time): number {
+  if (typeof time === 'number') {
+    return time // no need to change anything
+  }
+
+  if (isDate(time)) {
+    return Number(time) // TODO: appropriately convert date to number
+  }
+
+  return performance.now() // TODO: implement clock functionality
+}
+
+function generateRandomId (bits = 64): string {
+  return crypto.randomBytes(bits / 8).toString('hex')
+}
+
 export function createClient (): BugsnagPerformance {
   return {
     start: (config: Configuration | string) => {
@@ -83,16 +102,16 @@ export function createClient (): BugsnagPerformance {
     },
     startSpan: (name, startTime) => {
       const spanInternal: SpanInternal = {
-        id: 'mock-id', // TODO: Generate id
-        traceId: 'mock-trace-id', // TODO: Generate trace id
+        id: generateRandomId(),
+        traceId: generateRandomId(128),
         kind: 'client', // TODO: How do we define the current kind?
         name,
-        startTime: Number(startTime) // TODO: Sanitize startTime
+        startTime: sanitizeTime(startTime)
       }
 
       return {
         end: (endTime) => {
-          processor.add({ ...spanInternal, endTime: Number(endTime) }) // TODO: Sanitize endTime
+          processor.add({ ...spanInternal, endTime: sanitizeTime(endTime) })
         }
       }
     }
