@@ -1,4 +1,4 @@
-import browser from '..'
+import browser from '../lib/browser'
 
 describe('browser', () => {
   it('returns a string', () => {
