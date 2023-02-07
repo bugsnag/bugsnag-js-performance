@@ -2,7 +2,7 @@ import { createClient } from '../lib/core'
 
 describe('Core', () => {
   describe('createClient()', () => {
-    it('returns a performance client', () => {
+    it('returns a BugsnagPerformance client', () => {
       const testClient = createClient()
       expect(testClient).toMatchObject({
         start: expect.any(Function),
@@ -140,6 +140,7 @@ describe('Core', () => {
           { type: 'a bigint', config: BigInt(9007199254740991) },
           { type: 'a function', config: () => {} },
           { type: 'a number', config: 12345 },
+          { type: 'a date', config: new Date() },
           { type: 'boolean (true)', config: true },
           { type: 'boolean (false)', config: false },
           { type: 'null', config: null },
@@ -165,12 +166,28 @@ describe('Core', () => {
         it('accepts an optional startTime', () => {
           const testClient = createClient()
           const startTime = new Date()
-          const testSpan = testClient.startSpan('test span', startTime)
-          expect(testSpan).toMatchObject({
-            end: expect.any(Function)
-          })
+          expect(() => {
+            testClient.startSpan('test span', startTime)
+          }).not.toThrow()
         })
       })
+    })
+  })
+})
+
+describe('Span', () => {
+  describe('end()', () => {
+    it('can be ended without an endTime', () => {
+      const testClient = createClient()
+      const testSpan = testClient.startSpan('test span')
+      expect(() => { testSpan.end() }).not.toThrow()
+    })
+
+    it('accepts a valid Date as endTime', () => {
+      const testClient = createClient()
+      const testSpan = testClient.startSpan('test span')
+      const endTime = new Date()
+      expect(() => { testSpan.end(endTime) }).not.toThrow()
     })
   })
 })
