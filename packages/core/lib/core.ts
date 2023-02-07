@@ -1,3 +1,6 @@
+import processor from './processor'
+import type { SpanInternal, Span, Time } from './span'
+
 interface Logger {
   debug: (msg: string) => void
   info: (msg: string) => void
@@ -16,6 +19,7 @@ type InternalConfiguration = Required<Configuration>
 
 export interface BugsnagPerformance {
   start: (config: Configuration | string) => void
+  startSpan: (name: string, startTime?: Time) => Span
 }
 
 function isObject (obj: unknown): obj is Record<string, unknown> {
@@ -76,6 +80,21 @@ export function createClient (): BugsnagPerformance {
   return {
     start: (config: Configuration | string) => {
       config = validate(config)
+    },
+    startSpan: (name, startTime) => {
+      const spanInternal: SpanInternal = {
+        id: 'mock-id', // TODO: Generate id
+        traceId: 'mock-trace-id', // TODO: Generate trace id
+        kind: 'client', // TODO: How do we define the current kind?
+        name,
+        startTime: Number(startTime) // TODO: Sanitize startTime
+      }
+
+      return {
+        end: (endTime) => {
+          processor.add({ ...spanInternal, endTime: Number(endTime) }) // TODO: Sanitize endTime
+        }
+      }
     }
   }
 }
