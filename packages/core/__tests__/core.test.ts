@@ -121,32 +121,6 @@ describe('Core', () => {
           expect(logger.warn).toHaveBeenCalledWith(`Invalid configuration. releaseStage should be a string, got ${type}`)
         })
 
-        const invalidParameters = [
-          { type: 'bigint', value: BigInt(9007199254740991) },
-          { type: 'boolean', value: true },
-          { type: 'function', value: () => {} },
-          { type: 'number', value: 12345 },
-          { type: 'object', value: { property: 'test' } },
-          { type: 'object', value: [] },
-          { type: 'symbol', value: Symbol('test') }
-        ]
-
-        test.each(invalidParameters)('warns if config.endpoint is invalid ($type)', ({ value, type }) => {
-          jest.spyOn(console, 'warn')
-          const testClient = createClient()
-          // @ts-expect-error endpoint should be a string
-          testClient.start({ apiKey: 'test-api-key', endpoint: value })
-          expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. endpoint should be a string, got ${String(type)}`)
-        })
-
-        test.each(invalidParameters)('warns if config.releaseStage is invalid ($type)', ({ value, type }) => {
-          jest.spyOn(console, 'warn')
-          const testClient = createClient()
-          // @ts-expect-error releaseStage should be a string
-          testClient.start({ apiKey: 'test-api-key', releaseStage: value })
-          expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. releaseStage should be a string, got ${String(type)}`)
-        })
-
         it('throws if no configuration is provided', () => {
           const processor = { add: jest.fn() }
           const idGenerator = { generate: jest.fn() }
