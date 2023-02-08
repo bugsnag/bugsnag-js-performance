@@ -114,19 +114,44 @@ describe('Core', () => {
         ]
 
         test.each(invalidParameters)('warns if config.endpoint is invalid ($type)', ({ value, type }) => {
-          jest.spyOn(console, 'warn')
+          jest.spyOn(console, 'warn').mockImplementation()
           const testClient = createClient()
           // @ts-expect-error endpoint should be a string
           testClient.start({ apiKey: 'test-api-key', endpoint: value })
-          expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. endpoint should be a string, got ${String(type)}`)
+          expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. endpoint should be a string, got ${type}`)
         })
 
         test.each(invalidParameters)('warns if config.releaseStage is invalid ($type)', ({ value, type }) => {
-          jest.spyOn(console, 'warn')
+          jest.spyOn(console, 'warn').mockImplementation()
           const testClient = createClient()
           // @ts-expect-error releaseStage should be a string
           testClient.start({ apiKey: 'test-api-key', releaseStage: value })
-          expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. releaseStage should be a string, got ${String(type)}`)
+          expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. releaseStage should be a string, got ${type}`)
+        })
+
+        test.each(invalidParameters)('warns if config.logger is invalid ($type)', ({ value, type }) => {
+          jest.spyOn(console, 'warn').mockImplementation()
+          const testClient = createClient()
+          // @ts-expect-error logger should be a logger object
+          testClient.start({ apiKey: 'test-api-key', logger: value })
+          expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. logger should be a Logger object, got ${type}`)
+        })
+
+        test.each(invalidParameters)('uses config.logger if it is valid', ({ value, type }) => {
+          const testClient = createClient()
+
+          const logger = {
+            debug: jest.fn(),
+            info: jest.fn(),
+            warn: jest.fn(),
+            error: jest.fn()
+          }
+
+          // @ts-expect-error logger should be a logger object
+          testClient.start({ apiKey: 'test-api-key', logger, endpoint: value, releaseStage: value })
+
+          expect(logger.warn).toHaveBeenCalledWith(`Invalid configuration. endpoint should be a string, got ${type}`)
+          expect(logger.warn).toHaveBeenCalledWith(`Invalid configuration. releaseStage should be a string, got ${type}`)
         })
 
         it('throws if no configuration is provided', () => {
