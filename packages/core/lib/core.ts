@@ -1,6 +1,6 @@
-import crypto from 'crypto'
 import { millisecondsToNanoseconds } from './time'
 import type { Processor } from './processor'
+import type { IdGenerator } from './id-generator'
 import type { Span, SpanInternal, Time } from './span'
 
 interface Logger {
@@ -93,12 +93,9 @@ function sanitizeTime (time?: Time): number {
   return performance.now() // TODO: implement clock functionality
 }
 
-function generateRandomId (bits = 64): string {
-  return crypto.randomBytes(bits / 8).toString('hex')
-}
-
 export interface ClientOptions {
   processor: Processor
+  idGenerator: IdGenerator
 }
 
 export function createClient (options: ClientOptions): BugsnagPerformance {
@@ -108,8 +105,8 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
     },
     startSpan: (name, startTime) => {
       const spanInternal: SpanInternal = {
-        id: generateRandomId(),
-        traceId: generateRandomId(128),
+        id: options.idGenerator.generate(64),
+        traceId: options.idGenerator.generate(128),
         kind: 'client', // TODO: How do we define the current kind?
         name,
         startTime: sanitizeTime(startTime)

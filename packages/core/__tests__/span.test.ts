@@ -1,4 +1,5 @@
 import createTestClient from '../create-test-client'
+import type { IdGenerator } from '../lib/id-generator'
 
 describe('Span', () => {
   describe('client.startSpan()', () => {
@@ -44,60 +45,63 @@ describe('Span', () => {
 
   describe('Span.end()', () => {
     it('can be ended without an endTime', () => {
-      const testProcessor = { add: jest.fn() }
-      const testClient = createTestClient({ processor: testProcessor })
+      const processor = { add: jest.fn() }
+      const idGenerator: IdGenerator = { generate: bits => `a random ${bits} bit string` }
+      const testClient = createTestClient({ processor, idGenerator })
 
       const testSpan = testClient.startSpan('test span')
       testSpan.end()
 
-      expect(testProcessor.add).toHaveBeenCalledWith({
-        id: expect.stringMatching(/^[a-f0-9]{16}$/),
-        traceId: expect.stringMatching(/^[a-f0-9]{32}$/),
+      expect(processor.add).toHaveBeenCalledWith({
+        id: 'a random 64 bit string',
+        traceId: 'a random 128 bit string',
         kind: 'client',
         name: 'test span',
         startTime: expect.any(Number), // TODO: this can be stricter when we have a clock
         endTime: expect.any(Number) // TODO: this can be stricter when we have a clock
       })
 
-      expect(testProcessor.add).toHaveBeenCalledTimes(1)
+      expect(processor.add).toHaveBeenCalledTimes(1)
     })
 
     it('accepts a Date object as endTime', () => {
-      const testProcessor = { add: jest.fn() }
-      const testClient = createTestClient({ processor: testProcessor })
+      const processor = { add: jest.fn() }
+      const idGenerator: IdGenerator = { generate: bits => `a random ${bits} bit string` }
+      const testClient = createTestClient({ processor, idGenerator })
 
       const testSpan = testClient.startSpan('test span')
       testSpan.end(new Date('2023-01-02T03:04:05.006Z'))
 
-      expect(testProcessor.add).toHaveBeenCalledWith({
-        id: expect.stringMatching(/^[a-f0-9]{16}$/),
-        traceId: expect.stringMatching(/^[a-f0-9]{32}$/),
+      expect(processor.add).toHaveBeenCalledWith({
+        id: 'a random 64 bit string',
+        traceId: 'a random 128 bit string',
         kind: 'client',
         name: 'test span',
         startTime: expect.any(Number), // TODO: this can be stricter when we have a clock
         endTime: 1672628645006000000 // 2023-01-02T03:04:05.006Z in nanoseconds
       })
 
-      expect(testProcessor.add).toHaveBeenCalledTimes(1)
+      expect(processor.add).toHaveBeenCalledTimes(1)
     })
 
     it('accepts a number of nanoseconds as endTime', () => {
-      const testProcessor = { add: jest.fn() }
-      const testClient = createTestClient({ processor: testProcessor })
+      const processor = { add: jest.fn() }
+      const idGenerator: IdGenerator = { generate: bits => `a random ${bits} bit string` }
+      const testClient = createTestClient({ processor, idGenerator })
 
       const testSpan = testClient.startSpan('test span')
       testSpan.end(12345)
 
-      expect(testProcessor.add).toHaveBeenCalledWith({
-        id: expect.stringMatching(/^[a-f0-9]{16}$/),
-        traceId: expect.stringMatching(/^[a-f0-9]{32}$/),
+      expect(processor.add).toHaveBeenCalledWith({
+        id: 'a random 64 bit string',
+        traceId: 'a random 128 bit string',
         kind: 'client',
         name: 'test span',
         startTime: expect.any(Number), // TODO: this can be stricter when we have a clock
         endTime: 12345
       })
 
-      expect(testProcessor.add).toHaveBeenCalledTimes(1)
+      expect(processor.add).toHaveBeenCalledTimes(1)
     })
   })
 })

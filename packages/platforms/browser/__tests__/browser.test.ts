@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import BugsnagPerformance from '../lib/browser'
 
 describe('BugsnagPerformance Browser Client', () => {
