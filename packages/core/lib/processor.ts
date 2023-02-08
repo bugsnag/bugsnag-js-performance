@@ -1,4 +1,3 @@
-
 import type { SpanInternal } from './span'
 
 // processor.add is called by a Span when 'Span.end' is called
@@ -6,9 +5,3 @@ import type { SpanInternal } from './span'
 export interface Processor {
   add: (span: SpanInternal) => void
 }
-
-const processor: Processor = {
-  add: (span) => {}
-}
-
-export default processor
