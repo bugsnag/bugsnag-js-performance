@@ -82,5 +82,24 @@ describe('Span', () => {
 
       expect(testProcessor.add).toHaveBeenCalledTimes(1)
     })
+
+    it('accepts a number of nanoseconds as endTime', () => {
+      const testProcessor = { add: jest.fn() }
+      const testClient = createClient({ processor: testProcessor })
+
+      const testSpan = testClient.startSpan('test span')
+      testSpan.end(12345)
+
+      expect(testProcessor.add).toHaveBeenCalledWith({
+        id: expect.stringMatching(/^[a-f0-9]{16}$/),
+        traceId: expect.stringMatching(/^[a-f0-9]{32}$/),
+        kind: 'client',
+        name: 'test span',
+        startTime: expect.any(Number), // TODO: this can be stricter when we have a clock
+        endTime: 12345
+      })
+
+      expect(testProcessor.add).toHaveBeenCalledTimes(1)
+    })
   })
 })
