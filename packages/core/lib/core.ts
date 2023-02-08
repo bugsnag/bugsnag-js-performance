@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import { isDate } from 'util/types'
+import { millisecondsToNanoseconds } from './time'
 import type { Processor } from './processor'
 import type { Span, SpanInternal, Time } from './span'
 
@@ -81,11 +82,13 @@ function validate (config: unknown): InternalConfiguration {
 
 function sanitizeTime (time?: Time): number {
   if (typeof time === 'number') {
-    return time // no need to change anything
+    // no need to change anything - we want to store numbers anyway
+    // we assume this is nanosecond precision
+    return time
   }
 
   if (isDate(time)) {
-    return Number(time) // TODO: appropriately convert date to number
+    return millisecondsToNanoseconds(time.getTime())
   }
 
   return performance.now() // TODO: implement clock functionality

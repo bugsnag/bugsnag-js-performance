@@ -77,7 +77,7 @@ describe('Span', () => {
         kind: 'client',
         name: 'test span',
         startTime: expect.any(Number), // TODO: this can be stricter when we have a clock
-        endTime: 1672628645006 // 2023-01-02T03:04:05.006Z in milliseconds // TODO: this is wrong! should be nanos
+        endTime: 1672628645006000000 // 2023-01-02T03:04:05.006Z in nanoseconds
       })
 
       expect(testProcessor.add).toHaveBeenCalledTimes(1)
