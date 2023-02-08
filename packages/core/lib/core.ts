@@ -1,5 +1,4 @@
 import crypto from 'crypto'
-import { isDate } from 'util/types'
 import { millisecondsToNanoseconds } from './time'
 import type { Processor } from './processor'
 import type { Span, SpanInternal, Time } from './span'
@@ -87,7 +86,7 @@ function sanitizeTime (time?: Time): number {
     return time
   }
 
-  if (isDate(time)) {
+  if (time instanceof Date) {
     return millisecondsToNanoseconds(time.getTime())
   }
 
