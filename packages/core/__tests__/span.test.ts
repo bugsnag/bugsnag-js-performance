@@ -48,16 +48,39 @@ describe('Span', () => {
     it('can be ended without an endTime', () => {
       const testProcessor = { add: jest.fn() }
       const testClient = createClient({ processor: testProcessor })
+
       const testSpan = testClient.startSpan('test span')
-      expect(() => { testSpan.end() }).not.toThrow()
+      testSpan.end()
+
+      expect(testProcessor.add).toHaveBeenCalledWith({
+        id: expect.stringMatching(/^[a-f0-9]{16}$/),
+        traceId: expect.stringMatching(/^[a-f0-9]{32}$/),
+        kind: 'client',
+        name: 'test span',
+        startTime: expect.any(Number), // TODO: this can be stricter when we have a clock
+        endTime: expect.any(Number) // TODO: this can be stricter when we have a clock
+      })
+
+      expect(testProcessor.add).toHaveBeenCalledTimes(1)
     })
 
-    it('accepts a valid Date as endTime', () => {
+    it('accepts a Date object as endTime', () => {
       const testProcessor = { add: jest.fn() }
       const testClient = createClient({ processor: testProcessor })
+
       const testSpan = testClient.startSpan('test span')
-      const endTime = new Date()
-      expect(() => { testSpan.end(endTime) }).not.toThrow()
+      testSpan.end(new Date('2023-01-02T03:04:05.006Z'))
+
+      expect(testProcessor.add).toHaveBeenCalledWith({
+        id: expect.stringMatching(/^[a-f0-9]{16}$/),
+        traceId: expect.stringMatching(/^[a-f0-9]{32}$/),
+        kind: 'client',
+        name: 'test span',
+        startTime: expect.any(Number), // TODO: this can be stricter when we have a clock
+        endTime: 1672628645006 // 2023-01-02T03:04:05.006Z in milliseconds // TODO: this is wrong! should be nanos
+      })
+
+      expect(testProcessor.add).toHaveBeenCalledTimes(1)
     })
   })
 })
