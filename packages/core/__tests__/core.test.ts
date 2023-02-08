@@ -129,7 +129,7 @@ describe('Core', () => {
           expect(() => { testClient.start() }).toThrow('No Bugsnag API Key set')
         })
 
-        it.each([
+        test.each([
           { type: 'a bigint', config: BigInt(9007199254740991) },
           { type: 'a function', config: () => {} },
           { type: 'a number', config: 12345 },
