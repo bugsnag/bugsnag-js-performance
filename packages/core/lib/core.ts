@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import { isDate } from 'util/types'
-import processor from './processor'
+import type { Processor } from './processor'
 import type { Span, SpanInternal, Time } from './span'
 
 interface Logger {
@@ -95,7 +95,11 @@ function generateRandomId (bits = 64): string {
   return crypto.randomBytes(bits / 8).toString('hex')
 }
 
-export function createClient (): BugsnagPerformance {
+interface ClientOptions {
+  processor: Processor
+}
+
+export function createClient (options: ClientOptions): BugsnagPerformance {
   return {
     start: (config: Configuration | string) => {
       config = validate(config)
@@ -111,7 +115,7 @@ export function createClient (): BugsnagPerformance {
 
       return {
         end: (endTime) => {
-          processor.add({ ...spanInternal, endTime: sanitizeTime(endTime) })
+          options.processor.add({ ...spanInternal, endTime: sanitizeTime(endTime) })
         }
       }
     }
