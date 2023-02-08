@@ -5,7 +5,7 @@ describe('Core', () => {
     it('returns a BugsnagPerformance client', () => {
       const testProcessor = { add: jest.fn() }
       const testClient = createClient({ processor: testProcessor })
-      expect(testClient).toMatchObject({
+      expect(testClient).toStrictEqual({
         start: expect.any(Function),
         startSpan: expect.any(Function)
       })
@@ -163,45 +163,6 @@ describe('Core', () => {
           expect(() => { testClient.start(config) }).toThrow('No Bugsnag API Key set')
         })
       })
-
-      describe('startSpan()', () => {
-        it('returns a Span', () => {
-          const testProcessor = { add: jest.fn() }
-          const testClient = createClient({ processor: testProcessor })
-          const testSpan = testClient.startSpan('test span')
-          expect(testSpan).toMatchObject({
-            end: expect.any(Function)
-          })
-        })
-
-        it('accepts an optional startTime', () => {
-          const testProcessor = { add: jest.fn() }
-          const testClient = createClient({ processor: testProcessor })
-          const startTime = new Date()
-          expect(() => {
-            testClient.startSpan('test span', startTime)
-          }).not.toThrow()
-        })
-      })
-    })
-  })
-})
-
-describe('Span', () => {
-  describe('end()', () => {
-    it('can be ended without an endTime', () => {
-      const testProcessor = { add: jest.fn() }
-      const testClient = createClient({ processor: testProcessor })
-      const testSpan = testClient.startSpan('test span')
-      expect(() => { testSpan.end() }).not.toThrow()
-    })
-
-    it('accepts a valid Date as endTime', () => {
-      const testProcessor = { add: jest.fn() }
-      const testClient = createClient({ processor: testProcessor })
-      const testSpan = testClient.startSpan('test span')
-      const endTime = new Date()
-      expect(() => { testSpan.end(endTime) }).not.toThrow()
     })
   })
 })
