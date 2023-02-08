@@ -97,7 +97,7 @@ function generateRandomId (bits = 64): string {
   return crypto.randomBytes(bits / 8).toString('hex')
 }
 
-interface ClientOptions {
+export interface ClientOptions {
   processor: Processor
 }
 

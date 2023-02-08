@@ -1,10 +1,9 @@
-import { createClient } from '../lib/core'
+import createTestClient from '../create-test-client'
 
 describe('Span', () => {
   describe('client.startSpan()', () => {
     it('returns a Span', () => {
-      const testProcessor = { add: jest.fn() }
-      const testClient = createClient({ processor: testProcessor })
+      const testClient = createTestClient()
       const testSpan = testClient.startSpan('test span')
       expect(testSpan).toStrictEqual({
         end: expect.any(Function)
@@ -12,8 +11,7 @@ describe('Span', () => {
     })
 
     it('accepts an optional startTime', () => {
-      const testProcessor = { add: jest.fn() }
-      const testClient = createClient({ processor: testProcessor })
+      const testClient = createTestClient()
       const startTime = new Date()
       expect(() => {
         testClient.startSpan('test span', startTime)
@@ -30,16 +28,16 @@ describe('Span', () => {
       { type: 'object', startTime: [] },
       { type: 'symbol', startTime: Symbol('test') }
     ])('uses default clock implementation if startTime is invalid ($type)', ({ startTime }) => {
-      jest.spyOn(console, 'warn').mockImplementation()
       const testProcessor = { add: jest.fn() }
-      // TODO: Add clock implementation
-      const testClient = createClient({ processor: testProcessor })
+      const testClient = createTestClient({ processor: testProcessor })
       testClient.start({ apiKey: 'test-api-key' })
+
       // @ts-expect-error startTime will be invalid
       const span = testClient.startSpan('test span', startTime)
       span.end()
+
       expect(testProcessor.add).toHaveBeenCalledWith(expect.objectContaining({
-        startTime: expect.any(Number)
+        startTime: expect.any(Number) // TODO: this can be stricter when we have a clock
       }))
     })
   })
@@ -47,7 +45,7 @@ describe('Span', () => {
   describe('Span.end()', () => {
     it('can be ended without an endTime', () => {
       const testProcessor = { add: jest.fn() }
-      const testClient = createClient({ processor: testProcessor })
+      const testClient = createTestClient({ processor: testProcessor })
 
       const testSpan = testClient.startSpan('test span')
       testSpan.end()
@@ -66,7 +64,7 @@ describe('Span', () => {
 
     it('accepts a Date object as endTime', () => {
       const testProcessor = { add: jest.fn() }
-      const testClient = createClient({ processor: testProcessor })
+      const testClient = createTestClient({ processor: testProcessor })
 
       const testSpan = testClient.startSpan('test span')
       testSpan.end(new Date('2023-01-02T03:04:05.006Z'))
@@ -85,7 +83,7 @@ describe('Span', () => {
 
     it('accepts a number of nanoseconds as endTime', () => {
       const testProcessor = { add: jest.fn() }
-      const testClient = createClient({ processor: testProcessor })
+      const testClient = createTestClient({ processor: testProcessor })
 
       const testSpan = testClient.startSpan('test span')
       testSpan.end(12345)
