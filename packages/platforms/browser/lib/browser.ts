@@ -1,5 +1,5 @@
-export function browser () {
-  return 'Hello from browser'
-}
+import { createClient } from '@bugsnag/js-performance-core'
 
-export default browser
+const BugsnagPerformance = createClient()
+
+export default BugsnagPerformance
