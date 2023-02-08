@@ -18,6 +18,7 @@ describe('Core', () => {
           })
 
           afterEach(() => {
+            // eslint-disable-next-line jest/no-standalone-expect
             expect(console.warn).not.toHaveBeenCalled()
           })
 
