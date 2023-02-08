@@ -11,43 +11,45 @@ describe('Core', () => {
 
     describe('BugsnagPerformance', () => {
       describe('start()', () => {
-        describe('valid configuration', () => {
-          beforeEach(() => {
-            jest.restoreAllMocks()
-            jest.spyOn(console, 'warn')
+        beforeEach(() => {
+          jest.restoreAllMocks()
+          jest.spyOn(console, 'debug')
+          jest.spyOn(console, 'info')
+          jest.spyOn(console, 'warn')
+          jest.spyOn(console, 'error')
+        })
+
+        it('accepts a string', () => {
+          const testClient = createClient()
+          testClient.start('test-api-key')
+
+          expect(console.warn).not.toHaveBeenCalled()
+        })
+
+        it('accepts a minimal valid configuration object', () => {
+          const testClient = createClient()
+          testClient.start({ apiKey: 'test-api-key' })
+
+          expect(console.warn).not.toHaveBeenCalled()
+        })
+
+        it('accepts a complete configuration object', () => {
+          const testClient = createClient()
+          const logger = {
+            debug: jest.fn(),
+            info: jest.fn(),
+            warn: jest.fn(),
+            error: jest.fn()
+          }
+
+          testClient.start({
+            apiKey: 'test-api-key',
+            endpoint: '/test',
+            releaseStage: 'test',
+            logger
           })
 
-          afterEach(() => {
-            // eslint-disable-next-line jest/no-standalone-expect
-            expect(console.warn).not.toHaveBeenCalled()
-          })
-
-          it('accepts a string', () => {
-            const testClient = createClient()
-            expect(() => { testClient.start('test-api-key') }).not.toThrow()
-          })
-
-          it('accepts a minimal valid configuration object', () => {
-            const testClient = createClient()
-            expect(() => { testClient.start({ apiKey: 'test-api-key' }) }).not.toThrow()
-          })
-
-          it('accepts a complete configuration object', () => {
-            const testClient = createClient()
-            expect(() => {
-              testClient.start({
-                apiKey: 'test-api-key',
-                endpoint: '/test',
-                releaseStage: 'test',
-                logger: {
-                  debug: jest.fn(),
-                  info: jest.fn(),
-                  warn: jest.fn(),
-                  error: jest.fn()
-                }
-              })
-            }).not.toThrow()
-          })
+          expect(logger.warn).not.toHaveBeenCalled()
         })
 
         const invalidParameters = [
