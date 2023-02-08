@@ -57,16 +57,16 @@ function validate (config: unknown): InternalConfiguration {
     cleanConfiguration.logger.warn(`Invalid configuration. logger should be a Logger object, got ${typeof config.logger}`)
   }
 
-  if ('endpoint' in config) {
-    typeof config.endpoint === 'string'
-      ? cleanConfiguration.endpoint = config.endpoint
-      : cleanConfiguration.logger.warn(`Invalid configuration. endpoint should be a string, got ${typeof config.endpoint}`)
+  if (typeof config.endpoint === 'string') {
+    cleanConfiguration.endpoint = config.endpoint
+  } else if (config.endpoint !== undefined) {
+    cleanConfiguration.logger.warn(`Invalid configuration. endpoint should be a string, got ${typeof config.endpoint}`)
   }
 
-  if ('releaseStage' in config) {
-    typeof config.releaseStage === 'string'
-      ? cleanConfiguration.releaseStage = config.releaseStage
-      : cleanConfiguration.logger.warn(`Invalid configuration. releaseStage should be a string, got ${typeof config.releaseStage}`)
+  if (typeof config.releaseStage === 'string') {
+    cleanConfiguration.releaseStage = config.releaseStage
+  } else if (config.releaseStage !== undefined) {
+    cleanConfiguration.logger.warn(`Invalid configuration. releaseStage should be a string, got ${typeof config.releaseStage}`)
   }
 
   return cleanConfiguration

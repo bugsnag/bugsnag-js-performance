@@ -11,31 +11,42 @@ describe('Core', () => {
 
     describe('BugsnagPerformance', () => {
       describe('start()', () => {
-        it('accepts a string', () => {
-          const testClient = createClient()
-          expect(() => { testClient.start('test-api-key') }).not.toThrow()
-        })
+        describe('valid configuration', () => {
+          beforeEach(() => {
+            jest.restoreAllMocks()
+            jest.spyOn(console, 'warn')
+          })
 
-        it('accepts a minimal valid configuration object', () => {
-          const testClient = createClient()
-          expect(() => { testClient.start({ apiKey: 'test-api-key' }) }).not.toThrow()
-        })
+          afterEach(() => {
+            expect(console.warn).not.toHaveBeenCalled()
+          })
 
-        it('accepts a complete configuration object', () => {
-          const testClient = createClient()
-          expect(() => {
-            testClient.start({
-              apiKey: 'test-api-key',
-              endpoint: '/test',
-              releaseStage: 'test',
-              logger: {
-                debug: jest.fn(),
-                info: jest.fn(),
-                warn: jest.fn(),
-                error: jest.fn()
-              }
-            })
-          }).not.toThrow()
+          it('accepts a string', () => {
+            const testClient = createClient()
+            expect(() => { testClient.start('test-api-key') }).not.toThrow()
+          })
+
+          it('accepts a minimal valid configuration object', () => {
+            const testClient = createClient()
+            expect(() => { testClient.start({ apiKey: 'test-api-key' }) }).not.toThrow()
+          })
+
+          it('accepts a complete configuration object', () => {
+            const testClient = createClient()
+            expect(() => {
+              testClient.start({
+                apiKey: 'test-api-key',
+                endpoint: '/test',
+                releaseStage: 'test',
+                logger: {
+                  debug: jest.fn(),
+                  info: jest.fn(),
+                  warn: jest.fn(),
+                  error: jest.fn()
+                }
+              })
+            }).not.toThrow()
+          })
         })
 
         const invalidParameters = [
