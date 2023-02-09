@@ -25,8 +25,7 @@ describe('Span', () => {
       const span = testClient.startSpan('test span', startTime)
       span.end()
 
-      expect(processor.spans).toHaveLength(1)
-      expect(processor.spans[0]).toStrictEqual(expect.objectContaining({
+      expect(processor).toHaveProcessedSpan(expect.objectContaining({
         startTime: 1
       }))
     })
@@ -40,8 +39,7 @@ describe('Span', () => {
       const span = testClient.startSpan('test span')
       span.end()
 
-      expect(processor.spans).toHaveLength(1)
-      expect(processor.spans[0]).toStrictEqual({
+      expect(processor).toHaveProcessedSpan({
         id: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         kind: 'client',
@@ -49,6 +47,7 @@ describe('Span', () => {
         startTime: 1,
         endTime: 2
       })
+      expect(processor.spans).toHaveLength(1)
     })
 
     it('accepts a Date object as endTime', () => {
@@ -59,6 +58,7 @@ describe('Span', () => {
       const span = testClient.startSpan('test span')
       span.end(new Date('2023-01-02T03:04:05.008Z')) // 2ms after time origin
 
+      expect(processor).toHaveProcessedSpan({
         id: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         kind: 'client',
@@ -66,6 +66,7 @@ describe('Span', () => {
         startTime: 1,
         endTime: 2_000_000 // 2ms in nanoseconds
       })
+      expect(processor.spans).toHaveLength(1)
     })
 
     it('accepts a number of nanoseconds as endTime', () => {
@@ -75,8 +76,7 @@ describe('Span', () => {
       const testSpan = testClient.startSpan('test span')
       testSpan.end(4321)
 
-      expect(processor.spans).toHaveLength(1)
-      expect(processor.spans[0]).toStrictEqual({
+      expect(processor).toHaveProcessedSpan({
         id: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         kind: 'client',
@@ -84,6 +84,7 @@ describe('Span', () => {
         startTime: 1,
         endTime: 4321
       })
+      expect(processor.spans).toHaveLength(1)
     })
   })
 })
