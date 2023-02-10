@@ -1,3 +1,8 @@
+import { millisecondsToNanoseconds } from './time'
+import type { Processor } from './processor'
+import type { IdGenerator } from './id-generator'
+import type { Span, SpanInternal, Time } from './span'
+
 interface Logger {
   debug: (msg: string) => void
   info: (msg: string) => void
@@ -16,8 +21,10 @@ type InternalConfiguration = Required<Configuration>
 
 export interface BugsnagPerformance {
   start: (config: Configuration | string) => void
+  startSpan: (name: string, startTime?: Time) => Span
 }
 
+// TODO: find appropriate utility type
 function isObject (obj: unknown): obj is Record<string, unknown> {
   return !!obj && typeof obj === 'object'
 }
@@ -72,10 +79,44 @@ function validate (config: unknown): InternalConfiguration {
   return cleanConfiguration
 }
 
-export function createClient (): BugsnagPerformance {
+function sanitizeTime (time?: Time): number {
+  if (typeof time === 'number') {
+    // no need to change anything - we want to store numbers anyway
+    // we assume this is nanosecond precision
+    return time
+  }
+
+  if (time instanceof Date) {
+    return millisecondsToNanoseconds(time.getTime())
+  }
+
+  return performance.now() // TODO: implement clock functionality
+}
+
+export interface ClientOptions {
+  processor: Processor
+  idGenerator: IdGenerator
+}
+
+export function createClient (options: ClientOptions): BugsnagPerformance {
   return {
     start: (config: Configuration | string) => {
       config = validate(config)
+    },
+    startSpan: (name, startTime) => {
+      const spanInternal: SpanInternal = {
+        id: options.idGenerator.generate(64),
+        traceId: options.idGenerator.generate(128),
+        kind: 'client', // TODO: How do we define the current kind?
+        name,
+        startTime: sanitizeTime(startTime)
+      }
+
+      return {
+        end: (endTime) => {
+          options.processor.add({ ...spanInternal, endTime: sanitizeTime(endTime) })
+        }
+      }
     }
   }
 }
