@@ -8,7 +8,7 @@ describe('Span', () => {
       expect(span).toStrictEqual({ end: expect.any(Function) })
     })
 
-    test.each([
+    it.each([
       { type: 'string', startTime: 'i am not a startTime' },
       { type: 'bigint', startTime: BigInt(9007199254740991) },
       { type: 'boolean', startTime: true },
