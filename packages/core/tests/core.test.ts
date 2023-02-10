@@ -1,4 +1,4 @@
-import { createClient } from '../lib/core'
+import { createClient, createNoopClient } from '../lib/core'
 import { InMemoryProcessor, StableIdGenerator, IncrementingClock } from './utilities'
 
 describe('Core', () => {
@@ -180,6 +180,32 @@ describe('Core', () => {
           expect(() => { client.start(config) }).toThrow('No Bugsnag API Key set')
         })
       })
+    })
+  })
+
+  describe('createNoopClient', () => {
+    it('implements the expected API (minimal arguments)', () => {
+      expect(() => {
+        const client = createNoopClient()
+        client.start('api key')
+
+        const span = client.startSpan('name')
+        span.end()
+      }).not.toThrow()
+    })
+
+    it('implements the expected API (all arguments)', () => {
+      expect(() => {
+        const client = createNoopClient()
+        client.start({
+          apiKey: '1234',
+          endpoint: 'https://example.bugsnag.com',
+          releaseStage: 'staging'
+        })
+
+        const span = client.startSpan('name', new Date())
+        span.end()
+      }).not.toThrow()
     })
   })
 })
