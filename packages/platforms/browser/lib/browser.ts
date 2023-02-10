@@ -1,9 +1,11 @@
 import { createClient } from '@bugsnag/js-performance-core'
 import idGenerator from './id-generator'
+import clock from './clock'
 
 const BugsnagPerformance = createClient({
-  processor: { add: () => {} },
-  idGenerator
+  clock,
+  idGenerator,
+  processor: { add: () => {} }
 })
 
 export default BugsnagPerformance
