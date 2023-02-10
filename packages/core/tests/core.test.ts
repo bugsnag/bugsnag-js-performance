@@ -1,12 +1,14 @@
 import { createClient } from '../lib/core'
+import { InMemoryProcessor, StableIdGenerator, IncrementingClock } from './utilities'
 
 describe('Core', () => {
   describe('createClient()', () => {
     it('returns a BugsnagPerformance client', () => {
-      const processor = { add: jest.fn() }
-      const idGenerator = { generate: jest.fn() }
-      const clock = { now: jest.fn(), convert: jest.fn() }
-      const testClient = createClient({ processor, idGenerator, clock })
+      const testClient = createClient({
+        processor: new InMemoryProcessor(),
+        idGenerator: new StableIdGenerator(),
+        clock: new IncrementingClock()
+      })
 
       expect(testClient).toStrictEqual({
         start: expect.any(Function),
@@ -25,30 +27,36 @@ describe('Core', () => {
         })
 
         it('accepts a string', () => {
-          const processor = { add: jest.fn() }
-          const idGenerator = { generate: jest.fn() }
-          const clock = { now: jest.fn(), convert: jest.fn() }
-          const testClient = createClient({ processor, idGenerator, clock })
+          const testClient = createClient({
+            processor: new InMemoryProcessor(),
+            idGenerator: new StableIdGenerator(),
+            clock: new IncrementingClock()
+          })
+
           testClient.start('test-api-key')
 
           expect(console.warn).not.toHaveBeenCalled()
         })
 
         it('accepts a minimal valid configuration object', () => {
-          const processor = { add: jest.fn() }
-          const idGenerator = { generate: jest.fn() }
-          const clock = { now: jest.fn(), convert: jest.fn() }
-          const testClient = createClient({ processor, idGenerator, clock })
+          const testClient = createClient({
+            processor: new InMemoryProcessor(),
+            idGenerator: new StableIdGenerator(),
+            clock: new IncrementingClock()
+          })
+
           testClient.start({ apiKey: 'test-api-key' })
 
           expect(console.warn).not.toHaveBeenCalled()
         })
 
         it('accepts a complete configuration object', () => {
-          const processor = { add: jest.fn() }
-          const idGenerator = { generate: jest.fn() }
-          const clock = { now: jest.fn(), convert: jest.fn() }
-          const testClient = createClient({ processor, idGenerator, clock })
+          const testClient = createClient({
+            processor: new InMemoryProcessor(),
+            idGenerator: new StableIdGenerator(),
+            clock: new IncrementingClock()
+          })
+
           const logger = {
             debug: jest.fn(),
             info: jest.fn(),
@@ -78,10 +86,13 @@ describe('Core', () => {
 
         test.each(invalidParameters)('warns if config.endpoint is invalid ($type)', ({ value, type }) => {
           jest.spyOn(console, 'warn').mockImplementation()
-          const processor = { add: jest.fn() }
-          const idGenerator = { generate: jest.fn() }
-          const clock = { now: jest.fn(), convert: jest.fn() }
-          const testClient = createClient({ processor, idGenerator, clock })
+
+          const testClient = createClient({
+            processor: new InMemoryProcessor(),
+            idGenerator: new StableIdGenerator(),
+            clock: new IncrementingClock()
+          })
+
           // @ts-expect-error endpoint should be a string
           testClient.start({ apiKey: 'test-api-key', endpoint: value })
           expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. endpoint should be a string, got ${type}`)
@@ -89,10 +100,13 @@ describe('Core', () => {
 
         test.each(invalidParameters)('warns if config.releaseStage is invalid ($type)', ({ value, type }) => {
           jest.spyOn(console, 'warn').mockImplementation()
-          const processor = { add: jest.fn() }
-          const idGenerator = { generate: jest.fn() }
-          const clock = { now: jest.fn(), convert: jest.fn() }
-          const testClient = createClient({ processor, idGenerator, clock })
+
+          const testClient = createClient({
+            processor: new InMemoryProcessor(),
+            idGenerator: new StableIdGenerator(),
+            clock: new IncrementingClock()
+          })
+
           // @ts-expect-error releaseStage should be a string
           testClient.start({ apiKey: 'test-api-key', releaseStage: value })
           expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. releaseStage should be a string, got ${type}`)
@@ -100,20 +114,24 @@ describe('Core', () => {
 
         test.each(invalidParameters)('warns if config.logger is invalid ($type)', ({ value, type }) => {
           jest.spyOn(console, 'warn').mockImplementation()
-          const processor = { add: jest.fn() }
-          const idGenerator = { generate: jest.fn() }
-          const clock = { now: jest.fn(), convert: jest.fn() }
-          const testClient = createClient({ processor, idGenerator, clock })
+
+          const testClient = createClient({
+            processor: new InMemoryProcessor(),
+            idGenerator: new StableIdGenerator(),
+            clock: new IncrementingClock()
+          })
+
           // @ts-expect-error logger should be a logger object
           testClient.start({ apiKey: 'test-api-key', logger: value })
           expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. logger should be a Logger object, got ${type}`)
         })
 
         test.each(invalidParameters)('uses config.logger if it is valid', ({ value, type }) => {
-          const processor = { add: jest.fn() }
-          const idGenerator = { generate: jest.fn() }
-          const clock = { now: jest.fn(), convert: jest.fn() }
-          const testClient = createClient({ processor, idGenerator, clock })
+          const testClient = createClient({
+            processor: new InMemoryProcessor(),
+            idGenerator: new StableIdGenerator(),
+            clock: new IncrementingClock()
+          })
 
           const logger = {
             debug: jest.fn(),
@@ -130,10 +148,12 @@ describe('Core', () => {
         })
 
         it('throws if no configuration is provided', () => {
-          const processor = { add: jest.fn() }
-          const idGenerator = { generate: jest.fn() }
-          const clock = { now: jest.fn(), convert: jest.fn() }
-          const testClient = createClient({ processor, idGenerator, clock })
+          const testClient = createClient({
+            processor: new InMemoryProcessor(),
+            idGenerator: new StableIdGenerator(),
+            clock: new IncrementingClock()
+          })
+
           // @ts-expect-error no configuration provided
           expect(() => { testClient.start() }).toThrow('No Bugsnag API Key set')
         })
@@ -150,10 +170,12 @@ describe('Core', () => {
           { type: 'an array', config: [] },
           { type: 'a symbol', config: Symbol('test') }
         ])('throws if provided configuration is $type', ({ config }) => {
-          const processor = { add: jest.fn() }
-          const idGenerator = { generate: jest.fn() }
-          const clock = { now: jest.fn(), convert: jest.fn() }
-          const testClient = createClient({ processor, idGenerator, clock })
+          const testClient = createClient({
+            processor: new InMemoryProcessor(),
+            idGenerator: new StableIdGenerator(),
+            clock: new IncrementingClock()
+          })
+
           // @ts-expect-error invalid configuration provided
           expect(() => { testClient.start(config) }).toThrow('No Bugsnag API Key set')
         })
