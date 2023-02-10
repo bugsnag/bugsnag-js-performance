@@ -14,7 +14,7 @@
   "main": "lib/core.ts",
   "directories": {
     "lib": "lib",
-    "test": "__tests__"
+    "test": "tests"
   },
   "files": ["lib"],
   "repository": {
