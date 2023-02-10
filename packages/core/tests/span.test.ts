@@ -3,9 +3,9 @@ import { createTestClient, InMemoryProcessor, IncrementingClock } from './utilit
 describe('Span', () => {
   describe('client.startSpan()', () => {
     it('returns a Span', () => {
-      const testClient = createTestClient()
-      const testSpan = testClient.startSpan('test span')
-      expect(testSpan).toStrictEqual({ end: expect.any(Function) })
+      const client = createTestClient()
+      const span = client.startSpan('test span')
+      expect(span).toStrictEqual({ end: expect.any(Function) })
     })
 
     test.each([
@@ -18,11 +18,11 @@ describe('Span', () => {
       { type: 'symbol', startTime: Symbol('test') }
     ])('uses default clock implementation if startTime is invalid ($type)', ({ startTime }) => {
       const processor = new InMemoryProcessor()
-      const testClient = createTestClient({ processor })
-      testClient.start({ apiKey: 'test-api-key' })
+      const client = createTestClient({ processor })
+      client.start({ apiKey: 'test-api-key' })
 
       // @ts-expect-error startTime will be invalid
-      const span = testClient.startSpan('test span', startTime)
+      const span = client.startSpan('test span', startTime)
       span.end()
 
       expect(processor).toHaveProcessedSpan(expect.objectContaining({
@@ -34,9 +34,9 @@ describe('Span', () => {
   describe('Span.end()', () => {
     it('can be ended without an endTime', () => {
       const processor = new InMemoryProcessor()
-      const testClient = createTestClient({ processor })
+      const client = createTestClient({ processor })
 
-      const span = testClient.startSpan('test span')
+      const span = client.startSpan('test span')
       span.end()
 
       expect(processor).toHaveProcessedSpan({
@@ -53,9 +53,9 @@ describe('Span', () => {
     it('accepts a Date object as endTime', () => {
       const processor = new InMemoryProcessor()
       const clock = new IncrementingClock('2023-01-02T03:04:05.006Z')
-      const testClient = createTestClient({ processor, clock })
+      const client = createTestClient({ processor, clock })
 
-      const span = testClient.startSpan('test span')
+      const span = client.startSpan('test span')
       span.end(new Date('2023-01-02T03:04:05.008Z')) // 2ms after time origin
 
       expect(processor).toHaveProcessedSpan({
@@ -71,10 +71,10 @@ describe('Span', () => {
 
     it('accepts a number of nanoseconds as endTime', () => {
       const processor = new InMemoryProcessor()
-      const testClient = createTestClient({ processor })
+      const client = createTestClient({ processor })
 
-      const testSpan = testClient.startSpan('test span')
-      testSpan.end(4321)
+      const span = client.startSpan('test span')
+      span.end(4321)
 
       expect(processor).toHaveProcessedSpan({
         id: 'a random 64 bit string',
