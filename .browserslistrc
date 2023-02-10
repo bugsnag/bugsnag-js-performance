@@ -1,0 +1,29 @@
+# future improvement
+# extends browserslist-config-bugsnag
+
+# full api support 
+[production]
+# desktop browsers
+chrome >= 62 # 41
+edge >= 17
+firefox >= 78
+opera >= 49 # 13
+safari >= 17 # 12
+# mobile browsers
+chromeandroid >= 62 # 41 
+# firefoxandroid >= 78
+# operaandroid >= 46
+ios >= 17
+# samsung >= 8
+# webviewandroid >= 62
+
+# browsers we want to test don't crash, but we can perform a noop for all high level api methods
+[nocrash]
+chrome >= 30 
+chromeandroid >= 30 
+firefox >= 31
+safari >= 6
+ios >= 8
+edge >= 14 
+opera >= 12
+ie >= 8

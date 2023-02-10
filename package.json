@@ -5,11 +5,6 @@
     "packages/*",
     "packages/platforms/*"
   ],
-  "browserslist": [
-    ">0.3%",
-    "last 3 years",
-    "not dead"
-  ],
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "lerna run --stream build",
