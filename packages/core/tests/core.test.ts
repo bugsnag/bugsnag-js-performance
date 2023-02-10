@@ -84,7 +84,7 @@ describe('Core', () => {
           { type: 'symbol', value: Symbol('test') }
         ]
 
-        test.each(invalidParameters)('warns if config.endpoint is invalid ($type)', ({ value, type }) => {
+        it.each(invalidParameters)('warns if config.endpoint is invalid ($type)', ({ value, type }) => {
           jest.spyOn(console, 'warn').mockImplementation()
 
           const client = createClient({
@@ -98,7 +98,7 @@ describe('Core', () => {
           expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. endpoint should be a string, got ${type}`)
         })
 
-        test.each(invalidParameters)('warns if config.releaseStage is invalid ($type)', ({ value, type }) => {
+        it.each(invalidParameters)('warns if config.releaseStage is invalid ($type)', ({ value, type }) => {
           jest.spyOn(console, 'warn').mockImplementation()
 
           const client = createClient({
@@ -112,7 +112,7 @@ describe('Core', () => {
           expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. releaseStage should be a string, got ${type}`)
         })
 
-        test.each(invalidParameters)('warns if config.logger is invalid ($type)', ({ value, type }) => {
+        it.each(invalidParameters)('warns if config.logger is invalid ($type)', ({ value, type }) => {
           jest.spyOn(console, 'warn').mockImplementation()
 
           const client = createClient({
@@ -126,7 +126,7 @@ describe('Core', () => {
           expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. logger should be a Logger object, got ${type}`)
         })
 
-        test.each(invalidParameters)('uses config.logger if it is valid', ({ value, type }) => {
+        it.each(invalidParameters)('uses config.logger if it is valid', ({ value, type }) => {
           const client = createClient({
             processor: new InMemoryProcessor(),
             idGenerator: new StableIdGenerator(),
@@ -158,7 +158,7 @@ describe('Core', () => {
           expect(() => { client.start() }).toThrow('No Bugsnag API Key set')
         })
 
-        test.each([
+        it.each([
           { type: 'a bigint', config: BigInt(9007199254740991) },
           { type: 'a function', config: () => {} },
           { type: 'a number', config: 12345 },
