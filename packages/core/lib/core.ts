@@ -121,4 +121,11 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
   }
 }
 
-export default createClient
+export function createNoopClient (): BugsnagPerformance {
+  const noop = () => {}
+
+  return {
+    start: noop,
+    startSpan: () => ({ end: noop })
+  }
+}
