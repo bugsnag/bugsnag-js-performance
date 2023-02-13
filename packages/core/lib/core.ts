@@ -1,7 +1,8 @@
-import type { Processor } from './processor'
-import type { IdGenerator } from './id-generator'
-import type { Span, SpanInternal, Time } from './span'
 import type { Clock } from './clock'
+import type { IdGenerator } from './id-generator'
+import type { Processor } from './processor'
+import type { ResourceAttributes, Span, SpanInternal, Time } from './span'
+import { SpanAttributes } from './span'
 
 interface Logger {
   debug: (msg: string) => void
@@ -96,20 +97,26 @@ export interface ClientOptions {
   processor: Processor
   idGenerator: IdGenerator
   clock: Clock
+  resourceAttributes: ResourceAttributes
 }
 
 export function createClient (options: ClientOptions): BugsnagPerformance {
+  const defaultSpanAttributes = {}
+
   return {
     start: (config: Configuration | string) => {
       config = validate(config)
+      // TODO: store defaultSpanAttributes
+      // TODO: store resourceAttributes
     },
     startSpan: (name, startTime) => {
       const spanInternal: SpanInternal = {
+        name,
+        kind: 'client', // TODO: How do we define the current kind?
         id: options.idGenerator.generate(64),
         traceId: options.idGenerator.generate(128),
-        kind: 'client', // TODO: How do we define the current kind?
-        name,
-        startTime: sanitizeTime(options.clock, startTime)
+        startTime: sanitizeTime(options.clock, startTime),
+        attributes: new SpanAttributes(defaultSpanAttributes)
       }
 
       return {
