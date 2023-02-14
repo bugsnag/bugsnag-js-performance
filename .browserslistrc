@@ -1,29 +1,20 @@
-# future improvement
+# as a future improvement, could create a specific npm package
 # extends browserslist-config-bugsnag
 
-# full api support 
-[production]
-# desktop browsers
-chrome >= 62 # 41
-edge >= 17
-firefox >= 78
-opera >= 49 # 13
-safari >= 17 # 12
-# mobile browsers
-chromeandroid >= 62 # 41 
-# firefoxandroid >= 78
-# operaandroid >= 46
-ios >= 17
-# samsung >= 8
-# webviewandroid >= 62
+# Desktop
+# Baidu >= 13
+Chrome >= 51
+Edge >= 15
+Firefox >= 54
+Opera >= 38
+Safari >= 10
 
-# browsers we want to test don't crash, but we can perform a noop for all high level api methods
-[nocrash]
-chrome >= 30 
-chromeandroid >= 30 
-firefox >= 31
-safari >= 6
-ios >= 8
-edge >= 14 
-opera >= 12
-ie >= 8
+# Mobile
+# and_qq >= 13 # QQ Browser
+Android >= 109 # Android Browser
+ChromeAndroid >= 109
+FirefoxAndroid >= 109
+iOS >= 10
+op_mob >= 73 # Opera Mobile
+Samsung >= 5 
+UCAndroid >= 13.4
