@@ -15,9 +15,9 @@ export interface SpanInternal {
 }
 
 export interface ResourceAttributes {
-  brands: Array<{ name: string, version: string }> // browser.brands
-  platform: string // browser.platform
-  mobile: boolean // browser.mobile
+  brands?: Array<{ name: string, version: string }> // browser.brands
+  platform?: string // browser.platform
+  mobile?: boolean // browser.mobile
   userAgent: string // browser.user_agent
   releaseStage: string // deployment.environment
   sdkName: string // telemetry.sdk.name
