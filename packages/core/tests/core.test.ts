@@ -1,5 +1,5 @@
 import { createClient, createNoopClient } from '../lib/core'
-import { InMemoryProcessor, StableIdGenerator, IncrementingClock } from './utilities'
+import { InMemoryProcessor, StableIdGenerator, IncrementingClock, resourceAttributes } from './utilities'
 
 describe('Core', () => {
   describe('createClient()', () => {
@@ -7,7 +7,8 @@ describe('Core', () => {
       const client = createClient({
         processor: new InMemoryProcessor(),
         idGenerator: new StableIdGenerator(),
-        clock: new IncrementingClock()
+        clock: new IncrementingClock(),
+        resourceAttributes
       })
 
       expect(client).toStrictEqual({
@@ -30,7 +31,8 @@ describe('Core', () => {
           const client = createClient({
             processor: new InMemoryProcessor(),
             idGenerator: new StableIdGenerator(),
-            clock: new IncrementingClock()
+            clock: new IncrementingClock(),
+            resourceAttributes
           })
 
           client.start('test-api-key')
@@ -42,7 +44,8 @@ describe('Core', () => {
           const client = createClient({
             processor: new InMemoryProcessor(),
             idGenerator: new StableIdGenerator(),
-            clock: new IncrementingClock()
+            clock: new IncrementingClock(),
+            resourceAttributes
           })
 
           client.start({ apiKey: 'test-api-key' })
@@ -54,7 +57,8 @@ describe('Core', () => {
           const client = createClient({
             processor: new InMemoryProcessor(),
             idGenerator: new StableIdGenerator(),
-            clock: new IncrementingClock()
+            clock: new IncrementingClock(),
+            resourceAttributes
           })
 
           const logger = {
@@ -90,7 +94,8 @@ describe('Core', () => {
           const client = createClient({
             processor: new InMemoryProcessor(),
             idGenerator: new StableIdGenerator(),
-            clock: new IncrementingClock()
+            clock: new IncrementingClock(),
+            resourceAttributes
           })
 
           // @ts-expect-error endpoint should be a string
@@ -104,7 +109,8 @@ describe('Core', () => {
           const client = createClient({
             processor: new InMemoryProcessor(),
             idGenerator: new StableIdGenerator(),
-            clock: new IncrementingClock()
+            clock: new IncrementingClock(),
+            resourceAttributes
           })
 
           // @ts-expect-error releaseStage should be a string
@@ -118,7 +124,8 @@ describe('Core', () => {
           const client = createClient({
             processor: new InMemoryProcessor(),
             idGenerator: new StableIdGenerator(),
-            clock: new IncrementingClock()
+            clock: new IncrementingClock(),
+            resourceAttributes
           })
 
           // @ts-expect-error logger should be a logger object
@@ -130,7 +137,8 @@ describe('Core', () => {
           const client = createClient({
             processor: new InMemoryProcessor(),
             idGenerator: new StableIdGenerator(),
-            clock: new IncrementingClock()
+            clock: new IncrementingClock(),
+            resourceAttributes
           })
 
           const logger = {
@@ -151,7 +159,8 @@ describe('Core', () => {
           const client = createClient({
             processor: new InMemoryProcessor(),
             idGenerator: new StableIdGenerator(),
-            clock: new IncrementingClock()
+            clock: new IncrementingClock(),
+            resourceAttributes
           })
 
           // @ts-expect-error no configuration provided
@@ -173,6 +182,7 @@ describe('Core', () => {
           const client = createClient({
             processor: new InMemoryProcessor(),
             idGenerator: new StableIdGenerator(),
+            resourceAttributes,
             clock: new IncrementingClock()
           })
 

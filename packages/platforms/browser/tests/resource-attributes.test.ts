@@ -8,8 +8,8 @@ const jsDomUserAgent = 'Mozilla/5.0 (darwin) AppleWebKit/537.36 (KHTML, like Gec
 
 describe('resourceAttributes', () => {
   it('includes navigator.userAgent', () => {
-    expect(resourceAttributes).toEqual({
+    expect(resourceAttributes).toEqual(expect.objectContaining({
       userAgent: jsDomUserAgent
-    })
+    }))
   })
 })
