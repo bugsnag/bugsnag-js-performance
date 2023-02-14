@@ -60,6 +60,14 @@ module.exports = {
     // linting for ts files
     {
       files: ['**/*.ts'],
+      extends: ['standard-with-typescript'],
+      rules: { ...tsRuleOverrides },
+      parserOptions: {
+        project: 'tsconfig.json'
+      }
+    },
+    {
+      files: ['packages/platforms/browser/**/*.ts'],
       plugins: ['compat'],
       extends: ['standard-with-typescript', 'plugin:compat/recommended'],
       env: { browser: true },
