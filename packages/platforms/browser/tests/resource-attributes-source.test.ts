@@ -4,7 +4,7 @@
 
 import { resourceAttributesSource } from '../lib/resource-attributes-source'
 
-describe('resourceAttributes', () => {
+describe('resourceAttributesSource', () => {
   it('includes the userAgent', () => {
     expect(resourceAttributesSource()).toEqual(expect.objectContaining({
       userAgent: expect.stringMatching(/\((?<info>.*?)\)(\s|$)|(?<name>.*?)\/(?<version>.*?)(\s|$)/gm),
