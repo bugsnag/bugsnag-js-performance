@@ -2,18 +2,18 @@ import type { Attribute } from '../../lib/span'
 
 export function spanAttributesSource (): Record<string, Attribute> {
   return {
-    'browser.page.url': '',
-    'browser.page.route': '',
-    'bugsnag.span.category': '',
-    'http.url': '',
-    'http.method': '',
-    'http.status_code': '',
-    // 'http.flavor': 1.0,
-    'http.request_content_length': '',
-    'http.request_content_length_uncompressed': '',
-    'http.response_content_length': '',
-    'http.response_content_length_uncompressed': '',
-    'http.retry_count': ''
+    'browser.page.url': '/unit-test/span-attributes-source',
+    'browser.page.route': '/unit-test/[case]',
+    'bugsnag.span.category': 'unit test',
+    'http.url': 'https://example.com',
+    'http.method': 'GET',
+    'http.status_code': 200,
+    'http.flavor': 2.0,
+    'http.request_content_length': 12_345,
+    'http.request_content_length_uncompressed': 20_000,
+    'http.response_content_length': 28_461,
+    'http.response_content_length_uncompressed': 40_000,
+    'http.retry_count': 2
   }
 }
 
