@@ -107,7 +107,6 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       config = validate(config)
     },
     startSpan: (name, startTime) => {
-      // Internal API
       const spanInternal: SpanInternal = {
         name,
         kind: 'client', // TODO: How do we define the current kind?
@@ -117,7 +116,6 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
         attributes: new SpanAttributes(options.spanAttributesSource())
       }
 
-      // Public API
       return {
         // TODO Expose internal span to platforms using Symbol / WeakMap?
         end: (endTime) => {
