@@ -97,29 +97,29 @@ export interface ClientOptions {
   processor: Processor
   idGenerator: IdGenerator
   clock: Clock
-  resourceAttributes: ResourceAttributes
+  resourceAttributesSource: () => ResourceAttributes
+  spanAttributesSource: () => Record<string, string | number | boolean>
 }
 
 export function createClient (options: ClientOptions): BugsnagPerformance {
-  const defaultSpanAttributes = {}
-
   return {
     start: (config: Configuration | string) => {
       config = validate(config)
-      // TODO: store defaultSpanAttributes
-      // TODO: store resourceAttributes
     },
     startSpan: (name, startTime) => {
+      // Internal API
       const spanInternal: SpanInternal = {
         name,
         kind: 'client', // TODO: How do we define the current kind?
         id: options.idGenerator.generate(64),
         traceId: options.idGenerator.generate(128),
         startTime: sanitizeTime(options.clock, startTime),
-        attributes: new SpanAttributes(defaultSpanAttributes)
+        attributes: new SpanAttributes(options.spanAttributesSource())
       }
 
+      // Public API
       return {
+        // TODO Expose internal span to platforms using Symbol / WeakMap?
         end: (endTime) => {
           options.processor.add({ ...spanInternal, endTime: sanitizeTime(options.clock, endTime) })
         }

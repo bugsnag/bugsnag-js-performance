@@ -1,11 +1,13 @@
 import { createClient } from '@bugsnag/js-performance-core'
-import idGenerator from './id-generator'
 import clock from './clock'
-import resourceAttributes from './resource-attributes'
+import idGenerator from './id-generator'
+import { resourceAttributesSource } from './resource-attributes-source'
+import { spanAttributesSource } from './span-attributes-source'
 
 const BugsnagPerformance = createClient({
   clock,
-  resourceAttributes,
+  resourceAttributesSource,
+  spanAttributesSource,
   idGenerator,
   processor: { add: () => {} }
 })

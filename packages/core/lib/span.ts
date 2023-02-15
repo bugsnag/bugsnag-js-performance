@@ -24,7 +24,7 @@ export interface ResourceAttributes {
   sdkVersion: string // telemetry.sdk.version
 }
 
-type Attribute = string | number | boolean
+export type Attribute = string | number | boolean
 
 export type DefaultSpanAttributes = Record<string, Attribute | (() => Attribute)>
 
