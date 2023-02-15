@@ -26,8 +26,6 @@ export interface ResourceAttributes {
 
 export type Attribute = string | number | boolean
 
-export type DefaultSpanAttributes = Record<string, Attribute | (() => Attribute)>
-
 export class SpanAttributes {
   private readonly attributes = new Map()
 
