@@ -36,7 +36,7 @@ export class SpanAttributes {
   }
 
   public set (name: string, value: Attribute) {
-    // TODO: Validation
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean')
     this.attributes.set(name, value)
   }
 
