@@ -98,7 +98,7 @@ export interface ClientOptions {
   idGenerator: IdGenerator
   clock: Clock
   resourceAttributesSource: () => ResourceAttributes
-  spanAttributesSource: () => Record<string, SpanAttribute>
+  spanAttributesSource: () => Map<string, SpanAttribute>
 }
 
 export function createClient (options: ClientOptions): BugsnagPerformance {

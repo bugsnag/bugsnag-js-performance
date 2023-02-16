@@ -29,7 +29,7 @@ export type SpanAttribute = string | number | boolean
 export class SpanAttributes {
   private readonly attributes: Map<string, SpanAttribute>
 
-  constructor (initialValues: Record<string, SpanAttribute>) {
+  constructor (initialValues: Map<string, SpanAttribute>) {
     this.attributes = new Map(Object.entries(initialValues))
   }
 
