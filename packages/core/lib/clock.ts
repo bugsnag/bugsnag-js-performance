@@ -1,6 +1,7 @@
 export interface Clock {
-  // number will be accurate until the page has been open for more than 104.25 days
-  // returns nanoseconds since load
+  // returns a platform-specific value representing the current time
+  // this could be an absolute timestamp, a time relative to a "time origin"
+  // or any other number, so long as it is consistent to the platform
   now: () => number
 
   // a function to convert a Date object into the format returned by 'now'
