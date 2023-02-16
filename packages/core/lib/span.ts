@@ -26,6 +26,14 @@ export interface ResourceAttributes {
 
 export type SpanAttribute = string | number | boolean
 
+interface SpanAttributeJSON {
+  key: string
+  value: { stringValue: string }
+  | { intValue: string }
+  | { doubleValue: number }
+  | { boolValue: boolean }
+}
+
 export class SpanAttributes {
   private readonly attributes: Map<string, SpanAttribute>
 
@@ -41,5 +49,20 @@ export class SpanAttributes {
 
   public remove (name: string) {
     this.attributes.delete(name)
+  }
+
+  public toJSON (): SpanAttributeJSON[] {
+    function objectify (attribute: SpanAttribute) {
+      switch (typeof attribute) {
+        case 'number':
+          return { doubleValue: attribute }
+        case 'boolean':
+          return { boolValue: attribute }
+        default:
+          return { stringValue: attribute }
+      }
+    }
+
+    return Array.from(this.attributes, ([key, value]) => ({ key, value: objectify(value) }))
   }
 }
