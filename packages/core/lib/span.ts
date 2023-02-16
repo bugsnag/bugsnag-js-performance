@@ -27,12 +27,10 @@ export interface ResourceAttributes {
 export type SpanAttribute = string | number | boolean
 
 export class SpanAttributes {
-  private readonly attributes = new Map()
+  private readonly attributes: Map<string, SpanAttribute>
 
-  constructor (initialValues?: Record<string, SpanAttribute>) {
-    if (initialValues) {
-      this.attributes = new Map(Object.entries(initialValues))
-    }
+  constructor (initialValues: Record<string, SpanAttribute>) {
+    this.attributes = new Map(Object.entries(initialValues))
   }
 
   public set (name: string, value: SpanAttribute) {
