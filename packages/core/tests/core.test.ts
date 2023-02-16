@@ -1,15 +1,5 @@
 import { createClient, createNoopClient } from '../lib/core'
-import { IncrementingClock, InMemoryProcessor, resourceAttributesSource, spanAttributesSource, StableIdGenerator } from './utilities'
-
-function createTestClient () {
-  return createClient({
-    processor: new InMemoryProcessor(),
-    idGenerator: new StableIdGenerator(),
-    clock: new IncrementingClock(),
-    spanAttributesSource,
-    resourceAttributesSource
-  })
-}
+import { createTestClient } from './utilities'
 
 describe('Core', () => {
   describe('createClient()', () => {
