@@ -1,6 +1,6 @@
 import type { ResourceAttributes } from '../../lib/span'
 
-export function resourceAttributesSource (): ResourceAttributes {
+function resourceAttributesSource (): ResourceAttributes {
   return {
     brands: [{ name: 'Test Browser', version: '2.0' }],
     mobile: false,
