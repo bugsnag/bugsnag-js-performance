@@ -30,7 +30,7 @@ export class SpanAttributes {
   private readonly attributes: Map<string, SpanAttribute>
 
   constructor (initialValues: Map<string, SpanAttribute>) {
-    this.attributes = new Map(Object.entries(initialValues))
+    this.attributes = initialValues
   }
 
   public set (name: string, value: SpanAttribute) {
