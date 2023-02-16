@@ -1,4 +1,4 @@
-import { createClient, createNoopClient } from '../lib/core'
+import { createNoopClient } from '../lib/core'
 import { createTestClient } from './utilities'
 
 describe('Core', () => {
