@@ -9,6 +9,6 @@ export interface SpanInternal {
   readonly name: string
   readonly kind: 'internal' | 'server' | 'client' | 'producer' | 'consumer'
   readonly traceId: string // 128 bit random string
-  readonly startTime: number // stored as nanoseconds relative to "start time"
-  endTime?: number // stored as nanoseconds relative to "start time" - write once when 'end' is called
+  readonly startTime: number // stored in the format returned from Clock.now (see clock.ts)
+  endTime?: number // stored in the format returned from Clock.now (see clock.ts) - written once when 'end' is called
 }
