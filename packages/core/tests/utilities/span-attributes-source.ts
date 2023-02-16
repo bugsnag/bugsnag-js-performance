@@ -1,6 +1,6 @@
-import type { Attribute } from '../../lib/span'
+import type { SpanAttribute } from '../../lib/span'
 
-export function spanAttributesSource (): Record<string, Attribute> {
+export function spanAttributesSource (): Record<string, SpanAttribute> {
   return {
     'browser.page.url': '/unit-test/span-attributes-source',
     'browser.page.route': '/unit-test/[case]',

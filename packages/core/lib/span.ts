@@ -24,20 +24,21 @@ export interface ResourceAttributes {
   sdkVersion: string // telemetry.sdk.version
 }
 
-export type Attribute = string | number | boolean
+export type SpanAttribute = string | number | boolean
 
 export class SpanAttributes {
   private readonly attributes = new Map()
 
-  constructor (initialValues?: Record<string, Attribute>) {
+  constructor (initialValues?: Record<string, SpanAttribute>) {
     if (initialValues) {
       this.attributes = new Map(Object.entries(initialValues))
     }
   }
 
-  public set (name: string, value: Attribute) {
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean')
-    this.attributes.set(name, value)
+  public set (name: string, value: SpanAttribute) {
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      this.attributes.set(name, value)
+    }
   }
 
   public remove (name: string) {

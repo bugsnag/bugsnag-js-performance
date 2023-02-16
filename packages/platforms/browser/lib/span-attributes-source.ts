@@ -1,6 +1,6 @@
-import type { Attribute } from '@bugsnag/js-performance-core/lib/span'
+import type { SpanAttribute } from '@bugsnag/js-performance-core/lib/span'
 
-export function spanAttributesSource (): Record<string, Attribute> {
+export function spanAttributesSource (): Record<string, SpanAttribute> {
   return {
     'browser.page.url': window.location.href
     // 'browser.page.route': '' // TODO Implement with React, etc.

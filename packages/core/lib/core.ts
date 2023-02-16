@@ -1,7 +1,7 @@
 import type { Clock } from './clock'
 import type { IdGenerator } from './id-generator'
 import type { Processor } from './processor'
-import type { Attribute, ResourceAttributes, Span, SpanInternal, Time } from './span'
+import type { SpanAttribute, ResourceAttributes, Span, SpanInternal, Time } from './span'
 import { SpanAttributes } from './span'
 
 interface Logger {
@@ -98,7 +98,7 @@ export interface ClientOptions {
   idGenerator: IdGenerator
   clock: Clock
   resourceAttributesSource: () => ResourceAttributes
-  spanAttributesSource: () => Record<string, Attribute>
+  spanAttributesSource: () => Record<string, SpanAttribute>
 }
 
 export function createClient (options: ClientOptions): BugsnagPerformance {
