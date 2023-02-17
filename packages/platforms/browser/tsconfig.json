@@ -3,7 +3,8 @@
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "dist",
-    "rootDir": "lib"
+    "rootDir": "lib",
+    "types": ["./navigator-user-agent-data", "node"]
   },
   "include": ["lib/*"],
   "exclude": [

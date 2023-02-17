@@ -1,7 +1,8 @@
-import type { Processor } from './processor'
-import type { IdGenerator } from './id-generator'
-import type { Span, SpanInternal, Time } from './span'
 import type { Clock } from './clock'
+import type { IdGenerator } from './id-generator'
+import type { Processor } from './processor'
+import type { SpanAttribute, ResourceAttributes, Span, SpanInternal, Time } from './span'
+import { SpanAttributes } from './span'
 
 interface Logger {
   debug: (msg: string) => void
@@ -96,6 +97,8 @@ export interface ClientOptions {
   processor: Processor
   idGenerator: IdGenerator
   clock: Clock
+  resourceAttributesSource: () => ResourceAttributes
+  spanAttributesSource: () => Map<string, SpanAttribute>
 }
 
 export function createClient (options: ClientOptions): BugsnagPerformance {
@@ -105,14 +108,16 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
     },
     startSpan: (name, startTime) => {
       const spanInternal: SpanInternal = {
+        name,
+        kind: 'client', // TODO: How do we define the current kind?
         id: options.idGenerator.generate(64),
         traceId: options.idGenerator.generate(128),
-        kind: 'client', // TODO: How do we define the current kind?
-        name,
-        startTime: sanitizeTime(options.clock, startTime)
+        startTime: sanitizeTime(options.clock, startTime),
+        attributes: new SpanAttributes(options.spanAttributesSource())
       }
 
       return {
+        // TODO Expose internal span to platforms using Symbol / WeakMap?
         end: (endTime) => {
           options.processor.add({ ...spanInternal, endTime: sanitizeTime(options.clock, endTime) })
         }
