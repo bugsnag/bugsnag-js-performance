@@ -4,7 +4,10 @@ export type SpanAttributesSource = Map<string, SpanAttribute>
 
 export interface JSONAttribute {
   key: string
-  value: { stringValue: string } | { intValue: string } | { doubleValue: number } | { boolValue: boolean }
+  value: { stringValue: string }
+  | { intValue: string }
+  | { doubleValue: number }
+  | { boolValue: boolean }
 }
 
 export interface ResourceAttributes {

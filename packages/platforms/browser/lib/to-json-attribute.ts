@@ -9,6 +9,7 @@ function toJSONAttribute (key: string, attribute: SpanAttribute): JSONAttribute 
     case 'string':
       return { key, value: { stringValue: attribute } }
     default:
+      // TODO: How should we handle values that aren't a correct type?
       return { key, value: { stringValue: attribute } }
   }
 }
