@@ -1,3 +1,5 @@
+import type { SpanAttribute } from './attributes'
+
 export type Time = Date | number
 
 export interface Span {
@@ -12,26 +14,6 @@ export interface SpanInternal {
   readonly attributes: SpanAttributes
   readonly startTime: number // stored in the format returned from Clock.now (see clock.ts)
   endTime?: number // stored in the format returned from Clock.now (see clock.ts) - written once when 'end' is called
-}
-
-export interface ResourceAttributes {
-  brands?: Array<{ name: string, version: string }> // browser.brands
-  platform?: string // browser.platform
-  mobile?: boolean // browser.mobile
-  userAgent: string // browser.user_agent
-  releaseStage: string // deployment.environment
-  sdkName: string // telemetry.sdk.name
-  sdkVersion: string // telemetry.sdk.version
-}
-
-export type SpanAttribute = string | number | boolean
-
-interface SpanAttributeJSON {
-  key: string
-  value: { stringValue: string }
-  | { intValue: string }
-  | { doubleValue: number }
-  | { boolValue: boolean }
 }
 
 export class SpanAttributes {
@@ -49,20 +31,5 @@ export class SpanAttributes {
 
   public remove (name: string) {
     this.attributes.delete(name)
-  }
-
-  public toJSON (): SpanAttributeJSON[] {
-    function objectify (attribute: SpanAttribute) {
-      switch (typeof attribute) {
-        case 'number':
-          return { doubleValue: attribute }
-        case 'boolean':
-          return { boolValue: attribute }
-        default:
-          return { stringValue: attribute }
-      }
-    }
-
-    return Array.from(this.attributes, ([key, value]) => ({ key, value: objectify(value) }))
   }
 }
