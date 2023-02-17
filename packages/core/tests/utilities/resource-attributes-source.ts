@@ -1,4 +1,4 @@
-import type { ResourceAttributes } from '../../lib/span'
+import type { ResourceAttributes } from '../../lib/attributes'
 
 function resourceAttributesSource (): ResourceAttributes {
   return {

@@ -1,4 +1,4 @@
-import type { SpanAttribute } from '../../lib/span'
+import type { SpanAttribute } from '../../lib/attributes'
 
 function spanAttributesSource (): Map<string, SpanAttribute> {
   const spanAttributes = new Map()
