@@ -7,6 +7,8 @@ class InMemoryProcessor implements Processor {
   add (span: SpanInternal): void {
     this.spans.push(span)
   }
+
+  configure (): void {}
 }
 
 export default InMemoryProcessor
