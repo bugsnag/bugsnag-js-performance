@@ -105,7 +105,8 @@ export interface ClientOptions {
 export function createClient (options: ClientOptions): BugsnagPerformance {
   return {
     start: (config: Configuration | string) => {
-      config = validate(config)
+      const processedConfig = validate(config)
+      options.processor.configure(processedConfig, options.resourceAttributesSource)
     },
     startSpan: (name, startTime) => {
       const spanInternal: SpanInternal = {
