@@ -1,8 +1,7 @@
 import type { ResourceAttributes } from '@bugsnag/js-performance-core/lib/attributes'
 import type { Processor } from '@bugsnag/js-performance-core/lib/processor'
-import delivery from './delivery'
+import createDelivery from './delivery'
 
-// Can we store these somewhere better?
 let endpoint: string | undefined
 let apiKey: string | undefined
 let resourceAttributesSource: (() => ResourceAttributes) | undefined
@@ -13,7 +12,8 @@ const processor: Processor = {
       return // TODO: logger.error
     }
 
-    delivery(global.fetch).send(endpoint, apiKey, [span], resourceAttributesSource())
+    const delivery = createDelivery(global.fetch)
+    delivery.send(endpoint, apiKey, [span], resourceAttributesSource())
   },
   configure: (config, attributesSource) => {
     apiKey = config.apiKey

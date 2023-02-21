@@ -3,7 +3,7 @@
  */
 
 import { SpanAttributes, type SpanInternal } from '@bugsnag/js-performance-core/lib/span'
-import delivery from '../lib/delivery'
+import createDelivery from '../lib/delivery'
 import createResourseAttributesSource from '../lib/resource-attributes-source'
 import createSpanAttributesSource from '../lib/span-attributes-source'
 
@@ -32,7 +32,8 @@ describe('delivery', () => {
       attributes: spanAttributes
     }]
 
-    delivery(global.fetch).send('/test', 'test-api-key', spans, resourceAttributesSource())
+    const delivery = createDelivery(global.fetch)
+    delivery.send('/test', 'test-api-key', spans, resourceAttributesSource())
 
     expect(global.fetch).toHaveBeenCalledWith('/test', expect.objectContaining({ body: expect.stringContaining('test span') }))
   })
