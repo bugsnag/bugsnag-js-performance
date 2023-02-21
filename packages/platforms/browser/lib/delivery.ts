@@ -1,49 +1,54 @@
+import { attributeToJson } from '@bugsnag/js-performance-core/lib/attributes'
 import type { Delivery } from '@bugsnag/js-performance-core/lib/delivery'
-import { type SpanInternal } from '@bugsnag/js-performance-core/lib/span'
-import toJSONAttribute from './to-json-attribute'
+import type { SpanInternal } from '@bugsnag/js-performance-core/lib/span'
 
-const browserDelivery: Delivery = {
-  send: (endpoint, apiKey, spans, resourceAtrributes) => {
-    function shapeSpan (span: SpanInternal) {
-      return {
-        id: span.id,
-        name: span.name,
-        kind: span.kind,
-        spanId: span.id, // Should this be here?
-        // traceId: '...', // Not yet implemented
-        startTimeUnixNano: span.startTime,
-        endTimeUnixNano: span.endTime,
-        attributes: Object.entries(span.attributes).map(([key, value]) => toJSONAttribute(key, value))
-      }
-    }
+type Fetch = (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>
 
-    const payload = {
-      resourceSpans: [
-        {
-          resource: {
-            attributes: Object.entries(resourceAtrributes).map(([key, value]) => toJSONAttribute(key, value))
-          },
-          scopeSpans: [
-            {
-              spans: spans.map(shapeSpan)
-            }
-          ]
+function browserDelivery (fetch: Fetch): Delivery {
+  return {
+    send: (endpoint, apiKey, spans, resourceAtrributes) => {
+      function shapeSpan (span: SpanInternal) {
+        return {
+          name: span.name,
+          kind: span.kind,
+          spanId: span.id,
+          traceId: span.traceId,
+          startTimeUnixNano: span.startTime, // TODO: Convert to absolute timestamp
+          endTimeUnixNano: span.endTime, // TODO: Convert to absolute timestamp
+          attributes: Object.entries(span.attributes).map(([key, value]) => attributeToJson(key, value))
         }
-      ]
-    }
+      }
 
-    return new Promise((resolve, reject) => {
-      fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Bugsnag-Api-Key': apiKey,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
+      const payload = {
+        resourceSpans: [
+          {
+            resource: {
+              attributes: Object.entries(resourceAtrributes).map(([key, value]) => attributeToJson(key, value))
+            },
+            scopeSpans: [
+              {
+                spans: spans.map(shapeSpan)
+              }
+            ]
+          }
+        ]
+      }
+
+      const body = JSON.stringify(payload)
+
+      return new Promise((resolve, reject) => {
+        fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Bugsnag-Api-Key': apiKey,
+            'Content-Type': 'application/json'
+          },
+          body
+        })
+          .then(res => { resolve() })
+          .catch(err => { reject(err) })
       })
-        .then(res => { resolve() })
-        .catch(err => { reject(err) })
-    })
+    }
   }
 }
 

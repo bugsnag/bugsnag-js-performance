@@ -7,13 +7,13 @@ import delivery from '../lib/delivery'
 import createResourseAttributesSource from '../lib/resource-attributes-source'
 import createSpanAttributesSource from '../lib/span-attributes-source'
 
-// @ts-expect-error don't overwrite global.fetch
+// @ts-expect-error mock not assignable to global.fetch
 global.fetch = jest.fn(() =>
   Promise.resolve()
 )
 
 beforeEach(() => {
-// @ts-expect-error don't overwrite global.fetch
+  // @ts-expect-error property mockClear does not exist on fetch
   fetch.mockClear()
 })
 
@@ -32,7 +32,7 @@ describe('delivery', () => {
       attributes: spanAttributes
     }]
 
-    delivery.send('/test', 'test-api-key', spans, resourceAttributesSource())
+    delivery(global.fetch).send('/test', 'test-api-key', spans, resourceAttributesSource())
 
     expect(global.fetch).toHaveBeenCalledWith('/test', expect.objectContaining({ body: expect.stringContaining('test span') }))
   })

@@ -9,7 +9,7 @@ let resourceAttributesSource: () => ResourceAttributes
 
 const processor: Processor = {
   add: (span) => {
-    delivery.send(endpoint, apiKey, [span], resourceAttributesSource())
+    delivery(global.fetch).send(endpoint, apiKey, [span], resourceAttributesSource())
   },
   configure: (config, attributesSource) => {
     apiKey = config.apiKey
