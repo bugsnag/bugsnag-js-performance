@@ -1,11 +1,26 @@
-import type { ResourceAttributes } from './attributes'
-import type { SpanInternal } from './span'
+import type { JsonAttribute } from './attributes'
 
 export interface Delivery {
   send: (
     endpoint: string,
     apiKey: string,
-    spans: SpanInternal[],
-    resourceAtrributes: ResourceAttributes
-  ) => Promise<Response> // this will become some kind of Response type when we capture p-values, for now we don't care
+    payload: DeliveryPayload
+  ) => Promise<void> // this will become some kind of Response type when we capture p-values, for now we don't care
+}
+
+interface Resource {
+  attributes: JsonAttribute[]
+}
+
+interface ScopeSpan {
+  spans: JsonAttribute[]
+}
+
+interface ResourceSpan {
+  resource: Resource
+  scopeSpans: ScopeSpan[]
+}
+
+export interface DeliveryPayload {
+  resourceSpans: ResourceSpan[]
 }
