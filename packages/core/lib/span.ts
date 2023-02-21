@@ -1,4 +1,4 @@
-import type { SpanAttribute } from './attributes'
+import { attributeToJson, type SpanAttribute } from './attributes'
 
 export type Time = Date | number
 
@@ -31,5 +31,17 @@ export class SpanAttributes {
 
   public remove (name: string) {
     this.attributes.delete(name)
+  }
+}
+
+export function spanToJson (span: SpanInternal) {
+  return {
+    name: span.name,
+    kind: span.kind,
+    spanId: span.id,
+    traceId: span.traceId,
+    startTimeUnixNano: span.startTime, // TODO: Convert to absolute timestamp
+    endTimeUnixNano: span.endTime, // TODO: Convert to absolute timestamp
+    attributes: Object.entries(span.attributes).map(([key, value]) => attributeToJson(key, value))
   }
 }

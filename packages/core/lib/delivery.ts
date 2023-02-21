@@ -7,5 +7,5 @@ export interface Delivery {
     apiKey: string,
     spans: SpanInternal[],
     resourceAtrributes: ResourceAttributes
-  ) => Promise<void> // this will become some kind of Response type when we capture p-values, for now we don't care
+  ) => Promise<Response> // this will become some kind of Response type when we capture p-values, for now we don't care
 }
