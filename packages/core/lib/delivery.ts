@@ -1,4 +1,5 @@
 import type { JsonAttribute } from './attributes'
+import type { Kind } from './span'
 
 export interface Delivery {
   send: (
@@ -9,11 +10,11 @@ export interface Delivery {
 }
 
 interface Resource {
-  attributes: JsonAttribute[]
+  attributes: Array<JsonAttribute | undefined>
 }
 
 interface ScopeSpan {
-  spans: JsonAttribute[]
+  spans: DeliverySpan[]
 }
 
 interface ResourceSpan {
@@ -23,4 +24,14 @@ interface ResourceSpan {
 
 export interface DeliveryPayload {
   resourceSpans: ResourceSpan[]
+}
+
+export interface DeliverySpan {
+  name: string
+  kind: Kind
+  spanId: string
+  traceId: string
+  startTimeUnixNano: number
+  endTimeUnixNano: number
+  attributes: Array<JsonAttribute | undefined>
 }

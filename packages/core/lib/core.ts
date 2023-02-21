@@ -1,7 +1,7 @@
-import type { ResourceAttributes, SpanAttribute } from './attributes'
-import type { Clock } from './clock'
-import type { IdGenerator } from './id-generator'
-import type { Processor } from './processor'
+import { type ResourceAttributeSource, type SpanAttributesSource } from './attributes'
+import { type Clock } from './clock'
+import { type IdGenerator } from './id-generator'
+import { BufferingProcessor, type ProcessorFactory } from './processor'
 import { SpanAttributes, type Span, type SpanInternal, type Time } from './span'
 
 interface Logger {
@@ -94,18 +94,24 @@ function sanitizeTime (clock: Clock, time?: Time): number {
 }
 
 export interface ClientOptions {
-  processor: Processor
-  idGenerator: IdGenerator
   clock: Clock
-  resourceAttributesSource: () => ResourceAttributes
-  spanAttributesSource: () => Map<string, SpanAttribute>
+  idGenerator: IdGenerator
+  processorFactory: ProcessorFactory
+  resourceAttributesSource: ResourceAttributeSource
+  spanAttributesSource: SpanAttributesSource
 }
 
 export function createClient (options: ClientOptions): BugsnagPerformance {
+  const bufferingProcessor = new BufferingProcessor()
+  let processor = bufferingProcessor
+
   return {
     start: (config: Configuration | string) => {
-      const processedConfig = validate(config)
-      options.processor.configure(processedConfig, options.resourceAttributesSource)
+      const configuration = validate(config)
+      processor = options.processorFactory.create(configuration)
+      bufferingProcessor.spans.forEach(span => {
+        processor.add(span)
+      })
     },
     startSpan: (name, startTime) => {
       const spanInternal: SpanInternal = {
@@ -120,7 +126,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       return {
         // TODO Expose internal span to platforms using Symbol / WeakMap?
         end: (endTime) => {
-          options.processor.add({ ...spanInternal, endTime: sanitizeTime(options.clock, endTime) })
+          processor.add({ ...spanInternal, endTime: sanitizeTime(options.clock, endTime) })
         }
       }
     }

@@ -1,10 +1,10 @@
-import type { SpanInternal } from '../../lib/span'
-import type { Processor } from '../../lib/processor'
+import { type SpanEnded } from '../../lib/span'
+import { type Processor } from '../../lib/processor'
 
 class InMemoryProcessor implements Processor {
-  public readonly spans: SpanInternal[] = []
+  public readonly spans: SpanEnded[] = []
 
-  add (span: SpanInternal): void {
+  add (span: SpanEnded): void {
     this.spans.push(span)
   }
 

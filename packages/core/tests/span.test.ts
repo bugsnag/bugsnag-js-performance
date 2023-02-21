@@ -19,7 +19,8 @@ describe('Span', () => {
       { type: 'symbol', startTime: Symbol('test') }
     ])('uses default clock implementation if startTime is invalid ($type)', ({ startTime }) => {
       const processor = new InMemoryProcessor()
-      const client = createTestClient({ processor })
+      const processorFactory = { create: () => processor }
+      const client = createTestClient({ processorFactory })
       client.start({ apiKey: 'test-api-key' })
 
       // @ts-expect-error startTime will be invalid
@@ -35,7 +36,9 @@ describe('Span', () => {
   describe('Span.end()', () => {
     it('can be ended without an endTime', () => {
       const processor = new InMemoryProcessor()
-      const client = createTestClient({ processor })
+      const processorFactory = { create: () => processor }
+      const client = createTestClient({ processorFactory })
+      client.start({ apiKey: 'test-api-key' })
 
       const span = client.startSpan('test span')
       span.end()
@@ -53,9 +56,11 @@ describe('Span', () => {
     })
 
     it('accepts a Date object as endTime', () => {
-      const processor = new InMemoryProcessor()
       const clock = new IncrementingClock('2023-01-02T03:04:05.006Z')
-      const client = createTestClient({ processor, clock })
+      const processor = new InMemoryProcessor()
+      const processorFactory = { create: () => processor }
+      const client = createTestClient({ processorFactory, clock })
+      client.start({ apiKey: 'test-api-key' })
 
       const span = client.startSpan('test span')
       span.end(new Date('2023-01-02T03:04:05.008Z')) // 2ms after time origin
@@ -74,7 +79,9 @@ describe('Span', () => {
 
     it('accepts a number of nanoseconds as endTime', () => {
       const processor = new InMemoryProcessor()
-      const client = createTestClient({ processor })
+      const processorFactory = { create: () => processor }
+      const client = createTestClient({ processorFactory })
+      client.start({ apiKey: 'test-api-key' })
 
       const span = client.startSpan('test span')
       span.end(4321)

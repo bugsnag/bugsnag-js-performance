@@ -25,6 +25,8 @@ export interface SpanInternal {
   endTime?: number // stored in the format returned from Clock.now (see clock.ts) - written once when 'end' is called
 }
 
+export type SpanEnded = Required<SpanInternal>
+
 export class SpanAttributes {
   public readonly attributes: Map<string, SpanAttribute>
 
@@ -43,7 +45,7 @@ export class SpanAttributes {
   }
 }
 
-export function spanToJson (span: SpanInternal) {
+export function spanToJson (span: SpanEnded) {
   return {
     name: span.name,
     kind: Kind[span.kind],
