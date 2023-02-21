@@ -1,4 +1,4 @@
-import { Kind, SpanAttributes } from '../lib/span'
+import { SpanAttributes } from '../lib/span'
 import { createTestClient, IncrementingClock, InMemoryProcessor } from './utilities'
 
 describe('Span', () => {
@@ -43,7 +43,7 @@ describe('Span', () => {
       expect(processor).toHaveProcessedSpan({
         id: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
-        kind: Kind.client,
+        kind: 'client',
         name: 'test span',
         startTime: 1,
         endTime: 2,
@@ -64,7 +64,7 @@ describe('Span', () => {
         id: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         attributes: expect.any(SpanAttributes),
-        kind: Kind.client,
+        kind: 'client',
         name: 'test span',
         startTime: 1,
         endTime: 2_000_000 // 2ms in nanoseconds
@@ -83,7 +83,7 @@ describe('Span', () => {
         id: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         attributes: expect.any(SpanAttributes),
-        kind: Kind.client,
+        kind: 'client',
         name: 'test span',
         startTime: 1,
         endTime: 4321

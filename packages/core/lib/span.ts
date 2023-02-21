@@ -18,7 +18,7 @@ export enum Kind {
 export interface SpanInternal {
   readonly id: string // 64 bit random string
   readonly name: string
-  readonly kind: Kind
+  readonly kind: 'internal' | 'server' | 'client' | 'producer' | 'consumer'
   readonly traceId: string // 128 bit random string
   readonly attributes: SpanAttributes
   readonly startTime: number // stored in the format returned from Clock.now (see clock.ts)
@@ -46,7 +46,7 @@ export class SpanAttributes {
 export function spanToJson (span: SpanInternal) {
   return {
     name: span.name,
-    kind: span.kind,
+    kind: Kind[span.kind],
     spanId: span.id,
     traceId: span.traceId,
     startTimeUnixNano: span.startTime, // TODO: Convert to absolute timestamp
