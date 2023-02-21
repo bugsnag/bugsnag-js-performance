@@ -6,10 +6,19 @@ export interface Span {
   end: (endTime?: Time) => void
 }
 
+export enum Kind {
+  unspecified = 0,
+  internal = 1,
+  server = 2,
+  client = 3,
+  producer = 4,
+  consumer = 5
+}
+
 export interface SpanInternal {
   readonly id: string // 64 bit random string
   readonly name: string
-  readonly kind: 'internal' | 'server' | 'client' | 'producer' | 'consumer'
+  readonly kind: Kind
   readonly traceId: string // 128 bit random string
   readonly attributes: SpanAttributes
   readonly startTime: number // stored in the format returned from Clock.now (see clock.ts)

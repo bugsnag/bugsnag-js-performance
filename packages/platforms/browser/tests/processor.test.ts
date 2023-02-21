@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { SpanAttributes, type SpanInternal } from '@bugsnag/js-performance-core/lib/span'
+import { Kind, SpanAttributes, type SpanInternal } from '@bugsnag/js-performance-core/lib/span'
 import createProcessor from '../lib/processor'
 import resourceAttributesSource from '../lib/resource-attributes-source'
 
@@ -17,7 +17,7 @@ describe('Browser Processor', () => {
   it('prevents delivery until configure has been called', () => {
     const span: SpanInternal = {
       id: 'test-span-id',
-      kind: 'consumer',
+      kind: Kind.consumer,
       name: 'test-span',
       startTime: 12345,
       endTime: 56789,
@@ -50,7 +50,7 @@ describe('Browser Processor', () => {
   it('correctly formats the delivery payload', () => {
     const span: SpanInternal = {
       id: 'test-span-id',
-      kind: 'consumer',
+      kind: Kind.unspecified,
       name: 'test-span',
       startTime: 12345,
       endTime: 56789,
