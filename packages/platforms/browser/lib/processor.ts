@@ -1,11 +1,11 @@
-import { attributeToJson, type ResourceAttributes } from '@bugsnag/js-performance-core/lib/attributes'
+import { attributeToJson, type ResourceAttributeSource } from '@bugsnag/js-performance-core/lib/attributes'
 import type { Delivery, DeliveryPayload } from '@bugsnag/js-performance-core/lib/delivery'
 import type { Processor } from '@bugsnag/js-performance-core/lib/processor'
 import { spanToJson } from '@bugsnag/js-performance-core/lib/span'
 
 let endpoint: string | undefined
 let apiKey: string | undefined
-let resourceAttributesSource: (() => ResourceAttributes) | undefined
+let resourceAttributesSource: ResourceAttributeSource | undefined
 
 function createProcessor (delivery: Delivery): Processor {
   return {

@@ -20,6 +20,8 @@ export interface ResourceAttributes {
   sdkVersion: string // telemetry.sdk.version
 }
 
+export type ResourceAttributeSource = () => ResourceAttributes
+
 export function attributeToJson (key: string, attribute: SpanAttribute): JsonAttribute | undefined {
   switch (typeof attribute) {
     case 'number':

@@ -1,4 +1,4 @@
-import type { ResourceAttributes } from './attributes'
+import type { ResourceAttributeSource } from './attributes'
 import type { Configuration } from './core'
 import type { SpanInternal } from './span'
 
@@ -6,5 +6,5 @@ import type { SpanInternal } from './span'
 // it can then add to a queue or send immediately
 export interface Processor {
   add: (span: SpanInternal) => void
-  configure: (config: Required<Configuration>, resourceAttributesSource: () => ResourceAttributes) => void
+  configure: (config: Required<Configuration>, resourceAttributesSource: ResourceAttributeSource) => void
 }
