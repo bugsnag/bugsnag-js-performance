@@ -3,6 +3,7 @@
  */
 
 import type { DeliveryPayload } from '@bugsnag/js-performance-core/lib/delivery'
+import { Kind } from '@bugsnag/js-performance-core/lib/span'
 import createDelivery from '../lib/delivery'
 
 // TODO: Improve fetch mocking
@@ -22,7 +23,17 @@ describe('Browser Delivery', () => {
     const deliveryPayload: DeliveryPayload = {
       resourceSpans: [{
         resource: { attributes: [{ key: 'test-key', value: { stringValue: 'test-value' } }] },
-        scopeSpans: [{ spans: [{ key: 'test-span', value: { intValue: 12345 } }] }]
+        scopeSpans: [{
+          spans: [{
+            name: 'test-span',
+            kind: Kind.client,
+            spanId: 'test-span-id',
+            traceId: 'test-trace-id',
+            endTimeUnixNano: 56789,
+            startTimeUnixNano: 12345,
+            attributes: [{ key: 'test-span', value: { intValue: 12345 } }]
+          }]
+        }]
       }]
     }
 
