@@ -8,7 +8,7 @@ describe('attributeToJson', () => {
 
   it('converts an integer into an OTEL compliant value', () => {
     const attribute = attributeToJson('test.int', 12345)
-    expect(attribute).toStrictEqual({ key: 'test.int', value: { intValue: 12345 } })
+    expect(attribute).toStrictEqual({ key: 'test.int', value: { intValue: '12345' } })
   })
 
   it('converts a double into an OTEL compliant value', () => {
