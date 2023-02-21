@@ -2,7 +2,7 @@ export type SpanAttribute = string | number | boolean
 
 export type SpanAttributesSource = Map<string, SpanAttribute>
 
-export interface JSONAttribute {
+export interface JsonAttribute {
   key: string
   value: { stringValue: string }
   | { intValue: string }
@@ -18,4 +18,17 @@ export interface ResourceAttributes {
   releaseStage: string // deployment.environment
   sdkName: string // telemetry.sdk.name
   sdkVersion: string // telemetry.sdk.version
+}
+
+export function toJsonAttribute (key: string, attribute: SpanAttribute): JsonAttribute | undefined {
+  switch (typeof attribute) {
+    case 'number':
+      return { key, value: { doubleValue: attribute } }
+    case 'boolean':
+      return { key, value: { boolValue: attribute } }
+    case 'string':
+      return { key, value: { stringValue: attribute } }
+    default:
+      return undefined
+  }
 }
