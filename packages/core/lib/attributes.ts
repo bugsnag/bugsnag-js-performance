@@ -5,7 +5,6 @@ export type SpanAttributesSource = Map<string, SpanAttribute>
 export interface JsonAttribute {
   key: string
   value: { stringValue: string }
-  | { intValue: string }
   | { doubleValue: number }
   | { boolValue: boolean }
 }
