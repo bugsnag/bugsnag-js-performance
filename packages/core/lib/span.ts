@@ -26,7 +26,7 @@ export interface SpanInternal {
 }
 
 export class SpanAttributes {
-  private readonly attributes: Map<string, SpanAttribute>
+  public readonly attributes: Map<string, SpanAttribute>
 
   constructor (initialValues: Map<string, SpanAttribute>) {
     this.attributes = initialValues
@@ -51,6 +51,6 @@ export function spanToJson (span: SpanInternal) {
     traceId: span.traceId,
     startTimeUnixNano: span.startTime, // TODO: Convert to absolute timestamp
     endTimeUnixNano: span.endTime, // TODO: Convert to absolute timestamp
-    attributes: Object.entries(span.attributes).map(([key, value]) => attributeToJson(key, value))
+    attributes: Object.entries(span.attributes.attributes).map(([key, value]) => attributeToJson(key, value))
   }
 }
