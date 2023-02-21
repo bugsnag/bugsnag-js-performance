@@ -20,7 +20,11 @@ export interface ResourceAttributes {
   sdkVersion: string // telemetry.sdk.version
 }
 
-export function toJsonAttribute (key: string, attribute: SpanAttribute): JsonAttribute | undefined {
+export function attributeToJson (key: string, attribute: SpanAttribute): JsonAttribute | undefined {
+  if (typeof attribute === 'number' && (Number.isNaN(attribute) || !Number.isFinite(attribute))) {
+    return undefined
+  }
+
   switch (typeof attribute) {
     case 'number':
       return { key, value: { doubleValue: attribute } }
