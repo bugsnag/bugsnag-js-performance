@@ -1,6 +1,6 @@
 export type SpanAttribute = string | number | boolean
 
-export type SpanAttributesSource = Map<string, SpanAttribute>
+export type SpanAttributesSource = () => Map<string, SpanAttribute>
 
 export interface JsonAttribute {
   key: string
