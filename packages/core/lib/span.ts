@@ -1,4 +1,5 @@
 import { attributeToJson, type SpanAttribute } from './attributes'
+import { type Clock } from './clock'
 
 export type Time = Date | number
 
@@ -45,14 +46,14 @@ export class SpanAttributes {
   }
 }
 
-export function spanToJson (span: SpanEnded) {
+export function spanToJson (span: SpanEnded, clock: Clock) {
   return {
     name: span.name,
     kind: Kind[span.kind],
     spanId: span.id,
     traceId: span.traceId,
-    startTimeUnixNano: span.startTime, // TODO: Convert to absolute timestamp
-    endTimeUnixNano: span.endTime, // TODO: Convert to absolute timestamp
+    startTimeUnixNano: clock.toAbsoluteTimeStamp(span.startTime),
+    endTimeUnixNano: clock.toAbsoluteTimeStamp(span.endTime),
     attributes: Object.entries(span.attributes.attributes).map(([key, value]) => attributeToJson(key, value))
   }
 }

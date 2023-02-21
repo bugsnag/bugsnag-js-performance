@@ -26,7 +26,8 @@ describe('BrowserProcessor', () => {
     }
 
     const mockDelivery = { send: jest.fn() }
-    const processor = new BrowserProcessor('test-api-key', '/traces', mockDelivery, resourceAttributesSource(navigator))
+    const mockClock = { now: jest.now, convert: jest.fn(), toAbsoluteTimeStamp: jest.fn() }
+    const processor = new BrowserProcessor('test-api-key', '/traces', mockDelivery, mockClock, resourceAttributesSource(navigator))
     processor.add(span)
 
     expect(mockDelivery.send).toHaveBeenCalledWith(

@@ -8,7 +8,8 @@ export function millisecondsToNanoseconds (milliseconds: number): number {
 
 export const clock: Clock = {
   now: () => performance.now(), // nanoseconds passed since performance.timeOrigin
-  convert: (date) => millisecondsToNanoseconds(date.getTime() - performance.timeOrigin)
+  convert: (date) => millisecondsToNanoseconds(date.getTime() - performance.timeOrigin),
+  toAbsoluteTimeStamp: (time: number) => time + performance.timeOrigin // convert nanoseconds since timeOrigin to full timeStamp
 }
 
 export default clock

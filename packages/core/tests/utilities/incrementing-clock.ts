@@ -16,6 +16,10 @@ class IncrementingClock implements Clock {
   convert (date: Date) {
     return (date.getTime() - this.timeOrigin) * 1_000_000
   }
+
+  toAbsoluteTimeStamp (time: number) {
+    return time
+  }
 }
 
 export default IncrementingClock

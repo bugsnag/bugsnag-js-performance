@@ -6,4 +6,6 @@ export interface Clock {
 
   // a function to convert a Date object into the format returned by 'now'
   convert: (date: Date) => number
+
+  toAbsoluteTimeStamp: (time: number) => number
 }
