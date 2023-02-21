@@ -6,14 +6,14 @@ describe('attributeToJson', () => {
     expect(attribute).toStrictEqual({ key: 'test.string', value: { stringValue: 'string' } })
   })
 
-  it('converts a number into an OTEL compliant value', () => {
-    const attribute = attributeToJson('test.number', 12345)
-    expect(attribute).toStrictEqual({ key: 'test.number', value: { doubleValue: 12345 } })
+  it('converts an integer into an OTEL compliant value', () => {
+    const attribute = attributeToJson('test.int', 12345)
+    expect(attribute).toStrictEqual({ key: 'test.int', value: { intValue: 12345 } })
   })
 
   it('converts a double into an OTEL compliant value', () => {
-    const attribute = attributeToJson('test.number', 123.45)
-    expect(attribute).toStrictEqual({ key: 'test.number', value: { doubleValue: 123.45 } })
+    const attribute = attributeToJson('test.double', 123.45)
+    expect(attribute).toStrictEqual({ key: 'test.double', value: { doubleValue: 123.45 } })
   })
 
   it('converts a boolean into an OTEL compliant value', () => {

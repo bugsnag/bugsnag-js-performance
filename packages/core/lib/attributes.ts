@@ -5,6 +5,7 @@ export type SpanAttributesSource = Map<string, SpanAttribute>
 export interface JsonAttribute {
   key: string
   value: { stringValue: string }
+  | { intValue: number }
   | { doubleValue: number }
   | { boolValue: boolean }
 }
@@ -25,7 +26,9 @@ export function attributeToJson (key: string, attribute: SpanAttribute): JsonAtt
       if (Number.isNaN(attribute) || !Number.isFinite(attribute)) {
         return undefined
       }
-
+      if (Number.isInteger(attribute)) {
+        return { key, value: { intValue: attribute } }
+      }
       return { key, value: { doubleValue: attribute } }
     case 'boolean':
       return { key, value: { boolValue: attribute } }
