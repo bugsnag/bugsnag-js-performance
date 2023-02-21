@@ -20,12 +20,12 @@ export interface ResourceAttributes {
 }
 
 export function attributeToJson (key: string, attribute: SpanAttribute): JsonAttribute | undefined {
-  if (typeof attribute === 'number' && (Number.isNaN(attribute) || !Number.isFinite(attribute))) {
-    return undefined
-  }
-
   switch (typeof attribute) {
     case 'number':
+      if (Number.isNaN(attribute) || !Number.isFinite(attribute)) {
+        return undefined
+      }
+    
       return { key, value: { doubleValue: attribute } }
     case 'boolean':
       return { key, value: { boolValue: attribute } }
