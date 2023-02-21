@@ -25,7 +25,7 @@ export function attributeToJson (key: string, attribute: SpanAttribute): JsonAtt
       if (Number.isNaN(attribute) || !Number.isFinite(attribute)) {
         return undefined
       }
-    
+
       return { key, value: { doubleValue: attribute } }
     case 'boolean':
       return { key, value: { boolValue: attribute } }
