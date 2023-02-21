@@ -2,10 +2,10 @@
  * @jest-environment jsdom
  */
 
-import { SpanAttributes, type SpanInternal } from '@bugsnag/js-performance-core/lib/span'
+import type { DeliveryPayload } from '@bugsnag/js-performance-core/lib/delivery'
 import createDelivery from '../lib/delivery'
-import createResourseAttributesSource from '../lib/resource-attributes-source'
-import createSpanAttributesSource from '../lib/span-attributes-source'
+
+// TODO: Improve fetch mocking
 
 // @ts-expect-error mock not assignable to global.fetch
 global.fetch = jest.fn(() =>
@@ -14,27 +14,26 @@ global.fetch = jest.fn(() =>
 
 beforeEach(() => {
   // @ts-expect-error property mockClear does not exist on fetch
-  fetch.mockClear()
+  global.fetch.mockClear()
 })
 
-describe('delivery', () => {
+describe('Browser Delivery', () => {
   it('delivers a span', () => {
-    const resourceAttributesSource = createResourseAttributesSource(navigator)
-    const spanAttributesSource = createSpanAttributesSource()
-    const spanAttributes = new SpanAttributes(spanAttributesSource)
-    const spans: SpanInternal[] = [{
-      id: 'unique-span-id',
-      kind: 'internal',
-      name: 'test span',
-      startTime: 12345,
-      traceId: 'trace-span-id',
-      endTime: 56789,
-      attributes: spanAttributes
-    }]
+    const deliveryPayload: DeliveryPayload = {
+      resourceSpans: [{
+        resource: { attributes: [{ key: 'test-key', value: { stringValue: 'test-value' } }] },
+        scopeSpans: [{ spans: [{ key: 'test-span', value: { intValue: 12345 } }] }]
+      }]
+    }
 
     const delivery = createDelivery(global.fetch)
-    delivery.send('/test', 'test-api-key', spans, resourceAttributesSource())
+    delivery.send('/test', 'test-api-key', deliveryPayload)
 
-    expect(global.fetch).toHaveBeenCalledWith('/test', expect.objectContaining({ body: expect.stringContaining('test span') }))
+    expect(global.fetch).toHaveBeenCalledWith('/test', expect.objectContaining({
+      body: expect.stringContaining(JSON.stringify(deliveryPayload)),
+      headers: expect.objectContaining({
+        'Bugsnag-Api-Key': 'test-api-key'
+      })
+    }))
   })
 })
