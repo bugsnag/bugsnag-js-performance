@@ -60,11 +60,11 @@ export class BrowserProcessor implements Processor {
 
 export class BrowserProcessorFactory implements ProcessorFactory {
   create (
-    configuration: Configuration
+    configuration: Required<Configuration>
   ): BrowserProcessor {
     return new BrowserProcessor(
       configuration.apiKey,
-      configuration.endpoint || 'https://otlp.bugsnag.com/v1/traces',
+      configuration.endpoint,
       browserDelivery(global.fetch),
       clock,
       createResourceAttributesSource(navigator)

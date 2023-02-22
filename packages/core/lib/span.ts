@@ -44,6 +44,10 @@ export class SpanAttributes {
   public remove (name: string) {
     this.attributes.delete(name)
   }
+
+  public toJson () {
+    return Array.from(this.attributes).map(([key, value]) => attributeToJson(key, value))
+  }
 }
 
 export function spanToJson (span: SpanEnded, clock: Clock) {
@@ -54,6 +58,6 @@ export function spanToJson (span: SpanEnded, clock: Clock) {
     traceId: span.traceId,
     startTimeUnixNano: clock.toUnixTimestampNanoseconds(span.startTime),
     endTimeUnixNano: clock.toUnixTimestampNanoseconds(span.endTime),
-    attributes: Object.entries(span.attributes.attributes).map(([key, value]) => attributeToJson(key, value))
+    attributes: span.attributes.toJson()
   }
 }

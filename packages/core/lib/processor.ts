@@ -10,7 +10,7 @@ export interface Processor {
 
 export interface ProcessorFactory {
   create: (
-    configuration: Configuration,
+    configuration: Required<Configuration>,
   ) => Processor
 }
 
