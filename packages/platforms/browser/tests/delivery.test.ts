@@ -6,20 +6,9 @@ import type { DeliveryPayload } from '@bugsnag/js-performance-core/lib/delivery'
 import { Kind } from '@bugsnag/js-performance-core/lib/span'
 import createDelivery from '../lib/delivery'
 
-// TODO: Improve fetch mocking
-
-// @ts-expect-error mock not assignable to global.fetch
-global.fetch = jest.fn(() =>
-  Promise.resolve()
-)
-
-beforeEach(() => {
-  // @ts-expect-error property mockClear does not exist on fetch
-  global.fetch.mockClear()
-})
-
 describe('Browser Delivery', () => {
   it('delivers a span', () => {
+    const mockFetch = jest.fn(() => Promise.resolve({} as unknown as Response))
     const deliveryPayload: DeliveryPayload = {
       resourceSpans: [{
         resource: { attributes: [{ key: 'test-key', value: { stringValue: 'test-value' } }] },
@@ -37,10 +26,10 @@ describe('Browser Delivery', () => {
       }]
     }
 
-    const delivery = createDelivery(global.fetch)
+    const delivery = createDelivery(mockFetch)
     delivery.send('/test', 'test-api-key', deliveryPayload)
 
-    expect(global.fetch).toHaveBeenCalledWith('/test', expect.objectContaining({
+    expect(mockFetch).toHaveBeenCalledWith('/test', expect.objectContaining({
       body: expect.stringContaining(JSON.stringify(deliveryPayload)),
       headers: expect.objectContaining({
         'Bugsnag-Api-Key': 'test-api-key'
