@@ -1,7 +1,7 @@
 import { type ResourceAttributeSource, type SpanAttributesSource } from './attributes'
 import { type Clock } from './clock'
 import { type IdGenerator } from './id-generator'
-import { BufferingProcessor, type ProcessorFactory } from './processor'
+import { BufferingProcessor, type Processor, type ProcessorFactory } from './processor'
 import { SpanAttributes, type Span, type SpanInternal, type Time } from './span'
 
 interface Logger {
@@ -103,7 +103,7 @@ export interface ClientOptions {
 
 export function createClient (options: ClientOptions): BugsnagPerformance {
   const bufferingProcessor = new BufferingProcessor()
-  let processor = bufferingProcessor
+  let processor: Processor = bufferingProcessor
 
   return {
     start: (config: Configuration | string) => {
