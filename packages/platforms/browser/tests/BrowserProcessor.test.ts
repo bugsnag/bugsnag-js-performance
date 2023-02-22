@@ -35,20 +35,29 @@ describe('BrowserProcessor', () => {
     expect(mockDelivery.send).toHaveBeenCalledWith(
       '/traces', // Endpoint
       'test-api-key', // API Key
-      expect.objectContaining({
-        resourceSpans: expect.arrayContaining([
-          expect.objectContaining({
-            resource: expect.objectContaining({
-              attributes: expect.any(Array)
-            }),
-            scopeSpans: expect.arrayContaining([
-              expect.objectContaining({
-                spans: expect.any(Array)
-              })
-            ])
-          })
-        ])
-      })
+      {
+        resourceSpans: [{
+          resource: {
+            attributes: [
+              { key: 'releaseStage', value: { stringValue: 'test' } },
+              { key: 'sdkName', value: { stringValue: 'bugsnag.performance.browser' } },
+              { key: 'sdkVersion', value: { stringValue: 'unknown' } },
+              { key: 'userAgent', value: { stringValue: expect.stringMatching(/\((?<info>.*?)\)(\s|$)|(?<name>.*?)\/(?<version>.*?)(\s|$)/gm) } }
+            ]
+          },
+          scopeSpans: [{
+            spans: [{
+              attributes: [],
+              endTimeUnixNano: undefined,
+              kind: 1,
+              name: 'test-span',
+              spanId: 'test-span-id',
+              startTimeUnixNano: undefined,
+              traceId: 'trace-id'
+            }]
+          }]
+        }]
+      }
     )
   })
 })

@@ -15,7 +15,6 @@ export class BrowserProcessor implements Processor {
   private clock: Clock
   private resourceAttributeSource: ResourceAttributeSource
 
-
   constructor (
     apiKey: string,
     endpoint: string,
