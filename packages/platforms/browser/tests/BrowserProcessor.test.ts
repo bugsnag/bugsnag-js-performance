@@ -28,7 +28,7 @@ describe('BrowserProcessor', () => {
     }
 
     const mockDelivery = { send: jest.fn() }
-    const mockClock = { now: jest.now, convert: jest.fn(), toUnixTimestampNanoseconds: jest.fn() }
+    const mockClock = { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => 50_000 }
     const processor = new BrowserProcessor('test-api-key', '/traces', mockDelivery, mockClock, resourceAttributesSource(navigator))
     processor.add(span)
 
@@ -48,11 +48,11 @@ describe('BrowserProcessor', () => {
           scopeSpans: [{
             spans: [{
               attributes: [],
-              endTimeUnixNano: undefined,
+              endTimeUnixNano: 50_000,
               kind: 1,
               name: 'test-span',
               spanId: 'test-span-id',
-              startTimeUnixNano: undefined,
+              startTimeUnixNano: 50_000,
               traceId: 'trace-id'
             }]
           }]
