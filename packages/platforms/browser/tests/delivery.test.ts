@@ -3,7 +3,6 @@
  */
 
 import type { DeliveryPayload } from '@bugsnag/js-performance-core/lib/delivery'
-import { Kind } from '@bugsnag/js-performance-core/lib/span'
 import createDelivery from '../lib/delivery'
 
 describe('Browser Delivery', () => {
@@ -15,7 +14,7 @@ describe('Browser Delivery', () => {
         scopeSpans: [{
           spans: [{
             name: 'test-span',
-            kind: Kind.client,
+            kind: 1,
             spanId: 'test-span-id',
             traceId: 'test-trace-id',
             endTimeUnixNano: 56789,

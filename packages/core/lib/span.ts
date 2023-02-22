@@ -7,13 +7,30 @@ export interface Span {
   end: (endTime?: Time) => void
 }
 
-export enum Kind {
-  unspecified = 0,
-  internal = 1,
-  server = 2,
-  client = 3,
-  producer = 4,
-  consumer = 5
+const enum Kind {
+  Unspecified = 0,
+  Internal = 1,
+  Server = 2,
+  Client = 3,
+  Producer = 4,
+  Consumer = 5
+}
+
+export function getKind (kind: 'internal' | 'server' | 'client' | 'producer' | 'consumer') {
+  switch (kind) {
+    case 'internal':
+      return Kind.Internal
+    case 'server':
+      return Kind.Server
+    case 'client':
+      return Kind.Client
+    case 'producer':
+      return Kind.Producer
+    case 'consumer':
+      return Kind.Consumer
+    default:
+      return Kind.Internal
+  }
 }
 
 export interface SpanInternal {
@@ -53,7 +70,7 @@ export class SpanAttributes {
 export function spanToJson (span: SpanEnded, clock: Clock) {
   return {
     name: span.name,
-    kind: Kind[span.kind],
+    kind: getKind(span.kind),
     spanId: span.id,
     traceId: span.traceId,
     startTimeUnixNano: clock.toUnixTimestampNanoseconds(span.startTime),
