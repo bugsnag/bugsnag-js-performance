@@ -9,7 +9,7 @@ import resourceAttributesSource from '../lib/resource-attributes-source'
 describe('BrowserProcessorFactory', () => {
   it('returns an instance of BrowserProcessor', () => {
     const mockLogger = { warn: jest.fn(), debug: jest.fn(), error: jest.fn(), info: jest.fn() }
-    const processor = new BrowserProcessorFactory().create({ apiKey: 'test-api-key', endpoint: '/traces', releaseStage: 'test', logger: mockLogger })
+    const processor = new BrowserProcessorFactory(global.fetch, navigator).create({ apiKey: 'test-api-key', endpoint: '/traces', releaseStage: 'test', logger: mockLogger })
     expect(processor).toBeInstanceOf(BrowserProcessor)
   })
 })

@@ -58,16 +58,26 @@ export class BrowserProcessor implements Processor {
   }
 }
 
+type Fetch = (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>
+
 export class BrowserProcessorFactory implements ProcessorFactory {
+  private fetch: Fetch
+  private navigator: Navigator
+
+  constructor (fetch: Fetch, navigator: Navigator) {
+    this.fetch = fetch
+    this.navigator = navigator
+  }
+
   create (
     configuration: Required<Configuration>
   ): BrowserProcessor {
     return new BrowserProcessor(
       configuration.apiKey,
       configuration.endpoint,
-      browserDelivery(global.fetch),
+      browserDelivery(this.fetch),
       clock,
-      createResourceAttributesSource(navigator)
+      createResourceAttributesSource(this.navigator)
     )
   }
 }
