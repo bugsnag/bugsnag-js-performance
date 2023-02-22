@@ -17,8 +17,8 @@ class IncrementingClock implements Clock {
     return (date.getTime() - this.timeOrigin) * 1_000_000
   }
 
-  toAbsoluteTimeStamp (time: number) {
-    return time
+  toUnixTimestampNanoseconds (time: number) {
+    return this.timeOrigin + time
   }
 }
 

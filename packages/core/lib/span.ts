@@ -52,8 +52,8 @@ export function spanToJson (span: SpanEnded, clock: Clock) {
     kind: Kind[span.kind],
     spanId: span.id,
     traceId: span.traceId,
-    startTimeUnixNano: clock.toAbsoluteTimeStamp(span.startTime),
-    endTimeUnixNano: clock.toAbsoluteTimeStamp(span.endTime),
+    startTimeUnixNano: clock.toUnixTimestampNanoseconds(span.startTime),
+    endTimeUnixNano: clock.toUnixTimestampNanoseconds(span.endTime),
     attributes: Object.entries(span.attributes.attributes).map(([key, value]) => attributeToJson(key, value))
   }
 }
