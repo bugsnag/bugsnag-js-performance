@@ -1,4 +1,4 @@
-import type { ResourceAttributes } from '@bugsnag/js-performance-core/lib/span'
+import type { ResourceAttributes } from '@bugsnag/js-performance-core/lib/attributes'
 
 function createResourceAttributesSource (navigator: Navigator): () => ResourceAttributes {
   return function resourceAttributesSource () {

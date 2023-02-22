@@ -1,6 +1,6 @@
-import type { SpanAttribute } from '@bugsnag/js-performance-core/lib/span'
+import type { SpanAttribute, SpanAttributesSource } from '@bugsnag/js-performance-core/lib/attributes'
 
-function spanAttributesSource (): Map<string, SpanAttribute> {
+function spanAttributesSource (): SpanAttributesSource {
   const spanAttributes = new Map<string, SpanAttribute>()
   spanAttributes.set('browser.page.url', window.location.href)
 

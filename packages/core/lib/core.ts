@@ -1,7 +1,8 @@
+import type { ResourceAttributes, SpanAttribute } from './attributes'
 import type { Clock } from './clock'
 import type { IdGenerator } from './id-generator'
 import type { Processor } from './processor'
-import type { SpanAttribute, ResourceAttributes, Span, SpanInternal, Time } from './span'
+import type { Span, SpanInternal, Time } from './span'
 import { SpanAttributes } from './span'
 
 interface Logger {
