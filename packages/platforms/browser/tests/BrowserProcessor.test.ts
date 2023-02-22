@@ -41,7 +41,7 @@ describe('BrowserProcessor', () => {
             attributes: [
               { key: 'releaseStage', value: { stringValue: 'test' } },
               { key: 'sdkName', value: { stringValue: 'bugsnag.performance.browser' } },
-              { key: 'sdkVersion', value: { stringValue: 'unknown' } },
+              { key: 'sdkVersion', value: { stringValue: expect.stringMatching(/\d{1,2}\.\d{1,2}\.\d{1,3}/g) } },
               { key: 'userAgent', value: { stringValue: expect.stringMatching(/\((?<info>.*?)\)(\s|$)|(?<name>.*?)\/(?<version>.*?)(\s|$)/gm) } }
             ]
           },
