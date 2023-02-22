@@ -29,11 +29,13 @@ describe('Browser Delivery', () => {
     const delivery = createDelivery(mockFetch)
     delivery.send('/test', 'test-api-key', deliveryPayload)
 
-    expect(mockFetch).toHaveBeenCalledWith('/test', expect.objectContaining({
-      body: expect.stringContaining(JSON.stringify(deliveryPayload)),
-      headers: expect.objectContaining({
-        'Bugsnag-Api-Key': 'test-api-key'
-      })
-    }))
+    expect(mockFetch).toHaveBeenCalledWith('/test', {
+      method: 'POST',
+      body: JSON.stringify(deliveryPayload),
+      headers: {
+        'Bugsnag-Api-Key': 'test-api-key',
+        'Content-Type': 'application/json'
+      }
+    })
   })
 })

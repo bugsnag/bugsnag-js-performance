@@ -29,7 +29,7 @@ export interface SpanInternal {
 export type SpanEnded = Required<SpanInternal>
 
 export class SpanAttributes {
-  public readonly attributes: Map<string, SpanAttribute>
+  private readonly attributes: Map<string, SpanAttribute>
 
   constructor (initialValues: Map<string, SpanAttribute>) {
     this.attributes = initialValues
