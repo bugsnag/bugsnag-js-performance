@@ -1,5 +1,4 @@
 {
-    "name": "bugsnag-js-performance-test-harness",
-    "private": true
-  }
-  
+  "name": "@bugsnag/js-performance-browser-test-fixtures",
+  "private": true
+}

@@ -8,7 +8,7 @@
     "javascript",
     "typescript"
   ],
-  "homepage": "",
+  "homepage": "https://github.com/bugsnag/bugsnag-js-performance",
   "author": "Ben Wilson <ben.wilson@smartbear.com>",
   "license": "MIT",
   "main": "lib/core.ts",
