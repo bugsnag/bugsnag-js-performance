@@ -33,6 +33,7 @@ describe('Browser Delivery', () => {
       body: JSON.stringify(deliveryPayload),
       headers: {
         'Bugsnag-Api-Key': 'test-api-key',
+        'Bugsnag-Span-Sampling': '1:1',
         'Content-Type': 'application/json'
       }
     })
