@@ -1,5 +1,4 @@
 import type { JsonAttribute } from './attributes'
-import type { Kind } from './span'
 
 export interface Delivery {
   send: (
@@ -28,7 +27,7 @@ export interface DeliveryPayload {
 
 export interface DeliverySpan {
   name: string
-  kind: Kind
+  kind: 0 | 1 | 2 | 3 | 4 | 5
   spanId: string
   traceId: string
   startTimeUnixNano: number
