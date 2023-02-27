@@ -1,19 +1,13 @@
 import type { ResourceAttributes } from '@bugsnag/js-performance-core/lib/attributes'
-import path from 'path'
 
-function getPackageVersion () {
-  const pkgname = path.join(__dirname, '..', 'package.json')
-
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  return require(pkgname).version
-}
+const version = process.env.PACKAGE_VERSION || '__VERSION__'
 
 function createResourceAttributesSource (navigator: Navigator): () => ResourceAttributes {
   return function resourceAttributesSource () {
     return {
       releaseStage: process.env.NODE_ENV || 'production',
       sdkName: 'bugsnag.performance.browser',
-      sdkVersion: getPackageVersion(),
+      sdkVersion: version,
       userAgent: navigator.userAgent,
       // chromium only
       ...(navigator.userAgentData
