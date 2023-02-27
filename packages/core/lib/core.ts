@@ -2,7 +2,7 @@ import { type ResourceAttributeSource, type SpanAttributesSource } from './attri
 import { type Clock } from './clock'
 import { type IdGenerator } from './id-generator'
 import { BufferingProcessor, type Processor, type ProcessorFactory } from './processor'
-import { SpanAttributes, type Span, type SpanInternal, type Time } from './span'
+import { Kind, SpanAttributes, type Span, type SpanInternal, type Time } from './span'
 
 interface Logger {
   debug: (msg: string) => void
@@ -116,7 +116,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
     startSpan: (name, startTime) => {
       const spanInternal: SpanInternal = {
         name,
-        kind: 'client', // TODO: How do we define the current kind?
+        kind: Kind.Client, // TODO: How do we define the current kind?
         id: options.idGenerator.generate(64),
         traceId: options.idGenerator.generate(128),
         startTime: sanitizeTime(options.clock, startTime),

@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { SpanAttributes, type SpanEnded } from '@bugsnag/js-performance-core/lib/span'
+import { Kind, SpanAttributes, type SpanEnded } from '@bugsnag/js-performance-core/lib/span'
 import { BrowserProcessor, BrowserProcessorFactory } from '../lib/BrowserProcessor'
 import resourceAttributesSource from '../lib/resource-attributes-source'
 
@@ -19,7 +19,7 @@ describe('BrowserProcessor', () => {
   it('correctly formats the delivery payload', () => {
     const span: SpanEnded = {
       id: 'test-span-id',
-      kind: 'internal',
+      kind: Kind.Internal,
       name: 'test-span',
       startTime: 12345,
       endTime: 56789,
