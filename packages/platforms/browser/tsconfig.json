@@ -9,8 +9,7 @@
   "include": ["lib/*"],
   "exclude": [
     "node_modules",
-    "**/tests/*",
-    "**/__e2e__/*"
+    "**/tests/*"
   ]
 }
 
