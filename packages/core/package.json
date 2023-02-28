@@ -21,6 +21,9 @@
     "type": "git",
     "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
   },
+  "scripts": {
+    "build": "rm -f dist/* && tsc"
+  },
   "bugs": {
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   }
