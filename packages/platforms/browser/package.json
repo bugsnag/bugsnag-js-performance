@@ -7,7 +7,6 @@
   "license": "MIT",
   "main": "dist/browser.js",
   "types": "dist/browser.d.ts",
-  "type": "module",
   "directories": {
     "lib": "lib",
     "test": "tests"
@@ -20,12 +19,17 @@
     "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
   },
   "scripts": {
-    "build": "rm -f dist/* && tsc"
+    "build": "rm -f dist/* && tsc && webpack"
   },
   "bugs": {
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "dependencies": {
     "@bugsnag/js-performance-core": "*"
+  },
+  "devDependencies": {
+    "ts-loader": "^9.4.2",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   }
 }

@@ -11,13 +11,13 @@
   "homepage": "https://github.com/bugsnag/bugsnag-js-performance",
   "author": "Ben Wilson <ben.wilson@smartbear.com>",
   "license": "MIT",
-  "main": "dist/core.ts",
-  "type": "module",
+  "main": "lib/core.ts",
+  "browser": "dist/core.js",
   "directories": {
     "lib": "lib",
     "test": "tests"
   },
-  "files": ["dist"],
+  "files": ["lib", "dist"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"

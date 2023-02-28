@@ -1,9 +1,9 @@
-import type { ResourceAttributes, SpanAttribute } from './attributes.js'
-import type { Clock } from './clock.js'
-import type { IdGenerator } from './id-generator.js'
-import type { Processor } from './processor.js'
-import type { Span, SpanInternal, Time } from './span.js'
-import { SpanAttributes } from './span.js'
+import type { ResourceAttributes, SpanAttribute } from './attributes'
+import type { Clock } from './clock'
+import type { IdGenerator } from './id-generator'
+import type { Processor } from './processor'
+import type { Span, SpanInternal, Time } from './span'
+import { SpanAttributes } from './span'
 
 interface Logger {
   debug: (msg: string) => void

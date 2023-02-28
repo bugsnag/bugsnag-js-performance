@@ -3,19 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <link href="/favicon.png" rel="shortcut icon" type="image/x-icon">
-
-    <script type="importmap">
-    {
-      "imports": {
-        "@bugsnag/js-performance-core": "/node_modules/@bugsnag/js-performance-core/dist/core.js",
-        "@bugsnag/js-performance-browser": "/node_modules/@bugsnag/js-performance-browser/dist/browser.js"
-      }
-    }
-    </script>
-
-    <script type="module">
-      import BugsnagPerformance from '@bugsnag/js-performance-browser'
-
+    <script src="/node_modules/@bugsnag/js-performance-browser/dist/bugsnag-performance.min.js"></script>
+    <script>
       const apiKey = decodeURIComponent(window.location.search.match(/API_KEY=([^&]+)/)[1])
       const endpoint = decodeURIComponent(window.location.search.match(/ENDPOINT=([^&]+)/)[1])
 
