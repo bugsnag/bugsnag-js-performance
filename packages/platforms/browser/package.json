@@ -12,7 +12,7 @@
     "test": "tests"
   },
   "files": [
-    "dist"
+    "dist", "lib"
   ],
   "repository": {
     "type": "git",
