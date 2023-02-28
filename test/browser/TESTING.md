@@ -5,19 +5,19 @@
 To run the tests locally, you'll need a copy of Chrome and ChromeDriver (available with Homebrew):
 
 ```sh
-$ brew install chromedriver
+brew install chromedriver
 ```
 
 To run all the tests, run the following in `test/browser`:
 
 ```sh
-$ bundle exec maze-runner --farm=local --browser=chrome
+bundle exec maze-runner --farm=local --browser=chrome
 ```
 
 Or to run a single feature file:
 
 ```sh
-$ bundle exec maze-runner --farm=local --browser=chrome features/device.feature
+bundle exec maze-runner --farm=local --browser=chrome features/device.feature
 ```
 
 ## Running the end-to-end tests with BrowserStack
@@ -34,11 +34,11 @@ The browsers available to test on are the keys in [`browsers.yml`](https://githu
 To run all the tests, run the following in `test/browser`:
 
 ```sh
-$ bundle exec maze-runner --farm=bs --browser=chrome_latest
+bundle exec maze-runner --farm=bs --browser=chrome_latest
 ```
 
 Or to run a single feature file:
 
 ```sh
-$ bundle exec maze-runner --farm=bs --browser=chrome_latest features/device.feature
+bundle exec maze-runner --farm=bs --browser=chrome_latest features/device.feature
 ```
