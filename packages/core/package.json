@@ -17,7 +17,7 @@
     "lib": "lib",
     "test": "tests"
   },
-  "files": ["lib"],
+  "files": ["lib", "dist"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
