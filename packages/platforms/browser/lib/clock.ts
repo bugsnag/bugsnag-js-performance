@@ -1,4 +1,4 @@
-import { type Clock } from '@bugsnag/js-performance-core/lib/clock'
+import { type Clock } from '@bugsnag/js-performance-core/lib/clock.js'
 
 const NANOSECONDS_IN_MILLISECONDS = 1_000_000
 

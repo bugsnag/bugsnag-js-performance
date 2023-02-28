@@ -1,4 +1,4 @@
-import type { SpanAttribute } from './attributes'
+import type { SpanAttribute } from './attributes.js'
 
 export type Time = Date | number
 
