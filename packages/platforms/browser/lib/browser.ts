@@ -1,8 +1,8 @@
 import { createClient } from '@bugsnag/js-performance-core'
-import clock from './clock.js'
-import idGenerator from './id-generator.js'
-import createResourceAttributesSource from './resource-attributes-source.js'
-import spanAttributesSource from './span-attributes-source.js'
+import clock from './clock'
+import idGenerator from './id-generator'
+import createResourceAttributesSource from './resource-attributes-source'
+import spanAttributesSource from './span-attributes-source'
 
 const BugsnagPerformance = createClient({
   clock,
