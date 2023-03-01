@@ -1,4 +1,6 @@
-import type { Delivery, Fetch } from '@bugsnag/js-performance-core/lib/delivery'
+import type { Delivery } from '@bugsnag/js-performance-core/lib/delivery'
+
+export type Fetch = (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>
 
 function browserDelivery (fetch: Fetch): Delivery {
   return {

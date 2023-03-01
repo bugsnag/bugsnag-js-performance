@@ -1,11 +1,11 @@
 import { type Configuration } from '@bugsnag/js-performance-core'
 import { attributeToJson, type ResourceAttributeSource } from '@bugsnag/js-performance-core/lib/attributes'
 import { type Clock } from '@bugsnag/js-performance-core/lib/clock'
-import { type Fetch, type Delivery, type DeliveryPayload } from '@bugsnag/js-performance-core/lib/delivery'
+import { type Delivery, type DeliveryPayload } from '@bugsnag/js-performance-core/lib/delivery'
 import { type Processor, type ProcessorFactory } from '@bugsnag/js-performance-core/lib/processor'
 import { spanToJson, type SpanEnded } from '@bugsnag/js-performance-core/lib/span'
 import clock from './clock'
-import browserDelivery from './delivery'
+import browserDelivery, { type Fetch } from './delivery'
 import createResourceAttributesSource from './resource-attributes-source'
 
 export class BrowserProcessor implements Processor {
