@@ -11,13 +11,13 @@
     "lib": "lib",
     "test": "tests"
   },
-  "files": ["dist"],
+  "files": ["dist/bugsnag-performance.*"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
   },
   "scripts": {
-    "build": "rm -f dist/* && webpack"
+    "build": "rm -rf dist && webpack"
   },
   "bugs": {
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"

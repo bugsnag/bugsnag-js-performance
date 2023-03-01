@@ -1,9 +1,8 @@
 {
   "extends": "../tsconfig.platforms-base.json",
   "compilerOptions": {
-    "baseUrl": "./",
-    "outDir": "dist",
-    "rootDir": "lib",
+    "outDir": "./dist",
+    "sourceMap": true,
     "types": ["./navigator-user-agent-data", "node"]
   },
   "include": ["lib/*"],
