@@ -19,7 +19,7 @@
     "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
   },
   "scripts": {
-    "build": "rm -f dist/* && tsc && webpack"
+    "build": "rm -f dist/* && webpack"
   },
   "bugs": {
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"

@@ -2,7 +2,7 @@
   "name": "bugsnag-js-performance",
   "private": true,
   "workspaces": [
-    "packages/core",
+    "packages/*",
     "packages/platforms/*"
   ],
   "scripts": {
