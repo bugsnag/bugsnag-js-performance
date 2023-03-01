@@ -3,7 +3,7 @@ import type { BugsnagPerformance, ClientOptions } from '../../lib/core'
 import { createClient } from '../../lib/core'
 
 const defaultOptions = () => ({
-  processor: new InMemoryProcessor(),
+  processorFactory: { create: () => new InMemoryProcessor() },
   idGenerator: new StableIdGenerator(),
   clock: new IncrementingClock(),
   resourceAttributesSource,

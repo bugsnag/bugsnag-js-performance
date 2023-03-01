@@ -1,6 +1,6 @@
 export type SpanAttribute = string | number | boolean
 
-export type SpanAttributesSource = Map<string, SpanAttribute>
+export type SpanAttributesSource = () => Map<string, SpanAttribute>
 
 export interface JsonAttribute {
   key: string
@@ -19,6 +19,8 @@ export interface ResourceAttributes {
   sdkName: string // telemetry.sdk.name
   sdkVersion: string // telemetry.sdk.version
 }
+
+export type ResourceAttributeSource = () => ResourceAttributes
 
 export function attributeToJson (key: string, attribute: SpanAttribute): JsonAttribute | undefined {
   switch (typeof attribute) {

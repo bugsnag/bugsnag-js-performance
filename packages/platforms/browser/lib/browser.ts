@@ -1,4 +1,5 @@
 import { createClient } from '@bugsnag/js-performance-core'
+import { BrowserProcessorFactory } from './BrowserProcessor'
 import clock from './clock'
 import idGenerator from './id-generator'
 import createResourceAttributesSource from './resource-attributes-source'
@@ -9,7 +10,7 @@ const BugsnagPerformance = createClient({
   resourceAttributesSource: createResourceAttributesSource(navigator),
   spanAttributesSource,
   idGenerator,
-  processor: { add: () => {} }
+  processorFactory: new BrowserProcessorFactory(global.fetch, navigator)
 })
 
 export default BugsnagPerformance

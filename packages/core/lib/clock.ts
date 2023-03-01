@@ -6,4 +6,7 @@ export interface Clock {
 
   // a function to convert a Date object into the format returned by 'now'
   convert: (date: Date) => number
+
+  // convert the format returned by 'now' into a unix timestamp in nanoseconds
+  toUnixTimestampNanoseconds: (time: number) => number
 }

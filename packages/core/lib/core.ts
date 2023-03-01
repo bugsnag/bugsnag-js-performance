@@ -1,9 +1,8 @@
-import type { ResourceAttributes, SpanAttribute } from './attributes'
-import type { Clock } from './clock'
-import type { IdGenerator } from './id-generator'
-import type { Processor } from './processor'
-import type { Span, SpanInternal, Time } from './span'
-import { SpanAttributes } from './span'
+import { type ResourceAttributeSource, type SpanAttributesSource } from './attributes'
+import { type Clock } from './clock'
+import { type IdGenerator } from './id-generator'
+import { BufferingProcessor, type Processor, type ProcessorFactory } from './processor'
+import { Kind, SpanAttributes, type Span, type SpanInternal, type Time } from './span'
 
 interface Logger {
   debug: (msg: string) => void
@@ -95,22 +94,29 @@ function sanitizeTime (clock: Clock, time?: Time): number {
 }
 
 export interface ClientOptions {
-  processor: Processor
-  idGenerator: IdGenerator
   clock: Clock
-  resourceAttributesSource: () => ResourceAttributes
-  spanAttributesSource: () => Map<string, SpanAttribute>
+  idGenerator: IdGenerator
+  processorFactory: ProcessorFactory
+  resourceAttributesSource: ResourceAttributeSource
+  spanAttributesSource: SpanAttributesSource
 }
 
 export function createClient (options: ClientOptions): BugsnagPerformance {
+  const bufferingProcessor = new BufferingProcessor()
+  let processor: Processor = bufferingProcessor
+
   return {
     start: (config: Configuration | string) => {
-      config = validate(config)
+      const configuration = validate(config)
+      processor = options.processorFactory.create(configuration)
+      bufferingProcessor.spans.forEach(span => {
+        processor.add(span)
+      })
     },
     startSpan: (name, startTime) => {
       const spanInternal: SpanInternal = {
         name,
-        kind: 'client', // TODO: How do we define the current kind?
+        kind: Kind.Client, // TODO: How do we define the current kind?
         id: options.idGenerator.generate(64),
         traceId: options.idGenerator.generate(128),
         startTime: sanitizeTime(options.clock, startTime),
@@ -120,7 +126,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       return {
         // TODO Expose internal span to platforms using Symbol / WeakMap?
         end: (endTime) => {
-          options.processor.add({ ...spanInternal, endTime: sanitizeTime(options.clock, endTime) })
+          processor.add({ ...spanInternal, endTime: sanitizeTime(options.clock, endTime) })
         }
       }
     }

@@ -1,5 +1,5 @@
-import { SpanAttributes } from '../lib/span'
-import { createTestClient, InMemoryProcessor, IncrementingClock } from './utilities'
+import { Kind, SpanAttributes } from '../lib/span'
+import { createTestClient, IncrementingClock, InMemoryProcessor } from './utilities'
 
 describe('Span', () => {
   describe('client.startSpan()', () => {
@@ -19,7 +19,8 @@ describe('Span', () => {
       { type: 'symbol', startTime: Symbol('test') }
     ])('uses default clock implementation if startTime is invalid ($type)', ({ startTime }) => {
       const processor = new InMemoryProcessor()
-      const client = createTestClient({ processor })
+      const processorFactory = { create: () => processor }
+      const client = createTestClient({ processorFactory })
       client.start({ apiKey: 'test-api-key' })
 
       // @ts-expect-error startTime will be invalid
@@ -35,7 +36,9 @@ describe('Span', () => {
   describe('Span.end()', () => {
     it('can be ended without an endTime', () => {
       const processor = new InMemoryProcessor()
-      const client = createTestClient({ processor })
+      const processorFactory = { create: () => processor }
+      const client = createTestClient({ processorFactory })
+      client.start({ apiKey: 'test-api-key' })
 
       const span = client.startSpan('test span')
       span.end()
@@ -43,7 +46,7 @@ describe('Span', () => {
       expect(processor).toHaveProcessedSpan({
         id: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
-        kind: 'client',
+        kind: Kind.Client,
         name: 'test span',
         startTime: 1,
         endTime: 2,
@@ -53,9 +56,11 @@ describe('Span', () => {
     })
 
     it('accepts a Date object as endTime', () => {
-      const processor = new InMemoryProcessor()
       const clock = new IncrementingClock('2023-01-02T03:04:05.006Z')
-      const client = createTestClient({ processor, clock })
+      const processor = new InMemoryProcessor()
+      const processorFactory = { create: () => processor }
+      const client = createTestClient({ processorFactory, clock })
+      client.start({ apiKey: 'test-api-key' })
 
       const span = client.startSpan('test span')
       span.end(new Date('2023-01-02T03:04:05.008Z')) // 2ms after time origin
@@ -64,7 +69,7 @@ describe('Span', () => {
         id: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         attributes: expect.any(SpanAttributes),
-        kind: 'client',
+        kind: Kind.Client,
         name: 'test span',
         startTime: 1,
         endTime: 2_000_000 // 2ms in nanoseconds
@@ -74,7 +79,9 @@ describe('Span', () => {
 
     it('accepts a number of nanoseconds as endTime', () => {
       const processor = new InMemoryProcessor()
-      const client = createTestClient({ processor })
+      const processorFactory = { create: () => processor }
+      const client = createTestClient({ processorFactory })
+      client.start({ apiKey: 'test-api-key' })
 
       const span = client.startSpan('test span')
       span.end(4321)
@@ -83,7 +90,7 @@ describe('Span', () => {
         id: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         attributes: expect.any(SpanAttributes),
-        kind: 'client',
+        kind: Kind.Client,
         name: 'test span',
         startTime: 1,
         endTime: 4321
