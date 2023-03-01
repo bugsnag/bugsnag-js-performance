@@ -11,7 +11,7 @@ describe('resourceAttributesSource', () => {
       userAgent: expect.stringMatching(/\((?<info>.*?)\)(\s|$)|(?<name>.*?)\/(?<version>.*?)(\s|$)/g),
       releaseStage: 'test',
       sdkName: 'bugsnag.performance.browser',
-      sdkVersion: expect.stringMatching(/\d{1,2}\.\d{1,2}\.\d{1,3}/g)
+      sdkVersion: '1.2.3-jest'
     })
   })
 })
