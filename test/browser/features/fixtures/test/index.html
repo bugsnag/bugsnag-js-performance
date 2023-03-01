@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link href="/favicon.png" rel="shortcut icon" type="image/x-icon">
+    <script src="/node_modules/@bugsnag/js-performance-browser/dist/bugsnag-performance.min.js"></script>
+    <script>
+      const apiKey = decodeURIComponent(window.location.search.match(/API_KEY=([^&]+)/)[1])
+      const endpoint = decodeURIComponent(window.location.search.match(/ENDPOINT=([^&]+)/)[1])
+
+      BugsnagPerformance.start({ apiKey, endpoint })
+    </script>
+  </head>
+  <body>
+    <h1>Hello you!</h1>
+    <script>
+    //   Bugsnag.notify(new Error('device data does work'))
+    </script>
+  </body>
+</html>

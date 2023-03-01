@@ -8,18 +8,22 @@
     "javascript",
     "typescript"
   ],
-  "homepage": "",
+  "homepage": "https://github.com/bugsnag/bugsnag-js-performance",
   "author": "Ben Wilson <ben.wilson@smartbear.com>",
   "license": "MIT",
   "main": "lib/core.ts",
+  "browser": "dist/core.js",
   "directories": {
     "lib": "lib",
     "test": "tests"
   },
-  "files": ["lib"],
+  "files": ["dist"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "scripts": {
+    "build": "rm -f dist/* && tsc"
   },
   "bugs": {
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
