@@ -1,0 +1,37 @@
+steps:
+
+  - group: "Browser Tests"
+    steps:
+      - label:  ":docker: Build browser maze runner image"
+        key: "browser-maze-runner"
+        timeout_in_minutes: 20
+        plugins:
+          - docker-compose#v3.9.0:
+              build:
+                - browser-maze-runner
+              image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
+          - docker-compose#v3.9.0:
+              push:
+                - browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-browser-${BRANCH_NAME}
+
+      #
+      # BitBar tests
+      #
+      - label: ":chrome: v108 Browser tests"
+        depends_on: "browser-maze-runner"
+        timeout_in_minutes: 30
+        env:
+          SKIP_BUILD_PACKAGES: 1
+        plugins:
+          docker-compose#v3.9.0:
+            pull: browser-maze-runner
+            run: browser-maze-runner
+            use-aliases: true
+            command:
+              - --farm=bb
+              - --browser=chrome_108
+          artifacts#v1.5.0:
+            upload:
+              - "./test/browser/maze_output/failed/**/*"
+        concurrency: 5
+        concurrency_group: "bitbar-web"

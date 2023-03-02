@@ -8,3 +8,10 @@ steps:
     plugins:
       - docker-compose#v3.9.0:
           run: license-finder
+
+  #
+  # Upload browser-pipeline yaml 
+  #
+  - label: ":pipeline_upload:"
+    commands:
+      - buildkite-agent pipeline upload .buildkite/browser-pipeline.yml
