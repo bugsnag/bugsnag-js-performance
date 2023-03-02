@@ -3,7 +3,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  setupFilesAfterEnv: ['<rootDir>/.jest/matchers.ts', '<rootDir>/.jest/set-environment-variables.ts'],
+  setupFilesAfterEnv: ['<rootDir>/.jest/matchers.ts'],
   reporters: process.env.CI
     ? [['github-actions', { silent: false }], 'summary']
     : ['default']

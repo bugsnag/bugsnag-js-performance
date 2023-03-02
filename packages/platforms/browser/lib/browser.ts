@@ -10,7 +10,7 @@ const BugsnagPerformance = createClient({
   resourceAttributesSource: createResourceAttributesSource(navigator),
   spanAttributesSource,
   idGenerator,
-  processorFactory: new BrowserProcessorFactory(global.fetch, navigator)
+  processorFactory: new BrowserProcessorFactory(window.fetch, navigator)
 })
 
 export default BugsnagPerformance
