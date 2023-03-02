@@ -7,13 +7,15 @@
   ],
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "build": "lerna run build",
-    "clean": "lerna run --parallel clean",
+    "build": "lerna run --stream build",
+    "clean": "lerna run --stream --parallel clean",
     "test:lint": "eslint --max-warnings=0 .",
     "test:unit": "jest",
     "test:test-container-registry-login": "aws ecr get-login-password --profile=opensource --region=us-west-1 | docker login --username AWS --password-stdin 855461928731.dkr.ecr.us-west-1.amazonaws.com"
   },
   "devDependencies": {
+    "@rollup/plugin-replace": "^5.0.2",
+    "@rollup/plugin-typescript": "^11.0.0",
     "@types/jest": "^29.4.0",
     "@types/node": "^18.11.18",
     "@typescript-eslint/eslint-plugin": "^5.50.0",
@@ -28,6 +30,7 @@
     "jest": "^29.4.1",
     "jest-environment-jsdom": "^29.4.2",
     "lerna": "^6.4.0",
+    "rollup": "^3.18.0",
     "ts-jest": "^29.0.5",
     "typescript": "^4.9.5"
   }
