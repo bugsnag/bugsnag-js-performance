@@ -10,6 +10,8 @@ steps:
               build:
                 - browser-maze-runner
               image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
+              cache-from:
+                - browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-browser-${BRANCH_NAME}
           - docker-compose#v3.9.0:
               push:
                 - browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:ci-browser-${BRANCH_NAME}

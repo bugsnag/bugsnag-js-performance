@@ -1,10 +1,10 @@
+# set the SKIP_BUILD_PACKAGES environment variable to disable building
+return if ENV.key?("SKIP_BUILD_PACKAGES")
+
 require 'open3'
 require 'logger'
 
 $logger = Logger.new(STDOUT) unless $logger
-
-# set the SKIP_BUILD_PACKAGES environment variable to disable building
-return if ENV.key?("SKIP_BUILD_PACKAGES")
 
 ROOT = "#{__dir__}/../../../.."
 FIXTURES_DIRECTORY = "#{__dir__}/../fixtures"

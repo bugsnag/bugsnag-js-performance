@@ -34,7 +34,7 @@ GEM
       concurrent-ruby (~> 1.0)
     builder (3.2.4)
     childprocess (4.1.0)
-    concurrent-ruby (1.2.0)
+    concurrent-ruby (1.2.2)
     cucumber (7.1.0)
       builder (~> 3.2, >= 3.2.4)
       cucumber-core (~> 10.1, >= 10.1.0)
@@ -91,7 +91,7 @@ GEM
     os (1.0.1)
     power_assert (2.0.3)
     racc (1.6.2)
-    rack (2.2.6.2)
+    rack (2.2.6.3)
     rake (12.3.3)
     regexp_parser (2.7.0)
     rexml (3.2.5)
@@ -115,7 +115,6 @@ GEM
 
 PLATFORMS
   arm64-darwin-21
-  ruby
 
 DEPENDENCIES
   bugsnag-maze-runner!
