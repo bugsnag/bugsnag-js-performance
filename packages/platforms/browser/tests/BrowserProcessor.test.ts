@@ -39,9 +39,9 @@ describe('BrowserProcessor', () => {
         resourceSpans: [{
           resource: {
             attributes: [
-              { key: 'releaseStage', value: { stringValue: 'test' } },
+              { key: 'releaseStage', value: { stringValue: 'production' } },
               { key: 'sdkName', value: { stringValue: 'bugsnag.performance.browser' } },
-              { key: 'sdkVersion', value: { stringValue: '1.2.3-jest' } },
+              { key: 'sdkVersion', value: { stringValue: '__VERSION__' } },
               { key: 'userAgent', value: { stringValue: expect.stringMatching(/\((?<info>.*?)\)(\s|$)|(?<name>.*?)\/(?<version>.*?)(\s|$)/gm) } }
             ]
           },

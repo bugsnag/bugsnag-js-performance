@@ -9,9 +9,9 @@ describe('resourceAttributesSource', () => {
     const resourceAttributesSource = createResourceAttributesSource(navigator)
     expect(resourceAttributesSource()).toEqual({
       userAgent: expect.stringMatching(/\((?<info>.*?)\)(\s|$)|(?<name>.*?)\/(?<version>.*?)(\s|$)/g),
-      releaseStage: 'test',
+      releaseStage: 'production',
       sdkName: 'bugsnag.performance.browser',
-      sdkVersion: '1.2.3-jest'
+      sdkVersion: '__VERSION__'
     })
   })
 })
