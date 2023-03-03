@@ -3,7 +3,7 @@ const pkg = require('./package.json')
 const { DefinePlugin } = require('webpack')
 
 module.exports = {
-  entry: './lib/browser.ts',
+  entry: './lib/index.ts',
   mode: 'production',
   devtool: 'source-map',
   optimization: {
