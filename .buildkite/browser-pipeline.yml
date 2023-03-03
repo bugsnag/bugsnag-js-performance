@@ -22,8 +22,6 @@ steps:
       - label: ":chrome: v108 Browser tests"
         depends_on: "browser-maze-runner"
         timeout_in_minutes: 30
-        env:
-          SKIP_BUILD_PACKAGES: 1
         plugins:
           docker-compose#v3.9.0:
             pull: browser-maze-runner
