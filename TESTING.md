@@ -42,3 +42,18 @@ npm run test:lint
 These tests are implemented with our notifier testing tool [Maze runner](https://github.com/bugsnag/maze-runner).
 
 End to end tests are written in cucumber-style `.feature` files, and need Ruby-backed "steps" in order to know what to run. The tests are located in the top level [`test`](/test/) directory.
+
+#### Authenticating with the private container registry
+
+You'll need to set the credentials for the aws profile in order to access the private docker registry:
+
+```sh
+aws configure --profile=opensource
+```
+
+Subsequently you'll need to run the following command to authenticate with the registry:
+
+```sh
+aws sso login --profile opensource
+npm run test:test-container-registry-login
+```
