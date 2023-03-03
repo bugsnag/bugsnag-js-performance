@@ -1,4 +1,4 @@
-import type { ResourceAttributes } from '@bugsnag/js-performance-core/lib/attributes'
+import type { ResourceAttributes } from '@bugsnag/js-performance-core'
 
 const version = process.env.PACKAGE_VERSION || '__VERSION__'
 

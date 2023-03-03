@@ -1,4 +1,4 @@
-import type { BitLength, IdGenerator } from '@bugsnag/js-performance-core/lib/id-generator'
+import type { BitLength, IdGenerator } from '@bugsnag/js-performance-core'
 
 function toHex (value: number): string {
   return value.toString(16).padStart(2, '0')
