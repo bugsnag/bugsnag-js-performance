@@ -4,6 +4,8 @@ return if ENV.key?("SKIP_BUILD_PACKAGES")
 require 'open3'
 require 'logger'
 
+# this file is run by Maze Runner automatically (where $logger is defined) and
+# by the browser dockerfile when building for CI (where $logger is NOT defined)
 $logger = Logger.new(STDOUT) unless $logger
 
 ROOT = "#{__dir__}/../../../.."
