@@ -46,3 +46,6 @@ services:
       default:
         aliases:
           - maze-runner
+    volumes:
+      - ./test/browser/maze_output:/app/test/browser/maze_output
+
