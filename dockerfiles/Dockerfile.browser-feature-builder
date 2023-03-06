@@ -18,6 +18,7 @@ FROM 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v7
 COPY --from=browser-feature-builder /app/test/browser /app/test/browser/
 WORKDIR /app/test/browser
 
+# Workaround to be removed in PLAT-9769
 RUN bundle install
 
 ENV SKIP_BUILD_PACKAGES=true
