@@ -54,9 +54,18 @@ begin
   end
 
   Dir.chdir(FIXTURES_DIRECTORY) do
-    run("rm -rf node_modules")
     run("npm install --no-package-lock --no-save *.tgz")
+    run("npm run build --workspaces")
   end
 ensure
   run("rm -f #{FIXTURES_DIRECTORY}/*.tgz")
+end
+
+# this at_exit is after the above commands on purpose - if they fail then we
+# DON'T want these cleanup commands to run so it's easier to debug
+at_exit do
+  Dir.chdir(FIXTURES_DIRECTORY) do
+    run("rm -rf node_modules")
+    run("npm run clean --workspaces")
+  end
 end

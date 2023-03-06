@@ -1,4 +1,11 @@
 {
   "name": "@bugsnag/js-performance-browser-test-fixtures",
-  "private": true
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "rollup": "^3.18.0"
+  }
 }
