@@ -17,8 +17,8 @@ describe('Browser Delivery', () => {
             kind: 1,
             spanId: 'test-span-id',
             traceId: 'test-trace-id',
-            endTimeUnixNano: 56789,
-            startTimeUnixNano: 12345,
+            endTimeUnixNano: '56789',
+            startTimeUnixNano: '12345',
             attributes: [{ key: 'test-span', value: { intValue: '12345' } }]
           }]
         }]
@@ -33,7 +33,7 @@ describe('Browser Delivery', () => {
       body: JSON.stringify(deliveryPayload),
       headers: {
         'Bugsnag-Api-Key': 'test-api-key',
-        'Bugsnag-Span-Sampling': '1:1',
+        'Bugsnag-Span-Sampling': '1.0:1',
         'Content-Type': 'application/json'
       }
     })

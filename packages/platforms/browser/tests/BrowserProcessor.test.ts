@@ -58,11 +58,11 @@ describe('BrowserProcessor', () => {
           scopeSpans: [{
             spans: [{
               attributes: [],
-              endTimeUnixNano: 50_000,
+              endTimeUnixNano: '50000',
               kind: 1,
               name: 'test-span',
               spanId: 'test-span-id',
-              startTimeUnixNano: 50_000,
+              startTimeUnixNano: '50000',
               traceId: 'trace-id'
             }]
           }]
