@@ -10,7 +10,6 @@ import {
   attributeToJson,
   spanToJson
 } from '@bugsnag/js-performance-core'
-import clock from './clock'
 import browserDelivery, { type Fetch } from './delivery'
 import createResourceAttributesSource from './resource-attributes-source'
 
@@ -65,10 +64,12 @@ export class BrowserProcessor implements Processor {
 export class BrowserProcessorFactory implements ProcessorFactory {
   private fetch: Fetch
   private navigator: Navigator
+  private clock: Clock
 
-  constructor (fetch: Fetch, navigator: Navigator) {
+  constructor (fetch: Fetch, navigator: Navigator, clock: Clock) {
     this.fetch = fetch
     this.navigator = navigator
+    this.clock = clock
   }
 
   create (
@@ -78,7 +79,7 @@ export class BrowserProcessorFactory implements ProcessorFactory {
       configuration.apiKey,
       configuration.endpoint,
       browserDelivery(this.fetch),
-      clock,
+      this.clock,
       createResourceAttributesSource(this.navigator)
     )
   }
