@@ -5,7 +5,6 @@ export type Fetch = typeof fetch
 function browserDelivery (fetch: Fetch): Delivery {
   return {
     send: (endpoint, apiKey, payload) => {
-      const pValue = 1
       const spanCount = payload.resourceSpans.reduce((count, resourceSpan) => count + resourceSpan.scopeSpans.length, 0)
 
       return new Promise((resolve, reject) => {
@@ -14,7 +13,7 @@ function browserDelivery (fetch: Fetch): Delivery {
           headers: {
             'Bugsnag-Api-Key': apiKey,
             'Content-Type': 'application/json',
-            'Bugsnag-Span-Sampling': `${pValue}:${spanCount}`
+            'Bugsnag-Span-Sampling': `1.0:${spanCount}`
           },
           body: JSON.stringify(payload)
         }).then(() => {
