@@ -22,3 +22,11 @@ Feature: Manual creation of spans
       | macOS |
       | Windows |
       | Linux |
+
+  Scenario: Spans can be logged before start
+    Given I navigate to the test URL "/pre-start-spans"
+    And I wait to receive at least 1 trace
+    Then a span name equals "Custom/Post Start"
+    * a span name equals "Custom/Pre Start Span 0"
+    * a span name equals "Custom/Pre Start Span 1"
+    * a span name equals "Custom/Pre Start Span 2"
