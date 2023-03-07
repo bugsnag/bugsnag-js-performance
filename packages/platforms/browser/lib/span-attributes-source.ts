@@ -1,4 +1,4 @@
-import type { SpanAttribute, SpanAttributesSource } from '@bugsnag/js-performance-core/lib/attributes'
+import type { SpanAttribute, SpanAttributesSource } from '@bugsnag/js-performance-core'
 
 const spanAttributesSource: SpanAttributesSource = () => {
   const spanAttributes = new Map<string, SpanAttribute>()

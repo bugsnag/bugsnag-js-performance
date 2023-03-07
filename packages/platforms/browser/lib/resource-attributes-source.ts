@@ -1,13 +1,11 @@
-import type { ResourceAttributes } from '@bugsnag/js-performance-core/lib/attributes'
-
-const version = process.env.PACKAGE_VERSION || '__VERSION__'
+import type { ResourceAttributes } from '@bugsnag/js-performance-core'
 
 function createResourceAttributesSource (navigator: Navigator): () => ResourceAttributes {
   return function resourceAttributesSource () {
     return {
-      releaseStage: process.env.NODE_ENV || 'production',
+      releaseStage: 'production',
       sdkName: 'bugsnag.performance.browser',
-      sdkVersion: version,
+      sdkVersion: '__VERSION__',
       userAgent: navigator.userAgent,
       // chromium only
       ...(navigator.userAgentData

@@ -1,4 +1,4 @@
-import type { Delivery } from '@bugsnag/js-performance-core/lib/delivery'
+import type { Delivery } from '@bugsnag/js-performance-core'
 
 export type Fetch = typeof fetch
 

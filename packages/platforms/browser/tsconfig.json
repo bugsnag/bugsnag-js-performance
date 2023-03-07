@@ -1,14 +1,7 @@
 {
-  "extends": "../tsconfig.platforms-base.json",
-  "compilerOptions": {
-    "outDir": "./dist",
-    "sourceMap": true,
-    "types": ["./navigator-user-agent-data", "node"]
-  },
+  "extends": "../../../tsconfig.json",
   "include": ["lib/*"],
-  "exclude": [
-    "node_modules",
-    "**/tests/*"
-  ]
+  "compilerOptions": {
+    "types": ["./navigator-user-agent-data"]
+  }
 }
-
