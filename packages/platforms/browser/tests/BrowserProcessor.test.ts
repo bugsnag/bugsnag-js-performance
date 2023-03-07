@@ -9,8 +9,18 @@ import resourceAttributesSource from '../lib/resource-attributes-source'
 describe('BrowserProcessorFactory', () => {
   it('returns an instance of BrowserProcessor', () => {
     const fetch = jest.fn(() => Promise.resolve({} as unknown as Response))
-    const mockLogger = { warn: jest.fn(), debug: jest.fn(), error: jest.fn(), info: jest.fn() }
-    const processor = new BrowserProcessorFactory(fetch, navigator).create({ apiKey: 'test-api-key', endpoint: '/traces', releaseStage: 'test', logger: mockLogger })
+    const logger = { warn: jest.fn(), debug: jest.fn(), error: jest.fn(), info: jest.fn() }
+    const clock = { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => 50_000 }
+
+    const factory = new BrowserProcessorFactory(fetch, navigator, clock)
+
+    const processor = factory.create({
+      apiKey: 'test-api-key',
+      endpoint: '/traces',
+      releaseStage: 'test',
+      logger
+    })
+
     expect(processor).toBeInstanceOf(BrowserProcessor)
   })
 })
