@@ -11,21 +11,22 @@
   "homepage": "https://github.com/bugsnag/bugsnag-js-performance",
   "author": "Ben Wilson <ben.wilson@smartbear.com>",
   "license": "MIT",
-  "main": "lib/index.ts",
-  "browser": "dist/index.js",
-  "directories": {
-    "lib": "lib",
-    "test": "tests"
-  },
-  "files": ["dist"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
   },
   "scripts": {
-    "build": "rm -f dist/* && tsc"
+    "build": "rollup --config",
+    "clean": "rm -rf dist/*"
   },
   "bugs": {
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
-  }
+  },
+
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ]
 }

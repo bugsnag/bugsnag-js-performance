@@ -8,7 +8,7 @@ Maze.config.enforce_bugsnag_integrity = false
 
 Maze.config.bind_address = ENV.fetch('API_HOST', 'localhost')
 Maze.config.document_server_bind_address = ENV.fetch('HOST', 'localhost')
-Maze.config.document_server_root = File.realpath("#{__dir__}/../fixtures")
+Maze.config.document_server_root = File.realpath("#{__dir__}/../fixtures/packages")
 
 $browser = Browser.new(
   URI("http://#{Maze.config.bind_address}:#{Maze.config.port}"),
