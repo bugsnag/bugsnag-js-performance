@@ -21,15 +21,13 @@ function millisecondsToNanoseconds (milliseconds: number): number {
 }
 
 function createClock (performance: PerformanceWithOptionalTimeOrigin): Clock {
-  const timeOrigin = performance.timeOrigin
-    ? performance.timeOrigin
-    : performance.timing.navigationStart
+  const timeOrigin = performance.timeOrigin || performance.timing.navigationStart
 
   return {
     now: () => performance.now(),
     convert: (date) => millisecondsToNanoseconds(date.getTime() - timeOrigin),
     // convert nanoseconds since timeOrigin to full timestamp
-    toUnixTimestampNanoseconds: (time: number) => timeOrigin + time
+    toUnixTimestampNanoseconds: (time: number) => millisecondsToNanoseconds(timeOrigin + time)
   }
 }
 
