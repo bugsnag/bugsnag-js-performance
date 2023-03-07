@@ -1,3 +1,9 @@
+const NANOSECONDS_IN_MILLISECONDS = 1_000_000
+
+export function millisecondsToNanoseconds (milliseconds: number): number {
+  return milliseconds * NANOSECONDS_IN_MILLISECONDS
+}
+
 export interface Clock {
   // returns a platform-specific value representing the current time
   // this could be an absolute timestamp, a time relative to a "time origin"
