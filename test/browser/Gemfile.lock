@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/bugsnag/maze-runner
-  revision: 422b2de4d1dedcbab931dd0e6f8c9033ca94e339
-  tag: v7.18.0
+  revision: de093a928c85b1d4736fe416ff101385f99908f3
+  tag: v7.20.1
   specs:
-    bugsnag-maze-runner (7.18.0)
+    bugsnag-maze-runner (7.20.1)
       appium_lib (~> 12.0.0)
       appium_lib_core (~> 5.4.0)
       bugsnag (~> 6.24)
