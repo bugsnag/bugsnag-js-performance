@@ -19,7 +19,6 @@
   "dependencies": {
     "@bugsnag/js-performance-core": "0.0.0"
   },
-
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",

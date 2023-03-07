@@ -1,7 +1,6 @@
 {
   "extends": "../../../tsconfig.json",
   "include": ["lib/*"],
-
   "compilerOptions": {
     "types": ["./navigator-user-agent-data"]
   }

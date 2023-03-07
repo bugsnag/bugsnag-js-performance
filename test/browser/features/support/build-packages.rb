@@ -1,6 +1,13 @@
 # set the SKIP_BUILD_PACKAGES environment variable to disable building
 return if ENV.key?("SKIP_BUILD_PACKAGES")
 
+require 'open3'
+require 'logger'
+
+# this file is run by Maze Runner automatically (where $logger is defined) and
+# by the browser dockerfile when building for CI (where $logger is NOT defined)
+$logger = Logger.new(STDOUT) unless $logger
+
 ROOT = "#{__dir__}/../../../.."
 FIXTURES_DIRECTORY = "#{__dir__}/../fixtures"
 
