@@ -19,8 +19,8 @@ function createClock (performance: PerformanceWithOptionalTimeOrigin): Clock {
 
   return {
     now: () => performance.now(),
-    convert: (date) => millisecondsToNanoseconds(date.getTime() - timeOrigin),
-    // convert nanoseconds since timeOrigin to full timestamp
+    convert: (date) => date.getTime() - timeOrigin,
+    // convert milliseconds since timeOrigin to full timestamp
     toUnixTimestampNanoseconds: (time: number) => millisecondsToNanoseconds(timeOrigin + time)
   }
 }
