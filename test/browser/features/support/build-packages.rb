@@ -70,7 +70,7 @@ end
 
 # this at_exit is after the above commands on purpose - if they fail then we
 # DON'T want these cleanup commands to run so it's easier to debug
-unless ENV.key?("SKIP_CLEANUP") || ENV.key?("DEBUG")
+unless ENV.key?("SKIP_FIXTURE_CLEANUP") || ENV.key?("DEBUG")
   at_exit do
     Dir.chdir(FIXTURES_DIRECTORY) do
       run("rm -rf node_modules")

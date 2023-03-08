@@ -10,7 +10,8 @@ RUN npm install
 
 # Install packages
 WORKDIR /app/test/browser
-RUN ruby ./features/support/build-packages.rb
+
+RUN SKIP_FIXTURE_CLEANUP=true ruby ./features/support/build-packages.rb
 
 # The maze-runner bitbar browser tests (W3C protocol)
 FROM 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v7-cli as browser-maze-runner
@@ -21,4 +22,5 @@ WORKDIR /app/test/browser
 # Workaround to be removed in PLAT-9769
 RUN bundle install
 
+# Don't rebuild packages during e2e tests
 ENV SKIP_BUILD_PACKAGES=true
