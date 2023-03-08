@@ -73,6 +73,6 @@ end
 at_exit do
   Dir.chdir(FIXTURES_DIRECTORY) do
     run("rm -rf node_modules")
-    run("npm run clean --workspaces")
+    # run("npm run clean --workspaces")
   end
 end
