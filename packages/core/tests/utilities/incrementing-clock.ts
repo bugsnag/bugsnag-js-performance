@@ -18,7 +18,7 @@ class IncrementingClock implements Clock {
   }
 
   toUnixTimestampNanoseconds (time: number) {
-    return this.timeOrigin + time
+    return (this.timeOrigin + time).toString()
   }
 }
 

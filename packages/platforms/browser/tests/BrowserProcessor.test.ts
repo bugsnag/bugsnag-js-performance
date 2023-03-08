@@ -10,7 +10,7 @@ describe('BrowserProcessorFactory', () => {
   it('returns an instance of BrowserProcessor', () => {
     const fetch = jest.fn(() => Promise.resolve({} as unknown as Response))
     const logger = { warn: jest.fn(), debug: jest.fn(), error: jest.fn(), info: jest.fn() }
-    const clock = { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => 50_000 }
+    const clock = { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' }
 
     const factory = new BrowserProcessorFactory(fetch, navigator, clock)
 
@@ -38,7 +38,7 @@ describe('BrowserProcessor', () => {
     }
 
     const mockDelivery = { send: jest.fn() }
-    const mockClock = { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => 50_000 }
+    const mockClock = { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' }
     const processor = new BrowserProcessor('test-api-key', '/traces', mockDelivery, mockClock, resourceAttributesSource(navigator))
     processor.add(span)
 
