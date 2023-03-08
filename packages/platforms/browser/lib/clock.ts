@@ -1,4 +1,4 @@
-import { type Clock } from '@bugsnag/js-performance-core'
+import { type Clock, millisecondsToNanoseconds } from '@bugsnag/js-performance-core'
 
 // a cut-down PerformanceTiming interface, since we don't care about most of
 // its properties
@@ -12,12 +12,6 @@ interface PerformanceWithOptionalTimeOrigin {
   now: () => number
   timeOrigin?: number
   timing: PerformanceTiming
-}
-
-const NANOSECONDS_IN_MILLISECONDS = 1_000_000
-
-function millisecondsToNanoseconds (milliseconds: number): number {
-  return milliseconds * NANOSECONDS_IN_MILLISECONDS
 }
 
 function createClock (performance: PerformanceWithOptionalTimeOrigin): Clock {
