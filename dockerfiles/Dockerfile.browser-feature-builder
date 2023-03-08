@@ -1,18 +1,16 @@
 # The maze-runner bitbar browser tests (W3C protocol)
 FROM 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v7-cli as browser-maze-runner
 
-RUN apt-get install -y nodejs npm
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
 
 # Copy repo
 WORKDIR /app
 COPY . .
 
 # Install packages
-RUN npm install
-WORKDIR /app/test/browser
-RUN SKIP_FIXTURE_CLEANUP=true ruby ./features/support/build-packages.rb
-
-# RUN bundle install
+RUN npm ci
+WORKDIR /app/test/browser/features
+RUN SKIP_FIXTURE_CLEANUP=true ruby ./support/build-packages.rb
 
 # Don't rebuild packages during e2e tests
 ENV SKIP_BUILD_PACKAGES=true
