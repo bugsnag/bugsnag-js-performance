@@ -31,7 +31,7 @@ export interface DeliverySpan {
   kind: Kind
   spanId: string
   traceId: string
-  startTimeUnixNano: number
-  endTimeUnixNano: number
+  startTimeUnixNano: string
+  endTimeUnixNano: string
   attributes: Array<JsonAttribute | undefined>
 }
