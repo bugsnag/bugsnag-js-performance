@@ -11,7 +11,6 @@ function createResourceAttributesSource (navigator: Navigator): () => ResourceAt
 
     // chromium only
     if (navigator.userAgentData) {
-      // attributes.brands = navigator.userAgentData.brands.map(({ brand, version }) => ({ name: brand, version })).toString()
       attributes.platform = navigator.userAgentData.platform
       attributes.mobile = navigator.userAgentData.mobile
     }
