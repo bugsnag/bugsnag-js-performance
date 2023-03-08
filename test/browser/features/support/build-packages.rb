@@ -70,9 +70,11 @@ end
 
 # this at_exit is after the above commands on purpose - if they fail then we
 # DON'T want these cleanup commands to run so it's easier to debug
-at_exit do
-  Dir.chdir(FIXTURES_DIRECTORY) do
-    run("rm -rf node_modules")
-    run("npm run clean --workspaces")
+unless ENV.key?("SKIP_FIXTURE_CLEANUP") || ENV.key?("DEBUG")
+  at_exit do
+    Dir.chdir(FIXTURES_DIRECTORY) do
+      run("rm -rf node_modules")
+      run("npm run clean --workspaces")
+    end
   end
 end

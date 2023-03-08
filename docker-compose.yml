@@ -13,7 +13,6 @@ services:
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
-      target: browser-maze-runner
       args:
         - BUILDKITE_BUILD_NUMBER
     environment:
