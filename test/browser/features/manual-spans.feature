@@ -15,7 +15,7 @@ Feature: Manual creation of spans
     * the trace payload field "resourceSpans.0.resource" string attribute "sdkName" equals "bugsnag.performance.browser"
     * the trace payload field "resourceSpans.0.resource" string attribute "sdkVersion" equals "0.0.0"
 
-  @chromium_only
+  @chromium_only @local_only
   Scenario: userAgentData is included in custom span
     Given I navigate to the test URL "/manual-span"
     And I wait to receive at least 1 trace
