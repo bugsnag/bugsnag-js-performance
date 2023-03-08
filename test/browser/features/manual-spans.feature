@@ -32,7 +32,7 @@ Feature: Manual creation of spans
 
   Scenario: Spans can be logged before start
     Given I navigate to the test URL "/pre-start-spans"
-    When I wait to receive at least 1 traces
+    When I wait to receive at least 4 traces
     Then a span name equals "Custom/Post Start"
     And a span name equals "Custom/Pre Start Span 0"
     And a span name equals "Custom/Pre Start Span 1"
