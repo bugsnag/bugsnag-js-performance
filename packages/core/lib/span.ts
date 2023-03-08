@@ -57,8 +57,8 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
     kind: span.kind,
     spanId: span.id,
     traceId: span.traceId,
-    startTimeUnixNano: clock.toUnixTimestampNanoseconds(span.startTime).toString(),
-    endTimeUnixNano: clock.toUnixTimestampNanoseconds(span.endTime).toString(),
+    startTimeUnixNano: clock.toUnixTimestampNanoseconds(span.startTime),
+    endTimeUnixNano: clock.toUnixTimestampNanoseconds(span.endTime),
     attributes: span.attributes.toJson()
   }
 }
