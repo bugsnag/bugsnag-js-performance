@@ -21,9 +21,14 @@ Feature: Manual creation of spans
     And I wait to receive at least 1 trace
     Then the trace payload field "resourceSpans.0.resource" bool attribute "mobile" is false
     * the trace payload field "resourceSpans.0.resource" string attribute "platform" is one of:
+      | Android |
+      | Chrome OS |
+      | Chromium OS |
+      | iOS |
+      | Linux |
       | macOS |
       | Windows |
-      | Linux |
+      | Unknown |
 
   Scenario: Spans can be logged before start
     Given I navigate to the test URL "/pre-start-spans"
