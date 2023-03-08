@@ -8,8 +8,6 @@ WORKDIR /app
 COPY . .
 RUN npm install
 
-ENV SKIP_CLEANUP=true
-
 # Install packages
 WORKDIR /app/test/browser
 RUN ruby ./features/support/build-packages.rb
