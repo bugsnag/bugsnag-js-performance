@@ -24,14 +24,6 @@ export class SpanAttributes {
   }
 }
 
-export interface JsonAttribute {
-  key: string
-  value: { stringValue: string }
-  | { intValue: string }
-  | { doubleValue: number }
-  | { boolValue: boolean }
-}
-
 export interface ResourceAttributes {
   brands?: Array<{ name: string, version: string }> // browser.brands
   platform?: string // browser.platform
@@ -43,6 +35,14 @@ export interface ResourceAttributes {
 }
 
 export type ResourceAttributeSource = () => ResourceAttributes
+
+export interface JsonAttribute {
+  key: string
+  value: { stringValue: string }
+  | { intValue: string }
+  | { doubleValue: number }
+  | { boolValue: boolean }
+}
 
 export function attributeToJson (key: string, attribute: SpanAttribute): JsonAttribute | undefined {
   switch (typeof attribute) {
