@@ -9,17 +9,17 @@ export class SpanAttributes {
     this.attributes = initialValues
   }
 
-  public set (name: string, value: SpanAttribute) {
+  set (name: string, value: SpanAttribute) {
     if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
       this.attributes.set(name, value)
     }
   }
 
-  public remove (name: string) {
+  remove (name: string) {
     this.attributes.delete(name)
   }
 
-  public toJson () {
+  toJson () {
     return Array.from(this.attributes).map(([key, value]) => attributeToJson(key, value))
   }
 }
