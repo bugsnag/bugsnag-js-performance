@@ -7,7 +7,6 @@ import {
   type ProcessorFactory,
   type ResourceAttributeSource,
   type SpanEnded,
-  attributeToJson,
   spanToJson
 } from '@bugsnag/js-performance-core'
 import browserDelivery, { type Fetch } from './delivery'
@@ -35,14 +34,13 @@ export class BrowserProcessor implements Processor {
   }
 
   add (span: SpanEnded): void {
-    const resourceAttributes = this.resourceAttributeSource()
     const spans = [span]
 
     const payload: DeliveryPayload = {
       resourceSpans: [
         {
           resource: {
-            attributes: Object.entries(resourceAttributes).map(([key, value]) => attributeToJson(key, value))
+            attributes: this.resourceAttributeSource().toJson()
           },
           scopeSpans: [
             {

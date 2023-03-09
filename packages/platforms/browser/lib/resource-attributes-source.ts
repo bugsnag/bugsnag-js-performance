@@ -1,18 +1,19 @@
-import type { ResourceAttributes } from '@bugsnag/js-performance-core'
+import { ResourceAttributes } from '@bugsnag/js-performance-core'
 
 function createResourceAttributesSource (navigator: Navigator): () => ResourceAttributes {
   return function resourceAttributesSource () {
-    const attributes: ResourceAttributes = {
-      releaseStage: 'production',
-      sdkName: 'bugsnag.performance.browser',
-      sdkVersion: '__VERSION__',
-      userAgent: navigator.userAgent
-    }
+    const attributes = new ResourceAttributes(
+      'production',
+      'bugsnag.performance.browser',
+      '__VERSION__'
+    )
+
+    attributes.set('userAgent', navigator.userAgent)
 
     // chromium only
     if (navigator.userAgentData) {
-      attributes.platform = navigator.userAgentData.platform
-      attributes.mobile = navigator.userAgentData.mobile
+      attributes.set('platform', navigator.userAgentData.platform)
+      attributes.set('mobile', navigator.userAgentData.mobile)
     }
 
     return attributes
