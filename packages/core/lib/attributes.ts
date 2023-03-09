@@ -24,14 +24,16 @@ export class SpanAttributes {
   }
 }
 
-export interface ResourceAttributes {
-  brands?: Array<{ name: string, version: string }> // browser.brands
-  platform?: string // browser.platform
-  mobile?: boolean // browser.mobile
-  userAgent: string // browser.user_agent
-  releaseStage: string // deployment.environment
-  sdkName: string // telemetry.sdk.name
-  sdkVersion: string // telemetry.sdk.version
+export class ResourceAttributes extends SpanAttributes {
+  constructor (releaseStage: string, sdkName: string, sdkVersion: string) {
+    const initialValues = new Map([
+      ['releaseStage', releaseStage],
+      ['sdkName', sdkName],
+      ['sdkVersion', sdkVersion]
+    ])
+
+    super(initialValues)
+  }
 }
 
 export type ResourceAttributeSource = () => ResourceAttributes

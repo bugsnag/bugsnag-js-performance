@@ -39,6 +39,8 @@ describe('BrowserProcessor', () => {
 
     const mockDelivery = { send: jest.fn() }
     const mockClock = { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' }
+    const navigator = { ...window.navigator, userAgent: ':)' }
+
     const processor = new BrowserProcessor('test-api-key', '/traces', mockDelivery, mockClock, resourceAttributesSource(navigator))
     processor.add(span)
 
@@ -52,7 +54,7 @@ describe('BrowserProcessor', () => {
               { key: 'releaseStage', value: { stringValue: 'production' } },
               { key: 'sdkName', value: { stringValue: 'bugsnag.performance.browser' } },
               { key: 'sdkVersion', value: { stringValue: '__VERSION__' } },
-              { key: 'userAgent', value: { stringValue: expect.stringMatching(/\((?<info>.*?)\)(\s|$)|(?<name>.*?)\/(?<version>.*?)(\s|$)/gm) } }
+              { key: 'userAgent', value: { stringValue: ':)' } }
             ]
           },
           scopeSpans: [{
