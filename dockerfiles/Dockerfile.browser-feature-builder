@@ -1,5 +1,5 @@
-# The maze-runner bitbar browser tests (W3C protocol)
-FROM 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v7-cli as browser-maze-runner
+ARG MAZE_RUNNER_VERSION
+FROM 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:$MAZE_RUNNER_VERSION as browser-maze-runner
 
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
 
