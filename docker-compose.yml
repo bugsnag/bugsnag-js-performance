@@ -14,7 +14,7 @@ services:
       context: .
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
-        - BUILDKITE_BUILD_NUMBER
+        MAZE_RUNNER_VERSION: latest-v7-cli
     environment:
       BUILDKITE:
       BUILDKITE_BRANCH:
