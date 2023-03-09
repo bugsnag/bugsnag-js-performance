@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { Kind, SpanAttributes, type SpanEnded } from '@bugsnag/js-performance-core/lib/span'
+import { Kind, SpanAttributes, type SpanEnded } from '@bugsnag/js-performance-core'
 import { BrowserProcessor, BrowserProcessorFactory } from '../lib/BrowserProcessor'
 import resourceAttributesSource from '../lib/resource-attributes-source'
 

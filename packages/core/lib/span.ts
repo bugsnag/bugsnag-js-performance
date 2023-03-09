@@ -1,4 +1,4 @@
-import { attributeToJson, type SpanAttribute } from './attributes'
+import { type SpanAttributes } from './attributes'
 import { type Clock } from './clock'
 import { type DeliverySpan } from './delivery'
 
@@ -28,28 +28,6 @@ export interface SpanInternal {
 }
 
 export type SpanEnded = Required<SpanInternal>
-
-export class SpanAttributes {
-  private readonly attributes: Map<string, SpanAttribute>
-
-  constructor (initialValues: Map<string, SpanAttribute>) {
-    this.attributes = initialValues
-  }
-
-  public set (name: string, value: SpanAttribute) {
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      this.attributes.set(name, value)
-    }
-  }
-
-  public remove (name: string) {
-    this.attributes.delete(name)
-  }
-
-  public toJson () {
-    return Array.from(this.attributes).map(([key, value]) => attributeToJson(key, value))
-  }
-}
 
 export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
   return {

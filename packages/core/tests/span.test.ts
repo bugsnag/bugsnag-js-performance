@@ -1,4 +1,5 @@
-import { Kind, SpanAttributes } from '../lib/span'
+import { Kind } from '../lib/span'
+import { SpanAttributes } from '../lib/attributes'
 import { createTestClient, IncrementingClock, InMemoryProcessor } from './utilities'
 
 describe('Span', () => {

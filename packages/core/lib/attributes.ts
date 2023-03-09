@@ -2,6 +2,28 @@ export type SpanAttribute = string | number | boolean
 
 export type SpanAttributesSource = () => Map<string, SpanAttribute>
 
+export class SpanAttributes {
+  private readonly attributes: Map<string, SpanAttribute>
+
+  constructor (initialValues: Map<string, SpanAttribute>) {
+    this.attributes = initialValues
+  }
+
+  public set (name: string, value: SpanAttribute) {
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      this.attributes.set(name, value)
+    }
+  }
+
+  public remove (name: string) {
+    this.attributes.delete(name)
+  }
+
+  public toJson () {
+    return Array.from(this.attributes).map(([key, value]) => attributeToJson(key, value))
+  }
+}
+
 export interface JsonAttribute {
   key: string
   value: { stringValue: string }
