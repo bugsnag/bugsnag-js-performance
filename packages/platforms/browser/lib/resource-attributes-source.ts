@@ -8,12 +8,12 @@ function createResourceAttributesSource (navigator: Navigator): () => ResourceAt
       '__VERSION__'
     )
 
-    attributes.set('userAgent', navigator.userAgent)
+    attributes.set('browser.user_agent', navigator.userAgent)
 
     // chromium only
     if (navigator.userAgentData) {
-      attributes.set('platform', navigator.userAgentData.platform)
-      attributes.set('mobile', navigator.userAgentData.mobile)
+      attributes.set('browser.platform', navigator.userAgentData.platform)
+      attributes.set('browser.mobile', navigator.userAgentData.mobile)
     }
 
     return attributes

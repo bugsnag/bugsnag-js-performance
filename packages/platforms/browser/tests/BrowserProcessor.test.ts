@@ -39,8 +39,6 @@ describe('BrowserProcessor', () => {
 
     const mockDelivery = { send: jest.fn() }
     const mockClock = { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' }
-    const navigator = { ...window.navigator, userAgent: ':)' }
-
     const processor = new BrowserProcessor('test-api-key', '/traces', mockDelivery, mockClock, resourceAttributesSource(navigator))
     processor.add(span)
 
@@ -51,10 +49,10 @@ describe('BrowserProcessor', () => {
         resourceSpans: [{
           resource: {
             attributes: [
-              { key: 'releaseStage', value: { stringValue: 'production' } },
-              { key: 'sdkName', value: { stringValue: 'bugsnag.performance.browser' } },
-              { key: 'sdkVersion', value: { stringValue: '__VERSION__' } },
-              { key: 'userAgent', value: { stringValue: ':)' } }
+              { key: 'deployment.environment', value: { stringValue: 'production' } },
+              { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.browser' } },
+              { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
+              { key: 'browser.user_agent', value: { stringValue: expect.stringMatching(/\((?<info>.*?)\)(\s|$)|(?<name>.*?)\/(?<version>.*?)(\s|$)/gm) } }
             ]
           },
           scopeSpans: [{

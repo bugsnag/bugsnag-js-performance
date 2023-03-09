@@ -16,10 +16,10 @@ describe('resourceAttributesSource', () => {
     const resourceAttributes = resourceAttributesSource()
 
     expect(resourceAttributes.toJson()).toEqual([
-      { key: 'releaseStage', value: { stringValue: 'production' } },
-      { key: 'sdkName', value: { stringValue: 'bugsnag.performance.browser' } },
-      { key: 'sdkVersion', value: { stringValue: '__VERSION__' } },
-      { key: 'userAgent', value: { stringValue: navigator.userAgent } }
+      { key: 'deployment.environment', value: { stringValue: 'production' } },
+      { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.browser' } },
+      { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
+      { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } }
     ])
   })
 
@@ -37,12 +37,12 @@ describe('resourceAttributesSource', () => {
     const resourceAttributes = resourceAttributesSource()
 
     expect(resourceAttributes.toJson()).toEqual([
-      { key: 'releaseStage', value: { stringValue: 'production' } },
-      { key: 'sdkName', value: { stringValue: 'bugsnag.performance.browser' } },
-      { key: 'sdkVersion', value: { stringValue: '__VERSION__' } },
-      { key: 'userAgent', value: { stringValue: navigator.userAgent } },
-      { key: 'platform', value: { stringValue: 'macOS' } },
-      { key: 'mobile', value: { boolValue: false } }
+      { key: 'deployment.environment', value: { stringValue: 'production' } },
+      { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.browser' } },
+      { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
+      { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } },
+      { key: 'browser.platform', value: { stringValue: 'macOS' } },
+      { key: 'browser.mobile', value: { boolValue: false } }
     ])
   })
 })
