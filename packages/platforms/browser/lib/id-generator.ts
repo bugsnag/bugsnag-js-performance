@@ -1,7 +1,14 @@
 import type { BitLength, IdGenerator } from '@bugsnag/js-performance-core'
 
 function toHex (value: number): string {
-  return value.toString(16).padStart(2, '0')
+  const hex = value.toString(16)
+
+  // pad hex with a leading 0 if it's not already 2 characters
+  if (hex.length === 1) {
+    return '0' + hex
+  }
+
+  return hex
 }
 
 const idGenerator: IdGenerator = {
