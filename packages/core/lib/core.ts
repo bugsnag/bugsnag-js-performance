@@ -1,8 +1,8 @@
-import { type ResourceAttributeSource, type SpanAttributesSource } from './attributes'
+import { type ResourceAttributeSource, type SpanAttributesSource, SpanAttributes } from './attributes'
 import { type Clock } from './clock'
 import { type IdGenerator } from './id-generator'
 import { BufferingProcessor, type Processor, type ProcessorFactory } from './processor'
-import { Kind, SpanAttributes, type Span, type SpanInternal, type Time } from './span'
+import { Kind, type Span, type SpanInternal, type Time } from './span'
 
 interface Logger {
   debug: (msg: string) => void
