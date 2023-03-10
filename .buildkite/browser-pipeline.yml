@@ -73,3 +73,53 @@ steps:
             - with: { browser: firefox, version: 60 }
             - with: { browser: edge, version: 80 }
             - with: { browser: safari, version: 11 }
+
+      # BrowserStack - iOS
+      - label: ":ios: iOS {{ matrix.os }} Browser tests"
+        depends_on: "browser-maze-runner"
+        timeout_in_minutes: 30
+        env:
+          HOST: "bs-local.com"
+        plugins:
+          docker-compose#v3.9.0:
+            pull: browser-maze-runner
+            run: browser-maze-runner
+            use-aliases: true
+            command:
+              - --farm=bs
+              - --browser={{ matrix.device }}
+          artifacts#v1.5.0:
+            upload:
+              - "./test/browser/maze_output/failed/**/*"
+        concurrency: 2
+        concurrency_group: "browserstack"
+        matrix:
+          setup:
+            device: [iphone_x]
+            os: [11]
+          adjustments:
+            - with: { device: iphone_13, os: 13 }
+
+      # BrowserStack - Android
+      - label: ":android: Android {{ matrix.os }} Browser tests"
+        depends_on: "browser-maze-runner" # not legacy?
+        timeout_in_minutes: 30
+        plugins:
+          docker-compose#v3.9.0:
+            pull: browser-maze-runner
+            run: browser-maze-runner
+            use-aliases: true
+            command:
+              - --farm=bs
+              - --browser={{ matrix.device }}
+          artifacts#v1.5.0:
+            upload:
+              - "./test/browser/maze_output/failed/**/*"
+        concurrency: 2
+        concurrency_group: "browserstack"
+        matrix:
+          setup:
+            device: [android_s6]
+            os: [5]
+          adjustments:
+            - with: { device: android_s8, os: 7 }
