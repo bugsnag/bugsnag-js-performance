@@ -1,9 +1,11 @@
 import { ResourceAttributes } from '@bugsnag/js-performance-core'
 
-function createResourceAttributesSource (navigator: Navigator): () => ResourceAttributes {
+function createResourceAttributesSource (navigator: Navigator, host: string): () => ResourceAttributes {
+  const releaseStage = /^localhost(:\d+)?$/.test(host) ? 'development' : 'production'
+
   return function resourceAttributesSource () {
     const attributes = new ResourceAttributes(
-      'production',
+      releaseStage,
       'bugsnag.performance.browser',
       '__VERSION__'
     )

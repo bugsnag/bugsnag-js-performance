@@ -12,11 +12,47 @@ describe('resourceAttributesSource', () => {
       userAgent: 'a jest test, (like Gecko and WebKit and also Blink) etc...'
     }
 
-    const resourceAttributesSource = createResourceAttributesSource(navigator)
+    const resourceAttributesSource = createResourceAttributesSource(navigator, 'www.bugsnag.com')
     const resourceAttributes = resourceAttributesSource()
 
     expect(resourceAttributes.toJson()).toEqual([
       { key: 'deployment.environment', value: { stringValue: 'production' } },
+      { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.browser' } },
+      { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
+      { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } }
+    ])
+  })
+
+  it('sets releaseStage to development on localhost (with port)', () => {
+    const navigator = {
+      ...window.navigator,
+      userAgentData: undefined,
+      userAgent: 'a jest test, (like Gecko and WebKit and also Blink) etc...'
+    }
+
+    const resourceAttributesSource = createResourceAttributesSource(navigator, 'localhost:8000')
+    const resourceAttributes = resourceAttributesSource()
+
+    expect(resourceAttributes.toJson()).toEqual([
+      { key: 'deployment.environment', value: { stringValue: 'development' } },
+      { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.browser' } },
+      { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
+      { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } }
+    ])
+  })
+
+  it('sets releaseStage to development on localhost (without port)', () => {
+    const navigator = {
+      ...window.navigator,
+      userAgentData: undefined,
+      userAgent: 'a jest test, (like Gecko and WebKit and also Blink) etc...'
+    }
+
+    const resourceAttributesSource = createResourceAttributesSource(navigator, 'localhost')
+    const resourceAttributes = resourceAttributesSource()
+
+    expect(resourceAttributes.toJson()).toEqual([
+      { key: 'deployment.environment', value: { stringValue: 'development' } },
       { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.browser' } },
       { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
       { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } }
@@ -33,7 +69,7 @@ describe('resourceAttributesSource', () => {
       userAgent: 'a jest test, (like Gecko and WebKit and also Blink) etc...'
     }
 
-    const resourceAttributesSource = createResourceAttributesSource(navigator)
+    const resourceAttributesSource = createResourceAttributesSource(navigator, 'www.bugsnag.com')
     const resourceAttributes = resourceAttributesSource()
 
     expect(resourceAttributes.toJson()).toEqual([
