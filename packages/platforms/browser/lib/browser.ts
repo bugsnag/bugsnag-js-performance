@@ -6,13 +6,14 @@ import createResourceAttributesSource from './resource-attributes-source'
 import spanAttributesSource from './span-attributes-source'
 
 const clock = createClock(performance)
+const resourceAttributesSource = createResourceAttributesSource(navigator)
 
 const BugsnagPerformance = createClient({
   clock,
-  resourceAttributesSource: createResourceAttributesSource(navigator),
+  resourceAttributesSource,
   spanAttributesSource,
   idGenerator,
-  processorFactory: new BrowserProcessorFactory(window.fetch, navigator, clock)
+  processorFactory: new BrowserProcessorFactory(window.fetch, resourceAttributesSource, clock)
 })
 
 export default BugsnagPerformance

@@ -4,21 +4,21 @@
 
 import { Kind, SpanAttributes, type SpanEnded } from '@bugsnag/js-performance-core'
 import { BrowserProcessor, BrowserProcessorFactory } from '../lib/BrowserProcessor'
-import resourceAttributesSource from '../lib/resource-attributes-source'
+import createResourceAttributesSource from '../lib/resource-attributes-source'
 
 describe('BrowserProcessorFactory', () => {
   it('returns an instance of BrowserProcessor', () => {
     const fetch = jest.fn(() => Promise.resolve({} as unknown as Response))
-    const logger = { warn: jest.fn(), debug: jest.fn(), error: jest.fn(), info: jest.fn() }
+    const resourceAttributesSource = createResourceAttributesSource(window.navigator)
     const clock = { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' }
 
-    const factory = new BrowserProcessorFactory(fetch, navigator, clock)
+    const factory = new BrowserProcessorFactory(fetch, resourceAttributesSource, clock)
 
     const processor = factory.create({
       apiKey: 'test-api-key',
       endpoint: '/traces',
       releaseStage: 'test',
-      logger
+      logger: { warn: jest.fn(), debug: jest.fn(), error: jest.fn(), info: jest.fn() }
     })
 
     expect(processor).toBeInstanceOf(BrowserProcessor)
@@ -39,7 +39,7 @@ describe('BrowserProcessor', () => {
 
     const mockDelivery = { send: jest.fn() }
     const mockClock = { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' }
-    const processor = new BrowserProcessor('test-api-key', '/traces', mockDelivery, mockClock, resourceAttributesSource(navigator))
+    const processor = new BrowserProcessor('test-api-key', '/traces', mockDelivery, mockClock, createResourceAttributesSource(navigator))
     processor.add(span)
 
     expect(mockDelivery.send).toHaveBeenCalledWith(
