@@ -39,8 +39,8 @@ describe('BrowserProcessor', () => {
 
     const mockDelivery = { send: jest.fn() }
     const processor = new BrowserProcessor(
-      'test-api-key',
       '/traces',
+      'test-api-key',
       mockDelivery,
       { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' },
       createResourceAttributesSource(navigator, 'www.bugsnag.com')

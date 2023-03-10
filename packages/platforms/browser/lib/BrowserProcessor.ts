@@ -19,8 +19,8 @@ export class BrowserProcessor implements Processor {
   private resourceAttributeSource: ResourceAttributeSource
 
   constructor (
-    apiKey: string,
     endpoint: string,
+    apiKey: string,
     delivery: Delivery,
     clock: Clock,
     resourceAttributeSource: ResourceAttributeSource
@@ -73,8 +73,8 @@ export class BrowserProcessorFactory implements ProcessorFactory {
     configuration: Required<Configuration>
   ): BrowserProcessor {
     return new BrowserProcessor(
-      configuration.apiKey,
       configuration.endpoint,
+      configuration.apiKey,
       browserDelivery(this.fetch),
       this.clock,
       this.resourceAttributeSource
