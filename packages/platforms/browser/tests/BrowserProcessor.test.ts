@@ -9,7 +9,7 @@ import createResourceAttributesSource from '../lib/resource-attributes-source'
 describe('BrowserProcessorFactory', () => {
   it('returns an instance of BrowserProcessor', () => {
     const fetch = jest.fn(() => Promise.resolve({} as unknown as Response))
-    const resourceAttributesSource = createResourceAttributesSource(window.navigator)
+    const resourceAttributesSource = createResourceAttributesSource(window.navigator, 'www.bugsnag.com')
     const clock = { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' }
 
     const factory = new BrowserProcessorFactory(fetch, resourceAttributesSource, clock)
@@ -38,8 +38,14 @@ describe('BrowserProcessor', () => {
     }
 
     const mockDelivery = { send: jest.fn() }
-    const mockClock = { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' }
-    const processor = new BrowserProcessor('test-api-key', '/traces', mockDelivery, mockClock, createResourceAttributesSource(navigator))
+    const processor = new BrowserProcessor(
+      'test-api-key',
+      '/traces',
+      mockDelivery,
+      { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' },
+      createResourceAttributesSource(navigator, 'www.bugsnag.com')
+    )
+
     processor.add(span)
 
     expect(mockDelivery.send).toHaveBeenCalledWith(

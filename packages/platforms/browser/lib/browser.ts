@@ -6,7 +6,7 @@ import createResourceAttributesSource from './resource-attributes-source'
 import spanAttributesSource from './span-attributes-source'
 
 const clock = createClock(performance)
-const resourceAttributesSource = createResourceAttributesSource(navigator)
+const resourceAttributesSource = createResourceAttributesSource(navigator, window.location.host)
 
 const BugsnagPerformance = createClient({
   clock,
