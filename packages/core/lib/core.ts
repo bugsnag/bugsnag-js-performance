@@ -1,24 +1,9 @@
-import { type ResourceAttributeSource, type SpanAttributesSource, SpanAttributes } from './attributes'
+import { SpanAttributes, type ResourceAttributeSource, type SpanAttributesSource } from './attributes'
 import { type Clock } from './clock'
+import { type Configuration, type CoreSchema, type InternalConfiguration, type Logger } from './config'
 import { type IdGenerator } from './id-generator'
 import { BufferingProcessor, type Processor, type ProcessorFactory } from './processor'
 import { Kind, type Span, type SpanInternal, type Time } from './span'
-
-interface Logger {
-  debug: (msg: string) => void
-  info: (msg: string) => void
-  warn: (msg: string) => void
-  error: (msg: string) => void
-}
-
-export interface Configuration {
-  apiKey: string
-  endpoint?: string
-  releaseStage?: string
-  logger?: Logger
-}
-
-type InternalConfiguration = Required<Configuration>
 
 export interface BugsnagPerformance {
   start: (config: Configuration | string) => void
@@ -93,15 +78,16 @@ function sanitizeTime (clock: Clock, time?: Time): number {
   return clock.now()
 }
 
-export interface ClientOptions {
+export interface ClientOptions<SchemaType extends CoreSchema> {
   clock: Clock
   idGenerator: IdGenerator
   processorFactory: ProcessorFactory
   resourceAttributesSource: ResourceAttributeSource
   spanAttributesSource: SpanAttributesSource
+  schema: SchemaType
 }
 
-export function createClient (options: ClientOptions): BugsnagPerformance {
+export function createClient<PlatformSchema extends CoreSchema> (options: ClientOptions<PlatformSchema>): BugsnagPerformance {
   const bufferingProcessor = new BufferingProcessor()
   let processor: Processor = bufferingProcessor
 
