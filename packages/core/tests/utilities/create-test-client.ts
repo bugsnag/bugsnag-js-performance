@@ -1,5 +1,5 @@
 import { IncrementingClock, InMemoryProcessor, resourceAttributesSource, spanAttributesSource, StableIdGenerator } from '.'
-import { schema, type CoreSchema } from '../../lib/config'
+import { coreSchema } from '../../lib/config'
 import type { BugsnagPerformance, ClientOptions } from '../../lib/core'
 import { createClient } from '../../lib/core'
 
@@ -9,10 +9,10 @@ const defaultOptions = () => ({
   clock: new IncrementingClock(),
   resourceAttributesSource,
   spanAttributesSource,
-  schema
+  schema: coreSchema
 })
 
-function createTestClient<Schema extends CoreSchema> (optionOverrides: Partial<ClientOptions<Schema>> = {}): BugsnagPerformance {
+function createTestClient (optionOverrides: Partial<ClientOptions> = {}): BugsnagPerformance {
   return createClient({ ...defaultOptions(), ...optionOverrides })
 }
 
