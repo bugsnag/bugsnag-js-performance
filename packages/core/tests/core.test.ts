@@ -113,8 +113,7 @@ describe('Core', () => {
           client.start({ apiKey: VALID_API_KEY, logger, endpoint: value, releaseStage: value })
 
           expect(console.warn).not.toHaveBeenCalled()
-          expect(logger.warn).toHaveBeenCalledWith(`Invalid configuration. endpoint should be a string, got ${type}`)
-          expect(logger.warn).toHaveBeenCalledWith(`Invalid configuration. releaseStage should be a string, got ${type}`)
+          expect(logger.warn).toHaveBeenCalledWith(`Invalid configuration\n  - endpoint should be a string, got ${type}\n  - releaseStage should be a string, got ${type}`)
         })
 
         it('throws if no configuration is provided', () => {

@@ -71,6 +71,20 @@ export const schema: CoreSchema = {
   }
 }
 
+function createWarningMessage (warnings: string[]) {
+  let message = 'Invalid configuration'
+
+  if (warnings.length === 1) {
+    message += `. ${warnings[0]}`
+  } else {
+    for (const warning of warnings) {
+      message += `\n  - ${warning}`
+    }
+  }
+
+  return message
+}
+
 export function validateConfig (config: unknown, schema: Schema): InternalConfiguration {
   if (typeof config === 'string') { config = { apiKey: config } }
 
@@ -86,7 +100,7 @@ export function validateConfig (config: unknown, schema: Schema): InternalConfig
       if (schema[option].validate(config[option])) {
         cleanConfiguration[option] = config[option]
       } else {
-        warnings.push(`Invalid configuration. ${option} ${schema[option].message}, got ${typeof config[option]}`)
+        warnings.push(`${option} ${schema[option].message}, got ${typeof config[option]}`)
         cleanConfiguration[option] = schema[option].defaultValue
       }
     } else {
@@ -97,8 +111,8 @@ export function validateConfig (config: unknown, schema: Schema): InternalConfig
   // If apiKey is set but not valid we should still use it, despite the validation warning.
   cleanConfiguration.apiKey = config.apiKey
 
-  for (const warning of warnings) {
-    (cleanConfiguration as InternalConfiguration).logger.warn(warning)
+  if (warnings.length >= 1) {
+    (cleanConfiguration as InternalConfiguration).logger.warn(createWarningMessage(warnings))
   }
 
   return cleanConfiguration as InternalConfiguration
