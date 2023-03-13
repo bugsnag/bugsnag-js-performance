@@ -1,6 +1,6 @@
 import { SpanAttributes, type ResourceAttributeSource, type SpanAttributesSource } from './attributes'
 import { type Clock } from './clock'
-import { type Configuration, type CoreSchema, type InternalConfiguration, type Logger } from './config'
+import { type Configuration, type CoreSchema, type InternalConfiguration } from './config'
 import { type IdGenerator } from './id-generator'
 import { BufferingProcessor, type Processor, type ProcessorFactory } from './processor'
 import { Kind, type Span, type SpanInternal, type Time } from './span'
@@ -14,54 +14,38 @@ function isObject (obj: unknown): obj is Record<string, unknown> {
   return !!obj && typeof obj === 'object'
 }
 
-function isLogger (object: unknown): object is Logger {
-  return isObject(object) &&
-    typeof object.debug === 'function' &&
-    typeof object.info === 'function' &&
-    typeof object.warn === 'function' &&
-    typeof object.error === 'function'
-}
-
-const defaultLogger: Logger = {
-  debug (message: string) { console.debug(message) },
-  info (message: string) { console.info(message) },
-  warn (message: string) { console.warn(message) },
-  error (message: string) { console.error(message) }
-}
-
-function validate (config: unknown): InternalConfiguration {
+function validate <PlatformSchema extends CoreSchema> (config: unknown, schema: PlatformSchema): InternalConfiguration {
   if (typeof config === 'string') { config = { apiKey: config } }
 
-  if (!isObject(config) || typeof config.apiKey !== 'string') {
-    throw new Error('No Bugsnag API Key set')
+  if (!isObject(config) || !schema.apiKey.validate(config.apiKey)) {
+    throw new Error(schema.apiKey.message)
   }
 
-  const cleanConfiguration: InternalConfiguration = {
-    apiKey: config.apiKey,
-    endpoint: 'https://otlp.bugsnag.com/v1/traces',
-    releaseStage: 'production', // TODO: this should have a sensible default based on platform
-    logger: defaultLogger
+  const warnings = []
+  const cleanConfiguration: Record<string, unknown> = {}
+
+  // TODO: Rewrite me
+  for (const option of Object.getOwnPropertyNames(schema)) {
+    if (Object.prototype.hasOwnProperty.call(config, option)) {
+      if (schema[option].validate(config[option])) {
+        // Valid option provided, use it
+        cleanConfiguration[option] = config[option]
+      } else {
+        // Invalid option provided, set default
+        warnings.push(`Invalid configuration. ${option} ${schema[option].message}, got ${typeof config[option]}`)
+        cleanConfiguration[option] = schema[option].defaultValue
+      }
+    } else {
+      // No option set - use default from schema
+      cleanConfiguration[option] = schema[option].defaultValue
+    }
   }
 
-  if (isLogger(config.logger)) {
-    cleanConfiguration.logger = config.logger
-  } else if (config.logger !== undefined) {
-    cleanConfiguration.logger.warn(`Invalid configuration. logger should be a Logger object, got ${typeof config.logger}`)
+  for (const warning of warnings) {
+    (cleanConfiguration as InternalConfiguration).logger.warn(warning)
   }
 
-  if (typeof config.endpoint === 'string') {
-    cleanConfiguration.endpoint = config.endpoint
-  } else if (config.endpoint !== undefined) {
-    cleanConfiguration.logger.warn(`Invalid configuration. endpoint should be a string, got ${typeof config.endpoint}`)
-  }
-
-  if (typeof config.releaseStage === 'string') {
-    cleanConfiguration.releaseStage = config.releaseStage
-  } else if (config.releaseStage !== undefined) {
-    cleanConfiguration.logger.warn(`Invalid configuration. releaseStage should be a string, got ${typeof config.releaseStage}`)
-  }
-
-  return cleanConfiguration
+  return cleanConfiguration as InternalConfiguration
 }
 
 function sanitizeTime (clock: Clock, time?: Time): number {
@@ -93,7 +77,7 @@ export function createClient<PlatformSchema extends CoreSchema> (options: Client
 
   return {
     start: (config: Configuration | string) => {
-      const configuration = validate(config)
+      const configuration = validate(config, options.schema)
       processor = options.processorFactory.create(configuration)
       bufferingProcessor.spans.forEach(span => {
         processor.add(span)

@@ -29,23 +29,23 @@ export type InternalConfiguration = Required<Configuration>
 export interface ConfigOption<Type> {
   message: string
   defaultValue: Type
-  validate: (value: unknown) => boolean
+  validate: (value: unknown) => value is Type
 }
 
-// TODO: Figure out how to make generic version of this
-export interface CoreSchema {
+// TODO: Fix type
+export type CoreSchema = {
   apiKey: ConfigOption<string>
   endpoint: ConfigOption<string>
   releaseStage: ConfigOption<string>
   logger: ConfigOption<Logger>
-}
+} & Record<string, ConfigOption<unknown>>
 
-const isString = (value: unknown) => typeof value === 'string'
+const isString = (value: unknown): value is string => typeof value === 'string'
 
 export const schema: CoreSchema = {
   endpoint: {
     defaultValue: 'https://otlp.bugsnag.com/v1/traces',
-    message: 'should be a valid URL. Bugsnag will not send any requests.',
+    message: 'should be a string',
     validate: isString
   },
   apiKey: {
@@ -65,7 +65,7 @@ export const schema: CoreSchema = {
   },
   releaseStage: {
     defaultValue: 'production',
-    message: 'should be a string.',
+    message: 'should be a string',
     validate: isString
   }
 }
