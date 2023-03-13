@@ -5,7 +5,7 @@ export interface Logger {
   error: (msg: string) => void
 }
 
-function isObject (obj: unknown): obj is Record<string, unknown> {
+export function isObject (obj: unknown): obj is Record<string, unknown> {
   return !!obj && typeof obj === 'object'
 }
 
@@ -26,19 +26,18 @@ export interface Configuration {
 
 export type InternalConfiguration = Required<Configuration>
 
-export interface ConfigOption<Type> {
+export interface ConfigOption<T> {
   message: string
-  defaultValue: Type
-  validate: (value: unknown) => value is Type
+  defaultValue: T
+  validate: (value: unknown) => value is T
 }
 
-// TODO: Fix type
-export type CoreSchema = {
+export interface CoreSchema {
   apiKey: ConfigOption<string>
   endpoint: ConfigOption<string>
   releaseStage: ConfigOption<string>
   logger: ConfigOption<Logger>
-} & Record<string, ConfigOption<unknown>>
+}
 
 const isString = (value: unknown): value is string => typeof value === 'string'
 

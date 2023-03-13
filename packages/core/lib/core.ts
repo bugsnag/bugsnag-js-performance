@@ -1,6 +1,6 @@
 import { SpanAttributes, type ResourceAttributeSource, type SpanAttributesSource } from './attributes'
 import { type Clock } from './clock'
-import { type Configuration, type CoreSchema, type InternalConfiguration } from './config'
+import { isObject, type ConfigOption, type Configuration, type CoreSchema, type InternalConfiguration } from './config'
 import { type IdGenerator } from './id-generator'
 import { BufferingProcessor, type Processor, type ProcessorFactory } from './processor'
 import { Kind, type Span, type SpanInternal, type Time } from './span'
@@ -10,11 +10,9 @@ export interface BugsnagPerformance {
   startSpan: (name: string, startTime?: Time) => Span
 }
 
-function isObject (obj: unknown): obj is Record<string, unknown> {
-  return !!obj && typeof obj === 'object'
-}
+type PlatformSchema = CoreSchema & Record<string, ConfigOption<unknown>>
 
-function validate <PlatformSchema extends CoreSchema> (config: unknown, schema: PlatformSchema): InternalConfiguration {
+function validate (config: unknown, schema: PlatformSchema): InternalConfiguration {
   if (typeof config === 'string') { config = { apiKey: config } }
 
   if (!isObject(config) || !schema.apiKey.validate(config.apiKey)) {
@@ -24,19 +22,15 @@ function validate <PlatformSchema extends CoreSchema> (config: unknown, schema: 
   const warnings = []
   const cleanConfiguration: Record<string, unknown> = {}
 
-  // TODO: Rewrite me
-  for (const option of Object.getOwnPropertyNames(schema)) {
-    if (Object.prototype.hasOwnProperty.call(config, option)) {
+  for (const option in schema) {
+    if (option in config) {
       if (schema[option].validate(config[option])) {
-        // Valid option provided, use it
         cleanConfiguration[option] = config[option]
       } else {
-        // Invalid option provided, set default
         warnings.push(`Invalid configuration. ${option} ${schema[option].message}, got ${typeof config[option]}`)
         cleanConfiguration[option] = schema[option].defaultValue
       }
     } else {
-      // No option set - use default from schema
       cleanConfiguration[option] = schema[option].defaultValue
     }
   }
@@ -71,7 +65,7 @@ export interface ClientOptions<SchemaType extends CoreSchema> {
   schema: SchemaType
 }
 
-export function createClient<PlatformSchema extends CoreSchema> (options: ClientOptions<PlatformSchema>): BugsnagPerformance {
+export function createClient (options: ClientOptions<PlatformSchema>): BugsnagPerformance {
   const bufferingProcessor = new BufferingProcessor()
   let processor: Processor = bufferingProcessor
 
