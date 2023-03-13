@@ -41,6 +41,8 @@ export interface CoreSchema extends Schema {
   logger: ConfigOption<Logger>
 }
 
+export type PlatformSchema = CoreSchema
+
 const isString = (value: unknown): value is string => typeof value === 'string'
 
 export const schema: CoreSchema = {
