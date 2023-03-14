@@ -1,8 +1,8 @@
 export interface Logger {
-  debug: (msg: string) => void
-  info: (msg: string) => void
-  warn: (msg: string) => void
-  error: (msg: string) => void
+  debug: (message: string) => void
+  info: (message: string) => void
+  warn: (message: string) => void
+  error: (message: string) => void
 }
 
 export function isObject (obj: unknown): obj is Record<string, unknown> {
@@ -11,10 +11,10 @@ export function isObject (obj: unknown): obj is Record<string, unknown> {
 
 function isLogger (object: unknown): object is Logger {
   return isObject(object) &&
-      typeof object.debug === 'function' &&
-      typeof object.info === 'function' &&
-      typeof object.warn === 'function' &&
-      typeof object.error === 'function'
+    typeof object.debug === 'function' &&
+    typeof object.info === 'function' &&
+    typeof object.warn === 'function' &&
+    typeof object.error === 'function'
 }
 
 export interface Configuration {
@@ -52,7 +52,7 @@ export const coreSchema: CoreSchema = {
   apiKey: {
     defaultValue: '',
     message: 'No Bugsnag API Key set',
-    validate: isString
+    validate: (value: unknown): value is string => typeof value === 'string' && value.length > 0
   },
   logger: {
     defaultValue: {
@@ -81,8 +81,8 @@ export function validateConfig (config: unknown, schema: Schema): InternalConfig
   const warnings = []
   const cleanConfiguration: Record<string, unknown> = {}
 
-  for (const option in schema) {
-    if (option in config) {
+  for (const option of Object.keys(schema)) {
+    if (Object.prototype.hasOwnProperty.call(config, option)) {
       if (schema[option].validate(config[option])) {
         cleanConfiguration[option] = config[option]
       } else {
