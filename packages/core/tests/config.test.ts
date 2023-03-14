@@ -1,9 +1,9 @@
-import { schema as coreSchema, validateConfig, type PlatformSchema } from '../lib/config'
+import { schema as coreSchema, validateConfig, type Schema } from '../lib/config'
 import { VALID_API_KEY } from './utilities'
 
 describe('Schema validation', () => {
   it('logs a warning if a config option is invalid', () => {
-    const schema: PlatformSchema = {
+    const schema: Schema = {
       ...coreSchema,
       newValue: {
         defaultValue: 'default-new-value',
@@ -29,7 +29,7 @@ describe('Schema validation', () => {
   })
 
   it('logs a warning if two or more config options are invalid', () => {
-    const schema: PlatformSchema = {
+    const schema: Schema = {
       ...coreSchema,
       newValue: {
         defaultValue: 'default-new-value',
@@ -56,7 +56,7 @@ describe('Schema validation', () => {
   })
 
   it('uses the default value if one is not provided', () => {
-    const schema: PlatformSchema = {
+    const schema: Schema = {
       ...coreSchema,
       endpoint: {
         defaultValue: 'default-endpoint',
@@ -71,7 +71,7 @@ describe('Schema validation', () => {
   })
 
   it('uses the default value if config option is invalid', () => {
-    const schema: PlatformSchema = {
+    const schema: Schema = {
       ...coreSchema,
       endpoint: {
         defaultValue: 'default-endpoint',
