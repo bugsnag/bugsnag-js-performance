@@ -43,7 +43,7 @@ export interface CoreSchema extends Schema {
 
 const isString = (value: unknown): value is string => typeof value === 'string'
 
-export const coreSchema: CoreSchema = {
+export const schema: CoreSchema = {
   endpoint: {
     defaultValue: 'https://otlp.bugsnag.com/v1/traces',
     message: 'should be a string',
