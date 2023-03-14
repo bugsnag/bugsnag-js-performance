@@ -78,7 +78,7 @@ export function validateConfig (config: unknown, schema: Schema): InternalConfig
     throw new Error('No Bugsnag API Key set')
   }
 
-  const warnings = []
+  let warnings = ''
   const cleanConfiguration: Record<string, unknown> = {}
 
   for (const option of Object.keys(schema)) {
@@ -86,7 +86,7 @@ export function validateConfig (config: unknown, schema: Schema): InternalConfig
       if (schema[option].validate(config[option])) {
         cleanConfiguration[option] = config[option]
       } else {
-        warnings.push(`Invalid configuration. ${option} ${schema[option].message}, got ${typeof config[option]}`)
+        warnings += `\n  - ${option} ${schema[option].message}, got ${typeof config[option]}`
         cleanConfiguration[option] = schema[option].defaultValue
       }
     } else {
@@ -97,8 +97,8 @@ export function validateConfig (config: unknown, schema: Schema): InternalConfig
   // If apiKey is set but not valid we should still use it, despite the validation warning.
   cleanConfiguration.apiKey = config.apiKey
 
-  for (const warning of warnings) {
-    (cleanConfiguration as InternalConfiguration).logger.warn(warning)
+  if (warnings.length > 0) {
+    (cleanConfiguration as InternalConfiguration).logger.warn(`Invalid configuration${warnings}`)
   }
 
   return cleanConfiguration as InternalConfiguration
