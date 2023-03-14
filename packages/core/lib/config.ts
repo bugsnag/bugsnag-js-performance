@@ -51,8 +51,8 @@ export const coreSchema: CoreSchema = {
   },
   apiKey: {
     defaultValue: '',
-    message: 'No Bugsnag API Key set',
-    validate: (value: unknown): value is string => typeof value === 'string' && value.length > 0
+    message: 'should be a 32 character hexadecimal string',
+    validate: (value: unknown): value is string => isString(value) && /^[a-f0-9]{32}$/.test(value)
   },
   logger: {
     defaultValue: {
@@ -74,8 +74,8 @@ export const coreSchema: CoreSchema = {
 export function validateConfig (config: unknown, schema: Schema): InternalConfiguration {
   if (typeof config === 'string') { config = { apiKey: config } }
 
-  if (!isObject(config) || !schema.apiKey.validate(config.apiKey)) {
-    throw new Error(schema.apiKey.message)
+  if (!isObject(config) || !isString(config.apiKey) || config.apiKey.length === 0) {
+    throw new Error('No Bugsnag API Key set')
   }
 
   const warnings = []
@@ -93,6 +93,9 @@ export function validateConfig (config: unknown, schema: Schema): InternalConfig
       cleanConfiguration[option] = schema[option].defaultValue
     }
   }
+
+  // If apiKey is set but not valid we should still use it, despite the validation warning.
+  cleanConfiguration.apiKey = config.apiKey
 
   for (const warning of warnings) {
     (cleanConfiguration as InternalConfiguration).logger.warn(warning)

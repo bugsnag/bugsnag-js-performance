@@ -1,5 +1,5 @@
 import { createNoopClient } from '../lib/core'
-import { createTestClient } from './utilities'
+import { createTestClient, VALID_API_KEY } from './utilities'
 
 describe('Core', () => {
   describe('createClient()', () => {
@@ -25,7 +25,7 @@ describe('Core', () => {
         it('accepts a string', () => {
           const client = createTestClient()
 
-          client.start('test-api-key')
+          client.start(VALID_API_KEY)
 
           expect(console.warn).not.toHaveBeenCalled()
         })
@@ -33,7 +33,7 @@ describe('Core', () => {
         it('accepts a minimal valid configuration object', () => {
           const client = createTestClient()
 
-          client.start({ apiKey: 'test-api-key' })
+          client.start({ apiKey: VALID_API_KEY })
 
           expect(console.warn).not.toHaveBeenCalled()
         })
@@ -49,7 +49,7 @@ describe('Core', () => {
           }
 
           client.start({
-            apiKey: 'test-api-key',
+            apiKey: VALID_API_KEY,
             endpoint: '/test',
             releaseStage: 'test',
             logger
@@ -74,7 +74,7 @@ describe('Core', () => {
           const client = createTestClient()
 
           // @ts-expect-error endpoint should be a string
-          client.start({ apiKey: 'test-api-key', endpoint: value })
+          client.start({ apiKey: VALID_API_KEY, endpoint: value })
           expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. endpoint should be a string, got ${type}`)
         })
 
@@ -84,7 +84,7 @@ describe('Core', () => {
           const client = createTestClient()
 
           // @ts-expect-error releaseStage should be a string
-          client.start({ apiKey: 'test-api-key', releaseStage: value })
+          client.start({ apiKey: VALID_API_KEY, releaseStage: value })
           expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. releaseStage should be a string, got ${type}`)
         })
 
@@ -94,7 +94,7 @@ describe('Core', () => {
           const client = createTestClient()
 
           // @ts-expect-error logger should be a logger object
-          client.start({ apiKey: 'test-api-key', logger: value })
+          client.start({ apiKey: VALID_API_KEY, logger: value })
           expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. logger should be a Logger object, got ${type}`)
         })
 
@@ -109,7 +109,7 @@ describe('Core', () => {
           }
 
           // @ts-expect-error logger should be a logger object
-          client.start({ apiKey: 'test-api-key', logger, endpoint: value, releaseStage: value })
+          client.start({ apiKey: VALID_API_KEY, logger, endpoint: value, releaseStage: value })
 
           expect(logger.warn).toHaveBeenCalledWith(`Invalid configuration. endpoint should be a string, got ${type}`)
           expect(logger.warn).toHaveBeenCalledWith(`Invalid configuration. releaseStage should be a string, got ${type}`)
