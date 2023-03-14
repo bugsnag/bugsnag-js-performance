@@ -1,4 +1,5 @@
 import {
+  spanToJson,
   type Clock,
   type Configuration,
   type Delivery,
@@ -7,26 +8,23 @@ import {
   type ProcessorFactory,
   type ResourceAttributeSource,
   type SpanEnded,
-  spanToJson
+  type InternalConfiguration
 } from '@bugsnag/js-performance-core'
 import browserDelivery, { type Fetch } from './delivery'
 
 export class BrowserProcessor implements Processor {
-  private apiKey: string
-  private endpoint: string
+  private configuration: InternalConfiguration
   private delivery: Delivery
   private clock: Clock
   private resourceAttributeSource: ResourceAttributeSource
 
   constructor (
-    endpoint: string,
-    apiKey: string,
+    configuration: InternalConfiguration,
     delivery: Delivery,
     clock: Clock,
     resourceAttributeSource: ResourceAttributeSource
   ) {
-    this.apiKey = apiKey
-    this.endpoint = endpoint
+    this.configuration = configuration
     this.delivery = delivery
     this.clock = clock
     this.resourceAttributeSource = resourceAttributeSource
@@ -39,7 +37,7 @@ export class BrowserProcessor implements Processor {
       resourceSpans: [
         {
           resource: {
-            attributes: this.resourceAttributeSource().toJson()
+            attributes: this.resourceAttributeSource(this.configuration).toJson()
           },
           scopeSpans: [
             {
@@ -51,8 +49,8 @@ export class BrowserProcessor implements Processor {
     }
 
     this.delivery.send(
-      this.endpoint,
-      this.apiKey,
+      this.configuration.endpoint,
+      this.configuration.apiKey,
       payload
     )
   }
@@ -73,8 +71,7 @@ export class BrowserProcessorFactory implements ProcessorFactory {
     configuration: Required<Configuration>
   ): BrowserProcessor {
     return new BrowserProcessor(
-      configuration.endpoint,
-      configuration.apiKey,
+      configuration,
       browserDelivery(this.fetch),
       this.clock,
       this.resourceAttributeSource

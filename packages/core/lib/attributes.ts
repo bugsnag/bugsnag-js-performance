@@ -1,3 +1,5 @@
+import { type InternalConfiguration } from './config'
+
 export type SpanAttribute = string | number | boolean
 
 export type SpanAttributesSource = () => Map<string, SpanAttribute>
@@ -36,7 +38,7 @@ export class ResourceAttributes extends SpanAttributes {
   }
 }
 
-export type ResourceAttributeSource = () => ResourceAttributes
+export type ResourceAttributeSource = (configuration: InternalConfiguration) => ResourceAttributes
 
 export interface JsonAttribute {
   key: string
