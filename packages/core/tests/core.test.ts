@@ -76,7 +76,7 @@ describe('Core', () => {
 
           // @ts-expect-error endpoint should be a string
           client.start({ apiKey: VALID_API_KEY, endpoint: value })
-          expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. endpoint should be a string, got ${type}`)
+          expect(console.warn).toHaveBeenCalledWith(`Invalid configuration\n  - endpoint should be a string, got ${type}`)
         })
 
         it.each(invalidParameters)('warns if config.releaseStage is invalid ($type)', ({ value, type }) => {
@@ -86,7 +86,7 @@ describe('Core', () => {
 
           // @ts-expect-error releaseStage should be a string
           client.start({ apiKey: VALID_API_KEY, releaseStage: value })
-          expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. releaseStage should be a string, got ${type}`)
+          expect(console.warn).toHaveBeenCalledWith(`Invalid configuration\n  - releaseStage should be a string, got ${type}`)
         })
 
         it.each(invalidParameters)('warns if config.logger is invalid ($type)', ({ value, type }) => {
@@ -96,7 +96,7 @@ describe('Core', () => {
 
           // @ts-expect-error logger should be a logger object
           client.start({ apiKey: VALID_API_KEY, logger: value })
-          expect(console.warn).toHaveBeenCalledWith(`Invalid configuration. logger should be a Logger object, got ${type}`)
+          expect(console.warn).toHaveBeenCalledWith(`Invalid configuration\n  - logger should be a Logger object, got ${type}`)
         })
 
         it.each(invalidParameters)('uses config.logger if it is valid', ({ value, type }) => {
@@ -128,7 +128,7 @@ describe('Core', () => {
           const client = createTestClient()
           client.start('NOT_VALID')
 
-          expect(console.warn).toHaveBeenCalledWith('Invalid configuration. apiKey should be a 32 character hexadecimal string, got string')
+          expect(console.warn).toHaveBeenCalledWith('Invalid configuration\n  - apiKey should be a 32 character hexadecimal string, got string')
         })
 
         it('warns if the api key is not valid (config object)', () => {
@@ -142,7 +142,7 @@ describe('Core', () => {
           client.start({ apiKey: 'NOT_VALID', logger })
 
           expect(console.warn).not.toHaveBeenCalled()
-          expect(logger.warn).toHaveBeenCalledWith('Invalid configuration. apiKey should be a 32 character hexadecimal string, got string')
+          expect(logger.warn).toHaveBeenCalledWith('Invalid configuration\n  - apiKey should be a 32 character hexadecimal string, got string')
         })
 
         it.each([

@@ -1,4 +1,5 @@
-import { coreSchema, validateConfig, type PlatformSchema } from '../lib/config'
+import { schema as coreSchema, validateConfig, type PlatformSchema } from '../lib/config'
+import { VALID_API_KEY } from './utilities'
 
 describe('Schema validation', () => {
   it('logs a warning if a config option is invalid', () => {
@@ -12,7 +13,7 @@ describe('Schema validation', () => {
     }
 
     const config = {
-      apiKey: 'valid-api-key',
+      apiKey: VALID_API_KEY,
       newValue: 12345,
       logger: {
         warn: jest.fn(),
@@ -24,10 +25,10 @@ describe('Schema validation', () => {
 
     validateConfig(config, schema)
 
-    expect(config.logger.warn).toHaveBeenCalledWith('Invalid configuration. newValue is not valid, got number')
+    expect(config.logger.warn).toHaveBeenCalledWith('Invalid configuration\n  - newValue is not valid, got number')
   })
 
-  it('logs a multi-line warning if two or more config options are invalid', () => {
+  it('logs a warning if two or more config options are invalid', () => {
     const schema: PlatformSchema = {
       ...coreSchema,
       newValue: {
@@ -38,7 +39,7 @@ describe('Schema validation', () => {
     }
 
     const config = {
-      apiKey: 'valid-api-key',
+      apiKey: VALID_API_KEY,
       newValue: 12345,
       endpoint: () => {},
       logger: {
@@ -64,11 +65,7 @@ describe('Schema validation', () => {
       }
     }
 
-    const config = {
-      apiKey: 'valid-api-key'
-    }
-
-    const validConfig = validateConfig(config, schema)
+    const validConfig = validateConfig(VALID_API_KEY, schema)
 
     expect(validConfig.endpoint).toStrictEqual('default-endpoint')
   })
@@ -84,7 +81,7 @@ describe('Schema validation', () => {
     }
 
     const config = {
-      apiKey: 'valid-api-key',
+      apiKey: VALID_API_KEY,
       endpoint: 12345,
       logger: {
         warn: jest.fn(),

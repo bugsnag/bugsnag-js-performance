@@ -73,20 +73,6 @@ export const schema: CoreSchema = {
   }
 }
 
-function createWarningMessage (warnings: string[]) {
-  let message = 'Invalid configuration'
-
-  if (warnings.length === 1) {
-    message += `. ${warnings[0]}`
-  } else {
-    for (const warning of warnings) {
-      message += `\n  - ${warning}`
-    }
-  }
-
-  return message
-}
-
 export function validateConfig (config: unknown, schema: Schema): InternalConfiguration {
   if (typeof config === 'string') { config = { apiKey: config } }
 
@@ -94,7 +80,7 @@ export function validateConfig (config: unknown, schema: Schema): InternalConfig
     throw new Error('No Bugsnag API Key set')
   }
 
-  const warnings = []
+  let warnings = ''
   const cleanConfiguration: Record<string, unknown> = {}
 
   for (const option of Object.keys(schema)) {
@@ -102,7 +88,7 @@ export function validateConfig (config: unknown, schema: Schema): InternalConfig
       if (schema[option].validate(config[option])) {
         cleanConfiguration[option] = config[option]
       } else {
-        warnings.push(`${option} ${schema[option].message}, got ${typeof config[option]}`)
+        warnings += `\n  - ${option} ${schema[option].message}, got ${typeof config[option]}`
         cleanConfiguration[option] = schema[option].defaultValue
       }
     } else {
@@ -113,8 +99,8 @@ export function validateConfig (config: unknown, schema: Schema): InternalConfig
   // If apiKey is set but not valid we should still use it, despite the validation warning.
   cleanConfiguration.apiKey = config.apiKey
 
-  if (warnings.length >= 1) {
-    (cleanConfiguration as InternalConfiguration).logger.warn(createWarningMessage(warnings))
+  if (warnings.length > 0) {
+    (cleanConfiguration as InternalConfiguration).logger.warn(`Invalid configuration${warnings}`)
   }
 
   return cleanConfiguration as InternalConfiguration
