@@ -1,4 +1,4 @@
-import { type Configuration } from './core'
+import { type Configuration } from './config'
 import { type SpanEnded } from './span'
 
 // processor.add is called by a Span when 'Span.end' is called

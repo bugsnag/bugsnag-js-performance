@@ -1,6 +1,6 @@
 import { Kind } from '../lib/span'
 import { SpanAttributes } from '../lib/attributes'
-import { createTestClient, IncrementingClock, InMemoryProcessor } from './utilities'
+import { createTestClient, IncrementingClock, InMemoryProcessor, VALID_API_KEY } from './utilities'
 
 describe('Span', () => {
   describe('client.startSpan()', () => {
@@ -22,7 +22,7 @@ describe('Span', () => {
       const processor = new InMemoryProcessor()
       const processorFactory = { create: () => processor }
       const client = createTestClient({ processorFactory })
-      client.start({ apiKey: 'test-api-key' })
+      client.start({ apiKey: VALID_API_KEY })
 
       // @ts-expect-error startTime will be invalid
       const span = client.startSpan('test span', startTime)
@@ -39,7 +39,7 @@ describe('Span', () => {
       const processor = new InMemoryProcessor()
       const processorFactory = { create: () => processor }
       const client = createTestClient({ processorFactory })
-      client.start({ apiKey: 'test-api-key' })
+      client.start({ apiKey: VALID_API_KEY })
 
       const span = client.startSpan('test span')
       span.end()
@@ -61,7 +61,7 @@ describe('Span', () => {
       const processor = new InMemoryProcessor()
       const processorFactory = { create: () => processor }
       const client = createTestClient({ processorFactory, clock })
-      client.start({ apiKey: 'test-api-key' })
+      client.start({ apiKey: VALID_API_KEY })
 
       const span = client.startSpan('test span')
       span.end(new Date('2023-01-02T03:04:05.008Z')) // 2ms after time origin
@@ -82,7 +82,7 @@ describe('Span', () => {
       const processor = new InMemoryProcessor()
       const processorFactory = { create: () => processor }
       const client = createTestClient({ processorFactory })
-      client.start({ apiKey: 'test-api-key' })
+      client.start({ apiKey: VALID_API_KEY })
 
       const span = client.startSpan('test span')
       span.end(4321)
