@@ -55,6 +55,7 @@ describe('Core', () => {
             logger
           })
 
+          expect(console.warn).not.toHaveBeenCalled()
           expect(logger.warn).not.toHaveBeenCalled()
         })
 
@@ -111,6 +112,7 @@ describe('Core', () => {
           // @ts-expect-error logger should be a logger object
           client.start({ apiKey: VALID_API_KEY, logger, endpoint: value, releaseStage: value })
 
+          expect(console.warn).not.toHaveBeenCalled()
           expect(logger.warn).toHaveBeenCalledWith(`Invalid configuration. endpoint should be a string, got ${type}`)
           expect(logger.warn).toHaveBeenCalledWith(`Invalid configuration. releaseStage should be a string, got ${type}`)
         })
@@ -120,6 +122,28 @@ describe('Core', () => {
 
           // @ts-expect-error no configuration provided
           expect(() => { client.start() }).toThrow('No Bugsnag API Key set')
+        })
+
+        it('warns if the api key is not valid', () => {
+          jest.spyOn(console, 'warn').mockImplementation()
+          const client = createTestClient()
+          client.start('NOT_VALID')
+
+          expect(console.warn).toHaveBeenCalledWith('Invalid configuration. apiKey should be a 32 character hexadecimal string, got string')
+        })
+
+        it('warns if the api key is not valid (config object)', () => {
+          const client = createTestClient()
+          const logger = {
+            debug: jest.fn(),
+            info: jest.fn(),
+            warn: jest.fn(),
+            error: jest.fn()
+          }
+          client.start({ apiKey: 'NOT_VALID', logger })
+
+          expect(console.warn).not.toHaveBeenCalled()
+          expect(logger.warn).toHaveBeenCalledWith('Invalid configuration. apiKey should be a 32 character hexadecimal string, got string')
         })
 
         it.each([
