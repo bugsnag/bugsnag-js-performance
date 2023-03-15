@@ -1,4 +1,4 @@
-import { isObject, isLogger, isString, isStringWithLength } from './validation'
+import { isObject, isLogger, isString, isStringWithLength, isStringArray } from './validation'
 
 export interface Logger {
   debug: (message: string) => void
@@ -13,6 +13,7 @@ export interface Configuration {
   releaseStage?: string
   logger?: Logger
   appVersion?: string
+  enabledReleaseStages?: string[]
 }
 
 export type InternalConfiguration = Required<Configuration>
@@ -31,6 +32,7 @@ export interface CoreSchema extends Schema {
   releaseStage: ConfigOption<string>
   logger: ConfigOption<Logger>
   appVersion: ConfigOption<string>
+  enabledReleaseStages: ConfigOption<string[]>
 }
 
 export const schema: CoreSchema = {
@@ -63,6 +65,11 @@ export const schema: CoreSchema = {
     defaultValue: 'production',
     message: 'should be a string',
     validate: isString
+  },
+  enabledReleaseStages: {
+    defaultValue: [],
+    message: 'should be an array of strings',
+    validate: isStringArray
   }
 }
 

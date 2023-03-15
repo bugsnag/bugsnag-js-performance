@@ -5,6 +5,7 @@ export function createConfiguration (overrides: Partial<InternalConfiguration> =
     apiKey: 'abcdefabcdefabcdefabcdefabcdef12',
     endpoint: '/traces',
     releaseStage: 'production',
+    enabledReleaseStages: ['production'],
     logger: {
       debug: jest.fn(),
       warn: jest.fn(),
