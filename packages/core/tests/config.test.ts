@@ -95,4 +95,30 @@ describe('Schema validation', () => {
 
     expect(validConfig.endpoint).toStrictEqual('default-endpoint')
   })
+
+  describe('Core Schema', () => {
+    describe('appVersion', () => {
+      it('accepts a valid value', () => {
+        const config = {
+          apiKey: VALID_API_KEY,
+          appVersion: '1.2.3'
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.appVersion).toBe('1.2.3')
+      })
+
+      it('replaces an invalid value with undefined', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
+        const config = {
+          apiKey: VALID_API_KEY,
+          appVersion: 123
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.appVersion).toBe(undefined)
+      })
+    })
+  })
 })
