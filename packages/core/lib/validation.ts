@@ -15,3 +15,5 @@ export const isLogger = (value: unknown): value is Logger =>
     typeof value.info === 'function' &&
     typeof value.warn === 'function' &&
     typeof value.error === 'function'
+
+export const isStringArray = (value: unknown): value is string[] => Array.isArray(value) && value.length > 0 && value.every((v) => typeof v === 'string' && v.length > 0)
