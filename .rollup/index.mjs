@@ -2,7 +2,13 @@ import typescript from '@rollup/plugin-typescript'
 import replace from '@rollup/plugin-replace'
 import fs from 'fs'
 
-function createRollupConfig () {
+const defaultOptions = () => ({
+  // additional variables to define with '@rollup/plugin-replace'
+  // e.g. '{ ABC: 123 }' is equivalent to running 'globalThis.ABC = 123'
+  additionalReplacements: {},
+})
+
+function createRollupConfig (options = defaultOptions()) {
   const packageJson = JSON.parse(fs.readFileSync(`${process.cwd()}/package.json`))
 
   return {
@@ -21,6 +27,7 @@ function createRollupConfig () {
         preventAssignment: true,
         values: {
           __VERSION__: packageJson.version,
+          ...options.additionalReplacements,
         },
       }),
       typescript({
