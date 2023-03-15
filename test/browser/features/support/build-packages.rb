@@ -53,7 +53,7 @@ end
 
 begin
   Dir.chdir(ROOT) do
-    run("npm run build -- --scope #{PACKAGE_NAMES.join(" --scope ")}")
+    run("ENABLE_TEST_CONFIGURATION=1 npm run build -- --scope #{PACKAGE_NAMES.join(" --scope ")}")
 
     PACKAGE_DIRECTORIES.each do |package|
       run("npm pack #{package} --pack-destination #{FIXTURES_DIRECTORY}")
