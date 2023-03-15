@@ -34,7 +34,7 @@ describe('BrowserProcessor', () => {
 
     const mockDelivery = { send: jest.fn() }
     const processor = new BrowserProcessor(
-      createConfiguration({ apiKey: 'test-api-key', releaseStage: 'test', enabledReleaseStages: ['production'] }),
+      createConfiguration({ releaseStage: 'test', enabledReleaseStages: ['production'] }),
       mockDelivery,
       { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' },
       createResourceAttributesSource(navigator)
@@ -58,7 +58,7 @@ describe('BrowserProcessor', () => {
 
     const mockDelivery = { send: jest.fn() }
     const processor = new BrowserProcessor(
-      createConfiguration({ apiKey: 'test-api-key', releaseStage: 'production', enabledReleaseStages: ['production'] }),
+      createConfiguration({ releaseStage: 'production', enabledReleaseStages: ['production'] }),
       mockDelivery,
       { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' },
       createResourceAttributesSource(navigator)
@@ -82,7 +82,7 @@ describe('BrowserProcessor', () => {
 
     const mockDelivery = { send: jest.fn() }
     const processor = new BrowserProcessor(
-      createConfiguration({ apiKey: 'test-api-key', releaseStage: 'production', enabledReleaseStages: null }),
+      createConfiguration({ releaseStage: 'production', enabledReleaseStages: null }),
       mockDelivery,
       { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' },
       createResourceAttributesSource(navigator)
