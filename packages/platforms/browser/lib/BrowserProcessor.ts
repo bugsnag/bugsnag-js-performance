@@ -1,14 +1,13 @@
 import {
   spanToJson,
   type Clock,
-  type Configuration,
   type Delivery,
   type DeliveryPayload,
+  type InternalConfiguration,
   type Processor,
   type ProcessorFactory,
   type ResourceAttributeSource,
-  type SpanEnded,
-  type InternalConfiguration
+  type SpanEnded
 } from '@bugsnag/js-performance-core'
 import browserDelivery, { type Fetch } from './delivery'
 
@@ -68,7 +67,7 @@ export class BrowserProcessorFactory implements ProcessorFactory {
   }
 
   create (
-    configuration: Required<Configuration>
+    configuration: InternalConfiguration
   ): BrowserProcessor {
     return new BrowserProcessor(
       configuration,
