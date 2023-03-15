@@ -5,14 +5,7 @@
 import { Kind, SpanAttributes, type SpanEnded } from '@bugsnag/js-performance-core'
 import { BrowserProcessor, BrowserProcessorFactory } from '../lib/BrowserProcessor'
 import createResourceAttributesSource from '../lib/resource-attributes-source'
-
-const CONFIGURATION = {
-  apiKey: 'test-api-key',
-  endpoint: '/traces',
-  releaseStage: 'production',
-  logger: { warn: jest.fn(), debug: jest.fn(), error: jest.fn(), info: jest.fn() },
-  appVersion: ''
-}
+import { createConfiguration } from './utilities'
 
 describe('BrowserProcessorFactory', () => {
   it('returns an instance of BrowserProcessor', () => {
@@ -21,8 +14,7 @@ describe('BrowserProcessorFactory', () => {
     const clock = { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' }
 
     const factory = new BrowserProcessorFactory(fetch, resourceAttributesSource, clock)
-
-    const processor = factory.create(CONFIGURATION)
+    const processor = factory.create(createConfiguration())
 
     expect(processor).toBeInstanceOf(BrowserProcessor)
   })
@@ -42,7 +34,7 @@ describe('BrowserProcessor', () => {
 
     const mockDelivery = { send: jest.fn() }
     const processor = new BrowserProcessor(
-      CONFIGURATION,
+      createConfiguration({ apiKey: 'test-api-key' }),
       mockDelivery,
       { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' },
       createResourceAttributesSource(navigator)
