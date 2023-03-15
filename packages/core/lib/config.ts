@@ -1,20 +1,10 @@
+import { isObject, isLogger, isString, isStringWithLength } from './validation'
+
 export interface Logger {
   debug: (message: string) => void
   info: (message: string) => void
   warn: (message: string) => void
   error: (message: string) => void
-}
-
-export function isObject (obj: unknown): obj is Record<string, unknown> {
-  return !!obj && typeof obj === 'object'
-}
-
-function isLogger (object: unknown): object is Logger {
-  return isObject(object) &&
-    typeof object.debug === 'function' &&
-    typeof object.info === 'function' &&
-    typeof object.warn === 'function' &&
-    typeof object.error === 'function'
 }
 
 export interface Configuration {
@@ -42,9 +32,6 @@ export interface CoreSchema extends Schema {
   logger: ConfigOption<Logger>
   appVersion: ConfigOption<string>
 }
-
-const isString = (value: unknown): value is string => typeof value === 'string'
-const isStringWithLength = (value: unknown): value is string => isString(value) && value.length > 0
 
 export const schema: CoreSchema = {
   appVersion: {
