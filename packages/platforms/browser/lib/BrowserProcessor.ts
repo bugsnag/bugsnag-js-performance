@@ -47,6 +47,9 @@ export class BrowserProcessor implements Processor {
       ]
     }
 
+    // Should we prevent delivery?
+    if (this.configuration.enabledReleaseStages?.indexOf(this.configuration.releaseStage) === -1) return
+
     this.delivery.send(
       this.configuration.endpoint,
       this.configuration.apiKey,

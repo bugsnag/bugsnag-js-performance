@@ -13,7 +13,7 @@ export interface Configuration {
   releaseStage?: string
   logger?: Logger
   appVersion?: string
-  enabledReleaseStages?: string[]
+  enabledReleaseStages?: string[] | null
 }
 
 export type InternalConfiguration = Required<Configuration>
@@ -32,7 +32,7 @@ export interface CoreSchema extends Schema {
   releaseStage: ConfigOption<string>
   logger: ConfigOption<Logger>
   appVersion: ConfigOption<string>
-  enabledReleaseStages: ConfigOption<string[]>
+  enabledReleaseStages: ConfigOption<string[] | null>
 }
 
 export const schema: CoreSchema = {
@@ -67,9 +67,9 @@ export const schema: CoreSchema = {
     validate: isString
   },
   enabledReleaseStages: {
-    defaultValue: [],
+    defaultValue: null,
     message: 'should be an array of strings',
-    validate: isStringArray
+    validate: (value: unknown): value is string[] | null => value === null || isStringArray(value)
   }
 }
 
