@@ -22,6 +22,7 @@ export interface Configuration {
   endpoint?: string
   releaseStage?: string
   logger?: Logger
+  appVersion?: string
 }
 
 export type InternalConfiguration = Required<Configuration>
@@ -32,18 +33,25 @@ export interface ConfigOption<T> {
   validate: (value: unknown) => value is T
 }
 
-export type Schema = Record<string, ConfigOption<unknown>>
+type Schema = Record<string, ConfigOption<unknown>>
 
 export interface CoreSchema extends Schema {
   apiKey: ConfigOption<string>
   endpoint: ConfigOption<string>
   releaseStage: ConfigOption<string>
   logger: ConfigOption<Logger>
+  appVersion: ConfigOption<string>
 }
 
 const isString = (value: unknown): value is string => typeof value === 'string'
+const isStringWithLength = (value: unknown): value is string => isString(value) && value.length > 0
 
 export const schema: CoreSchema = {
+  appVersion: {
+    defaultValue: '',
+    message: 'should be a string',
+    validate: isStringWithLength
+  },
   endpoint: {
     defaultValue: 'https://otlp.bugsnag.com/v1/traces',
     message: 'should be a string',
@@ -98,8 +106,8 @@ export function validateConfig (config: unknown, schema: Schema): InternalConfig
   cleanConfiguration.apiKey = config.apiKey
 
   if (warnings.length > 0) {
-    (cleanConfiguration as InternalConfiguration).logger.warn(`Invalid configuration${warnings}`)
+    (cleanConfiguration as unknown as InternalConfiguration).logger.warn(`Invalid configuration${warnings}`)
   }
 
-  return cleanConfiguration as InternalConfiguration
+  return cleanConfiguration as unknown as InternalConfiguration
 }

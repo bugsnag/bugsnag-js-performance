@@ -10,7 +10,8 @@ const CONFIGURATION = {
   apiKey: 'test-api-key',
   endpoint: '/traces',
   releaseStage: 'production',
-  logger: { warn: jest.fn(), debug: jest.fn(), error: jest.fn(), info: jest.fn() }
+  logger: { warn: jest.fn(), debug: jest.fn(), error: jest.fn(), info: jest.fn() },
+  appVersion: ''
 }
 
 describe('BrowserProcessorFactory', () => {

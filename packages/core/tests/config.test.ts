@@ -1,9 +1,9 @@
-import { schema as coreSchema, validateConfig, type Schema } from '../lib/config'
+import { schema as coreSchema, validateConfig, type CoreSchema } from '../lib/config'
 import { VALID_API_KEY } from './utilities'
 
 describe('Schema validation', () => {
   it('logs a warning if a config option is invalid', () => {
-    const schema: Schema = {
+    const schema: CoreSchema = {
       ...coreSchema,
       newValue: {
         defaultValue: 'default-new-value',
@@ -29,7 +29,7 @@ describe('Schema validation', () => {
   })
 
   it('logs a warning if two or more config options are invalid', () => {
-    const schema: Schema = {
+    const schema: CoreSchema = {
       ...coreSchema,
       newValue: {
         defaultValue: 'default-new-value',
@@ -56,7 +56,7 @@ describe('Schema validation', () => {
   })
 
   it('uses the default value if one is not provided', () => {
-    const schema: Schema = {
+    const schema: CoreSchema = {
       ...coreSchema,
       endpoint: {
         defaultValue: 'default-endpoint',
@@ -71,7 +71,7 @@ describe('Schema validation', () => {
   })
 
   it('uses the default value if config option is invalid', () => {
-    const schema: Schema = {
+    const schema: CoreSchema = {
       ...coreSchema,
       endpoint: {
         defaultValue: 'default-endpoint',
@@ -94,5 +94,31 @@ describe('Schema validation', () => {
     const validConfig = validateConfig(config, schema)
 
     expect(validConfig.endpoint).toStrictEqual('default-endpoint')
+  })
+
+  describe('Core Schema', () => {
+    describe('appVersion', () => {
+      it('accepts a valid value', () => {
+        const config = {
+          apiKey: VALID_API_KEY,
+          appVersion: '1.2.3'
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.appVersion).toBe('1.2.3')
+      })
+
+      it('replaces an invalid value with the default', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
+        const config = {
+          apiKey: VALID_API_KEY,
+          appVersion: 123
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.appVersion).toBe('')
+      })
+    })
   })
 })

@@ -27,12 +27,16 @@ export class SpanAttributes {
 }
 
 export class ResourceAttributes extends SpanAttributes {
-  constructor (releaseStage: string, sdkName: string, sdkVersion: string) {
+  constructor (releaseStage: string, appVersion: string, sdkName: string, sdkVersion: string) {
     const initialValues = new Map([
       ['deployment.environment', releaseStage],
       ['telemetry.sdk.name', sdkName],
       ['telemetry.sdk.version', sdkVersion]
     ])
+
+    if (appVersion.length > 0) {
+      initialValues.set('service.version', appVersion)
+    }
 
     super(initialValues)
   }

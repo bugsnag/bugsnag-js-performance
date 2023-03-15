@@ -1,4 +1,4 @@
-import { type Configuration } from './config'
+import { type InternalConfiguration } from './config'
 import { type SpanEnded } from './span'
 
 // processor.add is called by a Span when 'Span.end' is called
@@ -9,7 +9,7 @@ export interface Processor {
 
 export interface ProcessorFactory {
   create: (
-    configuration: Required<Configuration>,
+    configuration: InternalConfiguration,
   ) => Processor
 }
 

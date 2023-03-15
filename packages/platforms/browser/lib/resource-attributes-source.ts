@@ -4,6 +4,7 @@ function createResourceAttributesSource (navigator: Navigator): ResourceAttribut
   return function resourceAttributesSource (config) {
     const attributes = new ResourceAttributes(
       config.releaseStage,
+      config.appVersion,
       'bugsnag.performance.browser',
       '__VERSION__'
     )
