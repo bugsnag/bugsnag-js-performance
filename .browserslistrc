@@ -2,19 +2,11 @@
 # extends browserslist-config-bugsnag
 
 # Desktop
-# Baidu >= 13
-Chrome >= 51
-Edge >= 15
-Firefox >= 54
-Opera >= 38
-Safari >= 10
+Chrome >= 61
+Edge >= 80
+Firefox >= 60
+Safari >= 11
 
 # Mobile
-# and_qq >= 13 # QQ Browser
-Android >= 109 # Android Browser
-ChromeAndroid >= 109
-FirefoxAndroid >= 109
-iOS >= 10
-op_mob >= 73 # Opera Mobile
-Samsung >= 5 
-UCAndroid >= 13.4
+ChromeAndroid >= 100
+iOS >= 11
