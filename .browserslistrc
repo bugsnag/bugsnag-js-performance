@@ -1,0 +1,12 @@
+# as a future improvement, could create a specific npm package
+# extends browserslist-config-bugsnag
+
+# Desktop
+Chrome >= 61
+Edge >= 80
+Firefox >= 60
+Safari >= 11
+
+# Mobile
+ChromeAndroid >= 100
+iOS >= 11

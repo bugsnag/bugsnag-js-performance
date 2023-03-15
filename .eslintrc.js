@@ -67,6 +67,16 @@ module.exports = {
       }
     },
     {
+      files: ['packages/platforms/browser/**/*.ts'],
+      plugins: ['compat'],
+      extends: ['standard-with-typescript', 'plugin:compat/recommended'],
+      env: { browser: true },
+      rules: { ...tsRuleOverrides },
+      parserOptions: {
+        project: 'tsconfig.json'
+      }
+    },
+    {
       files: [
         '**/*.test.ts?(x)'
       ],
