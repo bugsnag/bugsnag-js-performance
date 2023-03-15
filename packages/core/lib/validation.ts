@@ -1,7 +1,7 @@
 import { type Logger } from './config'
 
 export const isObject = (value: unknown): value is Record<string, unknown> =>
-  !!value && typeof value === 'object'
+  !!value && typeof value === 'object' && !Array.isArray(value)
 
 export const isString = (value: unknown): value is string =>
   typeof value === 'string'

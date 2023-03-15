@@ -8,6 +8,7 @@ describe('validation', () => {
     { type: 'string', value: 'hello' },
     { type: 'function', value: () => {} },
     { type: 'number', value: 12345 },
+    { type: 'array', value: [] },
     { type: 'symbol', value: Symbol('test') },
     { type: 'null', value: null },
     { type: 'undefined', value: undefined },
