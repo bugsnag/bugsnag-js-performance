@@ -64,7 +64,7 @@ export const schema: CoreSchema = {
   releaseStage: {
     defaultValue: 'production',
     message: 'should be a string',
-    validate: isString
+    validate: isStringWithLength
   },
   enabledReleaseStages: {
     defaultValue: null,
