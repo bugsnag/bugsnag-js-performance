@@ -25,11 +25,7 @@ export interface Configuration {
   appVersion?: string
 }
 
-export interface InternalConfiguration extends Configuration {
-  endpoint: string
-  releaseStage: string
-  logger: Logger
-}
+export type InternalConfiguration = Required<Configuration>
 
 export interface ConfigOption<T> {
   message: string
@@ -44,15 +40,17 @@ export interface CoreSchema extends Schema {
   endpoint: ConfigOption<string>
   releaseStage: ConfigOption<string>
   logger: ConfigOption<Logger>
+  appVersion: ConfigOption<string>
 }
 
 const isString = (value: unknown): value is string => typeof value === 'string'
+const isStringWithLength = (value: unknown): value is string => isString(value) && value.length > 0
 
 export const schema: CoreSchema = {
   appVersion: {
-    defaultValue: undefined,
+    defaultValue: '',
     message: 'should be a string',
-    validate: (value): value is string | undefined => value === undefined || (isString(value) && value.length > 0)
+    validate: isStringWithLength
   },
   endpoint: {
     defaultValue: 'https://otlp.bugsnag.com/v1/traces',

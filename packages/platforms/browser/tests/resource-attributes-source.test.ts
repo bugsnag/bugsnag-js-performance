@@ -22,7 +22,8 @@ describe('resourceAttributesSource', () => {
         warn: jest.fn(),
         info: jest.fn(),
         error: jest.fn()
-      }
+      },
+      appVersion: ''
     })
 
     expect(resourceAttributes.toJson()).toEqual([
@@ -53,7 +54,8 @@ describe('resourceAttributesSource', () => {
         warn: jest.fn(),
         info: jest.fn(),
         error: jest.fn()
-      }
+      },
+      appVersion: ''
     })
 
     expect(resourceAttributes.toJson()).toEqual([

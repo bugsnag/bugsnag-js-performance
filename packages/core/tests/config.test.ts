@@ -108,7 +108,7 @@ describe('Schema validation', () => {
         expect(validConfig.appVersion).toBe('1.2.3')
       })
 
-      it('replaces an invalid value with undefined', () => {
+      it('replaces an invalid value with the default', () => {
         jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
 
         const config = {
@@ -117,7 +117,7 @@ describe('Schema validation', () => {
         }
 
         const validConfig = validateConfig(config, coreSchema)
-        expect(validConfig.appVersion).toBe(undefined)
+        expect(validConfig.appVersion).toBe('')
       })
     })
   })
