@@ -66,6 +66,30 @@ export const schema: CoreSchema = {
   }
 }
 
+// @ts-expect-error this global variable is injected when building
+if (typeof __ENABLE_BUGSNAG_TEST_CONFIGURATION__ !== 'undefined' && __ENABLE_BUGSNAG_TEST_CONFIGURATION__) {
+  // in test builds, allow customising the maximum batch size and the timeout
+  // between sending batches
+  // this allows our e2e tests to run without having to create 100 batches or
+  // wait 30 seconds for delviery to kick in
+
+  // the maximum size allowed in a batch - when the queue reaches this size
+  // the batch will be sent to delivery
+  schema.maximumBatchSize = {
+    message: 'should be a number',
+    defaultValue: 100,
+    validate: (value: unknown): value is number => typeof value === 'number'
+  }
+
+  // the number of seconds to wait after adding a span to a batch for that
+  // batch to be sent to delivery if no other spans are added
+  schema.batchInactivityTimeoutMilliseconds = {
+    message: 'should be a number',
+    defaultValue: 30 * 1000, // 30 seconds
+    validate: (value: unknown): value is number => typeof value === 'number'
+  }
+}
+
 export function validateConfig (config: unknown, schema: Schema): InternalConfiguration {
   if (typeof config === 'string') { config = { apiKey: config } }
 
