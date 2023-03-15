@@ -33,7 +33,7 @@ export interface ConfigOption<T> {
   validate: (value: unknown) => value is T
 }
 
-export type Schema = Record<string, ConfigOption<unknown>>
+type Schema = Record<string, ConfigOption<unknown>>
 
 export interface CoreSchema extends Schema {
   apiKey: ConfigOption<string>

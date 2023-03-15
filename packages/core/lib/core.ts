@@ -1,6 +1,6 @@
 import { SpanAttributes, type ResourceAttributeSource, type SpanAttributesSource } from './attributes'
 import { type Clock } from './clock'
-import { validateConfig, type Configuration, type Schema } from './config'
+import { validateConfig, type Configuration, type CoreSchema } from './config'
 import { type IdGenerator } from './id-generator'
 import { BufferingProcessor, type Processor, type ProcessorFactory } from './processor'
 import { Kind, type Span, type SpanInternal, type Time } from './span'
@@ -30,7 +30,7 @@ export interface ClientOptions {
   processorFactory: ProcessorFactory
   resourceAttributesSource: ResourceAttributeSource
   spanAttributesSource: SpanAttributesSource
-  schema: Schema
+  schema: CoreSchema
 }
 
 export function createClient (options: ClientOptions): BugsnagPerformance {
