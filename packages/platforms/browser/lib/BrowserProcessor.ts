@@ -12,6 +12,9 @@ import {
 import { BatchProcessor } from './batch-processor'
 import browserDelivery, { type Fetch } from './delivery'
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
+const __ENABLE_BUGSNAG_TEST_CONFIGURATION__ = '__ENABLE_BUGSNAG_TEST_CONFIGURATION__'
+
 export class BrowserProcessor implements Processor {
   private configuration: InternalConfiguration
   private delivery: Delivery
@@ -29,6 +32,17 @@ export class BrowserProcessor implements Processor {
     this.delivery = delivery
     this.clock = clock
     this.resourceAttributeSource = resourceAttributeSource
+
+    let maximumBatchSize = 100
+    let batchInactivityTimeoutMilliseconds = 30 * 1000
+
+    if (typeof __ENABLE_BUGSNAG_TEST_CONFIGURATION__ !== 'undefined' && __ENABLE_BUGSNAG_TEST_CONFIGURATION__) {
+      // @ts-expect-error maximumBatchSize does not exist on type Required<Configuration>
+      maximumBatchSize = configuration.maximumBatchSize
+      // @ts-expect-error batchInactivityTimeoutMilliseconds does not exist on type Required<Configuration>
+      batchInactivityTimeoutMilliseconds = configuration.batchInactivityTimeoutMilliseconds
+    }
+
     this.batchProcessor = new BatchProcessor((spans) => {
       const payload: DeliveryPayload = {
         resourceSpans: [
@@ -50,7 +64,7 @@ export class BrowserProcessor implements Processor {
         this.configuration.apiKey,
         payload
       )
-    })
+    }, batchInactivityTimeoutMilliseconds, maximumBatchSize)
   }
 
   add (span: SpanEnded): void {

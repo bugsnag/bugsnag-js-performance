@@ -1,13 +1,14 @@
 import type { Processor, SpanEnded } from '@bugsnag/js-performance-core'
 
-const BATCH_TIMEOUT_MS = 30000
-const BATCH_LIMIT = 100
-
 export class BatchProcessor implements Processor {
   private batch: SpanEnded[] = []
   private timeout: ReturnType<typeof setTimeout> | null = null
 
-  constructor (private onFlushCallback = (batch: SpanEnded[]) => {}) {}
+  constructor (
+    private onFlushCallback = (batch: SpanEnded[]) => {},
+    private batchTimeoutMs = 30000,
+    private batchLimit = 100
+  ) {}
 
   private stop = () => {
     if (this.timeout !== null) {
@@ -18,7 +19,7 @@ export class BatchProcessor implements Processor {
 
   private start = () => {
     if (this.timeout === null) {
-      this.timeout = setTimeout(this.flush, BATCH_TIMEOUT_MS)
+      this.timeout = setTimeout(this.flush, this.batchTimeoutMs)
     }
   }
 
@@ -32,7 +33,7 @@ export class BatchProcessor implements Processor {
     this.batch.push(span)
     this.start()
 
-    if (this.batch.length >= BATCH_LIMIT) {
+    if (this.batch.length >= this.batchLimit) {
       this.flush()
     }
   }
