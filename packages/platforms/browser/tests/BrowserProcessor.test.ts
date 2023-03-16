@@ -7,6 +7,8 @@ import { BrowserProcessor, BrowserProcessorFactory } from '../lib/BrowserProcess
 import createResourceAttributesSource from '../lib/resource-attributes-source'
 import { createConfiguration } from './utilities'
 
+jest.useFakeTimers()
+
 describe('BrowserProcessorFactory', () => {
   it('returns an instance of BrowserProcessor', () => {
     const fetch = jest.fn(() => Promise.resolve({} as unknown as Response))
@@ -113,6 +115,7 @@ describe('BrowserProcessor', () => {
     )
 
     processor.add(span)
+    jest.runAllTimers()
 
     expect(mockDelivery.send).toHaveBeenCalledWith(
       '/traces', // Endpoint

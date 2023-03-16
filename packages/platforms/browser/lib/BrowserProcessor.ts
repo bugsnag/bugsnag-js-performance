@@ -9,6 +9,7 @@ import {
   type ResourceAttributeSource,
   type SpanEnded
 } from '@bugsnag/js-performance-core'
+import { BatchProcessor } from './batch-processor'
 import browserDelivery, { type Fetch } from './delivery'
 
 export class BrowserProcessor implements Processor {
@@ -16,6 +17,7 @@ export class BrowserProcessor implements Processor {
   private delivery: Delivery
   private clock: Clock
   private resourceAttributeSource: ResourceAttributeSource
+  private batchProcessor: BatchProcessor
 
   constructor (
     configuration: InternalConfiguration,
@@ -27,34 +29,34 @@ export class BrowserProcessor implements Processor {
     this.delivery = delivery
     this.clock = clock
     this.resourceAttributeSource = resourceAttributeSource
+    this.batchProcessor = new BatchProcessor((spans) => {
+      const payload: DeliveryPayload = {
+        resourceSpans: [
+          {
+            resource: {
+              attributes: this.resourceAttributeSource(this.configuration).toJson()
+            },
+            scopeSpans: [
+              {
+                spans: spans.map((span) => spanToJson(span, this.clock))
+              }
+            ]
+          }
+        ]
+      }
+
+      this.delivery.send(
+        this.configuration.endpoint,
+        this.configuration.apiKey,
+        payload
+      )
+    })
   }
 
   add (span: SpanEnded): void {
-    const spans = [span]
-
-    const payload: DeliveryPayload = {
-      resourceSpans: [
-        {
-          resource: {
-            attributes: this.resourceAttributeSource(this.configuration).toJson()
-          },
-          scopeSpans: [
-            {
-              spans: spans.map((span) => spanToJson(span, this.clock))
-            }
-          ]
-        }
-      ]
-    }
-
     // Should we prevent delivery?
     if (this.configuration.enabledReleaseStages?.indexOf(this.configuration.releaseStage) === -1) return
-
-    this.delivery.send(
-      this.configuration.endpoint,
-      this.configuration.apiKey,
-      payload
-    )
+    this.batchProcessor.add(span)
   }
 }
 
