@@ -1,5 +1,5 @@
 import { SpanAttributes, type SpanEnded } from '@bugsnag/js-performance-core'
-import { Queue } from '../lib/queue'
+import { BatchProcessor } from '../lib/batch-processor'
 import { randomUUID } from 'crypto'
 
 jest.useFakeTimers()
@@ -16,22 +16,23 @@ function generateSpan (): SpanEnded {
   }
 }
 
-describe('Queue', () => {
+describe('BatchProcessor', () => {
   it('delivers after reaching the specified span limit', () => {
     const callback = jest.fn()
-    const queue = new Queue(callback)
+    const queue = new BatchProcessor(callback)
 
     // add 100 spans
     for (let i = 0; i <= 100; i++) {
       queue.add(generateSpan())
     }
 
+    expect(callback).toHaveBeenCalled()
     expect(callback).toHaveBeenCalledTimes(1)
   })
 
   it('delivers after the specified time limit', () => {
     const callback = jest.fn()
-    const queue = new Queue(callback)
+    const queue = new BatchProcessor(callback)
     queue.add(generateSpan())
     expect(callback).not.toHaveBeenCalled()
 
