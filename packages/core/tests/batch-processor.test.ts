@@ -78,7 +78,7 @@ describe('BatchProcessor', () => {
     batchProcessor.add(generateSpan())
     expect(delivery.send).not.toHaveBeenCalled()
 
-    jest.runOnlyPendingTimers()
+    jest.advanceTimersByTime(30_000)
 
     expect(delivery.send).toHaveBeenCalledTimes(1)
   })
