@@ -1,7 +1,7 @@
 import { expect } from '@jest/globals'
 import type { MatcherFunction } from 'expect'
-import type { SpanInternal } from '../packages/core/lib/span'
-import { InMemoryProcessor } from '../packages/core/tests/utilities'
+import type { SpanEnded } from '../../lib'
+import InMemoryProcessor from './in-memory-processor'
 
 const toHaveProcessedSpan: MatcherFunction<[expectedSpan: unknown]> = function (processor, expectedSpan) {
   if (!(processor instanceof InMemoryProcessor)) {
@@ -35,11 +35,11 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
     interface AsymmetricMatchers {
-      toHaveProcessedSpan: (span: SpanInternal) => void
+      toHaveProcessedSpan: (span: SpanEnded) => void
     }
 
     interface Matchers<R> {
-      toHaveProcessedSpan: (span: SpanInternal) => R
+      toHaveProcessedSpan: (span: SpanEnded) => R
     }
   }
 }

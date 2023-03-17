@@ -26,7 +26,6 @@ module.exports = {
     ]
   },
   testEnvironment: 'node',
-  setupFilesAfterEnv: ['<rootDir>/.jest/matchers.ts'],
   moduleNameMapper,
   reporters: process.env.CI
     ? [['github-actions', { silent: false }], 'summary']
