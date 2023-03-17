@@ -68,6 +68,8 @@ describe('BrowserProcessor', () => {
 
     processor.add(span)
 
+    jest.runAllTimers()
+
     expect(mockDelivery.send).toHaveBeenCalled()
   })
 
@@ -91,6 +93,8 @@ describe('BrowserProcessor', () => {
     )
 
     processor.add(span)
+
+    jest.runAllTimers()
 
     expect(mockDelivery.send).toHaveBeenCalled()
   })
