@@ -49,4 +49,34 @@ describe('BatchProcessor', () => {
 
     expect(delivery.send).toHaveBeenCalledTimes(1)
   })
+
+  it('restarts the timer when calling .add()', () => {
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+    const delivery: Delivery = { send: jest.fn() }
+    const logger: Logger = {
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+      debug: jest.fn()
+    }
+    const config: InternalConfiguration = {
+      apiKey: VALID_API_KEY,
+      releaseStage: 'test',
+      enabledReleaseStages: ['test'],
+      appVersion: '1.0.0',
+      batchInactivityTimeoutMs: 30 * 1000,
+      maximumBatchSize: 100,
+      endpoint: '/traces',
+      logger
+    }
+    const batchProcessor = new BatchProcessor(delivery, config, resourceAttributesSource, clock)
+    batchProcessor.add(generateSpan())
+    jest.advanceTimersByTime(20_000)
+    expect(delivery.send).not.toHaveBeenCalled()
+    batchProcessor.add(generateSpan())
+    jest.advanceTimersByTime(20_000)
+    expect(delivery.send).not.toHaveBeenCalled()
+    jest.advanceTimersByTime(10_000)
+    expect(delivery.send).toHaveBeenCalledTimes(1)
+  })
 })
