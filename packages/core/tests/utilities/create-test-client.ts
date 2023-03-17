@@ -1,10 +1,11 @@
-import { IncrementingClock, InMemoryProcessor, resourceAttributesSource, spanAttributesSource, StableIdGenerator } from '.'
+import { IncrementingClock, resourceAttributesSource, spanAttributesSource, StableIdGenerator } from '.'
 import { schema } from '../../lib/config'
 import type { BugsnagPerformance, ClientOptions } from '../../lib/core'
 import { createClient } from '../../lib/core'
+import InMemoryDelivery from './in-memory-delivery'
 
 const defaultOptions = () => ({
-  processorFactory: { create: () => new InMemoryProcessor() },
+  delivery: new InMemoryDelivery(),
   idGenerator: new StableIdGenerator(),
   clock: new IncrementingClock(),
   resourceAttributesSource,
