@@ -16,7 +16,10 @@ export interface Configuration {
   enabledReleaseStages?: string[] | null
 }
 
-export type InternalConfiguration = Required<Configuration>
+export type InternalConfiguration = Required<Configuration> & {
+  maximumBatchSize: number
+  batchInactivityTimeoutMs: number
+}
 
 export interface ConfigOption<T> {
   message: string
@@ -90,7 +93,7 @@ if (typeof __ENABLE_BUGSNAG_TEST_CONFIGURATION__ !== 'undefined' && __ENABLE_BUG
 
   // the number of seconds to wait after adding a span to a batch for that
   // batch to be sent to delivery if no other spans are added
-  schema.batchInactivityTimeoutMilliseconds = {
+  schema.batchInactivityTimeoutMs = {
     message: 'should be a number',
     defaultValue: 30 * 1000, // 30 seconds
     validate: (value: unknown): value is number => typeof value === 'number'
@@ -122,6 +125,8 @@ export function validateConfig (config: unknown, schema: Schema): InternalConfig
 
   // If apiKey is set but not valid we should still use it, despite the validation warning.
   cleanConfiguration.apiKey = config.apiKey
+  cleanConfiguration.maximumBatchSize = config.maximumBatchSize || 100
+  cleanConfiguration.batchInactivityTimeoutMs = config.batchInactivityTimeoutMs || 30 * 1000
 
   if (warnings.length > 0) {
     (cleanConfiguration as unknown as InternalConfiguration).logger.warn(`Invalid configuration${warnings}`)
