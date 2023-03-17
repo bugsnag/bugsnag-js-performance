@@ -6,6 +6,8 @@ export function createConfiguration (overrides: Partial<InternalConfiguration> =
     endpoint: '/traces',
     releaseStage: 'production',
     enabledReleaseStages: null,
+    maximumBatchSize: 100,
+    batchInactivityTimeoutMs: 30 * 1000,
     logger: {
       debug: jest.fn(),
       warn: jest.fn(),
