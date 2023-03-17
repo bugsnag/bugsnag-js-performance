@@ -79,7 +79,7 @@ describe('Core', () => {
           expect(console.warn).toHaveBeenCalledWith(`Invalid configuration\n  - endpoint should be a string, got ${type}`)
         })
 
-        it.each(invalidParameters)('warns if config.releaseStage is invalid ($type)', ({ value, type }) => {
+        it.each([...invalidParameters, { type: 'string', value: '' }])('warns if config.releaseStage is invalid ($type)', ({ value, type }) => {
           jest.spyOn(console, 'warn').mockImplementation()
 
           const client = createTestClient()
