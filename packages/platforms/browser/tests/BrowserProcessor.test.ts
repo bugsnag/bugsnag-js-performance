@@ -21,6 +21,78 @@ describe('BrowserProcessorFactory', () => {
 })
 
 describe('BrowserProcessor', () => {
+  it('prevents delivery if releaseStage not in enabledReleaseStages', () => {
+    const span: SpanEnded = {
+      id: 'test-span-id',
+      kind: Kind.Internal,
+      name: 'test-span',
+      startTime: 12345,
+      endTime: 56789,
+      traceId: 'trace-id',
+      attributes: new SpanAttributes(new Map())
+    }
+
+    const mockDelivery = { send: jest.fn() }
+    const processor = new BrowserProcessor(
+      createConfiguration({ releaseStage: 'test', enabledReleaseStages: ['production'] }),
+      mockDelivery,
+      { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' },
+      createResourceAttributesSource(navigator)
+    )
+
+    processor.add(span)
+
+    expect(mockDelivery.send).not.toHaveBeenCalled()
+  })
+
+  it('allows delivery if releaseStage present in enabledReleaseStages', () => {
+    const span: SpanEnded = {
+      id: 'test-span-id',
+      kind: Kind.Internal,
+      name: 'test-span',
+      startTime: 12345,
+      endTime: 56789,
+      traceId: 'trace-id',
+      attributes: new SpanAttributes(new Map())
+    }
+
+    const mockDelivery = { send: jest.fn() }
+    const processor = new BrowserProcessor(
+      createConfiguration({ releaseStage: 'production', enabledReleaseStages: ['production'] }),
+      mockDelivery,
+      { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' },
+      createResourceAttributesSource(navigator)
+    )
+
+    processor.add(span)
+
+    expect(mockDelivery.send).toHaveBeenCalled()
+  })
+
+  it('allows delivery if enabledReleaseStages is null (default)', () => {
+    const span: SpanEnded = {
+      id: 'test-span-id',
+      kind: Kind.Internal,
+      name: 'test-span',
+      startTime: 12345,
+      endTime: 56789,
+      traceId: 'trace-id',
+      attributes: new SpanAttributes(new Map())
+    }
+
+    const mockDelivery = { send: jest.fn() }
+    const processor = new BrowserProcessor(
+      createConfiguration({ releaseStage: 'production', enabledReleaseStages: null }),
+      mockDelivery,
+      { now: jest.now, convert: () => 20_000, toUnixTimestampNanoseconds: () => '50000' },
+      createResourceAttributesSource(navigator)
+    )
+
+    processor.add(span)
+
+    expect(mockDelivery.send).toHaveBeenCalled()
+  })
+
   it('correctly formats the delivery payload', () => {
     const span: SpanEnded = {
       id: 'test-span-id',

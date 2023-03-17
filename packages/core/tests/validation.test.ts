@@ -69,6 +69,23 @@ describe('validation', () => {
     })
   })
 
+  describe('isStringArray', () => {
+    it.each([
+      ...nonObjects.filter(({ type }) => type !== 'array'),
+      ...nonStrings.map(({ type, value }) => ({ type: `array of ${type}`, value: [value] }))
+    ])('fails validation with $type', ({ value, type }) => {
+      expect(validation.isStringArray(value)).toBe(false)
+    })
+
+    it('passes validation with an array of strings', () => {
+      expect(validation.isStringArray(['production', 'development'])).toBe(true)
+    })
+
+    it('passes validation with an empty array', () => {
+      expect(validation.isStringArray([])).toBe(true)
+    })
+  })
+
   describe('isLogger', () => {
     it.each(nonObjects.concat([
       { type: 'empty object', value: {} },
