@@ -1,8 +1,17 @@
-import { IncrementingClock, resourceAttributesSource, spanAttributesSource, StableIdGenerator } from '.'
-import { schema } from '../../lib/config'
-import type { BugsnagPerformance, ClientOptions } from '../../lib/core'
-import { createClient } from '../../lib/core'
-import InMemoryDelivery from './in-memory-delivery'
+import {
+  IncrementingClock,
+  InMemoryDelivery,
+  resourceAttributesSource,
+  spanAttributesSource,
+  StableIdGenerator
+} from '.'
+
+import {
+  type BugsnagPerformance,
+  type ClientOptions,
+  createClient,
+  schema
+} from '@bugsnag/js-performance-core'
 
 const defaultOptions = () => ({
   delivery: new InMemoryDelivery(),

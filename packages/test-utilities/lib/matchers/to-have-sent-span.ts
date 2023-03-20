@@ -1,7 +1,7 @@
 import { expect } from '@jest/globals'
-import type { MatcherFunction } from 'expect'
-import type { DeliverySpan } from '../../lib'
-import InMemoryDelivery from './in-memory-delivery'
+import { type MatcherFunction } from 'expect'
+import { type DeliverySpan } from '@bugsnag/js-performance-core'
+import { InMemoryDelivery } from '..'
 
 const toHaveSentSpan: MatcherFunction<[expectedSpan: unknown]> = function (delivery, expectedSpan) {
   if (!(delivery instanceof InMemoryDelivery)) {

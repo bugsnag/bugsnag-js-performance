@@ -1,8 +1,12 @@
 import { SpanAttributes, type SpanEnded } from '@bugsnag/js-performance-core'
 import { BatchProcessor } from '../lib/batch-processor'
 import { randomUUID } from 'crypto'
-import { IncrementingClock, resourceAttributesSource, VALID_CONFIGURATION } from './utilities'
 import { type Delivery } from '../lib'
+import {
+  IncrementingClock,
+  resourceAttributesSource,
+  createConfiguration
+} from '@bugsnag/js-performance-test-utilities'
 
 jest.useFakeTimers()
 
@@ -24,7 +28,7 @@ describe('BatchProcessor', () => {
   it('delivers after reaching the specified span limit', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery: Delivery = { send: jest.fn() }
-    const batchProcessor = new BatchProcessor(delivery, VALID_CONFIGURATION, resourceAttributesSource, clock)
+    const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock)
 
     // add 99 spans
     for (let i = 0; i < 99; i++) {
@@ -41,7 +45,7 @@ describe('BatchProcessor', () => {
   it('delivers after the specified time limit', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery: Delivery = { send: jest.fn() }
-    const batchProcessor = new BatchProcessor(delivery, VALID_CONFIGURATION, resourceAttributesSource, clock)
+    const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock)
     batchProcessor.add(generateSpan())
     expect(delivery.send).not.toHaveBeenCalled()
 
@@ -53,7 +57,7 @@ describe('BatchProcessor', () => {
   it('restarts the timer when calling .add()', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery: Delivery = { send: jest.fn() }
-    const batchProcessor = new BatchProcessor(delivery, VALID_CONFIGURATION, resourceAttributesSource, clock)
+    const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock)
     batchProcessor.add(generateSpan())
     jest.advanceTimersByTime(20_000)
     expect(delivery.send).not.toHaveBeenCalled()
@@ -67,7 +71,8 @@ describe('BatchProcessor', () => {
   it('prevents delivery if releaseStage not in enabledReleaseStages', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery: Delivery = { send: jest.fn() }
-    const batchProcessor = new BatchProcessor(delivery, { ...VALID_CONFIGURATION, enabledReleaseStages: ['production'], releaseStage: 'test' }, resourceAttributesSource, clock)
+    const configuration = createConfiguration({ enabledReleaseStages: ['production'], releaseStage: 'test' })
+    const batchProcessor = new BatchProcessor(delivery, configuration, resourceAttributesSource, clock)
     batchProcessor.add(generateSpan())
     jest.runAllTimers()
     expect(delivery.send).not.toHaveBeenCalled()

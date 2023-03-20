@@ -1,4 +1,4 @@
-import type { DeliveryPayload, Delivery } from '../../lib'
+import { type DeliveryPayload, type Delivery } from '@bugsnag/js-performance-core'
 
 interface Request {
   apiKey: string

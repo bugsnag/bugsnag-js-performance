@@ -1,6 +1,6 @@
 import { type InternalConfiguration } from '@bugsnag/js-performance-core'
 
-export function createConfiguration (overrides: Partial<InternalConfiguration> = {}): InternalConfiguration {
+function createConfiguration (overrides: Partial<InternalConfiguration> = {}): InternalConfiguration {
   return {
     apiKey: 'abcdefabcdefabcdefabcdefabcdef12',
     endpoint: '/traces',
@@ -18,3 +18,5 @@ export function createConfiguration (overrides: Partial<InternalConfiguration> =
     ...overrides
   }
 }
+
+export default createConfiguration

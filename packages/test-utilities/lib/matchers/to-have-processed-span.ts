@@ -1,7 +1,7 @@
 import { expect } from '@jest/globals'
-import type { MatcherFunction } from 'expect'
-import type { SpanEnded } from '../../lib'
-import InMemoryProcessor from './in-memory-processor'
+import { type MatcherFunction } from 'expect'
+import { type SpanEnded } from '@bugsnag/js-performance-core'
+import { InMemoryProcessor } from '..'
 
 const toHaveProcessedSpan: MatcherFunction<[expectedSpan: unknown]> = function (processor, expectedSpan) {
   if (!(processor instanceof InMemoryProcessor)) {

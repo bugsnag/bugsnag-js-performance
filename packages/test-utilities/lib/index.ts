@@ -1,9 +1,10 @@
-import './to-have-processed-span'
-import './to-have-sent-span'
+import './matchers'
 
+export { default as createConfiguration } from './create-configuration'
 export { default as createTestClient } from './create-test-client'
-export { default as InMemoryProcessor } from './in-memory-processor'
 export { default as IncrementingClock } from './incrementing-clock'
+export { default as InMemoryDelivery } from './in-memory-delivery'
+export { default as InMemoryProcessor } from './in-memory-processor'
 export { default as resourceAttributesSource } from './resource-attributes-source'
 export { default as spanAttributesSource } from './span-attributes-source'
 export { default as StableIdGenerator } from './stable-id-generator'
