@@ -1,5 +1,5 @@
 import { createNoopClient } from '../lib/core'
-import { createTestClient, VALID_API_KEY } from './utilities'
+import { createTestClient, VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 
 describe('Core', () => {
   describe('createClient()', () => {

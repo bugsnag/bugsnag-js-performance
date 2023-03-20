@@ -1,6 +1,10 @@
 import { Kind } from '../lib/span'
-import { createTestClient, IncrementingClock, VALID_API_KEY } from './utilities'
-import InMemoryDelivery from './utilities/in-memory-delivery'
+import {
+  createTestClient,
+  IncrementingClock,
+  InMemoryDelivery,
+  VALID_API_KEY
+} from '@bugsnag/js-performance-test-utilities'
 
 jest.useFakeTimers()
 

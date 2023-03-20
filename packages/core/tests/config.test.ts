@@ -1,5 +1,5 @@
 import { schema as coreSchema, validateConfig, type CoreSchema } from '../lib/config'
-import { VALID_API_KEY } from './utilities'
+import { VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 
 describe('Schema validation', () => {
   it('logs a warning if a config option is invalid', () => {

@@ -1,0 +1,10 @@
+{
+  "name": "@bugsnag/js-performance-test-utilities",
+  "private": true,
+  "license": "MIT",
+  "main": "lib/index.ts",
+  "files": [],
+  "dependencies": {
+    "@bugsnag/js-performance-core": "0.0.0"
+  }
+}

@@ -1,4 +1,4 @@
-import type { Clock } from '../../lib/clock'
+import { type Clock } from '@bugsnag/js-performance-core'
 
 class IncrementingClock implements Clock {
   private currentTime: number

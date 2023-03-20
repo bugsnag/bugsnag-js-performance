@@ -3,7 +3,7 @@
  */
 
 import createResourceAttributesSource from '../lib/resource-attributes-source'
-import { createConfiguration } from './utilities'
+import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
 
 describe('resourceAttributesSource', () => {
   it('contains expected values', () => {
