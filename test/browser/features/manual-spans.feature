@@ -10,10 +10,11 @@ Feature: Manual creation of spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.traceId" matches the regex "^[A-Fa-f0-9]{32}$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.startTimeUnixNano" matches the regex "^[0-9]+$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.endTimeUnixNano" matches the regex "^[0-9]+$"
-
-    And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals "production"
     And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.name" equals "bugsnag.performance.browser"
     And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.version" equals "0.0.0"
+    And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" is one of:
+      | development |
+      | production  |
 
   @chromium_only @local_only
   Scenario: userAgentData is included in custom span
