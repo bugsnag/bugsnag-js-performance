@@ -14,22 +14,23 @@ export class BatchProcessor implements Processor {
     private configuration: InternalConfiguration,
     private resourceAttributeSource: ResourceAttributeSource,
     private clock: Clock
-  ) {}
+  ) {
+    this.flush = this.flush.bind(this)
+  }
 
-  private stop = () => {
+  private stop () {
     if (this.timeout !== null) {
       clearTimeout(this.timeout)
       this.timeout = null
     }
   }
 
-  private start = () => {
-    if (this.timeout === null) {
-      this.timeout = setTimeout(this.flush, this.configuration.batchInactivityTimeoutMs)
-    }
+  private start () {
+    this.stop()
+    this.timeout = setTimeout(this.flush, this.configuration.batchInactivityTimeoutMs)
   }
 
-  private flush = () => {
+  private flush () {
     this.stop()
     const payload: DeliveryPayload = {
       resourceSpans: [
@@ -54,7 +55,7 @@ export class BatchProcessor implements Processor {
     )
   }
 
-  add = (span: SpanEnded) => {
+  add (span: SpanEnded) {
     this.batch.push(span)
     this.start()
 
