@@ -14,11 +14,11 @@ class IncrementingClock implements Clock {
   }
 
   convert (date: Date) {
-    return (date.getTime() - this.timeOrigin) * 1_000_000
+    return date.getTime() - this.timeOrigin
   }
 
   toUnixTimestampNanoseconds (time: number) {
-    return (this.timeOrigin + time).toString()
+    return ((this.timeOrigin + time) * 1_000_000).toString()
   }
 }
 

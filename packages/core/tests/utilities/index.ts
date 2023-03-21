@@ -1,4 +1,5 @@
 import './to-have-processed-span'
+import './to-have-sent-span'
 
 export { default as createTestClient } from './create-test-client'
 export { default as InMemoryProcessor } from './in-memory-processor'
