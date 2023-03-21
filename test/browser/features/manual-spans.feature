@@ -2,7 +2,7 @@ Feature: Manual creation of spans
 
   Scenario: Manual spans can be logged
     Given I navigate to the test URL "/manual-span"
-    When I wait to receive at least 1 trace
+    When I wait to receive 1 span
     Then the trace "Bugsnag-Span-Sampling" header equals "1.0:1"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "Custom/ManualSpanScenario"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.kind" equals 3
@@ -12,9 +12,7 @@ Feature: Manual creation of spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.endTimeUnixNano" matches the regex "^[0-9]+$"
     And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.name" equals "bugsnag.performance.browser"
     And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.version" equals "0.0.0"
-    And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" is one of:
-      | development |
-      | production  |
+    And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals the stored value "environment"
 
   @chromium_only @local_only
   Scenario: userAgentData is included in custom span
