@@ -1,7 +1,7 @@
 import { type ResourceAttributeSource } from './attributes'
 import { type Clock } from './clock'
 import { type InternalConfiguration } from './config'
-import { type Delivery, type DeliveryPayload } from './delivery'
+import { type Delivery } from './delivery'
 import { type Processor } from './processor'
 import { spanToJson, type SpanEnded } from './span'
 
@@ -32,27 +32,29 @@ export class BatchProcessor implements Processor {
 
   private flush () {
     this.stop()
-    const payload: DeliveryPayload = {
-      resourceSpans: [
+
+    if (!this.configuration.enabledReleaseStages || this.configuration.enabledReleaseStages.includes(this.configuration.releaseStage)) {
+      this.delivery.send(
+        this.configuration.endpoint,
+        this.configuration.apiKey,
         {
-          resource: {
-            attributes: this.resourceAttributeSource(this.configuration).toJson()
-          },
-          scopeSpans: [
+          resourceSpans: [
             {
-              spans: this.batch.map((span) => spanToJson(span, this.clock))
+              resource: {
+                attributes: this.resourceAttributeSource(this.configuration).toJson()
+              },
+              scopeSpans: [
+                {
+                  spans: this.batch.map((span) => spanToJson(span, this.clock))
+                }
+              ]
             }
           ]
         }
-      ]
+      )
     }
 
     this.batch = []
-    this.delivery.send(
-      this.configuration.endpoint,
-      this.configuration.apiKey,
-      payload
-    )
   }
 
   add (span: SpanEnded) {
