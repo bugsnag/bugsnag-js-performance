@@ -2,7 +2,7 @@ Feature: Manual creation of spans
 
   Scenario: Manual spans can be logged
     Given I navigate to the test URL "/manual-span"
-    When I wait to receive 1 span
+    When I wait for 1 span
     Then the trace "Bugsnag-Span-Sampling" header equals "1.0:1"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "Custom/ManualSpanScenario"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.kind" equals 3
@@ -17,7 +17,7 @@ Feature: Manual creation of spans
   @chromium_only @local_only
   Scenario: userAgentData is included in custom span
     Given I navigate to the test URL "/manual-span"
-    When I wait to receive at least 1 trace
+    When I wait for 1 span
     Then the trace payload field "resourceSpans.0.resource" bool attribute "browser.mobile" is false
     And the trace payload field "resourceSpans.0.resource" string attribute "browser.platform" is one of:
       | Android |
