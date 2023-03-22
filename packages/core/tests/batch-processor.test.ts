@@ -63,4 +63,13 @@ describe('BatchProcessor', () => {
     jest.advanceTimersByTime(10_000)
     expect(delivery.send).toHaveBeenCalledTimes(1)
   })
+
+  it('prevents delivery if releaseStage not in enabledReleaseStages', () => {
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+    const delivery: Delivery = { send: jest.fn() }
+    const batchProcessor = new BatchProcessor(delivery, { ...VALID_CONFIGURATION, enabledReleaseStages: ['production'], releaseStage: 'test' }, resourceAttributesSource, clock)
+    batchProcessor.add(generateSpan())
+    jest.runAllTimers()
+    expect(delivery.send).not.toHaveBeenCalled()
+  })
 })
