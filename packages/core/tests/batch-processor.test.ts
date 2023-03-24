@@ -1,7 +1,6 @@
-import { SpanAttributes, type SpanEnded } from '@bugsnag/js-performance-core'
 import { BatchProcessor } from '../lib/batch-processor'
 import { randomUUID } from 'crypto'
-import { type Delivery } from '../lib'
+import { SpanAttributes, type Delivery, type SpanEnded } from '../lib'
 import {
   IncrementingClock,
   resourceAttributesSource,
