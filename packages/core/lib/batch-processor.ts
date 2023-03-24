@@ -35,6 +35,9 @@ export class BatchProcessor implements Processor {
   private async flush () {
     this.stop()
 
+    const batch = this.batch
+    this.batch = []
+
     if (this.configuration.enabledReleaseStages && !this.configuration.enabledReleaseStages.includes(this.configuration.releaseStage)) {
       return
     }
@@ -47,7 +50,7 @@ export class BatchProcessor implements Processor {
           },
           scopeSpans: [
             {
-              spans: this.batch.map((span) => spanToJson(span, this.clock))
+              spans: batch.map((span) => spanToJson(span, this.clock))
             }
           ]
         }
@@ -55,19 +58,17 @@ export class BatchProcessor implements Processor {
     }
 
     try {
-      this.delivery.send(
+      await this.delivery.send(
         this.configuration.endpoint,
         this.configuration.apiKey,
         payload
-      ).then(() => {
-        this.retryQueue.flush()
-      })
+      )
+
+      this.retryQueue.flush()
     } catch (err) {
       this.configuration.logger.debug('delivery failed')
       this.retryQueue.add(payload)
     }
-
-    this.batch = []
   }
 
   add (span: SpanEnded) {
