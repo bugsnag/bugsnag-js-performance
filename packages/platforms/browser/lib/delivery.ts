@@ -1,4 +1,4 @@
-import type { Delivery } from '@bugsnag/js-performance-core'
+import { type Delivery, responseStateFromStatusCode } from '@bugsnag/js-performance-core'
 
 export type Fetch = typeof fetch
 
@@ -7,7 +7,7 @@ function browserDelivery (fetch: Fetch): Delivery {
     send: (endpoint, apiKey, payload) => {
       const spanCount = payload.resourceSpans.reduce((count, resourceSpan) => count + resourceSpan.scopeSpans.length, 0)
 
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         fetch(endpoint, {
           method: 'POST',
           headers: {
@@ -16,11 +16,10 @@ function browserDelivery (fetch: Fetch): Delivery {
             'Bugsnag-Span-Sampling': `1.0:${spanCount}`
           },
           body: JSON.stringify(payload)
-        }).then(() => {
-          // TODO: Handle p values, etc.
-          resolve()
-        }).catch(err => {
-          reject(err)
+        }).then((response) => {
+          resolve({ state: responseStateFromStatusCode(response.status) })
+        }).catch(() => {
+          resolve({ state: 'failure-retryable' })
         })
       })
     }

@@ -28,9 +28,27 @@ export default class InMemoryQueue implements RetryQueue {
     }
   }
 
-  flush () {
-    for (const payload of this.payloads) {
-      this.delivery.send(this.endpoint, this.apiKey, payload)
+  async flush () {
+    const payloads = this.payloads
+    this.payloads = []
+
+    for (const payload of payloads) {
+      try {
+        const { state } = await this.delivery.send(this.endpoint, this.apiKey, payload)
+
+        switch (state) {
+          case 'success':
+          case 'failure-discard':
+            break
+          case 'failure-retryable':
+            this.payloads.push(payload)
+            break
+          default: {
+            const _exhaustiveCheck: never = state
+            return _exhaustiveCheck
+          }
+        }
+      } catch (err) {}
     }
   }
 }

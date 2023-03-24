@@ -1,12 +1,15 @@
 import { type JsonAttribute } from './attributes'
 import { type Kind } from './span'
 
+export type ResponseState = 'success' | 'failure-discard' | 'failure-retryable'
+interface Response { state: ResponseState }
+
 export interface Delivery {
   send: (
     endpoint: string,
     apiKey: string,
     payload: DeliveryPayload
-  ) => Promise<void> // this will become some kind of Response type when we capture p-values, for now we don't care
+  ) => Promise<Response>
 }
 
 interface Resource {
@@ -34,4 +37,18 @@ export interface DeliverySpan {
   startTimeUnixNano: string
   endTimeUnixNano: string
   attributes: Array<JsonAttribute | undefined>
+}
+
+const retryCodes = new Set([402, 407, 408, 429])
+
+export function responseStateFromStatusCode (statusCode: number): ResponseState {
+  if (statusCode >= 200 && statusCode < 300) {
+    return 'success'
+  }
+
+  if (statusCode >= 400 && statusCode < 500 && !retryCodes.has(statusCode)) {
+    return 'failure-discard'
+  }
+
+  return 'failure-retryable'
 }

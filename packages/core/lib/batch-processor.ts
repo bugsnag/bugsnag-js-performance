@@ -32,7 +32,7 @@ export class BatchProcessor implements Processor {
     this.timeout = setTimeout(this.flush, this.configuration.batchInactivityTimeoutMs)
   }
 
-  private flush () {
+  private async flush () {
     this.stop()
 
     const batch = this.batch
@@ -57,17 +57,32 @@ export class BatchProcessor implements Processor {
       ]
     }
 
-    this.delivery.send(
-      this.configuration.endpoint,
-      this.configuration.apiKey,
-      payload
-    ).then(() => {
-      this.retryQueue.flush()
-    }).catch((err) => {
+    try {
+      const { state } = await this.delivery.send(
+        this.configuration.endpoint,
+        this.configuration.apiKey,
+        payload
+      )
+
+      switch (state) {
+        case 'success':
+          this.retryQueue.flush()
+          break
+        case 'failure-discard':
+          this.configuration.logger.warn('delivery failed')
+          break
+        case 'failure-retryable':
+          this.configuration.logger.info('delivery failed, adding to retry queue')
+          this.retryQueue.add(payload)
+          break
+        default: {
+          const _exhaustiveCheck: never = state
+          return _exhaustiveCheck
+        }
+      }
+    } catch (err) {
       this.configuration.logger.warn('delivery failed')
-      this.configuration.logger.debug(err)
-      this.retryQueue.add(payload)
-    })
+    }
   }
 
   add (span: SpanEnded) {

@@ -1,4 +1,4 @@
-import { type DeliveryPayload, type Delivery } from '@bugsnag/js-performance-core'
+import { type DeliveryPayload, type Delivery, type ResponseState } from '@bugsnag/js-performance-core'
 
 interface Request {
   apiKey: string
@@ -11,7 +11,7 @@ class InMemoryDelivery implements Delivery {
 
   send (endpoint: string, apiKey: string, payload: DeliveryPayload) {
     this.requests.push({ apiKey, endpoint, payload })
-    return Promise.resolve()
+    return Promise.resolve({ state: 'success' as ResponseState })
   }
 }
 
