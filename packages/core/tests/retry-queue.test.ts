@@ -1,18 +1,17 @@
 import { randomUUID } from 'crypto'
 import { type DeliverySpan, type DeliveryPayload } from '../lib'
 import InMemoryQueue from '../lib/retry-queue'
-import { VALID_API_KEY } from './utilities'
 
 describe('RetryQueue', () => {
   it('calls delivery after flushing', () => {
     const delivery = { send: jest.fn() }
-    const retryQueue = new InMemoryQueue(delivery, '/traces', VALID_API_KEY)
+    const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key')
     const payload = generateFullPayload()
 
     retryQueue.add(payload)
     retryQueue.flush()
 
-    expect(delivery.send).toHaveBeenCalledWith('/traces', VALID_API_KEY, payload)
+    expect(delivery.send).toHaveBeenCalledWith('/traces', 'valid-api-key', payload)
   })
 
   it('limits the number of spans in the queue', () => {
@@ -34,7 +33,7 @@ describe('RetryQueue', () => {
     }
 
     const delivery = { send: jest.fn() }
-    const retryQueue = new InMemoryQueue(delivery, '/traces', VALID_API_KEY)
+    const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key')
 
     retryQueue.add(initialPayload)
 
@@ -46,7 +45,7 @@ describe('RetryQueue', () => {
     retryQueue.flush()
 
     // initial payload should have been knocked out of the queue
-    expect(delivery.send).not.toHaveBeenCalledWith('/traces', VALID_API_KEY, initialPayload)
+    expect(delivery.send).not.toHaveBeenCalledWith('/traces', 'valid-api-key', initialPayload)
   })
 })
 

@@ -3,6 +3,7 @@ import { type Clock } from './clock'
 import { type InternalConfiguration } from './config'
 import { type Delivery } from './delivery'
 import { type Processor } from './processor'
+import { type RetryQueue } from './retry-queue'
 import { spanToJson, type SpanEnded } from './span'
 
 export class BatchProcessor implements Processor {
@@ -13,7 +14,8 @@ export class BatchProcessor implements Processor {
     private delivery: Delivery,
     private configuration: InternalConfiguration,
     private resourceAttributeSource: ResourceAttributeSource,
-    private clock: Clock
+    private clock: Clock,
+    private retryQueue: RetryQueue
   ) {
     this.flush = this.flush.bind(this)
   }
@@ -30,28 +32,39 @@ export class BatchProcessor implements Processor {
     this.timeout = setTimeout(this.flush, this.configuration.batchInactivityTimeoutMs)
   }
 
-  private flush () {
+  private async flush () {
     this.stop()
 
-    if (!this.configuration.enabledReleaseStages || this.configuration.enabledReleaseStages.includes(this.configuration.releaseStage)) {
-      this.delivery.send(
-        this.configuration.endpoint,
-        this.configuration.apiKey,
+    if (this.configuration.enabledReleaseStages && !this.configuration.enabledReleaseStages.includes(this.configuration.releaseStage)) {
+      return
+    }
+
+    const payload = {
+      resourceSpans: [
         {
-          resourceSpans: [
+          resource: {
+            attributes: this.resourceAttributeSource(this.configuration).toJson()
+          },
+          scopeSpans: [
             {
-              resource: {
-                attributes: this.resourceAttributeSource(this.configuration).toJson()
-              },
-              scopeSpans: [
-                {
-                  spans: this.batch.map((span) => spanToJson(span, this.clock))
-                }
-              ]
+              spans: this.batch.map((span) => spanToJson(span, this.clock))
             }
           ]
         }
-      )
+      ]
+    }
+
+    try {
+      this.delivery.send(
+        this.configuration.endpoint,
+        this.configuration.apiKey,
+        payload
+      ).then(() => {
+        this.retryQueue.flush()
+      })
+    } catch (err) {
+      this.configuration.logger.debug('delivery failed')
+      this.retryQueue.add(payload)
     }
 
     this.batch = []
