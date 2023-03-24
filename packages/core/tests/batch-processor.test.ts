@@ -81,4 +81,19 @@ describe('BatchProcessor', () => {
     jest.runAllTimers()
     expect(delivery.send).not.toHaveBeenCalled()
   })
+
+  it('adds delivery payload to a retry queue if delivery fails', async () => {
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+    const delivery: Delivery = { send: jest.fn(() => Promise.reject(new Error('delivery failed'))) }
+    const retryQueue = { add: jest.fn(), flush: jest.fn() }
+    const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
+    const batchProcessor = new BatchProcessor(delivery, createConfiguration({ logger }), resourceAttributesSource, clock, retryQueue)
+    batchProcessor.add(generateSpan())
+    await jest.runAllTimersAsync()
+    expect(delivery.send).toHaveBeenCalled()
+    expect(retryQueue.add).toHaveBeenCalled()
+    expect(retryQueue.flush).not.toHaveBeenCalled()
+    expect(logger.warn).toHaveBeenCalledWith('delivery failed')
+    expect(logger.debug).toHaveBeenCalledWith(new Error('delivery failed'))
+  })
 })
