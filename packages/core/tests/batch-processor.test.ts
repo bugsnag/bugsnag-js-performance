@@ -27,7 +27,7 @@ function generateSpan (): SpanEnded {
 describe('BatchProcessor', () => {
   it('delivers after reaching the specified span limit', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-    const delivery: Delivery = { send: jest.fn() }
+    const delivery: Delivery = { send: jest.fn(() => Promise.resolve()) }
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock, retryQueue)
 
@@ -45,7 +45,7 @@ describe('BatchProcessor', () => {
 
   it('delivers after the specified time limit', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-    const delivery: Delivery = { send: jest.fn() }
+    const delivery: Delivery = { send: jest.fn(() => Promise.resolve()) }
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock, retryQueue)
     batchProcessor.add(generateSpan())
@@ -58,7 +58,7 @@ describe('BatchProcessor', () => {
 
   it('restarts the timer when calling .add()', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-    const delivery: Delivery = { send: jest.fn() }
+    const delivery: Delivery = { send: jest.fn(() => Promise.resolve()) }
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock, retryQueue)
     batchProcessor.add(generateSpan())
@@ -73,7 +73,7 @@ describe('BatchProcessor', () => {
 
   it('prevents delivery if releaseStage not in enabledReleaseStages', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-    const delivery: Delivery = { send: jest.fn() }
+    const delivery: Delivery = { send: jest.fn(() => Promise.resolve()) }
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const configuration = createConfiguration({ enabledReleaseStages: ['production'], releaseStage: 'test' })
     const batchProcessor = new BatchProcessor(delivery, configuration, resourceAttributesSource, clock, retryQueue)
