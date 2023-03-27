@@ -1,7 +1,5 @@
 import { type Delivery, type DeliveryPayload } from './delivery'
 
-const MAX_SPANS_IN_QUEUE = 1000
-
 export interface RetryQueue {
   add: (payload: DeliveryPayload) => void
   flush: () => Promise<void>
@@ -11,14 +9,14 @@ export default class InMemoryQueue implements RetryQueue {
   private payloads: DeliveryPayload[] = []
   private requestQueue: Promise<void> = Promise.resolve()
 
-  constructor (private delivery: Delivery, private endpoint: string, private apiKey: string) {}
+  constructor (private delivery: Delivery, private endpoint: string, private apiKey: string, private retryQueueMaxSize: number) {}
 
   add (payload: DeliveryPayload) {
     this.payloads.push(payload)
 
     let spanCount = this.payloads.reduce((count, payload) => count + countSpansInPayload(payload), 0)
 
-    while (spanCount > MAX_SPANS_IN_QUEUE) {
+    while (spanCount > this.retryQueueMaxSize) {
       const payload = this.payloads.shift()
 
       if (!payload) {
