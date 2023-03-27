@@ -26,7 +26,6 @@ Feature: Retries
             | 429    | Too Many Requests             |
             | 500    | Connection Error              |
 
-    @skip
     Scenario: Oldest batch is removed when max retry queue size is exceeded
         Given I set the HTTP status code for the next requests to "500,500,500,500"
         And I navigate to the test URL "/oldest-batch-removed"

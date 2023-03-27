@@ -32,6 +32,16 @@ export class BatchProcessor implements Processor {
     this.timeout = setTimeout(this.flush, this.configuration.batchInactivityTimeoutMs)
   }
 
+  add (span: SpanEnded) {
+    this.batch.push(span)
+
+    if (this.batch.length >= this.configuration.maximumBatchSize) {
+      this.flush()
+    } else {
+      this.start()
+    }
+  }
+
   private async flush () {
     this.stop()
 
@@ -82,15 +92,6 @@ export class BatchProcessor implements Processor {
       }
     } catch (err) {
       this.configuration.logger.warn('delivery failed')
-    }
-  }
-
-  add (span: SpanEnded) {
-    this.batch.push(span)
-    this.start()
-
-    if (this.batch.length >= this.configuration.maximumBatchSize) {
-      this.flush()
     }
   }
 }
