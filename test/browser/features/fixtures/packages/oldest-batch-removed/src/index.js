@@ -5,17 +5,15 @@ const endpoint = decodeURIComponent(window.location.search.match(/ENDPOINT=([^&]
 
 BugsnagPerformance.start({ apiKey, endpoint, retryQueueMaxSize: 3, maximumBatchSize: 1 })
 
-const spans = [
-    "Custom/Span to discard", 
-    "Custom/Span to retry 1",
-    "Custom/Span to retry 2",
-    "Custom/Span to retry 3",
-    "Custom/Span to deliver"
-]
+BugsnagPerformance.startSpan("Custom/Span to discard").end()
 
-spans.forEach(name => {
-    const span = BugsnagPerformance.startSpan(name)
+setTimeout(() => {
+    BugsnagPerformance.startSpan("Custom/Span to retry 1").end()
+    BugsnagPerformance.startSpan("Custom/Span to retry 2").end()
+    BugsnagPerformance.startSpan("Custom/Span to retry 3").end()
+    
     setTimeout(() => {
-        span.end()
+        BugsnagPerformance.startSpan("Custom/Span to deliver").end()
     }, 100)
-})
+
+}, 100)
