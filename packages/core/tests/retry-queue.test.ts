@@ -5,7 +5,7 @@ import InMemoryQueue from '../lib/retry-queue'
 describe('RetryQueue', () => {
   it('calls delivery after flushing', async () => {
     const delivery = { send: jest.fn() }
-    const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key')
+    const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key', 1000)
     const payload = generateFullPayload()
 
     retryQueue.add(payload)
@@ -33,7 +33,7 @@ describe('RetryQueue', () => {
     }
 
     const delivery = { send: jest.fn() }
-    const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key')
+    const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key', 1000)
 
     retryQueue.add(initialPayload)
 
