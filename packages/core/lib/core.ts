@@ -5,6 +5,7 @@ import { validateConfig, type Configuration, type CoreSchema } from './config'
 import { type Delivery } from './delivery'
 import { type IdGenerator } from './id-generator'
 import { BufferingProcessor, type Processor } from './processor'
+import InMemoryQueue from './retry-queue'
 import { Kind, type Span, type SpanInternal, type Time } from './span'
 
 export interface BugsnagPerformance {
@@ -42,7 +43,8 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
   return {
     start: (config: Configuration | string) => {
       const configuration = validateConfig(config, options.schema)
-      processor = new BatchProcessor(options.delivery, configuration, options.resourceAttributesSource, options.clock)
+      const retryQueue = new InMemoryQueue(options.delivery, configuration.endpoint, configuration.apiKey)
+      processor = new BatchProcessor(options.delivery, configuration, options.resourceAttributesSource, options.clock, retryQueue)
 
       // ensure all spans started before .start() are added to the batch
       bufferingProcessor.spans.forEach(span => {
