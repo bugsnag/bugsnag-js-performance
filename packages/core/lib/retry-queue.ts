@@ -9,6 +9,7 @@ export interface RetryQueue {
 
 export default class InMemoryQueue implements RetryQueue {
   private payloads: DeliveryPayload[] = []
+  private requestQueue: Promise<void> = Promise.resolve()
 
   constructor (private delivery: Delivery, private endpoint: string, private apiKey: string) {}
 
@@ -34,24 +35,28 @@ export default class InMemoryQueue implements RetryQueue {
     const payloads = this.payloads
     this.payloads = []
 
-    for (const payload of payloads) {
-      try {
-        const { state } = await this.delivery.send(this.endpoint, this.apiKey, payload)
+    this.requestQueue = this.requestQueue.then(async () => {
+      for (const payload of payloads) {
+        try {
+          const { state } = await this.delivery.send(this.endpoint, this.apiKey, payload)
 
-        switch (state) {
-          case 'success':
-          case 'failure-discard':
-            break
-          case 'failure-retryable':
-            this.add(payload)
-            break
-          default: {
-            const _exhaustiveCheck: never = state
-            return _exhaustiveCheck
+          switch (state) {
+            case 'success':
+            case 'failure-discard':
+              break
+            case 'failure-retryable':
+              this.add(payload)
+              break
+            default: {
+              const _exhaustiveCheck: never = state
+              return _exhaustiveCheck
+            }
           }
-        }
-      } catch (err) {}
-    }
+        } catch (err) {}
+      }
+    })
+
+    await this.requestQueue
   }
 }
 
