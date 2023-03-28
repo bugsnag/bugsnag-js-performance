@@ -28,3 +28,11 @@ When('I set the HTTP status code for the next {int} {string} requests to {int}')
 
   Maze::Server.set_status_code_generator(generator, http_verb)
 end
+
+# Clicks a given element
+# Requires a running Selenium driver
+#
+# @step_input element_id [String] The locator id
+When('I click the DOM element {string}') do |element_id|
+  Maze.driver.find_element(id: element_id).click()
+end
