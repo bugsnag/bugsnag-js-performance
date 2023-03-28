@@ -9,7 +9,6 @@ export interface RetryQueue {
 
 export default class InMemoryQueue implements RetryQueue {
   private payloads: DeliveryPayload[] = []
-  private flushing = false
 
   constructor (private delivery: Delivery, private endpoint: string, private apiKey: string) {}
 
@@ -30,9 +29,7 @@ export default class InMemoryQueue implements RetryQueue {
   }
 
   async flush () {
-    if (this.flushing) return
-
-    this.flushing = true
+    if (this.payloads.length === 0) return
 
     const payloads = this.payloads
     this.payloads = []
@@ -46,7 +43,7 @@ export default class InMemoryQueue implements RetryQueue {
           case 'failure-discard':
             break
           case 'failure-retryable':
-            this.payloads.push(payload)
+            this.add(payload)
             break
           default: {
             const _exhaustiveCheck: never = state
@@ -55,8 +52,6 @@ export default class InMemoryQueue implements RetryQueue {
         }
       } catch (err) {}
     }
-
-    this.flushing = false
   }
 }
 
