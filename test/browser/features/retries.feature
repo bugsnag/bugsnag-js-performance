@@ -7,7 +7,7 @@ Feature: Retries
         # We need to wait for 2 traces, but maze-runner will log the rejected payload as well
         And I wait to receive 3 traces
 
-        # 500 - First payload (rejected, but will still be recorded by maze-runner)
+        # 500 - First payload (rejected, then retried)
         Then a span name equals "Custom/Span 1"
 
         # 200 - Second payload (delivered)
