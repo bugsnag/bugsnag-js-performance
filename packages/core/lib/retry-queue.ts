@@ -4,11 +4,12 @@ const MAX_SPANS_IN_QUEUE = 1000
 
 export interface RetryQueue {
   add: (payload: DeliveryPayload) => void
-  flush: () => void
+  flush: () => Promise<void>
 }
 
 export default class InMemoryQueue implements RetryQueue {
   private payloads: DeliveryPayload[] = []
+  private flushing = false
 
   constructor (private delivery: Delivery, private endpoint: string, private apiKey: string) {}
 
@@ -29,6 +30,10 @@ export default class InMemoryQueue implements RetryQueue {
   }
 
   async flush () {
+    if (this.flushing) return
+
+    this.flushing = true
+
     const payloads = this.payloads
     this.payloads = []
 
@@ -50,6 +55,8 @@ export default class InMemoryQueue implements RetryQueue {
         }
       } catch (err) {}
     }
+
+    this.flushing = false
   }
 }
 
