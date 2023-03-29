@@ -63,11 +63,13 @@ export default class InMemoryQueue implements RetryQueue {
 function countSpansInPayload (payload: DeliveryPayload) {
   let count = 0
 
-  payload.resourceSpans.forEach(({ scopeSpans }) => {
-    scopeSpans.forEach(({ spans }) => {
-      count += spans.length
-    })
-  })
+  for (let i = 0; i < payload.resourceSpans.length; ++i) {
+    const scopeSpans = payload.resourceSpans[i].scopeSpans
+
+    for (let j = 0; j < scopeSpans.length; ++j) {
+      count += scopeSpans[j].spans.length
+    }
+  }
 
   return count
 }
