@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <link href="/favicon.png" rel="shortcut icon" type="image/x-icon">
+
+        <script>
+          // patch 'fetch' so that it causes a connection failure the first time
+          // it's called, then works as normal for all subsequent calls
+          // this has to be outside of the bundle, otherwise BugsnagPerformance
+          // will grab a reference to fetch at import time (before we patch it)
+          const originalFetch = window.fetch
+          let called = false
+
+          window.fetch = function (resource, options) {
+            // we can't just swap 'window.fetch' back to the original as
+            // BugsnagPerformance has stored a reference to this function
+            if (called) {
+              return originalFetch.call(this, resource, options)
+            }
+
+            called = true
+
+            // make a request to a (hopefully) non-existent URL instead of to
+            // Maze Runner
+            //
+            // port 994 is used because it shouldn't be in use as it's
+            // officially reserved for both TCP & UDP traffic
+            // (https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml?search=994)
+            //
+            // it's also below 1024 so requires privileges to bind to on Linux
+            // and we use HTTPS to make it even less likely to succeed if
+            // something does happen to listen on this port
+            return originalFetch.call(this, 'https://localhost:994', options)
+          }
+        </script>
+    </head>
+    <body>
+        <h1>connection-failure</h1>
+
+        <button id="send-span">send span</button>
+
+        <script src="./dist/bundle.js"></script>
+    </body>
+</html>
