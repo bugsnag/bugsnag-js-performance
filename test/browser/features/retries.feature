@@ -25,6 +25,19 @@ Feature: Retries
             | 429    | Too Many Requests             |
             | 500    | Connection Error              |
 
+    Scenario: Batch is retried with connection failure
+        Given I navigate to the test URL "/connection-failure"
+
+        When I click the element "send-span"
+        And I wait for 5 seconds
+        Then I wait to receive 0 traces
+
+        When I click the element "send-span"
+        And I wait to receive 2 traces
+
+        Then a span name equals "Custom/Span 1"
+        And a span name equals "Custom/Span 2"
+
     Scenario Outline: Batch is not retried with specified status codes
         Given I set the HTTP status code for the next "POST" request to <status>
         And I navigate to the test URL "/retry-scenario"
