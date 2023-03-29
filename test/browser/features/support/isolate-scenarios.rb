@@ -1,6 +1,6 @@
 Maze.hooks.after do
   path = $browser.url_for("/")
-  
+
   begin
     $logger.debug "Navigating to: #{path}"
     Maze.driver.navigate.to path

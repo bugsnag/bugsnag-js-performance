@@ -1,3 +1,3 @@
-Before('@skip') do |scenario|
-    skip_this_scenario("Skipping scenario")
+Before('@skip') do
+  skip_this_scenario("Skipping scenario")
 end
