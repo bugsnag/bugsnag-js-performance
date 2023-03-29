@@ -24,6 +24,25 @@ Feature: Retries
             | 429    | Too Many Requests             |
             | 500    | Connection Error              |
 
+    Scenario Outline: Batch is not retried with specified status codes
+        Given I set the HTTP status code for the next "POST" request to <status>
+        And I navigate to the test URL "/retry-scenario"
+        And I wait to receive 1 trace
+        And I discard the oldest trace
+
+        Then I click the DOM element "send-span"
+        And I wait to receive 1 trace
+        And a span name equals "Custom/Deliver"
+
+        Examples:
+            | status | definition                    |
+            | 100    | Continue                      |
+            | 200    | OK                            |
+            | 301    | Moved Permanently             |
+            | 400    | Bad Request                   |
+            | 401    | Unauthorized                  |
+            | 410    | Gone                          |
+
     # Status code 408 cannot be tested on certain browsers as it
     # is automatically retried and does not behave as expected
     Scenario Outline: Oldest batch is removed when max retry queue size is exceeded
