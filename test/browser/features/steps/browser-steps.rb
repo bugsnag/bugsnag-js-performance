@@ -34,5 +34,5 @@ end
 #
 # @step_input element_id [String] The locator id
 When('I click the DOM element {string}') do |element_id|
-  Maze.driver.find_element(id: element_id).click()
+  Maze.driver.find_element(id: element_id).click
 end
