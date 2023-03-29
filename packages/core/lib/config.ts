@@ -19,6 +19,7 @@ export interface Configuration {
 export type InternalConfiguration = Required<Configuration> & {
   maximumBatchSize: number
   batchInactivityTimeoutMs: number
+  retryQueueMaxSize: number
 }
 
 export interface ConfigOption<T> {
@@ -96,6 +97,13 @@ if (typeof __ENABLE_BUGSNAG_TEST_CONFIGURATION__ !== 'undefined' && __ENABLE_BUG
   schema.batchInactivityTimeoutMs = {
     message: 'should be a number',
     defaultValue: 30 * 1000, // 30 seconds
+    validate: (value: unknown): value is number => typeof value === 'number'
+  }
+
+  // the maximum number of spans to have in a retry queue
+  schema.retryQueueMaxSize = {
+    message: 'should be a number',
+    defaultValue: 1000,
     validate: (value: unknown): value is number => typeof value === 'number'
   }
 }

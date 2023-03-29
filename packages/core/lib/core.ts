@@ -43,7 +43,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
   return {
     start: (config: Configuration | string) => {
       const configuration = validateConfig(config, options.schema)
-      const retryQueue = new InMemoryQueue(options.delivery, configuration.endpoint, configuration.apiKey)
+      const retryQueue = new InMemoryQueue(options.delivery, configuration.endpoint, configuration.apiKey, configuration.retryQueueMaxSize)
       processor = new BatchProcessor(options.delivery, configuration, options.resourceAttributesSource, options.clock, retryQueue)
 
       // ensure all spans started before .start() are added to the batch

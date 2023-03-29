@@ -8,6 +8,7 @@ function createConfiguration (overrides: Partial<InternalConfiguration> = {}): I
     enabledReleaseStages: null,
     maximumBatchSize: 100,
     batchInactivityTimeoutMs: 30 * 1000,
+    retryQueueMaxSize: 1000,
     logger: {
       debug: jest.fn(),
       warn: jest.fn(),
