@@ -6,7 +6,7 @@ Feature: Retries
         And I wait to receive 1 trace
         And I discard the oldest trace
 
-        Then I click the DOM element "send-span"
+        Then I click the element "send-span"
         And I wait to receive 2 traces
 
         #  First payload (rejected, then retried)
@@ -30,7 +30,7 @@ Feature: Retries
         And I wait to receive 1 trace
         And I discard the oldest trace
 
-        Then I click the DOM element "send-span"
+        Then I click the element "send-span"
         And I wait to receive 1 trace
         And a span name equals "Custom/Deliver"
 
@@ -51,7 +51,7 @@ Feature: Retries
         And I wait to receive 1 trace
         And I discard the oldest trace
 
-        Then I click the DOM element "send-spans"
+        Then I click the element "send-spans"
         And I wait to receive 3 traces
 
         # Remove failed requests
@@ -59,7 +59,7 @@ Feature: Retries
         And I discard the oldest trace
         And I discard the oldest trace
 
-        Then I click the DOM element "send-final-span"
+        Then I click the element "send-final-span"
         And I wait to receive 4 traces
 
         # First successful batch
