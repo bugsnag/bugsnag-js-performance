@@ -5,8 +5,6 @@ const endpoint = decodeURIComponent(window.location.search.match(/ENDPOINT=([^&]
 
 BugsnagPerformance.start({ apiKey, endpoint, retryQueueMaxSize: 3, maximumBatchSize: 1 })
 
-BugsnagPerformance.startSpan("Custom/Span to discard").end()
-
 document.getElementById("send-spans").addEventListener("click", () => {
     BugsnagPerformance.startSpan("Custom/Span to retry 1").end()
     BugsnagPerformance.startSpan("Custom/Span to retry 2").end()
@@ -16,3 +14,5 @@ document.getElementById("send-spans").addEventListener("click", () => {
 document.getElementById("send-final-span").addEventListener("click", () => {
     BugsnagPerformance.startSpan("Custom/Span to deliver").end()
 })
+
+BugsnagPerformance.startSpan("Custom/Span to discard").end()

@@ -5,11 +5,8 @@ const endpoint = decodeURIComponent(window.location.search.match(/ENDPOINT=([^&]
 
 BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 1 })
 
-BugsnagPerformance.startSpan("Custom/Span 1").end()
+document.getElementById("send-span").addEventListener("click", () => {
+    BugsnagPerformance.startSpan("Custom/Deliver").end()
+})
 
-// Avoid a possible race condition by waiting before sending the second payload
-// Otherwise it could reach Maze Runner before the first payload, which
-// would apply the response status codes out of order
-setTimeout(() => {
-    BugsnagPerformance.startSpan("Custom/Span 2").end()
-}, 100)
+BugsnagPerformance.startSpan("Custom/Reject").end()
