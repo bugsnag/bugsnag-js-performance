@@ -7,7 +7,9 @@ BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 1 })
 
 BugsnagPerformance.startSpan("Custom/Span 1").end()
 
-// Wait 100ms before delivering second payload
+// Avoid a possible race condition by waiting before sending the second payload
+// Otherwise it could reach Maze Runner before the first payload, which
+// would apply the response status codes out of order
 setTimeout(() => {
     BugsnagPerformance.startSpan("Custom/Span 2").end()
 }, 100)
