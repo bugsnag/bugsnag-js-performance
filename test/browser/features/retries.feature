@@ -9,7 +9,7 @@ Feature: Retries
         Then I click the element "send-span"
         And I wait to receive 2 traces
 
-        #  First payload (rejected, then retried)
+        # First payload (rejected, then retried)
         Then a span name equals "Custom/Reject"
 
         # Second payload (delivered)
@@ -19,6 +19,7 @@ Feature: Retries
         # is automatically retried and does not behave as expected
         Examples:
             | status | definition                    |
+            | 301    | Moved Permanently             |
             | 402    | Payment Required              |
             | 407    | Proxy Authentication Required |
             | 429    | Too Many Requests             |
@@ -30,18 +31,18 @@ Feature: Retries
         And I wait to receive 1 trace
         And I discard the oldest trace
 
-        Then I click the element "send-span"
+        Given I click the element "send-span"
+        And I wait for 5 seconds
         And I wait to receive 1 trace
-        And a span name equals "Custom/Deliver"
+        Then a span name equals "Custom/Deliver"
 
         Examples:
             | status | definition                    |
-            | 100    | Continue                      |
             | 200    | OK                            |
-            | 301    | Moved Permanently             |
             | 400    | Bad Request                   |
             | 401    | Unauthorized                  |
             | 410    | Gone                          |
+            | 418    | I'm a teapot                  |
 
     # Status code 408 cannot be tested on certain browsers as it
     # is automatically retried and does not behave as expected
@@ -60,6 +61,7 @@ Feature: Retries
         And I discard the oldest trace
 
         Then I click the element "send-final-span"
+        And I wait for 5 seconds
         And I wait to receive 4 traces
 
         # First successful batch
@@ -72,6 +74,7 @@ Feature: Retries
 
         Examples:
             | status | definition                    |
+            | 301    | Moved Permanently             |
             | 402    | Payment Required              |
             | 407    | Proxy Authentication Required |
             | 429    | Too Many Requests             |
