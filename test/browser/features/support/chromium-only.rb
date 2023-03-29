@@ -1,7 +1,7 @@
-CHROMIUM_BROWSERS = Set['chrome', 'edge'] 
+CHROMIUM_BROWSERS = Set['chrome', 'edge']
 
-Before('@chromium_only') do 
-    unless CHROMIUM_BROWSERS.any? { |browser| Maze.config.browser.start_with?(browser) } 
-        skip_this_scenario 
-    end 
+Before('@chromium_only') do
+  if CHROMIUM_BROWSERS.none? { |browser| Maze.config.browser.start_with?(browser) }
+    skip_this_scenario
+  end
 end
