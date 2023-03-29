@@ -29,6 +29,14 @@ When('I set the HTTP status code for the next {int} {string} requests to {int}')
   Maze::Server.set_status_code_generator(generator, http_verb)
 end
 
+Then('I discard the oldest {int} {word}') do |number_to_discard, request_type|
+  raise "No #{request_type} to discard" if Maze::Server.list_for(request_type).current.nil?
+
+  number_to_discard.times do
+    Maze::Server.list_for(request_type).next
+  end
+end
+
 module Maze
   module Driver
     class Browser

@@ -69,9 +69,7 @@ Feature: Retries
         And I wait to receive 3 traces
 
         # Remove failed requests
-        And I discard the oldest trace
-        And I discard the oldest trace
-        And I discard the oldest trace
+        And I discard the oldest 3 traces
 
         Then I click the element "send-final-span"
         And I wait for 5 seconds
