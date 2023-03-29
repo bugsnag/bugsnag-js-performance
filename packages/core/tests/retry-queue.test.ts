@@ -3,13 +3,13 @@ import { type DeliverySpan, type DeliveryPayload } from '../lib'
 import InMemoryQueue from '../lib/retry-queue'
 
 describe('RetryQueue', () => {
-  it('calls delivery after flushing', () => {
+  it('calls delivery after flushing', async () => {
     const delivery = { send: jest.fn() }
     const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key')
     const payload = generateFullPayload()
 
     retryQueue.add(payload)
-    retryQueue.flush()
+    await retryQueue.flush()
 
     expect(delivery.send).toHaveBeenCalledWith('/traces', 'valid-api-key', payload)
   })
@@ -47,6 +47,50 @@ describe('RetryQueue', () => {
     // initial payload should have been knocked out of the queue
     expect(delivery.send).not.toHaveBeenCalledWith('/traces', 'valid-api-key', initialPayload)
   })
+
+  it('awaits current delivery before flushing queue', async () => {
+    const endpoint = '/traces'
+    const apiKey = 'valid-api-key'
+    let outstandingRequests = 0
+
+    const delivery = {
+      send: jest.fn(() => {
+        ++outstandingRequests
+        expect(outstandingRequests).toBe(1)
+
+        return new Promise<void>((resolve) => {
+          setTimeout(() => {
+            --outstandingRequests
+            expect(outstandingRequests).toBe(0)
+
+            resolve()
+          }, 0)
+        })
+      })
+    }
+
+    // @ts-expect-error something
+    const retryQueue = new InMemoryQueue(delivery, endpoint, apiKey)
+
+    const payload1 = generateFullPayload(1)
+    const payload2 = generateFullPayload(1)
+    const payload3 = generateFullPayload(1)
+
+    retryQueue.add(payload1)
+    const flush1 = retryQueue.flush()
+
+    retryQueue.add(payload2)
+    const flush2 = retryQueue.flush()
+
+    retryQueue.add(payload3)
+    const flush3 = retryQueue.flush()
+
+    await Promise.all([flush1, flush2, flush3])
+
+    expect(delivery.send).toHaveBeenNthCalledWith(1, endpoint, apiKey, payload1)
+    expect(delivery.send).toHaveBeenNthCalledWith(2, endpoint, apiKey, payload2)
+    expect(delivery.send).toHaveBeenNthCalledWith(3, endpoint, apiKey, payload3)
+  })
 })
 
 function generateSpan (): DeliverySpan {
@@ -61,12 +105,12 @@ function generateSpan (): DeliverySpan {
   }
 }
 
-function generateFullPayload (): DeliveryPayload {
+function generateFullPayload (spans: number = 100): DeliveryPayload {
   return {
     resourceSpans: [{
       resource: { attributes: [{ key: 'bugnsag.test.attribute', value: { stringValue: '1.0.0' } }] },
       scopeSpans: [{
-        spans: new Array(100).fill(generateSpan())
+        spans: new Array(spans).fill(generateSpan())
       }]
     }]
   }
