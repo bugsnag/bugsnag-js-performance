@@ -33,6 +33,12 @@ export class BatchProcessor implements Processor {
   }
 
   add (span: SpanEnded) {
+    if (this.configuration.enabledReleaseStages &&
+      !this.configuration.enabledReleaseStages.includes(this.configuration.releaseStage)
+    ) {
+      return
+    }
+
     this.batch.push(span)
 
     if (this.batch.length >= this.configuration.maximumBatchSize) {
@@ -47,10 +53,6 @@ export class BatchProcessor implements Processor {
 
     const batch = this.batch
     this.batch = []
-
-    if (this.configuration.enabledReleaseStages && !this.configuration.enabledReleaseStages.includes(this.configuration.releaseStage)) {
-      return
-    }
 
     const payload = {
       resourceSpans: [
