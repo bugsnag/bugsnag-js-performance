@@ -9,13 +9,14 @@ import spanAttributesSource from './span-attributes-source'
 
 const clock = createClock(performance)
 const resourceAttributesSource = createResourceAttributesSource(navigator)
+const backgroundingListener = createBrowserBackgroundingListener(document)
 
 const BugsnagPerformance = createClient({
-  backgroundingListener: createBrowserBackgroundingListener(document),
+  backgroundingListener,
   clock,
   resourceAttributesSource,
   spanAttributesSource,
-  delivery: browserDelivery(window.fetch),
+  delivery: browserDelivery(window.fetch, backgroundingListener),
   idGenerator,
   schema: createSchema(window.location.hostname)
 })
