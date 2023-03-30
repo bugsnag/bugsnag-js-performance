@@ -4,11 +4,11 @@ export type Fetch = typeof fetch
 
 function browserDelivery (fetch: Fetch): Delivery {
   return {
-    send: (endpoint, apiKey, payload) => {
+    async send (endpoint, apiKey, payload) {
       const spanCount = payload.resourceSpans.reduce((count, resourceSpan) => count + resourceSpan.scopeSpans.length, 0)
 
-      return new Promise((resolve) => {
-        fetch(endpoint, {
+      try {
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: {
             'Bugsnag-Api-Key': apiKey,
@@ -16,12 +16,12 @@ function browserDelivery (fetch: Fetch): Delivery {
             'Bugsnag-Span-Sampling': `1.0:${spanCount}`
           },
           body: JSON.stringify(payload)
-        }).then((response) => {
-          resolve({ state: responseStateFromStatusCode(response.status) })
-        }).catch(() => {
-          resolve({ state: 'failure-retryable' })
         })
-      })
+
+        return { state: responseStateFromStatusCode(response.status) }
+      } catch (err) {
+        return { state: 'failure-retryable' }
+      }
     }
   }
 }
