@@ -9,9 +9,18 @@ interface Request {
 class InMemoryDelivery implements Delivery {
   public requests: Request[] = []
 
+  private readonly responseStateStack: ResponseState[] = []
+
   send (endpoint: string, apiKey: string, payload: DeliveryPayload) {
     this.requests.push({ apiKey, endpoint, payload })
-    return Promise.resolve({ state: 'success' as ResponseState })
+
+    const state = this.responseStateStack.pop() || 'success' as ResponseState
+
+    return Promise.resolve({ state })
+  }
+
+  setNextResponseState (state: ResponseState): void {
+    this.responseStateStack.push(state)
   }
 }
 
