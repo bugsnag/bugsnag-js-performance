@@ -1,4 +1,5 @@
 export * from './attributes'
+export * from './backgrounding-listener'
 export * from './clock'
 export * from './core'
 export * from './delivery'

@@ -1,5 +1,6 @@
 import './matchers'
 
+export { default as ControllableBackgroundingListener } from './controllable-backgrounding-listener'
 export { default as createConfiguration } from './create-configuration'
 export { default as createTestClient } from './create-test-client'
 export { default as IncrementingClock } from './incrementing-clock'
