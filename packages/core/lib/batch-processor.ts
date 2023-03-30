@@ -48,7 +48,7 @@ export class BatchProcessor implements Processor {
     }
   }
 
-  private async flush () {
+  async flush () {
     this.stop()
 
     if (this.batch.length === 0) {
