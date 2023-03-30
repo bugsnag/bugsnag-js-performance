@@ -58,7 +58,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       // e.g. we can't trigger delivery until we have the apiKey and endpoint
       // from configuration
       options.backgroundingListener.onStateChange(state => {
-        // to be implemented
+        (processor as BatchProcessor).flush()
       })
     },
     startSpan: (name, startTime) => {

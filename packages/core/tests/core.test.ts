@@ -1,6 +1,11 @@
 import { createNoopClient } from '../lib/core'
 import { type BackgroundingListener } from '../lib/backgrounding-listener'
-import { createTestClient, VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
+import {
+  ControllableBackgroundingListener,
+  createTestClient,
+  InMemoryDelivery,
+  VALID_API_KEY
+} from '@bugsnag/js-performance-test-utilities'
 
 describe('Core', () => {
   describe('createClient()', () => {
@@ -177,6 +182,54 @@ describe('Core', () => {
 
           expect(backgroundingListener.onStateChange).toHaveBeenCalled()
           expect(console.warn).not.toHaveBeenCalled()
+        })
+
+        it('flushes the processor when the app is backgrounded', async () => {
+          const delivery = new InMemoryDelivery()
+          const backgroundingListener = new ControllableBackgroundingListener()
+
+          const client = createTestClient({ backgroundingListener, delivery })
+          client.start(VALID_API_KEY)
+
+          client.startSpan('Span 1').end()
+          client.startSpan('Span 2').end()
+
+          expect(delivery.requests).toHaveLength(0)
+
+          // sending the app to the background should flush the queue and
+          // deliver both spans we just ended
+          backgroundingListener.sendToBackground()
+
+          await jest.runAllTimersAsync()
+
+          expect(delivery.requests).toHaveLength(1)
+
+          const payload = delivery.requests[0].payload
+          const spans = payload.resourceSpans[0].scopeSpans[0].spans
+
+          expect(spans).toHaveLength(2)
+
+          const names = spans.map(({ name }) => name)
+
+          expect(names).toStrictEqual(['Span 1', 'Span 2'])
+        })
+
+        it('does not make an empty request when the app is backgrounded with no batched spans', async () => {
+          const delivery = new InMemoryDelivery()
+          const backgroundingListener = new ControllableBackgroundingListener()
+
+          const client = createTestClient({ backgroundingListener, delivery })
+          client.start(VALID_API_KEY)
+
+          expect(delivery.requests).toHaveLength(0)
+
+          // sending the app to the background should flush the queue but there
+          // are no spans to deliver so we shouldn't get any requests
+          backgroundingListener.sendToBackground()
+
+          await jest.runAllTimersAsync()
+
+          expect(delivery.requests).toHaveLength(0)
         })
       })
     })
