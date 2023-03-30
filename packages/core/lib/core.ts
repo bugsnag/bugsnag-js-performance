@@ -5,7 +5,7 @@ import { validateConfig, type Configuration, type CoreSchema } from './config'
 import { type Delivery } from './delivery'
 import { type IdGenerator } from './id-generator'
 import { BufferingProcessor, type Processor } from './processor'
-import InMemoryQueue from './retry-queue'
+import { InMemoryQueue } from './retry-queue'
 import { Kind, type Span, type SpanInternal, type Time } from './span'
 
 export interface BugsnagPerformance {
