@@ -1,4 +1,5 @@
 import { createClient } from '@bugsnag/js-performance-core'
+import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
 import { createSchema } from './config'
 import browserDelivery from './delivery'
@@ -10,6 +11,7 @@ const clock = createClock(performance)
 const resourceAttributesSource = createResourceAttributesSource(navigator)
 
 const BugsnagPerformance = createClient({
+  backgroundingListener: createBrowserBackgroundingListener(document),
   clock,
   resourceAttributesSource,
   spanAttributesSource,

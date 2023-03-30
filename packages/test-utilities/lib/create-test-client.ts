@@ -1,4 +1,5 @@
 import {
+  ControllableBackgroundingListener,
   IncrementingClock,
   InMemoryDelivery,
   resourceAttributesSource,
@@ -14,6 +15,7 @@ import {
 } from '@bugsnag/js-performance-core'
 
 const defaultOptions = () => ({
+  backgroundingListener: new ControllableBackgroundingListener(),
   delivery: new InMemoryDelivery(),
   idGenerator: new StableIdGenerator(),
   clock: new IncrementingClock(),

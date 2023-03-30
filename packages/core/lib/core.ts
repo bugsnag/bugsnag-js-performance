@@ -1,4 +1,5 @@
 import { SpanAttributes, type ResourceAttributeSource, type SpanAttributesSource } from './attributes'
+import { type BackgroundingListener } from './backgrounding-listener'
 import { BatchProcessor } from './batch-processor'
 import { type Clock } from './clock'
 import { validateConfig, type Configuration, type CoreSchema } from './config'
@@ -31,6 +32,7 @@ export interface ClientOptions {
   clock: Clock
   idGenerator: IdGenerator
   delivery: Delivery
+  backgroundingListener: BackgroundingListener
   resourceAttributesSource: ResourceAttributeSource
   spanAttributesSource: SpanAttributesSource
   schema: CoreSchema
@@ -49,6 +51,14 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       // ensure all spans started before .start() are added to the batch
       bufferingProcessor.spans.forEach(span => {
         processor.add(span)
+      })
+
+      // register with the backgrounding listener - we do this in 'start' as
+      // there's nothing to do if we're backgrounded before start is called
+      // e.g. we can't trigger delivery until we have the apiKey and endpoint
+      // from configuration
+      options.backgroundingListener.onStateChange(state => {
+        // to be implemented
       })
     },
     startSpan: (name, startTime) => {

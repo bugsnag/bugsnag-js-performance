@@ -1,4 +1,5 @@
 import { createNoopClient } from '../lib/core'
+import { type BackgroundingListener } from '../lib/backgrounding-listener'
 import { createTestClient, VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 
 describe('Core', () => {
@@ -161,6 +162,21 @@ describe('Core', () => {
 
           // @ts-expect-error invalid configuration provided
           expect(() => { client.start(config) }).toThrow('No Bugsnag API Key set')
+        })
+
+        it('registers with the backgrounding listener', () => {
+          const backgroundingListener: BackgroundingListener = {
+            onStateChange: jest.fn()
+          }
+
+          const client = createTestClient({ backgroundingListener })
+
+          expect(backgroundingListener.onStateChange).not.toHaveBeenCalled()
+
+          client.start(VALID_API_KEY)
+
+          expect(backgroundingListener.onStateChange).toHaveBeenCalled()
+          expect(console.warn).not.toHaveBeenCalled()
         })
       })
     })
