@@ -51,6 +51,10 @@ export class BatchProcessor implements Processor {
   private async flush () {
     this.stop()
 
+    if (this.batch.length === 0) {
+      return
+    }
+
     const batch = this.batch
     this.batch = []
 
