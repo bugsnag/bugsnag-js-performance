@@ -1,19 +1,32 @@
 import { randomUUID } from 'crypto'
-import { type DeliverySpan, type DeliveryPayload, InMemoryQueue } from '../lib'
+import {
+  type Delivery,
+  type DeliverySpan,
+  type DeliveryPayload,
+  type ResponseState,
+  InMemoryQueue
+} from '../lib'
+import { InMemoryDelivery } from '@bugsnag/js-performance-test-utilities'
 
 describe('RetryQueue', () => {
   it('calls delivery after flushing', async () => {
-    const delivery = { send: jest.fn() }
+    const delivery = new InMemoryDelivery()
     const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key', 1000)
     const payload = generateFullPayload()
 
     retryQueue.add(payload)
     await retryQueue.flush()
 
-    expect(delivery.send).toHaveBeenCalledWith('/traces', 'valid-api-key', payload)
+    expect(delivery.requests).toStrictEqual([
+      {
+        apiKey: 'valid-api-key',
+        endpoint: '/traces',
+        payload
+      }
+    ])
   })
 
-  it('limits the number of spans in the queue', () => {
+  it('limits the number of spans in the queue', async () => {
     const initialPayload: DeliveryPayload = {
       resourceSpans: [{
         resource: { attributes: [] },
@@ -31,20 +44,31 @@ describe('RetryQueue', () => {
       }]
     }
 
-    const delivery = { send: jest.fn() }
-    const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key', 1000)
+    const delivery = new InMemoryDelivery()
+    const endpoint = '/traces'
+    const apiKey = 'valid-api-key'
+    const retryQueue = new InMemoryQueue(delivery, endpoint, apiKey, 1000)
 
     retryQueue.add(initialPayload)
 
+    const expectedPayloads: Array<{
+      apiKey: string
+      endpoint: string
+      payload: DeliveryPayload
+    }> = []
+
     // add 1000 spans
     for (let i = 0; i <= 9; i++) {
-      retryQueue.add(generateFullPayload())
+      const payload = generateFullPayload()
+      expectedPayloads.push({ apiKey, endpoint, payload })
+
+      retryQueue.add(payload)
     }
 
-    retryQueue.flush()
+    await retryQueue.flush()
 
     // initial payload should have been knocked out of the queue
-    expect(delivery.send).not.toHaveBeenCalledWith('/traces', 'valid-api-key', initialPayload)
+    expect(delivery.requests).toStrictEqual(expectedPayloads)
   })
 
   it('awaits current delivery before flushing queue', async () => {
@@ -52,24 +76,23 @@ describe('RetryQueue', () => {
     const apiKey = 'valid-api-key'
     let outstandingRequests = 0
 
-    const delivery = {
-      send: jest.fn(() => {
+    const delivery: Delivery = {
+      send: jest.fn((endpoint, apiKey, payload) => {
         ++outstandingRequests
         expect(outstandingRequests).toBe(1)
 
-        return new Promise<void>((resolve) => {
+        return new Promise((resolve) => {
           setTimeout(() => {
             --outstandingRequests
             expect(outstandingRequests).toBe(0)
 
-            resolve()
+            resolve({ state: 'success' as ResponseState })
           }, 0)
         })
       })
     }
 
-    // @ts-expect-error something
-    const retryQueue = new InMemoryQueue(delivery, endpoint, apiKey)
+    const retryQueue = new InMemoryQueue(delivery, endpoint, apiKey, 1000)
 
     const payload1 = generateFullPayload(1)
     const payload2 = generateFullPayload(1)

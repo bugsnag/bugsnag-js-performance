@@ -1,8 +1,9 @@
 import { BatchProcessor } from '../lib/batch-processor'
 import { randomUUID } from 'crypto'
-import { SpanAttributes, type Delivery, type SpanEnded } from '../lib'
+import { SpanAttributes, type SpanEnded } from '../lib'
 import {
   IncrementingClock,
+  InMemoryDelivery,
   resourceAttributesSource,
   createConfiguration
 } from '@bugsnag/js-performance-test-utilities'
@@ -26,7 +27,7 @@ function generateSpan (): SpanEnded {
 describe('BatchProcessor', () => {
   it('delivers after reaching the specified span limit', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-    const delivery: Delivery = { send: jest.fn(() => Promise.resolve({ state: 'success' })) }
+    const delivery = new InMemoryDelivery()
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock, retryQueue)
 
@@ -35,61 +36,76 @@ describe('BatchProcessor', () => {
       batchProcessor.add(generateSpan())
     }
 
-    expect(delivery.send).not.toHaveBeenCalled()
+    expect(delivery.requests).toHaveLength(0)
 
     batchProcessor.add(generateSpan())
 
-    expect(delivery.send).toHaveBeenCalledTimes(1)
+    expect(delivery.requests).toHaveLength(1)
   })
 
   it('delivers after the specified time limit', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-    const delivery: Delivery = { send: jest.fn(() => Promise.resolve({ state: 'success' })) }
+    const delivery = new InMemoryDelivery()
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock, retryQueue)
+
     batchProcessor.add(generateSpan())
-    expect(delivery.send).not.toHaveBeenCalled()
+
+    expect(delivery.requests).toHaveLength(0)
 
     jest.advanceTimersByTime(30_000)
 
-    expect(delivery.send).toHaveBeenCalledTimes(1)
+    expect(delivery.requests).toHaveLength(1)
   })
 
   it('restarts the timer when calling .add()', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-    const delivery: Delivery = { send: jest.fn(() => Promise.resolve({ state: 'success' })) }
+    const delivery = new InMemoryDelivery()
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock, retryQueue)
+
     batchProcessor.add(generateSpan())
+
     jest.advanceTimersByTime(20_000)
-    expect(delivery.send).not.toHaveBeenCalled()
+    expect(delivery.requests).toHaveLength(0)
+
     batchProcessor.add(generateSpan())
+
     jest.advanceTimersByTime(20_000)
-    expect(delivery.send).not.toHaveBeenCalled()
+    expect(delivery.requests).toHaveLength(0)
+
     jest.advanceTimersByTime(10_000)
-    expect(delivery.send).toHaveBeenCalledTimes(1)
+    expect(delivery.requests).toHaveLength(1)
   })
 
   it('prevents delivery if releaseStage not in enabledReleaseStages', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-    const delivery: Delivery = { send: jest.fn(() => Promise.resolve({ state: 'success' })) }
+    const delivery = new InMemoryDelivery()
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const configuration = createConfiguration({ enabledReleaseStages: ['production'], releaseStage: 'test' })
     const batchProcessor = new BatchProcessor(delivery, configuration, resourceAttributesSource, clock, retryQueue)
+
     batchProcessor.add(generateSpan())
+
     jest.runAllTimers()
-    expect(delivery.send).not.toHaveBeenCalled()
+
+    expect(delivery.requests).toHaveLength(0)
   })
 
   it('adds delivery payload to a retry queue if delivery fails and response code is retryable', async () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-    const delivery: Delivery = { send: jest.fn(() => Promise.resolve({ state: 'failure-retryable' })) }
+    const delivery = new InMemoryDelivery()
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
     const batchProcessor = new BatchProcessor(delivery, createConfiguration({ logger }), resourceAttributesSource, clock, retryQueue)
+
+    delivery.setNextResponseState('failure-retryable')
+
     batchProcessor.add(generateSpan())
+
     await jest.runAllTimersAsync()
-    expect(delivery.send).toHaveBeenCalled()
+
+    expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).toHaveBeenCalled()
     expect(retryQueue.flush).not.toHaveBeenCalled()
     expect(logger.info).toHaveBeenCalledWith('delivery failed, adding to retry queue')
@@ -97,13 +113,18 @@ describe('BatchProcessor', () => {
 
   it('does not add delivery payload to a retry queue if delivery fails and response code is not retryable', async () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-    const delivery: Delivery = { send: jest.fn(() => Promise.resolve({ state: 'failure-discard' })) }
+    const delivery = new InMemoryDelivery()
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
     const batchProcessor = new BatchProcessor(delivery, createConfiguration({ logger }), resourceAttributesSource, clock, retryQueue)
+
+    delivery.setNextResponseState('failure-discard')
+
     batchProcessor.add(generateSpan())
+
     await jest.runAllTimersAsync()
-    expect(delivery.send).toHaveBeenCalled()
+
+    expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).not.toHaveBeenCalled()
     expect(retryQueue.flush).not.toHaveBeenCalled()
     expect(logger.warn).toHaveBeenCalledWith('delivery failed')
@@ -111,13 +132,16 @@ describe('BatchProcessor', () => {
 
   it('flushes retry queue after a successful delivery', async () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-    const delivery: Delivery = { send: jest.fn(() => Promise.resolve({ state: 'success' })) }
+    const delivery = new InMemoryDelivery()
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
     const batchProcessor = new BatchProcessor(delivery, createConfiguration({ logger }), resourceAttributesSource, clock, retryQueue)
+
     batchProcessor.add(generateSpan())
+
     await jest.runAllTimersAsync()
-    expect(delivery.send).toHaveBeenCalled()
+
+    expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).not.toHaveBeenCalled()
     expect(retryQueue.flush).toHaveBeenCalled()
   })
