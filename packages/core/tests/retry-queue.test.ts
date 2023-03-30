@@ -1,6 +1,5 @@
 import { randomUUID } from 'crypto'
-import { type DeliverySpan, type DeliveryPayload } from '../lib'
-import InMemoryQueue from '../lib/retry-queue'
+import { type DeliverySpan, type DeliveryPayload, InMemoryQueue } from '../lib'
 
 describe('RetryQueue', () => {
   it('calls delivery after flushing', async () => {

@@ -5,7 +5,7 @@ export interface RetryQueue {
   flush: () => Promise<void>
 }
 
-export default class InMemoryQueue implements RetryQueue {
+export class InMemoryQueue implements RetryQueue {
   private payloads: DeliveryPayload[] = []
   private requestQueue: Promise<void> = Promise.resolve()
 
