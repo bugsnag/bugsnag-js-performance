@@ -37,6 +37,11 @@ Then('I discard the oldest {int} {word}') do |number_to_discard, request_type|
   end
 end
 
+When("I minimise the browser window") do
+  driver = Maze.driver.instance_variable_get(:@driver)
+  driver.manage.window.minimize
+end
+
 module Maze
   module Driver
     class Browser
