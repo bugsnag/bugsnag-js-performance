@@ -49,11 +49,7 @@ describe('BugsnagPerformance Browser Client', () => {
 
       // End
       jest.advanceTimersByTime(testDuration)
-      if (endValue) {
-        span.end(endValue)
-      } else {
-        span.end()
-      }
+      span.end(endValue)
       jest.runAllTimers()
 
       expect(fetch).toHaveBeenCalledWith('test', {
