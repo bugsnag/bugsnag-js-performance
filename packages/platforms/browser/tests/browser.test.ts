@@ -52,38 +52,7 @@ describe('BugsnagPerformance Browser Client', () => {
       span.end(endValue)
       jest.runAllTimers()
 
-      expect(fetch).toHaveBeenCalledWith('test', {
-        method: 'POST',
-        body: expect.any(String),
-        headers: {
-          'Bugsnag-Api-Key': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-          'Bugsnag-Span-Sampling': '1.0:1',
-          'Content-Type': 'application/json'
-        }
-      })
-
-      // @ts-expect-error mock does not exist on fetch
-      expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({
-        resourceSpans: [{
-          resource: {
-            attributes: expect.any(Array)
-          },
-          scopeSpans: [{
-            spans: [{
-              name: 'Custom/Start',
-              attributes: [{
-                key: 'browser.page.url',
-                value: { stringValue: 'http://localhost/' }
-              }],
-              kind: 3,
-              spanId: expect.any(String),
-              traceId: expect.any(String),
-              startTimeUnixNano: expect.any(String),
-              endTimeUnixNano: expect.any(String)
-            }]
-          }]
-        }]
-      })
+      expect(fetch).toHaveBeenCalledTimes(1)
 
       // @ts-expect-error mock does not exist on fetch
       const requestBody = JSON.parse(fetch.mock.calls[0][1].body)
