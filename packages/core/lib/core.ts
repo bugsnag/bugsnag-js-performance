@@ -11,13 +11,19 @@ import { Kind, type Span, type SpanInternal, type Time } from './span'
 
 export interface BugsnagPerformance {
   start: (config: Configuration | string) => void
+  /**
+   * Start a new custom span
+   * @param name the name of the span
+   * @param startTime an optional start time - either a Date or a value captured from performance.now()
+   * @returns {Span} Returns a new Span
+   */
   startSpan: (name: string, startTime?: Time) => Span
 }
 
 function sanitizeTime (clock: Clock, time?: Time): number {
   if (typeof time === 'number') {
     // no need to change anything - we want to store numbers anyway
-    // we assume this is nanosecond precision
+    // we assume this is millisecond precision
     return time
   }
 
