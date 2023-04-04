@@ -23,7 +23,7 @@ describe('BugsnagPerformance Browser Client', () => {
   })
 
   describe('Span start/end', () => {
-    const testStartNanoseconds = new Date().getTime() * 1_000_000
+    const testStartNanoseconds = Date.now() * 1_000_000
     const testDuration = 20_000
 
     const startDate = new Date()
