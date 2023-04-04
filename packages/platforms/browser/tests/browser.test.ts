@@ -9,6 +9,10 @@ import BugsnagPerformance from '../lib/browser'
 
 jest.useFakeTimers()
 
+afterEach(() => {
+  jest.resetAllMocks()
+})
+
 describe('BugsnagPerformance Browser Client', () => {
   it('exposes a start method', () => {
     expect(BugsnagPerformance).toMatchObject({
