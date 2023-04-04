@@ -59,7 +59,7 @@ describe('BugsnagPerformance Browser Client', () => {
       const { startTimeUnixNano, endTimeUnixNano } = requestBody.resourceSpans[0].scopeSpans[0].spans[0]
 
       expect(Number(startTimeUnixNano)).toBeGreaterThanOrEqual(testStartNanoseconds)
-      expect(Number(endTimeUnixNano)).toBeGreaterThan(Number(startTimeUnixNano))
+      expect(Number(endTimeUnixNano)).toBeGreaterThanOrEqual(Number(startTimeUnixNano) + testDuration)
     })
   })
 })
