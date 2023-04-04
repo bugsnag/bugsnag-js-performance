@@ -5,5 +5,5 @@ const endpoint = decodeURIComponent(window.location.search.match(/ENDPOINT=([^&]
 
 BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 1 })
 
-const span = BugsnagPerformance.startSpan("Custom/ManualSpanScenario")
-span.end()
+const span = BugsnagPerformance.startSpan("Custom/ManualSpanScenario", new Date('2023-04-04T01:02:03Z'))
+span.end(new Date('2023-04-04T02:03:04Z'))

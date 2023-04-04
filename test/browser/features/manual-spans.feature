@@ -8,8 +8,8 @@ Feature: Manual creation of spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.kind" equals 3
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.spanId" matches the regex "^[A-Fa-f0-9]{16}$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.traceId" matches the regex "^[A-Fa-f0-9]{32}$"
-    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.startTimeUnixNano" matches the regex "^[0-9]+$"
-    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.endTimeUnixNano" matches the regex "^[0-9]+$"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.startTimeUnixNano" equals "1680570123000000000"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.endTimeUnixNano" matches the regex "1680573784000000000"
     And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.name" equals "bugsnag.performance.browser"
     And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.version" equals "0.0.0"
     And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals the stored value "environment"
