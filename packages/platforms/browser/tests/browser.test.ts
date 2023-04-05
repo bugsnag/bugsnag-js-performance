@@ -63,7 +63,7 @@ describe('BugsnagPerformance Browser Client', () => {
       expect(fetch).toHaveBeenCalledTimes(1)
 
       // @ts-expect-error mock does not exist on fetch
-      const requestBody = JSON.parse(fetch.mock.calls[0][1].body)
+      const requestBody = JSON.parse(window.fetch.mock.calls[0][1].body)
       const { startTimeUnixNano, endTimeUnixNano } = requestBody.resourceSpans[0].scopeSpans[0].spans[0]
 
       expect(Number(startTimeUnixNano)).toBeGreaterThanOrEqual(testStartNanoseconds)
