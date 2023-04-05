@@ -184,7 +184,7 @@ describe('Core', () => {
           expect(console.warn).not.toHaveBeenCalled()
         })
 
-        it('flushes the processor when the app is backgrounded', async () => {
+        it('flushes the processor when the app is backgrounded', () => {
           const delivery = new InMemoryDelivery()
           const backgroundingListener = new ControllableBackgroundingListener()
 
@@ -200,8 +200,6 @@ describe('Core', () => {
           // deliver both spans we just ended
           backgroundingListener.sendToBackground()
 
-          await jest.runAllTimersAsync()
-
           expect(delivery.requests).toHaveLength(1)
 
           const payload = delivery.requests[0].payload
@@ -214,7 +212,7 @@ describe('Core', () => {
           expect(names).toStrictEqual(['Span 1', 'Span 2'])
         })
 
-        it('does not make an empty request when the app is backgrounded with no batched spans', async () => {
+        it('does not make an empty request when the app is backgrounded with no batched spans', () => {
           const delivery = new InMemoryDelivery()
           const backgroundingListener = new ControllableBackgroundingListener()
 
@@ -226,8 +224,6 @@ describe('Core', () => {
           // sending the app to the background should flush the queue but there
           // are no spans to deliver so we shouldn't get any requests
           backgroundingListener.sendToBackground()
-
-          await jest.runAllTimersAsync()
 
           expect(delivery.requests).toHaveLength(0)
         })
