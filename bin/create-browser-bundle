@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+mkdir -p build
+
+cat <<JAVASCRIPT > build/index.js
+import BugsnagPerformance from '@bugsnag/js-performance-browser'
+
+BugsnagPerformance.start('abcdefabcdefabcdefabcdefabcdef12')
+JAVASCRIPT
+
+npm install @rollup/plugin-node-resolve @rollup/plugin-terser
+
+npx rollup build/index.js \
+  --file build/bundle.js \
+  --format iife \
+  --plugin @rollup/plugin-node-resolve
+
+npx rollup build/index.js \
+  --file build/bundle.min.js \
+  --format iife \
+  --plugin @rollup/plugin-node-resolve \
+  --plugin @rollup/plugin-terser

@@ -1,0 +1,29 @@
+name: Record bundle size
+
+on: [push]
+
+jobs:
+  record-bundle-size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Record bundle size
+        run: |
+          npm ci
+          npm run build
+          ./bin/create-browser-bundle
+          wc -c < build/bundle.js > build/bundle.size
+          wc -c < build/bundle.min.js > build/bundle.min.size
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.sha }}-bundle-size
+          if-no-files-found: error
+          path: |
+            build/bundle.size
+            build/bundle.min.size
