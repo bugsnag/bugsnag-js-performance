@@ -1,0 +1,34 @@
+name: Compare PR stats
+
+on: [pull_request]
+
+concurrency:
+  # only allow one run of this workflow per branch, otherwise the comment could
+  # be overwritten by an earlier commit that runs slower than the latest commit
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  base-branch:
+    uses: ./.github/workflows/record-pr-stats.yml
+    with:
+      ref: ${{ github.event.pull_request.base.sha }}
+
+  head-branch:
+    uses: ./.github/workflows/record-pr-stats.yml
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
+
+  compare-bundle-size:
+    runs-on: ubuntu-latest
+    needs: [base-branch, head-branch]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Leave comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const leaveBundleSizeComment = require('./.github/leave-bundle-size-comment.js')
+
+            await leaveBundleSizeComment(github, context, ${{ toJSON(needs) }})

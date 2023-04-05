@@ -1,0 +1,50 @@
+name: Record PR stats
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        required: true
+        type: string
+    outputs:
+      unminified-size:
+        description: "The unminified bundle size"
+        value: ${{ jobs.record-bundle-size.outputs.unminified-size }}
+      minified-size:
+        description: "The minified bundle size"
+        value: ${{ jobs.record-bundle-size.outputs.minified-size }}
+      minified-gzip-size:
+        description: "The minified bundle size after gzipping"
+        value: ${{ jobs.record-bundle-size.outputs.minified-gzip-size }}
+
+jobs:
+  record-bundle-size:
+    runs-on: ubuntu-latest
+
+    outputs:
+      unminified-size: ${{ steps.unminified.outputs.size }}
+      minified-size: ${{ steps.minified.outputs.size }}
+      minified-gzip-size: ${{ steps.minified-gzip.outputs.size }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm run build
+      - run: ./.github/create-browser-bundle-from-npm
+
+      - id: unminified
+        run: echo "size=$(wc -c < build/bundle.js)" >> $GITHUB_OUTPUT
+
+      - id: minified
+        run: echo "size=$(wc -c < build/bundle.min.js)" >> $GITHUB_OUTPUT
+
+      - id: minified-gzip
+        run: echo "size=$(gzip < build/bundle.min.js | wc -c)" >> $GITHUB_OUTPUT
