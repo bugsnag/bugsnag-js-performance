@@ -1,0 +1,87 @@
+name: Compare bundle size
+
+on: [pull_request]
+
+jobs:
+  record-base-branch-bundle-size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/workflows/record-bundle-size
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+
+  record-head-branch-bundle-size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/workflows/record-bundle-size
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+  compare-bundle-size:
+    runs-on: ubuntu-latest
+    needs: [record-base-branch-bundle-size, record-head-branch-bundle-size]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Download base branch bundle size
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ github.event.pull_request.base.sha }}-bundle-size
+          path: base
+
+      - name: Download head branch bundle size
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ github.event.pull_request.head.sha }}-bundle-size
+          path: head
+
+      - name: Leave comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs')
+            const formatKbs = n => `${(n / 1000).toFixed(2)} kB`
+
+            const showDiff = n => {
+              if (n > 0) return `⚠️ \`+${n.toLocaleString()} bytes\``
+              if (n < 0) return `\`${n.toLocaleString()} bytes\``
+              return '_No change_'
+            }
+
+            const before = {
+              unminified: parseInt(fs.readFileSync(`base/bundle.size`, 'utf8')),
+              minified: parseInt(fs.readFileSync(`base/bundle.min.size`, 'utf8')),
+            }
+
+            const after = {
+              unminified: parseInt(fs.readFileSync(`head/bundle.size`, 'utf8')),
+              minified: parseInt(fs.readFileSync(`head/bundle.min.size`, 'utf8'))
+            }
+
+            const diff = {
+              unminified: before.unminified - after.unminified,
+              minified: before.minified - after.minified,
+            }
+
+            const body = `
+            ### Browser bundle size
+
+            |        | Unminified                          | Minfied                              |
+            |--------|-------------------------------------|--------------------------------------|
+            | Before | \`${formatKbs(before.unminified)}\` | \`${formatKbs(before.minified)}\`    |
+            | After  | \`${formatKbs(after.unminified)}\`  | \`${formatKbs(after.minified)}\`     |
+            | ±      | ${showDiff(diff.unminified)}        | ${showDiff(diff.minified)}           |
+
+            <p align="right">Generated against ${context.sha}</p>
+            `.trim()
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            })
