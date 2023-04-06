@@ -8,15 +8,13 @@ import {
 } from '../lib'
 import { InMemoryDelivery } from '@bugsnag/js-performance-test-utilities'
 
-const createdTime = Date.now()
-
 describe('RetryQueue', () => {
   it('calls delivery after flushing', async () => {
     const delivery = new InMemoryDelivery()
     const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key', 1000)
     const payload = generateFullPayload()
 
-    retryQueue.add(payload, createdTime)
+    retryQueue.add(payload, Date.now())
     await retryQueue.flush()
 
     expect(delivery.requests).toStrictEqual([
@@ -51,7 +49,7 @@ describe('RetryQueue', () => {
     const apiKey = 'valid-api-key'
     const retryQueue = new InMemoryQueue(delivery, endpoint, apiKey, 1000)
 
-    retryQueue.add(initialPayload, createdTime)
+    retryQueue.add(initialPayload, Date.now())
 
     const expectedPayloads: Array<{
       apiKey: string
@@ -64,7 +62,7 @@ describe('RetryQueue', () => {
       const payload = generateFullPayload()
       expectedPayloads.push({ apiKey, endpoint, payload })
 
-      retryQueue.add(payload, createdTime)
+      retryQueue.add(payload, Date.now())
     }
 
     await retryQueue.flush()
@@ -100,13 +98,13 @@ describe('RetryQueue', () => {
     const payload2 = generateFullPayload(1)
     const payload3 = generateFullPayload(1)
 
-    retryQueue.add(payload1, createdTime)
+    retryQueue.add(payload1, Date.now())
     const flush1 = retryQueue.flush()
 
-    retryQueue.add(payload2, createdTime)
+    retryQueue.add(payload2, Date.now())
     const flush2 = retryQueue.flush()
 
-    retryQueue.add(payload3, createdTime)
+    retryQueue.add(payload3, Date.now())
     const flush3 = retryQueue.flush()
 
     await Promise.all([flush1, flush2, flush3])
@@ -117,18 +115,21 @@ describe('RetryQueue', () => {
   })
 
   it('drops payloads that are at least 24 hours old', async () => {
-    jest.useFakeTimers()
-
     const delivery = new InMemoryDelivery()
     const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key', 1000)
-    const payload = generateFullPayload()
+    const payloadToDiscard = generateFullPayload()
+    const payloadToRetain = generateFullPayload()
 
-    retryQueue.add(payload, createdTime)
-    await jest.advanceTimersByTimeAsync(24 * 60 * 60_000)
+    retryQueue.add(payloadToDiscard, Date.now() - 24 * 60 * 60_000)
+    retryQueue.add(payloadToRetain, Date.now())
 
     await retryQueue.flush()
 
-    expect(delivery.requests).toStrictEqual([])
+    expect(delivery.requests).toStrictEqual([{
+      apiKey: 'valid-api-key',
+      endpoint: '/traces',
+      payload: payloadToRetain
+    }])
   })
 })
 
