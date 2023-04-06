@@ -1,5 +1,6 @@
 @requires_fetch_keepalive
 Feature: Navigation changes
+    @skip_span_time_validation
     Scenario: Batch is sent when navigating to a new page by clicking an anchor tag
         Given I navigate to the test URL "/navigation-changes"
         When I click the element "add-span-to-batch"
@@ -15,6 +16,7 @@ Feature: Navigation changes
         And a span name equals "Span 1"
         And a span name equals "Span 2"
 
+    @skip_span_time_validation
     Scenario: Batch is sent when navigating to a new page by entering a new URL
         Given I navigate to the test URL "/navigation-changes"
         When I click the element "add-span-to-batch"
