@@ -5,14 +5,16 @@ export interface RetryQueue {
   flush: () => Promise<void>
 }
 
-interface RetryPayload {
-  time: number
+interface PayloadWithTimestamp {
   payload: DeliveryPayload
+  time: number
 }
 
+const msInDay = 24 * 60 * 60_000
+
 export class InMemoryQueue implements RetryQueue {
-  private payloads: RetryPayload[] = []
   private requestQueue: Promise<void> = Promise.resolve()
+  private payloads: PayloadWithTimestamp[] = []
 
   constructor (private delivery: Delivery, private endpoint: string, private apiKey: string, private retryQueueMaxSize: number) {}
 
@@ -39,19 +41,19 @@ export class InMemoryQueue implements RetryQueue {
     this.payloads = []
 
     this.requestQueue = this.requestQueue.then(async () => {
-      for (const payload of payloads) {
+      for (const { payload, time } of payloads) {
         // discard payloads at least 24 hours old
-        if (new Date().getTime() >= payload.time + 24 * 60 * 60_000) continue
+        if (new Date().getTime() >= time + msInDay) continue
 
         try {
-          const { state } = await this.delivery.send(this.endpoint, this.apiKey, payload.payload)
+          const { state } = await this.delivery.send(this.endpoint, this.apiKey, payload)
 
           switch (state) {
             case 'success':
             case 'failure-discard':
               break
             case 'failure-retryable':
-              this.add(payload.payload, payload.time)
+              this.add(payload, time)
               break
             default: {
               const _exhaustiveCheck: never = state
