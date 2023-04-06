@@ -2,6 +2,7 @@ import './matchers'
 
 export { default as ControllableBackgroundingListener } from './controllable-backgrounding-listener'
 export { default as createConfiguration } from './create-configuration'
+export * from './create-span'
 export { default as createTestClient } from './create-test-client'
 export { default as IncrementingClock } from './incrementing-clock'
 export { default as InMemoryDelivery } from './in-memory-delivery'
