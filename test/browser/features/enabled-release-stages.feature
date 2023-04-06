@@ -6,4 +6,6 @@ Feature: Configuration
 
   Scenario: Delivery is allowed when releaseStage is present in enabledReleaseStages
     Given I navigate to the test URL "/enabled-release-stages"
-    Then I wait to receive at least 1 trace
+    And I wait to receive at least 1 trace
+    Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "Custom/Should send"
+    And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals "test"
