@@ -7,7 +7,7 @@ import { type Delivery } from './delivery'
 import { type IdGenerator } from './id-generator'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
-import { Kind, type Span, type SpanInternal, type Time } from './span'
+import { Kind, type Span, type SpanEnded, type Time } from './span'
 
 export interface BugsnagPerformance {
   start: (config: Configuration | string) => void
@@ -62,19 +62,24 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       })
     },
     startSpan: (name, startTime) => {
-      const spanInternal: SpanInternal = {
-        name,
-        kind: Kind.Client, // TODO: How do we define the current kind?
-        id: options.idGenerator.generate(64),
-        traceId: options.idGenerator.generate(128),
-        startTime: sanitizeTime(options.clock, startTime),
-        attributes: new SpanAttributes(options.spanAttributesSource())
-      }
+      const safeStartTime = sanitizeTime(options.clock, startTime)
+      const attributes = new SpanAttributes(options.spanAttributesSource())
 
       return {
-        // TODO Expose internal span to platforms using Symbol / WeakMap?
         end: (endTime) => {
-          processor.add({ ...spanInternal, endTime: sanitizeTime(options.clock, endTime) })
+          const safeEndTime = sanitizeTime(options.clock, endTime)
+
+          const span: SpanEnded = {
+            name,
+            kind: Kind.Client, // TODO: How do we define the current kind?
+            id: options.idGenerator.generate(64),
+            traceId: options.idGenerator.generate(128),
+            startTime: safeStartTime,
+            endTime: safeEndTime,
+            attributes
+          }
+
+          processor.add(span)
         }
       }
     }
