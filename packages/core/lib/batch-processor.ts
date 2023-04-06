@@ -73,7 +73,7 @@ export class BatchProcessor implements Processor {
       ]
     }
 
-    const batchTime = new Date().getTime()
+    const batchTime = Date.now()
 
     try {
       const { state } = await this.delivery.send(
