@@ -23,7 +23,7 @@ export interface BugsnagPerformance {
 function sanitizeTime (clock: Clock, time?: Time): number {
   if (typeof time === 'number') {
     // no need to change anything - we want to store numbers anyway
-    // we assume this is millisecond precision
+    // we assume this is the correct precision for the platform
     return time
   }
 
