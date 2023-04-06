@@ -25,6 +25,7 @@ export interface SpanInternal {
   readonly attributes: SpanAttributes
   readonly startTime: number // stored in the format returned from Clock.now (see clock.ts)
   endTime?: number // stored in the format returned from Clock.now (see clock.ts) - written once when 'end' is called
+  readonly samplingRate: number
 }
 
 export type SpanEnded = Required<SpanInternal>
