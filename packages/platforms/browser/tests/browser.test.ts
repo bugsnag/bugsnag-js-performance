@@ -66,8 +66,8 @@ describe('BugsnagPerformance Browser Client', () => {
       const requestBody = JSON.parse(window.fetch.mock.calls[0][1].body)
       const { startTimeUnixNano, endTimeUnixNano } = requestBody.resourceSpans[0].scopeSpans[0].spans[0]
 
-      expect(Number(startTimeUnixNano)).toBeGreaterThanOrEqual(testStartNanoseconds)
-      expect(Number(endTimeUnixNano)).toBeGreaterThanOrEqual(Number(startTimeUnixNano) + testDurationMs)
+      expect(+startTimeUnixNano).toBeGreaterThanOrEqual(testStartNanoseconds)
+      expect(+endTimeUnixNano).toBeGreaterThanOrEqual(+startTimeUnixNano + testDurationMs)
     })
   })
 })
