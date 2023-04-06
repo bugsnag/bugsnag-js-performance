@@ -8,6 +8,7 @@ import { type IdGenerator } from './id-generator'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import { Kind, type Span, type SpanEnded, type Time } from './span'
+import traceIdToSamplingRate from './trace-id-to-sampling-rate'
 
 export interface BugsnagPerformance {
   start: (config: Configuration | string) => void
@@ -68,15 +69,17 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       return {
         end: (endTime) => {
           const safeEndTime = sanitizeTime(options.clock, endTime)
+          const traceId = options.idGenerator.generate(128)
 
           const span: SpanEnded = {
             name,
             kind: Kind.Client, // TODO: How do we define the current kind?
             id: options.idGenerator.generate(64),
-            traceId: options.idGenerator.generate(128),
+            traceId,
             startTime: safeStartTime,
             endTime: safeEndTime,
-            attributes
+            attributes,
+            samplingRate: traceIdToSamplingRate(traceId)
           }
 
           processor.add(span)
