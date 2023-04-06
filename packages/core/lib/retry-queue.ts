@@ -41,7 +41,7 @@ export class InMemoryQueue implements RetryQueue {
     this.requestQueue = this.requestQueue.then(async () => {
       for (const payload of payloads) {
         // discard payloads at least 24 hours old
-        if (new Date().getTime() >= payload.time + 24 * 60 * 60_000) break
+        if (new Date().getTime() >= payload.time + 24 * 60 * 60_000) continue
 
         try {
           const { state } = await this.delivery.send(this.endpoint, this.apiKey, payload.payload)
