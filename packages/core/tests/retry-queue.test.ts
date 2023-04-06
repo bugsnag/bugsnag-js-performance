@@ -8,7 +8,7 @@ import {
 } from '../lib'
 import { InMemoryDelivery } from '@bugsnag/js-performance-test-utilities'
 
-const createdTime = new Date().getTime()
+const createdTime = Date.now()
 
 describe('RetryQueue', () => {
   it('calls delivery after flushing', async () => {
