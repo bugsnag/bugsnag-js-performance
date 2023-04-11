@@ -1,20 +1,27 @@
 import { type Delivery, type DeliveryPayload } from './delivery'
 
 export interface RetryQueue {
-  add: (payload: DeliveryPayload) => void
+  add: (payload: DeliveryPayload, time: number) => void
   flush: () => Promise<void>
 }
 
+interface PayloadWithTimestamp {
+  payload: DeliveryPayload
+  time: number
+}
+
+const msInDay = 24 * 60 * 60_000
+
 export class InMemoryQueue implements RetryQueue {
-  private payloads: DeliveryPayload[] = []
   private requestQueue: Promise<void> = Promise.resolve()
+  private payloads: PayloadWithTimestamp[] = []
 
   constructor (private delivery: Delivery, private endpoint: string, private apiKey: string, private retryQueueMaxSize: number) {}
 
-  add (payload: DeliveryPayload) {
-    this.payloads.push(payload)
+  add (payload: DeliveryPayload, time: number) {
+    this.payloads.push({ payload, time })
 
-    let spanCount = this.payloads.reduce((count, payload) => count + countSpansInPayload(payload), 0)
+    let spanCount = this.payloads.reduce((count, { payload }) => count + countSpansInPayload(payload), 0)
 
     while (spanCount > this.retryQueueMaxSize) {
       const payload = this.payloads.shift()
@@ -23,7 +30,7 @@ export class InMemoryQueue implements RetryQueue {
         break
       }
 
-      spanCount -= countSpansInPayload(payload)
+      spanCount -= countSpansInPayload(payload.payload)
     }
   }
 
@@ -34,7 +41,10 @@ export class InMemoryQueue implements RetryQueue {
     this.payloads = []
 
     this.requestQueue = this.requestQueue.then(async () => {
-      for (const payload of payloads) {
+      for (const { payload, time } of payloads) {
+        // discard payloads at least 24 hours old
+        if (Date.now() >= time + msInDay) continue
+
         try {
           const { state } = await this.delivery.send(this.endpoint, this.apiKey, payload)
 
@@ -43,7 +53,7 @@ export class InMemoryQueue implements RetryQueue {
             case 'failure-discard':
               break
             case 'failure-retryable':
-              this.add(payload)
+              this.add(payload, time)
               break
             default: {
               const _exhaustiveCheck: never = state

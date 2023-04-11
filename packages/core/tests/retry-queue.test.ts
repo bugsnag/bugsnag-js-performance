@@ -14,7 +14,7 @@ describe('RetryQueue', () => {
     const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key', 1000)
     const payload = generateFullPayload()
 
-    retryQueue.add(payload)
+    retryQueue.add(payload, Date.now())
     await retryQueue.flush()
 
     expect(delivery.requests).toStrictEqual([
@@ -49,7 +49,7 @@ describe('RetryQueue', () => {
     const apiKey = 'valid-api-key'
     const retryQueue = new InMemoryQueue(delivery, endpoint, apiKey, 1000)
 
-    retryQueue.add(initialPayload)
+    retryQueue.add(initialPayload, Date.now())
 
     const expectedPayloads: Array<{
       apiKey: string
@@ -62,7 +62,7 @@ describe('RetryQueue', () => {
       const payload = generateFullPayload()
       expectedPayloads.push({ apiKey, endpoint, payload })
 
-      retryQueue.add(payload)
+      retryQueue.add(payload, Date.now())
     }
 
     await retryQueue.flush()
@@ -98,13 +98,13 @@ describe('RetryQueue', () => {
     const payload2 = generateFullPayload(1)
     const payload3 = generateFullPayload(1)
 
-    retryQueue.add(payload1)
+    retryQueue.add(payload1, Date.now())
     const flush1 = retryQueue.flush()
 
-    retryQueue.add(payload2)
+    retryQueue.add(payload2, Date.now())
     const flush2 = retryQueue.flush()
 
-    retryQueue.add(payload3)
+    retryQueue.add(payload3, Date.now())
     const flush3 = retryQueue.flush()
 
     await Promise.all([flush1, flush2, flush3])
@@ -112,6 +112,24 @@ describe('RetryQueue', () => {
     expect(delivery.send).toHaveBeenNthCalledWith(1, endpoint, apiKey, payload1)
     expect(delivery.send).toHaveBeenNthCalledWith(2, endpoint, apiKey, payload2)
     expect(delivery.send).toHaveBeenNthCalledWith(3, endpoint, apiKey, payload3)
+  })
+
+  it('drops payloads that are at least 24 hours old', async () => {
+    const delivery = new InMemoryDelivery()
+    const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key', 1000)
+    const payloadToDiscard = generateFullPayload()
+    const payloadToRetain = generateFullPayload()
+
+    retryQueue.add(payloadToDiscard, Date.now() - 24 * 60 * 60_000)
+    retryQueue.add(payloadToRetain, Date.now())
+
+    await retryQueue.flush()
+
+    expect(delivery.requests).toStrictEqual([{
+      apiKey: 'valid-api-key',
+      endpoint: '/traces',
+      payload: payloadToRetain
+    }])
   })
 })
 

@@ -73,6 +73,8 @@ export class BatchProcessor implements Processor {
       ]
     }
 
+    const batchTime = Date.now()
+
     try {
       const { state } = await this.delivery.send(
         this.configuration.endpoint,
@@ -89,7 +91,7 @@ export class BatchProcessor implements Processor {
           break
         case 'failure-retryable':
           this.configuration.logger.info('delivery failed, adding to retry queue')
-          this.retryQueue.add(payload)
+          this.retryQueue.add(payload, batchTime)
           break
         default: {
           const _exhaustiveCheck: never = state
