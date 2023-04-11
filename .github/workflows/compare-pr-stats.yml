@@ -17,7 +17,7 @@ jobs:
   head-branch:
     uses: ./.github/workflows/record-pr-stats.yml
     with:
-      ref: ${{ github.event.pull_request.head.sha }}
+      ref: ${{ github.sha }}
 
   compare-bundle-size:
     runs-on: ubuntu-latest
