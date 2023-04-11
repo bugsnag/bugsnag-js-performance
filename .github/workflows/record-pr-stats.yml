@@ -41,10 +41,19 @@ jobs:
       - run: ./.github/create-browser-bundle-from-npm
 
       - id: unminified
-        run: echo "size=$(wc -c < build/bundle.js)" >> $GITHUB_OUTPUT
+        run: |
+          SIZE="$(wc -c < build/bundle.js)"
+          echo "Un-minified bundle size: $SIZE bytes"
+          echo "size=$SIZE" >> $GITHUB_OUTPUT
 
       - id: minified
-        run: echo "size=$(wc -c < build/bundle.min.js)" >> $GITHUB_OUTPUT
+        run: |
+          SIZE="$(wc -c < build/bundle.min.js)"
+          echo "Minified bundle size: $SIZE bytes"
+          echo "size=$SIZE" >> $GITHUB_OUTPUT
 
       - id: minified-gzip
-        run: echo "size=$(gzip < build/bundle.min.js | wc -c)" >> $GITHUB_OUTPUT
+        run: |
+          SIZE="$(gzip < build/bundle.min.js | wc -c)"
+          echo "Gzipped bundle size: $SIZE bytes"
+          echo "size=$SIZE" >> $GITHUB_OUTPUT
