@@ -10,7 +10,7 @@ When("I navigate to the test URL {string}") do |test_path|
 
   # store app version from package.json
   package = JSON.parse(File.read("./features/fixtures/node_modules/@bugsnag/js-performance-browser/package.json"))
-  Maze::Store.values["app_version"] = package["version"]
+  Maze::Store.values["telemetry.sdk.version"] = package["version"]
 end
 
 When("I set the HTTP status code for the next {int} {string} requests to {int}") do |count, http_verb, status_code|
