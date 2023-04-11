@@ -7,9 +7,13 @@ When("I navigate to the test URL {string}") do |test_path|
   hostname = driver.execute_script("return window.location.hostname")
   environment = hostname == "localhost" ? "development" : "production"
   Maze::Store.values["environment"] = environment
+
+  # store app version from package.json
+  package = JSON.parse(File.read("./features/fixtures/node_modules/@bugsnag/js-performance-browser/package.json"))
+  Maze::Store.values["app_version"] = package["version"]
 end
 
-When('I set the HTTP status code for the next {int} {string} requests to {int}') do |count, http_verb, status_code|
+When("I set the HTTP status code for the next {int} {string} requests to {int}") do |count, http_verb, status_code|
   raise("Invalid HTTP verb: #{http_verb}") unless Maze::Server::ALLOWED_HTTP_VERBS.include?(http_verb)
 
   codes = [status_code] * count
@@ -29,7 +33,7 @@ When('I set the HTTP status code for the next {int} {string} requests to {int}')
   Maze::Server.set_status_code_generator(generator, http_verb)
 end
 
-Then('I discard the oldest {int} {word}') do |number_to_discard, request_type|
+Then("I discard the oldest {int} {word}") do |number_to_discard, request_type|
   raise "No #{request_type} to discard" if Maze::Server.list_for(request_type).current.nil?
 
   number_to_discard.times do

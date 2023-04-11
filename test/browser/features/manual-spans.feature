@@ -11,7 +11,7 @@ Feature: Manual creation of spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.startTimeUnixNano" matches the regex "^[0-9]+$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.endTimeUnixNano" matches the regex "^[0-9]+$"
     And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.name" equals "bugsnag.performance.browser"
-    And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.version" equals "0.0.0"
+    And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.version" equals the stored value "app_version"
     And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals the stored value "environment"
 
   @chromium_only @local_only
