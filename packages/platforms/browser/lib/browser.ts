@@ -2,7 +2,7 @@ import { createClient } from '@bugsnag/js-performance-core'
 import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
 import { createSchema } from './config'
-import browserDelivery from './delivery'
+import createBrowserDeliveryFactory from './delivery'
 import idGenerator from './id-generator'
 import createResourceAttributesSource from './resource-attributes-source'
 import spanAttributesSource from './span-attributes-source'
@@ -16,7 +16,7 @@ const BugsnagPerformance = createClient({
   clock,
   resourceAttributesSource,
   spanAttributesSource,
-  delivery: browserDelivery(window.fetch, backgroundingListener),
+  deliveryFactory: createBrowserDeliveryFactory(window.fetch, backgroundingListener),
   idGenerator,
   schema: createSchema(window.location.hostname)
 })

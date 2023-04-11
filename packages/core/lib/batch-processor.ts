@@ -76,11 +76,7 @@ export class BatchProcessor implements Processor {
     const batchTime = Date.now()
 
     try {
-      const { state } = await this.delivery.send(
-        this.configuration.endpoint,
-        this.configuration.apiKey,
-        payload
-      )
+      const { state } = await this.delivery.send(payload)
 
       switch (state) {
         case 'success':

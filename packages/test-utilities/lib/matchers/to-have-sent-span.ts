@@ -9,7 +9,7 @@ const toHaveSentSpan: MatcherFunction<[expectedSpan: unknown]> = function (deliv
   }
 
   // pass if any span matches the expectedSpan; we explicitly don't care about order
-  const pass = delivery.requests.some(request => this.equals(request.payload, expect.objectContaining({
+  const pass = delivery.requests.some(payload => this.equals(payload, expect.objectContaining({
     resourceSpans: expect.arrayContaining([
       expect.objectContaining({
         scopeSpans: expect.arrayContaining([
@@ -27,7 +27,7 @@ const toHaveSentSpan: MatcherFunction<[expectedSpan: unknown]> = function (deliv
   const actual = delivery.requests.length === 0
     ? this.utils.RECEIVED_COLOR('[]')
     : this.utils.RECEIVED_COLOR('[\n    ') +
-      delivery.requests.map(({ payload }) => payload.resourceSpans.flatMap(({ scopeSpans }) => scopeSpans.flatMap(({ spans }) => spans.flatMap(({ attributes, ...rest }) => this.utils.printReceived({ ...rest })).join(',\n    ')))).join(',\n    ') +
+      delivery.requests.map(payload => payload.resourceSpans.flatMap(({ scopeSpans }) => scopeSpans.flatMap(({ spans }) => spans.flatMap(({ attributes, ...rest }) => this.utils.printReceived({ ...rest })).join(',\n    ')))).join(',\n    ') +
       this.utils.RECEIVED_COLOR('\n]')
 
   const message = () =>

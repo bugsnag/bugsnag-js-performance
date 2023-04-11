@@ -16,7 +16,7 @@ export class InMemoryQueue implements RetryQueue {
   private requestQueue: Promise<void> = Promise.resolve()
   private payloads: PayloadWithTimestamp[] = []
 
-  constructor (private delivery: Delivery, private endpoint: string, private apiKey: string, private retryQueueMaxSize: number) {}
+  constructor (private delivery: Delivery, private retryQueueMaxSize: number) {}
 
   add (payload: DeliveryPayload, time: number) {
     this.payloads.push({ payload, time })
@@ -46,7 +46,7 @@ export class InMemoryQueue implements RetryQueue {
         if (Date.now() >= time + msInDay) continue
 
         try {
-          const { state } = await this.delivery.send(this.endpoint, this.apiKey, payload)
+          const { state } = await this.delivery.send(payload)
 
           switch (state) {
             case 'success':

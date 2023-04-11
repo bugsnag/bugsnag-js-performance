@@ -11,19 +11,13 @@ import { InMemoryDelivery } from '@bugsnag/js-performance-test-utilities'
 describe('RetryQueue', () => {
   it('calls delivery after flushing', async () => {
     const delivery = new InMemoryDelivery()
-    const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key', 1000)
+    const retryQueue = new InMemoryQueue(delivery, 1000)
     const payload = generateFullPayload()
 
     retryQueue.add(payload, Date.now())
     await retryQueue.flush()
 
-    expect(delivery.requests).toStrictEqual([
-      {
-        apiKey: 'valid-api-key',
-        endpoint: '/traces',
-        payload
-      }
-    ])
+    expect(delivery.requests).toStrictEqual([payload])
   })
 
   it('limits the number of spans in the queue', async () => {
@@ -45,22 +39,16 @@ describe('RetryQueue', () => {
     }
 
     const delivery = new InMemoryDelivery()
-    const endpoint = '/traces'
-    const apiKey = 'valid-api-key'
-    const retryQueue = new InMemoryQueue(delivery, endpoint, apiKey, 1000)
+    const retryQueue = new InMemoryQueue(delivery, 1000)
 
     retryQueue.add(initialPayload, Date.now())
 
-    const expectedPayloads: Array<{
-      apiKey: string
-      endpoint: string
-      payload: DeliveryPayload
-    }> = []
+    const expectedPayloads: DeliveryPayload[] = []
 
     // add 1000 spans
     for (let i = 0; i <= 9; i++) {
       const payload = generateFullPayload()
-      expectedPayloads.push({ apiKey, endpoint, payload })
+      expectedPayloads.push(payload)
 
       retryQueue.add(payload, Date.now())
     }
@@ -72,12 +60,10 @@ describe('RetryQueue', () => {
   })
 
   it('awaits current delivery before flushing queue', async () => {
-    const endpoint = '/traces'
-    const apiKey = 'valid-api-key'
     let outstandingRequests = 0
 
     const delivery: Delivery = {
-      send: jest.fn((endpoint, apiKey, payload) => {
+      send: jest.fn(payload => {
         ++outstandingRequests
         expect(outstandingRequests).toBe(1)
 
@@ -92,7 +78,7 @@ describe('RetryQueue', () => {
       })
     }
 
-    const retryQueue = new InMemoryQueue(delivery, endpoint, apiKey, 1000)
+    const retryQueue = new InMemoryQueue(delivery, 1000)
 
     const payload1 = generateFullPayload(1)
     const payload2 = generateFullPayload(1)
@@ -109,9 +95,9 @@ describe('RetryQueue', () => {
 
     await Promise.all([flush1, flush2, flush3])
 
-    expect(delivery.send).toHaveBeenNthCalledWith(1, endpoint, apiKey, payload1)
-    expect(delivery.send).toHaveBeenNthCalledWith(2, endpoint, apiKey, payload2)
-    expect(delivery.send).toHaveBeenNthCalledWith(3, endpoint, apiKey, payload3)
+    expect(delivery.send).toHaveBeenNthCalledWith(1, payload1)
+    expect(delivery.send).toHaveBeenNthCalledWith(2, payload2)
+    expect(delivery.send).toHaveBeenNthCalledWith(3, payload3)
   })
 
   it('drops payloads that are at least 24 hours old', async () => {
