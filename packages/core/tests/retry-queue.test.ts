@@ -102,7 +102,7 @@ describe('RetryQueue', () => {
 
   it('drops payloads that are at least 24 hours old', async () => {
     const delivery = new InMemoryDelivery()
-    const retryQueue = new InMemoryQueue(delivery, '/traces', 'valid-api-key', 1000)
+    const retryQueue = new InMemoryQueue(delivery, 1000)
     const payloadToDiscard = generateFullPayload()
     const payloadToRetain = generateFullPayload()
 
@@ -111,11 +111,7 @@ describe('RetryQueue', () => {
 
     await retryQueue.flush()
 
-    expect(delivery.requests).toStrictEqual([{
-      apiKey: 'valid-api-key',
-      endpoint: '/traces',
-      payload: payloadToRetain
-    }])
+    expect(delivery.requests).toStrictEqual([payloadToRetain])
   })
 })
 
