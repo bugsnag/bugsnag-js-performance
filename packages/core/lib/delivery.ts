@@ -1,15 +1,13 @@
 import { type JsonAttribute } from './attributes'
 import { type Kind } from './span'
 
+export type DeliveryFactory = (apiKey: string, endpoint: string) => Delivery
+
 export type ResponseState = 'success' | 'failure-discard' | 'failure-retryable'
 interface Response { state: ResponseState }
 
 export interface Delivery {
-  send: (
-    endpoint: string,
-    apiKey: string,
-    payload: DeliveryPayload
-  ) => Promise<Response>
+  send: (payload: DeliveryPayload) => Promise<Response>
 }
 
 interface Resource {

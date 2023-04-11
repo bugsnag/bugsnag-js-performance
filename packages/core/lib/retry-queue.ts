@@ -9,7 +9,7 @@ export class InMemoryQueue implements RetryQueue {
   private payloads: DeliveryPayload[] = []
   private requestQueue: Promise<void> = Promise.resolve()
 
-  constructor (private delivery: Delivery, private endpoint: string, private apiKey: string, private retryQueueMaxSize: number) {}
+  constructor (private delivery: Delivery, private retryQueueMaxSize: number) {}
 
   add (payload: DeliveryPayload) {
     this.payloads.push(payload)
@@ -36,7 +36,7 @@ export class InMemoryQueue implements RetryQueue {
     this.requestQueue = this.requestQueue.then(async () => {
       for (const payload of payloads) {
         try {
-          const { state } = await this.delivery.send(this.endpoint, this.apiKey, payload)
+          const { state } = await this.delivery.send(payload)
 
           switch (state) {
             case 'success':

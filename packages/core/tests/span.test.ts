@@ -27,7 +27,7 @@ describe('Span', () => {
     ])('uses default clock implementation if startTime is invalid ($type)', ({ startTime }) => {
       const delivery = new InMemoryDelivery()
       const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-      const client = createTestClient({ delivery, clock })
+      const client = createTestClient({ deliveryFactory: () => delivery, clock })
       client.start({ apiKey: VALID_API_KEY })
 
       // @ts-expect-error startTime will be invalid
@@ -46,7 +46,7 @@ describe('Span', () => {
     it('can be ended without an endTime', () => {
       const delivery = new InMemoryDelivery()
       const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-      const client = createTestClient({ delivery, clock })
+      const client = createTestClient({ deliveryFactory: () => delivery, clock })
       client.start({ apiKey: VALID_API_KEY })
 
       const span = client.startSpan('test span')
@@ -68,7 +68,7 @@ describe('Span', () => {
     it('accepts a Date object as endTime', () => {
       const clock = new IncrementingClock('2023-01-02T03:04:05.006Z')
       const delivery = new InMemoryDelivery()
-      const client = createTestClient({ clock, delivery })
+      const client = createTestClient({ deliveryFactory: () => delivery, clock })
       client.start({ apiKey: VALID_API_KEY })
 
       const span = client.startSpan('test span')
@@ -91,7 +91,7 @@ describe('Span', () => {
       const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
       const delivery = new InMemoryDelivery()
 
-      const client = createTestClient({ clock, delivery })
+      const client = createTestClient({ deliveryFactory: () => delivery, clock })
       client.start({ apiKey: VALID_API_KEY })
 
       const span = client.startSpan('test span')

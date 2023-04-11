@@ -4,7 +4,7 @@
 
 import { type DeliveryPayload } from '@bugsnag/js-performance-core'
 import { ControllableBackgroundingListener } from '@bugsnag/js-performance-test-utilities'
-import createDelivery from '../lib/delivery'
+import createBrowserDeliveryFactory from '../lib/delivery'
 
 describe('Browser Delivery', () => {
   it('delivers a span', () => {
@@ -28,8 +28,9 @@ describe('Browser Delivery', () => {
       }]
     }
 
-    const delivery = createDelivery(fetch, backgroundingListener)
-    delivery.send('/test', 'test-api-key', deliveryPayload)
+    const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
+    const delivery = deliveryFactory('test-api-key', '/test')
+    delivery.send(deliveryPayload)
 
     expect(fetch).toHaveBeenCalledWith('/test', {
       method: 'POST',
@@ -64,11 +65,12 @@ describe('Browser Delivery', () => {
       }]
     }
 
-    const delivery = createDelivery(fetch, backgroundingListener)
+    const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
+    const delivery = deliveryFactory('test-api-key', '/test')
 
     backgroundingListener.sendToBackground()
 
-    delivery.send('/test', 'test-api-key', deliveryPayload)
+    delivery.send(deliveryPayload)
 
     expect(fetch).toHaveBeenCalledWith('/test', {
       method: 'POST',
@@ -103,12 +105,13 @@ describe('Browser Delivery', () => {
       }]
     }
 
-    const delivery = createDelivery(fetch, backgroundingListener)
+    const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
+    const delivery = deliveryFactory('test-api-key', '/test')
 
     backgroundingListener.sendToBackground()
     backgroundingListener.sendToForeground()
 
-    delivery.send('/test', 'test-api-key', deliveryPayload)
+    delivery.send(deliveryPayload)
 
     expect(fetch).toHaveBeenCalledWith('/test', {
       method: 'POST',

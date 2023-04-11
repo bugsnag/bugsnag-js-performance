@@ -3,7 +3,7 @@ import { type BackgroundingListener } from './backgrounding-listener'
 import { BatchProcessor } from './batch-processor'
 import { type Clock } from './clock'
 import { validateConfig, type Configuration, type CoreSchema } from './config'
-import { type Delivery } from './delivery'
+import { type DeliveryFactory } from './delivery'
 import { type IdGenerator } from './id-generator'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
@@ -31,7 +31,7 @@ function sanitizeTime (clock: Clock, time?: Time): number {
 export interface ClientOptions {
   clock: Clock
   idGenerator: IdGenerator
-  delivery: Delivery
+  deliveryFactory: DeliveryFactory
   backgroundingListener: BackgroundingListener
   resourceAttributesSource: ResourceAttributeSource
   spanAttributesSource: SpanAttributesSource
@@ -45,8 +45,11 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
   return {
     start: (config: Configuration | string) => {
       const configuration = validateConfig(config, options.schema)
-      const retryQueue = new InMemoryQueue(options.delivery, configuration.endpoint, configuration.apiKey, configuration.retryQueueMaxSize)
-      processor = new BatchProcessor(options.delivery, configuration, options.resourceAttributesSource, options.clock, retryQueue)
+
+      const delivery = options.deliveryFactory(configuration.apiKey, configuration.endpoint)
+
+      const retryQueue = new InMemoryQueue(delivery, configuration.retryQueueMaxSize)
+      processor = new BatchProcessor(delivery, configuration, options.resourceAttributesSource, options.clock, retryQueue)
 
       // ensure all spans started before .start() are added to the batch
       bufferingProcessor.spans.forEach(span => {

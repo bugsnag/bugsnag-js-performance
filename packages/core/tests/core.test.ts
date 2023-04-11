@@ -188,7 +188,7 @@ describe('Core', () => {
           const delivery = new InMemoryDelivery()
           const backgroundingListener = new ControllableBackgroundingListener()
 
-          const client = createTestClient({ backgroundingListener, delivery })
+          const client = createTestClient({ backgroundingListener, deliveryFactory: () => delivery })
           client.start(VALID_API_KEY)
 
           client.startSpan('Span 1').end()
@@ -202,7 +202,7 @@ describe('Core', () => {
 
           expect(delivery.requests).toHaveLength(1)
 
-          const payload = delivery.requests[0].payload
+          const payload = delivery.requests[0]
           const spans = payload.resourceSpans[0].scopeSpans[0].spans
 
           expect(spans).toHaveLength(2)
@@ -216,7 +216,7 @@ describe('Core', () => {
           const delivery = new InMemoryDelivery()
           const backgroundingListener = new ControllableBackgroundingListener()
 
-          const client = createTestClient({ backgroundingListener, delivery })
+          const client = createTestClient({ backgroundingListener, deliveryFactory: () => delivery })
           client.start(VALID_API_KEY)
 
           expect(delivery.requests).toHaveLength(0)
