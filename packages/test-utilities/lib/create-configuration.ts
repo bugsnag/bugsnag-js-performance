@@ -16,6 +16,7 @@ function createConfiguration (overrides: Partial<InternalConfiguration> = {}): I
       error: jest.fn()
     },
     appVersion: '',
+    samplingProbability: 1.0,
     ...overrides
   }
 }
