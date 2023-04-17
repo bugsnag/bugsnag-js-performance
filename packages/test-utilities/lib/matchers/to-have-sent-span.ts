@@ -47,11 +47,11 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
     interface AsymmetricMatchers {
-      toHaveSentSpan: (span: DeliverySpan) => void
+      toHaveSentSpan: (span: Partial<DeliverySpan>) => void
     }
 
     interface Matchers<R> {
-      toHaveSentSpan: (span: DeliverySpan) => R
+      toHaveSentSpan: (span: Partial<DeliverySpan>) => R
     }
   }
 }
