@@ -4,6 +4,7 @@ import { type InternalConfiguration } from './config'
 import { type Delivery } from './delivery'
 import { type Processor } from './processor'
 import { type RetryQueue } from './retry-queue'
+import type Sampler from './sampler'
 import { spanToJson, type SpanEnded } from './span'
 
 export class BatchProcessor implements Processor {
@@ -15,7 +16,8 @@ export class BatchProcessor implements Processor {
     private configuration: InternalConfiguration,
     private resourceAttributeSource: ResourceAttributeSource,
     private clock: Clock,
-    private retryQueue: RetryQueue
+    private retryQueue: RetryQueue,
+    private sampler: Sampler
   ) {
     this.flush = this.flush.bind(this)
   }
@@ -76,9 +78,13 @@ export class BatchProcessor implements Processor {
     const batchTime = Date.now()
 
     try {
-      const { state } = await this.delivery.send(payload)
+      const response = await this.delivery.send(payload)
 
-      switch (state) {
+      if (response.samplingProbability !== undefined) {
+        this.sampler.probability = response.samplingProbability
+      }
+
+      switch (response.state) {
         case 'success':
           this.retryQueue.flush()
           break
@@ -90,7 +96,7 @@ export class BatchProcessor implements Processor {
           this.retryQueue.add(payload, batchTime)
           break
         default: {
-          const _exhaustiveCheck: never = state
+          const _exhaustiveCheck: never = response.state
           return _exhaustiveCheck
         }
       }
