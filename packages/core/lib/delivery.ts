@@ -4,7 +4,11 @@ import { type Kind } from './span'
 export type DeliveryFactory = (apiKey: string, endpoint: string) => Delivery
 
 export type ResponseState = 'success' | 'failure-discard' | 'failure-retryable'
-interface Response { state: ResponseState }
+
+interface Response {
+  state: ResponseState
+  samplingProbability?: number
+}
 
 export interface Delivery {
   send: (payload: DeliveryPayload) => Promise<Response>
