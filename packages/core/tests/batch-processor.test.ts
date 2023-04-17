@@ -1,4 +1,5 @@
 import { BatchProcessor } from '../lib/batch-processor'
+import Sampler from '../lib/sampler'
 import {
   IncrementingClock,
   InMemoryDelivery,
@@ -17,7 +18,8 @@ describe('BatchProcessor', () => {
       createConfiguration(),
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
-      { add: jest.fn(), flush: jest.fn() }
+      { add: jest.fn(), flush: jest.fn() },
+      new Sampler(1.0)
     )
 
     // add 99 spans
@@ -39,7 +41,8 @@ describe('BatchProcessor', () => {
       createConfiguration(),
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
-      { add: jest.fn(), flush: jest.fn() }
+      { add: jest.fn(), flush: jest.fn() },
+      new Sampler(1.0)
     )
 
     batchProcessor.add(createEndedSpan())
@@ -58,7 +61,8 @@ describe('BatchProcessor', () => {
       createConfiguration(),
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
-      { add: jest.fn(), flush: jest.fn() }
+      { add: jest.fn(), flush: jest.fn() },
+      new Sampler(1.0)
     )
 
     batchProcessor.add(createEndedSpan())
@@ -82,7 +86,8 @@ describe('BatchProcessor', () => {
       createConfiguration({ enabledReleaseStages: ['production'], releaseStage: 'test' }),
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
-      { add: jest.fn(), flush: jest.fn() }
+      { add: jest.fn(), flush: jest.fn() },
+      new Sampler(1.0)
     )
 
     batchProcessor.add(createEndedSpan())
@@ -102,7 +107,8 @@ describe('BatchProcessor', () => {
       createConfiguration({ logger }),
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
-      retryQueue
+      retryQueue,
+      new Sampler(1.0)
     )
 
     delivery.setNextResponseState('failure-retryable')
@@ -127,7 +133,8 @@ describe('BatchProcessor', () => {
       createConfiguration({ logger }),
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
-      retryQueue
+      retryQueue,
+      new Sampler(1.0)
     )
 
     delivery.setNextResponseState('failure-discard')
@@ -152,7 +159,8 @@ describe('BatchProcessor', () => {
       createConfiguration({ logger }),
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
-      retryQueue
+      retryQueue,
+      new Sampler(1.0)
     )
 
     batchProcessor.add(createEndedSpan())
@@ -163,5 +171,30 @@ describe('BatchProcessor', () => {
     expect(retryQueue.add).not.toHaveBeenCalled()
     expect(retryQueue.flush).toHaveBeenCalled()
     expect(logger.warn).not.toHaveBeenCalled()
+  })
+
+  it('updates the sampling probability when the response returns a new probability', async () => {
+    const delivery = new InMemoryDelivery()
+    const sampler = new Sampler(1.0)
+
+    const batchProcessor = new BatchProcessor(
+      delivery,
+      createConfiguration(),
+      resourceAttributesSource,
+      new IncrementingClock('1970-01-01T00:00:00Z'),
+      { add: jest.fn(), flush: jest.fn() },
+      sampler
+    )
+
+    batchProcessor.add(createEndedSpan())
+
+    delivery.setNextSamplingProbability(0.0)
+
+    expect(sampler.probability).toBe(1.0)
+
+    await jest.runAllTimersAsync()
+
+    expect(sampler.probability).toBe(0.0)
+    expect(delivery.requests).toHaveLength(1)
   })
 })
