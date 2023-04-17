@@ -89,7 +89,8 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
               startTime: safeStartTime,
               endTime: safeEndTime,
               attributes,
-              samplingRate
+              samplingRate,
+              samplingProbability: sampler.probability
             }
 
             processor.add(span)

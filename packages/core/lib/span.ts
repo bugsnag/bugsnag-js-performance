@@ -26,6 +26,7 @@ export interface SpanInternal {
   readonly startTime: number // stored in the format returned from Clock.now (see clock.ts)
   endTime?: number // stored in the format returned from Clock.now (see clock.ts) - written once when 'end' is called
   readonly samplingRate: number
+  readonly samplingProbability?: number
 }
 
 export type SpanEnded = Required<SpanInternal>
