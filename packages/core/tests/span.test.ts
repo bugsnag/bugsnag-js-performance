@@ -109,5 +109,98 @@ describe('Span', () => {
         endTimeUnixNano: '4321000000'
       })
     })
+
+    it('will always be sampled when probability is 1', () => {
+      const delivery = new InMemoryDelivery()
+
+      const client = createTestClient({ deliveryFactory: () => delivery })
+      client.start({
+        apiKey: VALID_API_KEY,
+        samplingProbability: 1
+      })
+
+      const span = client.startSpan('test span')
+      span.end()
+
+      jest.runAllTimers()
+
+      expect(delivery.requests).toHaveLength(1)
+    })
+
+    it('will always be discarded when probability is 0', () => {
+      const delivery = new InMemoryDelivery()
+
+      const client = createTestClient({ deliveryFactory: () => delivery })
+      client.start({
+        apiKey: VALID_API_KEY,
+        samplingProbability: 0
+      })
+
+      const span = client.startSpan('test span')
+      span.end()
+
+      jest.runAllTimers()
+
+      expect(delivery.requests).toHaveLength(0)
+    })
+
+    it('will sample spans based on their traceId', () => {
+      const delivery = new InMemoryDelivery()
+
+      // trace IDs with known sampling rates; this allows us to check that the
+      // first span is sampled and the second is discarded with a specific
+      // sampling probability
+      const traceIds = [
+        '0123456789abcdeffedcba9876543210', // samplingRate: 0
+        'a0b1c2d3e4f5a0b1c2d3e4f5a0b1c2d3', // samplingRate: 0.14902140296740024
+        '7eb23db1d1456caa839b662f3729d23c' // samplingRate: 0.10653525779641589
+      ]
+
+      const idGenerator = {
+        generate (bits: 64 | 128) {
+          if (bits === 128) {
+            const id = traceIds.shift()
+
+            if (id) {
+              return id
+            }
+
+            throw new Error('Too many trace IDs were generated!')
+          }
+
+          return 'a span ID'
+        }
+      }
+
+      const client = createTestClient({
+        deliveryFactory: () => delivery,
+        idGenerator
+      })
+
+      client.start({
+        apiKey: VALID_API_KEY,
+        // 0.14 as the second span's trace ID results in a sampling rate greater
+        // than this but the other two are smaller
+        samplingProbability: 0.14
+      })
+
+      client.startSpan('span 1').end()
+      client.startSpan('span 2').end()
+      client.startSpan('span 3').end()
+
+      jest.runAllTimers()
+
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: 'span 1'
+      }))
+
+      expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+        name: 'span 2'
+      }))
+
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: 'span 3'
+      }))
+    })
   })
 })

@@ -50,6 +50,8 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
     start: (config: Configuration | string) => {
       const configuration = validateConfig(config, options.schema)
 
+      sampler.probability = configuration.samplingProbability
+
       const delivery = options.deliveryFactory(configuration.apiKey, configuration.endpoint)
 
       const retryQueue = new InMemoryQueue(delivery, configuration.retryQueueMaxSize)
