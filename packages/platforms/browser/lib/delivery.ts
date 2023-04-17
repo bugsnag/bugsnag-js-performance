@@ -7,6 +7,22 @@ import {
 
 export type Fetch = typeof fetch
 
+function samplingProbabilityFromHeaders (headers: Headers): number | undefined {
+  const value = headers.get('Bugsnag-Sampling-Probability')
+
+  if (typeof value !== 'string') {
+    return undefined
+  }
+
+  const asNumber = Number.parseFloat(value)
+
+  if (Number.isNaN(asNumber) || asNumber < 0 || asNumber > 1) {
+    return undefined
+  }
+
+  return asNumber
+}
+
 function createBrowserDeliveryFactory (fetch: Fetch, backgroundingListener: BackgroundingListener): DeliveryFactory {
   // we set fetch's 'keepalive' flag if the app is backgrounded/terminated so
   // that we can flush the last batch - without 'keepalive' the browser can
@@ -35,7 +51,10 @@ function createBrowserDeliveryFactory (fetch: Fetch, backgroundingListener: Back
             }
           })
 
-          return { state: responseStateFromStatusCode(response.status) }
+          return {
+            state: responseStateFromStatusCode(response.status),
+            samplingProbability: samplingProbabilityFromHeaders(response.headers)
+          }
         } catch (err) {
           return { state: 'failure-retryable' }
         }
