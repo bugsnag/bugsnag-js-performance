@@ -25,6 +25,7 @@ export function createEndedSpan (overrides: Partial<SpanEnded> = {}): SpanEnded 
   return {
     ...createSpan(),
     endTime: 23456,
+    samplingProbability: 0.5,
     ...overrides
   }
 }
