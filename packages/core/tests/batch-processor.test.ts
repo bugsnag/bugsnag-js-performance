@@ -6,6 +6,7 @@ import {
   createConfiguration,
   createEndedSpan
 } from '@bugsnag/js-performance-test-utilities'
+import Sampler from '../lib/sampler'
 
 jest.useFakeTimers()
 
@@ -14,7 +15,8 @@ describe('BatchProcessor', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
-    const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock, retryQueue)
+    const sampler = new Sampler(0.5)
+    const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock, retryQueue, sampler)
 
     // add 99 spans
     for (let i = 0; i < 99; i++) {
@@ -32,7 +34,8 @@ describe('BatchProcessor', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
-    const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock, retryQueue)
+    const sampler = new Sampler(0.5)
+    const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock, retryQueue, sampler)
 
     batchProcessor.add(createEndedSpan())
 
@@ -47,7 +50,9 @@ describe('BatchProcessor', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
-    const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock, retryQueue)
+    const sampler = new Sampler(0.5)
+
+    const batchProcessor = new BatchProcessor(delivery, createConfiguration(), resourceAttributesSource, clock, retryQueue, sampler)
 
     batchProcessor.add(createEndedSpan())
 
@@ -68,7 +73,8 @@ describe('BatchProcessor', () => {
     const delivery = new InMemoryDelivery()
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const configuration = createConfiguration({ enabledReleaseStages: ['production'], releaseStage: 'test' })
-    const batchProcessor = new BatchProcessor(delivery, configuration, resourceAttributesSource, clock, retryQueue)
+    const sampler = new Sampler(0.5)
+    const batchProcessor = new BatchProcessor(delivery, configuration, resourceAttributesSource, clock, retryQueue, sampler)
 
     batchProcessor.add(createEndedSpan())
 
@@ -82,7 +88,8 @@ describe('BatchProcessor', () => {
     const delivery = new InMemoryDelivery()
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
-    const batchProcessor = new BatchProcessor(delivery, createConfiguration({ logger }), resourceAttributesSource, clock, retryQueue)
+    const sampler = new Sampler(0.5)
+    const batchProcessor = new BatchProcessor(delivery, createConfiguration({ logger }), resourceAttributesSource, clock, retryQueue, sampler)
 
     delivery.setNextResponseState('failure-retryable')
 
@@ -101,7 +108,8 @@ describe('BatchProcessor', () => {
     const delivery = new InMemoryDelivery()
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
-    const batchProcessor = new BatchProcessor(delivery, createConfiguration({ logger }), resourceAttributesSource, clock, retryQueue)
+    const sampler = new Sampler(0.5)
+    const batchProcessor = new BatchProcessor(delivery, createConfiguration({ logger }), resourceAttributesSource, clock, retryQueue, sampler)
 
     delivery.setNextResponseState('failure-discard')
 
@@ -120,7 +128,8 @@ describe('BatchProcessor', () => {
     const delivery = new InMemoryDelivery()
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
-    const batchProcessor = new BatchProcessor(delivery, createConfiguration({ logger }), resourceAttributesSource, clock, retryQueue)
+    const sampler = new Sampler(0.5)
+    const batchProcessor = new BatchProcessor(delivery, createConfiguration({ logger }), resourceAttributesSource, clock, retryQueue, sampler)
 
     batchProcessor.add(createEndedSpan())
 

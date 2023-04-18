@@ -4,6 +4,7 @@ import { type InternalConfiguration } from './config'
 import { type Delivery } from './delivery'
 import { type Processor } from './processor'
 import { type RetryQueue } from './retry-queue'
+import type Sampler from './sampler'
 import { spanToJson, type SpanEnded } from './span'
 
 export class BatchProcessor implements Processor {
@@ -15,7 +16,8 @@ export class BatchProcessor implements Processor {
     private configuration: InternalConfiguration,
     private resourceAttributeSource: ResourceAttributeSource,
     private clock: Clock,
-    private retryQueue: RetryQueue
+    private retryQueue: RetryQueue,
+    private sampler: Sampler
   ) {
     this.flush = this.flush.bind(this)
   }
@@ -55,7 +57,11 @@ export class BatchProcessor implements Processor {
       return
     }
 
-    const batch = this.batch
+    // Update sampling values and re-sample
+    const batch = this.batch.map((span) => ({
+      ...span,
+      samplingProbability: Math.min(span.samplingProbability, this.sampler.probability)
+    }))
     this.batch = []
 
     const payload = {
