@@ -61,7 +61,7 @@ export class BatchProcessor implements Processor {
     const batch = this.batch.map((span) => ({
       ...span,
       samplingProbability: Math.min(span.samplingProbability, this.sampler.probability)
-    }))
+    })).filter(({ samplingRate }) => this.sampler.sample(samplingRate))
     this.batch = []
 
     const payload = {
