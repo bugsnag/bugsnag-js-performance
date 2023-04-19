@@ -45,8 +45,8 @@ steps:
           setup:
             browser: [chrome, firefox, edge]
             version: [latest]
-          adjustments:
-            - with: { browser: safari, version: 16 }
+#          adjustments:
+#            - with: { browser: safari, version: 16 }
 
       # BrowserStack
       - label: ":{{ matrix.browser }}: {{ matrix.version }} Browser tests"
