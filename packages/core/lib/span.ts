@@ -1,8 +1,11 @@
-import { type SpanAttributes } from './attributes'
+import { SpanAttributes, type SpanAttribute, type SpanAttributesSource } from './attributes'
 import { type Clock } from './clock'
 import { type DeliverySpan } from './delivery'
-
-export type Time = Date | number
+import { type IdGenerator } from './id-generator'
+import { type Processor } from './processor'
+import type Sampler from './sampler'
+import sanitizeTime, { type Time } from './time'
+import traceIdToSamplingRate from './trace-id-to-sampling-rate'
 
 export interface Span {
   end: (endTime?: Time) => void
@@ -17,17 +20,6 @@ export const enum Kind {
   Consumer = 5
 }
 
-export interface SpanInternal {
-  readonly id: string // 64 bit random string
-  readonly name: string
-  readonly kind: Kind
-  readonly traceId: string // 128 bit random string
-  readonly attributes: SpanAttributes
-  readonly startTime: number // stored in the format returned from Clock.now (see clock.ts)
-  endTime?: number // stored in the format returned from Clock.now (see clock.ts) - written once when 'end' is called
-  readonly samplingRate: number
-}
-
 // use a unique symbol to define a 'SpanProbability' type that can't be confused
 // with the 'number' type
 // this prevents the wrong kind of number being assigned to the span's
@@ -36,7 +28,15 @@ export interface SpanInternal {
 declare const validSpanProbability: unique symbol
 export type SpanProbability = number & { [validSpanProbability]: true }
 
-export type SpanEnded = Required<SpanInternal> & {
+export interface SpanEnded {
+  readonly id: string // 64 bit random string
+  readonly name: string
+  readonly kind: Kind
+  readonly traceId: string // 128 bit random string
+  readonly attributes: SpanAttributes
+  readonly startTime: number // stored in the format returned from Clock.now (see clock.ts)
+  readonly samplingRate: number
+  readonly endTime: number // stored in the format returned from Clock.now (see clock.ts) - written once when 'end' is called
   samplingProbability: SpanProbability
 }
 
@@ -49,5 +49,65 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
     startTimeUnixNano: clock.toUnixTimestampNanoseconds(span.startTime),
     endTimeUnixNano: clock.toUnixTimestampNanoseconds(span.endTime),
     attributes: span.attributes.toJson()
+  }
+}
+
+interface Event {
+  name: string
+  time: Time
+}
+
+export class SpanInternal {
+  private id: string
+  private events: Event[] = []
+  private traceId: string
+  private startTime: number
+  private samplingRate: number
+  private kind = Kind.Client // TODO: How do we define the initial Kind?
+
+  constructor (private name: string, startTime: number, private attributes: SpanAttributes, private clock: Clock, idGenerator: IdGenerator, private sampler: Sampler) {
+    this.id = idGenerator.generate(64)
+    this.traceId = idGenerator.generate(128)
+    this.startTime = sanitizeTime(clock, startTime)
+    this.samplingRate = traceIdToSamplingRate(this.traceId)
+  }
+
+  end (endTime?: Time): SpanEnded {
+    const safeEndTime = sanitizeTime(this.clock, endTime)
+
+    return {
+      id: this.id,
+      name: this.name,
+      kind: this.kind,
+      traceId: this.traceId,
+      startTime: this.startTime,
+      endTime: safeEndTime,
+      attributes: this.attributes,
+      samplingRate: this.samplingRate,
+      samplingProbability: this.sampler.spanProbability
+    }
+  }
+
+  addEvent (name: string, time: Time) {
+    this.events.push({ name, time })
+  }
+
+  setAttribute (name: string, value: SpanAttribute) {
+    this.attributes.set(name, value)
+  }
+
+  toPublicApi (): Span {
+    return { end: this.end }
+  }
+}
+
+export function createSpanFactory (processor: Processor, clock: Clock, spanAttributesSource: SpanAttributesSource, idGenerator: IdGenerator, sampler: Sampler) {
+  return {
+    startSpan (name: string, startTime?: Time) {
+      const attributes = new SpanAttributes(spanAttributesSource())
+      const safeStartTime = sanitizeTime(clock, startTime)
+
+      return new SpanInternal(name, safeStartTime, attributes, clock, idGenerator, sampler)
+    }
   }
 }
