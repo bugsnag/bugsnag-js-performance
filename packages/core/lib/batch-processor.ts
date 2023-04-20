@@ -57,7 +57,11 @@ export class BatchProcessor implements Processor {
       return
     }
 
-    const batch = this.batch
+    // Update sampling values and re-sample
+    const batch = this.batch.map((span) => ({
+      ...span,
+      samplingProbability: Math.min(span.samplingProbability, this.sampler.probability)
+    }))
     this.batch = []
 
     const payload = {
