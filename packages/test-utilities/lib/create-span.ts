@@ -1,6 +1,7 @@
 import {
   type SpanEnded,
   type SpanInternal,
+  type SpanProbability,
   SpanAttributes,
   traceIdToSamplingRate
 } from '@bugsnag/js-performance-core'
@@ -25,6 +26,7 @@ export function createEndedSpan (overrides: Partial<SpanEnded> = {}): SpanEnded 
   return {
     ...createSpan(),
     endTime: 23456,
+    samplingProbability: Math.floor(0.5 * 0xffffffff) as SpanProbability,
     ...overrides
   }
 }
