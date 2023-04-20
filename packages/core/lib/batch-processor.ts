@@ -53,28 +53,10 @@ export class BatchProcessor implements Processor {
   async flush () {
     this.stop()
 
-    if (this.batch.length === 0) {
-      return
-    }
+    const batch = this.prepareBatch()
 
-    // Update sampling values and re-sample
-    const batch: DeliverySpan[] = []
-    const probability = this.sampler.spanProbability
-
-    for (const span of this.batch) {
-      if (span.samplingProbability < probability) {
-        span.samplingProbability = probability
-      }
-
-      if (this.sampler.sample(span)) {
-        batch.push(spanToJson(span, this.clock))
-      }
-    }
-
-    this.batch = []
-
-    // if every span was discarded, don't send an empty request
-    if (batch.length === 0) {
+    // we either had nothing in the batch originally or all spans were discarded
+    if (!batch) {
       return
     }
 
@@ -117,5 +99,35 @@ export class BatchProcessor implements Processor {
     } catch (err) {
       this.configuration.logger.warn('delivery failed')
     }
+  }
+
+  private prepareBatch (): DeliverySpan[] | undefined {
+    if (this.batch.length === 0) {
+      return
+    }
+
+    // update sampling values if necessary and re-sample
+    const batch: DeliverySpan[] = []
+    const probability = this.sampler.spanProbability
+
+    for (const span of this.batch) {
+      if (span.samplingProbability < probability) {
+        span.samplingProbability = probability
+      }
+
+      if (this.sampler.sample(span)) {
+        batch.push(spanToJson(span, this.clock))
+      }
+    }
+
+    // clear out the current batch so we're ready to start a new one
+    this.batch = []
+
+    // if every span was discarded there's nothing to send
+    if (batch.length === 0) {
+      return
+    }
+
+    return batch
   }
 }
