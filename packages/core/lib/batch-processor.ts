@@ -62,7 +62,13 @@ export class BatchProcessor implements Processor {
       ...span,
       samplingProbability: Math.min(span.samplingProbability, this.sampler.probability)
     })).filter(({ samplingRate }) => this.sampler.sample(samplingRate))
+
     this.batch = []
+
+    // if every span was discarded, don't send an empty request
+    if (batch.length === 0) {
+      return
+    }
 
     const payload = {
       resourceSpans: [
