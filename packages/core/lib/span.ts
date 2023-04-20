@@ -28,8 +28,16 @@ export interface SpanInternal {
   readonly samplingRate: number
 }
 
+// use a unique symbol to define a 'SpanProbability' type that can't be confused
+// with the 'number' type
+// this prevents the wrong kind of number being assigned to the span's
+// samplingProbability
+// this exists only in the type system; at runtime it's a regular number
+declare const validSpanProbability: unique symbol
+export type SpanProbability = number & { [validSpanProbability]: true }
+
 export type SpanEnded = Required<SpanInternal> & {
-  samplingProbability: number
+  samplingProbability: SpanProbability
 }
 
 export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
