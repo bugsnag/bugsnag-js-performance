@@ -1,4 +1,5 @@
 import Sampler from '../lib/sampler'
+import { createEndedSpan } from '@bugsnag/js-performance-test-utilities'
 
 describe('Sampler', () => {
   it('uses the initial probability', () => {
@@ -17,28 +18,46 @@ describe('Sampler', () => {
   describe('sample', () => {
     it('returns true when the samplingRate should be sampled with initial probability', () => {
       const sampler = new Sampler(0.75)
+      const span = createEndedSpan({
+        samplingRate: Math.floor(0.5 * 0xffffffff),
+        samplingProbability: sampler.spanProbability
+      })
 
-      expect(sampler.sample(Math.floor(0.5 * 0xffffffff))).toBe(true)
+      expect(sampler.sample(span)).toBe(true)
     })
 
     it('returns false when the samplingRate should not be sampled with initial probability', () => {
       const sampler = new Sampler(0.25)
+      const span = createEndedSpan({
+        samplingRate: Math.floor(0.5 * 0xffffffff),
+        samplingProbability: sampler.spanProbability
+      })
 
-      expect(sampler.sample(Math.floor(0.5 * 0xffffffff))).toBe(false)
+      expect(sampler.sample(span)).toBe(false)
     })
 
     it('returns true when the samplingRate should be sampled with a set probability', () => {
       const sampler = new Sampler(1.0)
       sampler.probability = 0.75
 
-      expect(sampler.sample(Math.floor(0.5 * 0xffffffff))).toBe(true)
+      const span = createEndedSpan({
+        samplingRate: Math.floor(0.5 * 0xffffffff),
+        samplingProbability: sampler.spanProbability
+      })
+
+      expect(sampler.sample(span)).toBe(true)
     })
 
     it('returns false when the samplingRate should not be sampled with a set probability', () => {
       const sampler = new Sampler(1.0)
       sampler.probability = 0.25
 
-      expect(sampler.sample(Math.floor(0.5 * 0xffffffff))).toBe(false)
+      const span = createEndedSpan({
+        samplingRate: Math.floor(0.5 * 0xffffffff),
+        samplingProbability: sampler.spanProbability
+      })
+
+      expect(sampler.sample(span)).toBe(false)
     })
 
     it.each([
@@ -112,7 +131,12 @@ describe('Sampler', () => {
       const sampler = new Sampler(1.0)
       sampler.probability = probability
 
-      expect(sampler.sample(Math.floor(rate * 0xffffffff))).toBe(expected)
+      const span = createEndedSpan({
+        samplingRate: Math.floor(rate * 0xffffffff),
+        samplingProbability: sampler.spanProbability
+      })
+
+      expect(sampler.sample(span)).toBe(expected)
     })
   })
 })

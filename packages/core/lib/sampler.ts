@@ -1,3 +1,5 @@
+import { type SpanEnded } from './span'
+
 // sampling rates are stored as a number between 0 and 0xffffffff (i.e. they are
 // u32s) so we need to scale the probability value to match this range as they
 // are stored as values between 0 and 1
@@ -36,8 +38,8 @@ class Sampler {
     return this.scaledProbability
   }
 
-  sample (samplingRate: number): boolean {
-    return samplingRate <= this.scaledProbability
+  sample (span: SpanEnded): boolean {
+    return span.samplingRate <= span.samplingProbability
   }
 }
 

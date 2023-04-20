@@ -58,10 +58,12 @@ export class BatchProcessor implements Processor {
     }
 
     // Update sampling values and re-sample
-    const batch = this.batch.map((span) => ({
-      ...span,
-      samplingProbability: Math.min(span.samplingProbability, this.sampler.spanProbability)
-    })).filter(({ samplingRate }) => this.sampler.sample(samplingRate))
+    const batch = this.batch
+      .map(span => ({
+        ...span,
+        samplingProbability: Math.min(span.samplingProbability, this.sampler.spanProbability)
+      }))
+      .filter(span => this.sampler.sample(span))
 
     this.batch = []
 

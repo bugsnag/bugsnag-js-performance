@@ -84,21 +84,20 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
         end: (endTime) => {
           const safeEndTime = sanitizeTime(options.clock, endTime)
           const traceId = options.idGenerator.generate(128)
-          const samplingRate = traceIdToSamplingRate(traceId)
 
-          if (sampler.sample(samplingRate)) {
-            const span: SpanEnded = {
-              name,
-              kind: Kind.Client, // TODO: How do we define the current kind?
-              id: options.idGenerator.generate(64),
-              traceId,
-              startTime: safeStartTime,
-              endTime: safeEndTime,
-              attributes,
-              samplingRate,
-              samplingProbability: sampler.spanProbability
-            }
+          const span: SpanEnded = {
+            name,
+            kind: Kind.Client, // TODO: How do we define the current kind?
+            id: options.idGenerator.generate(64),
+            traceId,
+            startTime: safeStartTime,
+            endTime: safeEndTime,
+            attributes,
+            samplingRate: traceIdToSamplingRate(traceId),
+            samplingProbability: sampler.spanProbability
+          }
 
+          if (sampler.sample(span)) {
             processor.add(span)
           }
         }
