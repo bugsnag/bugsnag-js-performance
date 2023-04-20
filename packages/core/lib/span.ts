@@ -29,7 +29,7 @@ export interface SpanInternal {
 }
 
 export type SpanEnded = Required<SpanInternal> & {
-  readonly samplingProbability: number
+  samplingProbability: number
 }
 
 export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {

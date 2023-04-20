@@ -1,7 +1,7 @@
 import { type ResourceAttributeSource } from './attributes'
 import { type Clock } from './clock'
 import { type InternalConfiguration } from './config'
-import { type Delivery } from './delivery'
+import { type Delivery, type DeliverySpan } from './delivery'
 import { type Processor } from './processor'
 import { type RetryQueue } from './retry-queue'
 import type Sampler from './sampler'
@@ -58,12 +58,18 @@ export class BatchProcessor implements Processor {
     }
 
     // Update sampling values and re-sample
-    const batch = this.batch
-      .map(span => ({
-        ...span,
-        samplingProbability: Math.min(span.samplingProbability, this.sampler.spanProbability)
-      }))
-      .filter(span => this.sampler.sample(span))
+    const batch: DeliverySpan[] = []
+    const probability = this.sampler.spanProbability
+
+    for (const span of this.batch) {
+      if (span.samplingProbability < probability) {
+        span.samplingProbability = probability
+      }
+
+      if (this.sampler.sample(span)) {
+        batch.push(spanToJson(span, this.clock))
+      }
+    }
 
     this.batch = []
 
@@ -78,11 +84,7 @@ export class BatchProcessor implements Processor {
           resource: {
             attributes: this.resourceAttributeSource(this.configuration).toJson()
           },
-          scopeSpans: [
-            {
-              spans: batch.map((span) => spanToJson(span, this.clock))
-            }
-          ]
+          scopeSpans: [{ spans: batch }]
         }
       ]
     }
