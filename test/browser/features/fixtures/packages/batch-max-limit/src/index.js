@@ -1,7 +1,8 @@
 import BugsnagPerformance from '@bugsnag/js-performance-browser'
 
-const apiKey = decodeURIComponent(window.location.search.match(/API_KEY=([^&]+)/)[1])
-const endpoint = decodeURIComponent(window.location.search.match(/ENDPOINT=([^&]+)/)[1])
+const parameters = new URLSearchParams(window.location.search)
+const apiKey = parameters.get('api_key')
+const endpoint = parameters.get('endpoint')
 
 BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 5 })
 
