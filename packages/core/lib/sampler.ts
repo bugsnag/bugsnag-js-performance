@@ -32,6 +32,10 @@ class Sampler {
     this.scaledProbability = scaleProbabilityToMatchSamplingRate(probability)
   }
 
+  get spanProbability (): number {
+    return this.scaledProbability
+  }
+
   sample (samplingRate: number): boolean {
     return samplingRate <= this.scaledProbability
   }
