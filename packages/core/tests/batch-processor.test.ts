@@ -199,22 +199,42 @@ describe('BatchProcessor', () => {
   })
 
   it('discards ended spans if samplingRate is higher than the samplingProbability', async () => {
-    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
-    const retryQueue = { add: jest.fn(), flush: jest.fn() }
-    const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
-    const configuration = createConfiguration({ logger })
     const sampler = new Sampler(0.5)
-    const batchProcessor = new BatchProcessor(delivery, configuration, resourceAttributesSource, clock, retryQueue, sampler)
+    const batchProcessor = new BatchProcessor(
+      delivery,
+      createConfiguration(),
+      resourceAttributesSource,
+      new IncrementingClock('1970-01-01T00:00:00Z'),
+      { add: jest.fn(), flush: jest.fn() },
+      sampler
+    )
 
-    const span = createEndedSpan({ name: 'Span 01', samplingRate: Math.floor(0.75 * 0xffffffff) })
-    batchProcessor.add(span)
+    const span1 = createEndedSpan({
+      name: 'Span 01',
+      samplingRate: Math.floor(0.75 * 0xffffffff),
+      samplingProbability: sampler.spanProbability
+    })
+
+    const span2 = createEndedSpan({
+      name: 'Span 02',
+      samplingRate: Math.floor(0.25 * 0xffffffff),
+      samplingProbability: sampler.spanProbability
+    })
+
+    batchProcessor.add(span1)
+    batchProcessor.add(span2)
 
     await jest.runAllTimersAsync()
 
-    expect(delivery.requests).toHaveLength(1)
     expect(delivery).not.toHaveSentSpan(expect.objectContaining({
       name: 'Span 01'
     }))
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: 'Span 02'
+    }))
+
+    expect(delivery.requests).toHaveLength(1)
   })
 })
