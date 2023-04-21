@@ -1,12 +1,37 @@
-import { Kind } from '../lib/span'
+import { SpanAttributes } from '../lib/attributes'
+import Sampler from '../lib/sampler'
+import { Kind, SpanInternal, spanToJson } from '../lib/span'
 import {
   createTestClient,
   IncrementingClock,
   InMemoryDelivery,
+  StableIdGenerator,
   VALID_API_KEY
 } from '@bugsnag/js-performance-test-utilities'
 
 jest.useFakeTimers()
+
+describe('SpanInternal', () => {
+  test.each([
+    { parameter: 'value', key: 'stringValue' },
+    { parameter: true, key: 'boolValue' },
+    { parameter: 0.5, key: 'doubleValue' },
+    { parameter: 42, key: 'intValue', expected: '42' }
+  ])('addAttribute results in an expected $key', ({ parameter, expected, key }) => {
+    const mockClock = { now: jest.fn(), convert: jest.fn(), toUnixTimestampNanoseconds: jest.fn(() => 'unixTimeStamp') }
+    const span = new SpanInternal('test', 1234, new SpanAttributes(new Map()), mockClock, new StableIdGenerator(), new Sampler(0.5))
+    span.setAttribute('bugsnag.test.attribute', parameter)
+    const json = spanToJson(span.end(5678), mockClock)
+    expect(json).toStrictEqual(expect.objectContaining({
+      attributes: [{
+        key: 'bugsnag.test.attribute',
+        value: {
+          [key]: expected || parameter
+        }
+      }]
+    }))
+  })
+})
 
 describe('Span', () => {
   describe('client.startSpan()', () => {
