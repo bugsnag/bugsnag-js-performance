@@ -86,7 +86,8 @@ describe('Span', () => {
         name: 'test span',
         startTimeUnixNano: '1000000',
         endTimeUnixNano: '2000000',
-        attributes: expect.any(Object)
+        attributes: expect.any(Object),
+        events: expect.any(Array)
       })
     })
 
@@ -105,6 +106,7 @@ describe('Span', () => {
         spanId: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         attributes: expect.any(Object),
+        events: expect.any(Array),
         kind: Kind.Client,
         name: 'test span',
         startTimeUnixNano: '1672628645007000000',
@@ -128,6 +130,7 @@ describe('Span', () => {
         spanId: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         attributes: expect.any(Object),
+        events: expect.any(Array),
         kind: Kind.Client,
         name: 'test span',
         startTimeUnixNano: '1000000',

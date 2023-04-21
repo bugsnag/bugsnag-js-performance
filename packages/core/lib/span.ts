@@ -1,6 +1,7 @@
 import { SpanAttributes, type SpanAttribute, type SpanAttributesSource } from './attributes'
 import { type Clock } from './clock'
 import { type DeliverySpan } from './delivery'
+import { SpanEvents } from './events'
 import { type IdGenerator } from './id-generator'
 import type Sampler from './sampler'
 import sanitizeTime, { type Time } from './time'
@@ -33,6 +34,7 @@ export interface SpanEnded {
   readonly kind: Kind
   readonly traceId: string // 128 bit random string
   readonly attributes: SpanAttributes
+  readonly events: SpanEvents
   readonly startTime: number // stored in the format returned from Clock.now (see clock.ts)
   readonly samplingRate: number
   readonly endTime: number // stored in the format returned from Clock.now (see clock.ts) - written once when 'end' is called
@@ -47,22 +49,17 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
     traceId: span.traceId,
     startTimeUnixNano: clock.toUnixTimestampNanoseconds(span.startTime),
     endTimeUnixNano: clock.toUnixTimestampNanoseconds(span.endTime),
-    attributes: span.attributes.toJson()
+    attributes: span.attributes.toJson(),
+    events: span.events.toJson()
   }
 }
-
-interface Event {
-  name: string
-  time: Time
-}
-
 export class SpanInternal {
   private id: string
-  private events: Event[] = []
   private traceId: string
   private startTime: number
   private samplingRate: number
   private kind = Kind.Client // TODO: How do we define the initial Kind?
+  private events = new SpanEvents()
 
   constructor (private name: string, startTime: number, private attributes: SpanAttributes, private clock: Clock, idGenerator: IdGenerator, private sampler: Sampler) {
     this.id = idGenerator.generate(64)
@@ -82,13 +79,14 @@ export class SpanInternal {
       startTime: this.startTime,
       endTime: safeEndTime,
       attributes: this.attributes,
+      events: this.events,
       samplingRate: this.samplingRate,
       samplingProbability: this.sampler.spanProbability
     }
   }
 
   addEvent (name: string, time: Time) {
-    this.events.push({ name, time })
+    this.events.add(name, time)
   }
 
   setAttribute (name: string, value: SpanAttribute) {

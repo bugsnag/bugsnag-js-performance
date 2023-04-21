@@ -22,7 +22,8 @@ describe('Browser Delivery', () => {
             traceId: 'test-trace-id',
             endTimeUnixNano: '56789',
             startTimeUnixNano: '12345',
-            attributes: [{ key: 'test-span', value: { intValue: '12345' } }]
+            attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+            events: []
           }]
         }]
       }]
@@ -59,7 +60,8 @@ describe('Browser Delivery', () => {
             traceId: 'test-trace-id',
             endTimeUnixNano: '56789',
             startTimeUnixNano: '12345',
-            attributes: [{ key: 'test-span', value: { intValue: '12345' } }]
+            attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+            events: []
           }]
         }]
       }]
@@ -99,7 +101,8 @@ describe('Browser Delivery', () => {
             traceId: 'test-trace-id',
             endTimeUnixNano: '56789',
             startTimeUnixNano: '12345',
-            attributes: [{ key: 'test-span', value: { intValue: '12345' } }]
+            attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+            events: []
           }]
         }]
       }]

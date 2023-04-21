@@ -2,7 +2,8 @@ import {
   type SpanEnded,
   type SpanProbability,
   SpanAttributes,
-  traceIdToSamplingRate
+  traceIdToSamplingRate,
+  SpanEvents
 } from '@bugsnag/js-performance-core'
 import { randomBytes } from 'crypto'
 
@@ -11,6 +12,7 @@ export function createEndedSpan (overrides: Partial<SpanEnded> = {}): SpanEnded 
 
   return {
     attributes: new SpanAttributes(new Map()),
+    events: new SpanEvents(),
     id: randomBytes(8).toString('hex'),
     name: 'test span',
     kind: 1,
