@@ -25,11 +25,11 @@ const init = (global: Window & typeof globalThis = window) => new EventEmitter<F
     })
   }
 
-  function uninitalize () {
     global.fetch = originalFetch
+  function uninitalise () {
   }
 
-  return uninitalize
+  return uninitalise
 })
 
 function onFetchStart (input: RequestInfo | URL, init?: RequestInit): FetchRequestData {
