@@ -10,11 +10,15 @@ export interface FetchRequestData {
   error?: Error
 }
 
+interface WindowWithFetch {
+  fetch: typeof fetch
+}
+
 let eventEmitter: EventEmitter<FetchRequestData> | undefined
 
-const init = (global: Window & typeof globalThis = window) => new EventEmitter<FetchRequestData>(() => {
-  const originalFetch = global.fetch
-  global.fetch = function fetch (input: RequestInfo | URL, init?: RequestInit) {
+const init = (win: WindowWithFetch = window) => new EventEmitter<FetchRequestData>(() => {
+  const originalFetch = win.fetch
+  win.fetch = function fetch (input: RequestInfo | URL, init?: RequestInit) {
     const context = onFetchStart(input, init)
     return originalFetch.call(this, input, init).then(response => {
       onFetchEnd(context, response)
@@ -25,8 +29,8 @@ const init = (global: Window & typeof globalThis = window) => new EventEmitter<F
     })
   }
 
-    global.fetch = originalFetch
   function uninitalise () {
+    win.fetch = originalFetch
   }
 
   return uninitalise
@@ -55,7 +59,7 @@ function onFetchEnd (context: FetchRequestData, response?: Response, error?: Err
   eventEmitter?.emit(context)
 }
 
-export function initFetchEventEmitter (global?: Window & typeof globalThis) {
-  if (!eventEmitter) eventEmitter = init(global)
+export function initFetchEventEmitter (window?: WindowWithFetch) {
+  if (!eventEmitter) eventEmitter = init(window)
   return eventEmitter
 }
