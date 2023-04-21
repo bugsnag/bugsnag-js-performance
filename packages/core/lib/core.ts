@@ -8,7 +8,7 @@ import { type IdGenerator } from './id-generator'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
-import { createSpanFactory, type Span } from './span'
+import { SpanFactory, type Span } from './span'
 import { type Time } from './time'
 
 export interface BugsnagPerformance {
@@ -31,7 +31,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
   let processor: Processor = bufferingProcessor
 
   const sampler = new Sampler(1.0)
-  const spanFactory = createSpanFactory(processor, options.clock, options.spanAttributesSource, options.idGenerator, sampler)
+  const spanFactory = new SpanFactory(options.clock, options.spanAttributesSource, options.idGenerator, sampler)
 
   return {
     start: (config: Configuration | string) => {

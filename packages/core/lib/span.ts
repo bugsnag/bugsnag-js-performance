@@ -2,7 +2,6 @@ import { SpanAttributes, type SpanAttribute, type SpanAttributesSource } from '.
 import { type Clock } from './clock'
 import { type DeliverySpan } from './delivery'
 import { type IdGenerator } from './id-generator'
-import { type Processor } from './processor'
 import type Sampler from './sampler'
 import sanitizeTime, { type Time } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
@@ -101,13 +100,13 @@ export class SpanInternal {
   }
 }
 
-export function createSpanFactory (processor: Processor, clock: Clock, spanAttributesSource: SpanAttributesSource, idGenerator: IdGenerator, sampler: Sampler) {
-  return {
-    startSpan (name: string, startTime?: Time) {
-      const attributes = new SpanAttributes(spanAttributesSource())
-      const safeStartTime = sanitizeTime(clock, startTime)
+export class SpanFactory {
+  constructor (private clock: Clock, private spanAttributesSource: SpanAttributesSource, private idGenerator: IdGenerator, private sampler: Sampler) {}
 
-      return new SpanInternal(name, safeStartTime, attributes, clock, idGenerator, sampler)
-    }
+  startSpan (name: string, startTime?: Time) {
+    const attributes = new SpanAttributes(this.spanAttributesSource())
+    const safeStartTime = sanitizeTime(this.clock, startTime)
+
+    return new SpanInternal(name, safeStartTime, attributes, this.clock, this.idGenerator, this.sampler)
   }
 }
