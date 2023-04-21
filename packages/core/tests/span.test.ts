@@ -18,10 +18,10 @@ describe('SpanInternal', () => {
     { parameter: 0.5, key: 'doubleValue' },
     { parameter: 42, key: 'intValue', expected: '42' }
   ])('addAttribute results in an expected $key', ({ parameter, expected, key }) => {
-    const mockClock = { now: jest.fn(), convert: jest.fn(), toUnixTimestampNanoseconds: jest.fn(() => 'unixTimeStamp') }
-    const span = new SpanInternal('test', 1234, new SpanAttributes(new Map()), mockClock, new StableIdGenerator(), new Sampler(0.5))
+    const clock = new IncrementingClock()
+    const span = new SpanInternal('test', 1234, new SpanAttributes(new Map()), clock, new StableIdGenerator(), new Sampler(0.5))
     span.setAttribute('bugsnag.test.attribute', parameter)
-    const json = spanToJson(span.end(5678), mockClock)
+    const json = spanToJson(span.end(5678), clock)
     expect(json).toStrictEqual(expect.objectContaining({
       attributes: [{
         key: 'bugsnag.test.attribute',
@@ -33,14 +33,14 @@ describe('SpanInternal', () => {
   })
 
   it('enables adding Events to spans', () => {
-    const mockClock = { now: jest.fn(), convert: jest.fn(), toUnixTimestampNanoseconds: jest.fn((number) => number.toString()) }
-    const span = new SpanInternal('test', 1234, new SpanAttributes(new Map()), mockClock, new StableIdGenerator(), new Sampler(0.5))
-    span.addEvent('bugsnag.test.event', 12345)
-    const json = spanToJson(span.end(5678), mockClock)
+    const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
+    const span = new SpanInternal('test', 0, new SpanAttributes(new Map()), clock, new StableIdGenerator(), new Sampler(0.5))
+    span.addEvent('bugsnag.test.event', 1234)
+    const json = spanToJson(span.end(5678), clock)
     expect(json).toStrictEqual(expect.objectContaining({
       events: [{
         name: 'bugsnag.test.event',
-        timeUnixNano: '12345'
+        timeUnixNano: '1234000000'
       }]
     }))
   })
