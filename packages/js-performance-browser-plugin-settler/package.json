@@ -1,0 +1,15 @@
+{
+  "name": "@bugsnag/js-performance-browser-plugin-settler",
+  "version": "0.0.0",
+  "description": "BugsnagPerformance browser plugin that listens for the page settling",
+  "author": "Joe Haines <hello@joehaines.co.uk>",
+  "homepage": "https://github.com/bugsnag/bugsnag-js-performance#readme",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
+  }
+}
