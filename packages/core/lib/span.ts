@@ -92,10 +92,6 @@ export class SpanInternal {
   setAttribute (name: string, value: SpanAttribute) {
     this.attributes.set(name, value)
   }
-
-  toPublicApi (): Span {
-    return { end: this.end }
-  }
 }
 
 export class SpanFactory {
