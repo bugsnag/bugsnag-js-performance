@@ -50,7 +50,7 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
     startTimeUnixNano: clock.toUnixTimestampNanoseconds(span.startTime),
     endTimeUnixNano: clock.toUnixTimestampNanoseconds(span.endTime),
     attributes: span.attributes.toJson(),
-    events: span.events.toJson()
+    events: span.events.toJson(clock)
   }
 }
 export class SpanInternal {
@@ -86,7 +86,7 @@ export class SpanInternal {
   }
 
   addEvent (name: string, time: Time) {
-    this.events.add(name, time)
+    this.events.add(name, sanitizeTime(this.clock, time))
   }
 
   setAttribute (name: string, value: SpanAttribute) {

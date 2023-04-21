@@ -1,5 +1,5 @@
 import { type JsonAttribute } from './attributes'
-import { type Event } from './events'
+import { type JsonEvent } from './events'
 import { type Kind } from './span'
 
 export type DeliveryFactory = (apiKey: string, endpoint: string) => Delivery
@@ -40,7 +40,7 @@ export interface DeliverySpan {
   startTimeUnixNano: string
   endTimeUnixNano: string
   attributes: Array<JsonAttribute | undefined>
-  events: Event[]
+  events: JsonEvent[]
 }
 
 const retryCodes = new Set([402, 407, 408, 429])

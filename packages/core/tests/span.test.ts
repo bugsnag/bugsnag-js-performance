@@ -31,6 +31,19 @@ describe('SpanInternal', () => {
       }]
     }))
   })
+
+  it('enables adding Events to spans', () => {
+    const mockClock = { now: jest.fn(), convert: jest.fn(), toUnixTimestampNanoseconds: jest.fn((number) => number.toString()) }
+    const span = new SpanInternal('test', 1234, new SpanAttributes(new Map()), mockClock, new StableIdGenerator(), new Sampler(0.5))
+    span.addEvent('bugsnag.test.event', 12345)
+    const json = spanToJson(span.end(5678), mockClock)
+    expect(json).toStrictEqual(expect.objectContaining({
+      events: [{
+        name: 'bugsnag.test.event',
+        timeUnixNano: '12345'
+      }]
+    }))
+  })
 })
 
 describe('Span', () => {
