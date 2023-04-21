@@ -208,6 +208,36 @@ describe('fetch Event Emitter', () => {
     })
   })
 
+  it('should handle a Request object with separate options', async () => {
+    window.fetch = mockFetch()
+    const eventEmitter = initFetchEventEmitter(window)
+
+    const contexts: FetchRequestData[] = []
+    const callback = (context: FetchRequestData) => contexts.push({ ...context })
+    subscription = eventEmitter.subscribe(callback)
+
+    const request = new MockRequest('http://test-url.com/')
+    const response = await window.fetch(request as unknown as Request, { method: 'POST' })
+    expect(response.status).toEqual(200)
+
+    expect(contexts.length).toEqual(2)
+    expect(contexts[0]).toEqual({
+      state: 'start',
+      method: 'POST',
+      url: 'http://test-url.com/',
+      startTime: expect.any(Date)
+    })
+
+    expect(contexts[1]).toEqual({
+      state: 'end',
+      method: 'POST',
+      url: 'http://test-url.com/',
+      startTime: expect.any(Date),
+      endTime: expect.any(Date),
+      status: 200
+    })
+  })
+
   it('should handle a fetch(undefined)', async () => {
     window.fetch = mockFetch(true)
     const eventEmitter = initFetchEventEmitter(window)
@@ -246,7 +276,7 @@ describe('fetch Event Emitter', () => {
     subscription = eventEmitter.subscribe(callback)
 
     expect.assertions(4)
-    await expect(window.fetch(null as unknown as string)).rejects.toEqual(new Error('Fail'))
+    await expect(window.fetch(null as unknown as RequestInfo)).rejects.toEqual(new Error('Fail'))
     expect(contexts.length).toEqual(2)
     expect(contexts[0]).toEqual({
       state: 'start',
@@ -275,6 +305,35 @@ describe('fetch Event Emitter', () => {
     subscription = eventEmitter.subscribe(callback)
 
     const response = await window.fetch('http://test-url.com/', null as unknown as RequestInit)
+    expect(response.status).toEqual(200)
+
+    expect(contexts.length).toEqual(2)
+    expect(contexts[0]).toEqual({
+      state: 'start',
+      method: 'GET',
+      url: 'http://test-url.com/',
+      startTime: expect.any(Date)
+    })
+
+    expect(contexts[1]).toEqual({
+      state: 'end',
+      method: 'GET',
+      url: 'http://test-url.com/',
+      startTime: expect.any(Date),
+      endTime: expect.any(Date),
+      status: 200
+    })
+  })
+
+  it('should handle a fetch(url, {}})', async () => {
+    window.fetch = mockFetch()
+    const eventEmitter = initFetchEventEmitter(window)
+
+    const contexts: FetchRequestData[] = []
+    const callback = (context: FetchRequestData) => contexts.push({ ...context })
+    subscription = eventEmitter.subscribe(callback)
+
+    const response = await window.fetch('http://test-url.com/', {})
     expect(response.status).toEqual(200)
 
     expect(contexts.length).toEqual(2)

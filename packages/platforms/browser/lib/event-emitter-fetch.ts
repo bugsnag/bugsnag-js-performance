@@ -37,9 +37,10 @@ const init = (win: WindowWithFetch = window) => new EventEmitter<FetchRequestDat
 })
 
 function onFetchStart (input: RequestInfo | URL, init?: RequestInit): FetchRequestData {
-  const inputIsRequest = typeof input === 'object' && !(input instanceof URL)
-  const method = init?.method || (inputIsRequest && (input as Request)?.method) || 'GET'
-  const url = input && (inputIsRequest ? (input as Request)?.url : String(input))
+  const inputIsRequest = isRequest(input)
+  const url = inputIsRequest ? input.url : input && String(input)
+  // eslint-disable-next-line @typescript-eslint/prefer-optional-chain
+  const method = (init && init.method) || (inputIsRequest && input.method) || 'GET'
   const context: FetchRequestData = {
     url,
     method,
@@ -57,6 +58,10 @@ function onFetchEnd (context: FetchRequestData, response?: Response, error?: Err
   context.state = 'end'
   context.error = error
   eventEmitter?.emit(context)
+}
+
+function isRequest (input: RequestInfo | URL): input is Request {
+  return input !== null && typeof input === 'object' && !(input instanceof URL)
 }
 
 export function initFetchEventEmitter (window?: WindowWithFetch) {
