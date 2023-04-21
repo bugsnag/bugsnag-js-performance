@@ -3,13 +3,13 @@ import EventEmitter from '../lib/event-emitter'
 describe('Event Emitter', () => {
   let eventEmitter: EventEmitter<void>
   let subscriber: jest.Func
-  let initialize: jest.Func
-  let uninitialize: jest.Func
+  let initialise: jest.Func
+  let uninitialise: jest.Func
 
   beforeEach(() => {
-    uninitialize = jest.fn()
-    initialize = jest.fn(() => uninitialize)
-    eventEmitter = new EventEmitter(initialize)
+    uninitialise = jest.fn()
+    initialise = jest.fn(() => uninitialise)
+    eventEmitter = new EventEmitter(initialise)
     subscriber = jest.fn()
   })
 
@@ -34,9 +34,9 @@ describe('Event Emitter', () => {
   })
 
   it('should call initialize on first subscribe', () => {
-    expect(initialize).not.toHaveBeenCalled()
+    expect(initialise).not.toHaveBeenCalled()
     eventEmitter.subscribe(subscriber)
-    expect(initialize).toHaveBeenCalled()
+    expect(initialise).toHaveBeenCalled()
   })
 
   it('should call uninitialize when there are no more subscribers', () => {
@@ -45,9 +45,9 @@ describe('Event Emitter', () => {
 
     eventEmitter.emit()
     expect(subscriber).toHaveBeenCalled()
-    expect(uninitialize).not.toHaveBeenCalled()
+    expect(uninitialise).not.toHaveBeenCalled()
 
     unsubscribe()
-    expect(uninitialize).toHaveBeenCalled()
+    expect(uninitialise).toHaveBeenCalled()
   })
 })

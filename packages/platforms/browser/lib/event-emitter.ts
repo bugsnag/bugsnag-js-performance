@@ -4,14 +4,14 @@ export interface Subscription {
 
 class EventEmitter<T> {
   private callbacks: Array<(data: T) => void> = []
-  private uninitalize?: () => void
+  private uninitalise?: () => void
 
-  constructor (private initialize?: () => (() => void)) {}
+  constructor (private initialise?: () => (() => void)) {}
 
   subscribe (callback: (data: T) => void): Subscription {
     // initialize the event emitter on first subscription
-    if (!this.callbacks.length && this.initialize) {
-      this.uninitalize = this.initialize() || undefined
+    if (!this.callbacks.length && this.initialise) {
+      this.uninitalise = this.initialise() || undefined
     }
 
     this.callbacks.push(callback)
@@ -19,7 +19,7 @@ class EventEmitter<T> {
     return {
       unsubscribe: () => {
         this.callbacks = this.callbacks.filter((other) => callback !== other)
-        if (!this.callbacks.length) this.uninitalize?.() // Uninitialize if there are no more subscribers
+        if (!this.callbacks.length) this.uninitalise?.() // Uninitialize if there are no more subscribers
       }
     }
   }
