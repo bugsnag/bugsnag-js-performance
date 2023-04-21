@@ -25,9 +25,9 @@ class EventEmitter<T> {
   }
 
   emit (data: T) {
-    this.callbacks.forEach((callback) => {
+    for (const callback of this.callbacks) {
       callback(data)
-    })
+    }
   }
 }
 
