@@ -5,7 +5,6 @@ import {
   createTestClient,
   IncrementingClock,
   InMemoryDelivery,
-  StableIdGenerator,
   VALID_API_KEY
 } from '@bugsnag/js-performance-test-utilities'
 
@@ -19,9 +18,10 @@ describe('SpanInternal', () => {
     { parameter: 42, key: 'intValue', expected: '42' }
   ])('addAttribute results in an expected $key', ({ parameter, expected, key }) => {
     const clock = new IncrementingClock()
-    const span = new SpanInternal('test', 1234, new SpanAttributes(new Map()), clock, new StableIdGenerator(), new Sampler(0.5))
+    const span = new SpanInternal('span-id', 'trace-id', 'span-name', 1234, new SpanAttributes(new Map()))
+    const sampler = new Sampler(0.5)
     span.setAttribute('bugsnag.test.attribute', parameter)
-    const json = spanToJson(span.end(5678), clock)
+    const json = spanToJson(span.end(5678, sampler.spanProbability), clock)
     expect(json).toStrictEqual(expect.objectContaining({
       attributes: [{
         key: 'bugsnag.test.attribute',
@@ -34,9 +34,10 @@ describe('SpanInternal', () => {
 
   it('enables adding Events to spans', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
-    const span = new SpanInternal('test', 0, new SpanAttributes(new Map()), clock, new StableIdGenerator(), new Sampler(0.5))
+    const span = new SpanInternal('span-id', 'trace-id', 'span-name', 0, new SpanAttributes(new Map()))
+    const sampler = new Sampler(0.5)
     span.addEvent('bugsnag.test.event', 1234)
-    const json = spanToJson(span.end(5678), clock)
+    const json = spanToJson(span.end(5678, sampler.spanProbability), clock)
     expect(json).toStrictEqual(expect.objectContaining({
       events: [{
         name: 'bugsnag.test.event',

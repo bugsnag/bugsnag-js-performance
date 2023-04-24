@@ -9,7 +9,7 @@ import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
 import { SpanFactory, type Span } from './span'
-import { type Time } from './time'
+import { timeToNumber, type Time } from './time'
 
 export interface BugsnagPerformance {
   start: (config: Configuration | string) => void
@@ -31,7 +31,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
   let processor: Processor = bufferingProcessor
 
   const sampler = new Sampler(1.0)
-  const spanFactory = new SpanFactory(options.clock, options.spanAttributesSource, options.idGenerator, sampler)
+  const spanFactory = new SpanFactory(options.idGenerator, options.spanAttributesSource)
 
   return {
     start: (config: Configuration | string) => {
@@ -64,11 +64,13 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       })
     },
     startSpan: (name, startTime) => {
-      const span = spanFactory.startSpan(name, startTime)
+      const safeStartTime = timeToNumber(options.clock, startTime)
+      const span = spanFactory.startSpan(name, safeStartTime)
 
       return {
         end: (endTime) => {
-          const spanEnded = span.end(endTime)
+          const safeEndTime = timeToNumber(options.clock, endTime)
+          const spanEnded = span.end(safeEndTime, sampler.spanProbability)
 
           if (sampler.sample(spanEnded)) {
             processor.add(spanEnded)

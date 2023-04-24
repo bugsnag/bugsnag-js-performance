@@ -3,8 +3,7 @@ import { type Clock } from './clock'
 import { type DeliverySpan } from './delivery'
 import { SpanEvents } from './events'
 import { type IdGenerator } from './id-generator'
-import type Sampler from './sampler'
-import sanitizeTime, { type Time } from './time'
+import { type Time } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
 
 export interface Span {
@@ -53,40 +52,43 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
     events: span.events.toJson(clock)
   }
 }
-export class SpanInternal {
-  private id: string
-  private traceId: string
-  private startTime: number
-  private samplingRate: number
-  private kind = Kind.Client // TODO: How do we define the initial Kind?
-  private events = new SpanEvents()
 
-  constructor (private name: string, startTime: number, private attributes: SpanAttributes, private clock: Clock, idGenerator: IdGenerator, private sampler: Sampler) {
-    this.id = idGenerator.generate(64)
-    this.traceId = idGenerator.generate(128)
-    this.startTime = sanitizeTime(clock, startTime)
+export class SpanInternal {
+  private readonly id: string
+  private readonly traceId: string
+  private readonly startTime: number
+  private readonly samplingRate: number
+  private readonly kind = Kind.Client // TODO: How do we define the initial Kind?
+  private readonly events = new SpanEvents()
+  private readonly attributes: SpanAttributes
+  private readonly name: string
+
+  constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes) {
+    this.id = id
+    this.traceId = traceId
+    this.name = name
+    this.startTime = startTime
+    this.attributes = attributes
     this.samplingRate = traceIdToSamplingRate(this.traceId)
   }
 
-  end (endTime?: Time): SpanEnded {
-    const safeEndTime = sanitizeTime(this.clock, endTime)
-
+  end (endTime: number, samplingProbability: SpanProbability): SpanEnded {
     return {
       id: this.id,
       name: this.name,
       kind: this.kind,
       traceId: this.traceId,
       startTime: this.startTime,
-      endTime: safeEndTime,
+      endTime,
       attributes: this.attributes,
       events: this.events,
       samplingRate: this.samplingRate,
-      samplingProbability: this.sampler.spanProbability
+      samplingProbability
     }
   }
 
-  addEvent (name: string, time: Time) {
-    this.events.add(name, sanitizeTime(this.clock, time))
+  addEvent (name: string, time: number) {
+    this.events.add(name, time)
   }
 
   setAttribute (name: string, value: SpanAttribute) {
@@ -95,12 +97,19 @@ export class SpanInternal {
 }
 
 export class SpanFactory {
-  constructor (private clock: Clock, private spanAttributesSource: SpanAttributesSource, private idGenerator: IdGenerator, private sampler: Sampler) {}
+  private readonly idGenerator: IdGenerator
+  private readonly spanAttributesSource: SpanAttributesSource
 
-  startSpan (name: string, startTime?: Time) {
+  constructor (idGenerator: IdGenerator, spanAttributesSource: SpanAttributesSource) {
+    this.idGenerator = idGenerator
+    this.spanAttributesSource = spanAttributesSource
+  }
+
+  startSpan (name: string, startTime: number) {
+    const spanId = this.idGenerator.generate(64)
+    const traceId = this.idGenerator.generate(128)
     const attributes = new SpanAttributes(this.spanAttributesSource())
-    const safeStartTime = sanitizeTime(this.clock, startTime)
 
-    return new SpanInternal(name, safeStartTime, attributes, this.clock, this.idGenerator, this.sampler)
+    return new SpanInternal(spanId, traceId, name, startTime, attributes)
   }
 }
