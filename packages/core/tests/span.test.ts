@@ -16,7 +16,7 @@ describe('SpanInternal', () => {
     { parameter: true, key: 'boolValue' },
     { parameter: 0.5, key: 'doubleValue' },
     { parameter: 42, key: 'intValue', expected: '42' }
-  ])('addAttribute results in an expected $key', ({ parameter, expected, key }) => {
+  ])('setAttribute results in an expected $key', ({ parameter, expected, key }) => {
     const clock = new IncrementingClock()
     const span = new SpanInternal('span-id', 'trace-id', 'span-name', 1234, new SpanAttributes(new Map()))
     const sampler = new Sampler(0.5)
