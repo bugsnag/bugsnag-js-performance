@@ -3,6 +3,8 @@ import { type Clock } from './clock'
 import { type DeliverySpan } from './delivery'
 import { SpanEvents } from './events'
 import { type IdGenerator } from './id-generator'
+import { type Processor } from './processor'
+import type Sampler from './sampler'
 import { type Time } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
 
@@ -72,27 +74,25 @@ export class SpanInternal {
     this.samplingRate = traceIdToSamplingRate(this.traceId)
   }
 
-  end (endTime: number, samplingProbability: SpanProbability): SpanEnded {
-    return {
-      id: this.id,
-      name: this.name,
-      kind: this.kind,
-      traceId: this.traceId,
-      startTime: this.startTime,
-      endTime,
-      attributes: this.attributes,
-      events: this.events,
-      samplingRate: this.samplingRate,
-      samplingProbability
-    }
-  }
-
   addEvent (name: string, time: number) {
     this.events.add(name, time)
   }
 
   setAttribute (name: string, value: SpanAttribute) {
     this.attributes.set(name, value)
+  }
+
+  getProperties () {
+    return {
+      id: this.id,
+      name: this.name,
+      kind: this.kind,
+      traceId: this.traceId,
+      startTime: this.startTime,
+      attributes: this.attributes,
+      events: this.events,
+      samplingRate: this.samplingRate
+    }
   }
 }
 
@@ -111,5 +111,22 @@ export class SpanFactory {
     const attributes = new SpanAttributes(this.spanAttributesSource())
 
     return new SpanInternal(spanId, traceId, name, startTime, attributes)
+  }
+
+  endSpan (
+    span: SpanInternal,
+    endTime: number,
+    sampler: Sampler,
+    processor: Processor
+  ) {
+    const spanEnded: SpanEnded = {
+      ...span.getProperties(),
+      endTime,
+      samplingProbability: sampler.spanProbability
+    }
+
+    if (sampler.sample(spanEnded)) {
+      processor.add(spanEnded)
+    }
   }
 }

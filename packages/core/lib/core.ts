@@ -70,11 +70,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       return {
         end: (endTime) => {
           const safeEndTime = timeToNumber(options.clock, endTime)
-          const spanEnded = span.end(safeEndTime, sampler.spanProbability)
-
-          if (sampler.sample(spanEnded)) {
-            processor.add(spanEnded)
-          }
+          spanFactory.endSpan(span, safeEndTime, sampler, processor)
         }
       }
     }
