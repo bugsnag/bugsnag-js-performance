@@ -82,7 +82,7 @@ export class SpanInternal {
     this.attributes.set(name, value)
   }
 
-  getProperties () {
+  end (endTime: number, samplingProbability: SpanProbability): SpanEnded {
     return {
       id: this.id,
       name: this.name,
@@ -91,7 +91,9 @@ export class SpanInternal {
       startTime: this.startTime,
       attributes: this.attributes,
       events: this.events,
-      samplingRate: this.samplingRate
+      samplingRate: this.samplingRate,
+      endTime,
+      samplingProbability
     }
   }
 }
@@ -119,11 +121,7 @@ export class SpanFactory {
     sampler: Sampler,
     processor: Processor
   ) {
-    const spanEnded: SpanEnded = {
-      ...span.getProperties(),
-      endTime,
-      samplingProbability: sampler.spanProbability
-    }
+    const spanEnded = span.end(endTime, sampler.spanProbability)
 
     if (sampler.sample(spanEnded)) {
       processor.add(spanEnded)
