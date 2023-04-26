@@ -1,5 +1,5 @@
 import { type Clock } from '@bugsnag/js-performance-core'
-import { type RequestStartContext, createRequestTracker } from './request-tracker'
+import { type RequestStartContext, RequestTracker } from './request-tracker'
 
 interface WindowWithFetch {
   fetch: typeof fetch
@@ -22,7 +22,7 @@ function isRequest (input: unknown): input is Request {
 }
 
 function createFetchRequestTracker (window: WindowWithFetch, clock: Clock) {
-  const requestTracker = createRequestTracker()
+  const requestTracker = new RequestTracker()
   const originalFetch = window.fetch
 
   window.fetch = function fetch (input?: unknown, init?: unknown) {

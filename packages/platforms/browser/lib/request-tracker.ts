@@ -12,27 +12,22 @@ type RequestEndContext = RequestEndContextSuccess | RequestEndContextError
 export type RequestStartCallback = (context: RequestStartContext) => RequestEndCallback
 export type RequestEndCallback = (context: RequestEndContext) => void
 
-export interface RequestTracker {
-  onStart: (callback: RequestStartCallback) => void
-  start: (context: RequestStartContext) => RequestEndCallback
-}
+export class RequestTracker {
+  private callbacks: RequestStartCallback[] = []
 
-export function createRequestTracker (): RequestTracker {
-  const callbacks: RequestStartCallback[] = []
-  return {
-    onStart (startCallback: RequestStartCallback) {
-      callbacks.push(startCallback)
-    },
-    start (context: RequestStartContext) {
-      const endCallbacks: RequestEndCallback[] = []
-      for (const startCallback of callbacks) {
-        endCallbacks.push(startCallback(context))
-      }
+  onStart (startCallback: RequestStartCallback) {
+    this.callbacks.push(startCallback)
+  }
 
-      return (endContext: RequestEndContext) => {
-        for (const endCallback of endCallbacks) {
-          endCallback(endContext)
-        }
+  start (context: RequestStartContext) {
+    const endCallbacks: RequestEndCallback[] = []
+    for (const startCallback of this.callbacks) {
+      endCallbacks.push(startCallback(context))
+    }
+
+    return (endContext: RequestEndContext) => {
+      for (const endCallback of endCallbacks) {
+        endCallback(endContext)
       }
     }
   }
