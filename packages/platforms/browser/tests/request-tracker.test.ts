@@ -1,8 +1,8 @@
-import { createRequestTracker } from '../lib/request-tracker'
+import { RequestTracker } from '../lib/request-tracker'
 
 describe('Request Tracker', () => {
   it('should invoke start callbacks on onStart', () => {
-    const requestTracker = createRequestTracker()
+    const requestTracker = new RequestTracker()
     const endCallback = jest.fn()
     const startCallback = jest.fn(() => endCallback)
 
@@ -15,7 +15,7 @@ describe('Request Tracker', () => {
   })
 
   it('should invoke end callbacks on end', () => {
-    const requestTracker = createRequestTracker()
+    const requestTracker = new RequestTracker()
     const endCallback = jest.fn()
     const startCallback = jest.fn(() => endCallback)
 

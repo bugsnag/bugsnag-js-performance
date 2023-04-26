@@ -9,12 +9,7 @@ function createStartContext (startTime: number, input: unknown, init?: unknown):
   const inputIsRequest = isRequest(input)
   const url = inputIsRequest ? input.url : String(input)
   const method = (!!init && (init as RequestInit).method) || (inputIsRequest && input.method) || 'GET'
-
-  return {
-    url,
-    method,
-    startTime
-  }
+  return { url, method, startTime }
 }
 
 function isRequest (input: unknown): input is Request {

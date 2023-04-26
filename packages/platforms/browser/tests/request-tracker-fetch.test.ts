@@ -29,7 +29,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it.each([['GET', 200], ['PUT', 200], ['POST', 201], ['DELETE', 204]])('should notify subscribers for a completed %s request', async (method, status) => {
-    const window = { fetch: mockFetch(false, status) } as unknown as Window
+    const window = { fetch: mockFetch(false, status) }
     const fetchTracker = createFetchRequestTracker(window, clock)
 
     fetchTracker.onStart(startCallback)
@@ -50,7 +50,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should notify subscribers and reject when a request errors', async () => {
-    const window = { fetch: mockFetch(true) } as unknown as Window
+    const window = { fetch: mockFetch(true) }
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
@@ -87,7 +87,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should handle a URL object', async () => {
-    const window = { fetch: mockFetch() } as unknown as Window
+    const window = { fetch: mockFetch() }
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
@@ -106,7 +106,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should handle a Request object', async () => {
-    const window = { fetch: mockFetch() } as unknown as Window
+    const window = { fetch: mockFetch() }
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
@@ -125,7 +125,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should handle a Request object with separate options', async () => {
-    const window = { fetch: mockFetch() } as unknown as Window
+    const window = { fetch: mockFetch() }
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
@@ -144,7 +144,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should handle a fetch(undefined)', async () => {
-    const window = { fetch: mockFetch(true) } as unknown as Window
+    const window = { fetch: mockFetch(true) }
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
@@ -163,7 +163,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should handle a fetch(null)', async () => {
-    const window = { fetch: mockFetch(true) } as unknown as Window
+    const window = { fetch: mockFetch(true) }
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
@@ -182,7 +182,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should handle a fetch(url, null)', async () => {
-    const window = { fetch: mockFetch() } as unknown as Window
+    const window = { fetch: mockFetch() }
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
@@ -200,7 +200,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should handle a fetch(url, {}})', async () => {
-    const window = { fetch: mockFetch() } as unknown as Window
+    const window = { fetch: mockFetch() }
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
