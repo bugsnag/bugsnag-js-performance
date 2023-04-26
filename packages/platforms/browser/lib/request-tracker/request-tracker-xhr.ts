@@ -1,5 +1,5 @@
 import { type Clock } from '@bugsnag/js-performance-core'
-import { RequestTracker, type RequestTracker, type RequestEndCallback } from './request-tracker'
+import { type RequestEndCallback, RequestTracker } from './request-tracker'
 
 interface WindowWithXMLHttpRequest {
   XMLHttpRequest: typeof XMLHttpRequest
