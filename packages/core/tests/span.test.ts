@@ -1,12 +1,70 @@
-import { Kind } from '../lib/span'
+
+import { Kind } from '@bugsnag/js-performance-core'
 import {
-  createTestClient,
-  IncrementingClock,
   InMemoryDelivery,
-  VALID_API_KEY
+  IncrementingClock,
+  StableIdGenerator,
+  VALID_API_KEY,
+  createTestClient,
+  spanAttributesSource
 } from '@bugsnag/js-performance-test-utilities'
+import { SpanFactory, spanToJson, type SpanEnded } from '../lib'
+import Sampler from '../lib/sampler'
 
 jest.useFakeTimers()
+
+describe('SpanInternal', () => {
+  describe('.setAttribute()', () => {
+    test.each([
+      { parameter: 'value', key: 'stringValue' },
+      { parameter: true, key: 'boolValue' },
+      { parameter: 0.5, key: 'doubleValue' },
+      { parameter: 42, key: 'intValue', expected: '42' }
+    ])('setAttribute results in an expected $key', ({ parameter, expected, key }) => {
+      const clock = new IncrementingClock()
+      const sampler = new Sampler(0.5)
+      const delivery = { send: jest.fn() }
+      const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+      const spanFactory = new SpanFactory(processor, sampler, new StableIdGenerator(), spanAttributesSource)
+
+      const spanInternal = spanFactory.startSpan('span-name', 1234)
+      spanInternal.setAttribute('bugsnag.test.attribute', parameter)
+
+      spanFactory.endSpan(spanInternal, 5678)
+
+      expect(delivery.send).toHaveBeenCalledWith(expect.objectContaining({
+        attributes: expect.arrayContaining([{
+          key: 'bugsnag.test.attribute',
+          value: {
+            [key]: expected || parameter
+          }
+        }])
+      }))
+    })
+  })
+
+  describe('.addEvent()', () => {
+    it('enables adding Events to spans', () => {
+      const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
+      const sampler = new Sampler(0.5)
+      const delivery = { send: jest.fn() }
+      const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+      const spanFactory = new SpanFactory(processor, sampler, new StableIdGenerator(), spanAttributesSource)
+
+      const spanInternal = spanFactory.startSpan('span-name', 1234)
+      spanInternal.addEvent('bugsnag.test.event', 1234)
+
+      spanFactory.endSpan(spanInternal, 5678)
+
+      expect(delivery.send).toHaveBeenCalledWith(expect.objectContaining({
+        events: [{
+          name: 'bugsnag.test.event',
+          timeUnixNano: '1234000000'
+        }]
+      }))
+    })
+  })
+})
 
 describe('Span', () => {
   describe('client.startSpan()', () => {
@@ -61,7 +119,8 @@ describe('Span', () => {
         name: 'test span',
         startTimeUnixNano: '1000000',
         endTimeUnixNano: '2000000',
-        attributes: expect.any(Object)
+        attributes: expect.any(Object),
+        events: expect.any(Array)
       })
     })
 
@@ -80,6 +139,7 @@ describe('Span', () => {
         spanId: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         attributes: expect.any(Object),
+        events: expect.any(Array),
         kind: Kind.Client,
         name: 'test span',
         startTimeUnixNano: '1672628645007000000',
@@ -103,6 +163,7 @@ describe('Span', () => {
         spanId: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         attributes: expect.any(Object),
+        events: expect.any(Array),
         kind: Kind.Client,
         name: 'test span',
         startTimeUnixNano: '1000000',

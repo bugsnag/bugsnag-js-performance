@@ -1,4 +1,4 @@
-import { SpanAttributes, type ResourceAttributeSource, type SpanAttributesSource } from './attributes'
+import { type ResourceAttributeSource, type SpanAttributesSource } from './attributes'
 import { type BackgroundingListener } from './backgrounding-listener'
 import { BatchProcessor } from './batch-processor'
 import { type Clock } from './clock'
@@ -8,26 +8,12 @@ import { type IdGenerator } from './id-generator'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
-import { Kind, type Span, type SpanEnded, type Time } from './span'
-import traceIdToSamplingRate from './trace-id-to-sampling-rate'
+import { SpanFactory, type Span } from './span'
+import { timeToNumber, type Time } from './time'
 
 export interface BugsnagPerformance {
   start: (config: Configuration | string) => void
   startSpan: (name: string, startTime?: Time) => Span
-}
-
-function sanitizeTime (clock: Clock, time?: Time): number {
-  if (typeof time === 'number') {
-    // no need to change anything - we want to store numbers anyway
-    // we assume this is nanosecond precision
-    return time
-  }
-
-  if (time instanceof Date) {
-    return clock.convert(time)
-  }
-
-  return clock.now()
 }
 
 export interface ClientOptions {
@@ -45,6 +31,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
   let processor: Processor = bufferingProcessor
 
   const sampler = new Sampler(1.0)
+  const spanFactory = new SpanFactory(processor, sampler, options.idGenerator, options.spanAttributesSource)
 
   return {
     start: (config: Configuration | string) => {
@@ -75,31 +62,17 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       options.backgroundingListener.onStateChange(state => {
         (processor as BatchProcessor).flush()
       })
+
+      spanFactory.updateProcessor(processor)
     },
     startSpan: (name, startTime) => {
-      const safeStartTime = sanitizeTime(options.clock, startTime)
-      const attributes = new SpanAttributes(options.spanAttributesSource())
+      const safeStartTime = timeToNumber(options.clock, startTime)
+      const span = spanFactory.startSpan(name, safeStartTime)
 
       return {
         end: (endTime) => {
-          const safeEndTime = sanitizeTime(options.clock, endTime)
-          const traceId = options.idGenerator.generate(128)
-
-          const span: SpanEnded = {
-            name,
-            kind: Kind.Client, // TODO: How do we define the current kind?
-            id: options.idGenerator.generate(64),
-            traceId,
-            startTime: safeStartTime,
-            endTime: safeEndTime,
-            attributes,
-            samplingRate: traceIdToSamplingRate(traceId),
-            samplingProbability: sampler.spanProbability
-          }
-
-          if (sampler.sample(span)) {
-            processor.add(span)
-          }
+          const safeEndTime = timeToNumber(options.clock, endTime)
+          spanFactory.endSpan(span, safeEndTime)
         }
       }
     }
