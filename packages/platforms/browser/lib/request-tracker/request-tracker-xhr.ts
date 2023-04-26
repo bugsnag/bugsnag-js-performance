@@ -5,20 +5,10 @@ interface WindowWithXMLHttpRequest {
   XMLHttpRequest: typeof XMLHttpRequest
 }
 
-type OpenFunction = (
-  method: string,
-  url: string | URL,
-  async?: boolean,
-  username?: string | null,
-  password?: string | null
-) => void
-
-function overrideOpen (window: WindowWithXMLHttpRequest, requestTracker: RequestTracker, clock: Clock): OpenFunction {
-  const originalOpen = window.XMLHttpRequest.prototype.open as OpenFunction
-  return function open (this: XMLHttpRequest, ...args): void {
-    const method = args[0]
-    const url = args[1]
-
+function createXMLHttpRequestTracker (window: WindowWithXMLHttpRequest, clock: Clock): RequestTracker {
+  const requestTracker = new RequestTracker()
+  const originalOpen = window.XMLHttpRequest.prototype.open
+  window.XMLHttpRequest.prototype.open = function open (method, url, ...rest: any[]): void {
     // start tracking the request on send
     const originalSend = this.send
     let onRequestEnd: RequestEndCallback
@@ -34,13 +24,10 @@ function overrideOpen (window: WindowWithXMLHttpRequest, requestTracker: Request
       }
     })
 
-    originalOpen.apply(this, args)
+    // @ts-expect-error rest
+    originalOpen.call(this, method, url, ...rest)
   }
-}
 
-function createXMLHttpRequestTracker (window: WindowWithXMLHttpRequest, clock: Clock): RequestTracker {
-  const requestTracker = new RequestTracker()
-  window.XMLHttpRequest.prototype.open = overrideOpen(window, requestTracker, clock)
   return requestTracker
 }
 
