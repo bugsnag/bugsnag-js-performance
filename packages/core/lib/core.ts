@@ -31,7 +31,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
   let processor: Processor = bufferingProcessor
 
   const sampler = new Sampler(1.0)
-  const spanFactory = new SpanFactory(options.idGenerator, options.spanAttributesSource)
+  const spanFactory = new SpanFactory(processor, sampler, options.idGenerator, options.spanAttributesSource)
 
   return {
     start: (config: Configuration | string) => {
@@ -62,6 +62,8 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       options.backgroundingListener.onStateChange(state => {
         (processor as BatchProcessor).flush()
       })
+
+      spanFactory.updateProcessor(processor)
     },
     startSpan: (name, startTime) => {
       const safeStartTime = timeToNumber(options.clock, startTime)
@@ -70,7 +72,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       return {
         end: (endTime) => {
           const safeEndTime = timeToNumber(options.clock, endTime)
-          spanFactory.endSpan(span, safeEndTime, sampler, processor)
+          spanFactory.endSpan(span, safeEndTime)
         }
       }
     }

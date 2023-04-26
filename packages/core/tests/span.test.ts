@@ -23,14 +23,14 @@ describe('SpanInternal', () => {
     ])('setAttribute results in an expected $key', ({ parameter, expected, key }) => {
       const clock = new IncrementingClock()
       const sampler = new Sampler(0.5)
-      const spanFactory = new SpanFactory(new StableIdGenerator(), spanAttributesSource)
       const delivery = { send: jest.fn() }
       const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+      const spanFactory = new SpanFactory(processor, sampler, new StableIdGenerator(), spanAttributesSource)
 
       const spanInternal = spanFactory.startSpan('span-name', 1234)
       spanInternal.setAttribute('bugsnag.test.attribute', parameter)
 
-      spanFactory.endSpan(spanInternal, 5678, sampler, processor)
+      spanFactory.endSpan(spanInternal, 5678)
 
       expect(delivery.send).toHaveBeenCalledWith(expect.objectContaining({
         attributes: expect.arrayContaining([{
@@ -47,14 +47,14 @@ describe('SpanInternal', () => {
     it('enables adding Events to spans', () => {
       const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
       const sampler = new Sampler(0.5)
-      const spanFactory = new SpanFactory(new StableIdGenerator(), spanAttributesSource)
       const delivery = { send: jest.fn() }
       const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+      const spanFactory = new SpanFactory(processor, sampler, new StableIdGenerator(), spanAttributesSource)
 
       const spanInternal = spanFactory.startSpan('span-name', 1234)
       spanInternal.addEvent('bugsnag.test.event', 1234)
 
-      spanFactory.endSpan(spanInternal, 5678, sampler, processor)
+      spanFactory.endSpan(spanInternal, 5678)
 
       expect(delivery.send).toHaveBeenCalledWith(expect.objectContaining({
         events: [{

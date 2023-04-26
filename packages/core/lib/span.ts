@@ -101,8 +101,12 @@ export class SpanInternal {
 export class SpanFactory {
   private readonly idGenerator: IdGenerator
   private readonly spanAttributesSource: SpanAttributesSource
+  private processor: Processor
+  private sampler: Sampler
 
-  constructor (idGenerator: IdGenerator, spanAttributesSource: SpanAttributesSource) {
+  constructor (processor: Processor, sampler: Sampler, idGenerator: IdGenerator, spanAttributesSource: SpanAttributesSource) {
+    this.processor = processor
+    this.sampler = sampler
     this.idGenerator = idGenerator
     this.spanAttributesSource = spanAttributesSource
   }
@@ -115,16 +119,18 @@ export class SpanFactory {
     return new SpanInternal(spanId, traceId, name, startTime, attributes)
   }
 
+  updateProcessor (processor: Processor) {
+    this.processor = processor
+  }
+
   endSpan (
     span: SpanInternal,
-    endTime: number,
-    sampler: Sampler,
-    processor: Processor
+    endTime: number
   ) {
-    const spanEnded = span.end(endTime, sampler.spanProbability)
+    const spanEnded = span.end(endTime, this.sampler.spanProbability)
 
-    if (sampler.sample(spanEnded)) {
-      processor.add(spanEnded)
+    if (this.sampler.sample(spanEnded)) {
+      this.processor.add(spanEnded)
     }
   }
 }
