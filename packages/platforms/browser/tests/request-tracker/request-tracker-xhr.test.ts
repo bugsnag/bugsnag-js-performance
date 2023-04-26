@@ -7,15 +7,11 @@ const TEST_URL = 'http://test-url.com/'
 
 class XMLHttpRequest {
   static readonly DONE: 4 = 4
-  _listeners: { readystatechange: Array<() => void> }
+  _listeners: { readystatechange: Array<() => void> } = { readystatechange: [] }
   _success: boolean = true
   _responseStatus: number = 200
   readyState: number = 0
   status: number = 0
-
-  constructor () {
-    this._listeners = { readystatechange: [] }
-  }
 
   open (method: string, url: string | { toString: () => string }, success: boolean = true, responseStatus: number = 200) {
     this._success = success
@@ -43,8 +39,10 @@ describe('XHR Request Tracker', () => {
   let clock: Clock
   let startCallback: jest.MockedFunction<RequestStartCallback>
   let endCallback: jest.MockedFunction<RequestEndCallback>
+  const originalOpen = XMLHttpRequest.prototype.open
 
   beforeEach(() => {
+    XMLHttpRequest.prototype.open = originalOpen
     clock = new IncrementingClock()
     endCallback = jest.fn()
     startCallback = jest.fn(context => endCallback)
