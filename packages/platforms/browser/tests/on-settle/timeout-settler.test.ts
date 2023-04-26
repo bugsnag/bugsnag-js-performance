@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import TimeoutSettler from '../lib/timeout-settler'
+import TimeoutSettler from '../../lib/on-settle/timeout-settler'
 
 describe('TimeoutSettler', () => {
   beforeEach(() => {

@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import DomMutationSettler from '../lib/dom-mutation-settler'
+import DomMutationSettler from '../../lib/on-settle/dom-mutation-settler'
 
 describe('DomMutationSettler', () => {
   beforeEach(() => {
