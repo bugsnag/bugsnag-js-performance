@@ -41,6 +41,20 @@ interface PerformanceObserverFake extends PerformanceObserver {
   trigger: (entries: PerformanceObserverEntryListFake) => void
 }
 
+const ALL_SUPPORTED_ENTRY_TYPES = [
+  'mark',
+  'measure',
+  'navigation',
+  'resource',
+  'longtask',
+  'paint',
+  'element',
+  'event',
+  'first-input',
+  'layout-shift',
+  'largest-contentful-paint'
+]
+
 export class PerformanceObserverManager {
   private readonly observers = new Set<PerformanceObserverFake>()
   private buffer: PerformanceEntryFake[] = []
@@ -61,11 +75,21 @@ export class PerformanceObserverManager {
     this.buffer = []
   }
 
-  createPerformanceObserverFakeClass (): typeof PerformanceObserver {
+  createPerformanceObserverFakeClass (
+    supportedEntryTypes: string[] | undefined | null = ALL_SUPPORTED_ENTRY_TYPES
+  ): typeof PerformanceObserver {
     const registerInstance = this.observers.add.bind(this.observers)
     const deregisterInstance = this.observers.delete.bind(this.observers)
     const clearBuffer = () => { this.buffer = [] }
 
+    // use 'null' to signal that supportedEntryTypes should not be implemented
+    if (supportedEntryTypes === null) {
+      supportedEntryTypes = undefined
+    }
+
+    // @ts-expect-error 'supportedEntryTypes' is supposed to be 'string[]' but
+    //                  it's possible for it to be unsupported ('undefined') so
+    //                  we have to expect an error here
     return class {
       public readonly entryTypes = new Set<PerformanceEntryType>()
 
@@ -110,20 +134,8 @@ export class PerformanceObserverManager {
       }
 
       // https://w3c.github.io/performance-timeline/#dom-performanceobserver-supportedentrytypes
-      static get supportedEntryTypes (): string[] {
-        return [
-          'mark',
-          'measure',
-          'navigation',
-          'resource',
-          'longtask',
-          'paint',
-          'element',
-          'event',
-          'first-input',
-          'layout-shift',
-          'largest-contentful-paint'
-        ]
+      static get supportedEntryTypes (): string[] | undefined {
+        return supportedEntryTypes as string[] | undefined
       }
 
       // https://w3c.github.io/performance-timeline/#disconnect-method
