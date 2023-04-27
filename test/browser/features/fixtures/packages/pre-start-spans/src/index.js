@@ -8,6 +8,6 @@ BugsnagPerformance.startSpan("Custom/Pre Start Span 0").end()
 BugsnagPerformance.startSpan("Custom/Pre Start Span 1").end()
 BugsnagPerformance.startSpan("Custom/Pre Start Span 2").end()
 
-BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 4 })
+BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 4, autoInstrumentFullPageLoads: false })
 
 BugsnagPerformance.startSpan("Custom/Post Start").end()
