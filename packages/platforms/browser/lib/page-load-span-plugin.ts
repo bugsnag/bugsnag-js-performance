@@ -2,21 +2,19 @@ import { type SpanFactory, type Plugin, type InternalConfiguration } from '@bugs
 
 export class PageLoadSpanPlugin implements Plugin {
   private route = window.location.pathname
-  private spanFactory: SpanFactory | undefined
+  private spanFactory: SpanFactory
+
+  constructor (spanFactory: SpanFactory) {
+    this.spanFactory = spanFactory
+  }
 
   get name () {
     return `[FullPageLoad]${this.route}`
   }
 
-  load (spanFactory: SpanFactory) {
-    this.spanFactory = spanFactory
-  }
-
   configure (configuration: InternalConfiguration) {
     // @ts-expect-error Property does not exist on InternalConfiguration
     if (!configuration.autoInstrumentFullPageLoads) return
-
-    if (!this.spanFactory) throw new Error('configure called before load')
 
     const startTime = 0 // TODO: Get start time
     const pageLoadSpan = this.spanFactory.startSpan(this.name, startTime)

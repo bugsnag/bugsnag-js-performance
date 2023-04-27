@@ -11,9 +11,11 @@ jest.useFakeTimers()
 describe('PageLoadSpanPlugin', () => {
   it('Automatically creates and delivers a pageLoadSpan', () => {
     const delivery = new InMemoryDelivery()
-    const pageLoadSpanPlugin = new PageLoadSpanPlugin()
-    const schema = createSchema(window.location.hostname)
-    const testClient = createTestClient({ schema, deliveryFactory: () => delivery, plugins: [pageLoadSpanPlugin] })
+    const testClient = createTestClient({
+      schema: createSchema(window.location.hostname),
+      deliveryFactory: () => delivery,
+      plugins: (spanFactory) => [new PageLoadSpanPlugin(spanFactory)]
+    })
 
     testClient.start({ apiKey: VALID_API_KEY, endpoint: '/test' })
 
@@ -28,9 +30,11 @@ describe('PageLoadSpanPlugin', () => {
 
   it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
     const delivery = { send: jest.fn() }
-    const pageLoadSpanPlugin = new PageLoadSpanPlugin()
-    const schema = createSchema(window.location.hostname)
-    const testClient = createTestClient({ schema, deliveryFactory: () => delivery, plugins: [pageLoadSpanPlugin] })
+    const testClient = createTestClient({
+      schema: createSchema(window.location.hostname),
+      deliveryFactory: () => delivery,
+      plugins: (spanFactory) => [new PageLoadSpanPlugin(spanFactory)]
+    })
 
     // TODO: This config option should show up
     // @ts-expect-error autoInstrumentFullPageLoads
