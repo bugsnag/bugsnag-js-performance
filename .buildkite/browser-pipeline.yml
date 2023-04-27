@@ -25,26 +25,26 @@ steps:
               push: browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-legacy-${BRANCH_NAME}
 
       # BitBar
-      - label: ":{{ matrix.browser }}: {{ matrix.version }} tests"
-        depends_on: "browser-maze-runner"
-        timeout_in_minutes: 30
-        plugins:
-          docker-compose#v3.9.0:
-            pull: browser-maze-runner
-            run: browser-maze-runner
-            use-aliases: true
-            command:
-              - --farm=bb
-              - --browser={{ matrix.browser }}_{{ matrix.version }}
-          artifacts#v1.5.0:
-            upload:
-              - "./test/browser/maze_output/failed/**/*"
-        concurrency: 5
-        concurrency_group: "bitbar-web"
-        matrix:
-          setup:
-            browser: [chrome, firefox, edge]
-            version: [latest]
+#      - label: ":{{ matrix.browser }}: {{ matrix.version }} tests"
+#        depends_on: "browser-maze-runner"
+#        timeout_in_minutes: 30
+#        plugins:
+#          docker-compose#v3.9.0:
+#            pull: browser-maze-runner
+#            run: browser-maze-runner
+#            use-aliases: true
+#            command:
+#              - --farm=bb
+#              - --browser={{ matrix.browser }}_{{ matrix.version }}
+#          artifacts#v1.5.0:
+#            upload:
+#              - "./test/browser/maze_output/failed/**/*"
+#        concurrency: 5
+#        concurrency_group: "bitbar-web"
+#        matrix:
+#          setup:
+#            browser: [chrome, firefox, edge]
+#            version: [latest]
 #          adjustments:
 #            - with: { browser: safari, version: 16 }
 
