@@ -1,11 +1,11 @@
 import { type Clock } from '@bugsnag/js-performance-core'
 import { type RequestEndCallback, RequestTracker } from './request-tracker'
 
-interface WindowWithXMLHttpRequest {
+interface WindowWithXmlHttpRequest {
   XMLHttpRequest: typeof XMLHttpRequest
 }
 
-function createXMLHttpRequestTracker (window: WindowWithXMLHttpRequest, clock: Clock): RequestTracker {
+function createXmlHttpRequestTracker (window: WindowWithXmlHttpRequest, clock: Clock): RequestTracker {
   const requestTracker = new RequestTracker()
   const originalOpen = window.XMLHttpRequest.prototype.open
   window.XMLHttpRequest.prototype.open = function open (method, url, ...rest: any[]): void {
@@ -31,4 +31,4 @@ function createXMLHttpRequestTracker (window: WindowWithXMLHttpRequest, clock: C
   return requestTracker
 }
 
-export default createXMLHttpRequestTracker
+export default createXmlHttpRequestTracker
