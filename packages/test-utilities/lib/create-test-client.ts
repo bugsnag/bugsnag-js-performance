@@ -22,7 +22,7 @@ const defaultOptions = () => ({
   resourceAttributesSource,
   spanAttributesSource,
   schema,
-  plugins: []
+  plugins: () => []
 })
 
 function createTestClient (optionOverrides: Partial<ClientOptions> = {}): BugsnagPerformance {

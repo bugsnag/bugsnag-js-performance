@@ -230,10 +230,11 @@ describe('Core', () => {
       })
     })
 
-    it('loads and configures a given plugin', () => {
-      const plugin = { load: jest.fn(), configure: jest.fn() }
-      const client = createTestClient({ plugins: [plugin] })
-      expect(plugin.load).toHaveBeenCalled()
+    it('creates and configures a given plugin', () => {
+      const plugin = { configure: jest.fn() }
+      const createPlugins = jest.fn(() => [plugin])
+      const client = createTestClient({ plugins: createPlugins })
+      expect(createPlugins).toHaveBeenCalled()
       expect(plugin.configure).not.toHaveBeenCalled()
       client.start(VALID_API_KEY)
       expect(plugin.configure).toHaveBeenCalled()
