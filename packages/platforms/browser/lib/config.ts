@@ -6,6 +6,11 @@ export function createSchema (hostname: string): CoreSchema {
     releaseStage: {
       ...schema.releaseStage,
       defaultValue: hostname === 'localhost' ? 'development' : 'production'
+    },
+    autoInstrumentFullPageLoads: {
+      defaultValue: true,
+      message: 'should be true|false',
+      validate: (value): value is boolean => value === true || value === false
     }
   }
 }
