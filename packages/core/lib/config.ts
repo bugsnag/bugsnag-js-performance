@@ -17,6 +17,10 @@ export interface Configuration {
   samplingProbability?: number
 }
 
+export type PlatformConfiguration <S extends CoreSchema> = {
+  [K in keyof S]?: S[K]['defaultValue']
+} & Configuration
+
 export type InternalConfiguration = Required<Configuration> & {
   maximumBatchSize: number
   batchInactivityTimeoutMs: number

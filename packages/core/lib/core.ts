@@ -2,7 +2,7 @@ import { type ResourceAttributeSource, type SpanAttributesSource } from './attri
 import { type BackgroundingListener } from './backgrounding-listener'
 import { BatchProcessor } from './batch-processor'
 import { type Clock } from './clock'
-import { validateConfig, type Configuration, type CoreSchema } from './config'
+import { validateConfig, type Configuration, type CoreSchema, type PlatformConfiguration } from './config'
 import { type DeliveryFactory } from './delivery'
 import { type IdGenerator } from './id-generator'
 import { type Plugin } from './plugin'
@@ -11,10 +11,6 @@ import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
 import { SpanFactory, type Span } from './span'
 import { timeToNumber, type Time } from './time'
-
-type PlatformConfiguration <S extends CoreSchema> = {
-  [K in keyof S]?: S[K]['defaultValue']
-} & Configuration
 
 export interface BugsnagPerformance <S extends CoreSchema> {
   start: (config: PlatformConfiguration<S> | string) => void
