@@ -18,7 +18,8 @@ const BugsnagPerformance = createClient({
   spanAttributesSource,
   deliveryFactory: createBrowserDeliveryFactory(window.fetch, backgroundingListener),
   idGenerator,
-  schema: createSchema(window.location.hostname)
+  schema: createSchema(window.location.hostname),
+  plugins: []
 })
 
 export default BugsnagPerformance

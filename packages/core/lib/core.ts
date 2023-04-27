@@ -5,6 +5,7 @@ import { type Clock } from './clock'
 import { validateConfig, type Configuration, type CoreSchema } from './config'
 import { type DeliveryFactory } from './delivery'
 import { type IdGenerator } from './id-generator'
+import { type Plugin } from './plugin'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
@@ -24,6 +25,7 @@ export interface ClientOptions {
   resourceAttributesSource: ResourceAttributeSource
   spanAttributesSource: SpanAttributesSource
   schema: CoreSchema
+  plugins: Plugin[]
 }
 
 export function createClient (options: ClientOptions): BugsnagPerformance {
@@ -32,6 +34,10 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
 
   const sampler = new Sampler(1.0)
   const spanFactory = new SpanFactory(processor, sampler, options.idGenerator, options.spanAttributesSource)
+
+  for (const plugin of options.plugins) {
+    plugin.load(spanFactory)
+  }
 
   return {
     start: (config: Configuration | string) => {
@@ -64,6 +70,10 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       })
 
       spanFactory.updateProcessor(processor)
+
+      for (const plugin of options.plugins) {
+        plugin.configure(configuration)
+      }
     },
     startSpan: (name, startTime) => {
       const safeStartTime = timeToNumber(options.clock, startTime)

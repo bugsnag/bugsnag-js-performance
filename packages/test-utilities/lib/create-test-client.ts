@@ -21,7 +21,8 @@ const defaultOptions = () => ({
   clock: new IncrementingClock(),
   resourceAttributesSource,
   spanAttributesSource,
-  schema
+  schema,
+  plugins: []
 })
 
 function createTestClient (optionOverrides: Partial<ClientOptions> = {}): BugsnagPerformance {
