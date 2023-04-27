@@ -4,7 +4,7 @@ const parameters = new URLSearchParams(window.location.search)
 const apiKey = parameters.get('api_key')
 const endpoint = parameters.get('endpoint')
 
-BugsnagPerformance.start({ apiKey, endpoint, autoInstrumentFullPageLoads: false })
+BugsnagPerformance.start({ apiKey, endpoint, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false })
 
 let spanNumber = 0
 

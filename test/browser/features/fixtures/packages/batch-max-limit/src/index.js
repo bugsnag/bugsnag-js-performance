@@ -4,7 +4,7 @@ const parameters = new URLSearchParams(window.location.search)
 const apiKey = parameters.get('api_key')
 const endpoint = parameters.get('endpoint')
 
-BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 5, autoInstrumentFullPageLoads: false })
+BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 5, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false })
 
 const spanNames = [
   "Custom/Full Batch 1",
