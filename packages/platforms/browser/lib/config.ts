@@ -11,6 +11,11 @@ export function createSchema (hostname: string): CoreSchema {
       defaultValue: true,
       message: 'should be true|false',
       validate: (value): value is boolean => value === true || value === false
+    },
+    autoInstrumentNetworkRequests: {
+      defaultValue: true,
+      message: 'should be true|false',
+      validate: (value): value is boolean => value === true || value === false
     }
   }
 }
