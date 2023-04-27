@@ -12,12 +12,16 @@ import Sampler from './sampler'
 import { SpanFactory, type Span } from './span'
 import { timeToNumber, type Time } from './time'
 
-export interface BugsnagPerformance {
-  start: (config: Configuration | string) => void
+type PlatformConfiguration <S extends CoreSchema> = {
+  [K in keyof S]?: S[K]['defaultValue']
+} & Configuration
+
+export interface BugsnagPerformance <S extends CoreSchema> {
+  start: (config: PlatformConfiguration<S> | string) => void
   startSpan: (name: string, startTime?: Time) => Span
 }
 
-export interface ClientOptions <S extends CoreSchema> {
+export interface ClientOptions <S> {
   clock: Clock
   idGenerator: IdGenerator
   deliveryFactory: DeliveryFactory
@@ -28,7 +32,7 @@ export interface ClientOptions <S extends CoreSchema> {
   plugins: (spanFactory: SpanFactory) => Plugin[]
 }
 
-export function createClient <S extends CoreSchema> (options: ClientOptions<S>): BugsnagPerformance {
+export function createClient <S extends CoreSchema> (options: ClientOptions<S>): BugsnagPerformance<S> {
   const bufferingProcessor = new BufferingProcessor()
   let processor: Processor = bufferingProcessor
 
@@ -86,7 +90,7 @@ export function createClient <S extends CoreSchema> (options: ClientOptions<S>):
   }
 }
 
-export function createNoopClient (): BugsnagPerformance {
+export function createNoopClient <S extends CoreSchema> (): BugsnagPerformance<S> {
   const noop = () => {}
 
   return {
