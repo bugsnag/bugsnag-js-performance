@@ -25,7 +25,7 @@ const defaultOptions = () => ({
   plugins: () => []
 })
 
-function createTestClient (optionOverrides: Partial<ClientOptions> = {}): BugsnagPerformance {
+function createTestClient (optionOverrides: Partial<ClientOptions<typeof schema>> = {}): BugsnagPerformance {
   return createClient({ ...defaultOptions(), ...optionOverrides })
 }
 
