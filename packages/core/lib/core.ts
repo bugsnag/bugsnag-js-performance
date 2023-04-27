@@ -17,18 +17,18 @@ export interface BugsnagPerformance {
   startSpan: (name: string, startTime?: Time) => Span
 }
 
-export interface ClientOptions {
+export interface ClientOptions <S extends CoreSchema> {
   clock: Clock
   idGenerator: IdGenerator
   deliveryFactory: DeliveryFactory
   backgroundingListener: BackgroundingListener
   resourceAttributesSource: ResourceAttributeSource
   spanAttributesSource: SpanAttributesSource
-  schema: CoreSchema
+  schema: S
   plugins: (spanFactory: SpanFactory) => Plugin[]
 }
 
-export function createClient (options: ClientOptions): BugsnagPerformance {
+export function createClient <S extends CoreSchema> (options: ClientOptions<S>): BugsnagPerformance {
   const bufferingProcessor = new BufferingProcessor()
   let processor: Processor = bufferingProcessor
 
