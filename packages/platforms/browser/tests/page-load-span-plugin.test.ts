@@ -8,7 +8,7 @@ import { PageLoadSpanPlugin } from '../lib/page-load-span-plugin'
 jest.useFakeTimers()
 
 describe('PageLoadSpanPlugin', () => {
-  it('creates a span', async () => {
+  it('Automatically creates and delivers a pageLoadSpan', async () => {
     const delivery = new InMemoryDelivery()
     const pageLoadSpanPlugin = new PageLoadSpanPlugin()
     const testClient = createTestClient({ deliveryFactory: () => delivery, plugins: [pageLoadSpanPlugin] })
@@ -17,6 +17,42 @@ describe('PageLoadSpanPlugin', () => {
 
     await jest.runAllTimersAsync()
 
-    expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/' }))
+    const deliveredSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+
+    expect(deliveredSpan).toStrictEqual(expect.objectContaining({
+      name: '[FullPageLoad]/',
+      attributes: expect.arrayContaining([
+        {
+          key: 'bugsnag.span.category',
+          value: {
+            stringValue: 'full_page_load'
+          }
+        },
+        {
+          key: 'bugsnag.browser.page.route',
+          value: {
+            stringValue: '/'
+          }
+        },
+        {
+          key: 'bugsnag.browser.page.url',
+          value: {
+            stringValue: 'http://localhost/'
+          }
+        },
+        {
+          key: 'bugsnag.browser.page.referrer',
+          value: {
+            stringValue: ''
+          }
+        },
+        {
+          key: 'bugsnag.browser.page.title',
+          value: {
+            stringValue: ''
+          }
+        }
+      ])
+    }))
   })
 })
