@@ -36,8 +36,6 @@ describe('PageLoadSpanPlugin', () => {
       plugins: (spanFactory) => [new PageLoadSpanPlugin(spanFactory)]
     })
 
-    // TODO: This config option should show up
-    // @ts-expect-error autoInstrumentFullPageLoads
     testClient.start({ apiKey: VALID_API_KEY, endpoint: '/test', autoInstrumentFullPageLoads: false })
 
     jest.runAllTimers()
