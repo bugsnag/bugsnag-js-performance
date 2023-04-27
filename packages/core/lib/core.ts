@@ -25,7 +25,7 @@ export interface ClientOptions {
   resourceAttributesSource: ResourceAttributeSource
   spanAttributesSource: SpanAttributesSource
   schema: CoreSchema
-  plugins: Plugin[]
+  plugins: (spanFactory: SpanFactory) => Plugin[]
 }
 
 export function createClient (options: ClientOptions): BugsnagPerformance {
@@ -34,10 +34,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
 
   const sampler = new Sampler(1.0)
   const spanFactory = new SpanFactory(processor, sampler, options.idGenerator, options.spanAttributesSource)
-
-  for (const plugin of options.plugins) {
-    plugin.load(spanFactory)
-  }
+  const plugins = options.plugins(spanFactory)
 
   return {
     start: (config: Configuration | string) => {
@@ -71,7 +68,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
 
       spanFactory.updateProcessor(processor)
 
-      for (const plugin of options.plugins) {
+      for (const plugin of plugins) {
         plugin.configure(configuration)
       }
     },

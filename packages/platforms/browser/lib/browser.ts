@@ -19,7 +19,7 @@ const BugsnagPerformance = createClient({
   deliveryFactory: createBrowserDeliveryFactory(window.fetch, backgroundingListener),
   idGenerator,
   schema: createSchema(window.location.hostname),
-  plugins: []
+  plugins: () => []
 })
 
 export default BugsnagPerformance
