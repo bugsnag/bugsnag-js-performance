@@ -4,10 +4,10 @@ export interface RequestStartContext {
   startTime: number
 }
 
-interface RequestEndContextSuccess { endTime: number, status: number }
-interface RequestEndContextError { endTime: number, error: Error }
+export interface RequestEndContextSuccess { endTime: number, status: number }
+export interface RequestEndContextError { endTime: number, error: Error }
 
-type RequestEndContext = RequestEndContextSuccess | RequestEndContextError
+export type RequestEndContext = RequestEndContextSuccess | RequestEndContextError
 
 export type RequestStartCallback = (context: RequestStartContext) => RequestEndCallback
 export type RequestEndCallback = (context: RequestEndContext) => void
