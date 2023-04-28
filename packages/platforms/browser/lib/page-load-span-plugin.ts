@@ -20,8 +20,7 @@ export class PageLoadSpanPlugin implements Plugin<BrowserConfiguration> {
     // TODO: Send to method in configuration.routingProvider to update the route and name, and end the span
     const settler = new LoadEventEndSettler(document)
     settler.subscribe(() => {
-      // eslint-disable-next-line compat/compat
-      const startTime = performance.timeOrigin || performance.timing.navigationStart // TODO: Use PerformanceTiming
+      const startTime = 0 // TODO: Use PerformanceTiming
       const pageLoadSpan = this.spanFactory.startSpan(this.name, startTime)
 
       // TODO: Add page load span attributes
