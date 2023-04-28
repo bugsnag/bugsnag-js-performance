@@ -1,11 +1,11 @@
-import { type Settler } from './settler'
+import { Settler } from './settler'
 
-class DomMutationSettler implements Settler {
+class DomMutationSettler extends Settler {
   private timeout: ReturnType<typeof setTimeout> | undefined = undefined
-  private settled: boolean = false
-  private callbacks: Array<() => void> = []
 
   constructor (target: Node) {
+    super()
+
     const observer = new MutationObserver(() => { this.restart() })
 
     observer.observe(target, {
@@ -19,26 +19,11 @@ class DomMutationSettler implements Settler {
     this.restart()
   }
 
-  subscribe (callback: () => void): void {
-    this.callbacks.push(callback)
-
-    // if the dom is already settled, call the callback immediately
-    if (this.settled) {
-      callback()
-    }
-  }
-
   private restart (): void {
     clearTimeout(this.timeout)
     this.settled = false
 
-    this.timeout = setTimeout(() => {
-      this.settled = true
-
-      for (const callback of this.callbacks) {
-        callback()
-      }
-    }, 100)
+    this.timeout = setTimeout(() => { this.settle() }, 100)
   }
 }
 

@@ -1,4 +1,4 @@
-import { type Settler } from './settler'
+import { Settler } from './settler'
 
 interface PerformanceWithTiming {
   timing: {
@@ -11,11 +11,10 @@ function isPerformanceNavigationTiming (entry: PerformanceEntry): entry is Perfo
   return entry.entryType === 'navigation'
 }
 
-class LoadEventEndSettler implements Settler {
-  private settled: boolean = false
-  private callbacks: Array<() => void> = []
-
+class LoadEventEndSettler extends Settler {
   constructor (PerformanceObserverClass: typeof PerformanceObserver, performance: PerformanceWithTiming) {
+    super()
+
     const supportedEntryTypes = PerformanceObserverClass.supportedEntryTypes
 
     // if the browser doesn't support 'supportedEntryTypes' or doesn't support
@@ -26,15 +25,6 @@ class LoadEventEndSettler implements Settler {
       this.settleUsingPerformanceObserver(PerformanceObserverClass)
     } else {
       this.settleUsingPerformanceTiming(performance)
-    }
-  }
-
-  subscribe (callback: () => void): void {
-    this.callbacks.push(callback)
-
-    // if we're already settled, call the callback immediately
-    if (this.settled) {
-      callback()
     }
   }
 
@@ -75,14 +65,6 @@ class LoadEventEndSettler implements Settler {
     }
 
     settleOnValidLoadEventEnd()
-  }
-
-  private settle (): void {
-    this.settled = true
-
-    for (const callback of this.callbacks) {
-      callback()
-    }
   }
 }
 
