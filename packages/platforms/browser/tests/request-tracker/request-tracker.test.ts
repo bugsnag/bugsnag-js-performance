@@ -31,4 +31,22 @@ describe('Request Tracker', () => {
     onEnd(endContext)
     expect(endCallback).toHaveBeenCalledWith(endContext)
   })
+
+  it('should handle no end callback returned', () => {
+    const requestTracker = new RequestTracker()
+    const endCallback = jest.fn()
+    const startCallback = jest.fn()
+
+    requestTracker.onStart(startCallback)
+    expect(startCallback).not.toHaveBeenCalled()
+
+    const startContext = { url: '/', method: 'GET', startTime: 1 }
+    const onEnd = requestTracker.start(startContext)
+    expect(startCallback).toHaveBeenCalledWith(startContext)
+    expect(endCallback).not.toHaveBeenCalled()
+
+    const endContext = { status: 200, endTime: 2 }
+    onEnd(endContext)
+    expect(endCallback).not.toHaveBeenCalled()
+  })
 })
