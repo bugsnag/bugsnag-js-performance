@@ -20,7 +20,11 @@ export class PageLoadSpanPlugin implements Plugin<BrowserConfiguration> {
       const startTime = 0 // TODO: Use PerformanceTiming
       const pageLoadSpan = this.spanFactory.startSpan(`[FullPageLoad]${this.route}`, startTime)
 
-      // TODO: Add page load span attributes
+      pageLoadSpan.setAttribute('bugsnag.span.category', 'full_page_load')
+      pageLoadSpan.setAttribute('bugsnag.browser.page.route', this.route) // TODO: Add using route resolve function
+      pageLoadSpan.setAttribute('bugsnag.browser.page.url', window.location.href)
+      pageLoadSpan.setAttribute('bugsnag.browser.page.referrer', document.referrer)
+      pageLoadSpan.setAttribute('bugsnag.browser.page.title', document.title)
 
       // TODO: Add web vitals
 
