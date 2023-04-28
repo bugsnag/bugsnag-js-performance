@@ -1,4 +1,4 @@
-import { RequestTracker } from '../lib/request-tracker'
+import { RequestTracker } from '../../lib/request-tracker/request-tracker'
 
 describe('Request Tracker', () => {
   it('should invoke start callbacks on onStart', () => {
