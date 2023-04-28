@@ -21,15 +21,13 @@ describe('PageLoadSpanPlugin', () => {
 
     jest.runAllTimers()
 
-    const deliveredSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
-
-    expect(deliveredSpan).toStrictEqual(expect.objectContaining({
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
       name: '[FullPageLoad]/'
     }))
   })
 
   it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
-    const delivery = { send: jest.fn() }
+    const delivery = new InMemoryDelivery()
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
@@ -40,6 +38,8 @@ describe('PageLoadSpanPlugin', () => {
 
     jest.runAllTimers()
 
-    expect(delivery.send).not.toHaveBeenCalled()
+    expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+      name: '[FullPageLoad]/'
+    }))
   })
 })
