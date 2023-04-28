@@ -5,28 +5,32 @@ import { type Clock } from '@bugsnag/js-performance-core'
 
 const TEST_URL = 'http://test-url.com/'
 
+interface XmlHttpRequestFake {
+  _listeners: { readystatechange: Array<() => void> }
+  readyState: number
+  status: number
+}
+
 function getXmlHttpRequestFake (success: boolean = true, responseStatus: number = 200) {
-  class XmlHttpRequestFake {
-    static readonly DONE: 4 = 4
-    _listeners: { readystatechange: Array<() => void> } = { readystatechange: [] }
-    readyState: number = 0
-    status: number = 0
+  function XmlHttpRequestFake (this: XmlHttpRequestFake) {
+    this._listeners = { readystatechange: [] }
+    this.readyState = 0
+    this.status = 0
   }
 
-  // @ts-expect-error open
+  XmlHttpRequestFake.DONE = 4
+
   XmlHttpRequestFake.prototype.open = jest.fn(function (method: string, url: string | URL) {
     this.readyState = 1
     for (const onReadyStateChange of this._listeners.readystatechange) onReadyStateChange()
   })
 
-  // @ts-expect-error send
   XmlHttpRequestFake.prototype.send = jest.fn(function (body?: any) {
     this.readyState = 4
     if (success) this.status = responseStatus
     for (const onReadyStateChange of this._listeners.readystatechange) onReadyStateChange()
   })
 
-  // @ts-expect-error addEventListener
   XmlHttpRequestFake.prototype.addEventListener = jest.fn(function (evt: 'readystatechange', listener: () => void) {
     this._listeners[evt].push(listener)
   })
