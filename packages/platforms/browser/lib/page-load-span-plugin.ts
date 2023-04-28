@@ -1,7 +1,8 @@
-import { type SpanFactory, type Plugin, type InternalConfiguration } from '@bugsnag/js-performance-core'
+import { type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/js-performance-core'
+import { type BrowserConfiguration } from './config'
 
-export class PageLoadSpanPlugin implements Plugin {
-  private route = window.location.pathname
+export class PageLoadSpanPlugin implements Plugin<BrowserConfiguration> {
+  private route = window.location.pathname // TODO: Get real route using configuration.routingProvider
   private spanFactory: SpanFactory
 
   constructor (spanFactory: SpanFactory) {
@@ -12,8 +13,7 @@ export class PageLoadSpanPlugin implements Plugin {
     return `[FullPageLoad]${this.route}`
   }
 
-  configure (configuration: InternalConfiguration) {
-    // @ts-expect-error Property does not exist on InternalConfiguration
+  configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     if (!configuration.autoInstrumentFullPageLoads) return
 
     const startTime = 0 // TODO: Get start time
