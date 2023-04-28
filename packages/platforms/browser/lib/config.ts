@@ -1,7 +1,11 @@
-import { schema, type CoreSchema, type ConfigOption } from '@bugsnag/js-performance-core'
+import { schema, type CoreSchema, type ConfigOption, type Configuration } from '@bugsnag/js-performance-core'
 
 export interface BrowserSchema extends CoreSchema {
   autoInstrumentFullPageLoads: ConfigOption<boolean>
+}
+
+export interface BrowserConfiguration extends Configuration {
+  autoInstrumentFullPageLoads?: boolean
 }
 
 export function createSchema (hostname: string): BrowserSchema {

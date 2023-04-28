@@ -1,20 +1,20 @@
 import { type ResourceAttributeSource } from './attributes'
 import { type Clock } from './clock'
-import { type InternalConfiguration } from './config'
+import { type Configuration, type InternalConfiguration } from './config'
 import { type Delivery, type DeliverySpan } from './delivery'
 import { type Processor } from './processor'
 import { type RetryQueue } from './retry-queue'
 import type Sampler from './sampler'
 import { spanToJson, type SpanEnded } from './span'
 
-export class BatchProcessor implements Processor {
+export class BatchProcessor<C extends Configuration> implements Processor {
   private batch: SpanEnded[] = []
   private timeout: ReturnType<typeof setTimeout> | null = null
 
   constructor (
     private delivery: Delivery,
-    private configuration: InternalConfiguration,
-    private resourceAttributeSource: ResourceAttributeSource,
+    private configuration: InternalConfiguration<C>,
+    private resourceAttributeSource: ResourceAttributeSource<C>,
     private clock: Clock,
     private retryQueue: RetryQueue,
     private sampler: Sampler
@@ -36,6 +36,7 @@ export class BatchProcessor implements Processor {
 
   add (span: SpanEnded) {
     if (this.configuration.enabledReleaseStages &&
+      this.configuration.releaseStage &&
       !this.configuration.enabledReleaseStages.includes(this.configuration.releaseStage)
     ) {
       return
@@ -85,10 +86,10 @@ export class BatchProcessor implements Processor {
           this.retryQueue.flush()
           break
         case 'failure-discard':
-          this.configuration.logger.warn('delivery failed')
+          this.configuration.logger?.warn('delivery failed')
           break
         case 'failure-retryable':
-          this.configuration.logger.info('delivery failed, adding to retry queue')
+          this.configuration.logger?.info('delivery failed, adding to retry queue')
           this.retryQueue.add(payload, batchTime)
           break
         default: {
@@ -97,7 +98,7 @@ export class BatchProcessor implements Processor {
         }
       }
     } catch (err) {
-      this.configuration.logger.warn('delivery failed')
+      this.configuration.logger?.warn('delivery failed')
     }
   }
 
