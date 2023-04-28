@@ -3,6 +3,7 @@ import { SpanFactory, type SpanEnded, type SpanInternal } from '@bugsnag/js-perf
 import { StableIdGenerator, spanAttributesSource } from '@bugsnag/js-performance-test-utilities'
 import { RequestTracker, type RequestStartCallback } from '../lib/request-tracker/request-tracker'
 
+const ENDPOINT = 'http://traces.endpoint/'
 const TEST_URL = 'http://test-url.com/'
 
 class MockRequestTracker extends RequestTracker {
@@ -49,25 +50,16 @@ describe('network span plugin', () => {
     expect(fetchTracker.onStart).not.toHaveBeenCalled()
 
     // @ts-expect-error configuration
-    plugin.configure({ autoInstrumentNetworkRequests: true })
+    plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: true })
     expect(xhrTracker.onStart).toHaveBeenCalled()
     expect(fetchTracker.onStart).toHaveBeenCalled()
-  })
-
-  it('does not track requests when autoInstrumentNetworkRequests = false', () => {
-    const plugin = new NetworkSpanPlugin(spanFactory, fetchTracker, xhrTracker)
-
-    // @ts-expect-error configuration
-    plugin.configure({ autoInstrumentNetworkRequests: false })
-    expect(xhrTracker.onStart).not.toHaveBeenCalled()
-    expect(fetchTracker.onStart).not.toHaveBeenCalled()
   })
 
   it('starts a span on request start', () => {
     const plugin = new NetworkSpanPlugin(spanFactory, fetchTracker, xhrTracker)
 
     // @ts-expect-error configuration
-    plugin.configure({ autoInstrumentNetworkRequests: true })
+    plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: true })
 
     fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
@@ -80,7 +72,7 @@ describe('network span plugin', () => {
     const plugin = new NetworkSpanPlugin(spanFactory, fetchTracker, xhrTracker)
 
     // @ts-expect-error configuration
-    plugin.configure({ autoInstrumentNetworkRequests: true })
+    plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: true })
 
     const endRequest = fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
@@ -90,11 +82,30 @@ describe('network span plugin', () => {
     expect(spanFactory.endSpan).toHaveBeenCalledWith(spanFactory.createdSpans[0], 2)
   })
 
+  it('does not track requests when autoInstrumentNetworkRequests = false', () => {
+    const plugin = new NetworkSpanPlugin(spanFactory, fetchTracker, xhrTracker)
+
+    // @ts-expect-error configuration
+    plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: false })
+    expect(xhrTracker.onStart).not.toHaveBeenCalled()
+    expect(fetchTracker.onStart).not.toHaveBeenCalled()
+  })
+
+  it('does not track requests to the configured traces endpoint', () => {
+    const plugin = new NetworkSpanPlugin(spanFactory, fetchTracker, xhrTracker)
+
+    // @ts-expect-error configuration
+    plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: true })
+
+    fetchTracker.start({ method: 'GET', url: ENDPOINT, startTime: 1 })
+    expect(spanFactory.startSpan).not.toHaveBeenCalled()
+  })
+
   it('discards the span if the status is 0', () => {
     const plugin = new NetworkSpanPlugin(spanFactory, fetchTracker, xhrTracker)
 
     // @ts-expect-error configuration
-    plugin.configure({ autoInstrumentNetworkRequests: true })
+    plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: true })
 
     const endRequest = xhrTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
@@ -107,7 +118,7 @@ describe('network span plugin', () => {
     const plugin = new NetworkSpanPlugin(spanFactory, fetchTracker, xhrTracker)
 
     // @ts-expect-error configuration
-    plugin.configure({ autoInstrumentNetworkRequests: true })
+    plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: true })
 
     const endRequest = fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
