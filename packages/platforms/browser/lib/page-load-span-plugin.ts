@@ -1,5 +1,6 @@
 import { type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/js-performance-core'
 import { type BrowserConfiguration } from './config'
+import LoadEventEndSettler from './on-settle/dom-mutation-settler'
 
 export class PageLoadSpanPlugin implements Plugin<BrowserConfiguration> {
   private route = window.location.pathname // TODO: Get real route using configuration.routingProvider
@@ -16,15 +17,19 @@ export class PageLoadSpanPlugin implements Plugin<BrowserConfiguration> {
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     if (!configuration.autoInstrumentFullPageLoads) return
 
-    const startTime = 0 // TODO: Get start time
-    const pageLoadSpan = this.spanFactory.startSpan(this.name, startTime)
-
-    // TODO: Page load span attributes
-
-    // TODO: Set web vitals
-
     // TODO: Send to method in configuration.routingProvider to update the route and name, and end the span
-    const endTime = 1234 // TODO: Get end time
-    this.spanFactory.endSpan(pageLoadSpan, endTime)
+    const settler = new LoadEventEndSettler(document)
+    settler.subscribe(() => {
+      // eslint-disable-next-line compat/compat
+      const startTime = performance.timeOrigin || performance.timing.navigationStart // TODO: Use PerformanceTiming
+      const pageLoadSpan = this.spanFactory.startSpan(this.name, startTime)
+
+      // TODO: Add page load span attributes
+
+      // TODO: Add web vitals
+
+      const endTime = performance.now() // TODO: Get end time from settler
+      this.spanFactory.endSpan(pageLoadSpan, endTime)
+    })
   }
 }
