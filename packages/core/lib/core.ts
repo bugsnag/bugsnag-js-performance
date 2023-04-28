@@ -12,23 +12,23 @@ import Sampler from './sampler'
 import { SpanFactory, type Span } from './span'
 import { timeToNumber, type Time } from './time'
 
-export interface BugsnagPerformance {
-  start: (config: Configuration | string) => void
+export interface BugsnagPerformance<C extends Configuration> {
+  start: (config: C | string) => void
   startSpan: (name: string, startTime?: Time) => Span
 }
 
-export interface ClientOptions {
+export interface ClientOptions<S extends CoreSchema, C extends Configuration> {
   clock: Clock
   idGenerator: IdGenerator
   deliveryFactory: DeliveryFactory
   backgroundingListener: BackgroundingListener
-  resourceAttributesSource: ResourceAttributeSource
+  resourceAttributesSource: ResourceAttributeSource<C>
   spanAttributesSource: SpanAttributesSource
-  schema: CoreSchema
-  plugins: (spanFactory: SpanFactory) => Plugin[]
+  schema: S
+  plugins: (spanFactory: SpanFactory) => Array<Plugin<C>>
 }
 
-export function createClient (options: ClientOptions): BugsnagPerformance {
+export function createClient<S extends CoreSchema, C extends Configuration> (options: ClientOptions<S, C>): BugsnagPerformance<C> {
   const bufferingProcessor = new BufferingProcessor()
   let processor: Processor = bufferingProcessor
 
@@ -37,8 +37,8 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
   const plugins = options.plugins(spanFactory)
 
   return {
-    start: (config: Configuration | string) => {
-      const configuration = validateConfig(config, options.schema)
+    start: (config: C | string) => {
+      const configuration = validateConfig<S, C>(config, options.schema)
 
       sampler.probability = configuration.samplingProbability
 
@@ -63,7 +63,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       // e.g. we can't trigger delivery until we have the apiKey and endpoint
       // from configuration
       options.backgroundingListener.onStateChange(state => {
-        (processor as BatchProcessor).flush()
+        (processor as BatchProcessor<C>).flush()
       })
 
       spanFactory.updateProcessor(processor)
@@ -86,7 +86,7 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
   }
 }
 
-export function createNoopClient (): BugsnagPerformance {
+export function createNoopClient<C extends Configuration> (): BugsnagPerformance<C> {
   const noop = () => {}
 
   return {

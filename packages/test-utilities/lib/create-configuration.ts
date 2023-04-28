@@ -1,7 +1,8 @@
-import { type InternalConfiguration } from '@bugsnag/js-performance-core'
+import { type Configuration, type InternalConfiguration } from '@bugsnag/js-performance-core'
 
-function createConfiguration (overrides: Partial<InternalConfiguration> = {}): InternalConfiguration {
+function createConfiguration<C extends Configuration> (overrides: Partial<C> = {}): InternalConfiguration<C> {
   return {
+    autoInstrumentFullPageLoads: false,
     apiKey: 'abcdefabcdefabcdefabcdefabcdef12',
     endpoint: '/traces',
     releaseStage: 'production',
@@ -18,7 +19,7 @@ function createConfiguration (overrides: Partial<InternalConfiguration> = {}): I
     appVersion: '',
     samplingProbability: 1.0,
     ...overrides
-  }
+  } as unknown as InternalConfiguration<C>
 }
 
 export default createConfiguration

@@ -2,8 +2,9 @@
  * @jest-environment jsdom
  */
 
-import createResourceAttributesSource from '../lib/resource-attributes-source'
 import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
+import { type BrowserConfiguration } from '../lib/config'
+import createResourceAttributesSource from '../lib/resource-attributes-source'
 
 describe('resourceAttributesSource', () => {
   it('contains expected values', () => {
@@ -14,7 +15,7 @@ describe('resourceAttributesSource', () => {
     }
 
     const resourceAttributesSource = createResourceAttributesSource(navigator)
-    const resourceAttributes = resourceAttributesSource(createConfiguration({ releaseStage: 'test', appVersion: '1.0.0' }))
+    const resourceAttributes = resourceAttributesSource(createConfiguration<BrowserConfiguration>({ releaseStage: 'test', appVersion: '1.0.0' }))
 
     expect(resourceAttributes.toJson()).toEqual([
       { key: 'deployment.environment', value: { stringValue: 'test' } },
