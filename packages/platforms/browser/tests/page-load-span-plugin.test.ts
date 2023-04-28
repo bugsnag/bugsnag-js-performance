@@ -17,13 +17,47 @@ describe('PageLoadSpanPlugin', () => {
       plugins: (spanFactory) => [new PageLoadSpanPlugin(spanFactory, '/example-page')]
     })
 
-    testClient.start({ apiKey: VALID_API_KEY, endpoint: '/test' })
+    testClient.start({ apiKey: VALID_API_KEY })
 
     jest.runAllTimers()
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({
       name: '[FullPageLoad]/example-page'
     }))
+
+    const deliveredSpanAttributes = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes
+    expect(deliveredSpanAttributes).toStrictEqual(expect.arrayContaining([
+      {
+        key: 'bugsnag.span.category',
+        value: {
+          stringValue: 'full_page_load'
+        }
+      },
+      {
+        key: 'bugsnag.browser.page.route',
+        value: {
+          stringValue: '/'
+        }
+      },
+      {
+        key: 'bugsnag.browser.page.url',
+        value: {
+          stringValue: 'http://localhost/'
+        }
+      },
+      {
+        key: 'bugsnag.browser.page.referrer',
+        value: {
+          stringValue: ''
+        }
+      },
+      {
+        key: 'bugsnag.browser.page.title',
+        value: {
+          stringValue: ''
+        }
+      }
+    ]))
   })
 
   it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
@@ -34,7 +68,7 @@ describe('PageLoadSpanPlugin', () => {
       plugins: (spanFactory) => [new PageLoadSpanPlugin(spanFactory, '/example-page')]
     })
 
-    testClient.start({ apiKey: VALID_API_KEY, endpoint: '/test', autoInstrumentFullPageLoads: false })
+    testClient.start({ apiKey: VALID_API_KEY, autoInstrumentFullPageLoads: false })
 
     jest.runAllTimers()
 
