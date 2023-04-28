@@ -1,0 +1,8 @@
+{
+    "name": "page-load-spans",
+    "private": true,
+    "scripts": {
+        "build": "rollup src/index.js --file dist/bundle.js --format iife --plugin @rollup/plugin-node-resolve",
+        "clean": "rm -rf dist"
+    }
+}
