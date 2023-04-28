@@ -8,10 +8,12 @@ import {
 } from '.'
 
 import {
+  createClient,
+  schema,
   type BugsnagPerformance,
   type ClientOptions,
-  createClient,
-  schema
+  type Configuration,
+  type CoreSchema
 } from '@bugsnag/js-performance-core'
 
 const defaultOptions = () => ({
@@ -25,7 +27,7 @@ const defaultOptions = () => ({
   plugins: () => []
 })
 
-function createTestClient (optionOverrides: Partial<ClientOptions> = {}): BugsnagPerformance {
+function createTestClient <S extends CoreSchema, C extends Configuration> (optionOverrides: Partial<ClientOptions<S, C>> = {}): BugsnagPerformance<C> {
   return createClient({ ...defaultOptions(), ...optionOverrides })
 }
 

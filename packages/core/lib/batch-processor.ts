@@ -1,20 +1,20 @@
 import { type ResourceAttributeSource } from './attributes'
 import { type Clock } from './clock'
-import { type InternalConfiguration } from './config'
+import { type Configuration, type InternalConfiguration } from './config'
 import { type Delivery, type DeliverySpan } from './delivery'
 import { type Processor } from './processor'
 import { type RetryQueue } from './retry-queue'
 import type Sampler from './sampler'
 import { spanToJson, type SpanEnded } from './span'
 
-export class BatchProcessor implements Processor {
+export class BatchProcessor<C extends Configuration> implements Processor {
   private batch: SpanEnded[] = []
   private timeout: ReturnType<typeof setTimeout> | null = null
 
   constructor (
     private delivery: Delivery,
-    private configuration: InternalConfiguration,
-    private resourceAttributeSource: ResourceAttributeSource,
+    private configuration: InternalConfiguration<C>,
+    private resourceAttributeSource: ResourceAttributeSource<C>,
     private clock: Clock,
     private retryQueue: RetryQueue,
     private sampler: Sampler

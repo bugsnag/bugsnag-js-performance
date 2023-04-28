@@ -1,6 +1,6 @@
-import { ResourceAttributes } from '@bugsnag/js-performance-core'
+import { ResourceAttributes, type Configuration, type ResourceAttributeSource } from '@bugsnag/js-performance-core'
 
-function resourceAttributesSource (): ResourceAttributes {
+const resourceAttributesSource: ResourceAttributeSource<Configuration> = () => {
   return new ResourceAttributes('test', '3.4.5', 'bugsnag.performance.core', '1.2.3')
 }
 
