@@ -32,21 +32,24 @@ describe('Request Tracker', () => {
     expect(endCallback).toHaveBeenCalledWith(endContext)
   })
 
-  it('should handle no end callback returned', () => {
+  it('should handle undefined end callbacks', () => {
     const requestTracker = new RequestTracker()
     const endCallback = jest.fn()
-    const startCallback = jest.fn()
+    const acceptCallback = jest.fn(() => endCallback)
+    const rejectCallback = jest.fn()
 
-    requestTracker.onStart(startCallback)
-    expect(startCallback).not.toHaveBeenCalled()
+    requestTracker.onStart(acceptCallback)
+    requestTracker.onStart(rejectCallback)
+    expect(acceptCallback).not.toHaveBeenCalled()
+    expect(rejectCallback).not.toHaveBeenCalled()
 
     const startContext = { url: '/', method: 'GET', startTime: 1 }
     const onEnd = requestTracker.start(startContext)
-    expect(startCallback).toHaveBeenCalledWith(startContext)
-    expect(endCallback).not.toHaveBeenCalled()
+    expect(acceptCallback).toHaveBeenCalledWith(startContext)
+    expect(rejectCallback).toHaveBeenCalledWith(startContext)
 
     const endContext = { status: 200, endTime: 2 }
     onEnd(endContext)
-    expect(endCallback).not.toHaveBeenCalled()
+    expect(endCallback).toHaveBeenCalledWith(endContext)
   })
 })
