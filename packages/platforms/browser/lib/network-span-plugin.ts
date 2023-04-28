@@ -6,8 +6,9 @@ import {
   type RequestEndCallback
 } from './request-tracker/request-tracker'
 import { type SpanFactory, type Plugin, type InternalConfiguration } from '@bugsnag/js-performance-core'
+import { type BrowserConfiguration } from './config'
 
-export default class NetworkSpanPlugin implements Plugin {
+export default class NetworkSpanPlugin implements Plugin<BrowserConfiguration> {
   private ignoredUrls: Array<string | RegExp> = []
 
   constructor (
@@ -16,8 +17,7 @@ export default class NetworkSpanPlugin implements Plugin {
     private xhrTracker: RequestTracker
   ) {}
 
-  configure (configuration: InternalConfiguration) {
-    // @ts-expect-error autoInstrumentNetworkRequests
+  configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     if (configuration.autoInstrumentNetworkRequests) {
       this.ignoredUrls.push(configuration.endpoint)
       this.xhrTracker.onStart(this.trackRequest)

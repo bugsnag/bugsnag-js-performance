@@ -2,10 +2,12 @@ import { schema, type CoreSchema, type ConfigOption, type Configuration } from '
 
 export interface BrowserSchema extends CoreSchema {
   autoInstrumentFullPageLoads: ConfigOption<boolean>
+  autoInstrumentNetworkRequests: ConfigOption<boolean>
 }
 
 export interface BrowserConfiguration extends Configuration {
   autoInstrumentFullPageLoads?: boolean
+  autoInstrumentNetworkRequests?: boolean
 }
 
 export function createSchema (hostname: string): BrowserSchema {
