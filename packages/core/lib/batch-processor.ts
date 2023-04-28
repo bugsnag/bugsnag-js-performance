@@ -36,7 +36,6 @@ export class BatchProcessor<C extends Configuration> implements Processor {
 
   add (span: SpanEnded) {
     if (this.configuration.enabledReleaseStages &&
-      this.configuration.releaseStage &&
       !this.configuration.enabledReleaseStages.includes(this.configuration.releaseStage)
     ) {
       return
@@ -86,10 +85,10 @@ export class BatchProcessor<C extends Configuration> implements Processor {
           this.retryQueue.flush()
           break
         case 'failure-discard':
-          this.configuration.logger?.warn('delivery failed')
+          this.configuration.logger.warn('delivery failed')
           break
         case 'failure-retryable':
-          this.configuration.logger?.info('delivery failed, adding to retry queue')
+          this.configuration.logger.info('delivery failed, adding to retry queue')
           this.retryQueue.add(payload, batchTime)
           break
         default: {
@@ -98,7 +97,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
         }
       }
     } catch (err) {
-      this.configuration.logger?.warn('delivery failed')
+      this.configuration.logger.warn('delivery failed')
     }
   }
 
