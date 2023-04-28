@@ -41,6 +41,6 @@ export default class NetworkSpanPlugin implements Plugin {
   private shouldTrackRequest (startContext: RequestStartContext): boolean {
     return !this.ignoredUrls.some(url => url instanceof RegExp
       ? url.test(startContext.url)
-      : url.indexOf(startContext.url) > -1)
+      : startContext.url.indexOf(url) > -1)
   }
 }

@@ -3,7 +3,7 @@ import { SpanFactory, type SpanEnded, type SpanInternal } from '@bugsnag/js-perf
 import { StableIdGenerator, spanAttributesSource } from '@bugsnag/js-performance-test-utilities'
 import { RequestTracker, type RequestStartCallback } from '../lib/request-tracker/request-tracker'
 
-const ENDPOINT = 'http://traces.endpoint/'
+const ENDPOINT = 'http://traces.endpoint'
 const TEST_URL = 'http://test-url.com/'
 
 class MockRequestTracker extends RequestTracker {
@@ -97,7 +97,7 @@ describe('network span plugin', () => {
     // @ts-expect-error configuration
     plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: true })
 
-    fetchTracker.start({ method: 'GET', url: ENDPOINT, startTime: 1 })
+    fetchTracker.start({ method: 'GET', url: `${ENDPOINT}/traces`, startTime: 1 })
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
   })
 
