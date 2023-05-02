@@ -30,6 +30,8 @@ describe('RequestSettler', () => {
     const tracker = new RequestTracker()
     const settler = new RequestSettler(tracker)
 
+    expect(settler.isSettled()).toBe(true)
+
     settler.subscribe(settleCallback)
     expect(settleCallback).toHaveBeenCalled()
   })
@@ -41,6 +43,8 @@ describe('RequestSettler', () => {
     tracker.start(START_CONTEXT)
 
     const settler = new RequestSettler(tracker)
+
+    expect(settler.isSettled()).toBe(false)
 
     settler.subscribe(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
@@ -55,17 +59,21 @@ describe('RequestSettler', () => {
 
     settler.subscribe(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
 
     end(END_CONTEXT)
     expect(settleCallback).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
 
     // after 99ms (1ms short of the timeout) we should not settle
     await jest.advanceTimersByTimeAsync(99)
     expect(settleCallback).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
 
     // it should settle after another 1ms
     await jest.advanceTimersByTimeAsync(1)
     expect(settleCallback).toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(true)
   })
 
   it.failing('settles 100ms after a request created before construction finishes', async () => {
@@ -78,12 +86,15 @@ describe('RequestSettler', () => {
 
     settler.subscribe(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
 
     end(END_CONTEXT)
     expect(settleCallback).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
 
     await jest.advanceTimersByTimeAsync(100)
     expect(settleCallback).toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(true)
   })
 
   it('does not settle after a request finishes if there is another outstanding request', async () => {
@@ -101,12 +112,15 @@ describe('RequestSettler', () => {
 
     await jest.advanceTimersByTimeAsync(100)
     expect(settleCallback).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
 
     endRequest2(END_CONTEXT)
     expect(settleCallback).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
 
     await jest.advanceTimersByTimeAsync(100)
     expect(settleCallback).toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(true)
   })
 
   it('can handle multiple callbacks', async () => {
@@ -116,12 +130,15 @@ describe('RequestSettler', () => {
 
     const end = tracker.start(START_CONTEXT)
 
+    expect(settler.isSettled()).toBe(false)
+
     for (const settleCallback of settleCallbacks) {
       settler.subscribe(settleCallback)
       expect(settleCallback).not.toHaveBeenCalled()
     }
 
     end(END_CONTEXT)
+    expect(settler.isSettled()).toBe(false)
 
     for (const settleCallback of settleCallbacks) {
       settler.subscribe(settleCallback)
@@ -129,6 +146,7 @@ describe('RequestSettler', () => {
     }
 
     await jest.advanceTimersByTimeAsync(100)
+    expect(settler.isSettled()).toBe(true)
 
     for (const settleCallback of settleCallbacks) {
       settler.subscribe(settleCallback)

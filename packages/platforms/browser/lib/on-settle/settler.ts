@@ -7,9 +7,13 @@ export abstract class Settler {
     this.callbacks.push(callback)
 
     // if we're already settled, call the callback immediately
-    if (this.settled) {
+    if (this.isSettled()) {
       callback()
     }
+  }
+
+  isSettled (): boolean {
+    return this.settled
   }
 
   protected settle (): void {
