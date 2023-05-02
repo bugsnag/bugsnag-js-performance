@@ -63,4 +63,18 @@ describe('TimeoutSettler', () => {
     expect(settleCallback1).toHaveBeenCalled()
     expect(settleCallback2).toHaveBeenCalled()
   })
+
+  it('can be cancelled', async () => {
+    const settleCallback = jest.fn()
+    const settler = new TimeoutSettler(10)
+
+    settler.subscribe(settleCallback)
+
+    settler.cancel()
+
+    await jest.advanceTimersByTimeAsync(10)
+
+    expect(settleCallback).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
+  })
 })
