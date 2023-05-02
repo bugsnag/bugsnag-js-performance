@@ -14,7 +14,7 @@ describe('PageLoadSpanPlugin', () => {
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new PageLoadSpanPlugin(spanFactory)]
+      plugins: (spanFactory) => [new PageLoadSpanPlugin(spanFactory, '/example-page')]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, endpoint: '/test' })
@@ -22,7 +22,7 @@ describe('PageLoadSpanPlugin', () => {
     jest.runAllTimers()
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({
-      name: '[FullPageLoad]/'
+      name: '[FullPageLoad]/example-page'
     }))
   })
 
@@ -31,15 +31,13 @@ describe('PageLoadSpanPlugin', () => {
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new PageLoadSpanPlugin(spanFactory)]
+      plugins: (spanFactory) => [new PageLoadSpanPlugin(spanFactory, '/example-page')]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, endpoint: '/test', autoInstrumentFullPageLoads: false })
 
     jest.runAllTimers()
 
-    expect(delivery).not.toHaveSentSpan(expect.objectContaining({
-      name: '[FullPageLoad]/'
-    }))
+    expect(delivery.requests).toHaveLength(0)
   })
 })

@@ -20,7 +20,9 @@ const BugsnagPerformance = createClient({
   deliveryFactory: createBrowserDeliveryFactory(window.fetch, backgroundingListener),
   idGenerator,
   schema: createSchema(window.location.hostname),
-  plugins: (spanFactory) => [new PageLoadSpanPlugin(spanFactory)]
+  plugins: (spanFactory) => [
+    new PageLoadSpanPlugin(spanFactory, window.location.pathname) // TODO: pathname easier to test than href
+  ]
 })
 
 export default BugsnagPerformance

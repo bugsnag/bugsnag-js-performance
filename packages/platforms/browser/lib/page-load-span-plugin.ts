@@ -3,15 +3,12 @@ import { type BrowserConfiguration } from './config'
 import LoadEventEndSettler from './on-settle/dom-mutation-settler'
 
 export class PageLoadSpanPlugin implements Plugin<BrowserConfiguration> {
-  private route = window.location.pathname // TODO: Get real route using configuration.routingProvider
   private spanFactory: SpanFactory
+  private route: string
 
-  constructor (spanFactory: SpanFactory) {
+  constructor (spanFactory: SpanFactory, route: string) {
     this.spanFactory = spanFactory
-  }
-
-  get name () {
-    return `[FullPageLoad]${this.route}`
+    this.route = route
   }
 
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
@@ -21,7 +18,7 @@ export class PageLoadSpanPlugin implements Plugin<BrowserConfiguration> {
     const settler = new LoadEventEndSettler(document)
     settler.subscribe(() => {
       const startTime = 0 // TODO: Use PerformanceTiming
-      const pageLoadSpan = this.spanFactory.startSpan(this.name, startTime)
+      const pageLoadSpan = this.spanFactory.startSpan(`[FullPageLoad]${this.route}`, startTime)
 
       // TODO: Add page load span attributes
 
