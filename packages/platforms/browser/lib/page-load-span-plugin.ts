@@ -1,6 +1,10 @@
 import { type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/js-performance-core'
 import { type BrowserConfiguration } from './config'
-import LoadEventEndSettler from './on-settle/dom-mutation-settler'
+
+export interface PageLoadSpan {
+  setRoute: (name: string) => void
+  end: (time: number) => void
+}
 
 export class PageLoadSpanPlugin implements Plugin<BrowserConfiguration> {
   private spanFactory: SpanFactory
@@ -18,22 +22,25 @@ export class PageLoadSpanPlugin implements Plugin<BrowserConfiguration> {
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     if (!configuration.autoInstrumentFullPageLoads) return
 
-    // TODO: Send to method in configuration.routingProvider to update the route and name, and end the span
-    const settler = new LoadEventEndSettler(document)
-    settler.subscribe(() => {
-      const startTime = 0 // TODO: Use PerformanceTiming
-      const pageLoadSpan = this.spanFactory.startSpan(`[FullPageLoad]${this.route}`, startTime)
+    const pageLoadSpan: PageLoadSpan = {
+      setRoute: (route) => {
+        this.route = route
+      },
+      end: (endTime) => {
+        const startTime = 0 // TODO: Get correct start time
+        const span = this.spanFactory.startSpan(`[FullPageLoad]${this.route}`, startTime)
 
-      pageLoadSpan.setAttribute('bugsnag.span.category', 'full_page_load')
-      pageLoadSpan.setAttribute('bugsnag.browser.page.route', this.route) // TODO: Add using route resolve function
-      pageLoadSpan.setAttribute('bugsnag.browser.page.url', this.location.href)
-      pageLoadSpan.setAttribute('bugsnag.browser.page.referrer', this.document.referrer)
-      pageLoadSpan.setAttribute('bugsnag.browser.page.title', this.document.title)
+        // Browser attributes
+        span.setAttribute('bugsnag.span.category', 'full_page_load')
+        span.setAttribute('bugsnag.browser.page.referrer', this.document.referrer)
+        span.setAttribute('bugsnag.browser.page.route', this.route)
+        span.setAttribute('bugsnag.browser.page.title', this.document.title)
+        span.setAttribute('bugsnag.browser.page.url', this.location.href)
 
-      // TODO: Add web vitals
+        this.spanFactory.endSpan(span, endTime)
+      }
+    }
 
-      const endTime = performance.now() // TODO: Get end time from settler
-      this.spanFactory.endSpan(pageLoadSpan, endTime)
-    })
+    configuration.routingProvider.initialize({ pageLoadSpan })
   }
 }
