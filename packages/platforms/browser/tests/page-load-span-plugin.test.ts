@@ -1,5 +1,6 @@
 /**
  * @jest-environment jsdom
+ * @jest-environment-options { "url": "https://bugsnag.com/page-load-span-plugin", "referrer": "https://bugsnag.com" }
  */
 
 import { InMemoryDelivery, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
@@ -7,11 +8,6 @@ import { createSchema } from '../lib/config'
 import { PageLoadSpanPlugin } from '../lib/page-load-span-plugin'
 
 jest.useFakeTimers()
-
-const document = {
-  title: 'Test fixture',
-  referrer: 'https://bugsnag.com'
-} as unknown as Document
 
 describe('PageLoadSpanPlugin', () => {
   it('Automatically creates and delivers a pageLoadSpan', () => {
@@ -27,10 +23,11 @@ describe('PageLoadSpanPlugin', () => {
     jest.runAllTimers()
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({
-      name: '[FullPageLoad]/'
+      name: '[FullPageLoad]/page-load-span-plugin'
     }))
 
     const deliveredSpanAttributes = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes
+    console.log(JSON.stringify(deliveredSpanAttributes))
     expect(deliveredSpanAttributes).toStrictEqual(expect.arrayContaining([
       {
         key: 'bugsnag.span.category',
@@ -39,27 +36,27 @@ describe('PageLoadSpanPlugin', () => {
         }
       },
       {
-        key: 'bugsnag.browser.page.route',
-        value: {
-          stringValue: '/'
-        }
-      },
-      {
         key: 'bugsnag.browser.page.url',
         value: {
-          stringValue: 'http://localhost/'
+          stringValue: 'https://bugsnag.com/page-load-span-plugin'
         }
       },
       {
         key: 'bugsnag.browser.page.referrer',
         value: {
-          stringValue: 'https://bugsnag.com'
+          stringValue: 'https://bugsnag.com/'
+        }
+      },
+      {
+        key: 'bugsnag.browser.page.route',
+        value: {
+          stringValue: '/page-load-span-plugin'
         }
       },
       {
         key: 'bugsnag.browser.page.title',
         value: {
-          stringValue: 'Test fixture'
+          stringValue: ''
         }
       }
     ]))
