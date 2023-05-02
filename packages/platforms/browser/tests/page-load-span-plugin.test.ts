@@ -14,7 +14,7 @@ describe('PageLoadSpanPlugin', () => {
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new PageLoadSpanPlugin(spanFactory, '/example-page')]
+      plugins: (spanFactory) => [new PageLoadSpanPlugin(document, window.location, spanFactory, '/example-page')]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -36,7 +36,7 @@ describe('PageLoadSpanPlugin', () => {
       {
         key: 'bugsnag.browser.page.route',
         value: {
-          stringValue: '/'
+          stringValue: '/example-page'
         }
       },
       {
@@ -65,7 +65,7 @@ describe('PageLoadSpanPlugin', () => {
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new PageLoadSpanPlugin(spanFactory, '/example-page')]
+      plugins: (spanFactory) => [new PageLoadSpanPlugin(document, window.location, spanFactory, '/example-page')]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentFullPageLoads: false })
