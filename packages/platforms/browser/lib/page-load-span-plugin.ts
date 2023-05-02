@@ -5,8 +5,12 @@ import LoadEventEndSettler from './on-settle/dom-mutation-settler'
 export class PageLoadSpanPlugin implements Plugin<BrowserConfiguration> {
   private spanFactory: SpanFactory
   private route: string
+  private document: Document
+  private location: Location
 
-  constructor (spanFactory: SpanFactory, route: string) {
+  constructor (document: Document, location: Location, spanFactory: SpanFactory, route: string) {
+    this.document = document
+    this.location = location
     this.spanFactory = spanFactory
     this.route = route
   }
@@ -22,9 +26,9 @@ export class PageLoadSpanPlugin implements Plugin<BrowserConfiguration> {
 
       pageLoadSpan.setAttribute('bugsnag.span.category', 'full_page_load')
       pageLoadSpan.setAttribute('bugsnag.browser.page.route', this.route) // TODO: Add using route resolve function
-      pageLoadSpan.setAttribute('bugsnag.browser.page.url', window.location.href)
-      pageLoadSpan.setAttribute('bugsnag.browser.page.referrer', document.referrer)
-      pageLoadSpan.setAttribute('bugsnag.browser.page.title', document.title)
+      pageLoadSpan.setAttribute('bugsnag.browser.page.url', this.location.href)
+      pageLoadSpan.setAttribute('bugsnag.browser.page.referrer', this.document.referrer)
+      pageLoadSpan.setAttribute('bugsnag.browser.page.title', this.document.title)
 
       // TODO: Add web vitals
 
