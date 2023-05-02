@@ -21,14 +21,18 @@ describe('TimeoutSettler', () => {
       expect(settleCallback).not.toHaveBeenCalled()
     }
 
+    expect(settler.isSettled()).toBe(false)
+
     await jest.advanceTimersByTimeAsync(1)
     expect(settleCallback).toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(true)
   })
 
   it('can handle multiple callbacks', async () => {
     const callbacks = [jest.fn(), jest.fn(), jest.fn(), jest.fn(), jest.fn()]
 
     const settler = new TimeoutSettler(100)
+    expect(settler.isSettled()).toBe(false)
 
     for (const callback of callbacks) {
       settler.subscribe(callback)
@@ -36,6 +40,7 @@ describe('TimeoutSettler', () => {
     }
 
     await jest.advanceTimersByTimeAsync(100)
+    expect(settler.isSettled()).toBe(true)
 
     for (const callback of callbacks) {
       expect(callback).toHaveBeenCalled()
@@ -47,8 +52,10 @@ describe('TimeoutSettler', () => {
     const settleCallback2 = jest.fn()
 
     const settler = new TimeoutSettler(50)
+    expect(settler.isSettled()).toBe(false)
 
     await jest.advanceTimersByTimeAsync(150)
+    expect(settler.isSettled()).toBe(true)
 
     settler.subscribe(settleCallback1)
     settler.subscribe(settleCallback2)

@@ -24,10 +24,12 @@ describe('DomMutationSettler', () => {
     settler.subscribe(settleCallback)
 
     expect(settleCallback).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
 
     await jest.advanceTimersByTimeAsync(100)
 
     expect(settleCallback).toHaveBeenCalledTimes(1)
+    expect(settler.isSettled()).toBe(true)
   })
 
   it('can handle multiple callbacks', async () => {
@@ -44,18 +46,22 @@ describe('DomMutationSettler', () => {
     expect(settleCallback1).not.toHaveBeenCalled()
     expect(settleCallback2).not.toHaveBeenCalled()
     expect(settleCallback3).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
 
     await jest.advanceTimersByTimeAsync(100)
 
     expect(settleCallback1).toHaveBeenCalledTimes(1)
     expect(settleCallback2).toHaveBeenCalledTimes(1)
     expect(settleCallback3).toHaveBeenCalledTimes(1)
+    expect(settler.isSettled()).toBe(true)
   })
 
   it('settles immediately if the dom is already settled', async () => {
     const settler = new DomMutationSettler(document.body)
 
     await jest.advanceTimersByTimeAsync(100)
+
+    expect(settler.isSettled()).toBe(true)
 
     const settleCallback = jest.fn()
     settler.subscribe(settleCallback)
@@ -69,9 +75,11 @@ describe('DomMutationSettler', () => {
 
     settler.subscribe(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
 
     await jest.advanceTimersByTimeAsync(80)
     expect(settleCallback).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
 
     // fix a typo
     // @ts-expect-error 'c' definitely exists
@@ -79,6 +87,7 @@ describe('DomMutationSettler', () => {
 
     await jest.advanceTimersByTimeAsync(80)
     expect(settleCallback).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
 
     // mutate something again
     // @ts-expect-error 'a' definitely exists
@@ -86,8 +95,10 @@ describe('DomMutationSettler', () => {
 
     await jest.advanceTimersByTimeAsync(80)
     expect(settleCallback).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
 
     await jest.advanceTimersByTimeAsync(20)
     expect(settleCallback).toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(true)
   })
 })
