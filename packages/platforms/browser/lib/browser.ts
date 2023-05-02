@@ -6,6 +6,7 @@ import createBrowserDeliveryFactory from './delivery'
 import idGenerator from './id-generator'
 import createResourceAttributesSource from './resource-attributes-source'
 import spanAttributesSource from './span-attributes-source'
+import { PageLoadSpanPlugin } from './page-load-span-plugin'
 
 const clock = createClock(performance)
 const resourceAttributesSource = createResourceAttributesSource(navigator)
@@ -19,7 +20,9 @@ const BugsnagPerformance = createClient({
   deliveryFactory: createBrowserDeliveryFactory(window.fetch, backgroundingListener),
   idGenerator,
   schema: createSchema(window.location.hostname),
-  plugins: () => []
+  plugins: (spanFactory) => [
+    new PageLoadSpanPlugin(spanFactory, window.location.pathname)
+  ]
 })
 
 export default BugsnagPerformance
