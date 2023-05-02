@@ -3,10 +3,15 @@
  */
 
 import { InMemoryDelivery, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
-import { PageLoadSpanPlugin } from '../lib/page-load-span-plugin'
 import { createSchema } from '../lib/config'
+import { PageLoadSpanPlugin } from '../lib/page-load-span-plugin'
 
 jest.useFakeTimers()
+
+const document = {
+  title: 'Test fixture',
+  referrer: 'https://bugsnag.com'
+} as unknown as Document
 
 describe('PageLoadSpanPlugin', () => {
   it('Automatically creates and delivers a pageLoadSpan', () => {
@@ -14,7 +19,7 @@ describe('PageLoadSpanPlugin', () => {
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new PageLoadSpanPlugin(document, window.location, spanFactory, '/example-page')]
+      plugins: (spanFactory) => [new PageLoadSpanPlugin(document, window.location, spanFactory)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -22,7 +27,7 @@ describe('PageLoadSpanPlugin', () => {
     jest.runAllTimers()
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({
-      name: '[FullPageLoad]/example-page'
+      name: '[FullPageLoad]/'
     }))
 
     const deliveredSpanAttributes = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes
@@ -36,7 +41,7 @@ describe('PageLoadSpanPlugin', () => {
       {
         key: 'bugsnag.browser.page.route',
         value: {
-          stringValue: '/example-page'
+          stringValue: '/'
         }
       },
       {
@@ -48,13 +53,13 @@ describe('PageLoadSpanPlugin', () => {
       {
         key: 'bugsnag.browser.page.referrer',
         value: {
-          stringValue: ''
+          stringValue: 'https://bugsnag.com'
         }
       },
       {
         key: 'bugsnag.browser.page.title',
         value: {
-          stringValue: ''
+          stringValue: 'Test fixture'
         }
       }
     ]))
@@ -65,7 +70,7 @@ describe('PageLoadSpanPlugin', () => {
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new PageLoadSpanPlugin(document, window.location, spanFactory, '/example-page')]
+      plugins: (spanFactory) => [new PageLoadSpanPlugin(document, window.location, spanFactory)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentFullPageLoads: false })

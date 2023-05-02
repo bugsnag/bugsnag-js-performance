@@ -21,7 +21,7 @@ const BugsnagPerformance = createClient({
   idGenerator,
   schema: createSchema(window.location.hostname),
   plugins: (spanFactory) => [
-    new PageLoadSpanPlugin(document, window.location, spanFactory, window.location.pathname)
+    new PageLoadSpanPlugin(document, window.location, spanFactory)
   ]
 })
 

@@ -7,6 +7,7 @@ interface InitializationParameters {
 
 export interface RoutingProvider {
   initialize: ({ pageLoadSpan }: InitializationParameters) => void
+  resolveRoute: RouteResolver
 }
 
 type RouteResolver = (url: string) => string
@@ -18,13 +19,11 @@ export class DefaultRoutingProvider implements RoutingProvider {
   resolveRoute: RouteResolver
 
   constructor (resolveRoute = defaultRouteResolver) {
-    this.resolveRoute = resolveRoute
     this.settler = new LoadEventEndSettler(document)
+    this.resolveRoute = resolveRoute
   }
 
   initialize ({ pageLoadSpan }: InitializationParameters) {
-    pageLoadSpan.setRoute(this.resolveRoute(window.location.href))
-
     this.settler.subscribe(() => {
       const endTime = performance.now() // TODO: Get the correct end time
       pageLoadSpan.end(endTime)
