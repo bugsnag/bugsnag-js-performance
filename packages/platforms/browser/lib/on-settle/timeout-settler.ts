@@ -1,10 +1,16 @@
 import { Settler } from './settler'
 
 class TimeoutSettler extends Settler {
+  private timeout: ReturnType<typeof setTimeout>
+
   constructor (timeoutMilliseconds: number) {
     super()
 
-    setTimeout(() => { this.settle() }, timeoutMilliseconds)
+    this.timeout = setTimeout(() => { this.settle() }, timeoutMilliseconds)
+  }
+
+  cancel () {
+    clearTimeout(this.timeout)
   }
 }
 
