@@ -27,12 +27,17 @@ describe('PageLoadSpanPlugin', () => {
     }))
 
     const deliveredSpanAttributes = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes
-    console.log(JSON.stringify(deliveredSpanAttributes))
     expect(deliveredSpanAttributes).toStrictEqual(expect.arrayContaining([
       {
         key: 'bugsnag.span.category',
         value: {
           stringValue: 'full_page_load'
+        }
+      },
+      {
+        key: 'bugsnag.browser.page.route',
+        value: {
+          stringValue: '/page-load-span-plugin'
         }
       },
       {
@@ -45,12 +50,6 @@ describe('PageLoadSpanPlugin', () => {
         key: 'bugsnag.browser.page.referrer',
         value: {
           stringValue: 'https://bugsnag.com/'
-        }
-      },
-      {
-        key: 'bugsnag.browser.page.route',
-        value: {
-          stringValue: '/page-load-span-plugin'
         }
       },
       {
