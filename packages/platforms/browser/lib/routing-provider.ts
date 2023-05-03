@@ -1,5 +1,7 @@
 import { type PageLoadSpan } from './page-load-span-plugin'
-import { isObject } from '@bugsnag/js-performance-core/lib/validation'
+
+export const isObject = (value: unknown): value is Record<string, unknown> =>
+  !!value && typeof value === 'object' && !Array.isArray(value)
 
 interface InitializationParameters {
   pageLoadSpan: PageLoadSpan
