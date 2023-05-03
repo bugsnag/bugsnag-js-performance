@@ -1,9 +1,5 @@
-import { type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/js-performance-core'
+import { type InternalConfiguration, type Plugin, type Span, type SpanFactory } from '@bugsnag/js-performance-core'
 import { type BrowserConfiguration } from './config'
-
-export interface PageLoadSpan {
-  end: (time: number) => void
-}
 
 export class PageLoadSpanPlugin implements Plugin<BrowserConfiguration> {
   private spanFactory: SpanFactory
@@ -19,7 +15,7 @@ export class PageLoadSpanPlugin implements Plugin<BrowserConfiguration> {
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     if (!configuration.autoInstrumentFullPageLoads) return
 
-    const pageLoadSpan: PageLoadSpan = {
+    const pageLoadSpan: Span = {
       end: (endTime) => {
         const route = configuration.routingProvider.resolveRoute(window.location.pathname)
 
@@ -33,7 +29,9 @@ export class PageLoadSpanPlugin implements Plugin<BrowserConfiguration> {
         span.setAttribute('bugsnag.browser.page.title', this.document.title)
         span.setAttribute('bugsnag.browser.page.url', this.location.href)
 
-        this.spanFactory.endSpan(span, endTime)
+        const safeEndTime = performance.now() // TODO: Sanitize and use endTime parameter
+
+        this.spanFactory.endSpan(span, safeEndTime)
       }
     }
 

@@ -1,10 +1,10 @@
-import { type PageLoadSpan } from './page-load-span-plugin'
+import { type Span } from '@bugsnag/js-performance-core'
 
 export const isObject = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === 'object' && !Array.isArray(value)
 
 interface InitializationParameters {
-  pageLoadSpan: PageLoadSpan
+  pageLoadSpan: Span
 }
 
 export interface RoutingProvider {
