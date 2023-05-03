@@ -1,4 +1,5 @@
 import { type PageLoadSpan } from './page-load-span-plugin'
+import { isObject } from '@bugsnag/js-performance-core/lib/validation'
 
 interface InitializationParameters {
   pageLoadSpan: PageLoadSpan
@@ -26,6 +27,7 @@ export class DefaultRoutingProvider implements RoutingProvider {
   }
 }
 
-export const isRoutingProvider = (value: unknown): value is RoutingProvider => {
-  return true
-}
+export const isRoutingProvider = (value: unknown): value is RoutingProvider =>
+  isObject(value) &&
+    typeof value.initialize === 'function' &&
+    typeof value.resolveRoute === 'function'
