@@ -1,20 +1,21 @@
 /**
  * @jest-environment jsdom
+ * @jest-environment-options { "url": "https://bugsnag.com/page-load-span-plugin", "referrer": "https://bugsnag.com" }
  */
 
 import { InMemoryDelivery, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
-import { PageLoadSpanPlugin } from '../lib/page-load-span-plugin'
 import { createSchema } from '../lib/config'
+import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
 
 jest.useFakeTimers()
 
-describe('PageLoadSpanPlugin', () => {
+describe('FullPageLoadPlugin', () => {
   it('Automatically creates and delivers a pageLoadSpan', () => {
     const delivery = new InMemoryDelivery()
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new PageLoadSpanPlugin(document, window.location, spanFactory, '/example-page')]
+      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -22,7 +23,7 @@ describe('PageLoadSpanPlugin', () => {
     jest.runAllTimers()
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({
-      name: '[FullPageLoad]/example-page'
+      name: '[FullPageLoad]/page-load-span-plugin'
     }))
 
     const deliveredSpanAttributes = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes
@@ -36,19 +37,19 @@ describe('PageLoadSpanPlugin', () => {
       {
         key: 'bugsnag.browser.page.route',
         value: {
-          stringValue: '/example-page'
+          stringValue: '/page-load-span-plugin'
         }
       },
       {
         key: 'bugsnag.browser.page.url',
         value: {
-          stringValue: 'http://localhost/'
+          stringValue: 'https://bugsnag.com/page-load-span-plugin'
         }
       },
       {
         key: 'bugsnag.browser.page.referrer',
         value: {
-          stringValue: ''
+          stringValue: 'https://bugsnag.com/'
         }
       },
       {
@@ -65,7 +66,7 @@ describe('PageLoadSpanPlugin', () => {
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new PageLoadSpanPlugin(document, window.location, spanFactory, '/example-page')]
+      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentFullPageLoads: false })

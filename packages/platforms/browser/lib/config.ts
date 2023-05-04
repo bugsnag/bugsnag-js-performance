@@ -1,11 +1,14 @@
-import { schema, type CoreSchema, type ConfigOption, type Configuration } from '@bugsnag/js-performance-core'
+import { schema, type ConfigOption, type Configuration, type CoreSchema } from '@bugsnag/js-performance-core'
+import { DefaultRoutingProvider, isRoutingProvider, type RoutingProvider } from './routing-provider'
 
 export interface BrowserSchema extends CoreSchema {
   autoInstrumentFullPageLoads: ConfigOption<boolean>
+  routingProvider: ConfigOption<RoutingProvider>
 }
 
 export interface BrowserConfiguration extends Configuration {
   autoInstrumentFullPageLoads?: boolean
+  routingProvider?: RoutingProvider
 }
 
 export function createSchema (hostname: string): BrowserSchema {
@@ -24,6 +27,11 @@ export function createSchema (hostname: string): BrowserSchema {
       defaultValue: true,
       message: 'should be true|false',
       validate: (value): value is boolean => value === true || value === false
+    },
+    routingProvider: {
+      defaultValue: new DefaultRoutingProvider(),
+      message: 'should be a routing provider',
+      validate: isRoutingProvider
     }
   }
 }
