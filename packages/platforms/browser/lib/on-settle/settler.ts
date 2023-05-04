@@ -1,9 +1,11 @@
+import { type OnSettleCallback } from '.'
+
 export abstract class Settler {
   protected settled: boolean = false
 
-  private readonly callbacks: Set<() => void> = new Set<() => void>()
+  private readonly callbacks: Set<OnSettleCallback> = new Set<OnSettleCallback>()
 
-  subscribe (callback: () => void): void {
+  subscribe (callback: OnSettleCallback): void {
     this.callbacks.add(callback)
 
     // if we're already settled, call the callback immediately
@@ -12,7 +14,7 @@ export abstract class Settler {
     }
   }
 
-  unsubscribe (callback: () => void): void {
+  unsubscribe (callback: OnSettleCallback): void {
     this.callbacks.delete(callback)
   }
 
