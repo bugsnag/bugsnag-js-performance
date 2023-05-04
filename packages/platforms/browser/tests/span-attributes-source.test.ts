@@ -14,8 +14,8 @@ describe('spanAttributesSource', () => {
     expect(Array.from(spanAttributes.entries())).toEqual([
       ['bugsnag.span.category', 'custom'],
       ['bugsnag.span.first_class', true],
-      ['bugsnag.browser.page.title', 'the page title'],
-      ['bugsnag.browser.page.url', 'https://www.bugsnag.com']
+      ['bugsnag.browser.page.url', 'https://www.bugsnag.com'],
+      ['bugsnag.browser.page.title', 'the page title']
     ])
   })
 })
