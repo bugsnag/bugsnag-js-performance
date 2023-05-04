@@ -1,6 +1,6 @@
 import { Settler } from './settler'
 
-interface PerformanceWithTiming {
+export interface PerformanceWithTiming {
   timing: {
     loadEventEnd: number
   }
