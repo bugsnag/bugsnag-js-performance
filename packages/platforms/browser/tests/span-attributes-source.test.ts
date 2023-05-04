@@ -11,9 +11,11 @@ describe('spanAttributesSource', () => {
       'https://www.bugsnag.com'
     )
     const spanAttributes = spanAttributesSource()
-    expect(spanAttributes.get('bugsnag.span.category')).toBe('custom')
-    expect(spanAttributes.get('bugsnag.span.first_class')).toBe(true)
-    expect(spanAttributes.get('bugsnag.browser.page.title')).toBe('the page title')
-    expect(spanAttributes.get('bugsnag.browser.page.url')).toBe('https://www.bugsnag.com')
+    expect(Array.from(spanAttributes.entries())).toEqual([
+      ['bugsnag.span.category', 'custom'],
+      ['bugsnag.span.first_class', true],
+      ['bugsnag.browser.page.title', 'the page title'],
+      ['bugsnag.browser.page.url', 'https://www.bugsnag.com']
+    ])
   })
 })
