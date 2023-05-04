@@ -1,3 +1,4 @@
+import { type Clock } from '@bugsnag/js-performance-core'
 import { Settler } from './settler'
 
 /**
@@ -7,8 +8,8 @@ import { Settler } from './settler'
 class SettlerAggregate extends Settler {
   private settlers: Settler[]
 
-  constructor (settlers: Settler[]) {
-    super()
+  constructor (clock: Clock, settlers: Settler[]) {
+    super(clock)
     this.settlers = settlers
 
     for (const settler of settlers) {

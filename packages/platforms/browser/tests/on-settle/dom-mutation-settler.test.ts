@@ -3,6 +3,7 @@
  */
 
 import DomMutationSettler from '../../lib/on-settle/dom-mutation-settler'
+import { IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 
 describe('DomMutationSettler', () => {
   beforeEach(() => {
@@ -19,7 +20,7 @@ describe('DomMutationSettler', () => {
 
   it('settles after 100ms when no dom mutation happens', async () => {
     const settleCallback = jest.fn()
-    const settler = new DomMutationSettler(document.body)
+    const settler = new DomMutationSettler(new IncrementingClock(), document.body)
 
     settler.subscribe(settleCallback)
 
@@ -37,7 +38,7 @@ describe('DomMutationSettler', () => {
     const settleCallback2 = jest.fn()
     const settleCallback3 = jest.fn()
 
-    const settler = new DomMutationSettler(document.body)
+    const settler = new DomMutationSettler(new IncrementingClock(), document.body)
 
     settler.subscribe(settleCallback1)
     settler.subscribe(settleCallback2)
@@ -60,7 +61,7 @@ describe('DomMutationSettler', () => {
     const settleCallback1 = jest.fn()
     const settleCallback2 = jest.fn()
 
-    const settler = new DomMutationSettler(document.body)
+    const settler = new DomMutationSettler(new IncrementingClock(), document.body)
 
     settler.subscribe(settleCallback1)
     settler.subscribe(settleCallback2)
@@ -79,7 +80,7 @@ describe('DomMutationSettler', () => {
   })
 
   it('settles immediately if the dom is already settled', async () => {
-    const settler = new DomMutationSettler(document.body)
+    const settler = new DomMutationSettler(new IncrementingClock(), document.body)
 
     await jest.advanceTimersByTimeAsync(100)
 
@@ -93,7 +94,7 @@ describe('DomMutationSettler', () => {
 
   it('doesnt settle until no dom mutations have happend for 100 consecutive milliseconds', async () => {
     const settleCallback = jest.fn()
-    const settler = new DomMutationSettler(document.body)
+    const settler = new DomMutationSettler(new IncrementingClock(), document.body)
 
     settler.subscribe(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()

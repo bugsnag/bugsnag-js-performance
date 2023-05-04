@@ -1,9 +1,15 @@
+import { type Clock } from '@bugsnag/js-performance-core'
 import { type OnSettleCallback } from '.'
 
 export abstract class Settler {
+  protected clock: Clock
   protected settled: boolean = false
 
   private readonly callbacks: Set<OnSettleCallback> = new Set<OnSettleCallback>()
+
+  constructor (clock: Clock) {
+    this.clock = clock
+  }
 
   subscribe (callback: OnSettleCallback): void {
     this.callbacks.add(callback)

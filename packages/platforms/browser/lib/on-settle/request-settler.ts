@@ -1,3 +1,4 @@
+import { type Clock } from '@bugsnag/js-performance-core'
 import { Settler } from './settler'
 import {
   type RequestStartContext,
@@ -10,8 +11,8 @@ class RequestSettler extends Settler {
   private timeout: ReturnType<typeof setTimeout> | undefined = undefined
   private outstandingRequests = 0
 
-  constructor (requestTracker: RequestTracker) {
-    super()
+  constructor (clock: Clock, requestTracker: RequestTracker) {
+    super(clock)
 
     // unlike most other settlers we start settled as it's possible to not make
     // any requests at all

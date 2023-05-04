@@ -4,10 +4,11 @@
 
 import SettlerAggregate from '../../lib/on-settle/settler-aggregate'
 import { Settler } from '../../lib/on-settle/settler'
+import { IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 
 class ControllableSettler extends Settler {
   constructor (settled: boolean) {
-    super()
+    super(new IncrementingClock())
     this.settled = settled
   }
 
@@ -27,7 +28,7 @@ describe('SettlerAggregate', () => {
     const settler2 = new ControllableSettler(false)
     const settler3 = new ControllableSettler(false)
 
-    const aggregate = new SettlerAggregate([settler1, settler2, settler3])
+    const aggregate = new SettlerAggregate(new IncrementingClock(), [settler1, settler2, settler3])
 
     expect(aggregate.isSettled()).toBe(false)
 
@@ -46,7 +47,7 @@ describe('SettlerAggregate', () => {
     const settler2 = new ControllableSettler(true)
     const settler3 = new ControllableSettler(true)
 
-    const aggregate = new SettlerAggregate([settler1, settler2, settler3])
+    const aggregate = new SettlerAggregate(new IncrementingClock(), [settler1, settler2, settler3])
 
     expect(aggregate.isSettled()).toBe(true)
   })
@@ -56,7 +57,7 @@ describe('SettlerAggregate', () => {
     const settler2 = new ControllableSettler(true)
     const settler3 = new ControllableSettler(true)
 
-    const aggregate = new SettlerAggregate([settler1, settler2, settler3])
+    const aggregate = new SettlerAggregate(new IncrementingClock(), [settler1, settler2, settler3])
 
     expect(aggregate.isSettled()).toBe(true)
 

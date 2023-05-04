@@ -8,6 +8,7 @@ import {
   type RequestEndContext,
   RequestTracker
 } from '../../lib/request-tracker/request-tracker'
+import { IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 
 const START_CONTEXT: RequestStartContext = {
   url: 'https://www.bugsnag.com',
@@ -28,7 +29,7 @@ describe('RequestSettler', () => {
   it('is settled by default when there are no outstanding requests', () => {
     const settleCallback = jest.fn()
     const tracker = new RequestTracker()
-    const settler = new RequestSettler(tracker)
+    const settler = new RequestSettler(new IncrementingClock(), tracker)
 
     expect(settler.isSettled()).toBe(true)
 
@@ -42,7 +43,7 @@ describe('RequestSettler', () => {
 
     tracker.start(START_CONTEXT)
 
-    const settler = new RequestSettler(tracker)
+    const settler = new RequestSettler(new IncrementingClock(), tracker)
 
     expect(settler.isSettled()).toBe(false)
 
@@ -53,7 +54,7 @@ describe('RequestSettler', () => {
   it('settles 100ms after a request finishes', async () => {
     const settleCallback = jest.fn()
     const tracker = new RequestTracker()
-    const settler = new RequestSettler(tracker)
+    const settler = new RequestSettler(new IncrementingClock(), tracker)
 
     const end = tracker.start(START_CONTEXT)
 
@@ -82,7 +83,7 @@ describe('RequestSettler', () => {
 
     const end = tracker.start(START_CONTEXT)
 
-    const settler = new RequestSettler(tracker)
+    const settler = new RequestSettler(new IncrementingClock(), tracker)
 
     settler.subscribe(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
@@ -100,7 +101,7 @@ describe('RequestSettler', () => {
   it('does not settle after a request finishes if there is another outstanding request', async () => {
     const settleCallback = jest.fn()
     const tracker = new RequestTracker()
-    const settler = new RequestSettler(tracker)
+    const settler = new RequestSettler(new IncrementingClock(), tracker)
 
     const endRequest1 = tracker.start(START_CONTEXT)
 
@@ -126,7 +127,7 @@ describe('RequestSettler', () => {
   it('can handle multiple callbacks', async () => {
     const settleCallbacks = [jest.fn(), jest.fn(), jest.fn(), jest.fn()]
     const tracker = new RequestTracker()
-    const settler = new RequestSettler(tracker)
+    const settler = new RequestSettler(new IncrementingClock(), tracker)
 
     const end = tracker.start(START_CONTEXT)
 
@@ -158,7 +159,7 @@ describe('RequestSettler', () => {
     const settleCallback1 = jest.fn()
     const settleCallback2 = jest.fn()
     const tracker = new RequestTracker()
-    const settler = new RequestSettler(tracker)
+    const settler = new RequestSettler(new IncrementingClock(), tracker)
 
     const end = tracker.start(START_CONTEXT)
 
