@@ -4,8 +4,8 @@
  */
 
 import { InMemoryDelivery, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
-import { createSchema } from '../lib/config'
-import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
+import { FullPageLoadPlugin } from '../../lib/auto-instrumentation/full-page-load-plugin'
+import { createSchema } from '../../lib/config'
 
 jest.useFakeTimers()
 
