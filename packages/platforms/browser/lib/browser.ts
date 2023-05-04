@@ -1,14 +1,15 @@
 import { createClient } from '@bugsnag/js-performance-core'
+import { FullPageLoadPlugin } from './auto-instrumentation/full-page-load-plugin'
 import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
 import { createSchema } from './config'
 import createBrowserDeliveryFactory from './delivery'
 import idGenerator from './id-generator'
 import createResourceAttributesSource from './resource-attributes-source'
-import spanAttributesSource from './span-attributes-source'
-import { FullPageLoadPlugin } from './auto-instrumentation/full-page-load-plugin'
+import createSpanAttributesSource from './span-attributes-source'
 
 const clock = createClock(performance)
+const spanAttributesSource = createSpanAttributesSource(document.title, window.location.href)
 const resourceAttributesSource = createResourceAttributesSource(navigator)
 const backgroundingListener = createBrowserBackgroundingListener(document)
 
