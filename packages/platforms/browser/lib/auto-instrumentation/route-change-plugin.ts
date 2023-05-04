@@ -1,22 +1,41 @@
-import { type SpanFactory, type Span } from '@bugsnag/js-performance-core'
+import { type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/js-performance-core'
+import { type BrowserConfiguration } from '../config'
 
-export const startRouteChangeSpan = (spanFactory: SpanFactory, route: string): Span => {
-  const startTime = performance.now()
+export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
+  private spanFactory: SpanFactory
+  private document: Document
+  private location: Location
+  private onSettle: (callback: () => void) => void
 
-  return {
-    end: (endTime) => {
-      const span = spanFactory.startSpan(`[RouteChange]/${route}`, startTime)
+  constructor (document: Document, location: Location, spanFactory: SpanFactory) {
+    this.document = document
+    this.location = location
+    this.spanFactory = spanFactory
 
-      span.setAttribute('bugsnag.span.category', 'route-change')
-      span.setAttribute('bugsnag.browser.page.route', route)
-      span.setAttribute('bugsnag.browser.page.previous_route', '') // TODO: Get previous route
-      span.setAttribute('bugsnag.browser.page.url', window.location.href)
-      span.setAttribute('bugsnag.browser.page.title', document.title)
-
-      // TODO: use and sanitize endTime parameter
-      const safeEndTime = performance.now()
-
-      spanFactory.endSpan(span, safeEndTime)
+    // TODO: Implement real settling function
+    this.onSettle = (callback: () => void) => {
+      callback()
     }
+  }
+
+  startRouteChangeSpan (route: string) {
+    const startTime = performance.now()
+    const span = this.spanFactory.startSpan(`[RouteChange]${route}`, startTime)
+
+    span.setAttribute('bugsnag.span.category', 'route_change')
+    span.setAttribute('bugsnag.browser.page.route', route)
+    // TODO: span.setAttribute('bugsnag.browser.page.previous_route', route)
+
+    this.onSettle(() => {
+      // TODO: Attach web vitals
+      const safeEndTime = performance.now()
+      this.spanFactory.endSpan(span, safeEndTime)
+    })
+  }
+
+  configure (configuration: InternalConfiguration<BrowserConfiguration>) {
+    // const route = configuration.routingProvider.resolveRoute(new URL(window.location.href))
+
+    // TODO: Add event listener
   }
 }
