@@ -4,6 +4,8 @@ import RequestSettler from './request-settler'
 import SettlerAggregate from './settler-aggregate'
 import { type RequestTracker } from '../request-tracker/request-tracker'
 
+export type OnSettleCallback = () => void
+
 const TIMEOUT_MILLISECONDS = 60 * 1000
 
 export default function createOnSettle (
@@ -25,7 +27,7 @@ export default function createOnSettle (
     xhrRequestSettler
   ])
 
-  return function onSettle (callback: () => void): void {
+  return function onSettle (callback: OnSettleCallback): void {
     const onSettle = () => {
       clearTimeout(timeout)
 
