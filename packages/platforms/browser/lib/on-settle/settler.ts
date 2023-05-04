@@ -1,10 +1,10 @@
 export abstract class Settler {
   protected settled: boolean = false
 
-  private readonly callbacks: Array<() => void> = []
+  private readonly callbacks: Set<() => void> = new Set<() => void>()
 
   subscribe (callback: () => void): void {
-    this.callbacks.push(callback)
+    this.callbacks.add(callback)
 
     // if we're already settled, call the callback immediately
     if (this.isSettled()) {
