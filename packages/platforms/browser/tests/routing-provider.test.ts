@@ -1,14 +1,6 @@
 import { DefaultRoutingProvider, isRoutingProvider } from '../lib/routing-provider'
 
 describe('DefaultRoutingProvider', () => {
-  it('Ends a provided page load span', () => {
-    const routingProvier = new DefaultRoutingProvider()
-    const pageLoadSpan = { end: jest.fn() }
-    routingProvier.initialize({ pageLoadSpan })
-
-    expect(pageLoadSpan.end).toHaveBeenCalled()
-  })
-
   it('Uses a provided route resolver function', () => {
     const routeResolverFn = jest.fn((url: string) => 'resolved-route')
     const routingProvier = new DefaultRoutingProvider(routeResolverFn)

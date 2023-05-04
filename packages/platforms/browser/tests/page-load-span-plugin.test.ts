@@ -5,17 +5,17 @@
 
 import { InMemoryDelivery, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { createSchema } from '../lib/config'
-import { PageLoadSpanPlugin } from '../lib/page-load-span-plugin'
+import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
 
 jest.useFakeTimers()
 
-describe('PageLoadSpanPlugin', () => {
+describe('FullPageLoadPlugin', () => {
   it('Automatically creates and delivers a pageLoadSpan', () => {
     const delivery = new InMemoryDelivery()
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new PageLoadSpanPlugin(document, window.location, spanFactory)]
+      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -66,7 +66,7 @@ describe('PageLoadSpanPlugin', () => {
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new PageLoadSpanPlugin(document, window.location, spanFactory)]
+      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentFullPageLoads: false })
