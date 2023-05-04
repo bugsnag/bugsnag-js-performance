@@ -30,8 +30,6 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     span.setAttribute('bugsnag.span.category', 'full_page_load')
     span.setAttribute('bugsnag.browser.page.referrer', this.document.referrer)
     span.setAttribute('bugsnag.browser.page.route', route)
-    span.setAttribute('bugsnag.browser.page.title', this.document.title)
-    span.setAttribute('bugsnag.browser.page.url', this.location.href)
 
     this.onSettle(() => {
       // TODO: Attach web vitals
