@@ -24,7 +24,12 @@ class DomMutationSettler extends Settler {
     clearTimeout(this.timeout)
     this.settled = false
 
-    this.timeout = setTimeout(() => { this.settle() }, 100)
+    // we wait 100ms to ensure that DOM mutations have actually stopped but
+    // don't want the settled time to reflect that wait, so we record the time
+    // here and use that when settling
+    const settledTime = this.clock.now()
+
+    this.timeout = setTimeout(() => { this.settle(settledTime) }, 100)
   }
 }
 

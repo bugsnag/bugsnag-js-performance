@@ -3,6 +3,7 @@
  */
 
 import DomMutationSettler from '../../lib/on-settle/dom-mutation-settler'
+import createClock from '../../lib/clock'
 import { IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 
 describe('DomMutationSettler', () => {
@@ -20,7 +21,7 @@ describe('DomMutationSettler', () => {
 
   it('settles after 100ms when no dom mutation happens', async () => {
     const settleCallback = jest.fn()
-    const settler = new DomMutationSettler(new IncrementingClock(), document.body)
+    const settler = new DomMutationSettler(createClock(performance), document.body)
 
     settler.subscribe(settleCallback)
 
@@ -31,6 +32,9 @@ describe('DomMutationSettler', () => {
 
     expect(settleCallback).toHaveBeenCalledTimes(1)
     expect(settler.isSettled()).toBe(true)
+
+    // the 100ms timeout is not included in the final 'settled time'
+    expect(settleCallback).toHaveBeenCalledWith(0)
   })
 
   it('can handle multiple callbacks', async () => {
@@ -94,7 +98,7 @@ describe('DomMutationSettler', () => {
 
   it('doesnt settle until no dom mutations have happend for 100 consecutive milliseconds', async () => {
     const settleCallback = jest.fn()
-    const settler = new DomMutationSettler(new IncrementingClock(), document.body)
+    const settler = new DomMutationSettler(createClock(performance), document.body)
 
     settler.subscribe(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
@@ -121,7 +125,7 @@ describe('DomMutationSettler', () => {
     expect(settler.isSettled()).toBe(false)
 
     await jest.advanceTimersByTimeAsync(20)
-    expect(settleCallback).toHaveBeenCalled()
+    expect(settleCallback).toHaveBeenCalledWith(160)
     expect(settler.isSettled()).toBe(true)
   })
 })
