@@ -6,7 +6,7 @@ export interface RoutingProvider {
 
 type RouteResolver = (url: string) => string
 
-const defaultRouteResolver: RouteResolver = (url: string) => url
+const defaultRouteResolver: RouteResolver = (url: string) => new URL(url).pathname
 
 export class DefaultRoutingProvider implements RoutingProvider {
   resolveRoute: RouteResolver

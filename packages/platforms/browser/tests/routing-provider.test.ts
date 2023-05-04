@@ -9,6 +9,15 @@ describe('DefaultRoutingProvider', () => {
     expect(resolvedRoute).toBe('resolved-route')
     expect(routeResolverFn).toHaveBeenCalled()
   })
+
+  describe('defaultRouteResolver', () => {
+    it('Returns a route when provided a complete URL', () => {
+      const routingProvier = new DefaultRoutingProvider()
+      const resolvedRoute = routingProvier.resolveRoute('https://www.bugsnag.com/platforms/javascript?test=true#unit-test')
+
+      expect(resolvedRoute).toBe('/platforms/javascript')
+    })
+  })
 })
 
 describe('isRoutingProvider', () => {
