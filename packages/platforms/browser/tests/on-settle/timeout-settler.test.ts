@@ -47,6 +47,25 @@ describe('TimeoutSettler', () => {
     }
   })
 
+  it('can subscribe a callback', async () => {
+    const settleCallback1 = jest.fn()
+    const settleCallback2 = jest.fn()
+
+    const settler = new TimeoutSettler(50)
+    expect(settler.isSettled()).toBe(false)
+
+    settler.subscribe(settleCallback1)
+    settler.subscribe(settleCallback2)
+
+    settler.unsubscribe(settleCallback1)
+
+    await jest.advanceTimersByTimeAsync(100)
+    expect(settler.isSettled()).toBe(true)
+
+    expect(settleCallback1).not.toHaveBeenCalled()
+    expect(settleCallback2).toHaveBeenCalled()
+  })
+
   it('calls callbacks immediately if already settled', async () => {
     const settleCallback1 = jest.fn()
     const settleCallback2 = jest.fn()

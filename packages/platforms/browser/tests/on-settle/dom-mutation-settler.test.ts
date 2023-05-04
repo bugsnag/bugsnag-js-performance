@@ -56,6 +56,28 @@ describe('DomMutationSettler', () => {
     expect(settler.isSettled()).toBe(true)
   })
 
+  it('can unsubscribe a callback', async () => {
+    const settleCallback1 = jest.fn()
+    const settleCallback2 = jest.fn()
+
+    const settler = new DomMutationSettler(document.body)
+
+    settler.subscribe(settleCallback1)
+    settler.subscribe(settleCallback2)
+
+    expect(settleCallback1).not.toHaveBeenCalled()
+    expect(settleCallback2).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
+
+    settler.unsubscribe(settleCallback2)
+
+    await jest.advanceTimersByTimeAsync(100)
+
+    expect(settleCallback1).toHaveBeenCalledTimes(1)
+    expect(settleCallback2).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(true)
+  })
+
   it('settles immediately if the dom is already settled', async () => {
     const settler = new DomMutationSettler(document.body)
 

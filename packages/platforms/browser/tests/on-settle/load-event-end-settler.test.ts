@@ -61,6 +61,30 @@ describe('LoadEventEndSettler', () => {
     expect(settler.isSettled()).toBe(true)
   })
 
+  it('can unsubscribe a callback', () => {
+    const manager = new PerformanceObserverManager()
+    const performance = { timing: { loadEventEnd: 0 } }
+    const settleCallback1 = jest.fn()
+    const settleCallback2 = jest.fn()
+    const settler = new LoadEventEndSettler(manager.createPerformanceObserverFakeClass(), performance)
+
+    settler.subscribe(settleCallback1)
+    settler.subscribe(settleCallback2)
+
+    expect(settleCallback1).not.toHaveBeenCalled()
+    expect(settleCallback2).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
+
+    settler.unsubscribe(settleCallback2)
+
+    manager.queueEntry(manager.createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+    manager.flushQueue()
+
+    expect(settleCallback1).toHaveBeenCalled()
+    expect(settleCallback2).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(true)
+  })
+
   it('settles immediately if already settled', () => {
     const manager = new PerformanceObserverManager()
     const performance = { timing: { loadEventEnd: 0 } }
