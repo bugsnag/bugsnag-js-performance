@@ -12,6 +12,10 @@ export abstract class Settler {
     }
   }
 
+  unsubscribe (callback: () => void): void {
+    this.callbacks.delete(callback)
+  }
+
   isSettled (): boolean {
     return this.settled
   }

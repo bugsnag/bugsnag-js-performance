@@ -153,4 +153,30 @@ describe('RequestSettler', () => {
       expect(settleCallback).toHaveBeenCalled()
     }
   })
+
+  it('can unsubscribe a callback', async () => {
+    const settleCallback1 = jest.fn()
+    const settleCallback2 = jest.fn()
+    const tracker = new RequestTracker()
+    const settler = new RequestSettler(tracker)
+
+    const end = tracker.start(START_CONTEXT)
+
+    settler.subscribe(settleCallback1)
+    settler.subscribe(settleCallback2)
+
+    expect(settleCallback1).not.toHaveBeenCalled()
+    expect(settleCallback2).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
+
+    settler.unsubscribe(settleCallback1)
+
+    end(END_CONTEXT)
+
+    await jest.advanceTimersByTimeAsync(100)
+
+    expect(settleCallback1).not.toHaveBeenCalled()
+    expect(settleCallback2).toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(true)
+  })
 })
