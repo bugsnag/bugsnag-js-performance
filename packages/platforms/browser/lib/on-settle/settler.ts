@@ -16,7 +16,7 @@ export abstract class Settler {
 
     // if we're already settled, call the callback immediately
     if (this.isSettled()) {
-      callback()
+      callback(this.clock.now())
     }
   }
 
@@ -28,11 +28,11 @@ export abstract class Settler {
     return this.settled
   }
 
-  protected settle (): void {
+  protected settle (settledTime: number = this.clock.now()): void {
     this.settled = true
 
     for (const callback of this.callbacks) {
-      callback()
+      callback(settledTime)
     }
   }
 }
