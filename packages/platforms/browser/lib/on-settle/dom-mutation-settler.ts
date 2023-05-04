@@ -1,10 +1,11 @@
+import { type Clock } from '@bugsnag/js-performance-core'
 import { Settler } from './settler'
 
 class DomMutationSettler extends Settler {
   private timeout: ReturnType<typeof setTimeout> | undefined = undefined
 
-  constructor (target: Node) {
-    super()
+  constructor (clock: Clock, target: Node) {
+    super(clock)
 
     const observer = new MutationObserver(() => { this.restart() })
 

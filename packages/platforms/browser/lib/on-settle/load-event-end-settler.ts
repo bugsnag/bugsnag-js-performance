@@ -1,3 +1,4 @@
+import { type Clock } from '@bugsnag/js-performance-core'
 import { Settler } from './settler'
 
 export interface PerformanceWithTiming {
@@ -12,8 +13,12 @@ function isPerformanceNavigationTiming (entry: PerformanceEntry): entry is Perfo
 }
 
 class LoadEventEndSettler extends Settler {
-  constructor (PerformanceObserverClass: typeof PerformanceObserver, performance: PerformanceWithTiming) {
-    super()
+  constructor (
+    clock: Clock,
+    PerformanceObserverClass: typeof PerformanceObserver,
+    performance: PerformanceWithTiming
+  ) {
+    super(clock)
 
     const supportedEntryTypes = PerformanceObserverClass.supportedEntryTypes
 

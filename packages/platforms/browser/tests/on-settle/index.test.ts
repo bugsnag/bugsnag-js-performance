@@ -8,7 +8,7 @@ import {
   type RequestEndContext,
   RequestTracker
 } from '../../lib/request-tracker/request-tracker'
-import { PerformanceObserverManager } from '@bugsnag/js-performance-test-utilities'
+import { IncrementingClock, PerformanceObserverManager } from '@bugsnag/js-performance-test-utilities'
 
 const START_CONTEXT: RequestStartContext = {
   url: 'https://www.bugsnag.com',
@@ -33,6 +33,7 @@ describe('onSettle', () => {
     const xhrRequestTracker = new RequestTracker()
 
     const onSettle = createOnSettle(
+      new IncrementingClock(),
       document,
       fetchRequestTracker,
       xhrRequestTracker,
@@ -68,6 +69,7 @@ describe('onSettle', () => {
     const xhrRequestTracker = new RequestTracker()
 
     const onSettle = createOnSettle(
+      new IncrementingClock(),
       document,
       fetchRequestTracker,
       xhrRequestTracker,
@@ -103,6 +105,7 @@ describe('onSettle', () => {
     const xhrRequestTracker = new RequestTracker()
 
     const onSettle = createOnSettle(
+      new IncrementingClock(),
       document,
       fetchRequestTracker,
       xhrRequestTracker,
@@ -136,6 +139,7 @@ describe('onSettle', () => {
     const xhrRequestTracker = new RequestTracker()
 
     const onSettle = createOnSettle(
+      new IncrementingClock(),
       document,
       fetchRequestTracker,
       xhrRequestTracker,
@@ -167,6 +171,7 @@ describe('onSettle', () => {
     const performance = { timing: { loadEventEnd: 0 } }
 
     const onSettle = createOnSettle(
+      new IncrementingClock(),
       document,
       new RequestTracker(),
       new RequestTracker(),
@@ -192,6 +197,7 @@ describe('onSettle', () => {
     const performance = { timing: { loadEventEnd: 0 } }
 
     const onSettle = createOnSettle(
+      new IncrementingClock(),
       document,
       new RequestTracker(),
       new RequestTracker(),

@@ -3,7 +3,7 @@
  */
 
 import LoadEventEndSettler from '../../lib/on-settle/load-event-end-settler'
-import { PerformanceObserverManager } from '@bugsnag/js-performance-test-utilities'
+import { IncrementingClock, PerformanceObserverManager } from '@bugsnag/js-performance-test-utilities'
 
 describe('LoadEventEndSettler', () => {
   afterEach(() => {
@@ -14,7 +14,11 @@ describe('LoadEventEndSettler', () => {
     const manager = new PerformanceObserverManager()
     const performance = { timing: { loadEventEnd: 0 } }
     const settleCallback = jest.fn()
-    const settler = new LoadEventEndSettler(manager.createPerformanceObserverFakeClass(), performance)
+    const settler = new LoadEventEndSettler(
+      new IncrementingClock(),
+      manager.createPerformanceObserverFakeClass(),
+      performance
+    )
 
     settler.subscribe(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
@@ -41,7 +45,11 @@ describe('LoadEventEndSettler', () => {
     const settleCallback1 = jest.fn()
     const settleCallback2 = jest.fn()
     const settleCallback3 = jest.fn()
-    const settler = new LoadEventEndSettler(manager.createPerformanceObserverFakeClass(), performance)
+    const settler = new LoadEventEndSettler(
+      new IncrementingClock(),
+      manager.createPerformanceObserverFakeClass(),
+      performance
+    )
 
     settler.subscribe(settleCallback1)
     settler.subscribe(settleCallback2)
@@ -66,7 +74,11 @@ describe('LoadEventEndSettler', () => {
     const performance = { timing: { loadEventEnd: 0 } }
     const settleCallback1 = jest.fn()
     const settleCallback2 = jest.fn()
-    const settler = new LoadEventEndSettler(manager.createPerformanceObserverFakeClass(), performance)
+    const settler = new LoadEventEndSettler(
+      new IncrementingClock(),
+      manager.createPerformanceObserverFakeClass(),
+      performance
+    )
 
     settler.subscribe(settleCallback1)
     settler.subscribe(settleCallback2)
@@ -88,7 +100,11 @@ describe('LoadEventEndSettler', () => {
   it('settles immediately if already settled', () => {
     const manager = new PerformanceObserverManager()
     const performance = { timing: { loadEventEnd: 0 } }
-    const settler = new LoadEventEndSettler(manager.createPerformanceObserverFakeClass(), performance)
+    const settler = new LoadEventEndSettler(
+      new IncrementingClock(),
+      manager.createPerformanceObserverFakeClass(),
+      performance
+    )
 
     expect(settler.isSettled()).toBe(false)
 
@@ -111,7 +127,11 @@ describe('LoadEventEndSettler', () => {
     const manager = new PerformanceObserverManager()
     const performance = { timing: { loadEventEnd: 0 } }
     const settleCallback = jest.fn()
-    const settler = new LoadEventEndSettler(manager.createPerformanceObserverFakeClass(), performance)
+    const settler = new LoadEventEndSettler(
+      new IncrementingClock(),
+      manager.createPerformanceObserverFakeClass(),
+      performance
+    )
 
     settler.subscribe(settleCallback)
 
@@ -142,6 +162,7 @@ describe('LoadEventEndSettler', () => {
     const performance = { timing: { loadEventEnd: 0 } }
     const settleCallback = jest.fn()
     const settler = new LoadEventEndSettler(
+      new IncrementingClock(),
       manager.createPerformanceObserverFakeClass(null),
       performance
     )
@@ -175,6 +196,7 @@ describe('LoadEventEndSettler', () => {
     const performance = { timing: { loadEventEnd: 0 } }
     const settleCallback = jest.fn()
     const settler = new LoadEventEndSettler(
+      new IncrementingClock(),
       manager.createPerformanceObserverFakeClass(['mark', 'measure']),
       performance
     )
@@ -206,6 +228,7 @@ describe('LoadEventEndSettler', () => {
     const performance = { timing: { loadEventEnd: 1234 } }
     const settleCallback = jest.fn()
     const settler = new LoadEventEndSettler(
+      new IncrementingClock(),
       manager.createPerformanceObserverFakeClass(null),
       performance
     )
@@ -225,6 +248,7 @@ describe('LoadEventEndSettler', () => {
     const performance = { timing: { loadEventEnd: 0 } }
     const settleCallback = jest.fn()
     const settler = new LoadEventEndSettler(
+      new IncrementingClock(),
       manager.createPerformanceObserverFakeClass(null),
       performance
     )
@@ -254,6 +278,7 @@ describe('LoadEventEndSettler', () => {
     const performance = { timing: { loadEventEnd: 1 } }
     const settleCallback = jest.fn()
     const settler = new LoadEventEndSettler(
+      new IncrementingClock(),
       manager.createPerformanceObserverFakeClass(null),
       performance
     )

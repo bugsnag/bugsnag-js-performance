@@ -3,24 +3,26 @@ import LoadEventEndSettler, { type PerformanceWithTiming } from './load-event-en
 import RequestSettler from './request-settler'
 import SettlerAggregate from './settler-aggregate'
 import { type RequestTracker } from '../request-tracker/request-tracker'
+import { type Clock } from '@bugsnag/js-performance-core'
 
 export type OnSettleCallback = () => void
 
 const TIMEOUT_MILLISECONDS = 60 * 1000
 
 export default function createOnSettle (
+  clock: Clock,
   document: Node,
   fetchRequestTracker: RequestTracker,
   xhrRequestTracker: RequestTracker,
   PerformanceObserverClass: typeof PerformanceObserver,
   performance: PerformanceWithTiming
 ) {
-  const domMutationSettler = new DomMutationSettler(document)
-  const fetchRequestSettler = new RequestSettler(fetchRequestTracker)
-  const xhrRequestSettler = new RequestSettler(xhrRequestTracker)
-  const loadEventEndSettler = new LoadEventEndSettler(PerformanceObserverClass, performance)
+  const domMutationSettler = new DomMutationSettler(clock, document)
+  const fetchRequestSettler = new RequestSettler(clock, fetchRequestTracker)
+  const xhrRequestSettler = new RequestSettler(clock, xhrRequestTracker)
+  const loadEventEndSettler = new LoadEventEndSettler(clock, PerformanceObserverClass, performance)
 
-  const settler = new SettlerAggregate([
+  const settler = new SettlerAggregate(clock, [
     domMutationSettler,
     loadEventEndSettler,
     fetchRequestSettler,
