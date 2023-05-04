@@ -2,10 +2,9 @@ import DomMutationSettler from './dom-mutation-settler'
 import LoadEventEndSettler, { type PerformanceWithTiming } from './load-event-end-settler'
 import RequestSettler from './request-settler'
 import SettlerAggregate from './settler-aggregate'
-import TimeoutSettler from './timeout-settler'
 import { type RequestTracker } from '../request-tracker/request-tracker'
 
-const TIMEOUT = 60 * 1000
+const TIMEOUT_MILLISECONDS = 60 * 1000
 
 export default function createOnSettle (
   document: Node,
@@ -27,13 +26,8 @@ export default function createOnSettle (
   ])
 
   return function onSettle (callback: () => void): void {
-    const timeout = new TimeoutSettler(TIMEOUT)
-
     const onSettle = () => {
-      // cancel the timeout and unsubscribe - this is fine to do even if the
-      // timeout is what called this function
-      timeout.cancel()
-      timeout.unsubscribe(onSettle)
+      clearTimeout(timeout)
 
       // unsubscribe from the settler so we don't call the callback more than
       // once
@@ -42,7 +36,7 @@ export default function createOnSettle (
       callback()
     }
 
+    const timeout = setTimeout(onSettle, TIMEOUT_MILLISECONDS)
     settler.subscribe(onSettle)
-    timeout.subscribe(onSettle)
   }
 }
