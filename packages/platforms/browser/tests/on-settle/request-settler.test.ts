@@ -8,6 +8,7 @@ import {
   type RequestEndContext,
   RequestTracker
 } from '../../lib/request-tracker/request-tracker'
+import createClock from '../../lib/clock'
 import { IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 
 const START_CONTEXT: RequestStartContext = {
@@ -54,7 +55,7 @@ describe('RequestSettler', () => {
   it('settles 100ms after a request finishes', async () => {
     const settleCallback = jest.fn()
     const tracker = new RequestTracker()
-    const settler = new RequestSettler(new IncrementingClock(), tracker)
+    const settler = new RequestSettler(createClock(performance), tracker)
 
     const end = tracker.start(START_CONTEXT)
 
@@ -73,7 +74,7 @@ describe('RequestSettler', () => {
 
     // it should settle after another 1ms
     await jest.advanceTimersByTimeAsync(1)
-    expect(settleCallback).toHaveBeenCalled()
+    expect(settleCallback).toHaveBeenCalledWith(0)
     expect(settler.isSettled()).toBe(true)
   })
 
@@ -101,7 +102,7 @@ describe('RequestSettler', () => {
   it('does not settle after a request finishes if there is another outstanding request', async () => {
     const settleCallback = jest.fn()
     const tracker = new RequestTracker()
-    const settler = new RequestSettler(new IncrementingClock(), tracker)
+    const settler = new RequestSettler(createClock(performance), tracker)
 
     const endRequest1 = tracker.start(START_CONTEXT)
 
@@ -120,7 +121,7 @@ describe('RequestSettler', () => {
     expect(settler.isSettled()).toBe(false)
 
     await jest.advanceTimersByTimeAsync(100)
-    expect(settleCallback).toHaveBeenCalled()
+    expect(settleCallback).toHaveBeenCalledWith(100)
     expect(settler.isSettled()).toBe(true)
   })
 

@@ -30,7 +30,12 @@ class RequestSettler extends Settler {
 
     return (endContext: RequestEndContext): void => {
       if (--this.outstandingRequests === 0) {
-        this.timeout = setTimeout(() => { this.settle() }, 100)
+        // we wait 100ms to ensure that requests have actually stopped but don't
+        // want the settled time to reflect that wait, so we record the time
+        // here and use that when settling
+        const settledTime = this.clock.now()
+
+        this.timeout = setTimeout(() => { this.settle(settledTime) }, 100)
       }
     }
   }
