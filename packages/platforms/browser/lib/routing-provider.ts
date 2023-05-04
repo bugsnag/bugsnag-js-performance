@@ -1,14 +1,7 @@
-import { type Span } from '@bugsnag/js-performance-core'
-
 export const isObject = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === 'object' && !Array.isArray(value)
 
-interface InitializationParameters {
-  pageLoadSpan: Span
-}
-
 export interface RoutingProvider {
-  initialize: ({ pageLoadSpan }: InitializationParameters) => void
   resolveRoute: RouteResolver
 }
 
@@ -22,14 +15,8 @@ export class DefaultRoutingProvider implements RoutingProvider {
   constructor (resolveRoute = defaultRouteResolver) {
     this.resolveRoute = resolveRoute
   }
-
-  initialize ({ pageLoadSpan }: InitializationParameters) {
-    const endTime = performance.now() // TODO: Get the correct end time
-    pageLoadSpan.end(endTime)
-  }
 }
 
 export const isRoutingProvider = (value: unknown): value is RoutingProvider =>
   isObject(value) &&
-    typeof value.initialize === 'function' &&
     typeof value.resolveRoute === 'function'
