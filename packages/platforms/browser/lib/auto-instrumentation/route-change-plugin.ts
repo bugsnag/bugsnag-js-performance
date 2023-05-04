@@ -3,13 +3,9 @@ import { type BrowserConfiguration } from '../config'
 
 export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   private spanFactory: SpanFactory
-  private document: Document
-  private location: Location
   private onSettle: (callback: () => void) => void
 
-  constructor (document: Document, location: Location, spanFactory: SpanFactory) {
-    this.document = document
-    this.location = location
+  constructor (spanFactory: SpanFactory) {
     this.spanFactory = spanFactory
 
     // TODO: Implement real settling function

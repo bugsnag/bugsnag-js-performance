@@ -1,5 +1,5 @@
 import { createClient } from '@bugsnag/js-performance-core'
-import { FullPageLoadPlugin } from './auto-instrumentation/full-page-load-plugin'
+import { FullPageLoadPlugin, RouteChangePlugin } from './auto-instrumentation'
 import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
 import { createSchema } from './config'
@@ -22,7 +22,8 @@ const BugsnagPerformance = createClient({
   idGenerator,
   schema: createSchema(window.location.hostname),
   plugins: (spanFactory) => [
-    new FullPageLoadPlugin(document, window.location, spanFactory)
+    new FullPageLoadPlugin(document, window.location, spanFactory),
+    new RouteChangePlugin(spanFactory)
   ]
 })
 
