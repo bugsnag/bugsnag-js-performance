@@ -1,5 +1,4 @@
-export const isObject = (value: unknown): value is Record<string, unknown> =>
-  !!value && typeof value === 'object' && !Array.isArray(value)
+import { isObject } from '@bugsnag/js-performance-core'
 
 export interface RoutingProvider {
   resolveRoute: RouteResolver
