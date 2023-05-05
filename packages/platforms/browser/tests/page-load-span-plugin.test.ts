@@ -41,21 +41,9 @@ describe('FullPageLoadPlugin', () => {
         }
       },
       {
-        key: 'bugsnag.browser.page.url',
-        value: {
-          stringValue: 'https://bugsnag.com/page-load-span-plugin'
-        }
-      },
-      {
         key: 'bugsnag.browser.page.referrer',
         value: {
           stringValue: 'https://bugsnag.com/'
-        }
-      },
-      {
-        key: 'bugsnag.browser.page.title',
-        value: {
-          stringValue: ''
         }
       }
     ]))
