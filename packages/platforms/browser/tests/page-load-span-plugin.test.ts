@@ -4,8 +4,8 @@
  */
 
 import { InMemoryDelivery, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
-import { createSchema } from '../lib/config'
 import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
+import { createSchema } from '../lib/config'
 import { type OnSettle } from '../lib/on-settle'
 
 jest.useFakeTimers()
@@ -28,6 +28,7 @@ describe('FullPageLoadPlugin', () => {
       name: '[FullPageLoad]/page-load-span-plugin'
     }))
 
+    // Attributes test
     const deliveredSpanAttributes = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes
     expect(deliveredSpanAttributes).toStrictEqual(expect.arrayContaining([
       {
@@ -47,6 +48,14 @@ describe('FullPageLoadPlugin', () => {
         value: {
           stringValue: 'https://bugsnag.com/'
         }
+      }
+    ]))
+
+    const deliveredSpanEvents = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].events
+    expect(deliveredSpanEvents).toStrictEqual(expect.arrayContaining([
+      {
+        name: 'ttfb',
+        timeUnixNano: expect.any(String) // TODO: Validate this
       }
     ]))
   })
