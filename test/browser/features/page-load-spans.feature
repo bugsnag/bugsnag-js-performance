@@ -11,3 +11,6 @@ Feature: Page Load spans
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.browser.page.route" equals "/page-load-spans/"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.browser.page.referrer" equals ""
         
+        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.events.0.name" equals "ttfb"
+        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.events.0.timeUnixNano" matches the regex "^[0-9]+$"
+        
