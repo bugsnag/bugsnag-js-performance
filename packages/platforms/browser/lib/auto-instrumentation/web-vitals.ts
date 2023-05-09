@@ -6,8 +6,8 @@ export class WebVitalsManager {
   ttfb = 0
 
   constructor (PerformanceObserverClass: typeof PerformanceObserver) {
-    const observer = new PerformanceObserverClass((entryList) => {
-      for (const entry of entryList.getEntries()) {
+    const observer = new PerformanceObserverClass((list) => {
+      for (const entry of list.getEntries()) {
         if (isPerformanceNavigationTiming(entry) && entry.responseStart > 0) {
           this.ttfb = entry.responseStart
           observer.disconnect()
@@ -16,6 +16,6 @@ export class WebVitalsManager {
       }
     })
 
-    observer.observe({ type: 'navigation', buffered: true })
+    observer.observe({ entryTypes: ['navigation'] })
   }
 }
