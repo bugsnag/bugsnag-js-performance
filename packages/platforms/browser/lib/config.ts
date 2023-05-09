@@ -1,14 +1,22 @@
-import { schema, type ConfigOption, type Configuration, type CoreSchema } from '@bugsnag/js-performance-core'
+import {
+  schema,
+  isStringOrRegExpArray,
+  type ConfigOption,
+  type Configuration,
+  type CoreSchema
+} from '@bugsnag/js-performance-core'
 import { DefaultRoutingProvider, isRoutingProvider, type RoutingProvider } from './routing-provider'
 
 export interface BrowserSchema extends CoreSchema {
   autoInstrumentFullPageLoads: ConfigOption<boolean>
   routingProvider: ConfigOption<RoutingProvider>
+  urlsToExcludeWhenAwaitingSettle: ConfigOption<Array<string | RegExp>>
 }
 
 export interface BrowserConfiguration extends Configuration {
   autoInstrumentFullPageLoads?: boolean
   routingProvider?: RoutingProvider
+  urlsToExcludeWhenAwaitingSettle?: Array<string | RegExp>
 }
 
 export function createSchema (hostname: string): BrowserSchema {
@@ -32,6 +40,11 @@ export function createSchema (hostname: string): BrowserSchema {
       defaultValue: new DefaultRoutingProvider(),
       message: 'should be a routing provider',
       validate: isRoutingProvider
+    },
+    urlsToExcludeWhenAwaitingSettle: {
+      defaultValue: [],
+      message: 'should be an array of string|RegExp',
+      validate: isStringOrRegExpArray
     }
   }
 }
