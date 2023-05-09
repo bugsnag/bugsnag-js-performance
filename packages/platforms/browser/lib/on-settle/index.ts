@@ -5,6 +5,7 @@ import SettlerAggregate from './settler-aggregate'
 import { type RequestTracker } from '../request-tracker/request-tracker'
 import { type Clock } from '@bugsnag/js-performance-core'
 
+export type OnSettle = (callback: OnSettleCallback) => void
 export type OnSettleCallback = (settledTime: number) => void
 
 const TIMEOUT_MILLISECONDS = 60 * 1000

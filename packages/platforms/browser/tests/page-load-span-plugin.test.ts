@@ -6,16 +6,18 @@
 import { InMemoryDelivery, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { createSchema } from '../lib/config'
 import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
+import { type OnSettle } from '../lib/on-settle'
 
 jest.useFakeTimers()
 
 describe('FullPageLoadPlugin', () => {
   it('Automatically creates and delivers a pageLoadSpan', () => {
     const delivery = new InMemoryDelivery()
+    const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory)]
+      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, onSettle)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -51,10 +53,11 @@ describe('FullPageLoadPlugin', () => {
 
   it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
     const delivery = new InMemoryDelivery()
+    const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory)]
+      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, onSettle)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentFullPageLoads: false })
