@@ -5,7 +5,7 @@ export class WebVitalsManager {
     new PerformanceObserverClass((entryList) => {
       const [pageNav] = entryList.getEntriesByType('navigation')
 
-      // @ts-expect-error responseStart does not exist
+      // @ts-expect-error TypeScript unaware of responseStart on pageNav
       this.ttfb = pageNav.responseStart
     }).observe({
       type: 'navigation',
