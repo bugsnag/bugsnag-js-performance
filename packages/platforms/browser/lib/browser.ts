@@ -35,6 +35,7 @@ const BugsnagPerformance = createClient({
   idGenerator,
   schema: createSchema(window.location.hostname),
   plugins: (spanFactory) => [
+    onSettle,
     new FullPageLoadPlugin(document, window.location, spanFactory, onSettle)
   ]
 })

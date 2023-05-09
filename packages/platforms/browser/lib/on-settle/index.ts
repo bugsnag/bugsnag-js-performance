@@ -2,11 +2,13 @@ import DomMutationSettler from './dom-mutation-settler'
 import LoadEventEndSettler, { type PerformanceWithTiming } from './load-event-end-settler'
 import RequestSettler from './request-settler'
 import SettlerAggregate from './settler-aggregate'
+import { type BrowserConfiguration } from '../config'
 import { type RequestTracker } from '../request-tracker/request-tracker'
-import { type Clock } from '@bugsnag/js-performance-core'
+import { type Clock, type InternalConfiguration, type Plugin } from '@bugsnag/js-performance-core'
 
 export type OnSettle = (callback: OnSettleCallback) => void
 export type OnSettleCallback = (settledTime: number) => void
+export type OnSettlePlugin = Plugin<BrowserConfiguration> & OnSettle
 
 const TIMEOUT_MILLISECONDS = 60 * 1000
 
@@ -17,7 +19,7 @@ export default function createOnSettle (
   xhrRequestTracker: RequestTracker,
   PerformanceObserverClass: typeof PerformanceObserver,
   performance: PerformanceWithTiming
-) {
+): OnSettlePlugin {
   const domMutationSettler = new DomMutationSettler(clock, document)
   const fetchRequestSettler = new RequestSettler(clock, fetchRequestTracker)
   const xhrRequestSettler = new RequestSettler(clock, xhrRequestTracker)
@@ -30,7 +32,7 @@ export default function createOnSettle (
     xhrRequestSettler
   ])
 
-  return function onSettle (callback: OnSettleCallback): void {
+  function onSettle (callback: OnSettleCallback): void {
     const onSettle: OnSettleCallback = (settledTime: number) => {
       clearTimeout(timeout)
 
@@ -51,4 +53,10 @@ export default function createOnSettle (
 
     settler.subscribe(onSettle)
   }
+
+  onSettle.configure = function (configuration: InternalConfiguration<BrowserConfiguration>): void {
+    // intentionally blank
+  }
+
+  return onSettle
 }
