@@ -7,8 +7,11 @@ import {
   type RequestTracker
 } from '../request-tracker/request-tracker'
 
+const ignoreRequest: RequestEndCallback = () => {}
+
 class RequestSettler extends Settler {
   private timeout: ReturnType<typeof setTimeout> | undefined = undefined
+  private urlsToExclude: RegExp[] = []
   private outstandingRequests = 0
 
   constructor (clock: Clock, requestTracker: RequestTracker) {
@@ -23,7 +26,16 @@ class RequestSettler extends Settler {
     requestTracker.onStart(this.onRequestStart.bind(this))
   }
 
+  setUrlsToExclude (urlsToExclude: RegExp[]): void {
+    this.urlsToExclude = urlsToExclude
+  }
+
   private onRequestStart (startContext: RequestStartContext): RequestEndCallback {
+    // if this is an excluded URL, ignore this request
+    if (this.shouldExcludeUrl(startContext.url)) {
+      return ignoreRequest
+    }
+
     clearTimeout(this.timeout)
     this.settled = false
     ++this.outstandingRequests
@@ -38,6 +50,10 @@ class RequestSettler extends Settler {
         this.timeout = setTimeout(() => { this.settle(settledTime) }, 100)
       }
     }
+  }
+
+  private shouldExcludeUrl (url: string): boolean {
+    return this.urlsToExclude.some(regexp => regexp.test(url))
   }
 }
 

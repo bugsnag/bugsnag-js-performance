@@ -181,4 +181,53 @@ describe('RequestSettler', () => {
     expect(settleCallback2).toHaveBeenCalled()
     expect(settler.isSettled()).toBe(true)
   })
+
+  it('ignores requests to URLs that match urlsToExclude', async () => {
+    const settleCallback = jest.fn()
+    const tracker = new RequestTracker()
+    const settler = new RequestSettler(createClock(performance), tracker)
+    settler.setUrlsToExclude([
+      // exactly 'https://www.bugsnag.com'
+      /^https:\/\/www.bugsnag.com$/,
+      // 'http://www.bugsnag.com' anywhere in the URL
+      /http:\/\/www.bugsnag.com/
+    ])
+
+    const endIgnoredRequest1 = tracker.start({
+      ...START_CONTEXT,
+      // matches the first URL to exclude
+      url: 'https://www.bugsnag.com'
+    })
+
+    settler.subscribe(settleCallback)
+    expect(settleCallback).toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(true)
+
+    endIgnoredRequest1(END_CONTEXT)
+
+    const endIgnoredRequest2 = tracker.start({
+      ...START_CONTEXT,
+      // matches the second URL to exclude
+      url: 'http://example.com/a/b/c?x=http://www.bugsnag.com'
+    })
+
+    await jest.advanceTimersByTimeAsync(100)
+
+    expect(settler.isSettled()).toBe(true)
+
+    endIgnoredRequest2(END_CONTEXT)
+
+    const end = tracker.start({
+      ...START_CONTEXT,
+      // does not match the URLs to exclude
+      url: 'http://example.com'
+    })
+
+    expect(settler.isSettled()).toBe(false)
+
+    end(END_CONTEXT)
+    await jest.advanceTimersByTimeAsync(100)
+
+    expect(settler.isSettled()).toBe(true)
+  })
 })
