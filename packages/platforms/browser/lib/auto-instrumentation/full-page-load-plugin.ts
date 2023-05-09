@@ -1,21 +1,23 @@
 import { type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/js-performance-core'
 import { type BrowserConfiguration } from '../config'
+import { type OnSettle } from '../on-settle'
 
 export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   private spanFactory: SpanFactory
   private document: Document
   private location: Location
-  private onSettle: (callback: () => void) => void
+  private onSettle: OnSettle
 
-  constructor (document: Document, location: Location, spanFactory: SpanFactory) {
+  constructor (
+    document: Document,
+    location: Location,
+    spanFactory: SpanFactory,
+    onSettle: OnSettle
+  ) {
     this.document = document
     this.location = location
     this.spanFactory = spanFactory
-
-    // TODO: Implement real settling function
-    this.onSettle = (callback: () => void) => {
-      callback()
-    }
+    this.onSettle = onSettle
   }
 
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
@@ -31,10 +33,9 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     span.setAttribute('bugsnag.browser.page.referrer', this.document.referrer)
     span.setAttribute('bugsnag.browser.page.route', route)
 
-    this.onSettle(() => {
+    this.onSettle((endTime: number) => {
       // TODO: Attach web vitals
-      const safeEndTime = performance.now()
-      this.spanFactory.endSpan(span, safeEndTime)
+      this.spanFactory.endSpan(span, endTime)
     })
   }
 }
