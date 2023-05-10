@@ -2,7 +2,7 @@ function isPerformanceNavigationTiming (entry: PerformanceEntry): entry is Perfo
   return entry.entryType === 'navigation'
 }
 
-export class WebVitalsManager {
+export class WebVitalsTracker {
   ttfb = 0
 
   constructor (PerformanceObserverClass: typeof PerformanceObserver) {

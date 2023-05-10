@@ -3,7 +3,7 @@
  * @jest-environment-options { "url": "https://bugsnag.com/page-load-span-plugin", "referrer": "https://bugsnag.com" }
  */
 
-import { InMemoryDelivery, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
+import { InMemoryDelivery, IncrementingClock, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
 import { createSchema } from '../lib/config'
 import { type OnSettle } from '../lib/on-settle'
@@ -12,12 +12,15 @@ jest.useFakeTimers()
 
 describe('FullPageLoadPlugin', () => {
   it('Automatically creates and delivers a pageLoadSpan', () => {
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
+    const webVitalsTracker = { ttfb: 1234 }
     const testClient = createTestClient({
+      clock,
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, onSettle)]
+      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitalsTracker, onSettle)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -55,7 +58,7 @@ describe('FullPageLoadPlugin', () => {
     expect(deliveredSpanEvents).toStrictEqual(expect.arrayContaining([
       {
         name: 'ttfb',
-        timeUnixNano: expect.any(String) // TODO: Validate this
+        timeUnixNano: '1234000000'
       }
     ]))
   })
@@ -63,10 +66,11 @@ describe('FullPageLoadPlugin', () => {
   it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
+    const webVitalsTracker = { ttfb: 0 }
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, onSettle)]
+      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitalsTracker, onSettle)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentFullPageLoads: false })
