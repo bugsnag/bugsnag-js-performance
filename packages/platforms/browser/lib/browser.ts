@@ -19,7 +19,7 @@ const resourceAttributesSource = createResourceAttributesSource(navigator)
 const backgroundingListener = createBrowserBackgroundingListener(document)
 const fetchRequestTracker = createFetchRequestTracker(window, clock)
 const xhrRequestTracker = createXmlHttpRequestTracker(window, clock)
-const webVitalsTracker = new WebVitalsTracker(PerformanceObserver)
+const webVitalsTracker = new WebVitalsTracker(PerformanceObserver, performance)
 const onSettle = createOnSettle(
   clock,
   document,
