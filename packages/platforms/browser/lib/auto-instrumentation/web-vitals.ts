@@ -9,7 +9,7 @@ function isPerformanceNavigationTiming (entry: PerformanceEntry): entry is Perfo
 }
 
 export class WebVitalsTracker {
-  ttfb = 0
+  timeToFirstByte = 0
 
   constructor (PerformanceObserverClass: typeof PerformanceObserver, performance: PerformanceWithTiming) {
     const supportedEntryTypes = PerformanceObserverClass.supportedEntryTypes
@@ -33,7 +33,7 @@ export class WebVitalsTracker {
         // this makes TypeScript happy :)
         if (isPerformanceNavigationTiming(entry) && entry.responseStart > 0) {
           // Set TTFB
-          this.ttfb = entry.responseStart
+          this.timeToFirstByte = entry.responseStart
 
           // the ttfb event can only happen once per-page, so we don't need to
           // keep observing
@@ -53,7 +53,7 @@ export class WebVitalsTracker {
     // 'responseStart' will be 0 until it has a valid value
 
       if (performance.timing.responseStart > 0) {
-        this.ttfb = performance.timing.responseStart
+        this.timeToFirstByte = performance.timing.responseStart
       } else {
       // check responseStart on the next frame if it's not available yet
         requestAnimationFrame(setOnValidResponseStart)
