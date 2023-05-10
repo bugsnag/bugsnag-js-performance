@@ -5,6 +5,7 @@
 
 import { InMemoryDelivery, IncrementingClock, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
+import { type WebVitalsTracker } from '../lib/auto-instrumentation/web-vitals'
 import { createSchema } from '../lib/config'
 import { type OnSettle } from '../lib/on-settle'
 
@@ -15,7 +16,7 @@ describe('FullPageLoadPlugin', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
-    const webVitalsTracker = { ttfb: 1234 }
+    const webVitalsTracker = { ttfb: 1234 } as unknown as WebVitalsTracker
     const testClient = createTestClient({
       clock,
       schema: createSchema(window.location.hostname),
@@ -66,7 +67,7 @@ describe('FullPageLoadPlugin', () => {
   it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
-    const webVitalsTracker = { ttfb: 0 }
+    const webVitalsTracker = { ttfb: 0 } as unknown as WebVitalsTracker
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
