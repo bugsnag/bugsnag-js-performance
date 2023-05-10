@@ -14,7 +14,9 @@ export class SpanEvents {
   private readonly events: Event[] = []
 
   add (name: string, time: number) {
-    this.events.push({ name, time })
+    if (time > 0) {
+      this.events.push({ name, time })
+    }
   }
 
   toJson (clock: Clock): JsonEvent[] {
