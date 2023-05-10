@@ -39,7 +39,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
 
     this.onSettle((endTime: number) => {
       // Attach web vitals
-      span.addEvent('ttfb', this.webVitalsTracker.ttfb)
+      span.addEvent('ttfb', this.webVitalsTracker.timeToFirstByte)
 
       this.spanFactory.endSpan(span, endTime)
     })
