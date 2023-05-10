@@ -1,6 +1,7 @@
 export interface PerformanceWithTiming {
   timing: {
     responseStart: number
+    navigationStart: number
   }
 }
 
@@ -53,7 +54,7 @@ export class WebVitalsTracker {
     // 'responseStart' will be 0 until it has a valid value
 
       if (performance.timing.responseStart > 0) {
-        this.timeToFirstByte = performance.timing.responseStart
+        this.timeToFirstByte = performance.timing.responseStart - performance.timing.navigationStart
       } else {
       // check responseStart on the next frame if it's not available yet
         requestAnimationFrame(setOnValidResponseStart)
