@@ -74,6 +74,14 @@ describe('FullPageLoadPlugin', () => {
         }
       }
     ]))
+
+    const deliveredSpanEvents = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].events
+    expect(deliveredSpanEvents).toStrictEqual(expect.arrayContaining([
+      {
+        name: 'ttfb',
+        timeUnixNano: '1234000000'
+      }
+    ]))
   })
 
   it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
