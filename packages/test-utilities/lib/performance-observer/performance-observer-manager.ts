@@ -189,7 +189,11 @@ export class PerformanceObserverManager {
       loadEventEnd: 0,
       type: 'navigate',
       redirectCount: 0,
-      toJSON () {},
+      toJSON () {
+        // this might look equivalent to 'return this' but that makes a recursive
+        // object and Jest just displays '[Circular]', which is not very useful
+        return Object.assign({}, this)
+      },
       ...overrides
     }
   }
