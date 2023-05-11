@@ -11,11 +11,7 @@ Then("a span named {string} contains the events:") do |span_name, table|
   expected_events = table.hashes
 
   match = named_spans.find_all do |span|
-    matches = expected_events.flat_map do |expected_event|
-      event_name = expected_event["name"]
-      span["events"].find_all { |event| event["name"] == event_name }
-    end
-
+    matches = get_matching_events span, expected_events
     matches.size == expected_events.size
   end
   
@@ -24,15 +20,16 @@ Then("a span named {string} contains the events:") do |span_name, table|
   all_valid = match.each do |span|
     startTime = span["startTimeUnixNano"].to_i
     endTime = span["endTimeUnixNano"].to_i
-
-    matches = expected_events.flat_map do |expected_event|
-      event_name = expected_event["name"]
-      span["events"].find_all { |event| event["name"] == event_name }
-    end
-
+    matches = get_matching_events span, expected_events
     matches.all? { |event| event["timeUnixNano"].to_i > startTime && event["timeUnixNano"].to_i < endTime }
   end
 
   raise Test::Unit::AssertionFailedError.new "Not all events were within the expected time range" unless all_valid
 
+end
+
+def get_matching_events(span, expected_events)
+  expected_events.flat_map do |expected_event| 
+    span["events"].find_all { |event| event["name"] == expected_event["name"] }
+  end
 end
