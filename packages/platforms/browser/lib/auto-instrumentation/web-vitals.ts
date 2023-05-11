@@ -1,3 +1,5 @@
+import { type SpanInternal } from '@bugsnag/js-performance-core'
+
 export interface PerformanceWithTiming {
   timing: {
     responseStart: number
@@ -10,7 +12,7 @@ function isPerformanceNavigationTiming (entry: PerformanceEntry): entry is Perfo
 }
 
 export class WebVitalsTracker {
-  timeToFirstByte = 0
+  timeToFirstByte?: number = undefined
 
   constructor (PerformanceObserverClass: typeof PerformanceObserver, performance: PerformanceWithTiming) {
     const supportedEntryTypes = PerformanceObserverClass.supportedEntryTypes
@@ -62,5 +64,11 @@ export class WebVitalsTracker {
     }
 
     setOnValidResponseStart()
+  }
+
+  attachTo (span: SpanInternal) {
+    if (this.timeToFirstByte) {
+      span.addEvent('ttfb', this.timeToFirstByte)
+    }
   }
 }

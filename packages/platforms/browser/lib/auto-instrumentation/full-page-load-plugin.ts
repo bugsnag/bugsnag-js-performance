@@ -38,9 +38,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     span.setAttribute('bugsnag.browser.page.route', route)
 
     this.onSettle((endTime: number) => {
-      // Attach web vitals
-      span.addEvent('ttfb', this.webVitalsTracker.timeToFirstByte)
-
+      this.webVitalsTracker.attachTo(span)
       this.spanFactory.endSpan(span, endTime)
     })
   }
