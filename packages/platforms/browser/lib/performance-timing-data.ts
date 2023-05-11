@@ -20,7 +20,12 @@ export interface PerformanceTimingData {
   readonly secureConnectionStart: number
   readonly unloadEventStart: number
   readonly unloadEventEnd: number
-  readonly workerStart: number
+  // workerStart is not present in the deprecated PerformanceTiming API
+  readonly workerStart?: number
+}
+
+interface PerformanceWithTiming {
+  timing: PerformanceTiming
 }
 
 // check if a PerformanceEntry is a PerformanceNavigationTiming
@@ -31,6 +36,23 @@ function isPerformanceNavigationTiming (entry: PerformanceEntry): entry is Perfo
 type PerformanceTimingDataGetter = () => Promise<PerformanceTimingData>
 
 function createPerformanceTimingSource (
+  PerformanceObserverClass: typeof PerformanceObserver,
+  performance: PerformanceWithTiming
+): PerformanceTimingDataGetter {
+  const supportedEntryTypes = PerformanceObserverClass.supportedEntryTypes
+
+  // if the browser doesn't support 'supportedEntryTypes' or doesn't support
+  // the 'navigation' entry type, we can't use PerformanceObserver to listen
+  // for 'navigation' entries so have to fall back to polling the deprecated
+  // 'performance.timing' object
+  if (Array.isArray(supportedEntryTypes) && supportedEntryTypes.includes('navigation')) {
+    return usingPerformanceObserver(PerformanceObserverClass)
+  }
+
+  return usingPerformanceNavigationTiming(performance)
+}
+
+function usingPerformanceObserver (
   PerformanceObserverClass: typeof PerformanceObserver
 ): PerformanceTimingDataGetter {
   return function getPerformanceTimingData (): Promise<PerformanceTimingData> {
@@ -57,6 +79,52 @@ function createPerformanceTimingSource (
 
       observer.observe({ type: 'navigation', buffered: true })
     })
+  }
+}
+
+function usingPerformanceNavigationTiming (
+  performance: PerformanceWithTiming
+): PerformanceTimingDataGetter {
+  return function getPerformanceNavigationTimingEntry () {
+    return new Promise(resolve => {
+      const resolveOnValidLoadEventEnd = () => {
+        // 'loadEventEnd' will be 0 until it has a valid value
+        if (performance.timing.loadEventEnd > 0) {
+          resolve(normalisePerformanceTiming(performance.timing))
+        } else {
+          // check loadEventEnd on the next frame if it's not available yet
+          requestAnimationFrame(resolveOnValidLoadEventEnd)
+        }
+      }
+
+      resolveOnValidLoadEventEnd()
+    })
+  }
+}
+
+function normalisePerformanceTiming (timing: PerformanceTiming): PerformanceTimingData {
+  const normalise = (value: number): number => Math.max(value - timing.navigationStart, 0)
+
+  return {
+    connectStart: normalise(timing.connectStart),
+    connectEnd: normalise(timing.connectEnd),
+    domainLookupStart: normalise(timing.domainLookupStart),
+    domainLookupEnd: normalise(timing.domainLookupEnd),
+    domComplete: normalise(timing.domComplete),
+    domContentLoadedEventStart: normalise(timing.domContentLoadedEventStart),
+    domContentLoadedEventEnd: normalise(timing.domContentLoadedEventEnd),
+    domInteractive: normalise(timing.domInteractive),
+    fetchStart: normalise(timing.fetchStart),
+    loadEventStart: normalise(timing.loadEventStart),
+    loadEventEnd: normalise(timing.loadEventEnd),
+    redirectStart: normalise(timing.redirectStart),
+    redirectEnd: normalise(timing.redirectEnd),
+    responseStart: normalise(timing.responseStart),
+    responseEnd: normalise(timing.responseEnd),
+    requestStart: normalise(timing.requestStart),
+    secureConnectionStart: normalise(timing.secureConnectionStart),
+    unloadEventStart: normalise(timing.unloadEventStart),
+    unloadEventEnd: normalise(timing.unloadEventEnd)
   }
 }
 
