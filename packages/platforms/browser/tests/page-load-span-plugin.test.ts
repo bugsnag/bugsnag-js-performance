@@ -28,6 +28,7 @@ describe('FullPageLoadPlugin', () => {
     testClient.start({ apiKey: VALID_API_KEY })
 
     manager.queueEntry(manager.createPerformanceNavigationTimingFake({ responseStart: 123 }))
+    manager.queueEntry(manager.createPerformanceEntryFake({ name: 'first-contentful-paint', entryType: 'paint', startTime: 234 }))
     manager.flushQueue()
 
     jest.runAllTimers()
@@ -39,10 +40,16 @@ describe('FullPageLoadPlugin', () => {
       kind: 3,
       spanId: 'a random 64 bit string',
       traceId: 'a random 128 bit string',
-      events: [{
-        name: 'ttfb',
-        timeUnixNano: '123000000'
-      }]
+      events: [
+        {
+          name: 'fcp',
+          timeUnixNano: '234000000'
+        },
+        {
+          name: 'ttfb',
+          timeUnixNano: '123000000'
+        }
+      ]
     }))
 
     // Attributes test

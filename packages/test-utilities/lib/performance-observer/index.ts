@@ -151,6 +151,19 @@ export class PerformanceObserverManager {
     }
   }
 
+  createPerformanceEntryFake (
+    overrides: Partial<PerformanceEntryFake> = {}
+  ): PerformanceEntryFake {
+    return {
+      duration: 0,
+      entryType: 'navigation',
+      name: 'fake-entry',
+      startTime: 0,
+      toJSON () {},
+      ...overrides
+    }
+  }
+
   createPerformanceNavigationTimingFake (
     overrides: Partial<PerformanceNavigationTimingFake> = {}
   ): PerformanceNavigationTimingFake {
