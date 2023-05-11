@@ -13,6 +13,7 @@ function isPerformanceNavigationTiming (entry: PerformanceEntry): entry is Perfo
 
 export class WebVitalsTracker {
   timeToFirstByte?: number = undefined
+  firstContentfulPaint?: number = undefined
 
   constructor (PerformanceObserverClass: typeof PerformanceObserver, performance: PerformanceWithTiming) {
     const supportedEntryTypes = PerformanceObserverClass.supportedEntryTypes
@@ -29,7 +30,7 @@ export class WebVitalsTracker {
   }
 
   private observeUsingPerformanceObserver (PerformanceObserverClass: typeof PerformanceObserver) {
-    const observer = new PerformanceObserverClass((list) => {
+    new PerformanceObserverClass((list, observer) => {
       for (const entry of list.getEntries()) {
         // we don't really _need_ to check 'isPerformanceNavigationTiming' here
         // as we only observe entries with type === 'navigation' anyway, but
@@ -46,9 +47,28 @@ export class WebVitalsTracker {
           break
         }
       }
-    })
+    }).observe({ type: 'navigation', buffered: true })
 
-    observer.observe({ type: 'navigation', buffered: true })
+    // TODO: The API will dispatch a first-contentful-paint entry for pages loaded in a background tab,
+    // but those pages should be ignored when calculating FCP (first paint timings should only
+    // be considered if the page was in the foreground the entire time).
+    //
+    // TODO: The API does not report first-contentful-paint entries when the page is restored from the
+    // back/forward cache, but FCP should be measured in these cases since users experience them
+    // as distinct page visits.
+    //
+    // TODO: The API may not report paint timings from cross-origin iframes, but to properly measure
+    // FCP you should consider all frames. Sub-frames can use the API to report their paint
+    // timings to the parent frame for aggregation.
+    new PerformanceObserverClass((list, observer) => {
+      for (const entry of list.getEntriesByName('first-contentful-paint')) {
+        if (entry.startTime > 0) {
+          this.firstContentfulPaint = entry.startTime
+          observer.disconnect()
+          break
+        }
+      }
+    }).observe({ type: 'paint', buffered: true })
   }
 
   private observeUsingPerformanceTiming (performance: PerformanceWithTiming) {
@@ -67,6 +87,9 @@ export class WebVitalsTracker {
   }
 
   attachTo (span: SpanInternal) {
+    if (this.firstContentfulPaint) {
+      span.addEvent('fcp', this.firstContentfulPaint)
+    }
     if (this.timeToFirstByte) {
       span.addEvent('ttfb', this.timeToFirstByte)
     }
