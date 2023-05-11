@@ -15,7 +15,7 @@ describe('FullPageLoadPlugin', () => {
   it('Automatically creates and delivers a pageLoadSpan', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
-    const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
+    const onSettle: OnSettle = (onSettleCallback) => { setTimeout(() => { onSettleCallback(1234) }, 1234) }
     const manager = new PerformanceObserverManager()
     const webVitalsTracker = new WebVitalsTracker(manager.createPerformanceObserverFakeClass(), performance)
     const testClient = createTestClient({
@@ -25,10 +25,10 @@ describe('FullPageLoadPlugin', () => {
       plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitalsTracker, onSettle)]
     })
 
+    testClient.start({ apiKey: VALID_API_KEY })
+
     manager.queueEntry(manager.createPerformanceNavigationTimingFake({ responseStart: 123 }))
     manager.flushQueue()
-
-    testClient.start({ apiKey: VALID_API_KEY })
 
     jest.runAllTimers()
 
