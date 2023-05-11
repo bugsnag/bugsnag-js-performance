@@ -3,9 +3,9 @@
  * @jest-environment-options { "url": "https://bugsnag.com/page-load-span-plugin", "referrer": "https://bugsnag.com" }
  */
 
-import { InMemoryDelivery, IncrementingClock, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
+import { InMemoryDelivery, IncrementingClock, PerformanceObserverManager, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
-import { type WebVitalsTracker } from '../lib/auto-instrumentation/web-vitals'
+import { WebVitalsTracker } from '../lib/auto-instrumentation/web-vitals'
 import { createSchema } from '../lib/config'
 import { type OnSettle } from '../lib/on-settle'
 
@@ -16,7 +16,8 @@ describe('FullPageLoadPlugin', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
-    const webVitalsTracker = { timeToFirstByte: 1234 } as unknown as WebVitalsTracker
+    const manager = new PerformanceObserverManager()
+    const webVitalsTracker = new WebVitalsTracker(manager.createPerformanceObserverFakeClass(), performance)
     const testClient = createTestClient({
       clock,
       schema: createSchema(window.location.hostname),
@@ -24,12 +25,24 @@ describe('FullPageLoadPlugin', () => {
       plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitalsTracker, onSettle)]
     })
 
+    manager.queueEntry(manager.createPerformanceNavigationTimingFake({ responseStart: 123 }))
+    manager.flushQueue()
+
     testClient.start({ apiKey: VALID_API_KEY })
 
     jest.runAllTimers()
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({
-      name: '[FullPageLoad]/page-load-span-plugin'
+      name: '[FullPageLoad]/page-load-span-plugin',
+      startTimeUnixNano: '0',
+      endTimeUnixNano: '1234000000',
+      kind: 3,
+      spanId: 'a random 64 bit string',
+      traceId: 'a random 128 bit string',
+      events: [{
+        name: 'ttfb',
+        timeUnixNano: '123000000'
+      }]
     }))
 
     // Attributes test
@@ -54,20 +67,12 @@ describe('FullPageLoadPlugin', () => {
         }
       }
     ]))
-
-    const deliveredSpanEvents = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].events
-    expect(deliveredSpanEvents).toStrictEqual(expect.arrayContaining([
-      {
-        name: 'ttfb',
-        timeUnixNano: '1234000000'
-      }
-    ]))
   })
 
   it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
-    const webVitalsTracker = { timeToFirstByte: 0 } as unknown as WebVitalsTracker
+    const webVitalsTracker = { timeToFirstByte: 0, attachTo: jest.fn() } as unknown as WebVitalsTracker
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
