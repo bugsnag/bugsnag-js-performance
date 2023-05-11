@@ -72,18 +72,17 @@ export class WebVitalsTracker {
   }
 
   private observeUsingPerformanceTiming (performance: PerformanceWithTiming) {
-    const setOnValidResponseStart = () => {
-    // 'responseStart' will be 0 until it has a valid value
-
+    const pollTimeToFirstByte = () => {
+      // 'responseStart' will be 0 until it has a valid value
       if (performance.timing.responseStart > 0) {
         this.timeToFirstByte = performance.timing.responseStart - performance.timing.navigationStart
       } else {
-      // check responseStart on the next frame if it's not available yet
-        requestAnimationFrame(setOnValidResponseStart)
+        // check responseStart on the next frame if it's not available yet
+        requestAnimationFrame(pollTimeToFirstByte)
       }
     }
 
-    setOnValidResponseStart()
+    pollTimeToFirstByte()
   }
 
   attachTo (span: SpanInternal) {

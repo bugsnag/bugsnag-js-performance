@@ -10,7 +10,7 @@ import createResourceAttributesSource from './resource-attributes-source'
 import createSpanAttributesSource from './span-attributes-source'
 import createFetchRequestTracker from './request-tracker/request-tracker-fetch'
 import createXmlHttpRequestTracker from './request-tracker/request-tracker-xhr'
-import { WebVitalsTracker } from './auto-instrumentation/web-vitals'
+import { WebVitalsTracker } from './auto-instrumentation/web-vitals-tracker'
 
 const clock = createClock(performance)
 const spanAttributesSource = createSpanAttributesSource(document.title, window.location.href)

@@ -1,7 +1,7 @@
 import { type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/js-performance-core'
 import { type BrowserConfiguration } from '../config'
 import { type OnSettle } from '../on-settle'
-import { type WebVitalsTracker } from './web-vitals'
+import { type WebVitalsTracker } from './web-vitals-tracker'
 
 export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   private spanFactory: SpanFactory

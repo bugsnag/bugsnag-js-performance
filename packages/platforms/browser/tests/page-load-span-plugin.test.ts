@@ -5,7 +5,7 @@
 
 import { InMemoryDelivery, IncrementingClock, PerformanceObserverManager, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
-import { WebVitalsTracker } from '../lib/auto-instrumentation/web-vitals'
+import { WebVitalsTracker } from '../lib/auto-instrumentation/web-vitals-tracker'
 import { createSchema } from '../lib/config'
 import { type OnSettle } from '../lib/on-settle'
 
