@@ -189,7 +189,9 @@ export class PerformanceObserverManager {
       loadEventEnd: 0,
       type: 'navigate',
       redirectCount: 0,
-      toJSON () {},
+      toJSON () {
+        return Object.fromEntries(Object.entries(this))
+      },
       ...overrides
     }
   }
