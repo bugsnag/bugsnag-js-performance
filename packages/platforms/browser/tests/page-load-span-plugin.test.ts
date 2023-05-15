@@ -5,9 +5,9 @@
 
 import { InMemoryDelivery, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
-import { type WebVitals } from '../lib/web-vitals'
 import { createSchema } from '../lib/config'
 import { type OnSettle } from '../lib/on-settle'
+import { type WebVitals } from '../lib/web-vitals'
 
 jest.useFakeTimers()
 
@@ -25,6 +25,8 @@ describe('FullPageLoadPlugin', () => {
     testClient.start({ apiKey: VALID_API_KEY })
 
     jest.runAllTimers()
+
+    expect(webVitals.attachTo).toHaveBeenCalled()
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({
       name: '[FullPageLoad]/page-load-span-plugin'
@@ -67,6 +69,7 @@ describe('FullPageLoadPlugin', () => {
 
     jest.runAllTimers()
 
+    expect(webVitals.attachTo).not.toHaveBeenCalled()
     expect(delivery.requests).toHaveLength(0)
   })
 })
