@@ -10,4 +10,4 @@ Feature: Page Load spans
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.browser.page.url" equals the stored value "bugsnag.browser.page.url"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.browser.page.route" equals "/page-load-spans/"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.browser.page.referrer" equals ""
-        
+        And the span named "[FullPageLoad]/page-load-spans/" is a valid full page load span
