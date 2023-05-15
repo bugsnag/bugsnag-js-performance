@@ -50,12 +50,12 @@ steps:
 
       # BrowserStack
       - label: ":{{ matrix.browser }}: {{ matrix.version }} Browser tests"
-        depends_on: "browser-maze-runner-legacy"
+        depends_on: "browser-maze-runner"
         timeout_in_minutes: 30
         plugins:
           docker-compose#v3.9.0:
-            pull: browser-maze-runner-legacy
-            run: browser-maze-runner-legacy
+            pull: browser-maze-runner
+            run: browser-maze-runner
             use-aliases: true
             command:
               - --farm=bs
