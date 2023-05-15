@@ -79,7 +79,7 @@ describe('FullPageLoadPlugin', () => {
     expect(deliveredSpanEvents).toStrictEqual(expect.arrayContaining([
       {
         name: 'ttfb',
-        timeUnixNano: '1234000000'
+        timeUnixNano: '500000'
       }
     ]))
   })
