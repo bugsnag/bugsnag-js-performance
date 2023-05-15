@@ -13,17 +13,26 @@ jest.useFakeTimers()
 
 describe('FullPageLoadPlugin', () => {
   it('Automatically creates and delivers a pageLoadSpan', () => {
-    const entry = {
+    const ttfbEntry = {
       duration: 1234,
       entryType: 'navigation',
-      name: 'test',
+      name: 'ttfb',
       responseStart: 5678,
       startTime: 0,
       toJSON: jest.fn()
     }
 
+    const fcpEntry = {
+      name: 'fcp',
+      entryType: 'first-contentful-paint',
+      duration: 64,
+      startTime: 128,
+      toJSON: jest.fn()
+    }
+
     const performance = {
-      getEntriesByType: () => [entry],
+      getEntriesByName: () => [fcpEntry],
+      getEntriesByType: () => [ttfbEntry],
       timing: {
         responseStart: 1,
         navigationStart: 0
@@ -47,10 +56,16 @@ describe('FullPageLoadPlugin', () => {
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({
       name: '[FullPageLoad]/page-load-span-plugin',
-      events: [{
-        name: 'ttfb',
-        timeUnixNano: '5678000000'
-      }]
+      events: [
+        {
+          name: 'fcp',
+          timeUnixNano: '128000000'
+        },
+        {
+          name: 'ttfb',
+          timeUnixNano: '5678000000'
+        }
+      ]
     }))
 
     const deliveredSpanAttributes = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes
