@@ -5,7 +5,7 @@
 
 import { InMemoryDelivery, IncrementingClock, PerformanceObserverManager, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
-import { WebVitalsTracker } from '../lib/auto-instrumentation/web-vitals'
+import { type WebVitals } from '../lib/web-vitals'
 import { createSchema } from '../lib/config'
 import { type OnSettle } from '../lib/on-settle'
 
@@ -17,12 +17,12 @@ describe('FullPageLoadPlugin', () => {
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { setTimeout(() => { onSettleCallback(1234) }, 1234) }
     const manager = new PerformanceObserverManager()
-    const webVitalsTracker = new WebVitalsTracker(manager.createPerformanceObserverFakeClass(), performance)
+    const webVitals = { attachTo: jest.fn() } as unknown as WebVitals
     const testClient = createTestClient({
       clock,
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitalsTracker, onSettle)]
+      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitals, onSettle)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -38,11 +38,7 @@ describe('FullPageLoadPlugin', () => {
       endTimeUnixNano: '1234000000',
       kind: 3,
       spanId: 'a random 64 bit string',
-      traceId: 'a random 128 bit string',
-      events: [{
-        name: 'ttfb',
-        timeUnixNano: '123000000'
-      }]
+      traceId: 'a random 128 bit string'
     }))
 
     // Attributes test
@@ -72,11 +68,11 @@ describe('FullPageLoadPlugin', () => {
   it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
-    const webVitalsTracker = { timeToFirstByte: 0, attachTo: jest.fn() } as unknown as WebVitalsTracker
+    const webVitals = { timeToFirstByte: 0, attachTo: jest.fn() } as unknown as WebVitals
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitalsTracker, onSettle)]
+      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitals, onSettle)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentFullPageLoads: false })
