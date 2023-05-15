@@ -59,7 +59,7 @@ end
 #
 # @step_input span_name [String] The name of the span to check
 Then("the span named {string} is a valid full page load span") do |span_name|
-  expected_event_names = ["ttfb"]
+  expected_event_names = ["fcp", "ttfb"]
   page_load_span_prefix = "[FullPageLoad]"
 
   Maze.check.true(

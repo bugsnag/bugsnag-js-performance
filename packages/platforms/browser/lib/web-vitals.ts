@@ -2,6 +2,7 @@ import { type Clock, type SpanInternal } from '@bugsnag/js-performance-core'
 
 interface PerformanceWithNavigationTiming {
   getEntriesByType: typeof performance.getEntriesByType
+  getEntriesByName: typeof performance.getEntriesByName
   timing: {
     responseStart: number
     navigationStart: number
@@ -18,10 +19,24 @@ export class WebVitals {
   }
 
   attachTo (span: SpanInternal) {
+    const firstContentfulPaint = this.firstContentfulPaint()
+
+    if (firstContentfulPaint) {
+      span.addEvent('fcp', firstContentfulPaint)
+    }
+
     const timeToFirstByte = this.timeToFirstByte()
 
     if (timeToFirstByte) {
       span.addEvent('ttfb', timeToFirstByte)
+    }
+  }
+
+  private firstContentfulPaint () {
+    const entry = this.performance.getEntriesByName('first-contentful-paint', 'paint')[0]
+
+    if (entry) {
+      return entry.startTime
     }
   }
 
