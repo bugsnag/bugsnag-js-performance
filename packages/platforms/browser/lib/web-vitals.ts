@@ -33,7 +33,7 @@ export class WebVitals {
   }
 
   private firstContentfulPaint () {
-    const entry = this.performance.getEntriesByName('first-contentful-paint', 'paint')[0]
+    const entry = this.performance.getEntriesByType('paint')[0]
 
     if (entry) {
       return entry.startTime
