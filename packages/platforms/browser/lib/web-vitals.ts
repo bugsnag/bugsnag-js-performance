@@ -2,7 +2,6 @@ import { type SpanInternal } from '@bugsnag/js-performance-core'
 
 interface PerformanceWithNavigationTiming {
   getEntriesByType: typeof performance.getEntriesByType
-  getEntriesByName: typeof performance.getEntriesByName
   timing: {
     responseStart: number
     navigationStart: number

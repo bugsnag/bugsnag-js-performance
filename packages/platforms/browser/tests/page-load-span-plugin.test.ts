@@ -23,16 +23,15 @@ describe('FullPageLoadPlugin', () => {
     }
 
     const fcpEntry = {
-      name: 'fcp',
-      entryType: 'first-contentful-paint',
+      name: 'first-contentful-paint',
+      entryType: 'paint',
       duration: 64,
       startTime: 128,
       toJSON: jest.fn()
     }
 
     const performance = {
-      getEntriesByName: () => [fcpEntry],
-      getEntriesByType: () => [ttfbEntry],
+      getEntriesByType: (type: 'paint' | 'navigation') => [type === 'navigation' ? ttfbEntry : fcpEntry],
       timing: {
         responseStart: 1,
         navigationStart: 0
