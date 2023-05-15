@@ -5,6 +5,14 @@ interface PerformanceEntryWithTiming extends PerformanceEntry {
 }
 
 export class WebVitals {
+  attachTo (span: SpanInternal) {
+    const timeToFirstByte = this.timeToFirstByte()
+
+    if (timeToFirstByte) {
+      span.addEvent('ttfb', timeToFirstByte)
+    }
+  }
+
   private timeToFirstByte () {
     const entry = performance.getEntriesByType('navigation')[0] as PerformanceEntryWithTiming
 
@@ -17,13 +25,5 @@ export class WebVitals {
       performance.timing.responseStart - performance.timing.navigationStart,
       0
     )
-  }
-
-  attachTo (span: SpanInternal) {
-    const timeToFirstByte = this.timeToFirstByte()
-
-    if (timeToFirstByte) {
-      span.addEvent('ttfb', timeToFirstByte)
-    }
   }
 }
