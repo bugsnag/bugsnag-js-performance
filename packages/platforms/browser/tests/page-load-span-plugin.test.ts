@@ -79,7 +79,7 @@ describe('FullPageLoadPlugin', () => {
   it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
-    const webVitals = { attachTo: jest.fn() } as unknown as WebVitals
+    const webVitals = new WebVitals({ getEntriesByType: jest.fn(), timing: { navigationStart: 0, responseStart: 0 } })
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
@@ -90,7 +90,6 @@ describe('FullPageLoadPlugin', () => {
 
     jest.runAllTimers()
 
-    expect(webVitals.attachTo).not.toHaveBeenCalled()
     expect(delivery.requests).toHaveLength(0)
   })
 })
