@@ -28,8 +28,11 @@ describe('network span plugin', () => {
     expect(xhrTracker.onStart).not.toHaveBeenCalled()
     expect(fetchTracker.onStart).not.toHaveBeenCalled()
 
-    // @ts-expect-error configuration
-    plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: true })
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true
+    }))
+
     expect(xhrTracker.onStart).toHaveBeenCalled()
     expect(fetchTracker.onStart).toHaveBeenCalled()
   })
@@ -68,8 +71,11 @@ describe('network span plugin', () => {
   it('does not track requests when autoInstrumentNetworkRequests = false', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)
 
-    // @ts-expect-error configuration
-    plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: false })
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: false
+    }))
+
     expect(xhrTracker.onStart).not.toHaveBeenCalled()
     expect(fetchTracker.onStart).not.toHaveBeenCalled()
   })
@@ -84,6 +90,48 @@ describe('network span plugin', () => {
 
     fetchTracker.start({ method: 'GET', url: `${ENDPOINT}/traces`, startTime: 1 })
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
+  })
+
+  it('does not track requests to an ignored url (string)', () => {
+    const plugin = new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)
+
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true,
+      networkInstrumentationIgnoreUrls: [TEST_URL]
+    }))
+
+    fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
+    expect(spanFactory.startSpan).not.toHaveBeenCalled()
+  })
+
+  it('does not track requests to an ignored url (regex)', () => {
+    const plugin = new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)
+
+    const urlsToIgnore = [
+      // exactly 'https://www.bugsnag.com'
+      /^https:\/\/www.bugsnag.com$/,
+      // 'http://www.bugsnag.com' anywhere in the URL
+      /http:\/\/www.bugsnag.com/
+    ]
+
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true,
+      networkInstrumentationIgnoreUrls: urlsToIgnore
+    }))
+
+    // matches the first URL to exclude
+    fetchTracker.start({ method: 'GET', url: 'https://www.bugsnag.com', startTime: 1 })
+    expect(spanFactory.startSpan).not.toHaveBeenCalled()
+
+    // matches the second URL to exclude
+    fetchTracker.start({ method: 'GET', url: 'http://example.com/a/b/c?x=http://www.bugsnag.com', startTime: 1 })
+    expect(spanFactory.startSpan).not.toHaveBeenCalled()
+
+    // does not match the URLs to exclude
+    fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
   })
 
   it('discards the span if the status is 0', () => {

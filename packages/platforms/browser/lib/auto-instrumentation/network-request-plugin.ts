@@ -18,7 +18,10 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
 
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     if (configuration.autoInstrumentNetworkRequests) {
-      this.ignoredUrls.push(RegExp(configuration.endpoint))
+      this.ignoredUrls = configuration.networkInstrumentationIgnoreUrls.map(
+        (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
+      ).concat(RegExp(configuration.endpoint))
+
       this.xhrTracker.onStart(this.trackRequest)
       this.fetchTracker.onStart(this.trackRequest)
     }
