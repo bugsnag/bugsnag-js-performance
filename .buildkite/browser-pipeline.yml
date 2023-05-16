@@ -13,17 +13,6 @@ steps:
           - docker-compose#v3.9.0:
               push: browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
 
-      - label:  ":docker: Build legacy browser maze runner image"
-        key: "browser-maze-runner-legacy"
-        timeout_in_minutes: 20
-        plugins:
-          - docker-compose#v3.9.0:
-              build: browser-maze-runner-legacy
-              image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
-              cache-from: browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-legacy-${BRANCH_NAME}
-          - docker-compose#v3.9.0:
-              push: browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-legacy-${BRANCH_NAME}
-
       # BitBar
 #      - label: ":{{ matrix.browser }}: {{ matrix.version }} tests"
 #        depends_on: "browser-maze-runner"
