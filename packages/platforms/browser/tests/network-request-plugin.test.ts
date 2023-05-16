@@ -1,6 +1,7 @@
 import { NetworkRequestPlugin } from '../lib/auto-instrumentation/network-request-plugin'
-import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
+import { MockSpanFactory, createConfiguration } from '@bugsnag/js-performance-test-utilities'
 import { RequestTracker, type RequestStartCallback } from '../lib/request-tracker/request-tracker'
+import { type BrowserConfiguration } from '../lib/config'
 
 const ENDPOINT = 'http://traces.endpoint'
 const TEST_URL = 'http://test-url.com/'
@@ -36,8 +37,10 @@ describe('network span plugin', () => {
   it('starts a span on request start', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)
 
-    // @ts-expect-error configuration
-    plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: true })
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true
+    }))
 
     fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
@@ -49,8 +52,10 @@ describe('network span plugin', () => {
   it('ends a span on request end', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)
 
-    // @ts-expect-error configuration
-    plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: true })
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true
+    }))
 
     const endRequest = fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
@@ -72,8 +77,10 @@ describe('network span plugin', () => {
   it('does not track requests to the configured traces endpoint', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)
 
-    // @ts-expect-error configuration
-    plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: true })
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true
+    }))
 
     fetchTracker.start({ method: 'GET', url: `${ENDPOINT}/traces`, startTime: 1 })
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
@@ -82,8 +89,10 @@ describe('network span plugin', () => {
   it('discards the span if the status is 0', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)
 
-    // @ts-expect-error configuration
-    plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: true })
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true
+    }))
 
     const endRequest = xhrTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
@@ -95,8 +104,10 @@ describe('network span plugin', () => {
   it('discards the span if there is an error', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)
 
-    // @ts-expect-error configuration
-    plugin.configure({ endpoint: ENDPOINT, autoInstrumentNetworkRequests: true })
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true
+    }))
 
     const endRequest = fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
