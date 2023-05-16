@@ -53,4 +53,27 @@ class Browser
       raise "Unable to determine fetch keepalive support for browser: #{@name}"
     end
   end
+
+  def supports_performance_paint_timing?
+    case @name
+    when "chrome"
+      # support added in Chrome 66
+      @version == "latest" || @version >= 60
+      
+    when "edge"
+      # support added in Edge 79
+      @version == "latest" || @version >= 79
+      
+    when "firefox"
+      # support added in Firefox 84
+      @version == "latest" || @version >= 84
+
+    when "safari"
+      # support added in Safari 14.1
+      @version == "latest" || @version >= 14.1
+
+    else
+      raise "Unable to determine PerformancePaintTiming support for browser: #{@name}"
+    end
+  end
 end

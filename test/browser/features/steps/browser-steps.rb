@@ -62,6 +62,10 @@ Then("the span named {string} is a valid full page load span") do |span_name|
   expected_event_names = ["ttfb"]
   page_load_span_prefix = "[FullPageLoad]"
 
+  if $browser.supports_performance_paint_timing? 
+    expected_event_names.push "fcp"
+  end
+
   Maze.check.true(
     span_name.start_with?(page_load_span_prefix),
     "A page load span's name should start with '#{page_load_span_prefix}'"
@@ -89,7 +93,7 @@ Then("the span named {string} is a valid full page load span") do |span_name|
   span_event_names = span["events"].map { |event| event["name"] }.sort
 
   Maze.check.equal(
-    expected_event_names,
+    expected_event_names.sort,
     span_event_names,
     "The span's events do not match the expected events"
   )
