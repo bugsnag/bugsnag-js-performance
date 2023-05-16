@@ -5,19 +5,13 @@ When("I navigate to the test URL {string}") do |test_path|
   step("I navigate to the URL \"#{path}\"")
 
   # store environment based on hostname
-  $logger.info 'skw 2'
-  driver = Maze.driver.instance_variable_get(:@driver)
-  $logger.info 'skw 3'
-  hostname = driver.execute_script("return window.location.hostname")
-  url = driver.execute_script("return window.location.href")
-
-  $logger.info "url = #{url}"
+  hostname = URI.parse(path).hostname
   $logger.info "path = #{path}"
 
   environment = hostname == "localhost" ? "development" : "production"
 
   Maze::Store.values["environment"] = environment
-  Maze::Store.values["bugsnag.browser.page.url"] = url
+  Maze::Store.values["bugsnag.browser.page.url"] = path
 
   # store app version from package.json
   package = JSON.parse(File.read("./features/fixtures/node_modules/@bugsnag/js-performance-browser/package.json"))
