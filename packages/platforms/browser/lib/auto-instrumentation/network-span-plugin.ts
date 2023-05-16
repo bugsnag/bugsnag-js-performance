@@ -4,9 +4,9 @@ import {
   type RequestEndContext,
   type RequestEndContextSuccess,
   type RequestEndCallback
-} from './request-tracker/request-tracker'
+} from '../request-tracker/request-tracker'
 import { type SpanFactory, type Plugin, type InternalConfiguration } from '@bugsnag/js-performance-core'
-import { type BrowserConfiguration } from './config'
+import { type BrowserConfiguration } from '../config'
 
 export default class NetworkSpanPlugin implements Plugin<BrowserConfiguration> {
   private ignoredUrls: Array<string | RegExp> = []

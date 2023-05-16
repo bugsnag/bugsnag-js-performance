@@ -1,20 +1,31 @@
 import { createClient } from '@bugsnag/js-performance-core'
+import { FullPageLoadPlugin } from './auto-instrumentation/full-page-load-plugin'
 import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
 import { createSchema } from './config'
 import createBrowserDeliveryFactory from './delivery'
 import idGenerator from './id-generator'
+import createOnSettle from './on-settle'
 import createResourceAttributesSource from './resource-attributes-source'
-import spanAttributesSource from './span-attributes-source'
-import createXmlHttpRequestTracker from './request-tracker/request-tracker-xhr'
+import createSpanAttributesSource from './span-attributes-source'
 import createFetchRequestTracker from './request-tracker/request-tracker-fetch'
-import NetworkSpanPlugin from './network-span-plugin'
+import createXmlHttpRequestTracker from './request-tracker/request-tracker-xhr'
+import { NetworkSpanPlugin } from './auto-instrumentation/network-span-plugin'
 
 const clock = createClock(performance)
+const spanAttributesSource = createSpanAttributesSource(document.title, window.location.href)
 const resourceAttributesSource = createResourceAttributesSource(navigator)
 const backgroundingListener = createBrowserBackgroundingListener(document)
-const xhrTracker = createXmlHttpRequestTracker(window, clock)
-const fetchTracker = createFetchRequestTracker(window, clock)
+const fetchRequestTracker = createFetchRequestTracker(window, clock)
+const xhrRequestTracker = createXmlHttpRequestTracker(window, clock)
+const onSettle = createOnSettle(
+  clock,
+  document,
+  fetchRequestTracker,
+  xhrRequestTracker,
+  PerformanceObserver,
+  performance
+)
 
 const BugsnagPerformance = createClient({
   backgroundingListener,
@@ -24,7 +35,11 @@ const BugsnagPerformance = createClient({
   deliveryFactory: createBrowserDeliveryFactory(window.fetch, backgroundingListener),
   idGenerator,
   schema: createSchema(window.location.hostname),
-  plugins: (spanFactory) => [new NetworkSpanPlugin(spanFactory, fetchTracker, xhrTracker)]
+  plugins: (spanFactory) => [
+    onSettle,
+    new FullPageLoadPlugin(document, window.location, spanFactory, onSettle),
+    new NetworkSpanPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker)
+  ]
 })
 
 export default BugsnagPerformance

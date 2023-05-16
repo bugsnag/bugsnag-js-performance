@@ -1,11 +1,12 @@
-import { type Settler } from './settler'
+import { type Clock } from '@bugsnag/js-performance-core'
+import { Settler } from './settler'
 
-class DomMutationSettler implements Settler {
+class DomMutationSettler extends Settler {
   private timeout: ReturnType<typeof setTimeout> | undefined = undefined
-  private settled: boolean = false
-  private callbacks: Array<() => void> = []
 
-  constructor (target: Node) {
+  constructor (clock: Clock, target: Node) {
+    super(clock)
+
     const observer = new MutationObserver(() => { this.restart() })
 
     observer.observe(target, {
@@ -19,26 +20,16 @@ class DomMutationSettler implements Settler {
     this.restart()
   }
 
-  subscribe (callback: () => void): void {
-    this.callbacks.push(callback)
-
-    // if the dom is already settled, call the callback immediately
-    if (this.settled) {
-      callback()
-    }
-  }
-
   private restart (): void {
     clearTimeout(this.timeout)
     this.settled = false
 
-    this.timeout = setTimeout(() => {
-      this.settled = true
+    // we wait 100ms to ensure that DOM mutations have actually stopped but
+    // don't want the settled time to reflect that wait, so we record the time
+    // here and use that when settling
+    const settledTime = this.clock.now()
 
-      for (const callback of this.callbacks) {
-        callback()
-      }
-    }, 100)
+    this.timeout = setTimeout(() => { this.settle(settledTime) }, 100)
   }
 }
 
