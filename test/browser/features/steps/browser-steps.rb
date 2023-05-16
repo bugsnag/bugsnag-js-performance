@@ -115,17 +115,3 @@ Then("the span named {string} is a valid full page load span") do |span_name|
     )
   end
 end
-
-module Maze
-  module Driver
-    class Browser
-      def wait_for_element(id)
-        @driver.find_element(id: id)
-      end
-      def click_element(id)
-        element = @driver.find_element(id: id)
-        @driver.action.move_to(element).click.perform
-      end
-    end
-  end
-end
