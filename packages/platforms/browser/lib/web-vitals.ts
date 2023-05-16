@@ -1,7 +1,6 @@
 import { type SpanInternal } from '@bugsnag/js-performance-core'
 
 interface PerformanceWithNavigationTiming {
-  getEntriesByName: typeof performance.getEntriesByName
   getEntriesByType: typeof performance.getEntriesByType
   timing: {
     responseStart: number
@@ -30,8 +29,10 @@ export class WebVitals {
     }
   }
 
+  // While listed as supported, chrome 61 returns an empty array when using performance.getEntriesByName
+  // with 'first-contentful-paint', but getting entries by type 'paint' returns the expected entry
   private firstContentfulPaint () {
-    const entry = this.performance.getEntriesByName('first-contentful-paint', 'paint')[0]
+    const entry = this.performance.getEntriesByType('paint').filter(({ name }) => name === 'first-contentful-paint')[0]
 
     if (entry) {
       return entry.startTime
