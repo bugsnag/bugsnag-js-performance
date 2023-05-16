@@ -1,6 +1,5 @@
 import { NetworkRequestPlugin } from '../lib/auto-instrumentation/network-request-plugin'
-import { SpanFactory, type SpanEnded, type SpanInternal } from '@bugsnag/js-performance-core'
-import { StableIdGenerator, spanAttributesSource } from '@bugsnag/js-performance-test-utilities'
+import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
 import { RequestTracker, type RequestStartCallback } from '../lib/request-tracker/request-tracker'
 
 const ENDPOINT = 'http://traces.endpoint'
@@ -9,27 +8,6 @@ const TEST_URL = 'http://test-url.com/'
 class MockRequestTracker extends RequestTracker {
   onStart = jest.fn((startCallback: RequestStartCallback) => {
     super.onStart(startCallback)
-  })
-}
-
-class MockSpanFactory extends SpanFactory {
-  createdSpans: SpanInternal[] = []
-
-  constructor () {
-    const delivery = { send: jest.fn() }
-    const processor = { add: (span: SpanEnded) => delivery.send(span) }
-    const sampler: any = { probability: 0.1, sample: () => true }
-    super(processor, sampler, new StableIdGenerator(), spanAttributesSource)
-  }
-
-  startSpan = jest.fn((name: string, startTime: number) => {
-    const span = super.startSpan(name, startTime)
-    this.createdSpans.push(span)
-    return span
-  })
-
-  endSpan = jest.fn((span: SpanInternal, endTime: number) => {
-    super.endSpan(span, endTime)
   })
 }
 
