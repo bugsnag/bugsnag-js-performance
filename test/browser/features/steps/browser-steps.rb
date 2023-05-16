@@ -1,12 +1,21 @@
 When("I navigate to the test URL {string}") do |test_path|
+  $logger.info 'skw 1'
   path = $browser.url_for(test_path)
+  $logger.info 'skw 2'
   step("I navigate to the URL \"#{path}\"")
 
   # store environment based on hostname
+  $logger.info 'skw 2'
   driver = Maze.driver.instance_variable_get(:@driver)
+  $logger.info 'skw 3'
   hostname = driver.execute_script("return window.location.hostname")
   url = driver.execute_script("return window.location.href")
+
+  $logger.info "url = #{url}"
+  $logger.info "path = #{path}"
+
   environment = hostname == "localhost" ? "development" : "production"
+
   Maze::Store.values["environment"] = environment
   Maze::Store.values["bugsnag.browser.page.url"] = url
 
