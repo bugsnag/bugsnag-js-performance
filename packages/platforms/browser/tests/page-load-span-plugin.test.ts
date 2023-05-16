@@ -31,8 +31,7 @@ describe('FullPageLoadPlugin', () => {
     }
 
     const performance = {
-      getEntriesByName: () => [fcpEntry],
-      getEntriesByType: () => [ttfbEntry],
+      getEntriesByType: (type: 'paint' | 'navigation') => [type === 'navigation' ? ttfbEntry : fcpEntry],
       timing: {
         responseStart: 0.5,
         navigationStart: 0
