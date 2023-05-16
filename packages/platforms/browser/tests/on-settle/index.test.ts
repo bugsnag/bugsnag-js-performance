@@ -255,7 +255,7 @@ describe('onSettle', () => {
 
     testClient.start({
       apiKey: VALID_API_KEY,
-      urlsToExcludeWhenAwaitingSettle: [
+      settleIgnoreUrls: [
         'http://www.bugsnag.com/xhr',
         /^https:\/\/www.bugsnag.com\/fetch\//
       ]

@@ -55,12 +55,12 @@ export default function createOnSettle (
   }
 
   onSettle.configure = function (configuration: InternalConfiguration<BrowserConfiguration>): void {
-    const urlsToExcludeWhenAwaitingSettle = configuration.urlsToExcludeWhenAwaitingSettle.map(
+    const settleIgnoreUrls = configuration.settleIgnoreUrls.map(
       (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
     )
 
-    fetchRequestSettler.setUrlsToExclude(urlsToExcludeWhenAwaitingSettle)
-    xhrRequestSettler.setUrlsToExclude(urlsToExcludeWhenAwaitingSettle)
+    fetchRequestSettler.setUrlsToExclude(settleIgnoreUrls)
+    xhrRequestSettler.setUrlsToExclude(settleIgnoreUrls)
   }
 
   return onSettle
