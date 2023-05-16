@@ -17,7 +17,7 @@ describe('FullPageLoadPlugin', () => {
       duration: 1234,
       entryType: 'navigation',
       name: 'test',
-      responseStart: 5678,
+      responseStart: 0.5,
       startTime: 0,
       toJSON: jest.fn()
     }
@@ -25,15 +25,15 @@ describe('FullPageLoadPlugin', () => {
     const performance = {
       getEntriesByType: () => [entry],
       timing: {
-        responseStart: 1,
+        responseStart: 0.5,
         navigationStart: 0
       }
     }
 
-    const webVitals = new WebVitals(performance)
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
+    const webVitals = new WebVitals(performance, clock)
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
@@ -49,7 +49,7 @@ describe('FullPageLoadPlugin', () => {
       name: '[FullPageLoad]/page-load-span-plugin',
       events: [{
         name: 'ttfb',
-        timeUnixNano: '5678000000'
+        timeUnixNano: '500000'
       }]
     }))
 
@@ -77,9 +77,11 @@ describe('FullPageLoadPlugin', () => {
   })
 
   it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
+    const clock = new IncrementingClock()
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
-    const webVitals = new WebVitals({ getEntriesByType: jest.fn(), timing: { navigationStart: 0, responseStart: 0 } })
+    const performance = { getEntriesByType: jest.fn(), timing: { navigationStart: 0, responseStart: 0 } }
+    const webVitals = new WebVitals(performance, clock)
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,

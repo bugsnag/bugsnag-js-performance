@@ -1,4 +1,4 @@
-import { type SpanInternal } from '@bugsnag/js-performance-core'
+import { type Clock, type SpanInternal } from '@bugsnag/js-performance-core'
 
 interface PerformanceWithNavigationTiming {
   getEntriesByType: typeof performance.getEntriesByType
@@ -10,9 +10,11 @@ interface PerformanceWithNavigationTiming {
 
 export class WebVitals {
   private performance: PerformanceWithNavigationTiming
+  private clock: Clock
 
-  constructor (performance: PerformanceWithNavigationTiming) {
+  constructor (performance: PerformanceWithNavigationTiming, clock: Clock) {
     this.performance = performance
+    this.clock = clock
   }
 
   attachTo (span: SpanInternal) {
@@ -26,14 +28,23 @@ export class WebVitals {
   private timeToFirstByte () {
     const entry = this.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
 
+    let responseStart: number
+
     if (entry) {
-      return entry.responseStart
+      responseStart = entry.responseStart
+    } else {
+      responseStart = this.performance.timing.responseStart - this.performance.timing.navigationStart
     }
 
-    // fallback for old browsers that don't support the 'navigation' entryType
-    return Math.max(
-      this.performance.timing.responseStart - this.performance.timing.navigationStart,
-      0
-    )
+    console.log({ responseStart, 'clock.now()': this.clock.now() })
+
+    // only use responseStart if it's valid (between 0 and the current time)
+    // any other value cannot be valid because it would mean the response
+    // started immediately or hasn't happened yet!
+    if (responseStart > 0 && responseStart < this.clock.now()) {
+      return responseStart
+    }
+
+    return undefined
   }
 }
