@@ -73,7 +73,8 @@ describe('XHR Request Tracker', () => {
     })
     expect(endCallback).toHaveBeenCalledWith({
       status,
-      endTime: 2
+      endTime: 2,
+      state: 'success'
     })
   })
 
@@ -96,7 +97,8 @@ describe('XHR Request Tracker', () => {
     })
     expect(endCallback).toHaveBeenCalledWith({
       status: 200,
-      endTime: 2
+      endTime: 2,
+      state: 'success'
     })
   })
 
@@ -121,7 +123,8 @@ describe('XHR Request Tracker', () => {
     })
     expect(endCallback).toHaveBeenCalledWith({
       status: 200,
-      endTime: 2
+      endTime: 2,
+      state: 'success'
     })
   })
 })

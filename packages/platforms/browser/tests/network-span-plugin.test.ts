@@ -78,7 +78,7 @@ describe('network span plugin', () => {
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
 
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
-    endRequest({ status: 200, endTime: 2 })
+    endRequest({ status: 200, endTime: 2, state: 'success' })
     expect(spanFactory.endSpan).toHaveBeenCalledWith(spanFactory.createdSpans[0], 2)
   })
 
@@ -110,7 +110,7 @@ describe('network span plugin', () => {
     const endRequest = xhrTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
 
-    endRequest({ status: 0, endTime: 2 })
+    endRequest({ endTime: 2, state: 'error' })
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
   })
 
@@ -123,7 +123,7 @@ describe('network span plugin', () => {
     const endRequest = fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
 
-    endRequest({ error: new Error('woopsy'), endTime: 2 })
+    endRequest({ state: 'error', error: new Error('woopsy'), endTime: 2 })
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
   })
 })

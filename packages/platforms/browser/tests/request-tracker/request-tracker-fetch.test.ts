@@ -45,7 +45,8 @@ describe('fetch Request Tracker', () => {
     })
     expect(endCallback).toHaveBeenCalledWith({
       status,
-      endTime: 2
+      endTime: 2,
+      state: 'success'
     })
   })
 
@@ -62,7 +63,8 @@ describe('fetch Request Tracker', () => {
     })
     expect(endCallback).toHaveBeenCalledWith({
       error: new Error('Fail'),
-      endTime: 2
+      endTime: 2,
+      state: 'error'
     })
     expect.assertions(3)
   })
@@ -82,7 +84,8 @@ describe('fetch Request Tracker', () => {
     })
     expect(endCallback).toHaveBeenCalledWith({
       status: 200,
-      endTime: 2
+      endTime: 2,
+      state: 'success'
     })
   })
 
@@ -101,7 +104,8 @@ describe('fetch Request Tracker', () => {
     })
     expect(endCallback).toHaveBeenCalledWith({
       status: 200,
-      endTime: 2
+      endTime: 2,
+      state: 'success'
     })
   })
 
@@ -120,7 +124,8 @@ describe('fetch Request Tracker', () => {
     })
     expect(endCallback).toHaveBeenCalledWith({
       status: 200,
-      endTime: 2
+      endTime: 2,
+      state: 'success'
     })
   })
 
@@ -139,7 +144,8 @@ describe('fetch Request Tracker', () => {
     })
     expect(endCallback).toHaveBeenCalledWith({
       status: 200,
-      endTime: 2
+      endTime: 2,
+      state: 'success'
     })
   })
 
@@ -156,7 +162,8 @@ describe('fetch Request Tracker', () => {
     })
     expect(endCallback).toHaveBeenCalledWith({
       error: new Error('Fail'),
-      endTime: 2
+      endTime: 2,
+      state: 'error'
     })
 
     expect.assertions(3)
@@ -175,7 +182,8 @@ describe('fetch Request Tracker', () => {
     })
     expect(endCallback).toHaveBeenCalledWith({
       error: new Error('Fail'),
-      endTime: 2
+      endTime: 2,
+      state: 'error'
     })
 
     expect.assertions(3)
@@ -195,7 +203,8 @@ describe('fetch Request Tracker', () => {
     })
     expect(endCallback).toHaveBeenCalledWith({
       status: 200,
-      endTime: 2
+      endTime: 2,
+      state: 'success'
     })
   })
 
@@ -214,7 +223,8 @@ describe('fetch Request Tracker', () => {
     })
     expect(endCallback).toHaveBeenCalledWith({
       status: 200,
-      endTime: 2
+      endTime: 2,
+      state: 'success'
     })
   })
 })

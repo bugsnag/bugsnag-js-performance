@@ -4,12 +4,22 @@ export interface RequestStartContext {
   startTime: number
 }
 
-export interface RequestEndContextSuccess { endTime: number, status: number }
-export interface RequestEndContextError { endTime: number, error: Error }
+export interface RequestEndContextSuccess {
+  endTime: number
+  status: number
+  state: 'success'
+}
+
+export interface RequestEndContextError {
+  endTime: number
+  state: 'error'
+  error?: Error
+}
 
 export type RequestEndContext = RequestEndContextSuccess | RequestEndContextError
 
 export type RequestStartCallback = (context: RequestStartContext) => RequestEndCallback | undefined
+
 export type RequestEndCallback = (context: RequestEndContext) => void
 
 export class RequestTracker {

@@ -2,7 +2,6 @@ import {
   type RequestTracker,
   type RequestStartContext,
   type RequestEndContext,
-  type RequestEndContextSuccess,
   type RequestEndCallback
 } from '../request-tracker/request-tracker'
 import { type SpanFactory, type Plugin, type InternalConfiguration } from '@bugsnag/js-performance-core'
@@ -31,10 +30,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
     // TODO: set span attributes
     const span = this.spanFactory.startSpan(`[HTTP]/${startContext.method.toUpperCase()}`, startContext.startTime)
     return (endContext: RequestEndContext) => {
-      const status = (endContext as RequestEndContextSuccess).status
-      if (status > 0) {
-        this.spanFactory.endSpan(span, endContext.endTime)
-      }
+      if (endContext.state === 'success') this.spanFactory.endSpan(span, endContext.endTime)
     }
   }
 
