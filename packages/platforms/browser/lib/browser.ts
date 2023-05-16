@@ -10,7 +10,7 @@ import createResourceAttributesSource from './resource-attributes-source'
 import createSpanAttributesSource from './span-attributes-source'
 import createFetchRequestTracker from './request-tracker/request-tracker-fetch'
 import createXmlHttpRequestTracker from './request-tracker/request-tracker-xhr'
-import { NetworkSpanPlugin } from './auto-instrumentation/network-span-plugin'
+import { NetworkRequestPlugin } from './auto-instrumentation/network-request-plugin'
 
 const clock = createClock(performance)
 const spanAttributesSource = createSpanAttributesSource(document.title, window.location.href)
@@ -38,7 +38,7 @@ const BugsnagPerformance = createClient({
   plugins: (spanFactory) => [
     onSettle,
     new FullPageLoadPlugin(document, window.location, spanFactory, onSettle),
-    new NetworkSpanPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker)
+    new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker)
   ]
 })
 

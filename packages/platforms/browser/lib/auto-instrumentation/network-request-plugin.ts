@@ -8,7 +8,7 @@ import {
 import { type SpanFactory, type Plugin, type InternalConfiguration } from '@bugsnag/js-performance-core'
 import { type BrowserConfiguration } from '../config'
 
-export default class NetworkSpanPlugin implements Plugin<BrowserConfiguration> {
+export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private ignoredUrls: Array<string | RegExp> = []
 
   constructor (
