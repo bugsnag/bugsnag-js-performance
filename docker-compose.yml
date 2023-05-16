@@ -13,8 +13,6 @@ services:
     build:
       context: .
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
-      args:
-        MAZE_RUNNER_VERSION: v7.26.1-cli
     environment: &browser-maze-runner-environment
       BUILDKITE:
       BUILDKITE_BRANCH:
@@ -49,14 +47,3 @@ services:
           - maze-runner
     volumes:
       - ./test/browser/maze_output:/app/test/browser/maze_output
-
-  browser-maze-runner-legacy:
-    <<: *browser-maze-runner
-    build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.browser-feature-builder
-      args:
-        MAZE_RUNNER_VERSION: v7.26.1-cli-legacy
-    environment:
-      <<: *browser-maze-runner-environment
-      USE_LEGACY_DRIVER: 1
