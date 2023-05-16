@@ -1,6 +1,7 @@
 import { type Clock, type SpanInternal } from '@bugsnag/js-performance-core'
 
 interface PerformanceWithNavigationTiming {
+  getEntriesByName: typeof performance.getEntriesByName
   getEntriesByType: typeof performance.getEntriesByType
   timing: {
     responseStart: number
@@ -32,7 +33,7 @@ export class WebVitals {
   }
 
   private firstContentfulPaint () {
-    const entry = this.performance.getEntriesByType('paint')[0]
+    const entry = this.performance.getEntriesByName('first-contentful-paint', 'paint')[0]
 
     if (entry) {
       return entry.startTime
