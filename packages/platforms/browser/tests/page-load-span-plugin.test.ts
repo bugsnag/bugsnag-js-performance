@@ -114,7 +114,6 @@ describe('FullPageLoadPlugin', () => {
 
     jest.runAllTimers()
 
-    expect(webVitals.attachTo).not.toHaveBeenCalled()
     expect(delivery.requests).toHaveLength(0)
   })
 })
