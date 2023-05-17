@@ -150,6 +150,44 @@ export function createPerformancePaintTimingFake (
   }
 }
 
+// https://w3c.github.io/largest-contentful-paint/#sec-largest-contentful-paint-interface
+export interface LargestContentfulPaintFake extends PerformanceEntryFake {
+  entryType: 'largest-contentful-paint'
+  // > The name attribute’s getter must return the empty string
+  name: ''
+  // > The duration attribute’s getter must return 0.
+  duration: 0
+  renderTime: number
+  loadTime: number
+  size: number
+  id: string
+  url: string
+  // note: the spec says 'Element?' but this is not 'Element | undefined', it's
+  // 'Element | null' — see the 'get an element' algorithm:
+  // https://wicg.github.io/element-timing/#get-an-element
+  element: Element | null
+}
+
+export function createLargestContentfulPaintFake (
+  overrides: Partial<LargestContentfulPaintFake> = {}
+): LargestContentfulPaintFake {
+  return {
+    entryType: 'largest-contentful-paint',
+    name: '',
+    duration: 0,
+    startTime: 0,
+    renderTime: 0,
+    loadTime: 0,
+    size: 0,
+    // if 'element' is null then id should be an empty string
+    id: '',
+    url: 'https://www.bugsnag.com',
+    element: null,
+    toJSON,
+    ...overrides
+  }
+}
+
 // generic toJSON that will do the Right Thing for these fake objects
 // this is necessary to fulfill the interface and provide a useful diff in
 // Jest's expectation output
