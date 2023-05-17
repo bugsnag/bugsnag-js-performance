@@ -70,7 +70,7 @@ class Browser
 
     when "safari"
       # support added in Safari 14.1
-      @version == "latest" || @version >= 14.1
+      @version == "latest" || @version >= 14
 
     else
       raise "Unable to determine PerformancePaintTiming support for browser: #{@name}"
