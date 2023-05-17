@@ -70,7 +70,7 @@ export interface PerformanceResourceTimingFake extends PerformanceEntryFake {
 export type NavigationTimingType = 'navigate' | 'reload' | 'back_forward' | 'prerender'
 
 // https://w3c.github.io/navigation-timing/#dom-performancenavigationtiming
-export interface PerformanceNavigationTimingFake extends PerformanceResourceTimingFake {
+export interface PerformanceNavigationTimingFake extends Omit<PerformanceResourceTimingFake, 'entryType'>, PerformanceEntryFake {
   entryType: 'navigation'
   unloadEventStart: number
   unloadEventEnd: number
