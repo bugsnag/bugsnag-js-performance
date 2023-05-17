@@ -127,6 +127,29 @@ export function createPerformanceNavigationTimingFake (
   }
 }
 
+type PerformancePaintTimingName = 'first-paint' | 'first-contentful-paint'
+
+// https://w3c.github.io/paint-timing/#sec-PerformancePaintTiming
+export interface PerformancePaintTimingFake extends PerformanceEntryFake {
+  // > The duration attribute’s getter must return 0
+  duration: 0
+  entryType: 'paint'
+  name: PerformancePaintTimingName
+}
+
+export function createPerformancePaintTimingFake (
+  overrides: Partial<PerformancePaintTimingFake> = {}
+): PerformancePaintTimingFake {
+  return {
+    duration: 0,
+    entryType: 'paint',
+    name: 'first-contentful-paint',
+    startTime: 0,
+    toJSON,
+    ...overrides
+  }
+}
+
 // generic toJSON that will do the Right Thing for these fake objects
 // this is necessary to fulfill the interface and provide a useful diff in
 // Jest's expectation output
