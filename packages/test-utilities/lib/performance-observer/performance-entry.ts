@@ -83,3 +83,50 @@ export interface PerformanceNavigationTimingFake extends Omit<PerformanceResourc
   type: NavigationTimingType
   redirectCount: number
 }
+
+export function createPerformanceNavigationTimingFake (
+  overrides: Partial<PerformanceNavigationTimingFake> = {}
+): PerformanceNavigationTimingFake {
+  return {
+    duration: 0,
+    entryType: 'navigation',
+    name: 'http://localhost:8000',
+    startTime: 0,
+    initiatorType: 'navigation',
+    deliveryType: '',
+    nextHopProtocol: 'h3',
+    workerStart: 0,
+    redirectStart: 0,
+    redirectEnd: 0,
+    fetchStart: 0,
+    domainLookupStart: 0,
+    domainLookupEnd: 0,
+    connectStart: 0,
+    connectEnd: 0,
+    secureConnectionStart: 0,
+    requestStart: 0,
+    responseStart: 0,
+    responseEnd: 0,
+    transferSize: 0,
+    encodedBodySize: 0,
+    decodedBodySize: 0,
+    responseStatus: 0,
+    renderBlockingStatus: 'blocking',
+    unloadEventStart: 0,
+    unloadEventEnd: 0,
+    domInteractive: 0,
+    domContentLoadedEventStart: 0,
+    domContentLoadedEventEnd: 0,
+    domComplete: 0,
+    loadEventStart: 0,
+    loadEventEnd: 0,
+    type: 'navigate',
+    redirectCount: 0,
+    toJSON () {
+      // this might look equivalent to 'return this' but that makes a recursive
+      // object and Jest just displays '[Circular]', which is not very useful
+      return Object.assign({}, this)
+    },
+    ...overrides
+  }
+}
