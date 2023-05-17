@@ -12,6 +12,7 @@ export interface BrowserSchema extends CoreSchema {
   autoInstrumentNetworkRequests: ConfigOption<boolean>
   routingProvider: ConfigOption<RoutingProvider>
   urlsToExcludeWhenAwaitingSettle: ConfigOption<Array<string | RegExp>>
+  networkInstrumentationIgnoreUrls: ConfigOption<Array<string | RegExp>>
 }
 
 export interface BrowserConfiguration extends Configuration {
@@ -19,6 +20,7 @@ export interface BrowserConfiguration extends Configuration {
   autoInstrumentNetworkRequests?: boolean
   routingProvider?: RoutingProvider
   urlsToExcludeWhenAwaitingSettle?: Array<string | RegExp>
+  networkInstrumentationIgnoreUrls?: Array<string | RegExp>
 }
 
 export function createSchema (hostname: string): BrowserSchema {
@@ -44,6 +46,11 @@ export function createSchema (hostname: string): BrowserSchema {
       validate: isRoutingProvider
     },
     urlsToExcludeWhenAwaitingSettle: {
+      defaultValue: [],
+      message: 'should be an array of string|RegExp',
+      validate: isStringOrRegExpArray
+    },
+    networkInstrumentationIgnoreUrls: {
       defaultValue: [],
       message: 'should be an array of string|RegExp',
       validate: isStringOrRegExpArray

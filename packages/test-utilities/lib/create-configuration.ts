@@ -3,6 +3,7 @@ import { type Configuration, type InternalConfiguration } from '@bugsnag/js-perf
 function createConfiguration<C extends Configuration> (overrides: Partial<C> = {}): InternalConfiguration<C> {
   return {
     autoInstrumentFullPageLoads: false,
+    autoInstrumentNetworkRequests: false,
     apiKey: 'abcdefabcdefabcdefabcdefabcdef12',
     endpoint: '/traces',
     releaseStage: 'production',
@@ -18,6 +19,7 @@ function createConfiguration<C extends Configuration> (overrides: Partial<C> = {
     },
     appVersion: '',
     samplingProbability: 1.0,
+    networkInstrumentationIgnoreUrls: [],
     ...overrides
   } as unknown as InternalConfiguration<C>
 }
