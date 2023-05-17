@@ -1,5 +1,5 @@
 import { type Clock } from '@bugsnag/js-performance-core'
-import { type RequestEndCallback, RequestTracker } from './request-tracker'
+import { type RequestEndCallback, type RequestEndContext, RequestTracker } from './request-tracker'
 
 interface WindowWithXmlHttpRequest {
   XMLHttpRequest: typeof XMLHttpRequest
@@ -17,10 +17,14 @@ function createXmlHttpRequestTracker (window: WindowWithXmlHttpRequest, clock: C
       originalSend.call(this, body)
     }
 
-    // for now report all requests on completion - if the request errors or is aborted, status will be 0
     this.addEventListener('readystatechange', () => {
       if (this.readyState === window.XMLHttpRequest.DONE && onRequestEnd) {
-        onRequestEnd({ status: this.status, endTime: clock.now() })
+        // If the status is 0 the request did not complete so report this as an error
+        const endContext: RequestEndContext = this.status > 0
+          ? { endTime: clock.now(), status: this.status, state: 'success' }
+          : { endTime: clock.now(), state: 'error' }
+
+        onRequestEnd(endContext)
       }
     })
 

@@ -19,7 +19,8 @@ const START_CONTEXT: RequestStartContext = {
 
 const END_CONTEXT: RequestEndContext = {
   endTime: 5678,
-  status: 200
+  status: 200,
+  state: 'success'
 }
 
 describe('RequestSettler', () => {

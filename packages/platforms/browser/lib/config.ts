@@ -9,12 +9,14 @@ import { DefaultRoutingProvider, isRoutingProvider, type RoutingProvider } from 
 
 export interface BrowserSchema extends CoreSchema {
   autoInstrumentFullPageLoads: ConfigOption<boolean>
+  autoInstrumentNetworkRequests: ConfigOption<boolean>
   routingProvider: ConfigOption<RoutingProvider>
   urlsToExcludeWhenAwaitingSettle: ConfigOption<Array<string | RegExp>>
 }
 
 export interface BrowserConfiguration extends Configuration {
   autoInstrumentFullPageLoads?: boolean
+  autoInstrumentNetworkRequests?: boolean
   routingProvider?: RoutingProvider
   urlsToExcludeWhenAwaitingSettle?: Array<string | RegExp>
 }

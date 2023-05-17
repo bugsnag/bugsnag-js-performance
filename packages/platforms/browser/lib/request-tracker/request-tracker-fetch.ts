@@ -25,10 +25,10 @@ function createFetchRequestTracker (window: WindowWithFetch, clock: Clock) {
     const onRequestEnd = requestTracker.start(startContext)
 
     return originalFetch.call(this, input as RequestInfo | URL, init as RequestInit).then(response => {
-      onRequestEnd({ status: response.status, endTime: clock.now() })
+      onRequestEnd({ status: response.status, endTime: clock.now(), state: 'success' })
       return response
     }).catch(error => {
-      onRequestEnd({ error, endTime: clock.now() })
+      onRequestEnd({ error, endTime: clock.now(), state: 'error' })
       throw error
     })
   }

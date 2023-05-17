@@ -10,6 +10,7 @@ import createResourceAttributesSource from './resource-attributes-source'
 import createSpanAttributesSource from './span-attributes-source'
 import createFetchRequestTracker from './request-tracker/request-tracker-fetch'
 import createXmlHttpRequestTracker from './request-tracker/request-tracker-xhr'
+import { NetworkRequestPlugin } from './auto-instrumentation/network-request-plugin'
 
 const clock = createClock(performance)
 const spanAttributesSource = createSpanAttributesSource(document.title, window.location.href)
@@ -36,7 +37,8 @@ const BugsnagPerformance = createClient({
   schema: createSchema(window.location.hostname),
   plugins: (spanFactory) => [
     onSettle,
-    new FullPageLoadPlugin(document, window.location, spanFactory, onSettle)
+    new FullPageLoadPlugin(document, window.location, spanFactory, onSettle),
+    new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker)
   ]
 })
 

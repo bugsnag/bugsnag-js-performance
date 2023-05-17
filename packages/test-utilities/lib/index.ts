@@ -11,5 +11,6 @@ export * from './performance-observer'
 export { default as resourceAttributesSource } from './resource-attributes-source'
 export { default as spanAttributesSource } from './span-attributes-source'
 export { default as StableIdGenerator } from './stable-id-generator'
+export { default as MockSpanFactory } from './mock-span-factory'
 
 export * from './constants'
