@@ -3,7 +3,16 @@
  * @jest-environment-options { "url": "https://bugsnag.com/page-load-span-plugin", "referrer": "https://bugsnag.com" }
  */
 
-import { InMemoryDelivery, IncrementingClock, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
+import {
+  InMemoryDelivery,
+  IncrementingClock,
+  PerformanceFake,
+  createPerformanceNavigationTimingFake,
+  createPerformancePaintTimingFake,
+  createPerformanceEventTimingFake,
+  VALID_API_KEY,
+  createTestClient
+} from '@bugsnag/js-performance-test-utilities'
 import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
 import { createSchema } from '../lib/config'
 import { type OnSettle } from '../lib/on-settle'
@@ -13,49 +22,10 @@ jest.useFakeTimers()
 
 describe('FullPageLoadPlugin', () => {
   it('Automatically creates and delivers a pageLoadSpan', () => {
-    const ttfbEntry = {
-      duration: 1234,
-      entryType: 'navigation',
-      name: 'test',
-      responseStart: 0.5,
-      startTime: 0,
-      toJSON: jest.fn()
-    }
-
-    const fcpEntry = {
-      name: 'first-contentful-paint',
-      entryType: 'paint',
-      duration: 64,
-      startTime: 128,
-      toJSON: jest.fn()
-    }
-
-    const fidEntry = {
-      duration: 0.5,
-      entryType: 'first-input',
-      name: 'fid',
-      processingStart: 1,
-      startTime: 0.4,
-      toJSON: jest.fn()
-    }
-
-    const performance = {
-      getEntriesByName: () => [fcpEntry],
-      getEntriesByType: (type: 'navigation' | 'first-input') => {
-        switch (type) {
-          case 'navigation':
-            return [ttfbEntry]
-          case 'first-input':
-            return [fidEntry]
-          default:
-            return []
-        }
-      },
-      timing: {
-        responseStart: 0.5,
-        navigationStart: 0
-      }
-    }
+    const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ responseStart: 0.5 }))
+    performance.addEntry(createPerformancePaintTimingFake({ startTime: 128 }))
+    performance.addEntry(createPerformanceEventTimingFake({ startTime: 0.4, processingStart: 1 }))
 
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
@@ -129,8 +99,7 @@ describe('FullPageLoadPlugin', () => {
     const clock = new IncrementingClock()
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
-    const performance = { getEntriesByType: jest.fn(), getEntriesByName: jest.fn(), timing: { navigationStart: 0, responseStart: 0 } }
-    const webVitals = new WebVitals(performance, clock)
+    const webVitals = new WebVitals(new PerformanceFake(), clock)
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
