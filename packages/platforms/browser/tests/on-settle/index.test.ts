@@ -11,6 +11,7 @@ import {
 } from '../../lib/request-tracker/request-tracker'
 import {
   IncrementingClock,
+  PerformanceFake,
   PerformanceObserverManager,
   createPerformanceNavigationTimingFake,
   createTestClient,
@@ -36,7 +37,7 @@ describe('onSettle', () => {
 
   it('settles when all the settlers have settled', async () => {
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
     const fetchRequestTracker = new RequestTracker()
     const xhrRequestTracker = new RequestTracker()
 
@@ -72,7 +73,7 @@ describe('onSettle', () => {
     `
 
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
     const fetchRequestTracker = new RequestTracker()
     const xhrRequestTracker = new RequestTracker()
 
@@ -108,7 +109,7 @@ describe('onSettle', () => {
 
   it('settles when all the settlers have settled (with fetch requests)', async () => {
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
     const fetchRequestTracker = new RequestTracker()
     const xhrRequestTracker = new RequestTracker()
 
@@ -142,7 +143,7 @@ describe('onSettle', () => {
 
   it('settles when all the settlers have settled (with xhr requests)', async () => {
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
     const fetchRequestTracker = new RequestTracker()
     const xhrRequestTracker = new RequestTracker()
 
@@ -176,7 +177,7 @@ describe('onSettle', () => {
 
   it('settles after the 60 second timeout if the settlers have not settled', async () => {
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
 
     const onSettle = createOnSettle(
       new IncrementingClock(),
@@ -202,7 +203,7 @@ describe('onSettle', () => {
 
   it('does not settle more than once if both the timeout and settlers settle', async () => {
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
 
     const onSettle = createOnSettle(
       new IncrementingClock(),
@@ -236,7 +237,7 @@ describe('onSettle', () => {
 
   it('can be configured to ignore requests to certain URLs', async () => {
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
     const fetchRequestTracker = new RequestTracker()
     const xhrRequestTracker = new RequestTracker()
 
