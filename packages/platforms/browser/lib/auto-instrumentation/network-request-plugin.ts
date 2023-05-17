@@ -28,7 +28,10 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
     if (!this.shouldTrackRequest(startContext)) return
 
     // TODO: set span attributes
-    const span = this.spanFactory.startSpan(`[HTTP]/${startContext.method.toUpperCase()}`, startContext.startTime)
+    const span = this.spanFactory.startSpan(
+      `[HTTP]/${startContext.method.toUpperCase()}`,
+      startContext.startTime
+    )
     return (endContext: RequestEndContext) => {
       if (endContext.state === 'success') this.spanFactory.endSpan(span, endContext.endTime)
     }
