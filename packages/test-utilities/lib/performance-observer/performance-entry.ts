@@ -122,11 +122,16 @@ export function createPerformanceNavigationTimingFake (
     loadEventEnd: 0,
     type: 'navigate',
     redirectCount: 0,
-    toJSON () {
-      // this might look equivalent to 'return this' but that makes a recursive
-      // object and Jest just displays '[Circular]', which is not very useful
-      return Object.assign({}, this)
-    },
+    toJSON,
     ...overrides
   }
+}
+
+// generic toJSON that will do the Right Thing for these fake objects
+// this is necessary to fulfill the interface and provide a useful diff in
+// Jest's expectation output
+function toJSON (this: PerformanceEntryFake) {
+  // this might look equivalent to 'return this' but that makes a recursive
+  // object and Jest just displays '[Circular]', which is not very useful
+  return Object.assign({}, this)
 }
