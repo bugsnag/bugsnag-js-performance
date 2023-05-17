@@ -4,7 +4,7 @@ export interface RoutingProvider {
   resolveRoute: RouteResolver
 }
 
-type RouteResolver = (url: URL) => string
+export type RouteResolver = (url: URL) => string
 
 const defaultRouteResolver: RouteResolver = (url: URL) => url.pathname
 
