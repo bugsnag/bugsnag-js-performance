@@ -16,8 +16,8 @@ describe('FullPageLoadPlugin', () => {
     const ttfbEntry = {
       duration: 1234,
       entryType: 'navigation',
-      name: 'ttfb',
-      responseStart: 5678,
+      name: 'test',
+      responseStart: 0.5,
       startTime: 0,
       toJSON: jest.fn()
     }
@@ -33,15 +33,15 @@ describe('FullPageLoadPlugin', () => {
     const performance = {
       getEntriesByType: (type: 'paint' | 'navigation') => [type === 'navigation' ? ttfbEntry : fcpEntry],
       timing: {
-        responseStart: 1,
+        responseStart: 0.5,
         navigationStart: 0
       }
     }
 
-    const webVitals = new WebVitals(performance)
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
+    const webVitals = new WebVitals(performance, clock)
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
@@ -62,7 +62,7 @@ describe('FullPageLoadPlugin', () => {
         },
         {
           name: 'ttfb',
-          timeUnixNano: '5678000000'
+          timeUnixNano: '500000'
         }
       ]
     }))
@@ -88,12 +88,22 @@ describe('FullPageLoadPlugin', () => {
         }
       }
     ]))
+
+    const deliveredSpanEvents = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].events
+    expect(deliveredSpanEvents).toStrictEqual(expect.arrayContaining([
+      {
+        name: 'ttfb',
+        timeUnixNano: '500000'
+      }
+    ]))
   })
 
   it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
+    const clock = new IncrementingClock()
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
-    const webVitals = { attachTo: jest.fn() } as unknown as WebVitals
+    const performance = { getEntriesByType: jest.fn(), getEntriesByName: jest.fn(), timing: { navigationStart: 0, responseStart: 0 } }
+    const webVitals = new WebVitals(performance, clock)
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,

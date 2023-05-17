@@ -19,7 +19,8 @@ const START_CONTEXT: RequestStartContext = {
 
 const END_CONTEXT: RequestEndContext = {
   endTime: 5678,
-  status: 200
+  status: 200,
+  state: 'success'
 }
 
 describe('RequestSettler', () => {
@@ -182,11 +183,11 @@ describe('RequestSettler', () => {
     expect(settler.isSettled()).toBe(true)
   })
 
-  it('ignores requests to URLs that match urlsToExclude', async () => {
+  it('ignores requests to URLs that match urlsToIgnore', async () => {
     const settleCallback = jest.fn()
     const tracker = new RequestTracker()
     const settler = new RequestSettler(createClock(performance), tracker)
-    settler.setUrlsToExclude([
+    settler.setUrlsToIgnore([
       // exactly 'https://www.bugsnag.com'
       /^https:\/\/www.bugsnag.com$/,
       // 'http://www.bugsnag.com' anywhere in the URL
@@ -195,7 +196,7 @@ describe('RequestSettler', () => {
 
     const endIgnoredRequest1 = tracker.start({
       ...START_CONTEXT,
-      // matches the first URL to exclude
+      // matches the first URL to ignore
       url: 'https://www.bugsnag.com'
     })
 
@@ -207,7 +208,7 @@ describe('RequestSettler', () => {
 
     const endIgnoredRequest2 = tracker.start({
       ...START_CONTEXT,
-      // matches the second URL to exclude
+      // matches the second URL to ignore
       url: 'http://example.com/a/b/c?x=http://www.bugsnag.com'
     })
 
@@ -219,7 +220,7 @@ describe('RequestSettler', () => {
 
     const end = tracker.start({
       ...START_CONTEXT,
-      // does not match the URLs to exclude
+      // does not match the URLs to ignore
       url: 'http://example.com'
     })
 

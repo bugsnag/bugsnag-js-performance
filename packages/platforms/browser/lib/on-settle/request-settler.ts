@@ -11,7 +11,7 @@ const ignoreRequest: RequestEndCallback = () => {}
 
 class RequestSettler extends Settler {
   private timeout: ReturnType<typeof setTimeout> | undefined = undefined
-  private urlsToExclude: RegExp[] = []
+  private urlsToIgnore: RegExp[] = []
   private outstandingRequests = 0
 
   constructor (clock: Clock, requestTracker: RequestTracker) {
@@ -26,13 +26,13 @@ class RequestSettler extends Settler {
     requestTracker.onStart(this.onRequestStart.bind(this))
   }
 
-  setUrlsToExclude (urlsToExclude: RegExp[]): void {
-    this.urlsToExclude = urlsToExclude
+  setUrlsToIgnore (urlsToIgnore: RegExp[]): void {
+    this.urlsToIgnore = urlsToIgnore
   }
 
   private onRequestStart (startContext: RequestStartContext): RequestEndCallback {
     // if this is an excluded URL, ignore this request
-    if (this.shouldExcludeUrl(startContext.url)) {
+    if (this.shouldIgnoreUrl(startContext.url)) {
       return ignoreRequest
     }
 
@@ -52,8 +52,8 @@ class RequestSettler extends Settler {
     }
   }
 
-  private shouldExcludeUrl (url: string): boolean {
-    return this.urlsToExclude.some(regexp => regexp.test(url))
+  private shouldIgnoreUrl (url: string): boolean {
+    return this.urlsToIgnore.some(regexp => regexp.test(url))
   }
 }
 

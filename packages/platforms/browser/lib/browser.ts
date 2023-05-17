@@ -10,6 +10,7 @@ import createResourceAttributesSource from './resource-attributes-source'
 import createSpanAttributesSource from './span-attributes-source'
 import createFetchRequestTracker from './request-tracker/request-tracker-fetch'
 import createXmlHttpRequestTracker from './request-tracker/request-tracker-xhr'
+import { NetworkRequestPlugin } from './auto-instrumentation/network-request-plugin'
 import { WebVitals } from './web-vitals'
 
 const clock = createClock(performance)
@@ -18,7 +19,7 @@ const resourceAttributesSource = createResourceAttributesSource(navigator)
 const backgroundingListener = createBrowserBackgroundingListener(document)
 const fetchRequestTracker = createFetchRequestTracker(window, clock)
 const xhrRequestTracker = createXmlHttpRequestTracker(window, clock)
-const webVitals = new WebVitals(performance)
+const webVitals = new WebVitals(performance, clock)
 const onSettle = createOnSettle(
   clock,
   document,
@@ -38,7 +39,8 @@ const BugsnagPerformance = createClient({
   schema: createSchema(window.location.hostname),
   plugins: (spanFactory) => [
     onSettle,
-    new FullPageLoadPlugin(document, window.location, spanFactory, webVitals, onSettle)
+    new FullPageLoadPlugin(document, window.location, spanFactory, webVitals, onSettle),
+    new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker)
   ]
 })
 

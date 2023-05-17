@@ -24,7 +24,8 @@ const START_CONTEXT: RequestStartContext = {
 
 const END_CONTEXT: RequestEndContext = {
   endTime: 5678,
-  status: 200
+  status: 200,
+  state: 'success'
 }
 
 describe('onSettle', () => {
@@ -254,7 +255,7 @@ describe('onSettle', () => {
 
     testClient.start({
       apiKey: VALID_API_KEY,
-      urlsToExcludeWhenAwaitingSettle: [
+      settleIgnoreUrls: [
         'http://www.bugsnag.com/xhr',
         /^https:\/\/www.bugsnag.com\/fetch\//
       ]
