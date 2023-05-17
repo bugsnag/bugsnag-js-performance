@@ -5,6 +5,7 @@
 import LoadEventEndSettler from '../../lib/on-settle/load-event-end-settler'
 import {
   IncrementingClock,
+  PerformanceFake,
   PerformanceObserverManager,
   createPerformanceNavigationTimingFake
 } from '@bugsnag/js-performance-test-utilities'
@@ -16,7 +17,7 @@ describe('LoadEventEndSettler', () => {
 
   it('settles when the load event has finished', () => {
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
     const settleCallback = jest.fn()
     const settler = new LoadEventEndSettler(
       new IncrementingClock(),
@@ -45,7 +46,7 @@ describe('LoadEventEndSettler', () => {
 
   it('can handle multiple callbacks', () => {
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
     const settleCallback1 = jest.fn()
     const settleCallback2 = jest.fn()
     const settleCallback3 = jest.fn()
@@ -75,7 +76,7 @@ describe('LoadEventEndSettler', () => {
 
   it('can unsubscribe a callback', () => {
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
     const settleCallback1 = jest.fn()
     const settleCallback2 = jest.fn()
     const settler = new LoadEventEndSettler(
@@ -103,7 +104,7 @@ describe('LoadEventEndSettler', () => {
 
   it('settles immediately if already settled', () => {
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
     const settler = new LoadEventEndSettler(
       new IncrementingClock(),
       manager.createPerformanceObserverFakeClass(),
@@ -129,7 +130,7 @@ describe('LoadEventEndSettler', () => {
 
   it('does not re-trigger if duplicate events fire', () => {
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
     const settleCallback = jest.fn()
     const settler = new LoadEventEndSettler(
       new IncrementingClock(),
@@ -163,7 +164,7 @@ describe('LoadEventEndSettler', () => {
     jest.useFakeTimers()
 
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
     const settleCallback = jest.fn()
     const settler = new LoadEventEndSettler(
       new IncrementingClock(),
@@ -197,7 +198,7 @@ describe('LoadEventEndSettler', () => {
     jest.useFakeTimers()
 
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
     const settleCallback = jest.fn()
     const settler = new LoadEventEndSettler(
       new IncrementingClock(),
@@ -229,7 +230,8 @@ describe('LoadEventEndSettler', () => {
 
   it('can settle immediately using performance.timing if loadEventEnd is valid', () => {
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 1234 } }
+    const performance = new PerformanceFake({ timing: { loadEventEnd: 1234 } })
+
     const settleCallback = jest.fn()
     const settler = new LoadEventEndSettler(
       new IncrementingClock(),
@@ -249,7 +251,7 @@ describe('LoadEventEndSettler', () => {
     jest.useFakeTimers()
 
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 0 } }
+    const performance = new PerformanceFake()
     const settleCallback = jest.fn()
     const settler = new LoadEventEndSettler(
       new IncrementingClock(),
@@ -279,7 +281,8 @@ describe('LoadEventEndSettler', () => {
     jest.useFakeTimers()
 
     const manager = new PerformanceObserverManager()
-    const performance = { timing: { loadEventEnd: 1 } }
+    const performance = new PerformanceFake({ timing: { loadEventEnd: 1 } })
+
     const settleCallback = jest.fn()
     const settler = new LoadEventEndSettler(
       new IncrementingClock(),
