@@ -188,6 +188,34 @@ export function createLargestContentfulPaintFake (
   }
 }
 
+// https://w3c.github.io/event-timing/#sec-performance-event-timing
+interface PerformanceEventTimingFake extends PerformanceEntryFake {
+  entryType: 'event' | 'first-input'
+  processingStart: number
+  processingEnd: number
+  cancelable: boolean
+  target: Node | null
+  interactionId: number
+}
+
+export function createPerformanceEventTimingFake (
+  overrides: Partial<PerformanceEventTimingFake> = {}
+): PerformanceEventTimingFake {
+  return {
+    entryType: 'first-input',
+    name: 'click',
+    startTime: 0,
+    duration: 0,
+    processingStart: 0,
+    processingEnd: 0,
+    cancelable: true,
+    target: null,
+    interactionId: 0,
+    toJSON,
+    ...overrides
+  }
+}
+
 // generic toJSON that will do the Right Thing for these fake objects
 // this is necessary to fulfill the interface and provide a useful diff in
 // Jest's expectation output
