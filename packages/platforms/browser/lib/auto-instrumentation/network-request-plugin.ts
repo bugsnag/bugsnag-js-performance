@@ -30,13 +30,20 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private trackRequest = (startContext: RequestStartContext): RequestEndCallback | undefined => {
     if (!this.shouldTrackRequest(startContext)) return
 
-    // TODO: set span attributes
     const span = this.spanFactory.startSpan(
       `[HTTP]/${startContext.method.toUpperCase()}`,
       startContext.startTime
     )
+
+    span.setAttribute('bugsnag.span.category', 'network')
+    span.setAttribute('http.url', startContext.url)
+    span.setAttribute('http.method', startContext.method)
+
     return (endContext: RequestEndContext) => {
-      if (endContext.state === 'success') this.spanFactory.endSpan(span, endContext.endTime)
+      if (endContext.state === 'success') {
+        span.setAttribute('http.status_code', endContext.status)
+        this.spanFactory.endSpan(span, endContext.endTime)
+      }
     }
   }
 

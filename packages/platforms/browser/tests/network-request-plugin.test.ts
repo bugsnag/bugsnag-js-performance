@@ -62,10 +62,42 @@ describe('network span plugin', () => {
 
     const endRequest = fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
-
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
+
     endRequest({ status: 200, endTime: 2, state: 'success' })
-    expect(spanFactory.endSpan).toHaveBeenCalledWith(spanFactory.createdSpans[0], 2)
+    expect(spanFactory.endSpan).toHaveBeenCalled()
+    expect(spanFactory.createdSpans.length).toEqual(1)
+
+    const span = spanFactory.createdSpans[0]
+    expect(span.name).toEqual('[HTTP]/GET')
+    expect(span.startTime).toEqual(1)
+    expect(span.endTime).toEqual(2)
+    expect(span.attributes.toJson()).toEqual(expect.arrayContaining([
+      {
+        key: 'bugsnag.span.category',
+        value: {
+          stringValue: 'network'
+        }
+      },
+      {
+        key: 'http.url',
+        value: {
+          stringValue: TEST_URL
+        }
+      },
+      {
+        key: 'http.method',
+        value: {
+          stringValue: 'GET'
+        }
+      },
+      {
+        key: 'http.status_code',
+        value: {
+          intValue: '200'
+        }
+      }
+    ]))
   })
 
   it('does not track requests when autoInstrumentNetworkRequests = false', () => {

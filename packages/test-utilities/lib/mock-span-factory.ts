@@ -1,21 +1,20 @@
-import { type SpanEnded, type SpanInternal, SpanFactory } from '@bugsnag/js-performance-core'
+import { type SpanInternal, type SpanEnded, SpanFactory } from '@bugsnag/js-performance-core'
 import StableIdGenerator from './stable-id-generator'
 import spanAttributesSource from './span-attributes-source'
+import InMemoryProcessor from './in-memory-processor'
 
 class MockSpanFactory extends SpanFactory {
-  createdSpans: SpanInternal[] = []
+  public createdSpans: SpanEnded[]
 
   constructor () {
-    const delivery = { send: jest.fn() }
-    const processor = { add: (span: SpanEnded) => delivery.send(span) }
     const sampler: any = { probability: 0.1, sample: () => true }
+    const processor = new InMemoryProcessor()
     super(processor, sampler, new StableIdGenerator(), spanAttributesSource)
+    this.createdSpans = processor.spans
   }
 
   startSpan = jest.fn((name: string, startTime: number) => {
-    const span = super.startSpan(name, startTime)
-    this.createdSpans.push(span)
-    return span
+    return super.startSpan(name, startTime)
   })
 
   endSpan = jest.fn((span: SpanInternal, endTime: number) => {
