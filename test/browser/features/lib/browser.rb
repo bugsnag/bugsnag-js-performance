@@ -20,7 +20,7 @@ class Browser
 
   def url_for(path)
     uri = URI.join(@fixtures_uri, path)
-    config_query_string = "endpoint=#{@maze_uri}/traces&logs=#{@maze_uri}/logs&api_key=#{$api_key}"
+    config_query_string = "endpoint=#{@maze_uri}/traces&logs=#{@maze_uri}/logs&api_key=#{$api_key}&reflect=#{@fixtures_uri}/reflect"
 
     if uri.query
       uri.query += "&#{config_query_string}"
