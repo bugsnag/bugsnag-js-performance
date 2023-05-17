@@ -59,8 +59,8 @@ export default function createOnSettle (
       (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
     )
 
-    fetchRequestSettler.setUrlsToExclude(settleIgnoreUrls)
-    xhrRequestSettler.setUrlsToExclude(settleIgnoreUrls)
+    fetchRequestSettler.setUrlsToIgnore(settleIgnoreUrls)
+    xhrRequestSettler.setUrlsToIgnore(settleIgnoreUrls)
   }
 
   return onSettle
