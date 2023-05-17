@@ -1,8 +1,6 @@
 import {
   type PerformanceEntryFake,
-  type PerformanceEntryType,
-  type PerformanceNavigationTimingFake,
-  createPerformanceNavigationTimingFake
+  type PerformanceEntryType
 } from './performance-entry'
 import PerformanceObserverEntryListFake from './performance-observer-entry-list'
 
@@ -150,11 +148,5 @@ export class PerformanceObserverManager {
         throw new Error('PerformanceObserver#takeRecords is not implemented')
       }
     }
-  }
-
-  createPerformanceNavigationTimingFake (
-    overrides: Partial<PerformanceNavigationTimingFake> = {}
-  ): PerformanceNavigationTimingFake {
-    return createPerformanceNavigationTimingFake(overrides)
   }
 }
