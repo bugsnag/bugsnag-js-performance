@@ -12,6 +12,7 @@ import {
 import {
   IncrementingClock,
   PerformanceObserverManager,
+  createPerformanceNavigationTimingFake,
   createTestClient,
   VALID_API_KEY
 } from '@bugsnag/js-performance-test-utilities'
@@ -56,7 +57,7 @@ describe('onSettle', () => {
     // everything has settled other than the load event end, so once we trigger
     // that 'settleCallback' should be called
 
-    manager.queueEntry(manager.createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
     manager.flushQueue()
 
     await jest.advanceTimersByTimeAsync(100)
@@ -89,7 +90,7 @@ describe('onSettle', () => {
     onSettle(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
 
-    manager.queueEntry(manager.createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
     manager.flushQueue()
 
     await jest.advanceTimersByTimeAsync(80)
@@ -125,7 +126,7 @@ describe('onSettle', () => {
     onSettle(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
 
-    manager.queueEntry(manager.createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
     manager.flushQueue()
 
     const end = fetchRequestTracker.start(START_CONTEXT)
@@ -159,7 +160,7 @@ describe('onSettle', () => {
     onSettle(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
 
-    manager.queueEntry(manager.createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
     manager.flushQueue()
 
     const end = xhrRequestTracker.start(START_CONTEXT)
@@ -218,7 +219,7 @@ describe('onSettle', () => {
 
     expect(settleCallback).not.toHaveBeenCalled()
 
-    const finishedEntry = manager.createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
+    const finishedEntry = createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
 
     manager.queueEntry(finishedEntry)
     manager.flushQueue()
@@ -266,7 +267,7 @@ describe('onSettle', () => {
     onSettle(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
 
-    manager.queueEntry(manager.createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
     manager.flushQueue()
 
     // both requests should be ignored, so advancing by 100ms will settle

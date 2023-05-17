@@ -3,7 +3,11 @@
  */
 
 import LoadEventEndSettler from '../../lib/on-settle/load-event-end-settler'
-import { IncrementingClock, PerformanceObserverManager } from '@bugsnag/js-performance-test-utilities'
+import {
+  IncrementingClock,
+  PerformanceObserverManager,
+  createPerformanceNavigationTimingFake
+} from '@bugsnag/js-performance-test-utilities'
 
 describe('LoadEventEndSettler', () => {
   afterEach(() => {
@@ -24,14 +28,14 @@ describe('LoadEventEndSettler', () => {
     expect(settleCallback).not.toHaveBeenCalled()
     expect(settler.isSettled()).toBe(false)
 
-    const notFinishedEntry = manager.createPerformanceNavigationTimingFake()
+    const notFinishedEntry = createPerformanceNavigationTimingFake()
 
     manager.queueEntry(notFinishedEntry)
     manager.flushQueue()
     expect(settleCallback).not.toHaveBeenCalled()
     expect(settler.isSettled()).toBe(false)
 
-    const finishedEntry = manager.createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
+    const finishedEntry = createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
 
     manager.queueEntry(finishedEntry)
     manager.flushQueue()
@@ -60,7 +64,7 @@ describe('LoadEventEndSettler', () => {
     expect(settleCallback3).not.toHaveBeenCalled()
     expect(settler.isSettled()).toBe(false)
 
-    manager.queueEntry(manager.createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
     manager.flushQueue()
 
     expect(settleCallback1).toHaveBeenCalled()
@@ -89,7 +93,7 @@ describe('LoadEventEndSettler', () => {
 
     settler.unsubscribe(settleCallback2)
 
-    manager.queueEntry(manager.createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
     manager.flushQueue()
 
     expect(settleCallback1).toHaveBeenCalled()
@@ -108,7 +112,7 @@ describe('LoadEventEndSettler', () => {
 
     expect(settler.isSettled()).toBe(false)
 
-    manager.queueEntry(manager.createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
     manager.flushQueue()
 
     expect(settler.isSettled()).toBe(true)
@@ -138,7 +142,7 @@ describe('LoadEventEndSettler', () => {
     expect(settleCallback).not.toHaveBeenCalled()
     expect(settler.isSettled()).toBe(false)
 
-    const finishedEntry = manager.createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
+    const finishedEntry = createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
 
     manager.queueEntry(finishedEntry)
     manager.queueEntry(finishedEntry)
@@ -173,7 +177,7 @@ describe('LoadEventEndSettler', () => {
     expect(settler.isSettled()).toBe(false)
 
     // sanity check that a PerformanceNavigationTiming event won't settle
-    const finishedEntry = manager.createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
+    const finishedEntry = createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
 
     manager.queueEntry(finishedEntry)
     manager.flushQueue()
@@ -207,7 +211,7 @@ describe('LoadEventEndSettler', () => {
     expect(settler.isSettled()).toBe(false)
 
     // sanity check that a PerformanceNavigationTiming event won't settle
-    const finishedEntry = manager.createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
+    const finishedEntry = createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
 
     manager.queueEntry(finishedEntry)
     manager.flushQueue()
