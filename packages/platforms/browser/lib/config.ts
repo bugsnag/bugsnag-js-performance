@@ -11,7 +11,7 @@ export interface BrowserSchema extends CoreSchema {
   autoInstrumentFullPageLoads: ConfigOption<boolean>
   autoInstrumentNetworkRequests: ConfigOption<boolean>
   routingProvider: ConfigOption<RoutingProvider>
-  urlsToExcludeWhenAwaitingSettle: ConfigOption<Array<string | RegExp>>
+  settleIgnoreUrls: ConfigOption<Array<string | RegExp>>
   networkInstrumentationIgnoreUrls: ConfigOption<Array<string | RegExp>>
 }
 
@@ -19,7 +19,7 @@ export interface BrowserConfiguration extends Configuration {
   autoInstrumentFullPageLoads?: boolean
   autoInstrumentNetworkRequests?: boolean
   routingProvider?: RoutingProvider
-  urlsToExcludeWhenAwaitingSettle?: Array<string | RegExp>
+  settleIgnoreUrls?: Array<string | RegExp>
   networkInstrumentationIgnoreUrls?: Array<string | RegExp>
 }
 
@@ -45,7 +45,7 @@ export function createSchema (hostname: string): BrowserSchema {
       message: 'should be a routing provider',
       validate: isRoutingProvider
     },
-    urlsToExcludeWhenAwaitingSettle: {
+    settleIgnoreUrls: {
       defaultValue: [],
       message: 'should be an array of string|RegExp',
       validate: isStringOrRegExpArray

@@ -11,11 +11,11 @@ describe('createSchema', () => {
     expect(schema.releaseStage.defaultValue).toStrictEqual('production')
   })
 
-  describe('urlsToExcludeWhenAwaitingSettle', () => {
+  describe('settleIgnoreUrls', () => {
     it('defaults to an empty array', () => {
       const schema = createSchema('')
 
-      expect(schema.urlsToExcludeWhenAwaitingSettle.defaultValue).toStrictEqual([])
+      expect(schema.settleIgnoreUrls.defaultValue).toStrictEqual([])
     })
 
     it.each([
@@ -40,7 +40,7 @@ describe('createSchema', () => {
       [true, ['a', /b/, 'c']]
     ])('returns %s from validation for the value %p', (expected, value) => {
       const schema = createSchema('')
-      const validate = schema.urlsToExcludeWhenAwaitingSettle.validate
+      const validate = schema.settleIgnoreUrls.validate
 
       expect(validate(value)).toBe(expected)
     })
