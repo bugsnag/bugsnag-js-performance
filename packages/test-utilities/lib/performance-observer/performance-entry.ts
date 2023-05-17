@@ -216,6 +216,41 @@ export function createPerformanceEventTimingFake (
   }
 }
 
+// https://wicg.github.io/layout-instability/#sec-layout-shift
+interface LayoutShiftFake extends PerformanceEntryFake {
+  entryType: 'layout-shift'
+  value: number
+  hadRecentInput: boolean
+  lastInputTime: number
+  sources: LayoutShiftAttribution[]
+}
+
+// https://wicg.github.io/layout-instability/#sec-layout-shift-attribution
+interface LayoutShiftAttribution {
+  node: Node | null
+  previouslRect: DOMRectReadOnly
+  currentRect: DOMRectReadOnly
+}
+
+export function createLayoutShiftFake (
+  overrides: Partial<LayoutShiftFake> = {}
+): LayoutShiftFake {
+  return {
+    entryType: 'layout-shift',
+    // this is not a mistake — the name and entryType are both 'layout-shift':
+    // https://wicg.github.io/layout-instability/#sec-report-layout-shift
+    name: 'layout-shift',
+    startTime: 0,
+    duration: 0,
+    value: 0,
+    lastInputTime: 0,
+    hadRecentInput: false,
+    sources: [],
+    toJSON,
+    ...overrides
+  }
+}
+
 // generic toJSON that will do the Right Thing for these fake objects
 // this is necessary to fulfill the interface and provide a useful diff in
 // Jest's expectation output
