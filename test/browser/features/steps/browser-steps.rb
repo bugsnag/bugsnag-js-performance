@@ -62,6 +62,10 @@ Then("the span named {string} is a valid full page load span") do |span_name|
   expected_event_names = $browser.supported_web_vitals
   page_load_span_prefix = "[FullPageLoad]"
 
+  if $browser.supports_performance_paint_timing? 
+    expected_event_names.push "fcp"
+  end
+
   Maze.check.true(
     span_name.start_with?(page_load_span_prefix),
     "A page load span's name should start with '#{page_load_span_prefix}'"
