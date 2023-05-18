@@ -13,7 +13,7 @@ jest.useFakeTimers()
 
 describe('FullPageLoadPlugin', () => {
   it('Automatically creates and delivers a pageLoadSpan', () => {
-    const entry = {
+    const ttfbEntry = {
       duration: 1234,
       entryType: 'navigation',
       name: 'test',
@@ -22,8 +22,17 @@ describe('FullPageLoadPlugin', () => {
       toJSON: jest.fn()
     }
 
+    const fcpEntry = {
+      name: 'first-contentful-paint',
+      entryType: 'paint',
+      duration: 64,
+      startTime: 128,
+      toJSON: jest.fn()
+    }
+
     const performance = {
-      getEntriesByType: () => [entry],
+      getEntriesByName: () => [fcpEntry],
+      getEntriesByType: () => [ttfbEntry],
       timing: {
         responseStart: 0.5,
         navigationStart: 0
@@ -47,10 +56,16 @@ describe('FullPageLoadPlugin', () => {
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({
       name: '[FullPageLoad]/page-load-span-plugin',
-      events: [{
-        name: 'ttfb',
-        timeUnixNano: '500000'
-      }]
+      events: [
+        {
+          name: 'fcp',
+          timeUnixNano: '128000000'
+        },
+        {
+          name: 'ttfb',
+          timeUnixNano: '500000'
+        }
+      ]
     }))
 
     const deliveredSpanAttributes = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes
@@ -74,13 +89,21 @@ describe('FullPageLoadPlugin', () => {
         }
       }
     ]))
+
+    const deliveredSpanEvents = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].events
+    expect(deliveredSpanEvents).toStrictEqual(expect.arrayContaining([
+      {
+        name: 'ttfb',
+        timeUnixNano: '500000'
+      }
+    ]))
   })
 
   it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
     const clock = new IncrementingClock()
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
-    const performance = { getEntriesByType: jest.fn(), timing: { navigationStart: 0, responseStart: 0 } }
+    const performance = { getEntriesByType: jest.fn(), getEntriesByName: jest.fn(), timing: { navigationStart: 0, responseStart: 0 } }
     const webVitals = new WebVitals(performance, clock)
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
