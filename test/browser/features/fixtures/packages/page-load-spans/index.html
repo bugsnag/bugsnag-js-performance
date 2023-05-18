@@ -12,11 +12,11 @@
         <button id="stop-clock">Stop</button>
 
         <script>
+            const node = document.getElementById("clock")
             let time = 0
 
-            let interval = setInterval(() => {
-                time += 1
-                document.getElementById("clock").innerText = time
+            const interval = setInterval(() => {
+                node.innerText = time++
             }, 50)
 
             document.getElementById("stop-clock").addEventListener("click", () => {
