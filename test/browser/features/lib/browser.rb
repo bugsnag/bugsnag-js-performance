@@ -54,26 +54,62 @@ class Browser
     end
   end
 
-  def supports_performance_paint_timing?
+  def supported_web_vitals
+    version = @version == "latest" ? 999 : @version.to_i
+
     case @name
     when "chrome"
-      # support added in Chrome 66
-      @version == "latest" || @version >= 60
-
+      chrome_supported_vitals version
     when "edge"
-      # support added in Edge 79
-      @version == "latest" || @version >= 79
-
+      edge_supported_vitals version
     when "firefox"
-      # support added in Firefox 84
-      @version == "latest" || @version >= 84
-
+      firefox_supported_vitals version
     when "safari"
-      # support added in Safari 14.1
-      @version == "latest" || @version >= 14
-
+      safari_supported_vitals version
     else
-      raise "Unable to determine PerformancePaintTiming support for browser: #{@name}"
+      raise "Unable to determine web vitals support for browser"
+    end
+
+    # send "#{@name}_supported_vitals".to_sym, version
+  end
+
+  def chrome_supported_vitals version
+    case version
+    when (77..)
+      ["ttfb"] # also ["fcp", "fid", "lcp", "cls"]
+    when (76..)
+      ["ttfb"] # also ["fid", "fcp"]
+    when (64..)
+      ["ttfb"] # also ["fcp"]
+    else 
+      ["ttfb"]
+    end
+  end
+
+  def edge_supported_vitals version
+    case version
+    when (79..)
+      ["ttfb"] # also ["fcp", "fid", "lcp", "cls"]
+    else 
+      ["ttfb"]
+    end
+  end
+
+  def firefox_supported_vitals version
+    case version
+    when (84..)
+      ["ttfb"] # also ["fcp", "fid", "lcp", "cls"]
+    else
+      ["ttfb"]
+    end
+  end
+
+  def safari_supported_vitals version
+    case version
+    when (14..) # technically 14.1, but our test fixtures never use 14.0
+      ["ttfb"] # also ["fcp", "fid", "lcp", "cls"]
+    else
+      ["ttfb"]
     end
   end
 end
