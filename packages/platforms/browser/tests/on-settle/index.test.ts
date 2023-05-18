@@ -11,12 +11,14 @@ import {
 } from '../../lib/request-tracker/request-tracker'
 import {
   IncrementingClock,
-  PerformanceFake,
-  PerformanceObserverManager,
-  createPerformanceNavigationTimingFake,
   createTestClient,
   VALID_API_KEY
 } from '@bugsnag/js-performance-test-utilities'
+import {
+  PerformanceFake,
+  PerformanceObserverManager,
+  createPerformanceNavigationTimingFake
+} from '../utilities'
 
 const START_CONTEXT: RequestStartContext = {
   url: 'https://www.bugsnag.com',

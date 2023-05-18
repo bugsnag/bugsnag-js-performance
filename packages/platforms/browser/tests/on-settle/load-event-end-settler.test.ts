@@ -3,12 +3,12 @@
  */
 
 import LoadEventEndSettler from '../../lib/on-settle/load-event-end-settler'
+import { IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 import {
-  IncrementingClock,
   PerformanceFake,
   PerformanceObserverManager,
   createPerformanceNavigationTimingFake
-} from '@bugsnag/js-performance-test-utilities'
+} from '../utilities'
 
 describe('LoadEventEndSettler', () => {
   afterEach(() => {
