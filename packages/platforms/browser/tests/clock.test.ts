@@ -3,7 +3,7 @@
  */
 
 import createClock from '../lib/clock'
-import { PerformanceFake } from '@bugsnag/js-performance-test-utilities'
+import { PerformanceFake } from './utilities'
 
 jest.useFakeTimers()
 

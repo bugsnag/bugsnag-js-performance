@@ -6,13 +6,15 @@
 import {
   InMemoryDelivery,
   IncrementingClock,
-  PerformanceFake,
-  createPerformanceNavigationTimingFake,
-  createPerformancePaintTimingFake,
-  createPerformanceEventTimingFake,
   VALID_API_KEY,
   createTestClient
 } from '@bugsnag/js-performance-test-utilities'
+import {
+  PerformanceFake,
+  createPerformanceNavigationTimingFake,
+  createPerformancePaintTimingFake,
+  createPerformanceEventTimingFake
+} from './utilities'
 import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
 import { createSchema } from '../lib/config'
 import { type OnSettle } from '../lib/on-settle'
