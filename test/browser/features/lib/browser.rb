@@ -12,7 +12,7 @@ class Browser
     # this should only happen locally where the browser will auto-update
     @version =
       if version.nil? || version == "latest"
-        "latest"
+        999
       else
         Integer(version)
       end
@@ -35,7 +35,7 @@ class Browser
     case @name
     when "safari"
       # support added in Safari 13
-      @version == "latest" || @version >= 13
+      @version >= 13
 
     when "firefox"
       # firefox does not support keepalive on any version
@@ -43,11 +43,11 @@ class Browser
 
     when "chrome"
       # support added in Chrome 66
-      @version == "latest" || @version >= 66
+      @version >= 66
 
     when "edge"
       # support added in Edge 15
-      @version == "latest" || @version >= 15
+      @version >= 15
 
     else
       raise "Unable to determine fetch keepalive support for browser: #{@name}"
@@ -55,22 +55,18 @@ class Browser
   end
 
   def supported_web_vitals
-    version = @version == "latest" ? 999 : @version.to_i
-
     case @name
     when "chrome"
-      chrome_supported_vitals version
+      chrome_supported_vitals @version
     when "edge"
-      edge_supported_vitals version
+      edge_supported_vitals @version
     when "firefox"
-      firefox_supported_vitals version
+      firefox_supported_vitals @version
     when "safari"
-      safari_supported_vitals version
+      safari_supported_vitals @version
     else
       raise "Unable to determine web vitals support for browser"
     end
-
-    # send "#{@name}_supported_vitals".to_sym, version
   end
 
   def chrome_supported_vitals version
