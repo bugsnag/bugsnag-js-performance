@@ -73,7 +73,5 @@ export class WebVitals {
     if (entry) {
       return entry.processingStart - entry.startTime
     }
-
-    return undefined
   }
 }
