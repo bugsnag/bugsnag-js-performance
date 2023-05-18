@@ -3,27 +3,30 @@
  */
 
 import createClock from '../lib/clock'
+import { PerformanceFake } from '@bugsnag/js-performance-test-utilities'
+
+jest.useFakeTimers()
 
 describe('Browser Clock', () => {
-  afterEach(() => {
-    jest.useRealTimers()
-  })
-
   describe('clock.now()', () => {
-    it('returns a number', () => {
-      const clock = createClock(performance)
+    it('returns a number', async () => {
+      const clock = createClock(new PerformanceFake())
 
-      expect(clock.now()).toBeGreaterThan(0)
+      await jest.advanceTimersByTimeAsync(100)
+
+      expect(clock.now()).toEqual(100)
     })
 
-    it('returns a greater number on every invocation (100 runs)', () => {
+    it('returns a greater number on every invocation (100 runs)', async () => {
       let lastTime = 0
+      const clock = createClock(new PerformanceFake())
 
       for (let i = 0; i < 100; i++) {
-        const clock = createClock(performance)
+        await jest.advanceTimersByTimeAsync(10)
+
         const newTime = clock.now()
 
-        expect(newTime).toBeGreaterThan(lastTime)
+        expect(newTime).toEqual(lastTime + 10)
         lastTime = newTime
       }
     })
@@ -31,21 +34,16 @@ describe('Browser Clock', () => {
 
   describe('clock.convert()', () => {
     it('converts a Date into a number', () => {
-      const clock = createClock(performance)
+      const clock = createClock(new PerformanceFake())
       const convertedTime = clock.convert(new Date())
 
       expect(convertedTime).toEqual(expect.any(Number))
     })
 
     it('returns the difference between provided Date and performance.timeOrigin in milliseconds', () => {
-      const performance = {
-        now: () => 1234,
-        timeOrigin: new Date('2023-01-02T00:00:00.000Z').getTime(),
-        timing: {
-          // this is different to the above date, so we know which is being used
-          navigationStart: new Date('2022-01-01T00:00:00.000Z').getTime()
-        }
-      }
+      jest.setSystemTime(new Date('2023-01-02T00:00:00.000Z'))
+
+      const performance = new PerformanceFake()
 
       const clock = createClock(performance)
       const time = new Date('2023-01-02T00:00:00.002Z')
@@ -54,12 +52,9 @@ describe('Browser Clock', () => {
     })
 
     it('works when performance.timeOrigin is not defined', () => {
-      const performance = {
-        now: () => 1234,
-        timing: {
-          navigationStart: new Date('2023-01-01T00:00:00.000Z').getTime()
-        }
-      }
+      jest.setSystemTime(new Date('2023-01-01T00:00:00.000Z'))
+
+      const performance = new PerformanceFake({ timeOrigin: undefined })
 
       const clock = createClock(performance)
       const time = new Date('2023-01-01T00:00:00.015Z')
