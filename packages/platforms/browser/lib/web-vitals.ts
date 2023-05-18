@@ -34,7 +34,8 @@ export class WebVitals {
     const firstInputDelay = this.firstInputDelay()
 
     if (firstInputDelay) {
-      span.addEvent('fid', firstInputDelay)
+      span.addEvent('fid_start', firstInputDelay.start)
+      span.addEvent('fid_end', firstInputDelay.end)
     }
   }
 
@@ -71,7 +72,10 @@ export class WebVitals {
     const entry = this.performance.getEntriesByType('first-input')[0] as PerformanceEventTiming
 
     if (entry) {
-      return entry.processingStart - entry.startTime
+      return {
+        start: entry.startTime,
+        end: entry.processingStart
+      }
     }
   }
 }

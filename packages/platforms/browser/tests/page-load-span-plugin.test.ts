@@ -84,8 +84,12 @@ describe('FullPageLoadPlugin', () => {
           timeUnixNano: '500000'
         },
         {
-          name: 'fid',
-          timeUnixNano: '600000'
+          name: 'fid_start',
+          timeUnixNano: '400000'
+        },
+        {
+          name: 'fid_end',
+          timeUnixNano: '1000000'
         }
       ]
     }))
