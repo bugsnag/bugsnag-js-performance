@@ -8,5 +8,20 @@
     </head>
     <body>
         <h1>page-load-spans</h1>
+        <span id="clock">0</span>
+        <button id="stop-clock">Stop</button>
+
+        <script>
+            let time = 0
+
+            let interval = setInterval(() => {
+                time += 1
+                document.getElementById("clock").innerText = time
+            }, 50)
+
+            document.getElementById("stop-clock").addEventListener("click", () => {
+                clearInterval(interval)
+            })
+        </script>
     </body>
 </html>
