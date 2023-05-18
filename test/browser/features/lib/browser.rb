@@ -57,20 +57,22 @@ class Browser
   def supported_web_vitals
     case @name
     when "chrome"
-      chrome_supported_vitals @version
+      chrome_supported_vitals
     when "edge"
-      edge_supported_vitals @version
+      edge_supported_vitals
     when "firefox"
-      firefox_supported_vitals @version
+      firefox_supported_vitals
     when "safari"
-      safari_supported_vitals @version
+      safari_supported_vitals
     else
-      raise "Unable to determine web vitals support for browser"
+      raise "Unable to determine web vitals support for browser: #{@name}"
     end
   end
 
-  def chrome_supported_vitals version
-    case version
+  private
+
+  def chrome_supported_vitals
+    case @version
     when (77..)
       ["ttfb"] # also ["fcp", "fid", "lcp", "cls"]
     when (76..)
@@ -82,8 +84,8 @@ class Browser
     end
   end
 
-  def edge_supported_vitals version
-    case version
+  def edge_supported_vitals
+    case @version
     when (79..)
       ["ttfb"] # also ["fcp", "fid", "lcp", "cls"]
     else 
@@ -91,8 +93,8 @@ class Browser
     end
   end
 
-  def firefox_supported_vitals version
-    case version
+  def firefox_supported_vitals
+    case @version
     when (84..)
       ["ttfb"] # also ["fcp", "fid", "lcp", "cls"]
     else
@@ -100,8 +102,8 @@ class Browser
     end
   end
 
-  def safari_supported_vitals version
-    case version
+  def safari_supported_vitals
+    case @version
     when (14..) # technically 14.1, but our test fixtures never use 14.0
       ["ttfb"] # also ["fcp", "fid", "lcp", "cls"]
     else
