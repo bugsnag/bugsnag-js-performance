@@ -12,7 +12,7 @@ class Browser
     # this should only happen locally where the browser will auto-update
     @version =
       if version.nil? || version == "latest"
-        999
+        Float::INFINITY
       else
         Integer(version)
       end
