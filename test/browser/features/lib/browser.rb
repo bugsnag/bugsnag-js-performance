@@ -12,7 +12,7 @@ class Browser
     # this should only happen locally where the browser will auto-update
     @version =
       if version.nil? || version == "latest"
-        "latest"
+        Float::INFINITY
       else
         Integer(version)
       end
@@ -35,7 +35,7 @@ class Browser
     case @name
     when "safari"
       # support added in Safari 13
-      @version == "latest" || @version >= 13
+      @version >= 13
 
     when "firefox"
       # firefox does not support keepalive on any version
@@ -43,14 +43,71 @@ class Browser
 
     when "chrome"
       # support added in Chrome 66
-      @version == "latest" || @version >= 66
+      @version >= 66
 
     when "edge"
       # support added in Edge 15
-      @version == "latest" || @version >= 15
+      @version >= 15
 
     else
       raise "Unable to determine fetch keepalive support for browser: #{@name}"
+    end
+  end
+
+  def supported_web_vitals
+    case @name
+    when "chrome"
+      chrome_supported_vitals
+    when "edge"
+      edge_supported_vitals
+    when "firefox"
+      firefox_supported_vitals
+    when "safari"
+      safari_supported_vitals
+    else
+      raise "Unable to determine web vitals support for browser: #{@name}"
+    end
+  end
+
+  private
+
+  def chrome_supported_vitals
+    case @version
+    when (77..)
+      ["ttfb"] # also ["fcp", "fid", "lcp", "cls"]
+    when (76..)
+      ["ttfb"] # also ["fid", "fcp"]
+    when (64..)
+      ["ttfb"] # also ["fcp"]
+    else 
+      ["ttfb"]
+    end
+  end
+
+  def edge_supported_vitals
+    case @version
+    when (79..)
+      ["ttfb"] # also ["fcp", "fid", "lcp", "cls"]
+    else 
+      ["ttfb"]
+    end
+  end
+
+  def firefox_supported_vitals
+    case @version
+    when (84..)
+      ["ttfb"] # also ["fcp", "fid", "lcp", "cls"]
+    else
+      ["ttfb"]
+    end
+  end
+
+  def safari_supported_vitals
+    case @version
+    when (14..) # technically 14.1, but our test fixtures never use 14.0
+      ["ttfb"] # also ["fcp", "fid", "lcp", "cls"]
+    else
+      ["ttfb"]
     end
   end
 end

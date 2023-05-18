@@ -59,7 +59,7 @@ end
 #
 # @step_input span_name [String] The name of the span to check
 Then("the span named {string} is a valid full page load span") do |span_name|
-  expected_event_names = ["ttfb"]
+  expected_event_names = $browser.supported_web_vitals
   page_load_span_prefix = "[FullPageLoad]"
 
   Maze.check.true(
@@ -89,7 +89,7 @@ Then("the span named {string} is a valid full page load span") do |span_name|
   span_event_names = span["events"].map { |event| event["name"] }.sort
 
   Maze.check.equal(
-    expected_event_names,
+    expected_event_names.sort,
     span_event_names,
     "The span's events do not match the expected events"
   )
