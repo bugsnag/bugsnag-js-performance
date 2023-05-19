@@ -64,8 +64,6 @@ export class WebVitals {
     if (responseStart > 0 && responseStart < this.clock.now()) {
       return responseStart
     }
-
-    return undefined
   }
 
   private firstInputDelay () {
