@@ -12,19 +12,19 @@
         <button id="stop-clock">Stop</button>
 
         <script>
-            // stop the page from settling until the 'stop-clock' button is
-            // clicked, otherwise we can't reliably get a first input delay event
+          // stop the page from settling until the 'stop-clock' button is
+          // clicked, otherwise we can't reliably get a first input delay event
 
-            const node = document.getElementById("clock")
-            let time = 0
+          const node = document.getElementById("clock")
+          let time = 0
 
-            const interval = setInterval(() => {
-                node.innerText = time++
-            }, 50)
+          const interval = setInterval(() => {
+            node.innerText = time++
+          }, 50)
 
-            document.getElementById("stop-clock").addEventListener("click", () => {
-                clearInterval(interval)
-            })
+          document.getElementById("stop-clock").addEventListener("click", () => {
+            clearInterval(interval)
+          })
         </script>
     </body>
 </html>
