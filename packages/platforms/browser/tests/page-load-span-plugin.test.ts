@@ -30,9 +30,27 @@ describe('FullPageLoadPlugin', () => {
       toJSON: jest.fn()
     }
 
+    const fidEntry = {
+      duration: 0.5,
+      entryType: 'first-input',
+      name: 'fid',
+      processingStart: 1,
+      startTime: 0.4,
+      toJSON: jest.fn()
+    }
+
     const performance = {
       getEntriesByName: () => [fcpEntry],
-      getEntriesByType: () => [ttfbEntry],
+      getEntriesByType: (type: 'navigation' | 'first-input') => {
+        switch (type) {
+          case 'navigation':
+            return [ttfbEntry]
+          case 'first-input':
+            return [fidEntry]
+          default:
+            return []
+        }
+      },
       timing: {
         responseStart: 0.5,
         navigationStart: 0
@@ -64,6 +82,14 @@ describe('FullPageLoadPlugin', () => {
         {
           name: 'ttfb',
           timeUnixNano: '500000'
+        },
+        {
+          name: 'fid_start',
+          timeUnixNano: '400000'
+        },
+        {
+          name: 'fid_end',
+          timeUnixNano: '1000000'
         }
       ]
     }))

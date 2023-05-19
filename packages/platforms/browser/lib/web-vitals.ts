@@ -30,6 +30,13 @@ export class WebVitals {
     if (timeToFirstByte) {
       span.addEvent('ttfb', timeToFirstByte)
     }
+
+    const firstInputDelay = this.firstInputDelay()
+
+    if (firstInputDelay) {
+      span.addEvent('fid_start', firstInputDelay.start)
+      span.addEvent('fid_end', firstInputDelay.end)
+    }
   }
 
   private firstContentfulPaint () {
@@ -59,5 +66,16 @@ export class WebVitals {
     }
 
     return undefined
+  }
+
+  private firstInputDelay () {
+    const entry = this.performance.getEntriesByType('first-input')[0] as PerformanceEventTiming
+
+    if (entry) {
+      return {
+        start: entry.startTime,
+        end: entry.processingStart
+      }
+    }
   }
 }
