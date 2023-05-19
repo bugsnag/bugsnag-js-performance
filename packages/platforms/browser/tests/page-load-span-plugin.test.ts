@@ -66,69 +66,20 @@ describe('FullPageLoadPlugin', () => {
 
     jest.runAllTimers()
 
-    expect(delivery).toHaveSentSpan(expect.objectContaining({
-      name: '[FullPageLoad]/page-load-span-plugin',
-      events: [
-        {
-          name: 'fcp',
-          timeUnixNano: '128000000'
-        },
-        {
-          name: 'ttfb',
-          timeUnixNano: '500000'
-        },
-        {
-          name: 'fid_start',
-          timeUnixNano: '400000'
-        },
-        {
-          name: 'fid_end',
-          timeUnixNano: '1000000'
-        },
-        {
-          name: 'lcp',
-          timeUnixNano: '64000000'
-        }
-      ]
-    }))
+    expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/page-load-span-plugin' }))
 
-    const deliveredSpanAttributes = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes
-    expect(deliveredSpanAttributes).toStrictEqual(expect.arrayContaining([
-      {
-        key: 'bugsnag.span.category',
-        value: {
-          stringValue: 'full_page_load'
-        }
-      },
-      {
-        key: 'bugsnag.browser.page.route',
-        value: {
-          stringValue: '/page-load-span-plugin'
-        }
-      },
-      {
-        key: 'bugsnag.browser.page.referrer',
-        value: {
-          stringValue: 'https://bugsnag.com/'
-        }
-      },
-      {
-        // cumulative layout shift
-        key: 'bugsnag.metrics.cls',
-        value: {
-          // the total of session window 2
-          intValue: '60'
-        }
-      }
-    ]))
+    const span = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
 
-    const deliveredSpanEvents = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].events
-    expect(deliveredSpanEvents).toStrictEqual(expect.arrayContaining([
-      {
-        name: 'ttfb',
-        timeUnixNano: '500000'
-      }
-    ]))
+    expect(span).toHaveAttribute('bugsnag.span.category', 'full_page_load')
+    expect(span).toHaveAttribute('bugsnag.browser.page.route', '/page-load-span-plugin')
+    expect(span).toHaveAttribute('bugsnag.browser.page.referrer', 'https://bugsnag.com/')
+    expect(span).toHaveAttribute('bugsnag.metrics.cls', 60)
+
+    expect(span).toHaveEvent('fcp', '128000000')
+    expect(span).toHaveEvent('ttfb', '500000')
+    expect(span).toHaveEvent('fid_start', '400000')
+    expect(span).toHaveEvent('fid_end', '1000000')
+    expect(span).toHaveEvent('lcp', '64000000')
   })
 
   it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
