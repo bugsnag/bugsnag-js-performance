@@ -72,32 +72,10 @@ describe('network span plugin', () => {
     expect(span.name).toEqual('[HTTP]/GET')
     expect(span.startTime).toEqual(1)
     expect(span.endTime).toEqual(2)
-    expect(span.attributes.toJson()).toEqual(expect.arrayContaining([
-      {
-        key: 'bugsnag.span.category',
-        value: {
-          stringValue: 'network'
-        }
-      },
-      {
-        key: 'http.url',
-        value: {
-          stringValue: TEST_URL
-        }
-      },
-      {
-        key: 'http.method',
-        value: {
-          stringValue: 'GET'
-        }
-      },
-      {
-        key: 'http.status_code',
-        value: {
-          intValue: '200'
-        }
-      }
-    ]))
+    expect(span).toHaveAttribute('bugsnag.span.category', 'network')
+    expect(span).toHaveAttribute('http.url', TEST_URL)
+    expect(span).toHaveAttribute('http.method', 'GET')
+    expect(span).toHaveAttribute('http.status_code', 200)
   })
 
   it('does not track requests when autoInstrumentNetworkRequests = false', () => {
