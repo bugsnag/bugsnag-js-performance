@@ -277,7 +277,7 @@ describe('Span', () => {
       }))
     })
 
-    it('will cancel open spans when visibility changes', () => {
+    it('will cancel any open spans when visibility changes', () => {
       const clock = new IncrementingClock()
       const sampler = new Sampler(0.5)
       const processor = { add: jest.fn() }
@@ -290,10 +290,43 @@ describe('Span', () => {
         backgroundingListener
       )
 
-      const span = spanFactory.startSpan('span-name', clock.now())
+      // started in foreground and ended in background
+      const foregroundSpan = spanFactory.startSpan('in-foreground', clock.now())
       backgroundingListener.sendToBackground()
-      spanFactory.endSpan(span, clock.now())
+      spanFactory.endSpan(foregroundSpan, clock.now())
+      expect(processor.add).not.toHaveBeenCalled()
 
+      // started in foreground and ended in foreground
+      const startedInForeground = spanFactory.startSpan('started-in-foreground', clock.now())
+      backgroundingListener.sendToBackground()
+      backgroundingListener.sendToForeground()
+      spanFactory.endSpan(startedInForeground, clock.now())
+      expect(processor.add).not.toHaveBeenCalled()
+    })
+
+    it('will discard spans started in the background', () => {
+      const clock = new IncrementingClock()
+      const sampler = new Sampler(0.5)
+      const processor = { add: jest.fn() }
+      const backgroundingListener = new ControllableBackgroundingListener()
+      backgroundingListener.sendToBackground()
+      const spanFactory = new SpanFactory(
+        processor,
+        sampler,
+        new StableIdGenerator(),
+        spanAttributesSource,
+        backgroundingListener
+      )
+
+      // started and ended in background
+      const backgroundSpan = spanFactory.startSpan('in-background', clock.now())
+      spanFactory.endSpan(backgroundSpan, clock.now())
+      expect(processor.add).not.toHaveBeenCalled()
+
+      // started in background and ended in foreground
+      const startedInBackground = spanFactory.startSpan('started-in-background', clock.now())
+      backgroundingListener.sendToForeground()
+      spanFactory.endSpan(startedInBackground, clock.now())
       expect(processor.add).not.toHaveBeenCalled()
     })
   })

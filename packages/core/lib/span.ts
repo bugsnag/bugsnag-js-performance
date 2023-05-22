@@ -105,16 +105,19 @@ export class SpanFactory {
   private processor: Processor
   private sampler: Sampler
   private openSpans: Set<SpanInternal> = new Set<SpanInternal>()
+  private isInForeground: boolean = true
 
   constructor (processor: Processor, sampler: Sampler, idGenerator: IdGenerator, spanAttributesSource: SpanAttributesSource, backgroundingListener: BackgroundingListener) {
     this.processor = processor
     this.sampler = sampler
     this.idGenerator = idGenerator
     this.spanAttributesSource = spanAttributesSource
+    // this will fire immediately if the app is already backgrounded
     backgroundingListener.onStateChange(this.onBackgroundStateChange)
   }
 
   private onBackgroundStateChange = (state: BackgroundingListenerState) => {
+    this.isInForeground = state === 'in-foreground'
     // clear all open spans regardless of the new background state
     // since spans are only valid if they start and end while the app is in the foreground
     this.openSpans.clear()
@@ -126,7 +129,8 @@ export class SpanFactory {
     const attributes = new SpanAttributes(this.spanAttributesSource())
     const span = new SpanInternal(spanId, traceId, name, startTime, attributes)
 
-    this.openSpans.add(span)
+    // don't track spans that are started while the app is backgrounded
+    if (this.isInForeground) this.openSpans.add(span)
     return span
   }
 
