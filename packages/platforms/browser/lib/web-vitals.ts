@@ -33,11 +33,11 @@ export class WebVitals {
   private clock: Clock
   private largestContentfulPaint: number | undefined
 
-  constructor (performance: PerformanceWithNavigationTiming, clock: Clock) {
+  constructor (performance: PerformanceWithNavigationTiming, clock: Clock, PerformanceObserverClass: typeof PerformanceObserver) {
     this.performance = performance
     this.clock = clock
 
-    new PerformanceObserver((list) => {
+    new PerformanceObserverClass((list) => {
       const entries = list.getEntries()
       const lastEntry = entries[entries.length - 1] // Use the latest LCP candidate
       this.largestContentfulPaint = lastEntry.startTime

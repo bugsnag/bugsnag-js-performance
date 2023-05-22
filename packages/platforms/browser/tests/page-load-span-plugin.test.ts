@@ -11,6 +11,7 @@ import {
 } from '@bugsnag/js-performance-test-utilities'
 import {
   PerformanceFake,
+  PerformanceObserverManager,
   createPerformanceNavigationTimingFake,
   createPerformancePaintTimingFake,
   createPerformanceEventTimingFake,
@@ -25,6 +26,8 @@ jest.useFakeTimers()
 
 describe('FullPageLoadPlugin', () => {
   it('Automatically creates and delivers a pageLoadSpan', () => {
+    const manager = new PerformanceObserverManager()
+
     const performance = new PerformanceFake()
     performance.addEntry(createPerformanceNavigationTimingFake({ responseStart: 0.5 }))
     performance.addEntry(createPerformancePaintTimingFake({ startTime: 128 }))
@@ -46,13 +49,17 @@ describe('FullPageLoadPlugin', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
-    const webVitals = new WebVitals(performance, clock)
+    const webVitals = new WebVitals(performance, clock, manager.createPerformanceObserverFakeClass())
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname),
       plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitals, onSettle)]
     })
+
+    // Trigger LCP event
+    manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 64, name: 'lcp', duration: 2, toJSON: jest.fn() })
+    manager.flushQueue()
 
     testClient.start({ apiKey: VALID_API_KEY })
 
@@ -76,6 +83,10 @@ describe('FullPageLoadPlugin', () => {
         {
           name: 'fid_end',
           timeUnixNano: '1000000'
+        },
+        {
+          name: 'lcp',
+          timeUnixNano: '64000000'
         }
       ]
     }))
@@ -123,7 +134,9 @@ describe('FullPageLoadPlugin', () => {
     const clock = new IncrementingClock()
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
-    const webVitals = new WebVitals(new PerformanceFake(), clock)
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
