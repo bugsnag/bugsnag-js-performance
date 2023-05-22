@@ -1,4 +1,5 @@
 import { SpanAttributes, type SpanAttribute, type SpanAttributesSource } from './attributes'
+import { type BackgroundingListenerState, type BackgroundingListener } from './backgrounding-listener'
 import { type Clock } from './clock'
 import { type DeliverySpan } from './delivery'
 import { SpanEvents } from './events'
@@ -103,20 +104,30 @@ export class SpanFactory {
   private readonly spanAttributesSource: SpanAttributesSource
   private processor: Processor
   private sampler: Sampler
+  private openSpans: Set<SpanInternal> = new Set<SpanInternal>()
 
-  constructor (processor: Processor, sampler: Sampler, idGenerator: IdGenerator, spanAttributesSource: SpanAttributesSource) {
+  constructor (processor: Processor, sampler: Sampler, idGenerator: IdGenerator, spanAttributesSource: SpanAttributesSource, backgroundingListener: BackgroundingListener) {
     this.processor = processor
     this.sampler = sampler
     this.idGenerator = idGenerator
     this.spanAttributesSource = spanAttributesSource
+    backgroundingListener.onStateChange(this.onBackgroundStateChange)
+  }
+
+  private onBackgroundStateChange = (state: BackgroundingListenerState) => {
+    // clear all open spans regardless of the new background state
+    // since spans are only valid if they start and end while the app is in the foreground
+    this.openSpans.clear()
   }
 
   startSpan (name: string, startTime: number) {
     const spanId = this.idGenerator.generate(64)
     const traceId = this.idGenerator.generate(128)
     const attributes = new SpanAttributes(this.spanAttributesSource())
+    const span = new SpanInternal(spanId, traceId, name, startTime, attributes)
 
-    return new SpanInternal(spanId, traceId, name, startTime, attributes)
+    this.openSpans.add(span)
+    return span
   }
 
   updateProcessor (processor: Processor) {
@@ -127,6 +138,9 @@ export class SpanFactory {
     span: SpanInternal,
     endTime: number
   ) {
+    // if the span doesn't exist here it shouldn't be processed
+    if (!this.openSpans.delete(span)) return
+
     const spanEnded = span.end(endTime, this.sampler.spanProbability)
 
     if (this.sampler.sample(spanEnded)) {

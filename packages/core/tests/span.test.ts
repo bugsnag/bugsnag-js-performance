@@ -1,6 +1,7 @@
 
 import { Kind } from '@bugsnag/js-performance-core'
 import {
+  ControllableBackgroundingListener,
   InMemoryDelivery,
   IncrementingClock,
   StableIdGenerator,
@@ -25,7 +26,13 @@ describe('SpanInternal', () => {
       const sampler = new Sampler(0.5)
       const delivery = { send: jest.fn() }
       const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
-      const spanFactory = new SpanFactory(processor, sampler, new StableIdGenerator(), spanAttributesSource)
+      const spanFactory = new SpanFactory(
+        processor,
+        sampler,
+        new StableIdGenerator(),
+        spanAttributesSource,
+        new ControllableBackgroundingListener()
+      )
 
       const spanInternal = spanFactory.startSpan('span-name', 1234)
       spanInternal.setAttribute('bugsnag.test.attribute', parameter)
@@ -49,7 +56,13 @@ describe('SpanInternal', () => {
       const sampler = new Sampler(0.5)
       const delivery = { send: jest.fn() }
       const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
-      const spanFactory = new SpanFactory(processor, sampler, new StableIdGenerator(), spanAttributesSource)
+      const spanFactory = new SpanFactory(
+        processor,
+        sampler,
+        new StableIdGenerator(),
+        spanAttributesSource,
+        new ControllableBackgroundingListener()
+      )
 
       const spanInternal = spanFactory.startSpan('span-name', 1234)
       spanInternal.addEvent('bugsnag.test.event', 1234)
@@ -262,6 +275,26 @@ describe('Span', () => {
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: 'span 3'
       }))
+    })
+
+    it('will cancel open spans when visibility changes', () => {
+      const clock = new IncrementingClock()
+      const sampler = new Sampler(0.5)
+      const processor = { add: jest.fn() }
+      const backgroundingListener = new ControllableBackgroundingListener()
+      const spanFactory = new SpanFactory(
+        processor,
+        sampler,
+        new StableIdGenerator(),
+        spanAttributesSource,
+        backgroundingListener
+      )
+
+      const span = spanFactory.startSpan('span-name', clock.now())
+      backgroundingListener.sendToBackground()
+      spanFactory.endSpan(span, clock.now())
+
+      expect(processor.add).not.toHaveBeenCalled()
     })
   })
 })

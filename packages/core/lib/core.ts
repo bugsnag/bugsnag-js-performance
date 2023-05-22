@@ -33,7 +33,7 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
   let processor: Processor = bufferingProcessor
 
   const sampler = new Sampler(1.0)
-  const spanFactory = new SpanFactory(processor, sampler, options.idGenerator, options.spanAttributesSource)
+  const spanFactory = new SpanFactory(processor, sampler, options.idGenerator, options.spanAttributesSource, options.backgroundingListener)
   const plugins = options.plugins(spanFactory)
 
   return {

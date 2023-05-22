@@ -2,6 +2,7 @@ import { type SpanInternal, type SpanEnded, SpanFactory } from '@bugsnag/js-perf
 import StableIdGenerator from './stable-id-generator'
 import spanAttributesSource from './span-attributes-source'
 import InMemoryProcessor from './in-memory-processor'
+import ControllableBackgroundingListener from './controllable-backgrounding-listener'
 
 class MockSpanFactory extends SpanFactory {
   public createdSpans: SpanEnded[]
@@ -9,7 +10,7 @@ class MockSpanFactory extends SpanFactory {
   constructor () {
     const sampler: any = { probability: 0.1, sample: () => true }
     const processor = new InMemoryProcessor()
-    super(processor, sampler, new StableIdGenerator(), spanAttributesSource)
+    super(processor, sampler, new StableIdGenerator(), spanAttributesSource, new ControllableBackgroundingListener())
     this.createdSpans = processor.spans
   }
 
