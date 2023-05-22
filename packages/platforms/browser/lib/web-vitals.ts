@@ -37,7 +37,9 @@ export class WebVitals {
     this.performance = performance
     this.clock = clock
 
-    if (PerformanceObserverClass.supportedEntryTypes.includes('largest-contentful-paint')) {
+    const supportedEntryTypes = PerformanceObserverClass.supportedEntryTypes
+
+    if (Array.isArray(supportedEntryTypes) && supportedEntryTypes.includes('largest-contentful-paint')) {
       const observer = new PerformanceObserverClass((list) => {
         const entries = list.getEntries()
         const lastEntry = entries[entries.length - 1] // Use the latest LCP candidate
