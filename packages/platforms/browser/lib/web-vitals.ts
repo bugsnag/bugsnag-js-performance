@@ -37,11 +37,12 @@ export class WebVitals {
     this.performance = performance
     this.clock = clock
 
-    new PerformanceObserverClass((list) => {
+    new PerformanceObserverClass((list, observer) => {
       const entries = list.getEntries()
       const lastEntry = entries[entries.length - 1] // Use the latest LCP candidate
       this.largestContentfulPaint = lastEntry.startTime
-    }).observe({ type: 'largest-contentful-paint', buffered: true })
+      observer.disconnect()
+    }).observe({ entryTypes: ['largest-contentful-paint'] })
   }
 
   attachTo (span: SpanInternal) {
