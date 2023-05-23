@@ -32,6 +32,7 @@ export class WebVitals {
   private performance: PerformanceWithNavigationTiming
   private clock: Clock
   private largestContentfulPaint: number | undefined
+  private observer: PerformanceObserver | undefined
 
   constructor (performance: PerformanceWithNavigationTiming, clock: Clock, PerformanceObserverClass: typeof PerformanceObserver) {
     this.performance = performance
@@ -40,14 +41,13 @@ export class WebVitals {
     const supportedEntryTypes = PerformanceObserverClass.supportedEntryTypes
 
     if (Array.isArray(supportedEntryTypes) && supportedEntryTypes.includes('largest-contentful-paint')) {
-      const observer = new PerformanceObserverClass((list) => {
+      this.observer = new PerformanceObserverClass((list) => {
         const entries = list.getEntries()
         const lastEntry = entries[entries.length - 1] // Use the latest LCP candidate
         this.largestContentfulPaint = lastEntry.startTime
-        observer.disconnect()
       })
 
-      observer.observe({ type: 'largest-contentful-paint', buffered: true })
+      this.observer.observe({ type: 'largest-contentful-paint', buffered: true })
     }
   }
 
@@ -79,6 +79,10 @@ export class WebVitals {
 
     if (this.largestContentfulPaint) {
       span.addEvent('lcp', this.largestContentfulPaint)
+    }
+
+    if (this.observer) {
+      this.observer.disconnect()
     }
   }
 
