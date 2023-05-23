@@ -15,7 +15,8 @@ import {
   createPerformanceNavigationTimingFake,
   createPerformancePaintTimingFake,
   createPerformanceEventTimingFake,
-  createLayoutShiftFake
+  createLayoutShiftFake,
+  createLargestContentfulPaintFake
 } from './utilities'
 import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
 import { createSchema } from '../lib/config'
@@ -58,7 +59,7 @@ describe('FullPageLoadPlugin', () => {
     })
 
     // Trigger LCP event
-    manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 64, name: 'lcp', duration: 2, toJSON: jest.fn() })
+    manager.queueEntry(createLargestContentfulPaintFake({ startTime: 64 }))
     manager.flushQueue()
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -168,10 +169,10 @@ describe('FullPageLoadPlugin', () => {
         })
 
         // LCP events
-        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 8, name: 'lcp', duration: 8, toJSON: jest.fn() })
-        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 16, name: 'lcp', duration: 16, toJSON: jest.fn() })
-        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 64, name: 'lcp', duration: 16, toJSON: jest.fn() })
-        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 32, name: 'lcp', duration: 64, toJSON: jest.fn() })
+        manager.queueEntry(createLargestContentfulPaintFake({ startTime: 8 }))
+        manager.queueEntry(createLargestContentfulPaintFake({ startTime: 16 }))
+        manager.queueEntry(createLargestContentfulPaintFake({ startTime: 64 }))
+        manager.queueEntry(createLargestContentfulPaintFake({ startTime: 32 }))
         manager.flushQueue()
 
         testClient.start({ apiKey: VALID_API_KEY })
@@ -205,16 +206,16 @@ describe('FullPageLoadPlugin', () => {
         })
 
         // LCP events
-        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 8, name: 'lcp', duration: 8, toJSON: jest.fn() })
-        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 16, name: 'lcp', duration: 16, toJSON: jest.fn() })
+        manager.queueEntry(createLargestContentfulPaintFake({ startTime: 8 }))
+        manager.queueEntry(createLargestContentfulPaintFake({ startTime: 16 }))
         manager.flushQueue()
 
-        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 64, name: 'lcp', duration: 16, toJSON: jest.fn() })
-        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 32, name: 'lcp', duration: 64, toJSON: jest.fn() })
+        manager.queueEntry(createLargestContentfulPaintFake({ startTime: 64 }))
+        manager.queueEntry(createLargestContentfulPaintFake({ startTime: 32 }))
         manager.flushQueue()
 
-        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 64, name: 'lcp', duration: 64, toJSON: jest.fn() })
-        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 128, name: 'lcp', duration: 256, toJSON: jest.fn() })
+        manager.queueEntry(createLargestContentfulPaintFake({ startTime: 64 }))
+        manager.queueEntry(createLargestContentfulPaintFake({ startTime: 128 }))
         manager.flushQueue()
 
         testClient.start({ apiKey: VALID_API_KEY })
