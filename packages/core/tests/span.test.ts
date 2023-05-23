@@ -277,57 +277,66 @@ describe('Span', () => {
       }))
     })
 
-    it('will cancel any open spans when visibility changes', () => {
-      const clock = new IncrementingClock()
-      const sampler = new Sampler(0.5)
-      const processor = { add: jest.fn() }
+    it('will cancel any open spans if the app is backgrounded', () => {
+      const delivery = new InMemoryDelivery()
       const backgroundingListener = new ControllableBackgroundingListener()
-      const spanFactory = new SpanFactory(
-        processor,
-        sampler,
-        new StableIdGenerator(),
-        spanAttributesSource,
+      const client = createTestClient({
+        deliveryFactory: () => delivery,
         backgroundingListener
-      )
+      })
+
+      client.start({
+        apiKey: VALID_API_KEY,
+        samplingProbability: 1
+      })
 
       // started in foreground and ended in background
-      const foregroundSpan = spanFactory.startSpan('in-foreground', clock.now())
+      const movedToBackground = client.startSpan('moved-to-background')
       backgroundingListener.sendToBackground()
-      spanFactory.endSpan(foregroundSpan, clock.now())
-      expect(processor.add).not.toHaveBeenCalled()
-
-      // started in foreground and ended in foreground
-      const startedInForeground = spanFactory.startSpan('started-in-foreground', clock.now())
-      backgroundingListener.sendToBackground()
-      backgroundingListener.sendToForeground()
-      spanFactory.endSpan(startedInForeground, clock.now())
-      expect(processor.add).not.toHaveBeenCalled()
-    })
-
-    it('will discard spans started in the background', () => {
-      const clock = new IncrementingClock()
-      const sampler = new Sampler(0.5)
-      const processor = { add: jest.fn() }
-      const backgroundingListener = new ControllableBackgroundingListener()
-      backgroundingListener.sendToBackground()
-      const spanFactory = new SpanFactory(
-        processor,
-        sampler,
-        new StableIdGenerator(),
-        spanAttributesSource,
-        backgroundingListener
-      )
-
-      // started and ended in background
-      const backgroundSpan = spanFactory.startSpan('in-background', clock.now())
-      spanFactory.endSpan(backgroundSpan, clock.now())
-      expect(processor.add).not.toHaveBeenCalled()
+      movedToBackground.end()
 
       // started in background and ended in foreground
-      const startedInBackground = spanFactory.startSpan('started-in-background', clock.now())
+      const movedToForeground = client.startSpan('moved-to-foreground')
       backgroundingListener.sendToForeground()
-      spanFactory.endSpan(startedInBackground, clock.now())
-      expect(processor.add).not.toHaveBeenCalled()
+      movedToForeground.end()
+
+      // entirely in background
+      backgroundingListener.sendToBackground()
+      const backgroundSpan = client.startSpan('entirely-in-background')
+      backgroundSpan.end()
+
+      // started and ended in foreground but backgrounded during span
+      backgroundingListener.sendToForeground()
+      const backgroundedDuringSpan = client.startSpan('backgrounded-during-span')
+      backgroundingListener.sendToBackground()
+      backgroundingListener.sendToForeground()
+      backgroundedDuringSpan.end()
+
+      // entirely in foreground (should be delivered)
+      const inForeground = client.startSpan('entirely-in-foreground')
+      inForeground.end()
+
+      jest.runAllTimers()
+
+      expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+        name: 'moved-to-background'
+      }))
+
+      expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+        name: 'moved-to-foreground'
+      }))
+
+      expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+        name: 'entirely-in-background'
+      }))
+
+      expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+        name: 'backgrounded-during-span'
+      }))
+
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: 'entirely-in-foreground'
+      }))
     })
   })
 })
