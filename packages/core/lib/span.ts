@@ -104,7 +104,7 @@ export class SpanFactory {
   private readonly spanAttributesSource: SpanAttributesSource
   private processor: Processor
   private sampler: Sampler
-  private openSpans: Set<SpanInternal> = new Set<SpanInternal>()
+  private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
   private isInForeground: boolean = true
 
   constructor (processor: Processor, sampler: Sampler, idGenerator: IdGenerator, spanAttributesSource: SpanAttributesSource, backgroundingListener: BackgroundingListener) {
@@ -120,7 +120,7 @@ export class SpanFactory {
     this.isInForeground = state === 'in-foreground'
     // clear all open spans regardless of the new background state
     // since spans are only valid if they start and end while the app is in the foreground
-    this.openSpans.clear()
+    this.openSpans = new WeakSet<SpanInternal>()
   }
 
   startSpan (name: string, startTime: number) {
