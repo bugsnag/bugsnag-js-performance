@@ -149,4 +149,88 @@ describe('FullPageLoadPlugin', () => {
 
     expect(delivery.requests).toHaveLength(0)
   })
+
+  describe('WebVitals', () => {
+    describe('lcp', () => {
+      it('uses the latest lcp entry (multiple entries)', () => {
+        const manager = new PerformanceObserverManager()
+        const performance = new PerformanceFake()
+
+        const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+        const delivery = new InMemoryDelivery()
+        const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
+        const webVitals = new WebVitals(performance, clock, manager.createPerformanceObserverFakeClass())
+        const testClient = createTestClient({
+          clock,
+          deliveryFactory: () => delivery,
+          schema: createSchema(window.location.hostname),
+          plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitals, onSettle)]
+        })
+
+        // LCP events
+        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 8, name: 'lcp', duration: 8, toJSON: jest.fn() })
+        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 16, name: 'lcp', duration: 16, toJSON: jest.fn() })
+        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 64, name: 'lcp', duration: 16, toJSON: jest.fn() })
+        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 32, name: 'lcp', duration: 64, toJSON: jest.fn() })
+        manager.flushQueue()
+
+        testClient.start({ apiKey: VALID_API_KEY })
+
+        jest.runAllTimers()
+
+        expect(delivery).toHaveSentSpan(expect.objectContaining({
+          name: '[FullPageLoad]/page-load-span-plugin',
+          events: [
+            {
+              name: 'lcp',
+              timeUnixNano: '32000000'
+            }
+          ]
+        }))
+      })
+
+      it('uses the latest lcp entry (multiple batches)', () => {
+        const manager = new PerformanceObserverManager()
+        const performance = new PerformanceFake()
+
+        const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+        const delivery = new InMemoryDelivery()
+        const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
+        const webVitals = new WebVitals(performance, clock, manager.createPerformanceObserverFakeClass())
+        const testClient = createTestClient({
+          clock,
+          deliveryFactory: () => delivery,
+          schema: createSchema(window.location.hostname),
+          plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitals, onSettle)]
+        })
+
+        // LCP events
+        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 8, name: 'lcp', duration: 8, toJSON: jest.fn() })
+        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 16, name: 'lcp', duration: 16, toJSON: jest.fn() })
+        manager.flushQueue()
+
+        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 64, name: 'lcp', duration: 16, toJSON: jest.fn() })
+        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 32, name: 'lcp', duration: 64, toJSON: jest.fn() })
+        manager.flushQueue()
+
+        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 64, name: 'lcp', duration: 64, toJSON: jest.fn() })
+        manager.queueEntry({ entryType: 'largest-contentful-paint', startTime: 128, name: 'lcp', duration: 256, toJSON: jest.fn() })
+        manager.flushQueue()
+
+        testClient.start({ apiKey: VALID_API_KEY })
+
+        jest.runAllTimers()
+
+        expect(delivery).toHaveSentSpan(expect.objectContaining({
+          name: '[FullPageLoad]/page-load-span-plugin',
+          events: [
+            {
+              name: 'lcp',
+              timeUnixNano: '128000000'
+            }
+          ]
+        }))
+      })
+    })
+  })
 })
