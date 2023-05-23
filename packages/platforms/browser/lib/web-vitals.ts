@@ -31,10 +31,24 @@ interface LayoutShift extends PerformanceEntry {
 export class WebVitals {
   private performance: PerformanceWithNavigationTiming
   private clock: Clock
+  private largestContentfulPaint: number | undefined
+  private observer: PerformanceObserver | undefined
 
-  constructor (performance: PerformanceWithNavigationTiming, clock: Clock) {
+  constructor (performance: PerformanceWithNavigationTiming, clock: Clock, PerformanceObserverClass: typeof PerformanceObserver) {
     this.performance = performance
     this.clock = clock
+
+    const supportedEntryTypes = PerformanceObserverClass.supportedEntryTypes
+
+    if (Array.isArray(supportedEntryTypes) && supportedEntryTypes.includes('largest-contentful-paint')) {
+      this.observer = new PerformanceObserverClass((list) => {
+        const entries = list.getEntries()
+        const lastEntry = entries[entries.length - 1] // Use the latest LCP candidate
+        this.largestContentfulPaint = lastEntry.startTime
+      })
+
+      this.observer.observe({ type: 'largest-contentful-paint', buffered: true })
+    }
   }
 
   attachTo (span: SpanInternal) {
@@ -61,6 +75,14 @@ export class WebVitals {
 
     if (cumulativeLayoutShift) {
       span.setAttribute('bugsnag.metrics.cls', cumulativeLayoutShift)
+    }
+
+    if (this.largestContentfulPaint) {
+      span.addEvent('lcp', this.largestContentfulPaint)
+    }
+
+    if (this.observer) {
+      this.observer.disconnect()
     }
   }
 
