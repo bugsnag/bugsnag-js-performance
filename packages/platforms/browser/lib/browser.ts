@@ -1,16 +1,15 @@
 import { createClient } from '@bugsnag/core-performance'
-import { FullPageLoadPlugin } from './auto-instrumentation/full-page-load-plugin'
+import { FullPageLoadPlugin, NetworkRequestPlugin, RouteChangePlugin } from './auto-instrumentation'
 import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
 import { createSchema } from './config'
 import createBrowserDeliveryFactory from './delivery'
 import idGenerator from './id-generator'
 import createOnSettle from './on-settle'
-import createResourceAttributesSource from './resource-attributes-source'
-import createSpanAttributesSource from './span-attributes-source'
 import createFetchRequestTracker from './request-tracker/request-tracker-fetch'
 import createXmlHttpRequestTracker from './request-tracker/request-tracker-xhr'
-import { NetworkRequestPlugin } from './auto-instrumentation/network-request-plugin'
+import createResourceAttributesSource from './resource-attributes-source'
+import createSpanAttributesSource from './span-attributes-source'
 import { WebVitals } from './web-vitals'
 
 const backgroundingListener = createBrowserBackgroundingListener(document)
@@ -46,7 +45,8 @@ const BugsnagPerformance = createClient({
       onSettle,
       backgroundingListener
     ),
-    new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker)
+    new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker),
+    new RouteChangePlugin(spanFactory, onSettle, clock)
   ]
 })
 

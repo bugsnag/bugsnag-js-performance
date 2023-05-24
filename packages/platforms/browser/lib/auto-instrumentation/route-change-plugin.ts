@@ -2,6 +2,17 @@ import { type Clock, type InternalConfiguration, type Plugin, type SpanFactory }
 import { type BrowserConfiguration } from '../config'
 import { type OnSettle } from '../on-settle'
 
+const sanitizeUrl = (url: string | URL) => {
+  if (url instanceof URL) return url
+
+  if (!url.startsWith('http')) {
+    const fullUrl = window.location.origin.replace(window.location.port, '') + url
+    return new URL(fullUrl)
+  }
+
+  return new URL(url)
+}
+
 export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   private spanFactory: SpanFactory
   private onSettle: OnSettle
@@ -32,15 +43,19 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
 
     // Push state
     const originalPushState = history.pushState
-    history.pushState = function (data, unused, url) {
+    history.pushState = function (...args) {
+      const url = args[2]
+
       if (url) {
-        const safeUrl = typeof url === 'string' ? new URL(url) : url
-        handleRouteChange(safeUrl)
-      } else {
-        // url is undefined or null - can we do anything about that?
+        try {
+          const safeUrl = sanitizeUrl(url)
+          handleRouteChange(safeUrl)
+        } catch (err) {
+          console.error(err)
+        }
       }
 
-      originalPushState.apply(this, [data, unused, url])
+      originalPushState.apply(this, args)
     }
   }
 }
