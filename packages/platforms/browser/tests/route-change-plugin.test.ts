@@ -11,7 +11,7 @@ import { type OnSettle } from '../lib/on-settle'
 jest.useFakeTimers()
 
 describe('RouteChangePlugin', () => {
-  it('automatically creates a route change span when programatically calling history methods', () => {
+  it('automatically creates a route change span when programatically calling pushState', () => {
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(32) }
 
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
@@ -27,35 +27,21 @@ describe('RouteChangePlugin', () => {
     testClient.start({ apiKey: VALID_API_KEY })
 
     // Perform route changes
-    history.replaceState('', '', new URL('https://bugsnag.com/first-route'))
     history.pushState('', '', new URL('https://bugsnag.com/second-route'))
 
     jest.runAllTimers()
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({
-      name: '[RouteChange]/first-route',
-      startTimeUnixNano: '1000000',
-      endTimeUnixNano: '32000000'
-    }))
-
-    expect(delivery).toHaveSentSpan(expect.objectContaining({
       name: '[RouteChange]/second-route',
-      startTimeUnixNano: '2000000',
+      startTimeUnixNano: '1000000',
       endTimeUnixNano: '32000000'
     }))
 
     const replaceStateSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
     expect(replaceStateSpan).toHaveAttribute('bugsnag.span.category', 'route_change')
-    expect(replaceStateSpan).toHaveAttribute('bugsnag.span.route', '/first-route')
+    expect(replaceStateSpan).toHaveAttribute('bugsnag.span.route', '/second-route')
     // expect(replaceStateSpan).toHaveAttribute('bugsnag.span.previous_route')
     // expect(replaceStateSpan).toHaveAttribute('bugsnag.browser.page.url')
     // expect(replaceStateSpan).toHaveAttribute('bugsnag.browser.page.title')
-
-    const pushStateSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[1]
-    expect(pushStateSpan).toHaveAttribute('bugsnag.span.category', 'route_change')
-    expect(pushStateSpan).toHaveAttribute('bugsnag.span.route', '/second-route')
-    // expect(pushStateSpan).toHaveAttribute('bugsnag.span.previous_route')
-    // expect(pushStateSpan).toHaveAttribute('bugsnag.browser.page.url')
-    // expect(pushStateSpan).toHaveAttribute('bugsnag.browser.page.title')
   })
 })

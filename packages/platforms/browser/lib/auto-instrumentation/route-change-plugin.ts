@@ -42,17 +42,5 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
 
       originalPushState.apply(this, [data, unused, url])
     }
-
-    const originalReplaceState = history.replaceState
-    history.replaceState = function (data, unused, url) {
-      if (url) {
-        const safeUrl = typeof url === 'string' ? new URL(url) : url
-        handleRouteChange(safeUrl)
-      } else {
-        // url is undefined or null - can we do anything about that?
-      }
-
-      originalReplaceState.apply(this, [data, unused, url])
-    }
   }
 }
