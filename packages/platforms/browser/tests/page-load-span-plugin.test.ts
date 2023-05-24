@@ -4,6 +4,7 @@
  */
 
 import {
+  ControllableBackgroundingListener,
   InMemoryDelivery,
   IncrementingClock,
   VALID_API_KEY,
@@ -55,7 +56,16 @@ describe('FullPageLoadPlugin', () => {
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname),
-      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitals, onSettle)]
+      plugins: (spanFactory) => [
+        new FullPageLoadPlugin(
+          document,
+          window.location,
+          spanFactory,
+          webVitals,
+          onSettle,
+          new ControllableBackgroundingListener()
+        )
+      ]
     })
 
     // Trigger LCP event
@@ -92,7 +102,16 @@ describe('FullPageLoadPlugin', () => {
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitals, onSettle)]
+      plugins: (spanFactory) => [
+        new FullPageLoadPlugin(
+          document,
+          window.location,
+          spanFactory,
+          webVitals,
+          onSettle,
+          new ControllableBackgroundingListener()
+        )
+      ]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentFullPageLoads: false })
@@ -100,6 +119,184 @@ describe('FullPageLoadPlugin', () => {
     jest.runAllTimers()
 
     expect(delivery.requests).toHaveLength(0)
+  })
+
+  it('does not create a span when the page is backgrounded before start', async () => {
+    const clock = new IncrementingClock()
+    const delivery = new InMemoryDelivery()
+    const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
+    const backgroundingListener = new ControllableBackgroundingListener()
+
+    const testClient = createTestClient({
+      schema: createSchema(window.location.hostname),
+      deliveryFactory: () => delivery,
+      backgroundingListener,
+      plugins: (spanFactory) => [
+        new FullPageLoadPlugin(
+          document,
+          window.location,
+          spanFactory,
+          webVitals,
+          onSettle,
+          backgroundingListener
+        )
+      ]
+    })
+
+    backgroundingListener.sendToBackground()
+
+    testClient.start({ apiKey: VALID_API_KEY })
+
+    await jest.runAllTimersAsync()
+
+    expect(delivery.requests).toHaveLength(0)
+  })
+
+  it('does not create a span when the page is backgrounded before start and returned to foreground', async () => {
+    const clock = new IncrementingClock()
+    const delivery = new InMemoryDelivery()
+    const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
+    const backgroundingListener = new ControllableBackgroundingListener()
+
+    const testClient = createTestClient({
+      schema: createSchema(window.location.hostname),
+      deliveryFactory: () => delivery,
+      backgroundingListener,
+      plugins: (spanFactory) => [
+        new FullPageLoadPlugin(
+          document,
+          window.location,
+          spanFactory,
+          webVitals,
+          onSettle,
+          backgroundingListener
+        )
+      ]
+    })
+
+    backgroundingListener.sendToBackground()
+    backgroundingListener.sendToForeground()
+
+    testClient.start({ apiKey: VALID_API_KEY })
+
+    await jest.runAllTimersAsync()
+
+    expect(delivery.requests).toHaveLength(0)
+  })
+
+  it('does not create a span when the page is backgrounded after start but before settle', async () => {
+    const clock = new IncrementingClock()
+    const delivery = new InMemoryDelivery()
+    const onSettle: OnSettle = (onSettleCallback) => {
+      Promise.resolve().then(() => { onSettleCallback(1234) })
+    }
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
+    const backgroundingListener = new ControllableBackgroundingListener()
+
+    const testClient = createTestClient({
+      schema: createSchema(window.location.hostname),
+      deliveryFactory: () => delivery,
+      backgroundingListener,
+      plugins: (spanFactory) => [
+        new FullPageLoadPlugin(
+          document,
+          window.location,
+          spanFactory,
+          webVitals,
+          onSettle,
+          backgroundingListener
+        )
+      ]
+    })
+
+    testClient.start({ apiKey: VALID_API_KEY })
+
+    backgroundingListener.sendToBackground()
+
+    await jest.runAllTimersAsync()
+
+    expect(delivery.requests).toHaveLength(0)
+  })
+
+  it('does not create a span when the page is backgrounded after start but before settle and returned to foreground', async () => {
+    const clock = new IncrementingClock()
+    const delivery = new InMemoryDelivery()
+    const onSettle: OnSettle = (onSettleCallback) => {
+      Promise.resolve().then(() => { onSettleCallback(1234) })
+    }
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
+    const backgroundingListener = new ControllableBackgroundingListener()
+
+    const testClient = createTestClient({
+      schema: createSchema(window.location.hostname),
+      deliveryFactory: () => delivery,
+      backgroundingListener,
+      plugins: (spanFactory) => [
+        new FullPageLoadPlugin(
+          document,
+          window.location,
+          spanFactory,
+          webVitals,
+          onSettle,
+          backgroundingListener
+        )
+      ]
+    })
+
+    testClient.start({ apiKey: VALID_API_KEY })
+
+    backgroundingListener.sendToBackground()
+    backgroundingListener.sendToForeground()
+
+    await jest.runAllTimersAsync()
+
+    expect(delivery.requests).toHaveLength(0)
+  })
+
+  it('creates a span when the page is backgrounded after settle', async () => {
+    const clock = new IncrementingClock()
+    const delivery = new InMemoryDelivery()
+    const onSettle: OnSettle = (onSettleCallback) => {
+      Promise.resolve().then(() => { onSettleCallback(1234) })
+    }
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
+    const backgroundingListener = new ControllableBackgroundingListener()
+
+    const testClient = createTestClient({
+      schema: createSchema(window.location.hostname),
+      deliveryFactory: () => delivery,
+      backgroundingListener,
+      plugins: (spanFactory) => [
+        new FullPageLoadPlugin(
+          document,
+          window.location,
+          spanFactory,
+          webVitals,
+          onSettle,
+          backgroundingListener
+        )
+      ]
+    })
+
+    testClient.start({ apiKey: VALID_API_KEY })
+
+    await jest.runAllTimersAsync()
+
+    backgroundingListener.sendToBackground()
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/page-load-span-plugin' }))
   })
 
   describe('WebVitals', () => {
@@ -116,7 +313,16 @@ describe('FullPageLoadPlugin', () => {
           clock,
           deliveryFactory: () => delivery,
           schema: createSchema(window.location.hostname),
-          plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitals, onSettle)]
+          plugins: (spanFactory) => [
+            new FullPageLoadPlugin(
+              document,
+              window.location,
+              spanFactory,
+              webVitals,
+              onSettle,
+              new ControllableBackgroundingListener()
+            )
+          ]
         })
 
         // LCP events
@@ -153,7 +359,16 @@ describe('FullPageLoadPlugin', () => {
           clock,
           deliveryFactory: () => delivery,
           schema: createSchema(window.location.hostname),
-          plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitals, onSettle)]
+          plugins: (spanFactory) => [
+            new FullPageLoadPlugin(
+              document,
+              window.location,
+              spanFactory,
+              webVitals,
+              onSettle,
+              new ControllableBackgroundingListener()
+            )
+          ]
         })
 
         // LCP events
