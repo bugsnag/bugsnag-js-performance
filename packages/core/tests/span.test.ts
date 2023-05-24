@@ -1,6 +1,7 @@
 
 import { Kind } from '@bugsnag/js-performance-core'
 import {
+  ControllableBackgroundingListener,
   InMemoryDelivery,
   IncrementingClock,
   StableIdGenerator,
@@ -25,7 +26,13 @@ describe('SpanInternal', () => {
       const sampler = new Sampler(0.5)
       const delivery = { send: jest.fn() }
       const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
-      const spanFactory = new SpanFactory(processor, sampler, new StableIdGenerator(), spanAttributesSource)
+      const spanFactory = new SpanFactory(
+        processor,
+        sampler,
+        new StableIdGenerator(),
+        spanAttributesSource,
+        new ControllableBackgroundingListener()
+      )
 
       const spanInternal = spanFactory.startSpan('span-name', 1234)
       spanInternal.setAttribute('bugsnag.test.attribute', parameter)
@@ -49,7 +56,13 @@ describe('SpanInternal', () => {
       const sampler = new Sampler(0.5)
       const delivery = { send: jest.fn() }
       const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
-      const spanFactory = new SpanFactory(processor, sampler, new StableIdGenerator(), spanAttributesSource)
+      const spanFactory = new SpanFactory(
+        processor,
+        sampler,
+        new StableIdGenerator(),
+        spanAttributesSource,
+        new ControllableBackgroundingListener()
+      )
 
       const spanInternal = spanFactory.startSpan('span-name', 1234)
       spanInternal.addEvent('bugsnag.test.event', 1234)
@@ -261,6 +274,68 @@ describe('Span', () => {
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: 'span 3'
+      }))
+    })
+
+    it('will cancel any open spans if the app is backgrounded', () => {
+      const delivery = new InMemoryDelivery()
+      const backgroundingListener = new ControllableBackgroundingListener()
+      const client = createTestClient({
+        deliveryFactory: () => delivery,
+        backgroundingListener
+      })
+
+      client.start({
+        apiKey: VALID_API_KEY,
+        samplingProbability: 1
+      })
+
+      // started in foreground and ended in background
+      const movedToBackground = client.startSpan('moved-to-background')
+      backgroundingListener.sendToBackground()
+      movedToBackground.end()
+
+      // started in background and ended in foreground
+      const movedToForeground = client.startSpan('moved-to-foreground')
+      backgroundingListener.sendToForeground()
+      movedToForeground.end()
+
+      // entirely in background
+      backgroundingListener.sendToBackground()
+      const backgroundSpan = client.startSpan('entirely-in-background')
+      backgroundSpan.end()
+
+      // started and ended in foreground but backgrounded during span
+      backgroundingListener.sendToForeground()
+      const backgroundedDuringSpan = client.startSpan('backgrounded-during-span')
+      backgroundingListener.sendToBackground()
+      backgroundingListener.sendToForeground()
+      backgroundedDuringSpan.end()
+
+      // entirely in foreground (should be delivered)
+      const inForeground = client.startSpan('entirely-in-foreground')
+      inForeground.end()
+
+      jest.runAllTimers()
+
+      expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+        name: 'moved-to-background'
+      }))
+
+      expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+        name: 'moved-to-foreground'
+      }))
+
+      expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+        name: 'entirely-in-background'
+      }))
+
+      expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+        name: 'backgrounded-during-span'
+      }))
+
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: 'entirely-in-foreground'
       }))
     })
   })

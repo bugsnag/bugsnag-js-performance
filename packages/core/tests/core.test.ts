@@ -176,11 +176,11 @@ describe('Core', () => {
 
           const client = createTestClient({ backgroundingListener })
 
-          expect(backgroundingListener.onStateChange).not.toHaveBeenCalled()
+          expect(backgroundingListener.onStateChange).toHaveBeenCalledTimes(1)
 
           client.start(VALID_API_KEY)
 
-          expect(backgroundingListener.onStateChange).toHaveBeenCalled()
+          expect(backgroundingListener.onStateChange).toHaveBeenCalledTimes(2)
           expect(console.warn).not.toHaveBeenCalled()
         })
 
