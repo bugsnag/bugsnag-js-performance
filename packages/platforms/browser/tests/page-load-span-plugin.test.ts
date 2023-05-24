@@ -183,6 +183,30 @@ describe('FullPageLoadPlugin', () => {
           ]
         }))
       })
+
+      it('handles PerformanceObserver not being available', () => {
+        const performance = new PerformanceFake()
+
+        const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+        const delivery = new InMemoryDelivery()
+        const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
+        const webVitals = new WebVitals(performance, clock, undefined)
+        const testClient = createTestClient({
+          clock,
+          deliveryFactory: () => delivery,
+          schema: createSchema(window.location.hostname),
+          plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitals, onSettle)]
+        })
+
+        testClient.start({ apiKey: VALID_API_KEY })
+
+        jest.runAllTimers()
+
+        expect(delivery).toHaveSentSpan(expect.objectContaining({
+          name: '[FullPageLoad]/page-load-span-plugin',
+          events: []
+        }))
+      })
     })
   })
 })
