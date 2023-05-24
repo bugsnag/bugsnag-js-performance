@@ -39,7 +39,7 @@ describe('RouteChangePlugin', () => {
 
     const replaceStateSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
     expect(replaceStateSpan).toHaveAttribute('bugsnag.span.category', 'route_change')
-    expect(replaceStateSpan).toHaveAttribute('bugsnag.span.route', '/second-route')
+    expect(replaceStateSpan).toHaveAttribute('bugsnag.browser.page.route', '/second-route')
     // expect(replaceStateSpan).toHaveAttribute('bugsnag.span.previous_route')
     // expect(replaceStateSpan).toHaveAttribute('bugsnag.browser.page.url')
     // expect(replaceStateSpan).toHaveAttribute('bugsnag.browser.page.title')

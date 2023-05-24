@@ -33,7 +33,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
       const span = this.spanFactory.startSpan(`[RouteChange]${route}`, startTime)
 
       span.setAttribute('bugsnag.span.category', 'route_change')
-      span.setAttribute('bugsnag.span.route', route)
+      span.setAttribute('bugsnag.browser.page.route', route)
       // span.setAttribute('bugsnag.span.previous_route', route) // TODO: How do we get this?
 
       this.onSettle((endTime) => {
