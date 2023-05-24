@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import createFetchRequestTracker from '../../lib/request-tracker/request-tracker-fetch'
 import { type RequestEndCallback, type RequestStartCallback } from '../../lib/request-tracker/request-tracker'
 import { IncrementingClock } from '@bugsnag/js-performance-test-utilities'
@@ -5,7 +9,7 @@ import { type Clock } from '@bugsnag/js-performance-core'
 
 const TEST_URL = 'http://test-url.com/'
 
-function mockFetch (fail: boolean = false, status: number = 200) {
+function createFetchFake (fail: boolean = false, status: number = 200) {
   return (input: RequestInfo | URL, init?: RequestInit | undefined) => {
     return new Promise<Response>((resolve, reject) => {
       if (fail) {
@@ -29,7 +33,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it.each([['GET', 200], ['PUT', 200], ['POST', 201], ['DELETE', 204]])('should notify subscribers for a completed %s request', async (method, status) => {
-    const window = { fetch: mockFetch(false, status) }
+    window.fetch = createFetchFake(false, status)
     const fetchTracker = createFetchRequestTracker(window, clock)
 
     fetchTracker.onStart(startCallback)
@@ -51,7 +55,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should notify subscribers and reject when a request errors', async () => {
-    const window = { fetch: mockFetch(true) }
+    window.fetch = createFetchFake(true)
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
@@ -70,7 +74,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should handle a fetch with no method specified', async () => {
-    const window = { fetch: mockFetch() } as unknown as Window
+    window.fetch = createFetchFake()
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
@@ -90,7 +94,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should handle a URL object', async () => {
-    const window = { fetch: mockFetch() }
+    window.fetch = createFetchFake()
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
@@ -110,7 +114,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should handle a Request object', async () => {
-    const window = { fetch: mockFetch() }
+    window.fetch = createFetchFake()
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
@@ -130,7 +134,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should handle a Request object with separate options', async () => {
-    const window = { fetch: mockFetch() }
+    window.fetch = createFetchFake()
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
@@ -149,14 +153,34 @@ describe('fetch Request Tracker', () => {
     })
   })
 
+  it('should handle relative URLs', async () => {
+    window.fetch = createFetchFake()
+    const fetchTracker = createFetchRequestTracker(window, clock)
+    fetchTracker.onStart(startCallback)
+
+    const response = await window.fetch('/test')
+    expect(response.status).toEqual(200)
+
+    expect(startCallback).toHaveBeenCalledWith({
+      url: `${window.location.origin}/test`,
+      method: 'GET',
+      startTime: 1
+    })
+    expect(endCallback).toHaveBeenCalledWith({
+      status: 200,
+      endTime: 2,
+      state: 'success'
+    })
+  })
+
   it('should handle a fetch(undefined)', async () => {
-    const window = { fetch: mockFetch(true) }
+    window.fetch = createFetchFake(true)
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
     await expect(window.fetch(undefined as unknown as string)).rejects.toEqual(new Error('Fail'))
     expect(startCallback).toHaveBeenCalledWith({
-      url: 'undefined',
+      url: `${window.location.origin}/undefined`,
       method: 'GET',
       startTime: 1
     })
@@ -170,13 +194,13 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should handle a fetch(null)', async () => {
-    const window = { fetch: mockFetch(true) }
+    window.fetch = createFetchFake(true)
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
     await expect(window.fetch(null as unknown as RequestInfo)).rejects.toEqual(new Error('Fail'))
     expect(startCallback).toHaveBeenCalledWith({
-      url: 'null',
+      url: `${window.location.origin}/null`,
       method: 'GET',
       startTime: 1
     })
@@ -190,7 +214,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should handle a fetch(url, null)', async () => {
-    const window = { fetch: mockFetch() }
+    window.fetch = createFetchFake()
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
@@ -209,7 +233,7 @@ describe('fetch Request Tracker', () => {
   })
 
   it('should handle a fetch(url, {}})', async () => {
-    const window = { fetch: mockFetch() }
+    window.fetch = createFetchFake()
     const fetchTracker = createFetchRequestTracker(window, clock)
     fetchTracker.onStart(startCallback)
 
