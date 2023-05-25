@@ -1,8 +1,10 @@
 import { type Clock } from '@bugsnag/js-performance-core'
 import { type RequestEndCallback, type RequestEndContext, RequestTracker } from './request-tracker'
+import getAbsoluteUrl from './url-helpers'
 
 interface WindowWithXmlHttpRequest {
   XMLHttpRequest: typeof XMLHttpRequest
+  document: Document
 }
 
 interface RequestData {
@@ -19,7 +21,7 @@ function createXmlHttpRequestTracker (window: WindowWithXmlHttpRequest, clock: C
 
   const originalOpen = window.XMLHttpRequest.prototype.open
   window.XMLHttpRequest.prototype.open = function open (method, url, ...rest: any[]): void {
-    trackedRequests.set(this, { method, url: String(url) })
+    trackedRequests.set(this, { method, url: getAbsoluteUrl(String(url), window.document.baseURI) })
 
     // @ts-expect-error rest
     originalOpen.call(this, method, url, ...rest)

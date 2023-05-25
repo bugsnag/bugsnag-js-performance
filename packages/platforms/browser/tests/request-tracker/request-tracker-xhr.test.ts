@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import createXmlHttpRequestTracker from '../../lib/request-tracker/request-tracker-xhr'
 import { type RequestEndCallback, type RequestStartCallback } from '../../lib/request-tracker/request-tracker'
 import { IncrementingClock } from '@bugsnag/js-performance-test-utilities'
@@ -11,7 +15,7 @@ interface XmlHttpRequestFake {
   status: number
 }
 
-function getXmlHttpRequestFake (success: boolean = true, responseStatus: number = 200) {
+function createXmlHttpRequestFake (success: boolean = true, responseStatus: number = 200) {
   function XmlHttpRequestFake (this: XmlHttpRequestFake) {
     this._listeners = { readystatechange: [] }
     this.readyState = 0
@@ -54,9 +58,9 @@ describe('XHR Request Tracker', () => {
   })
 
   it.each([['GET', 200], ['PUT', 200], ['POST', 201], ['DELETE', 204]])('should track a %s request', (method, status) => {
-    const window = { XMLHttpRequest: getXmlHttpRequestFake(true, status) as unknown as typeof XMLHttpRequest }
-    const mockOpen = window.XMLHttpRequest.prototype.open
-    const mockSend = window.XMLHttpRequest.prototype.send
+    window.XMLHttpRequest = createXmlHttpRequestFake(true, status) as unknown as typeof XMLHttpRequest
+    const originalOpen = window.XMLHttpRequest.prototype.open
+    const originalSend = window.XMLHttpRequest.prototype.send
     const xhrTracker = createXmlHttpRequestTracker(window, clock)
 
     xhrTracker.onStart(startCallback)
@@ -66,12 +70,12 @@ describe('XHR Request Tracker', () => {
     request.open(method, TEST_URL)
 
     expect(window.XMLHttpRequest.prototype.addEventListener).not.toHaveBeenCalled()
-    expect(mockOpen).toHaveBeenCalledWith(method, TEST_URL)
+    expect(originalOpen).toHaveBeenCalledWith(method, TEST_URL)
     expect(startCallback).not.toHaveBeenCalled()
 
     request.send()
     expect(window.XMLHttpRequest.prototype.addEventListener).toHaveBeenCalled()
-    expect(mockSend).toHaveBeenCalled()
+    expect(originalSend).toHaveBeenCalled()
     expect(startCallback).toHaveBeenCalledWith({
       url: TEST_URL,
       method,
@@ -84,8 +88,32 @@ describe('XHR Request Tracker', () => {
     })
   })
 
+  it('should handle relative URLs', () => {
+    window.XMLHttpRequest = createXmlHttpRequestFake() as unknown as typeof XMLHttpRequest
+    const xhrTracker = createXmlHttpRequestTracker(window, clock)
+
+    xhrTracker.onStart(startCallback)
+    expect(startCallback).not.toHaveBeenCalled()
+
+    const request = new window.XMLHttpRequest()
+    request.open('GET', '/test')
+    expect(startCallback).not.toHaveBeenCalled()
+
+    request.send()
+    expect(startCallback).toHaveBeenCalledWith({
+      url: `${window.location.origin}/test`,
+      method: 'GET',
+      startTime: 1
+    })
+    expect(endCallback).toHaveBeenCalledWith({
+      status: 200,
+      endTime: 2,
+      state: 'success'
+    })
+  })
+
   it('should track requests when the URL is not a string', () => {
-    const window = { XMLHttpRequest: getXmlHttpRequestFake() as unknown as typeof XMLHttpRequest }
+    window.XMLHttpRequest = createXmlHttpRequestFake() as unknown as typeof XMLHttpRequest
     const xhrTracker = createXmlHttpRequestTracker(window, clock)
 
     xhrTracker.onStart(startCallback)
@@ -109,7 +137,7 @@ describe('XHR Request Tracker', () => {
   })
 
   it('should pass down additional open arguments', () => {
-    const window = { XMLHttpRequest: getXmlHttpRequestFake() as unknown as typeof XMLHttpRequest }
+    window.XMLHttpRequest = createXmlHttpRequestFake() as unknown as typeof XMLHttpRequest
     const originalOpen = window.XMLHttpRequest.prototype.open
     const xhrTracker = createXmlHttpRequestTracker(window, clock)
 
@@ -135,7 +163,7 @@ describe('XHR Request Tracker', () => {
   })
 
   it('should handle open -> open -> send', () => {
-    const window = { XMLHttpRequest: getXmlHttpRequestFake() as unknown as typeof XMLHttpRequest }
+    window.XMLHttpRequest = createXmlHttpRequestFake() as unknown as typeof XMLHttpRequest
     const xhrTracker = createXmlHttpRequestTracker(window, clock)
     xhrTracker.onStart(startCallback)
 
@@ -166,7 +194,7 @@ describe('XHR Request Tracker', () => {
   })
 
   it('should handle open -> send -> open -> send', () => {
-    const window = { XMLHttpRequest: getXmlHttpRequestFake() as unknown as typeof XMLHttpRequest }
+    window.XMLHttpRequest = createXmlHttpRequestFake() as unknown as typeof XMLHttpRequest
     const xhrTracker = createXmlHttpRequestTracker(window, clock)
     xhrTracker.onStart(startCallback)
 

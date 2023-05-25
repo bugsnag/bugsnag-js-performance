@@ -10,7 +10,7 @@ Feature: Network spans
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.browser.page.title" equals "Network spans"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.browser.page.url" equals the stored value "bugsnag.browser.page.url"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.method" equals "GET"
-        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.url" equals "/reflect?status=200&delay_ms=0"
+        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.url" matches the regex "^http:\/\/.+:\d{4}\/reflect\?status=200\&delay_ms=0$"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer attribute "http.status_code" equals 200
 
     Scenario: Network spans are automatically instrumented for completed fetch requests
@@ -23,7 +23,7 @@ Feature: Network spans
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.browser.page.title" equals "Network spans"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.browser.page.url" equals the stored value "bugsnag.browser.page.url"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.method" equals "GET"
-        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.url" equals "/reflect?status=200&delay_ms=0"
+        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.url" matches the regex "^http:\/\/.+:\d{4}\/reflect\?status=200\&delay_ms=0$"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer attribute "http.status_code" equals 200
 
     Scenario: Network spans are not instrumented for failed requests

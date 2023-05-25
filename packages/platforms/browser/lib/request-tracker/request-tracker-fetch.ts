@@ -1,15 +1,17 @@
 import { type Clock } from '@bugsnag/js-performance-core'
 import { type RequestStartContext, RequestTracker } from './request-tracker'
+import getAbsoluteUrl from './url-helpers'
 
 interface WindowWithFetch {
   fetch: typeof fetch
+  document: Document
 }
 
-function createStartContext (startTime: number, input: unknown, init?: unknown): RequestStartContext {
+function createStartContext (baseUrl: string, startTime: number, input: unknown, init?: unknown): RequestStartContext {
   const inputIsRequest = isRequest(input)
   const url = inputIsRequest ? input.url : String(input)
   const method = (!!init && (init as RequestInit).method) || (inputIsRequest && input.method) || 'GET'
-  return { url, method, startTime }
+  return { url: getAbsoluteUrl(url, baseUrl), method, startTime }
 }
 
 function isRequest (input: unknown): input is Request {
@@ -21,7 +23,7 @@ function createFetchRequestTracker (window: WindowWithFetch, clock: Clock) {
   const originalFetch = window.fetch
 
   window.fetch = function fetch (input?: unknown, init?: unknown) {
-    const startContext = createStartContext(clock.now(), input, init)
+    const startContext = createStartContext(window.document.baseURI, clock.now(), input, init)
     const onRequestEnd = requestTracker.start(startContext)
 
     return originalFetch.call(this, input as RequestInfo | URL, init as RequestInit).then(response => {
