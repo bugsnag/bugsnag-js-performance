@@ -19,7 +19,8 @@ describe('getAbsoluteUrl', () => {
     { input: './test/page', baseUrl: 'http://bugsnag.com/home/dashboard/', expected: 'http://bugsnag.com/home/dashboard/test/page' },
     { input: '../test/page', baseUrl: 'http://bugsnag.com/home/dashboard/', expected: 'http://bugsnag.com/home/test/page' },
     { input: '../../test/page', baseUrl: 'http://bugsnag.com/home/dashboard/', expected: 'http://bugsnag.com/test/page' },
-    { input: 'test/img.png', baseUrl: 'file:///Documents/folder/file.txt', expected: 'file:///Documents/folder/test/img.png' }
+    { input: 'test/img.png', baseUrl: 'file:///Documents/folder/file.txt', expected: 'file:///Documents/folder/test/img.png' },
+    { input: '/test/page', baseUrl: 'invalid:base', expected: '/test/page' }
   ])('returns \'$expected\' for URL \'$input\' and base URL \'$baseUrl\'', ({ input, baseUrl, expected }) => {
     expect(getAbsoluteUrl(input, baseUrl)).toEqual(expected)
   })
