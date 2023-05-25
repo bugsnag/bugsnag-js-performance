@@ -43,7 +43,13 @@ export default function App() {
 }
 
 function Home() {
-    return <h2>RouteChange Spans</h2>;
+    return (
+        <div>
+            <h2>RouteChange Spans</h2>
+            <a href="#anchor-link" id="go-to-anchor">Anchor Link</a>
+            <h3 id="anchor-link">Anchor</h3>
+        </div>
+    );
 }
 
 function About() {

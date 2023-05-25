@@ -67,6 +67,14 @@ export class DefaultRoutingProvider implements RoutingProvider {
 
       originalPushState.apply(this, args)
     }
+
+    addEventListener('popstate', () => {
+      const newUrl = sanitizeUrl(window.location.href)
+
+      const span = startRouteChangeSpan(newUrl, previousUrl)
+      routeChangeSpanCallback(span)
+      setPreivousUrl(newUrl)
+    })
   }
 }
 

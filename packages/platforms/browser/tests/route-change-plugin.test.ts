@@ -11,7 +11,7 @@ import { type OnSettle } from '../lib/on-settle'
 jest.useFakeTimers()
 
 describe('RouteChangePlugin', () => {
-  it('automatically creates a route change span when programatically calling pushState', () => {
+  it('automatically creates a route change span when using pushState', () => {
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(32) }
 
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
@@ -37,9 +37,9 @@ describe('RouteChangePlugin', () => {
       endTimeUnixNano: '32000000'
     }))
 
-    const replaceStateSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
-    expect(replaceStateSpan).toHaveAttribute('bugsnag.span.category', 'route_change')
-    expect(replaceStateSpan).toHaveAttribute('bugsnag.browser.page.route', '/second-route')
-    expect(replaceStateSpan).toHaveAttribute('bugsnag.browser.page.previous_route', '/route-change-plugin')
+    const pushStateSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+    expect(pushStateSpan).toHaveAttribute('bugsnag.span.category', 'route_change')
+    expect(pushStateSpan).toHaveAttribute('bugsnag.browser.page.route', '/second-route')
+    expect(pushStateSpan).toHaveAttribute('bugsnag.browser.page.previous_route', '/route-change-plugin')
   })
 })
