@@ -22,10 +22,9 @@ const xhrRequestTracker = createXmlHttpRequestTracker(window, clock)
 const webVitals = new WebVitals(performance, clock, window.PerformanceObserver)
 const onSettle = createOnSettle(
   clock,
-  document,
+  window,
   fetchRequestTracker,
   xhrRequestTracker,
-  PerformanceObserver,
   performance
 )
 

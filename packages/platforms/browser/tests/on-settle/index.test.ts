@@ -16,7 +16,6 @@ import {
 } from '@bugsnag/js-performance-test-utilities'
 import {
   PerformanceFake,
-  PerformanceObserverManager,
   createPerformanceNavigationTimingFake
 } from '../utilities'
 
@@ -32,23 +31,21 @@ const END_CONTEXT: RequestEndContext = {
   state: 'success'
 }
 
-describe('onSettle', () => {
-  beforeEach(() => {
-    jest.useFakeTimers()
-  })
+jest.useFakeTimers()
 
+describe('onSettle', () => {
   it('settles when all the settlers have settled', async () => {
-    const manager = new PerformanceObserverManager()
     const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+
     const fetchRequestTracker = new RequestTracker()
     const xhrRequestTracker = new RequestTracker()
 
     const onSettle = createOnSettle(
       new IncrementingClock(),
-      document,
+      window,
       fetchRequestTracker,
       xhrRequestTracker,
-      manager.createPerformanceObserverFakeClass(),
       performance
     )
 
@@ -56,12 +53,6 @@ describe('onSettle', () => {
 
     onSettle(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
-
-    // everything has settled other than the load event end, so once we trigger
-    // that 'settleCallback' should be called
-
-    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
-    manager.flushQueue()
 
     await jest.advanceTimersByTimeAsync(100)
     expect(settleCallback).toHaveBeenCalled()
@@ -74,17 +65,17 @@ describe('onSettle', () => {
       <p id="c">CCCCCCCCCCC</p>
     `
 
-    const manager = new PerformanceObserverManager()
     const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+
     const fetchRequestTracker = new RequestTracker()
     const xhrRequestTracker = new RequestTracker()
 
     const onSettle = createOnSettle(
       new IncrementingClock(),
-      document,
+      window,
       fetchRequestTracker,
       xhrRequestTracker,
-      manager.createPerformanceObserverFakeClass(),
       performance
     )
 
@@ -92,9 +83,6 @@ describe('onSettle', () => {
 
     onSettle(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
-
-    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
-    manager.flushQueue()
 
     await jest.advanceTimersByTimeAsync(80)
 
@@ -110,17 +98,17 @@ describe('onSettle', () => {
   })
 
   it('settles when all the settlers have settled (with fetch requests)', async () => {
-    const manager = new PerformanceObserverManager()
     const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+
     const fetchRequestTracker = new RequestTracker()
     const xhrRequestTracker = new RequestTracker()
 
     const onSettle = createOnSettle(
       new IncrementingClock(),
-      document,
+      window,
       fetchRequestTracker,
       xhrRequestTracker,
-      manager.createPerformanceObserverFakeClass(),
       performance
     )
 
@@ -128,9 +116,6 @@ describe('onSettle', () => {
 
     onSettle(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
-
-    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
-    manager.flushQueue()
 
     const end = fetchRequestTracker.start(START_CONTEXT)
 
@@ -144,17 +129,17 @@ describe('onSettle', () => {
   })
 
   it('settles when all the settlers have settled (with xhr requests)', async () => {
-    const manager = new PerformanceObserverManager()
     const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+
     const fetchRequestTracker = new RequestTracker()
     const xhrRequestTracker = new RequestTracker()
 
     const onSettle = createOnSettle(
       new IncrementingClock(),
-      document,
+      window,
       fetchRequestTracker,
       xhrRequestTracker,
-      manager.createPerformanceObserverFakeClass(),
       performance
     )
 
@@ -162,9 +147,6 @@ describe('onSettle', () => {
 
     onSettle(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
-
-    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
-    manager.flushQueue()
 
     const end = xhrRequestTracker.start(START_CONTEXT)
 
@@ -178,17 +160,18 @@ describe('onSettle', () => {
   })
 
   it('settles after the 60 second timeout if the settlers have not settled', async () => {
-    const manager = new PerformanceObserverManager()
     const performance = new PerformanceFake()
+    const fetchRequestTracker = new RequestTracker()
 
     const onSettle = createOnSettle(
       new IncrementingClock(),
-      document,
+      window,
+      fetchRequestTracker,
       new RequestTracker(),
-      new RequestTracker(),
-      manager.createPerformanceObserverFakeClass(),
       performance
     )
+
+    fetchRequestTracker.start(START_CONTEXT)
 
     const settleCallback = jest.fn()
 
@@ -204,15 +187,14 @@ describe('onSettle', () => {
   })
 
   it('does not settle more than once if both the timeout and settlers settle', async () => {
-    const manager = new PerformanceObserverManager()
     const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
 
     const onSettle = createOnSettle(
       new IncrementingClock(),
-      document,
+      window,
       new RequestTracker(),
       new RequestTracker(),
-      manager.createPerformanceObserverFakeClass(),
       performance
     )
 
@@ -221,11 +203,6 @@ describe('onSettle', () => {
     onSettle(settleCallback)
 
     expect(settleCallback).not.toHaveBeenCalled()
-
-    const finishedEntry = createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
-
-    manager.queueEntry(finishedEntry)
-    manager.flushQueue()
 
     await jest.advanceTimersByTimeAsync(100)
     expect(settleCallback).toHaveBeenCalled()
@@ -238,17 +215,17 @@ describe('onSettle', () => {
   })
 
   it('can be configured to ignore requests to certain URLs', async () => {
-    const manager = new PerformanceObserverManager()
     const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+
     const fetchRequestTracker = new RequestTracker()
     const xhrRequestTracker = new RequestTracker()
 
     const onSettle = createOnSettle(
       new IncrementingClock(),
-      document,
+      window,
       fetchRequestTracker,
       xhrRequestTracker,
-      manager.createPerformanceObserverFakeClass(),
       performance
     )
 
@@ -269,9 +246,6 @@ describe('onSettle', () => {
 
     onSettle(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
-
-    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
-    manager.flushQueue()
 
     // both requests should be ignored, so advancing by 100ms will settle
     xhrRequestTracker.start({ ...START_CONTEXT, url: 'http://www.bugsnag.com/xhr' })
