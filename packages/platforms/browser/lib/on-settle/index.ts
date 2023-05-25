@@ -14,16 +14,20 @@ const TIMEOUT_MILLISECONDS = 60 * 1000
 
 export default function createOnSettle (
   clock: Clock,
-  document: Node,
+  window: Window,
   fetchRequestTracker: RequestTracker,
   xhrRequestTracker: RequestTracker,
-  PerformanceObserverClass: typeof PerformanceObserver,
   performance: PerformanceWithTiming
 ): OnSettlePlugin {
-  const domMutationSettler = new DomMutationSettler(clock, document)
+  const domMutationSettler = new DomMutationSettler(clock, window.document)
   const fetchRequestSettler = new RequestSettler(clock, fetchRequestTracker)
   const xhrRequestSettler = new RequestSettler(clock, xhrRequestTracker)
-  const loadEventEndSettler = new LoadEventEndSettler(clock, PerformanceObserverClass, performance)
+  const loadEventEndSettler = new LoadEventEndSettler(
+    clock,
+    window.addEventListener,
+    performance,
+    window.document
+  )
 
   const settler = new SettlerAggregate(clock, [
     domMutationSettler,

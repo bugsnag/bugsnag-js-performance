@@ -6,55 +6,75 @@ import LoadEventEndSettler from '../../lib/on-settle/load-event-end-settler'
 import { IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 import {
   PerformanceFake,
-  PerformanceObserverManager,
   createPerformanceNavigationTimingFake
 } from '../utilities'
 
-describe('LoadEventEndSettler', () => {
-  afterEach(() => {
-    jest.useRealTimers()
-  })
+class EventTarget {
+  private readonly callbacks: Record<string, Array<() => void>> = {}
 
-  it('settles when the load event has finished', () => {
-    const manager = new PerformanceObserverManager()
+  readonly addEventListener = (eventType: string, callback: () => void): void => {
+    this.callbacks[eventType] ||= []
+    this.callbacks[eventType].push(callback)
+  }
+
+  dispatchEvent (eventType: string) {
+    for (const callback of this.callbacks[eventType]) {
+      callback()
+    }
+  }
+}
+
+jest.useFakeTimers()
+
+describe('LoadEventEndSettler', () => {
+  it('settles when the load event has finished', async () => {
+    const clock = new IncrementingClock({ currentTime: 250 })
+    const eventTarget = new EventTarget()
     const performance = new PerformanceFake()
-    const settleCallback = jest.fn()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+
     const settler = new LoadEventEndSettler(
-      new IncrementingClock(),
-      manager.createPerformanceObserverFakeClass(),
-      performance
+      clock,
+      eventTarget.addEventListener,
+      performance,
+      { readyState: 'loading' }
     )
+
+    const settleCallback = jest.fn()
 
     settler.subscribe(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
     expect(settler.isSettled()).toBe(false)
 
-    const notFinishedEntry = createPerformanceNavigationTimingFake()
+    eventTarget.dispatchEvent('load')
 
-    manager.queueEntry(notFinishedEntry)
-    manager.flushQueue()
+    // settling is delayed by a macrotask to ensure the load event has ended so
+    // it should have settled yet
     expect(settleCallback).not.toHaveBeenCalled()
     expect(settler.isSettled()).toBe(false)
 
-    const finishedEntry = createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
+    await jest.runAllTimersAsync()
 
-    manager.queueEntry(finishedEntry)
-    manager.flushQueue()
-    expect(settleCallback).toHaveBeenCalled()
+    expect(settleCallback).toHaveBeenCalledWith(100)
     expect(settler.isSettled()).toBe(true)
   })
 
-  it('can handle multiple callbacks', () => {
-    const manager = new PerformanceObserverManager()
+  it('can handle multiple callbacks', async () => {
+    const clock = new IncrementingClock({ currentTime: 250 })
+    const eventTarget = new EventTarget()
     const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 220 }))
+
+    const settler = new LoadEventEndSettler(
+      clock,
+      eventTarget.addEventListener,
+      performance,
+      { readyState: 'loading' }
+    )
+
     const settleCallback1 = jest.fn()
     const settleCallback2 = jest.fn()
     const settleCallback3 = jest.fn()
-    const settler = new LoadEventEndSettler(
-      new IncrementingClock(),
-      manager.createPerformanceObserverFakeClass(),
-      performance
-    )
 
     settler.subscribe(settleCallback1)
     settler.subscribe(settleCallback2)
@@ -65,25 +85,38 @@ describe('LoadEventEndSettler', () => {
     expect(settleCallback3).not.toHaveBeenCalled()
     expect(settler.isSettled()).toBe(false)
 
-    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
-    manager.flushQueue()
+    eventTarget.dispatchEvent('load')
 
-    expect(settleCallback1).toHaveBeenCalled()
-    expect(settleCallback2).toHaveBeenCalled()
-    expect(settleCallback3).toHaveBeenCalled()
+    // settling is delayed by a macrotask to ensure the load event has ended so
+    // it should have settled yet
+    expect(settleCallback1).not.toHaveBeenCalled()
+    expect(settleCallback2).not.toHaveBeenCalled()
+    expect(settleCallback3).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
+
+    await jest.runAllTimersAsync()
+
+    expect(settleCallback1).toHaveBeenCalledWith(220)
+    expect(settleCallback2).toHaveBeenCalledWith(220)
+    expect(settleCallback3).toHaveBeenCalledWith(220)
     expect(settler.isSettled()).toBe(true)
   })
 
-  it('can unsubscribe a callback', () => {
-    const manager = new PerformanceObserverManager()
+  it('can unsubscribe a callback', async () => {
+    const clock = new IncrementingClock({ currentTime: 20 })
+    const eventTarget = new EventTarget()
     const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 10 }))
+
+    const settler = new LoadEventEndSettler(
+      clock,
+      eventTarget.addEventListener,
+      performance,
+      { readyState: 'loading' }
+    )
+
     const settleCallback1 = jest.fn()
     const settleCallback2 = jest.fn()
-    const settler = new LoadEventEndSettler(
-      new IncrementingClock(),
-      manager.createPerformanceObserverFakeClass(),
-      performance
-    )
 
     settler.subscribe(settleCallback1)
     settler.subscribe(settleCallback2)
@@ -94,213 +127,103 @@ describe('LoadEventEndSettler', () => {
 
     settler.unsubscribe(settleCallback2)
 
-    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
-    manager.flushQueue()
+    eventTarget.dispatchEvent('load')
+    await jest.runAllTimersAsync()
 
-    expect(settleCallback1).toHaveBeenCalled()
+    expect(settleCallback1).toHaveBeenCalledWith(10)
     expect(settleCallback2).not.toHaveBeenCalled()
     expect(settler.isSettled()).toBe(true)
   })
 
-  it('settles immediately if already settled', () => {
-    const manager = new PerformanceObserverManager()
-    const performance = new PerformanceFake()
+  it('can use performance.timing if the "navigation" entryType is not supported', async () => {
+    const eventTarget = new EventTarget()
+    const performance = new PerformanceFake({
+      timing: { navigationStart: 12, loadEventEnd: 34 }
+    })
+
     const settler = new LoadEventEndSettler(
-      new IncrementingClock(),
-      manager.createPerformanceObserverFakeClass(),
-      performance
+      new IncrementingClock({ currentTime: 150 }),
+      eventTarget.addEventListener,
+      performance,
+      { readyState: 'loading' }
     )
 
+    const settleCallback = jest.fn()
+
+    settler.subscribe(settleCallback)
+
+    expect(settleCallback).not.toHaveBeenCalled()
     expect(settler.isSettled()).toBe(false)
 
-    manager.queueEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
-    manager.flushQueue()
+    eventTarget.dispatchEvent('load')
 
+    expect(settleCallback).not.toHaveBeenCalled()
+    expect(settler.isSettled()).toBe(false)
+
+    await jest.runAllTimersAsync()
+
+    expect(settleCallback).toHaveBeenCalledWith(22)
     expect(settler.isSettled()).toBe(true)
+  })
+
+  it('settles immediately if document is ready', async () => {
+    const clock = new IncrementingClock({ currentTime: 20 })
+    const eventTarget = new EventTarget()
+    const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 5 }))
+
+    const settler = new LoadEventEndSettler(
+      clock,
+      eventTarget.addEventListener,
+      performance,
+      { readyState: 'complete' }
+    )
 
     const settleCallback1 = jest.fn()
     const settleCallback2 = jest.fn()
 
     settler.subscribe(settleCallback1)
-    expect(settleCallback1).toHaveBeenCalled()
-
     settler.subscribe(settleCallback2)
-    expect(settleCallback2).toHaveBeenCalled()
-  })
 
-  it('does not re-trigger if duplicate events fire', () => {
-    const manager = new PerformanceObserverManager()
-    const performance = new PerformanceFake()
-    const settleCallback = jest.fn()
-    const settler = new LoadEventEndSettler(
-      new IncrementingClock(),
-      manager.createPerformanceObserverFakeClass(),
-      performance
-    )
-
-    settler.subscribe(settleCallback)
-
-    expect(settleCallback).not.toHaveBeenCalled()
     expect(settler.isSettled()).toBe(false)
-
-    const finishedEntry = createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
-
-    manager.queueEntry(finishedEntry)
-    manager.queueEntry(finishedEntry)
-    manager.queueEntry(finishedEntry)
-    manager.flushQueue()
-
-    expect(settleCallback).toHaveBeenCalledTimes(1)
-    expect(settler.isSettled()).toBe(true)
-
-    manager.queueEntry(finishedEntry)
-    manager.flushQueue()
-
-    expect(settleCallback).toHaveBeenCalledTimes(1)
-    expect(settler.isSettled()).toBe(true)
-  })
-
-  it('can use performance.timing if "supportedEntryTypes" is not supported', async () => {
-    jest.useFakeTimers()
-
-    const manager = new PerformanceObserverManager()
-    const performance = new PerformanceFake()
-    const settleCallback = jest.fn()
-    const settler = new LoadEventEndSettler(
-      new IncrementingClock(),
-      manager.createPerformanceObserverFakeClass(null),
-      performance
-    )
-
-    settler.subscribe(settleCallback)
-
-    expect(settleCallback).not.toHaveBeenCalled()
-    expect(settler.isSettled()).toBe(false)
-
-    // sanity check that a PerformanceNavigationTiming event won't settle
-    const finishedEntry = createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
-
-    manager.queueEntry(finishedEntry)
-    manager.flushQueue()
-
-    expect(settleCallback).not.toHaveBeenCalled()
-    expect(settler.isSettled()).toBe(false)
-
-    performance.timing.loadEventEnd = 1234
+    expect(settleCallback1).not.toHaveBeenCalled()
+    expect(settleCallback2).not.toHaveBeenCalled()
 
     await jest.runAllTimersAsync()
 
-    expect(settleCallback).toHaveBeenCalledTimes(1)
     expect(settler.isSettled()).toBe(true)
+    expect(settleCallback1).toHaveBeenCalledWith(5)
+    expect(settleCallback2).toHaveBeenCalledWith(5)
   })
 
-  it('can use performance.timing if "supportedEntryTypes" does not contain "navigation"', async () => {
-    jest.useFakeTimers()
+  it('can settle immediately if document is ready using performance.timing', async () => {
+    const clock = new IncrementingClock({ currentTime: 20 })
+    const eventTarget = new EventTarget()
+    const performance = new PerformanceFake({
+      timing: { navigationStart: 2, loadEventEnd: 5 }
+    })
 
-    const manager = new PerformanceObserverManager()
-    const performance = new PerformanceFake()
-    const settleCallback = jest.fn()
     const settler = new LoadEventEndSettler(
-      new IncrementingClock(),
-      manager.createPerformanceObserverFakeClass(['mark', 'measure']),
-      performance
+      clock,
+      eventTarget.addEventListener,
+      performance,
+      { readyState: 'complete' }
     )
 
-    settler.subscribe(settleCallback)
+    const settleCallback1 = jest.fn()
+    const settleCallback2 = jest.fn()
 
-    expect(settleCallback).not.toHaveBeenCalled()
+    settler.subscribe(settleCallback1)
+    settler.subscribe(settleCallback2)
+
     expect(settler.isSettled()).toBe(false)
-
-    // sanity check that a PerformanceNavigationTiming event won't settle
-    const finishedEntry = createPerformanceNavigationTimingFake({ loadEventEnd: 100 })
-
-    manager.queueEntry(finishedEntry)
-    manager.flushQueue()
-
-    expect(settleCallback).not.toHaveBeenCalled()
-    expect(settler.isSettled()).toBe(false)
-
-    performance.timing.loadEventEnd = 1234
+    expect(settleCallback1).not.toHaveBeenCalled()
+    expect(settleCallback2).not.toHaveBeenCalled()
 
     await jest.runAllTimersAsync()
 
-    expect(settleCallback).toHaveBeenCalledTimes(1)
     expect(settler.isSettled()).toBe(true)
-  })
-
-  it('can settle immediately using performance.timing if loadEventEnd is valid', () => {
-    const manager = new PerformanceObserverManager()
-    const performance = new PerformanceFake({ timing: { loadEventEnd: 1234 } })
-
-    const settleCallback = jest.fn()
-    const settler = new LoadEventEndSettler(
-      new IncrementingClock(),
-      manager.createPerformanceObserverFakeClass(null),
-      performance
-    )
-
-    expect(settler.isSettled()).toBe(true)
-
-    settler.subscribe(settleCallback)
-
-    expect(settleCallback).toHaveBeenCalledTimes(1)
-    expect(settler.isSettled()).toBe(true)
-  })
-
-  it('does not settle more than once using performance.timing', async () => {
-    jest.useFakeTimers()
-
-    const manager = new PerformanceObserverManager()
-    const performance = new PerformanceFake()
-    const settleCallback = jest.fn()
-    const settler = new LoadEventEndSettler(
-      new IncrementingClock(),
-      manager.createPerformanceObserverFakeClass(null),
-      performance
-    )
-
-    settler.subscribe(settleCallback)
-
-    expect(settleCallback).not.toHaveBeenCalled()
-    expect(settler.isSettled()).toBe(false)
-
-    performance.timing.loadEventEnd = 100
-    await jest.runAllTimersAsync()
-
-    expect(settleCallback).toHaveBeenCalledTimes(1)
-    expect(settler.isSettled()).toBe(true)
-
-    performance.timing.loadEventEnd = 200
-    await jest.runAllTimersAsync()
-
-    expect(settleCallback).toHaveBeenCalledTimes(1)
-    expect(settler.isSettled()).toBe(true)
-  })
-
-  it('does not settle more than once using performance.timing if loadEventEnd is valid', async () => {
-    jest.useFakeTimers()
-
-    const manager = new PerformanceObserverManager()
-    const performance = new PerformanceFake({ timing: { loadEventEnd: 1 } })
-
-    const settleCallback = jest.fn()
-    const settler = new LoadEventEndSettler(
-      new IncrementingClock(),
-      manager.createPerformanceObserverFakeClass(null),
-      performance
-    )
-
-    expect(settler.isSettled()).toBe(true)
-
-    settler.subscribe(settleCallback)
-
-    expect(settleCallback).toHaveBeenCalledTimes(1)
-    expect(settler.isSettled()).toBe(true)
-
-    performance.timing.loadEventEnd = 2
-    await jest.runAllTimersAsync()
-
-    expect(settleCallback).toHaveBeenCalledTimes(1)
-    expect(settler.isSettled()).toBe(true)
+    expect(settleCallback1).toHaveBeenCalledWith(3)
+    expect(settleCallback2).toHaveBeenCalledWith(3)
   })
 })

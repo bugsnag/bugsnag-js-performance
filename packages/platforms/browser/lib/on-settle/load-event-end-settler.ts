@@ -1,75 +1,68 @@
 import { type Clock } from '@bugsnag/js-performance-core'
 import { Settler } from './settler'
 
+type AddEventListener = (event: string, callback: () => void) => void
+
 export interface PerformanceWithTiming {
+  getEntriesByType: typeof performance.getEntriesByType
   timing: {
     loadEventEnd: number
+    navigationStart: number
   }
 }
 
+interface DocumentWithReadyState {
+  readyState: DocumentReadyState
+}
+
 // check if a PerformanceEntry is a PerformanceNavigationTiming
-function isPerformanceNavigationTiming (entry: PerformanceEntry): entry is PerformanceNavigationTiming {
-  return entry.entryType === 'navigation'
+function isPerformanceNavigationTiming (entry?: PerformanceEntry): entry is PerformanceNavigationTiming {
+  return !!entry && entry.entryType === 'navigation'
 }
 
 class LoadEventEndSettler extends Settler {
   constructor (
     clock: Clock,
-    PerformanceObserverClass: typeof PerformanceObserver,
-    performance: PerformanceWithTiming
+    addEventListener: AddEventListener,
+    performance: PerformanceWithTiming,
+    document: DocumentWithReadyState
   ) {
     super(clock)
 
-    const supportedEntryTypes = PerformanceObserverClass.supportedEntryTypes
-
-    // if the browser doesn't support 'supportedEntryTypes' or doesn't support
-    // the 'navigation' entry type, we can't use PerformanceObserver to listen
-    // for 'navigation' entries so have to fall back to polling the deprecated
-    // 'performance.timing' object
-    if (Array.isArray(supportedEntryTypes) && supportedEntryTypes.includes('navigation')) {
-      this.settleUsingPerformanceObserver(PerformanceObserverClass)
+    // we delay settling by a macrotask so that the load event has ended
+    // see: https://stackoverflow.com/questions/25915634/difference-between-microtask-and-macrotask-within-an-event-loop-context/25933985#25933985
+    //      https://jakearchibald.com/2015/tasks-microtasks-queues-and-schedules/
+    if (document.readyState === 'complete') {
+      setTimeout(() => { this.settleUsingPerformance(performance) }, 0)
     } else {
-      this.settleUsingPerformanceTiming(performance)
+      addEventListener('load', () => {
+        setTimeout(() => { this.settleUsingPerformance(performance) }, 0)
+      })
     }
   }
 
-  private settleUsingPerformanceObserver (PerformanceObserverClass: typeof PerformanceObserver): void {
-    const observer = new PerformanceObserverClass(list => {
-      for (const entry of list.getEntries()) {
-        // we don't really _need_ to check 'isPerformanceNavigationTiming' here
-        // as we only observe entries with type === 'navigation' anyway, but
-        // this makes TypeScript happy :)
-        if (isPerformanceNavigationTiming(entry) && entry.loadEventEnd > 0) {
-          this.settle()
+  private settleUsingPerformance (performance: PerformanceWithTiming) {
+    const now = this.clock.now()
 
-          // the load event can only happen once per-page, so we don't need to
-          // keep observing
-          observer.disconnect()
+    // there's only ever one navigation entry
+    const entry = performance.getEntriesByType('navigation')[0]
 
-          // once we've found an entry with a valid loadEventEnd we can stop
-          // in practice this seems to always be the last entry in the list as
-          // loadEventEnd is the last value in the navigation timeline, but it
-          // doesn't hurt to break here anyway
-          break
-        }
-      }
-    })
+    let settledTime: number
 
-    observer.observe({ type: 'navigation', buffered: true })
-  }
-
-  private settleUsingPerformanceTiming (performance: PerformanceWithTiming): void {
-    const settleOnValidLoadEventEnd = () => {
-      // 'loadEventEnd' will be 0 until it has a valid value
-      if (performance.timing.loadEventEnd > 0) {
-        this.settle()
-      } else {
-        // check loadEventEnd on the next frame if it's not available yet
-        requestAnimationFrame(settleOnValidLoadEventEnd)
-      }
+    if (isPerformanceNavigationTiming(entry)) {
+      settledTime = entry.loadEventEnd
+    } else {
+      settledTime = performance.timing.loadEventEnd - performance.timing.navigationStart
     }
 
-    settleOnValidLoadEventEnd()
+    // if the settled time is obviously wrong then use the current time instead
+    // this won't be a perfectly accurate value, but it should be close enough
+    // for this purpose
+    if (settledTime <= 0 || settledTime > now) {
+      settledTime = now
+    }
+
+    this.settle(settledTime)
   }
 }
 
