@@ -73,3 +73,24 @@ steps:
             - with: { browser: firefox, version: 60 }
             - with: { browser: edge, version: 80 }
             - with: { browser: safari, version: 11 }
+
+      - label: ":{{ matrix }}: Mobile Browser tests"
+        matrix:
+          - android_pixel_7
+          - iphone_xs
+          - iphone_14
+        depends_on: "browser-maze-runner"
+        timeout_in_minutes: 30
+        plugins:
+          docker-compose#v3.9.0:
+            pull: browser-maze-runner
+            run: browser-maze-runner
+            use-aliases: true
+            command:
+              - --farm=bs
+              - --browser={{ matrix }}
+          artifacts#v1.5.0:
+            upload:
+              - "./test/browser/maze_output/failed/**/*"
+        concurrency: 2
+        concurrency_group: "browserstack"
