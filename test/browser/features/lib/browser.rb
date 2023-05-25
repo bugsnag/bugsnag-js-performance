@@ -13,6 +13,8 @@ class Browser
     @version =
       if version.nil? || version == "latest"
         Float::INFINITY
+      elsif @name.eql?('android') || @name.eql?('iphone')
+        Float::INFINITY
       else
         Integer(version)
       end
@@ -37,7 +39,7 @@ class Browser
       # support added in Safari 13
       @version >= 13
 
-    when "firefox"
+    when "firefox", "android", "iphone"
       # firefox does not support keepalive on any version
       false
 
