@@ -17,6 +17,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   private spanFactory: SpanFactory
   private onSettle: OnSettle
   private clock: Clock
+  private previousUrl = sanitizeUrl(window.location.href)
 
   constructor (spanFactory: SpanFactory, onSettle: OnSettle, clock: Clock) {
     this.spanFactory = spanFactory
@@ -25,23 +26,29 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   }
 
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
-    //   if (!configuration.autoInstrumentRouteChanges) return
+    // if (!configuration.autoInstrumentRouteChanges) return
 
-    const handleRouteChange = (url: URL) => {
+    const startRouteChangeSpan = (url: URL, previousUrl: URL) => {
       const startTime = this.clock.now()
       const route = configuration.routingProvider.resolveRoute(url)
+      const previousRoute = configuration.routingProvider.resolveRoute(previousUrl)
       const span = this.spanFactory.startSpan(`[RouteChange]${route}`, startTime)
 
       span.setAttribute('bugsnag.span.category', 'route_change')
       span.setAttribute('bugsnag.browser.page.route', route)
-      // span.setAttribute('bugsnag.span.previous_route', route) // TODO: How do we get this?
+      span.setAttribute('bugsnag.browser.page.previous_route', previousRoute)
 
       this.onSettle((endTime) => {
         this.spanFactory.endSpan(span, endTime)
       })
     }
 
-    // Push state
+    const setPreivousUrl = (url: URL) => {
+      this.previousUrl = url
+    }
+
+    const previousUrl = this.previousUrl
+
     const originalPushState = history.pushState
     history.pushState = function (...args) {
       const url = args[2]
@@ -49,7 +56,8 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
       if (url) {
         try {
           const safeUrl = sanitizeUrl(url)
-          handleRouteChange(safeUrl)
+          startRouteChangeSpan(safeUrl, previousUrl)
+          setPreivousUrl(safeUrl)
         } catch (err) {
           console.error(err)
         }
