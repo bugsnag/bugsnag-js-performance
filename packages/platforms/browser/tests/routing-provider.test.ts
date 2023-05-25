@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { DefaultRoutingProvider, isRoutingProvider } from '../lib/routing-provider'
 
 describe('DefaultRoutingProvider', () => {

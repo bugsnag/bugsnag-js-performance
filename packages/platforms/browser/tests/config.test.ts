@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { createSchema } from '../lib/config'
 
 describe('createSchema', () => {
