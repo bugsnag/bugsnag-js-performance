@@ -1,4 +1,4 @@
-import getAbsoluteUrl from '../lib/utils/url'
+import getAbsoluteUrl from '../../lib/request-tracker/url-helpers'
 
 describe('getAbsoluteUrl', () => {
   it.each([

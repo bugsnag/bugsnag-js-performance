@@ -1,6 +1,6 @@
 import { type Clock } from '@bugsnag/js-performance-core'
 import { type RequestEndCallback, type RequestEndContext, RequestTracker } from './request-tracker'
-import getAbsoluteUrl from '../utils/url'
+import getAbsoluteUrl from './url-helpers'
 
 interface WindowWithXmlHttpRequest {
   XMLHttpRequest: typeof XMLHttpRequest

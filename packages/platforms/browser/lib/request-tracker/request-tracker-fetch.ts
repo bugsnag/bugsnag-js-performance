@@ -1,6 +1,6 @@
 import { type Clock } from '@bugsnag/js-performance-core'
 import { type RequestStartContext, RequestTracker } from './request-tracker'
-import getAbsoluteUrl from '../utils/url'
+import getAbsoluteUrl from './url-helpers'
 
 interface WindowWithFetch {
   fetch: typeof fetch
