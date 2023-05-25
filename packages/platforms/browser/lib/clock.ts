@@ -15,7 +15,9 @@ interface PerformanceWithOptionalTimeOrigin {
 }
 
 function createClock (performance: PerformanceWithOptionalTimeOrigin): Clock {
-  const timeOrigin = performance.timeOrigin || performance.timing.navigationStart
+  const timeOrigin = performance.timeOrigin === undefined
+    ? performance.timing.navigationStart
+    : performance.timeOrigin
 
   return {
     now: () => performance.now(),

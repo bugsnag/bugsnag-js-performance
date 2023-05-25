@@ -14,6 +14,7 @@ export interface PerformanceTimingFake {
 export interface PerformanceFakeOptions {
   timing?: Partial<PerformanceTimingFake>
   timeOrigin?: number
+  undefinedTimeOrigin?: boolean
 }
 
 export class PerformanceFake extends PerformanceEntryListFake {
@@ -23,18 +24,20 @@ export class PerformanceFake extends PerformanceEntryListFake {
   constructor (options: PerformanceFakeOptions = {}) {
     super([])
 
+    // use 'jest.now' as the default for both timeOrigin and navigationStart
+    // so that 'advanceTimerByTime' & friends work as expected
+    // advanceTimerByTime will still work as 'now' also uses 'jest.now'
+    // https://jestjs.io/docs/jest-object#jestnow
     this.timing = {
       responseStart: 0,
-      navigationStart: 0,
+      navigationStart: jest.now(),
       loadEventEnd: 0,
       ...(options.timing || {})
     }
 
-    // use 'jest.now' so that 'advanceTimerByTime' & friends work as expected
-    // unless a timeOrigin has been provided as an option - advanceTimerByTime
-    // will still work as 'now' also uses 'jest.now'
-    // https://jestjs.io/docs/jest-object#jestnow
-    this.timeOrigin = options.timeOrigin === undefined
+    // in most cases we don't want to have to provide a timeOrigin as an option
+    // but we need to also allow explicitly setting timeOrigin as undefined (true on Safari <15)
+    this.timeOrigin = options.timeOrigin === undefined && !options.undefinedTimeOrigin
       ? jest.now()
       : options.timeOrigin
   }
