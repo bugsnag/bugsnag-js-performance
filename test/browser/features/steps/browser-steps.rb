@@ -124,7 +124,7 @@ module Maze
       end
       def click_element(id)
         element = @driver.find_element(id: id)
-        @driver.action.move_to(element).click.perform
+        element.click
       end
     end
   end
