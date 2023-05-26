@@ -28,7 +28,7 @@ export abstract class Settler {
     return this.settled
   }
 
-  protected settle (settledTime: number = this.clock.now()): void {
+  protected settle (settledTime: number): void {
     this.settled = true
 
     for (const callback of this.callbacks) {
