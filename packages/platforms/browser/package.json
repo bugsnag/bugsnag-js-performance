@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/browser-performance",
-  "version": "0.0.0",
+  "version": "0.0.1-alpha.0",
   "description": "BugsnagPerformance notifier for browsers",
   "author": "Ben Wilson <ben.wilson@smartbear.com>",
   "homepage": "https://github.com/bugsnag/bugsnag-js-performance#readme",
@@ -20,7 +20,7 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "dependencies": {
-    "@bugsnag/core-performance": "0.0.0"
+    "@bugsnag/core-performance": "^0.0.1-alpha.0"
   },
   "type": "module",
   "main": "dist/index.js",
