@@ -14,7 +14,7 @@ services:
       context: .
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
-        MAZE_RUNNER_VERSION: v7.26.1-cli
+        MAZE_RUNNER_VERSION: latest-v7-cli
     environment: &browser-maze-runner-environment
       BUILDKITE:
       BUILDKITE_BRANCH:
