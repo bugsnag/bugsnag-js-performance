@@ -113,7 +113,7 @@ export class WebVitals {
     // only use responseStart if it's valid (between 0 and the current time)
     // any other value cannot be valid because it would mean the response
     // started immediately or hasn't happened yet!
-    if (responseStart > 0 && responseStart < this.clock.now()) {
+    if (responseStart > 0 && responseStart <= this.clock.now()) {
       return responseStart
     }
   }
