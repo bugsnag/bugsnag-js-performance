@@ -13,7 +13,7 @@ FIXTURES_DIRECTORY = "#{__dir__}/../fixtures"
 
 PACKAGE_NAMES = [
   "@bugsnag/js-performance-core",
-  "@bugsnag/js-performance-browser",
+  "@bugsnag/browser-performance",
 ]
 
 PACKAGE_DIRECTORIES = [

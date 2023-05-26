@@ -1,5 +1,5 @@
 {
-  "name": "@bugsnag/js-performance-browser",
+  "name": "@bugsnag/browser-performance",
   "version": "0.0.0",
   "description": "BugsnagPerformance notifier for browsers",
   "author": "Ben Wilson <ben.wilson@smartbear.com>",
