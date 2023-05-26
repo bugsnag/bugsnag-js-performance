@@ -12,7 +12,7 @@ function Navigation() {
         <div>
             <nav>
                 <li>
-                    <Link to="/">Home</Link>
+                    <Link to="/route-change-spans">Home</Link>
                 </li>
                 <li>
                     <Link to="/new-route" id="change-route">Change Route</Link>
@@ -25,17 +25,13 @@ function Navigation() {
 export default function App() {
     return (
         <Router>
+            <Navigation />
             <Switch>
-                <Route path="/">
-                    <Navigation />
-                    <Switch>
-                        <Route path="/">
-                            <Home />
-                        </Route>
-                        <Route path="/new-route">
-                            <About />
-                        </Route>
-                    </Switch>
+                <Route path="/route-change-spans">
+                    <Home />
+                </Route>
+                <Route path="/new-route">
+                    <About />
                 </Route>
             </Switch>
         </Router>
