@@ -24,18 +24,19 @@ const sanitizeUrl = (url: string | URL) => {
 
 export class DefaultRoutingProvider implements RoutingProvider {
   resolveRoute: RouteResolver
-  private previousUrl = sanitizeUrl(window.location.href)
 
   constructor (resolveRoute = defaultRouteResolver) {
     this.resolveRoute = resolveRoute
   }
 
   onRouteChange (routeChangeSpanCallback: RouteChangeCallback, clock: Clock) {
+    let previousUrl = sanitizeUrl(window.location.href)
+
     const startRouteChangeSpan = (url: URL) => {
       const currentRoute = this.resolveRoute(url)
-      const previousRoute = this.resolveRoute(this.previousUrl)
+      const previousRoute = this.resolveRoute(previousUrl)
       routeChangeSpanCallback(currentRoute, previousRoute, clock.now())
-      this.previousUrl = url
+      previousUrl = url
     }
 
     const originalPushState = history.pushState
