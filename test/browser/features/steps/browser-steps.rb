@@ -124,7 +124,12 @@ module Maze
       end
       def click_element(id)
         element = @driver.find_element(id: id)
-        element.click
+        browser_os = Maze.config.capabilities['os']
+        if browser_os.eql?('ios') || browser_os.eql?('android')
+          element.click
+        else
+          @driver.action.move_to(element).click.perform
+        end
       end
     end
   end
