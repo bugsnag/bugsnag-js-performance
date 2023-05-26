@@ -19,8 +19,8 @@
     },
     "browser": "dist/browser.js",
     "files": [
-        "lib",
-        "dist"
+        "dist",
+        "types.d.ts"
     ],
     "scripts": {
       "build": "tsc",

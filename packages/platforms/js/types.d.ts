@@ -1,1 +1,1 @@
-export * from '@bugsnag/browser-performance'
+declare module '@bugsnag/js-performance'
