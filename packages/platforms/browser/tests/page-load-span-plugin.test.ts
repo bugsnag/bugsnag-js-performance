@@ -410,7 +410,16 @@ describe('FullPageLoadPlugin', () => {
           clock,
           deliveryFactory: () => delivery,
           schema: createSchema(window.location.hostname),
-          plugins: (spanFactory) => [new FullPageLoadPlugin(document, window.location, spanFactory, webVitals, onSettle)]
+          plugins: (spanFactory) => [
+            new FullPageLoadPlugin(
+              document,
+              window.location,
+              spanFactory,
+              webVitals,
+              onSettle,
+              new ControllableBackgroundingListener()
+            )
+          ]
         })
 
         testClient.start({ apiKey: VALID_API_KEY })
