@@ -59,7 +59,20 @@ describe('Browser Clock', () => {
       const clock = createClock(performance)
       const time = new Date('2023-01-01T00:00:00.015Z')
 
-      expect(clock.convert(time)).toEqual(15) // 15ms difference
+      // undefined timeOrigin should fall back to using navigationStart (set from system time)
+      expect(clock.convert(time)).toEqual(15) // 15 ms difference
+    })
+
+    it('works when performance.timeOrigin is 0', () => {
+      jest.setSystemTime(new Date('2023-01-01T00:00:00.000Z'))
+
+      const performance = new PerformanceFake({ timeOrigin: 0 })
+
+      const clock = createClock(performance)
+      const time = new Date('2023-01-01T00:00:00.015Z')
+
+      // 0 timeOrigin is valid and should be used
+      expect(clock.convert(time)).toEqual(1672531200015) // offset from 0 and not system time
     })
   })
 })
