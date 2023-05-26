@@ -1,4 +1,4 @@
-import { type Clock } from '@bugsnag/js-performance-core'
+import { type Clock } from '@bugsnag/core-performance'
 import { type RequestStartContext, RequestTracker } from './request-tracker'
 import getAbsoluteUrl from './url-helpers'
 

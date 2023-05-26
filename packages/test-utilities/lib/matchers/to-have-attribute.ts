@@ -6,7 +6,7 @@ import {
   type SpanEnded,
   type JsonAttribute,
   SpanAttributes
-} from '@bugsnag/js-performance-core'
+} from '@bugsnag/core-performance'
 
 function getValueObjectFor (value: unknown) {
   switch (typeof value) {

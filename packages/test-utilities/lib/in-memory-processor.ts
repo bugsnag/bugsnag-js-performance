@@ -1,4 +1,4 @@
-import { type SpanEnded, type Processor } from '@bugsnag/js-performance-core'
+import { type SpanEnded, type Processor } from '@bugsnag/core-performance'
 
 class InMemoryProcessor implements Processor {
   public readonly spans: SpanEnded[] = []

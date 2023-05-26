@@ -12,7 +12,7 @@ ROOT = "#{__dir__}/../../../.."
 FIXTURES_DIRECTORY = "#{__dir__}/../fixtures"
 
 PACKAGE_NAMES = [
-  "@bugsnag/js-performance-core",
+  "@bugsnag/core-performance",
   "@bugsnag/browser-performance",
 ]
 

@@ -1,4 +1,4 @@
-import { isObject } from '@bugsnag/js-performance-core'
+import { isObject } from '@bugsnag/core-performance'
 
 export interface RoutingProvider {
   resolveRoute: RouteResolver

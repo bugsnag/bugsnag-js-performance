@@ -17,7 +17,7 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "dependencies": {
-    "@bugsnag/js-performance-core": "0.0.0"
+    "@bugsnag/core-performance": "0.0.0"
   },
   "type": "module",
   "main": "dist/index.js",

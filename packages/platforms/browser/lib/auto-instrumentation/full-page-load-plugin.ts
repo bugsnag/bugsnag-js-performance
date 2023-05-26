@@ -3,7 +3,7 @@ import {
   type InternalConfiguration,
   type Plugin,
   type SpanFactory
-} from '@bugsnag/js-performance-core'
+} from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
 import { type OnSettle } from '../on-settle'
 import { type WebVitals } from '../web-vitals'
