@@ -15,6 +15,9 @@
     "type": "git",
     "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "rollup --config",
     "clean": "rm -rf dist/*"
