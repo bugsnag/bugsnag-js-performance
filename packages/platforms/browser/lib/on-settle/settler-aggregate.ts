@@ -6,18 +6,18 @@ import { Settler } from './settler'
  * constructed with are settled themselves
  */
 class SettlerAggregate extends Settler {
-  private settlers: Settler[]
+  private readonly settlers: Settler[]
 
   constructor (clock: Clock, settlers: Settler[]) {
     super(clock)
     this.settlers = settlers
 
     for (const settler of settlers) {
-      settler.subscribe(() => {
+      settler.subscribe((settledTime: number) => {
         // we need to check if all of the settlers are settled here as a
         // previously settled settler could have unsettled in the meantime
         if (this.settlersAreSettled()) {
-          this.settle()
+          this.settle(settledTime)
         } else {
           this.settled = false
         }
