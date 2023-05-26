@@ -26,6 +26,7 @@
       "build": "tsc",
       "prebuild": "rm -rf dist/*"
     },
+    "types": "types.d.ts",
     "dependencies": {
       "@bugsnag/browser-performance": "^0.0.0"
     }
