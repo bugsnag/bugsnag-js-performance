@@ -16,10 +16,15 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     // if (!configuration.autoInstrumentRouteChanges) return
 
-    configuration.routingProvider.initialize(this.spanFactory, this.clock, (routeChangeSpan) => {
+    configuration.routingProvider.onRouteChange((currentRoute: string, previousRoute: string, startTime: number) => {
+      const span = this.spanFactory.startSpan(`[RouteChange]${currentRoute}`, startTime)
+      span.setAttribute('bugsnag.span.category', 'route_change')
+      span.setAttribute('bugsnag.browser.page.route', currentRoute)
+      span.setAttribute('bugsnag.browser.page.previous_route', previousRoute)
+
       this.onSettle((endTime) => {
-        this.spanFactory.endSpan(routeChangeSpan, endTime)
+        this.spanFactory.endSpan(span, endTime)
       })
-    })
+    }, this.clock)
   }
 }

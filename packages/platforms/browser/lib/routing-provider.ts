@@ -1,10 +1,10 @@
-import { isObject, type Clock, type SpanFactory, type SpanInternal } from '@bugsnag/core-performance'
+import { isObject, type Clock } from '@bugsnag/core-performance'
 
-type RouteChangeSpanCallback = (routeChangeSpan: SpanInternal) => void
+type RouteChangeCallback = (currentRoute: string, previousRoute: string, startTime: number) => void
 
 export interface RoutingProvider {
   resolveRoute: RouteResolver
-  initialize: (spanFactory: SpanFactory, clock: Clock, routeChangeSpanCallback: RouteChangeSpanCallback) => void
+  onRouteChange: (routeChangeCallback: RouteChangeCallback, clock: Clock) => void
 }
 
 export type RouteResolver = (url: URL) => string
@@ -30,54 +30,34 @@ export class DefaultRoutingProvider implements RoutingProvider {
     this.resolveRoute = resolveRoute
   }
 
-  initialize (spanFactory: SpanFactory, clock: Clock, routeChangeSpanCallback: RouteChangeSpanCallback) {
-    const startRouteChangeSpan = (url: URL, previousUrl: URL) => {
-      const startTime = clock.now()
-      const route = this.resolveRoute(url)
-      const previousRoute = this.resolveRoute(previousUrl)
-      const span = spanFactory.startSpan(`[RouteChange]${route}`, startTime)
-
-      span.setAttribute('bugsnag.span.category', 'route_change')
-      span.setAttribute('bugsnag.browser.page.route', route)
-      span.setAttribute('bugsnag.browser.page.previous_route', previousRoute)
-
-      return span
-    }
-
-    const setPreivousUrl = (url: URL) => {
+  onRouteChange (routeChangeSpanCallback: RouteChangeCallback, clock: Clock) {
+    const startRouteChangeSpan = (url: URL) => {
+      const currentRoute = this.resolveRoute(url)
+      const previousRoute = this.resolveRoute(this.previousUrl)
+      routeChangeSpanCallback(currentRoute, previousRoute, clock.now())
       this.previousUrl = url
     }
-
-    const previousUrl = this.previousUrl
 
     const originalPushState = history.pushState
     history.pushState = function (...args) {
       const url = args[2]
 
       if (url) {
-        try {
-          const newUrl = sanitizeUrl(url)
-          const span = startRouteChangeSpan(newUrl, previousUrl)
-          routeChangeSpanCallback(span)
-          setPreivousUrl(newUrl)
-        } catch (err) {
-          console.error(err)
-        }
+        const safeUrl = sanitizeUrl(url)
+        startRouteChangeSpan(safeUrl)
       }
 
       originalPushState.apply(this, args)
     }
 
     addEventListener('popstate', () => {
-      const newUrl = sanitizeUrl(window.location.href)
-
-      const span = startRouteChangeSpan(newUrl, previousUrl)
-      routeChangeSpanCallback(span)
-      setPreivousUrl(newUrl)
+      const safeUrl = sanitizeUrl(window.location.href)
+      startRouteChangeSpan(safeUrl)
     })
   }
 }
 
 export const isRoutingProvider = (value: unknown): value is RoutingProvider =>
   isObject(value) &&
-    typeof value.resolveRoute === 'function'
+    typeof value.resolveRoute === 'function' &&
+    typeof value.onRouteChange === 'function'
