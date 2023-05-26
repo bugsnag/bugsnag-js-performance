@@ -14,7 +14,6 @@ export interface PerformanceTimingFake {
 export interface PerformanceFakeOptions {
   timing?: Partial<PerformanceTimingFake>
   timeOrigin?: number
-  undefinedTimeOrigin?: boolean
 }
 
 export class PerformanceFake extends PerformanceEntryListFake {
@@ -35,11 +34,9 @@ export class PerformanceFake extends PerformanceEntryListFake {
       ...(options.timing || {})
     }
 
-    // in most cases we don't want to have to provide a timeOrigin as an option
-    // but we need to also allow explicitly setting timeOrigin as undefined (true on Safari <15)
-    this.timeOrigin = options.timeOrigin === undefined && !options.undefinedTimeOrigin
-      ? jest.now()
-      : options.timeOrigin
+    this.timeOrigin = 'timeOrigin' in options
+      ? options.timeOrigin
+      : jest.now()
   }
 
   // NON SPEC

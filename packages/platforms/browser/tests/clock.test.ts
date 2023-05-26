@@ -54,7 +54,7 @@ describe('Browser Clock', () => {
     it('works when performance.timeOrigin is not defined', () => {
       jest.setSystemTime(new Date('2023-01-01T00:00:00.000Z'))
 
-      const performance = new PerformanceFake({ timeOrigin: undefined, undefinedTimeOrigin: true })
+      const performance = new PerformanceFake({ timeOrigin: undefined })
 
       const clock = createClock(performance)
       const time = new Date('2023-01-01T00:00:00.015Z')
