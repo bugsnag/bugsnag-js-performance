@@ -61,7 +61,7 @@ export default function createOnSettle (
   onSettle.configure = function (configuration: InternalConfiguration<BrowserConfiguration>): void {
     const settleIgnoreUrls = configuration.settleIgnoreUrls.map(
       (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
-    )
+    ).concat(RegExp(configuration.endpoint))
 
     fetchRequestSettler.setUrlsToIgnore(settleIgnoreUrls)
     xhrRequestSettler.setUrlsToIgnore(settleIgnoreUrls)
