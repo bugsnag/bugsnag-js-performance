@@ -1,4 +1,4 @@
-import { type Clock, type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/js-performance-core'
+import { type Clock, type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
 import { type OnSettle } from '../on-settle'
 
