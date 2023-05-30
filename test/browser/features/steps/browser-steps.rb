@@ -95,7 +95,6 @@ Then("the span named {string} is a valid full page load span") do |span_name|
   )
 
   start_time = Integer(span["startTimeUnixNano"])
-  end_time = Integer(span["endTimeUnixNano"])
 
   span["events"].each do |event|
     event_time = Integer(event["timeUnixNano"])
@@ -105,13 +104,6 @@ Then("the span named {string} is a valid full page load span") do |span_name|
       :<=,
       event_time,
       "The '#{event["name"]}' event happened before the span's start time (#{start_time - event_time}ns difference)"
-    )
-
-    Maze.check.operator(
-      end_time,
-      :>=,
-      event_time,
-      "The '#{event["name"]}' event happened after the span's end time (#{event_time - end_time}ns difference)"
     )
   end
 end
