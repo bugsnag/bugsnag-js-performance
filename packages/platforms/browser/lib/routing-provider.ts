@@ -1,7 +1,6 @@
 import { isObject } from '@bugsnag/core-performance'
 import { type OnSettle } from './on-settle'
 import { type StartRouteChangeSpan } from './auto-instrumentation'
-import getAbsoluteUrl from './request-tracker/url-helpers'
 
 export interface RoutingProvider {
   resolveRoute: RouteResolver
@@ -10,7 +9,17 @@ export interface RoutingProvider {
 
 export type RouteResolver = (url: URL | string) => string
 
-const defaultRouteResolver: RouteResolver = (url: URL | string) => url instanceof URL ? url.pathname : url
+const defaultRouteResolver: RouteResolver = (url: URL | string) => {
+  if (url instanceof URL) {
+    return url.pathname
+  } else if (url.startsWith('/')) {
+    return url
+  } else if (url.startsWith('http')) {
+    return new URL(url).pathname
+  }
+
+  return url
+}
 
 export class DefaultRoutingProvider implements RoutingProvider {
   resolveRoute: RouteResolver
@@ -20,10 +29,10 @@ export class DefaultRoutingProvider implements RoutingProvider {
   }
 
   configure (startRouteChangeSpan: StartRouteChangeSpan, onSettle: OnSettle) {
-    let initialRoute: string | undefined = this.resolveRoute(new URL(window.location.href))
+    let initialRoute: string | undefined = this.resolveRoute(window.location.pathname)
 
     addEventListener('popstate', () => {
-      const route = this.resolveRoute(window.location.href)
+      const route = this.resolveRoute(window.location.pathname)
       const span = startRouteChangeSpan(route, { previousRoute: initialRoute })
 
       // clear initial route
@@ -41,9 +50,7 @@ export class DefaultRoutingProvider implements RoutingProvider {
       const url = args[2]
 
       if (url) {
-        const absoluteUrl = getAbsoluteUrl(url.toString(), window.location.hostname)
-        const route = resolveRoute(new URL(absoluteUrl))
-        console.log({ absoluteUrl, route })
+        const route = resolveRoute(url)
         const span = startRouteChangeSpan(route, { previousRoute: initialRoute })
 
         // clear initial route
@@ -61,4 +68,5 @@ export class DefaultRoutingProvider implements RoutingProvider {
 
 export const isRoutingProvider = (value: unknown): value is RoutingProvider =>
   isObject(value) &&
+    typeof value.resolveRoute === 'function' &&
     typeof value.configure === 'function'
