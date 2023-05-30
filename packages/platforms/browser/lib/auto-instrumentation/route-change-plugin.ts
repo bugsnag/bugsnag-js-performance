@@ -17,7 +17,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   }
 
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
-    // if (!configuration.autoInstrumentRouteChanges) return
+    if (!configuration.autoInstrumentRouteChanges) return
 
     let previousRoute = configuration.routingProvider.initialRoute
 

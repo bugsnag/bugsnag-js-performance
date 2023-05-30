@@ -10,6 +10,7 @@ import { isRoutingProvider, type RoutingProvider } from './routing-provider'
 export interface BrowserSchema extends CoreSchema {
   autoInstrumentFullPageLoads: ConfigOption<boolean>
   autoInstrumentNetworkRequests: ConfigOption<boolean>
+  autoInstrumentRouteChanges: ConfigOption<boolean>
   routingProvider: ConfigOption<RoutingProvider>
   settleIgnoreUrls: ConfigOption<Array<string | RegExp>>
   networkInstrumentationIgnoreUrls: ConfigOption<Array<string | RegExp>>
@@ -18,6 +19,7 @@ export interface BrowserSchema extends CoreSchema {
 export interface BrowserConfiguration extends Configuration {
   autoInstrumentFullPageLoads?: boolean
   autoInstrumentNetworkRequests?: boolean
+  autoInstrumentRouteChanges?: boolean
   routingProvider?: RoutingProvider
   settleIgnoreUrls?: Array<string | RegExp>
   networkInstrumentationIgnoreUrls?: Array<string | RegExp>
@@ -36,6 +38,11 @@ export function createSchema (hostname: string, defaultRoutingProvider: RoutingP
       validate: (value): value is boolean => value === true || value === false
     },
     autoInstrumentNetworkRequests: {
+      defaultValue: true,
+      message: 'should be true|false',
+      validate: (value): value is boolean => value === true || value === false
+    },
+    autoInstrumentRouteChanges: {
       defaultValue: true,
       message: 'should be true|false',
       validate: (value): value is boolean => value === true || value === false
