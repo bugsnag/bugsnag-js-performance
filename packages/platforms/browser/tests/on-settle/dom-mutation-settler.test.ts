@@ -4,7 +4,7 @@
 
 import DomMutationSettler from '../../lib/on-settle/dom-mutation-settler'
 import createClock from '../../lib/clock'
-import { IncrementingClock } from '@bugsnag/js-performance-test-utilities'
+import { ControllableBackgroundingListener, IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 
 describe('DomMutationSettler', () => {
   beforeEach(() => {
@@ -21,7 +21,7 @@ describe('DomMutationSettler', () => {
 
   it('settles after 100ms when no dom mutation happens', async () => {
     const settleCallback = jest.fn()
-    const settler = new DomMutationSettler(createClock(performance), document.body)
+    const settler = new DomMutationSettler(createClock(performance, new ControllableBackgroundingListener()), document.body)
 
     settler.subscribe(settleCallback)
 
@@ -98,7 +98,7 @@ describe('DomMutationSettler', () => {
 
   it('doesnt settle until no dom mutations have happend for 100 consecutive milliseconds', async () => {
     const settleCallback = jest.fn()
-    const settler = new DomMutationSettler(createClock(performance), document.body)
+    const settler = new DomMutationSettler(createClock(performance, new ControllableBackgroundingListener()), document.body)
 
     settler.subscribe(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()

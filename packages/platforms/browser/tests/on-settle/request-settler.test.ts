@@ -9,7 +9,7 @@ import {
   RequestTracker
 } from '../../lib/request-tracker/request-tracker'
 import createClock from '../../lib/clock'
-import { IncrementingClock } from '@bugsnag/js-performance-test-utilities'
+import { ControllableBackgroundingListener, IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 
 const START_CONTEXT: RequestStartContext = {
   url: 'https://www.bugsnag.com',
@@ -56,7 +56,7 @@ describe('RequestSettler', () => {
   it('settles 100ms after a request finishes', async () => {
     const settleCallback = jest.fn()
     const tracker = new RequestTracker()
-    const settler = new RequestSettler(createClock(performance), tracker)
+    const settler = new RequestSettler(createClock(performance, new ControllableBackgroundingListener()), tracker)
 
     const end = tracker.start(START_CONTEXT)
 
@@ -103,7 +103,7 @@ describe('RequestSettler', () => {
   it('does not settle after a request finishes if there is another outstanding request', async () => {
     const settleCallback = jest.fn()
     const tracker = new RequestTracker()
-    const settler = new RequestSettler(createClock(performance), tracker)
+    const settler = new RequestSettler(createClock(performance, new ControllableBackgroundingListener()), tracker)
 
     const endRequest1 = tracker.start(START_CONTEXT)
 
@@ -186,7 +186,7 @@ describe('RequestSettler', () => {
   it('ignores requests to URLs that match urlsToIgnore', async () => {
     const settleCallback = jest.fn()
     const tracker = new RequestTracker()
-    const settler = new RequestSettler(createClock(performance), tracker)
+    const settler = new RequestSettler(createClock(performance, new ControllableBackgroundingListener()), tracker)
     settler.setUrlsToIgnore([
       // exactly 'https://www.bugsnag.com'
       /^https:\/\/www.bugsnag.com$/,
