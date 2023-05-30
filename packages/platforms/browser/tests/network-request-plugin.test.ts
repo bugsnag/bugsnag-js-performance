@@ -120,9 +120,9 @@ describe('network span plugin', () => {
 
     const urlsToIgnore = [
       // exactly 'https://www.bugsnag.com'
-      /^https:\/\/www.bugsnag.com$/,
+      /^https:\/\/www\.bugsnag\.com$/,
       // 'http://www.bugsnag.com' anywhere in the URL
-      /http:\/\/www.bugsnag.com/
+      /http:\/\/www\.bugsnag\.com/
     ]
 
     plugin.configure(createConfiguration<BrowserConfiguration>({

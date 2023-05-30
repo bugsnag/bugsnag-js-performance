@@ -238,7 +238,7 @@ describe('onSettle', () => {
       apiKey: VALID_API_KEY,
       settleIgnoreUrls: [
         'http://www.bugsnag.com/xhr',
-        /^https:\/\/www.bugsnag.com\/fetch\//
+        /^https:\/\/www\.bugsnag\.com\/fetch\//
       ]
     })
 

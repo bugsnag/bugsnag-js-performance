@@ -189,9 +189,9 @@ describe('RequestSettler', () => {
     const settler = new RequestSettler(createClock(performance, new ControllableBackgroundingListener()), tracker)
     settler.setUrlsToIgnore([
       // exactly 'https://www.bugsnag.com'
-      /^https:\/\/www.bugsnag.com$/,
+      /^https:\/\/www\.bugsnag\.com$/,
       // 'http://www.bugsnag.com' anywhere in the URL
-      /http:\/\/www.bugsnag.com/
+      /http:\/\/www\.bugsnag\.com/
     ])
 
     const endIgnoredRequest1 = tracker.start({
