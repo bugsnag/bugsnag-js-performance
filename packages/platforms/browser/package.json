@@ -1,9 +1,8 @@
 {
   "name": "@bugsnag/browser-performance",
   "version": "0.0.1-alpha.0",
-  "description": "BugsnagPerformance notifier for browsers",
-  "author": "Ben Wilson <ben.wilson@smartbear.com>",
-  "homepage": "https://github.com/bugsnag/bugsnag-js-performance#readme",
+  "description": "BugSnag performance monitoring for browsers",
+  "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
   "repository": {
     "type": "git",
