@@ -1,34 +1,33 @@
 {
-    "name": "@bugsnag/js-performance",
-    "version": "0.0.0",
-    "description": "",
-    "keywords": [
-      "bugsnag",
-      "javascript",
-      "browsers",
-      "performance",
-      "reporting",
-      "client-side"
-    ],
-    "author": "Bugsnag",
-    "homepage": "https://www.bugsnag.com/",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
-    },
-    "browser": "dist/browser.js",
-    "files": [
-        "dist",
-        "types.d.ts"
-    ],
-    "scripts": {
-      "build": "tsc",
-      "prebuild": "rm -rf dist/*"
-    },
-    "types": "types.d.ts",
-    "dependencies": {
-      "@bugsnag/browser-performance": "^0.0.0"
-    }
+  "name": "@bugsnag/js-performance",
+  "version": "0.0.2-alpha.0",
+  "description": "",
+  "keywords": [
+    "bugsnag",
+    "javascript",
+    "browsers",
+    "performance",
+    "reporting",
+    "client-side"
+  ],
+  "author": "Bugsnag",
+  "homepage": "https://www.bugsnag.com/",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "browser": "dist/browser.js",
+  "files": [
+    "dist",
+    "types.d.ts"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prebuild": "rm -rf dist/*"
+  },
+  "types": "types.d.ts",
+  "dependencies": {
+    "@bugsnag/browser-performance": "0.0.2-alpha.0"
   }
-  
+}
