@@ -6,7 +6,7 @@ import { DefaultRoutingProvider, isRoutingProvider } from '../lib/routing-provid
 
 describe('DefaultRoutingProvider', () => {
   it('Uses a provided route resolver function', () => {
-    const routeResolverFn = jest.fn((url: URL) => 'resolved-route')
+    const routeResolverFn = jest.fn((url: URL | string) => 'resolved-route')
     const routingProvier = new DefaultRoutingProvider(routeResolverFn)
     const resolvedRoute = routingProvier.resolveRoute(new URL('https://www.bugsnag.com'))
 

@@ -1,26 +1,16 @@
-import { isObject, type Clock } from '@bugsnag/core-performance'
-
-type RouteChangeCallback = (currentRoute: string, previousRoute: string, startTime: number) => void
+import { isObject } from '@bugsnag/core-performance'
+import { type OnSettle } from './on-settle'
+import { type StartRouteChangeSpan } from './auto-instrumentation'
+import getAbsoluteUrl from './request-tracker/url-helpers'
 
 export interface RoutingProvider {
   resolveRoute: RouteResolver
-  onRouteChange: (routeChangeCallback: RouteChangeCallback, clock: Clock) => void
+  configure: (startRouteChangeSpan: StartRouteChangeSpan, onSettle: OnSettle) => void
 }
 
-export type RouteResolver = (url: URL) => string
+export type RouteResolver = (url: URL | string) => string
 
-const defaultRouteResolver: RouteResolver = (url: URL) => url.pathname
-
-const sanitizeUrl = (url: string | URL) => {
-  if (url instanceof URL) return url
-
-  if (!url.startsWith('http')) {
-    const fullUrl = window.location.origin.replace(window.location.port, '') + url
-    return new URL(fullUrl)
-  }
-
-  return new URL(url)
-}
+const defaultRouteResolver: RouteResolver = (url: URL | string) => url instanceof URL ? url.pathname : url
 
 export class DefaultRoutingProvider implements RoutingProvider {
   resolveRoute: RouteResolver
@@ -29,36 +19,46 @@ export class DefaultRoutingProvider implements RoutingProvider {
     this.resolveRoute = resolveRoute
   }
 
-  onRouteChange (routeChangeSpanCallback: RouteChangeCallback, clock: Clock) {
-    let previousUrl = sanitizeUrl(window.location.href)
+  configure (startRouteChangeSpan: StartRouteChangeSpan, onSettle: OnSettle) {
+    let initialRoute: string | undefined = this.resolveRoute(new URL(window.location.href))
 
-    const startRouteChangeSpan = (url: URL) => {
-      const currentRoute = this.resolveRoute(url)
-      const previousRoute = this.resolveRoute(previousUrl)
-      routeChangeSpanCallback(currentRoute, previousRoute, clock.now())
-      previousUrl = url
-    }
+    addEventListener('popstate', () => {
+      const route = this.resolveRoute(window.location.href)
+      const span = startRouteChangeSpan(route, { previousRoute: initialRoute })
+
+      // clear initial route
+      initialRoute = undefined
+
+      onSettle((endTime) => {
+        span.end(endTime)
+      })
+    })
+
+    const resolveRoute = this.resolveRoute
 
     const originalPushState = history.pushState
     history.pushState = function (...args) {
       const url = args[2]
 
       if (url) {
-        const safeUrl = sanitizeUrl(url)
-        startRouteChangeSpan(safeUrl)
+        const absoluteUrl = getAbsoluteUrl(url.toString(), window.location.hostname)
+        const route = resolveRoute(new URL(absoluteUrl))
+        console.log({ absoluteUrl, route })
+        const span = startRouteChangeSpan(route, { previousRoute: initialRoute })
+
+        // clear initial route
+        initialRoute = undefined
+
+        onSettle((endTime) => {
+          span.end(endTime)
+        })
       }
 
       originalPushState.apply(this, args)
     }
-
-    addEventListener('popstate', () => {
-      const safeUrl = sanitizeUrl(window.location.href)
-      startRouteChangeSpan(safeUrl)
-    })
   }
 }
 
 export const isRoutingProvider = (value: unknown): value is RoutingProvider =>
   isObject(value) &&
-    typeof value.resolveRoute === 'function' &&
-    typeof value.onRouteChange === 'function'
+    typeof value.configure === 'function'

@@ -1,6 +1,13 @@
-import { type Clock, type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
+import { type Span, type Clock, type InternalConfiguration, type Plugin, type SpanFactory, type Time, timeToNumber } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
 import { type OnSettle } from '../on-settle'
+
+interface StartRouteOptions {
+  startTime?: Time
+  previousRoute?: string
+}
+
+export type StartRouteChangeSpan = (route: string, options?: StartRouteOptions) => Span
 
 export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   private spanFactory: SpanFactory
@@ -16,15 +23,25 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     // if (!configuration.autoInstrumentRouteChanges) return
 
-    configuration.routingProvider.onRouteChange((currentRoute: string, previousRoute: string, startTime: number) => {
-      const span = this.spanFactory.startSpan(`[RouteChange]${currentRoute}`, startTime)
-      span.setAttribute('bugsnag.span.category', 'route_change')
-      span.setAttribute('bugsnag.browser.page.route', currentRoute)
-      span.setAttribute('bugsnag.browser.page.previous_route', previousRoute)
+    let previousRoute = ''
 
-      this.onSettle((endTime) => {
-        this.spanFactory.endSpan(span, endTime)
-      })
-    }, this.clock)
+    const startRouteChangeSpan = (route: string, options?: StartRouteOptions) => {
+      const startTime = options?.startTime ? timeToNumber(this.clock, options.startTime) : this.clock.now()
+      const span = this.spanFactory.startSpan(`[RouteChange]${route}`, startTime)
+      span.setAttribute('bugsnag.span.category', 'route_change')
+      span.setAttribute('bugsnag.browser.page.route', route)
+      span.setAttribute('bugsnag.browser.page.previous_route', options?.previousRoute || previousRoute)
+
+      previousRoute = route
+
+      const end = (endTime?: Time) => {
+        const safeTime = timeToNumber(this.clock, endTime)
+        this.spanFactory.endSpan(span, safeTime)
+      }
+
+      return { end }
+    }
+
+    configuration.routingProvider.configure(startRouteChangeSpan, this.onSettle)
   }
 }
