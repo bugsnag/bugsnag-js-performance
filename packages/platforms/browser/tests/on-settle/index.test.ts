@@ -254,4 +254,75 @@ describe('onSettle', () => {
     await jest.advanceTimersByTimeAsync(100)
     expect(settleCallback).toHaveBeenCalled()
   })
+
+  it('ignores requests to the default endpoint', async () => {
+    const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+
+    const fetchRequestTracker = new RequestTracker()
+    const xhrRequestTracker = new RequestTracker()
+
+    const onSettle = createOnSettle(
+      new IncrementingClock(),
+      window,
+      fetchRequestTracker,
+      xhrRequestTracker,
+      performance
+    )
+
+    const testClient = createTestClient({
+      schema: createSchema(window.location.hostname),
+      plugins: (spanFactory) => [onSettle]
+    })
+
+    testClient.start(VALID_API_KEY)
+
+    const settleCallback = jest.fn()
+
+    onSettle(settleCallback)
+    expect(settleCallback).not.toHaveBeenCalled()
+
+    // request should be ignored, so advancing by 100ms will settle
+    fetchRequestTracker.start({ ...START_CONTEXT, url: 'https://otlp.bugsnag.com/v1/traces' })
+
+    await jest.advanceTimersByTimeAsync(100)
+    expect(settleCallback).toHaveBeenCalled()
+  })
+
+  it('ignores requests to the configured endpoint', async () => {
+    const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+
+    const fetchRequestTracker = new RequestTracker()
+    const xhrRequestTracker = new RequestTracker()
+
+    const onSettle = createOnSettle(
+      new IncrementingClock(),
+      window,
+      fetchRequestTracker,
+      xhrRequestTracker,
+      performance
+    )
+
+    const testClient = createTestClient({
+      schema: createSchema(window.location.hostname),
+      plugins: (spanFactory) => [onSettle]
+    })
+
+    testClient.start({
+      apiKey: VALID_API_KEY,
+      endpoint: 'https://www.bugsnag.com'
+    })
+
+    const settleCallback = jest.fn()
+
+    onSettle(settleCallback)
+    expect(settleCallback).not.toHaveBeenCalled()
+
+    // request should be ignored, so advancing by 100ms will settle
+    fetchRequestTracker.start({ ...START_CONTEXT, url: 'https://www.bugsnag.com/a/b/c' })
+
+    await jest.advanceTimersByTimeAsync(100)
+    expect(settleCallback).toHaveBeenCalled()
+  })
 })
