@@ -17,6 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
   },
+  "main": "dist/browser.js",
   "browser": "dist/browser.js",
   "files": [
     "dist",
