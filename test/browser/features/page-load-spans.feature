@@ -1,5 +1,7 @@
 Feature: Page Load spans
 
+    # Skipping on device browsers until the referrer handling is implement for those devices [PLAT-10176]
+    @skip_on_device
     Scenario: Page load spans are automatically instrumented
         Given I navigate to the test URL "/page-load-spans"
         # click a button to record a first input delay metric

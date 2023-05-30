@@ -1,6 +1,10 @@
 require 'yaml'
 
 class Browser
+
+  # Whether the Browser is running on a mobile device
+  attr_reader :is_device
+
   def initialize(browser_spec, maze_uri, fixtures_uri)
     @maze_uri = maze_uri
     @fixtures_uri = fixtures_uri
@@ -8,10 +12,12 @@ class Browser
     # e.g. "chrome_61", "edge_latest", "chrome"
     @name, version = browser_spec.split("_")
 
+    @is_device = @name.eql?('android') || @name.eql?('iphone')
+
     # assume we're running the latest version if there is no version present
     # this should only happen locally where the browser will auto-update
     @version =
-      if version.nil? || version == "latest"
+      if @is_device || version.nil? || version == "latest"
         Float::INFINITY
       else
         Integer(version)
@@ -37,7 +43,7 @@ class Browser
       # support added in Safari 13
       @version >= 13
 
-    when "firefox"
+    when "firefox", "android", "iphone"
       # firefox does not support keepalive on any version
       false
 
