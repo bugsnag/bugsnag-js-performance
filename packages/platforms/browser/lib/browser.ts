@@ -13,10 +13,10 @@ import createXmlHttpRequestTracker from './request-tracker/request-tracker-xhr'
 import { NetworkRequestPlugin } from './auto-instrumentation/network-request-plugin'
 import { WebVitals } from './web-vitals'
 
-const clock = createClock(performance)
+const backgroundingListener = createBrowserBackgroundingListener(document)
+const clock = createClock(performance, backgroundingListener)
 const spanAttributesSource = createSpanAttributesSource(document.title, window.location.href)
 const resourceAttributesSource = createResourceAttributesSource(navigator)
-const backgroundingListener = createBrowserBackgroundingListener(document)
 const fetchRequestTracker = createFetchRequestTracker(window, clock)
 const xhrRequestTracker = createXmlHttpRequestTracker(window, clock)
 const webVitals = new WebVitals(performance, clock, window.PerformanceObserver)
