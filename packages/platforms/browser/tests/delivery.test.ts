@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { type DeliveryPayload } from '@bugsnag/js-performance-core'
+import { type DeliveryPayload } from '@bugsnag/core-performance'
 import { ControllableBackgroundingListener } from '@bugsnag/js-performance-test-utilities'
 import createBrowserDeliveryFactory from '../lib/delivery'
 

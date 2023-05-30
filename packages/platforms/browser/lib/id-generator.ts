@@ -1,4 +1,4 @@
-import type { BitLength, IdGenerator } from '@bugsnag/js-performance-core'
+import type { BitLength, IdGenerator } from '@bugsnag/core-performance'
 
 function toHex (value: number): string {
   const hex = value.toString(16)

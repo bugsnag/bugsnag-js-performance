@@ -21,7 +21,7 @@ function createRollupConfig (options = defaultOptions()) {
         preset: 'es2015',
       },
     },
-    external: ['@bugsnag/js-performance-core'],
+    external: ['@bugsnag/core-performance'],
     plugins: [
       replace({
         preventAssignment: true,

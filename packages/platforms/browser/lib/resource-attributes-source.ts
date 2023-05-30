@@ -1,4 +1,4 @@
-import { ResourceAttributes, type ResourceAttributeSource } from '@bugsnag/js-performance-core'
+import { ResourceAttributes, type ResourceAttributeSource } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from './config'
 
 function createResourceAttributesSource (navigator: Navigator): ResourceAttributeSource<BrowserConfiguration> {

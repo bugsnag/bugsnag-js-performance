@@ -1,4 +1,4 @@
-import BugsnagPerformance from '@bugsnag/js-performance-browser'
+import BugsnagPerformance from '@bugsnag/browser-performance'
 
 const parameters = new URLSearchParams(window.location.search)
 const apiKey = parameters.get('api_key')
