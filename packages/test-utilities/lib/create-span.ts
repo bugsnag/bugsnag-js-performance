@@ -4,7 +4,7 @@ import {
   SpanAttributes,
   traceIdToSamplingRate,
   SpanEvents
-} from '@bugsnag/js-performance-core'
+} from '@bugsnag/core-performance'
 import { randomBytes } from 'crypto'
 
 export function createEndedSpan (overrides: Partial<SpanEnded> = {}): SpanEnded {

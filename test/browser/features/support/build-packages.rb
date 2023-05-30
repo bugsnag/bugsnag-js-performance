@@ -12,8 +12,8 @@ ROOT = "#{__dir__}/../../../.."
 FIXTURES_DIRECTORY = "#{__dir__}/../fixtures"
 
 PACKAGE_NAMES = [
-  "@bugsnag/js-performance-core",
-  "@bugsnag/js-performance-browser",
+  "@bugsnag/core-performance",
+  "@bugsnag/browser-performance",
 ]
 
 PACKAGE_DIRECTORIES = [

@@ -14,7 +14,7 @@ import {
   type ClientOptions,
   type Configuration,
   type CoreSchema
-} from '@bugsnag/js-performance-core'
+} from '@bugsnag/core-performance'
 
 const defaultOptions = () => ({
   backgroundingListener: new ControllableBackgroundingListener(),

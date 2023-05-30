@@ -1,5 +1,5 @@
 
-import { Kind } from '@bugsnag/js-performance-core'
+import { Kind } from '@bugsnag/core-performance'
 import {
   ControllableBackgroundingListener,
   InMemoryDelivery,

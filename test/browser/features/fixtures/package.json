@@ -1,5 +1,5 @@
 {
-  "name": "@bugsnag/js-performance-browser-test-fixtures",
+  "name": "@bugsnag/browser-performance-test-fixtures",
   "private": true,
   "workspaces": [
     "packages/*"

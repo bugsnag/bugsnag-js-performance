@@ -1,6 +1,6 @@
 import { expect } from '@jest/globals'
 import { type MatcherFunction } from 'expect'
-import { type DeliverySpan } from '@bugsnag/js-performance-core'
+import { type DeliverySpan } from '@bugsnag/core-performance'
 
 const toHaveEvent: MatcherFunction<[name: string, value?: string]> = function (unknownSpan: unknown, name: string, value?: string) {
   const span = unknownSpan as DeliverySpan

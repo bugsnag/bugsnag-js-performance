@@ -11,7 +11,7 @@ When("I navigate to the test URL {string}") do |test_path|
   Maze::Store.values["bugsnag.browser.page.url"] = url
 
   # store app version from package.json
-  package = JSON.parse(File.read("./features/fixtures/node_modules/@bugsnag/js-performance-browser/package.json"))
+  package = JSON.parse(File.read("./features/fixtures/node_modules/@bugsnag/browser-performance/package.json"))
   Maze::Store.values["telemetry.sdk.version"] = package["version"]
 end
 

@@ -2,7 +2,7 @@ import {
   type BackgroundingListenerState,
   type BackgroundingListener,
   type BackgroundingListenerCallback
-} from '@bugsnag/js-performance-core'
+} from '@bugsnag/core-performance'
 
 class ControllableBackgroundingListener implements BackgroundingListener {
   private state: BackgroundingListenerState = 'in-foreground'

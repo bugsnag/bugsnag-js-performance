@@ -1,4 +1,4 @@
-import { type Clock, millisecondsToNanoseconds } from '@bugsnag/js-performance-core'
+import { type Clock, millisecondsToNanoseconds } from '@bugsnag/core-performance'
 
 // a cut-down PerformanceTiming interface, since we don't care about most of
 // its properties

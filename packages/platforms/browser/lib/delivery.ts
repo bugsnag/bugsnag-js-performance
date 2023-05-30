@@ -3,7 +3,7 @@ import {
   type Delivery,
   type DeliveryFactory,
   responseStateFromStatusCode
-} from '@bugsnag/js-performance-core'
+} from '@bugsnag/core-performance'
 
 export type Fetch = typeof fetch
 

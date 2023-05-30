@@ -4,8 +4,8 @@
 // "main" field in each package.json file, which points to the compiled JS and
 // we want to run Jest against the TS source
 const paths = {
-  '@bugsnag/js-performance-core': ['./packages/core/lib/index.ts'],
-  '@bugsnag/js-performance-browser': ['./packages/platforms/browser/lib/index.ts']
+  '@bugsnag/core-performance': ['./packages/core/lib/index.ts'],
+  '@bugsnag/browser-performance': ['./packages/platforms/browser/lib/index.ts']
 }
 
 // convert the tsconfig "paths" option into Jest's "moduleNameMapper" option

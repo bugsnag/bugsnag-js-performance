@@ -1,4 +1,4 @@
-import type { SpanAttribute, SpanAttributesSource } from '@bugsnag/js-performance-core'
+import type { SpanAttribute, SpanAttributesSource } from '@bugsnag/core-performance'
 
 const createSpanAttributesSource = (title: string, url: string): SpanAttributesSource => {
   return () => {

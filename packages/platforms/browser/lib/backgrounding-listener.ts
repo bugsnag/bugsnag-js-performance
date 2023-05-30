@@ -1,7 +1,7 @@
 import {
   type BackgroundingListener,
   type BackgroundingListenerCallback
-} from '@bugsnag/js-performance-core'
+} from '@bugsnag/core-performance'
 
 interface DocumentForVisibilityState {
   addEventListener: (event: string, callback: () => void) => void

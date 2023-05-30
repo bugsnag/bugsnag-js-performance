@@ -4,7 +4,7 @@ import {
   type RequestEndContext,
   type RequestEndCallback
 } from '../request-tracker/request-tracker'
-import { type SpanFactory, type Plugin, type InternalConfiguration } from '@bugsnag/js-performance-core'
+import { type SpanFactory, type Plugin, type InternalConfiguration } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
 
 export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {

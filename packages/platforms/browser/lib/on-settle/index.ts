@@ -4,7 +4,7 @@ import RequestSettler from './request-settler'
 import SettlerAggregate from './settler-aggregate'
 import { type BrowserConfiguration } from '../config'
 import { type RequestTracker } from '../request-tracker/request-tracker'
-import { type Clock, type InternalConfiguration, type Plugin } from '@bugsnag/js-performance-core'
+import { type Clock, type InternalConfiguration, type Plugin } from '@bugsnag/core-performance'
 
 export type OnSettle = (callback: OnSettleCallback) => void
 export type OnSettleCallback = (settledTime: number) => void

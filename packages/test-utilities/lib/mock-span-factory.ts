@@ -1,4 +1,4 @@
-import { type SpanInternal, type SpanEnded, SpanFactory } from '@bugsnag/js-performance-core'
+import { type SpanInternal, type SpanEnded, SpanFactory } from '@bugsnag/core-performance'
 import StableIdGenerator from './stable-id-generator'
 import spanAttributesSource from './span-attributes-source'
 import InMemoryProcessor from './in-memory-processor'

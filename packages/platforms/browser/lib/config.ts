@@ -4,7 +4,7 @@ import {
   type ConfigOption,
   type Configuration,
   type CoreSchema
-} from '@bugsnag/js-performance-core'
+} from '@bugsnag/core-performance'
 import { DefaultRoutingProvider, isRoutingProvider, type RoutingProvider } from './routing-provider'
 
 export interface BrowserSchema extends CoreSchema {

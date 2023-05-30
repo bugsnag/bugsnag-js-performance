@@ -1,4 +1,4 @@
-import { createClient } from '@bugsnag/js-performance-core'
+import { createClient } from '@bugsnag/core-performance'
 import { FullPageLoadPlugin } from './auto-instrumentation/full-page-load-plugin'
 import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
