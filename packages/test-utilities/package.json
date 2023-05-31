@@ -5,6 +5,7 @@
   "main": "lib/index.ts",
   "files": [],
   "dependencies": {
-    "@bugsnag/core-performance": "*"
+    "@bugsnag/core-performance": "*",
+    "@bugsnag/browser-performance": "*"
   }
 }
