@@ -12,7 +12,8 @@ import {
 import {
   IncrementingClock,
   createTestClient,
-  VALID_API_KEY
+  VALID_API_KEY,
+  DefaultRoutingProvider
 } from '@bugsnag/js-performance-test-utilities'
 import {
   PerformanceFake,
@@ -230,7 +231,7 @@ describe('onSettle', () => {
     )
 
     const testClient = createTestClient({
-      schema: createSchema(window.location.hostname),
+      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
       plugins: (spanFactory) => [onSettle]
     })
 

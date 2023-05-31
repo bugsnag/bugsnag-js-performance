@@ -4,6 +4,7 @@ export { default as ControllableBackgroundingListener } from './controllable-bac
 export { default as createConfiguration } from './create-configuration'
 export * from './create-span'
 export { default as createTestClient } from './create-test-client'
+export { default as DefaultRoutingProvider } from './default-routing-provider'
 export { default as IncrementingClock } from './incrementing-clock'
 export { default as InMemoryDelivery } from './in-memory-delivery'
 export { default as InMemoryProcessor } from './in-memory-processor'

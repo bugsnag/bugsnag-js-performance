@@ -2,7 +2,10 @@
  * @jest-environment jsdom
  */
 
-import { DefaultRoutingProvider, isRoutingProvider } from '../lib/routing-provider'
+import { createDefaultRoutingProvider } from '../lib/default-routing-provider'
+import { isRoutingProvider } from '../lib/routing-provider'
+
+const DefaultRoutingProvider = createDefaultRoutingProvider(jest.fn())
 
 describe('DefaultRoutingProvider', () => {
   it('Uses a provided route resolver function', () => {

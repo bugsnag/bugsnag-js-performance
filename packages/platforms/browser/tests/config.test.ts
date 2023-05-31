@@ -2,22 +2,23 @@
  * @jest-environment jsdom
  */
 
+import { DefaultRoutingProvider } from '@bugsnag/js-performance-test-utilities'
 import { createSchema } from '../lib/config'
 
 describe('createSchema', () => {
   it('sets releaseStage.defaultValue to development on localhost', () => {
-    const schema = createSchema('localhost')
+    const schema = createSchema('localhost', new DefaultRoutingProvider())
     expect(schema.releaseStage.defaultValue).toStrictEqual('development')
   })
 
   it('sets releaseStage.defaultValue to production on another host', () => {
-    const schema = createSchema('bugsnag.com')
+    const schema = createSchema('bugsnag.com', new DefaultRoutingProvider())
     expect(schema.releaseStage.defaultValue).toStrictEqual('production')
   })
 
   describe('settleIgnoreUrls', () => {
     it('defaults to an empty array', () => {
-      const schema = createSchema('')
+      const schema = createSchema('', new DefaultRoutingProvider())
 
       expect(schema.settleIgnoreUrls.defaultValue).toStrictEqual([])
     })
@@ -43,7 +44,7 @@ describe('createSchema', () => {
       [true, [/a/, /b/, /c/]],
       [true, ['a', /b/, 'c']]
     ])('returns %s from validation for the value %p', (expected, value) => {
-      const schema = createSchema('')
+      const schema = createSchema('', new DefaultRoutingProvider())
       const validate = schema.settleIgnoreUrls.validate
 
       expect(validate(value)).toBe(expected)
