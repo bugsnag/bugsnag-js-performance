@@ -11,11 +11,18 @@ import { type OnSettle } from '../lib/on-settle'
 
 jest.useFakeTimers()
 
+afterEach(() => {
+  history.replaceState({}, 'unused', 'https://bugsnag.com/route-change-plugin')
+})
+
 describe('RouteChangePlugin', () => {
-  it('automatically creates a route change span when using pushState', () => {
+  it.each([
+    { type: 'URL', url: new URL('https://bugsnag.com/second-route') },
+    { type: 'string (absolute URL)', url: 'https://bugsnag.com/second-route' },
+    { type: 'string (relative URL)', url: '/second-route' }
+  ])('creates a route change span on pushState with $type', ({ url }) => {
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(32) }
     const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle)
-
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
 
@@ -28,8 +35,7 @@ describe('RouteChangePlugin', () => {
 
     testClient.start({ apiKey: VALID_API_KEY })
 
-    // Perform route changes
-    history.pushState('', '', new URL('https://bugsnag.com/second-route'))
+    history.pushState({}, '', url)
 
     jest.runAllTimers()
 
@@ -39,9 +45,87 @@ describe('RouteChangePlugin', () => {
       endTimeUnixNano: '32000000'
     }))
 
-    const pushStateSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
-    expect(pushStateSpan).toHaveAttribute('bugsnag.span.category', 'route_change')
-    expect(pushStateSpan).toHaveAttribute('bugsnag.browser.page.route', '/second-route')
-    expect(pushStateSpan).toHaveAttribute('bugsnag.browser.page.previous_route', '/route-change-plugin')
+    const span = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+    expect(span).toHaveAttribute('bugsnag.span.category', 'route_change')
+    expect(span).toHaveAttribute('bugsnag.browser.page.route', '/second-route')
+    expect(span).toHaveAttribute('bugsnag.browser.page.previous_route', '/route-change-plugin')
+  })
+
+  it('creates a route change span on popstate', () => {
+    const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(32) }
+    const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle)
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+    const delivery = new InMemoryDelivery()
+
+    const testClient = createTestClient({
+      clock,
+      deliveryFactory: () => delivery,
+      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, onSettle, clock)]
+    })
+
+    history.pushState({}, '', '/first-route')
+    history.pushState({}, '', '/second-route')
+    testClient.start({ apiKey: VALID_API_KEY })
+
+    history.back()
+    jest.runAllTimers()
+
+    const firstSpan = expect.objectContaining({
+      name: '[RouteChange]/first-route',
+      startTimeUnixNano: '1000000',
+      endTimeUnixNano: '32000000'
+    })
+
+    const secondSpan = expect.objectContaining({
+      name: '[RouteChange]/second-route',
+      startTimeUnixNano: '2000000',
+      endTimeUnixNano: '32000000'
+    })
+
+    expect(delivery).toHaveSentSpan(firstSpan)
+    expect(delivery).not.toHaveSentSpan(secondSpan)
+
+    const firstRouteSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+    expect(firstRouteSpan).toHaveAttribute('bugsnag.span.category', 'route_change')
+    expect(firstRouteSpan).toHaveAttribute('bugsnag.browser.page.route', '/first-route')
+    expect(firstRouteSpan).toHaveAttribute('bugsnag.browser.page.previous_route', '/second-route')
+
+    history.forward()
+    jest.runAllTimers()
+
+    expect(delivery).toHaveSentSpan(secondSpan)
+
+    const secondRouteSpan = delivery.requests[1].resourceSpans[0].scopeSpans[0].spans[0]
+    expect(secondRouteSpan).toHaveAttribute('bugsnag.span.category', 'route_change')
+    expect(secondRouteSpan).toHaveAttribute('bugsnag.browser.page.route', '/second-route')
+    expect(secondRouteSpan).toHaveAttribute('bugsnag.browser.page.previous_route', '/first-route')
+  })
+
+  it.each([
+    { type: 'empty string', url: '' },
+    { type: 'undefined', url: undefined },
+    { type: 'null', url: null }
+  ])('does not create a route change span on pushState with $type', ({ url }) => {
+    const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(32) }
+    const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle)
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+    const delivery = new InMemoryDelivery()
+
+    const testClient = createTestClient({
+      clock,
+      deliveryFactory: () => delivery,
+      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, onSettle, clock)]
+    })
+
+    testClient.start({ apiKey: VALID_API_KEY })
+
+    history.pushState({}, '', url)
+
+    jest.runAllTimers()
+
+    // No delivery
+    expect(delivery.requests).toHaveLength(0)
   })
 })
