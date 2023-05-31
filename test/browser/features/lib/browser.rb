@@ -80,7 +80,7 @@ class Browser
   def chrome_supported_vitals
     case @version
     when (77..)
-      ["ttfb", "fcp", "fid_start", "fid_end", "lcp"] # also ["cls"]
+      ["ttfb", "fcp", "fid_start", "fid_end", "lcp", "cls"]
     when (76..)
       ["ttfb", "fcp", "fid_start", "fid_end"]
     when (64..)
@@ -93,7 +93,7 @@ class Browser
   def edge_supported_vitals
     case @version
     when (79..)
-      ["ttfb", "fcp", "fid_start", "fid_end", "lcp"] # also ["cls"]
+      ["ttfb", "fcp", "fid_start", "fid_end", "lcp", "cls"]
     else 
       ["ttfb"]
     end
@@ -102,9 +102,9 @@ class Browser
   def firefox_supported_vitals
     case @version
     when (89..)
-      ["ttfb", "fcp", "fid_start", "fid_end"] # also ["lcp", "cls"]
+      ["ttfb", "fcp", "fid_start", "fid_end"] # also ["lcp"]
     when (84..)
-      ["ttfb", "fcp"] # also ["cls"]
+      ["ttfb", "fcp", "cls"]
     else
       ["ttfb"]
     end
@@ -113,7 +113,7 @@ class Browser
   def safari_supported_vitals
     case @version
     when (14..) # technically 14.1, but our test fixtures never use 14.0
-      ["ttfb", "fcp"] # also ["cls"]
+      ["ttfb", "fcp"]
     else
       ["ttfb"]
     end

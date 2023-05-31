@@ -8,8 +8,11 @@
     </head>
     <body>
         <h1>page-load-spans</h1>
-        <span id="clock">0</span>
+
         <button id="stop-clock">Stop</button>
+        <pre id="clock"></pre>
+
+        <p>I'm here to make the layout shift when the clock ticks :)</p>
 
         <script>
           // stop the page from settling until the 'stop-clock' button is
@@ -19,11 +22,13 @@
           let time = 0
 
           const interval = setInterval(() => {
-            node.innerText = time++
+            node.innerText += `${time++}\n`
           }, 50)
 
           document.getElementById("stop-clock").addEventListener("click", () => {
-            clearInterval(interval)
+            // delay stopping the clock for a bit so the performance observers
+            // have a chance to fire
+            setTimeout(() => { clearInterval(interval) }, 1000)
           })
         </script>
     </body>
