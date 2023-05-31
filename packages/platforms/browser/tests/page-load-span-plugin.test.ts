@@ -35,19 +35,6 @@ describe('FullPageLoadPlugin', () => {
     performance.addEntry(createPerformancePaintTimingFake({ startTime: 128 }))
     performance.addEntry(createPerformanceEventTimingFake({ startTime: 0.4, processingStart: 1 }))
 
-    // session window 1: should be ignored as there's a later session window
-    performance.addEntry(createLayoutShiftFake({ startTime: 1_000, value: 100 }))
-    performance.addEntry(createLayoutShiftFake({ startTime: 1_100, value: 200 }))
-    performance.addEntry(createLayoutShiftFake({ startTime: 1_200, value: 300 }))
-
-    // session window 2: should be ignored as there's a later session window
-    performance.addEntry(createLayoutShiftFake({ startTime: 5_000, value: 999 }))
-
-    // session window 3: should be included as it's the latest session window
-    performance.addEntry(createLayoutShiftFake({ startTime: 20_000, value: 10 }))
-    performance.addEntry(createLayoutShiftFake({ startTime: 20_100, value: 20 }))
-    performance.addEntry(createLayoutShiftFake({ startTime: 20_200, value: 30 }))
-
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
@@ -68,8 +55,23 @@ describe('FullPageLoadPlugin', () => {
       ]
     })
 
-    // Trigger LCP event
+    // largest contentful paint
     manager.queueEntry(createLargestContentfulPaintFake({ startTime: 64 }))
+
+    // cumulative layout shift
+    // session window 1: should be ignored as there's a later session window
+    manager.queueEntry(createLayoutShiftFake({ startTime: 1_000, value: 100 }))
+    manager.queueEntry(createLayoutShiftFake({ startTime: 1_100, value: 200 }))
+    manager.queueEntry(createLayoutShiftFake({ startTime: 1_200, value: 300 }))
+
+    // session window 2: should be ignored as there's a later session window
+    manager.queueEntry(createLayoutShiftFake({ startTime: 5_000, value: 999 }))
+
+    // session window 3: should be included as it's the latest session window
+    manager.queueEntry(createLayoutShiftFake({ startTime: 20_000, value: 10 }))
+    manager.queueEntry(createLayoutShiftFake({ startTime: 20_100, value: 20 }))
+    manager.queueEntry(createLayoutShiftFake({ startTime: 20_200, value: 30 }))
+
     manager.flushQueue()
 
     testClient.start({ apiKey: VALID_API_KEY })
