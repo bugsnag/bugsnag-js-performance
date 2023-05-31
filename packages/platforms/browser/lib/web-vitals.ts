@@ -29,10 +29,11 @@ interface LayoutShift extends PerformanceEntry {
 }
 
 export class WebVitals {
-  private performance: PerformanceWithNavigationTiming
-  private clock: Clock
+  private readonly performance: PerformanceWithNavigationTiming
+  private readonly clock: Clock
+  private readonly observers: PerformanceObserver[]
+
   private largestContentfulPaint: number | undefined
-  private observer: PerformanceObserver | undefined
 
   constructor (
     performance: PerformanceWithNavigationTiming,
@@ -41,21 +42,14 @@ export class WebVitals {
   ) {
     this.performance = performance
     this.clock = clock
+    this.observers = []
 
-    if (PerformanceObserverClass &&
-      Array.isArray(PerformanceObserverClass.supportedEntryTypes) &&
-      PerformanceObserverClass.supportedEntryTypes.includes('largest-contentful-paint')
-    ) {
-      this.observer = new PerformanceObserverClass((list) => {
-        const entries = list.getEntries()
+    if (PerformanceObserverClass && Array.isArray(PerformanceObserverClass.supportedEntryTypes)) {
+      const supportedEntryTypes = PerformanceObserverClass.supportedEntryTypes
 
-        if (entries.length > 0) {
-          // Use the latest LCP candidate
-          this.largestContentfulPaint = entries[entries.length - 1].startTime
-        }
-      })
-
-      this.observer.observe({ type: 'largest-contentful-paint', buffered: true })
+      if (supportedEntryTypes.includes('largest-contentful-paint')) {
+        this.observeLargestContentfulPaint(PerformanceObserverClass)
+      }
     }
   }
 
@@ -89,8 +83,10 @@ export class WebVitals {
       span.addEvent('lcp', this.largestContentfulPaint)
     }
 
-    if (this.observer) {
-      this.observer.disconnect()
+    // as there is only 1 page load span, we don't need to keep observing
+    // performance events, so can disconnect from any observers we've registered
+    for (const observer of this.observers) {
+      observer.disconnect()
     }
   }
 
@@ -166,5 +162,22 @@ export class WebVitals {
     if (session) {
       return session.value
     }
+  }
+
+  private observeLargestContentfulPaint (
+    PerformanceObserverClass: typeof PerformanceObserver
+  ): void {
+    const observer = new PerformanceObserverClass((list) => {
+      const entries = list.getEntries()
+
+      if (entries.length > 0) {
+        // Use the latest LCP candidate
+        this.largestContentfulPaint = entries[entries.length - 1].startTime
+      }
+    })
+
+    observer.observe({ type: 'largest-contentful-paint', buffered: true })
+
+    this.observers.push(observer)
   }
 }
