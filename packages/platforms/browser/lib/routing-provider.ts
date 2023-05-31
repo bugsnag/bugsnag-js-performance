@@ -1,24 +1,23 @@
 import { isObject } from '@bugsnag/core-performance'
-import { type OnSettle } from './on-settle'
 import { type StartRouteChangeSpan } from './auto-instrumentation'
+import { type OnSettle } from './on-settle'
+import getAbsoluteUrl from './request-tracker/url-helpers'
 
 export interface RoutingProvider {
   resolveRoute: RouteResolver
   configure: (startRouteChangeSpan: StartRouteChangeSpan, onSettle: OnSettle) => void
 }
 
-export type RouteResolver = (url: URL | string) => string
+export type RouteResolver = (url: URL) => string
 
-const defaultRouteResolver: RouteResolver = (url: URL | string) => {
+const defaultRouteResolver: RouteResolver = (url: URL) => url.pathname
+
+const sanitizeURL = (url: URL | string) => {
   if (url instanceof URL) {
-    return url.pathname
-  } else if (url.startsWith('/')) {
     return url
-  } else if (url.startsWith('http')) {
-    return new URL(url).pathname
   }
 
-  return url
+  return new URL(getAbsoluteUrl(url, window.document.baseURI))
 }
 
 export class DefaultRoutingProvider implements RoutingProvider {
@@ -29,10 +28,10 @@ export class DefaultRoutingProvider implements RoutingProvider {
   }
 
   configure (startRouteChangeSpan: StartRouteChangeSpan, onSettle: OnSettle) {
-    let initialRoute: string | undefined = this.resolveRoute(window.location.pathname)
+    let initialRoute: string | undefined = this.resolveRoute(sanitizeURL(window.location.pathname))
 
     addEventListener('popstate', () => {
-      const route = this.resolveRoute(window.location.pathname)
+      const route = this.resolveRoute(sanitizeURL(window.location.pathname))
       const span = startRouteChangeSpan(route, { previousRoute: initialRoute })
 
       // clear initial route
@@ -50,7 +49,7 @@ export class DefaultRoutingProvider implements RoutingProvider {
       const url = args[2]
 
       if (url) {
-        const route = resolveRoute(url)
+        const route = resolveRoute(sanitizeURL(url))
         const span = startRouteChangeSpan(route, { previousRoute: initialRoute })
 
         // clear initial route
