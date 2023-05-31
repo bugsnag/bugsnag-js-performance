@@ -3,6 +3,7 @@ import { FullPageLoadPlugin, NetworkRequestPlugin, RouteChangePlugin } from './a
 import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
 import { createSchema } from './config'
+import { createDefaultRoutingProvider } from './default-routing-provider'
 import createBrowserDeliveryFactory from './delivery'
 import idGenerator from './id-generator'
 import createOnSettle from './on-settle'
@@ -19,13 +20,14 @@ const resourceAttributesSource = createResourceAttributesSource(navigator)
 const fetchRequestTracker = createFetchRequestTracker(window, clock)
 const xhrRequestTracker = createXmlHttpRequestTracker(window, clock)
 const webVitals = new WebVitals(performance, clock, window.PerformanceObserver)
-const onSettle = createOnSettle(
+export const onSettle = createOnSettle(
   clock,
   window,
   fetchRequestTracker,
   xhrRequestTracker,
   performance
 )
+export const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle)
 
 const BugsnagPerformance = createClient({
   backgroundingListener,
@@ -34,7 +36,7 @@ const BugsnagPerformance = createClient({
   spanAttributesSource,
   deliveryFactory: createBrowserDeliveryFactory(window.fetch, backgroundingListener),
   idGenerator,
-  schema: createSchema(window.location.hostname),
+  schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
   plugins: (spanFactory) => [
     onSettle,
     new FullPageLoadPlugin(
