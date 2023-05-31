@@ -34,6 +34,7 @@ export class WebVitals {
   private readonly observers: PerformanceObserver[]
 
   private largestContentfulPaint: number | undefined
+  private cumulativeLayoutShift: number | undefined
 
   constructor (
     performance: PerformanceWithNavigationTiming,
@@ -49,6 +50,10 @@ export class WebVitals {
 
       if (supportedEntryTypes.includes('largest-contentful-paint')) {
         this.observeLargestContentfulPaint(PerformanceObserverClass)
+      }
+
+      if (supportedEntryTypes.includes('layout-shift')) {
+        this.observeLayoutShift(PerformanceObserverClass)
       }
     }
   }
@@ -73,10 +78,8 @@ export class WebVitals {
       span.addEvent('fid_end', firstInputDelay.end)
     }
 
-    const cumulativeLayoutShift = this.cumulativeLayoutShift()
-
-    if (cumulativeLayoutShift) {
-      span.setAttribute('bugsnag.metrics.cls', cumulativeLayoutShift)
+    if (this.cumulativeLayoutShift) {
+      span.setAttribute('bugsnag.metrics.cls', this.cumulativeLayoutShift)
     }
 
     if (this.largestContentfulPaint) {
@@ -128,42 +131,6 @@ export class WebVitals {
     }
   }
 
-  private cumulativeLayoutShift (): number | undefined {
-    let session: LayoutShiftSession | undefined
-
-    for (const entry of this.performance.getEntriesByType('layout-shift') as LayoutShift[]) {
-      // ignore entries with recent input as it's likely the layout shifted due
-      // to user input and this metric only cares about unexpected layout
-      // shifts
-      if (entry.hadRecentInput) {
-        continue
-      }
-
-      // include this entry in the current session if we have a current session
-      // and this entry fits into the session window (it occurred less than 1
-      // second after the previous entry and the session duration is less than
-      // 5 seconds), otherwise start a new session
-      if (
-        session &&
-        entry.startTime - session.previousStartTime < 1000 &&
-        entry.startTime - session.firstStartTime < 5000
-      ) {
-        session.value += entry.value
-        session.previousStartTime = entry.startTime
-      } else {
-        session = {
-          value: entry.value,
-          firstStartTime: entry.startTime,
-          previousStartTime: entry.startTime
-        }
-      }
-    }
-
-    if (session) {
-      return session.value
-    }
-  }
-
   private observeLargestContentfulPaint (
     PerformanceObserverClass: typeof PerformanceObserver
   ): void {
@@ -177,6 +144,52 @@ export class WebVitals {
     })
 
     observer.observe({ type: 'largest-contentful-paint', buffered: true })
+
+    this.observers.push(observer)
+  }
+
+  private observeLayoutShift (
+    PerformanceObserverClass: typeof PerformanceObserver
+  ): void {
+    let session: LayoutShiftSession | undefined
+
+    const observer = new PerformanceObserverClass((list) => {
+      for (const entry of list.getEntries() as LayoutShift[]) {
+        // ignore entries with recent input as it's likely the layout shifted due
+        // to user input and this metric only cares about unexpected layout
+        // shifts
+        if (entry.hadRecentInput) {
+          continue
+        }
+
+        // include this entry in the current session if we have a current session
+        // and this entry fits into the session window (it occurred less than 1
+        // second after the previous entry and the session duration is less than
+        // 5 seconds), otherwise start a new session
+        if (
+          session &&
+          entry.startTime - session.previousStartTime < 1000 &&
+          entry.startTime - session.firstStartTime < 5000
+        ) {
+          session.value += entry.value
+          session.previousStartTime = entry.startTime
+        } else {
+          session = {
+            value: entry.value,
+            firstStartTime: entry.startTime,
+            previousStartTime: entry.startTime
+          }
+        }
+      }
+
+      if (session &&
+        (this.cumulativeLayoutShift === undefined || session.value > this.cumulativeLayoutShift)
+      ) {
+        this.cumulativeLayoutShift = session.value
+      }
+    })
+
+    observer.observe({ type: 'layout-shift', buffered: true })
 
     this.observers.push(observer)
   }
