@@ -59,7 +59,12 @@ end
 #
 # @step_input span_name [String] The name of the span to check
 Then("the span named {string} is a valid full page load span") do |span_name|
-  expected_event_names = $browser.supported_web_vitals
+  supported_web_vitals = $browser.supported_web_vitals
+
+  # "cls" (cumulative layout shift) is an attribute, not an event
+  supports_cumulative_layout_shift = supported_web_vitals.include?("cls")
+  expected_event_names = supported_web_vitals.select { |vital| vital != "cls" }
+
   page_load_span_prefix = "[FullPageLoad]"
 
   Maze.check.true(
@@ -104,6 +109,24 @@ Then("the span named {string} is a valid full page load span") do |span_name|
       :<=,
       event_time,
       "The '#{event["name"]}' event happened before the span's start time (#{start_time - event_time}ns difference)"
+    )
+  end
+
+  if supports_cumulative_layout_shift
+    cumulative_layout_shift_attributes = span["attributes"].find_all do |attribute|
+      attribute["key"] == "bugsnag.metrics.cls"
+    end
+
+    Maze.check.true(
+      cumulative_layout_shift_attributes.length == 1,
+      "Expected 1 'bugsnag.metrics.cls' attribute, found: #{cumulative_layout_shift_attributes.length}"
+    )
+
+    cumulative_layout_shift_attribute = cumulative_layout_shift_attributes.first
+
+    Maze.check.true(
+      cumulative_layout_shift_attribute["value"].key?("doubleValue"),
+      "Expected an doubleValue attribute, got: #{cumulative_layout_shift_attribute}"
     )
   end
 end
