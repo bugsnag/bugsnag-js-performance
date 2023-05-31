@@ -399,6 +399,46 @@ describe('FullPageLoadPlugin', () => {
         }))
       })
 
+      it('handles there being no lcp entry', () => {
+        const manager = new PerformanceObserverManager()
+        const performance = new PerformanceFake()
+
+        const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+        const delivery = new InMemoryDelivery()
+        const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
+        const webVitals = new WebVitals(performance, clock, manager.createPerformanceObserverFakeClass())
+        const testClient = createTestClient({
+          clock,
+          deliveryFactory: () => delivery,
+          schema: createSchema(window.location.hostname),
+          plugins: (spanFactory) => [
+            new FullPageLoadPlugin(
+              document,
+              window.location,
+              spanFactory,
+              webVitals,
+              onSettle,
+              new ControllableBackgroundingListener()
+            )
+          ]
+        })
+
+        // it's an empty queue, but there's no harm in flushing
+        manager.flushQueue()
+
+        testClient.start(VALID_API_KEY)
+
+        jest.runAllTimers()
+
+        expect(delivery).toHaveSentSpan(expect.objectContaining({
+          name: '[FullPageLoad]/page-load-span-plugin'
+        }))
+
+        const span = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+
+        expect(span).not.toHaveEvent('lcp')
+      })
+
       it('handles PerformanceObserver not being available', () => {
         const performance = new PerformanceFake()
 
