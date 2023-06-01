@@ -26,7 +26,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
     let previousRoute = configuration.routingProvider.getInitialRoute()
 
     const startRouteChangeSpan = (route: string, options: StartRouteOptions = {}) => {
-      const startTime = options?.startTime ? timeToNumber(this.clock, options.startTime) : this.clock.now()
+      const startTime = options.startTime ? timeToNumber(this.clock, options.startTime) : this.clock.now()
       const span = this.spanFactory.startSpan(`[RouteChange]${route}`, startTime)
       span.setAttribute('bugsnag.span.category', 'route_change')
       span.setAttribute('bugsnag.browser.page.route', route)
