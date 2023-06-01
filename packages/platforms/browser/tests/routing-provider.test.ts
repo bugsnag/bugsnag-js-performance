@@ -34,8 +34,15 @@ describe('isRoutingProvider', () => {
     expect(isRoutingProvider(routingProvider)).toBe(true)
   })
 
-  it('Returns false for an invalid routing provider', () => {
-    const notRoutingProvider = { method: () => 'test' }
+  it.each([
+    1234,
+    null,
+    undefined,
+    'a string',
+    { method: () => 'test' },
+    () => ({ initialRoute: '/route', resolveRoute: () => {}, onRouteChange: () => {}, onSettle: () => {} }),
+    { initialRoute: 123, resolveRoute: () => {}, onRouteChange: () => {}, onSettle: () => {} }
+  ])('Returns false for an invalid routing provider', (notRoutingProvider) => {
     expect(isRoutingProvider(notRoutingProvider)).toBe(false)
   })
 })
