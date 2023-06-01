@@ -1,4 +1,7 @@
-import { BugsnagPerformance, type Configuration } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '@bugsnag/browser-performance'
+import { type BugsnagPerformance, type Configuration } from '@bugsnag/core-performance'
 
-export default BugsnagPerformance<BrowserConfiguration | Configuration>
+declare const Bugsnag: BugsnagPerformance<BrowserConfiguration | Configuration>
+
+export default Bugsnag
+export * from '@bugsnag/browser-performance'
