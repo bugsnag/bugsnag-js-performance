@@ -1,11 +1,10 @@
 import { isObject } from '@bugsnag/core-performance'
 import { type StartRouteChangeSpan } from './auto-instrumentation'
-import { type OnSettle } from './on-settle'
 
 export interface RoutingProvider {
   resolveRoute: RouteResolver
   getInitialRoute: () => string
-  configure: (startRouteChangeSpan: StartRouteChangeSpan, onSettle: OnSettle) => void
+  configure: (startRouteChangeSpan: StartRouteChangeSpan) => void
 }
 
 export type RouteResolver = (url: URL) => string

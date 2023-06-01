@@ -1,22 +1,18 @@
 import { timeToNumber, type Clock, type InternalConfiguration, type Plugin, type Span, type SpanFactory, type Time } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
-import { type OnSettle } from '../on-settle'
 
 interface StartRouteOptions {
   startTime?: Time
-  previousRoute?: string
 }
 
 export type StartRouteChangeSpan = (route: string, options?: StartRouteOptions) => Span
 
 export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
-  private spanFactory: SpanFactory
-  private onSettle: OnSettle
-  private clock: Clock
+  private readonly spanFactory: SpanFactory
+  private readonly clock: Clock
 
-  constructor (spanFactory: SpanFactory, onSettle: OnSettle, clock: Clock) {
+  constructor (spanFactory: SpanFactory, clock: Clock) {
     this.spanFactory = spanFactory
-    this.onSettle = onSettle
     this.clock = clock
   }
 
@@ -42,6 +38,6 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
       return { end }
     }
 
-    configuration.routingProvider.configure(startRouteChangeSpan, this.onSettle)
+    configuration.routingProvider.configure(startRouteChangeSpan)
   }
 }
