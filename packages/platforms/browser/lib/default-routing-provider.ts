@@ -1,6 +1,6 @@
-import { type OnSettle } from './on-settle'
+import { type OnSettle, type OnSettleCallback } from './on-settle'
 import getAbsoluteUrl from './request-tracker/url-helpers'
-import { type OnRouteChangeCallback, type OnSettleCallback, type RouteResolver, type RoutingProvider } from './routing-provider'
+import { type OnRouteChangeCallback, type RouteResolver, type RoutingProvider } from './routing-provider'
 
 const defaultRouteResolver: RouteResolver = (url: URL) => url.pathname
 

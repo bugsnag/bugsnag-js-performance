@@ -1,5 +1,6 @@
 import { type RoutingProvider } from '../../lib'
-import { type OnRouteChangeCallback, type OnSettleCallback } from '../../lib/routing-provider'
+import { type OnSettleCallback } from '../../lib/on-settle'
+import { type OnRouteChangeCallback } from '../../lib/routing-provider'
 
 class MockRoutingProvider implements RoutingProvider {
   readonly initialRoute = '/initial-route'
@@ -14,7 +15,8 @@ class MockRoutingProvider implements RoutingProvider {
   }
 
   onSettle (callback: OnSettleCallback) {
-    callback()
+    const time = 123
+    callback(time)
   }
 }
 

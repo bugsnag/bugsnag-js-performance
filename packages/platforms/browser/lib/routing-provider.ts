@@ -1,6 +1,6 @@
 import { isObject, type Time } from '@bugsnag/core-performance'
+import { type OnSettleCallback } from './on-settle'
 
-export type OnSettleCallback = (settledTime?: Time) => void
 export type OnRouteChangeCallback = (newRoute: string, routeChangeTime?: Time) => void
 
 export interface RoutingProvider {
