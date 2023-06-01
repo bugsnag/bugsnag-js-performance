@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/js-performance",
-  "version": "0.0.2-alpha.0",
+  "version": "0.0.2-alpha.2",
   "description": "",
   "keywords": [
     "bugsnag",
@@ -17,7 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
   },
-  "main": "dist/browser.js",
+  "main": "dist/node.js",
   "browser": "dist/browser.js",
   "files": [
     "dist",
@@ -29,6 +29,7 @@
   },
   "types": "types.d.ts",
   "dependencies": {
-    "@bugsnag/browser-performance": "0.0.2-alpha.0"
+    "@bugsnag/browser-performance": "0.0.2-alpha.2",
+    "@bugsnag/core-performance": "0.0.2-alpha.2"
   }
 }
