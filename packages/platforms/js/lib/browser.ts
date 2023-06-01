@@ -1,1 +1,1 @@
-export { default } from '@bugsnag/browser-performance'
+export * from '@bugsnag/browser-performance'
