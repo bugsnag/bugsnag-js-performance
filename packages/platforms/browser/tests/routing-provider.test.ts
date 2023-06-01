@@ -10,7 +10,7 @@ const DefaultRoutingProvider = createDefaultRoutingProvider(jest.fn())
 describe('DefaultRoutingProvider', () => {
   it('Uses a provided route resolver function', () => {
     const routeResolverFn = jest.fn((url: URL | string) => 'resolved-route')
-    const routingProvier = new DefaultRoutingProvider(routeResolverFn)
+    const routingProvier = new DefaultRoutingProvider(window.location, routeResolverFn)
     const resolvedRoute = routingProvier.resolveRoute(new URL('https://www.bugsnag.com'))
 
     expect(resolvedRoute).toBe('resolved-route')
@@ -20,7 +20,7 @@ describe('DefaultRoutingProvider', () => {
   describe('defaultRouteResolver', () => {
     it('Returns a route when provided a complete URL', () => {
       const url = new URL('https://www.bugsnag.com/platforms/javascript?test=true#unit-test')
-      const routingProvier = new DefaultRoutingProvider()
+      const routingProvier = new DefaultRoutingProvider(window.location)
       const resolvedRoute = routingProvier.resolveRoute(url)
 
       expect(resolvedRoute).toBe('/platforms/javascript')
@@ -30,7 +30,7 @@ describe('DefaultRoutingProvider', () => {
 
 describe('isRoutingProvider', () => {
   it('Returns true for a valid routing provider', () => {
-    const routingProvider = new DefaultRoutingProvider()
+    const routingProvider = new DefaultRoutingProvider(window.location)
     expect(isRoutingProvider(routingProvider)).toBe(true)
   })
 

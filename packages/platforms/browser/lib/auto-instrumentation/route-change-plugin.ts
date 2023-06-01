@@ -19,25 +19,27 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     // if (!configuration.autoInstrumentRouteChanges) return
 
-    let previousRoute = configuration.routingProvider.getInitialRoute()
+    let previousRoute = configuration.routingProvider.initialRoute
 
-    const startRouteChangeSpan = (route: string, options: StartRouteOptions = {}) => {
-      const startTime = options.startTime ? timeToNumber(this.clock, options.startTime) : this.clock.now()
-      const span = this.spanFactory.startSpan(`[RouteChange]${route}`, startTime)
+    configuration.routingProvider.onRouteChange((newRoute: string, routeChangeTime?: Time) => {
+      const startTime = routeChangeTime === undefined
+        ? this.clock.now()
+        : timeToNumber(this.clock, routeChangeTime)
+
+      const span = this.spanFactory.startSpan(`[RouteChange]${newRoute}`, startTime)
       span.setAttribute('bugsnag.span.category', 'route_change')
-      span.setAttribute('bugsnag.browser.page.route', route)
+      span.setAttribute('bugsnag.browser.page.route', newRoute)
       span.setAttribute('bugsnag.browser.page.previous_route', previousRoute)
 
-      previousRoute = route
+      previousRoute = newRoute
 
-      const end = (endTime?: Time) => {
-        const safeTime = timeToNumber(this.clock, endTime)
-        this.spanFactory.endSpan(span, safeTime)
-      }
+      configuration.routingProvider.onSettle((settledTime?: Time) => {
+        const endTime = settledTime === undefined
+          ? this.clock.now()
+          : timeToNumber(this.clock, settledTime)
 
-      return { end }
-    }
-
-    configuration.routingProvider.configure(startRouteChangeSpan)
+        this.spanFactory.endSpan(span, endTime)
+      })
+    })
   }
 }

@@ -1,16 +1,20 @@
 import { type RoutingProvider } from '../../lib'
+import { type OnRouteChangeCallback, type OnSettleCallback } from '../../lib/routing-provider'
 
 class MockRoutingProvider implements RoutingProvider {
-  getInitialRoute () {
-    return '/initial-route'
-  }
+  readonly initialRoute = '/initial-route'
 
   resolveRoute (url: URL) {
     return url.pathname
   }
 
-  configure () {
+  onRouteChange (callback: OnRouteChangeCallback) {
+    const route = '/new-route'
+    callback(route)
+  }
 
+  onSettle (callback: OnSettleCallback) {
+    callback()
   }
 }
 
