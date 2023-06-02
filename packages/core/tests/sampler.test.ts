@@ -26,7 +26,7 @@ describe('Sampler', () => {
     const sampler = new Sampler(1.0)
     const delivery = new InMemoryDelivery()
     sampler.initialise(0.5, delivery)
-    expect(delivery.requests[0]).toEqual({ resourceSpans: [] })
+    expect(delivery.initialSamplingRequest).not.toBeUndefined()
   })
 
   describe('sample', () => {

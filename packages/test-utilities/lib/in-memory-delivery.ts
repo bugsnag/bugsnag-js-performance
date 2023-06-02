@@ -2,12 +2,17 @@ import { type DeliveryPayload, type Delivery, type ResponseState } from '@bugsna
 
 class InMemoryDelivery implements Delivery {
   public requests: DeliveryPayload[] = []
+  public initialSamplingRequest: DeliveryPayload | undefined
 
   private readonly responseStateStack: ResponseState[] = []
   private readonly samplingProbabilityStack: number[] = []
 
   send (payload: DeliveryPayload) {
-    this.requests.push(payload)
+    if (!this.initialSamplingRequest && payload.resourceSpans.length === 0) {
+      this.initialSamplingRequest = payload
+    } else {
+      this.requests.push(payload)
+    }
 
     const state = this.responseStateStack.pop() || 'success' as ResponseState
     const samplingProbability = this.samplingProbabilityStack.pop()
