@@ -1,6 +1,8 @@
 import { type Delivery } from './delivery'
 import { type SpanEnded, type SpanProbability } from './span'
 
+const PROBABILITY_REFRESH_INTERVAL = 86400000
+
 // sampling rates are stored as a number between 0 and 2^32 - 1 (i.e. they are
 // u32s) so we need to scale the probability value to match this range as they
 // are stored as values between 0 and 1
@@ -11,6 +13,7 @@ function scaleProbabilityToMatchSamplingRate (probability: number): SpanProbabil
 class Sampler {
   private _probability: number
   private delivery?: Delivery
+  private interval?: ReturnType<typeof setInterval>
 
   /**
    * The current probability scaled to match sampling rate
@@ -37,6 +40,9 @@ class Sampler {
   set probability (probability: number) {
     this._probability = probability
     this.scaledProbability = scaleProbabilityToMatchSamplingRate(probability)
+
+    // reset the timer whenever we receive a new probability value
+    this.resetTimer()
   }
 
   /**
@@ -56,11 +62,18 @@ class Sampler {
     this.probability = configuredProbability
     this.delivery = delivery
 
-    // make initial sampling request
+    // make an initial request for the probability value
     this.fetchSamplingProbability()
+
+    // start the timer to refresh in 24 hours
+    this.interval = setInterval(this.fetchSamplingProbability, PROBABILITY_REFRESH_INTERVAL)
   }
 
-  async fetchSamplingProbability () {
+  sample (span: SpanEnded): boolean {
+    return span.samplingRate <= span.samplingProbability
+  }
+
+  private fetchSamplingProbability = async () => {
     if (!this.delivery) return
 
     const payload = { resourceSpans: [] }
@@ -71,8 +84,11 @@ class Sampler {
     }
   }
 
-  sample (span: SpanEnded): boolean {
-    return span.samplingRate <= span.samplingProbability
+  private resetTimer () {
+    if (this.interval) {
+      clearInterval(this.interval)
+      this.interval = setInterval(this.fetchSamplingProbability, PROBABILITY_REFRESH_INTERVAL)
+    }
   }
 }
 

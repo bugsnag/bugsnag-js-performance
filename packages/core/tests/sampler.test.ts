@@ -1,6 +1,8 @@
 import Sampler from '../lib/sampler'
 import { InMemoryDelivery, createEndedSpan } from '@bugsnag/js-performance-test-utilities'
 
+jest.useFakeTimers()
+
 describe('Sampler', () => {
   it('uses the initial probability', () => {
     const sampler = new Sampler(1.0)
@@ -15,18 +17,20 @@ describe('Sampler', () => {
     expect(sampler.probability).toBe(0.25)
   })
 
-  it('uses the provided probability when initialised', () => {
-    const sampler = new Sampler(1.0)
-    const delivery = new InMemoryDelivery()
-    sampler.initialise(0.5, delivery)
-    expect(sampler.probability).toBe(0.5)
-  })
+  describe('initialise', () => {
+    it('uses the provided probability when initialised', () => {
+      const sampler = new Sampler(1.0)
+      const delivery = new InMemoryDelivery()
+      sampler.initialise(0.5, delivery)
+      expect(sampler.probability).toBe(0.5)
+    })
 
-  it('makes an initial probability request when initialised', () => {
-    const sampler = new Sampler(1.0)
-    const delivery = new InMemoryDelivery()
-    sampler.initialise(0.5, delivery)
-    expect(delivery.initialSamplingRequest).not.toBeUndefined()
+    it('makes an initial probability request when initialised', () => {
+      const sampler = new Sampler(1.0)
+      const delivery = new InMemoryDelivery()
+      sampler.initialise(0.5, delivery)
+      expect(delivery.initialSamplingRequest).not.toBeUndefined()
+    })
   })
 
   describe('sample', () => {
@@ -151,6 +155,44 @@ describe('Sampler', () => {
       })
 
       expect(sampler.sample(span)).toBe(expected)
+    })
+  })
+
+  describe('periodic sampling request', () => {
+    it('requests a new sampling probability after 24 hours', async () => {
+      const sampler = new Sampler(1.0)
+      const delivery = new InMemoryDelivery()
+      sampler.initialise(1.0, delivery)
+      expect(delivery.initialSamplingRequest).not.toBeUndefined()
+      expect(delivery.requests.length).toEqual(0)
+
+      // just under 24 hours - no peridoic request yet
+      await jest.advanceTimersByTimeAsync(86399999)
+      expect(delivery.requests.length).toEqual(0)
+
+      // just over 24 hours - peridoic request sent
+      await jest.advanceTimersByTimeAsync(2)
+      expect(delivery.requests.length).toEqual(1)
+    })
+
+    it('uses a requested probability when sampling the next batch', async () => {
+      const sampler = new Sampler(1.0)
+      const delivery = new InMemoryDelivery()
+      delivery.setNextSamplingProbability(0.25)
+
+      sampler.initialise(1.0, delivery)
+      expect(delivery.initialSamplingRequest).not.toBeUndefined()
+
+      // wait for the mock request to resolve
+      await Promise.resolve()
+      expect(sampler.probability).toEqual(0.25)
+
+      const span = createEndedSpan({
+        samplingRate: Math.floor(0.5 * 0xffffffff),
+        samplingProbability: sampler.spanProbability
+      })
+
+      expect(sampler.sample(span)).toEqual(false)
     })
   })
 })
