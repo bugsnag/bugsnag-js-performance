@@ -1,5 +1,6 @@
 import Sampler from '../lib/sampler'
 import { InMemoryDelivery, createEndedSpan } from '@bugsnag/js-performance-test-utilities'
+import { type ResponseState } from '../lib'
 
 jest.useFakeTimers()
 
@@ -193,6 +194,43 @@ describe('Sampler', () => {
       })
 
       expect(sampler.sample(span)).toEqual(false)
+    })
+
+    it('retries a failed request after 30 seconds (failure response)', async () => {
+      const sampler = new Sampler(1.0)
+      const state: ResponseState = 'failure-retryable'
+      const delivery = {
+        send: jest.fn(() => {
+          return Promise.resolve({ state })
+        })
+      }
+
+      sampler.initialise(1.0, delivery)
+      expect(delivery.send).toHaveBeenCalledTimes(1)
+
+      await jest.advanceTimersByTimeAsync(29999)
+      expect(delivery.send).toHaveBeenCalledTimes(1)
+
+      await jest.advanceTimersByTimeAsync(30000)
+      expect(delivery.send).toHaveBeenCalledTimes(2)
+    })
+
+    it('retries a failed request after 30 seconds (request error)', async () => {
+      const sampler = new Sampler(1.0)
+      const delivery = {
+        send: jest.fn(() => {
+          return Promise.reject(new Error('request failed'))
+        })
+      }
+
+      sampler.initialise(1.0, delivery)
+      expect(delivery.send).toHaveBeenCalledTimes(1)
+
+      await jest.advanceTimersByTimeAsync(29999)
+      expect(delivery.send).toHaveBeenCalledTimes(1)
+
+      await jest.advanceTimersByTimeAsync(30000)
+      expect(delivery.send).toHaveBeenCalledTimes(2)
     })
   })
 })

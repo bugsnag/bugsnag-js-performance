@@ -3,6 +3,8 @@ import { type SpanEnded, type SpanProbability } from './span'
 
 const PROBABILITY_REFRESH_INTERVAL = 86400000
 
+const PROBABILITY_REFRESH_RETRY_INTERVAL = 30000
+
 // sampling rates are stored as a number between 0 and 2^32 - 1 (i.e. they are
 // u32s) so we need to scale the probability value to match this range as they
 // are stored as values between 0 and 1
@@ -76,18 +78,27 @@ class Sampler {
   private fetchSamplingProbability = async () => {
     if (!this.delivery) return
 
-    const payload = { resourceSpans: [] }
-    const response = await this.delivery.send(payload)
+    try {
+      const payload = { resourceSpans: [] }
+      const response = await this.delivery.send(payload)
 
-    if (response.samplingProbability !== undefined) {
-      this.probability = response.samplingProbability
+      if (response.samplingProbability !== undefined) {
+        this.probability = response.samplingProbability
+      } else if (response.state !== 'success') {
+        this.resetTimer(true)
+      }
+    } catch (err) {
+      this.resetTimer(true)
     }
   }
 
-  private resetTimer () {
+  private resetTimer (isRetry: boolean = false) {
     if (this.interval) {
       clearInterval(this.interval)
-      this.interval = setInterval(this.fetchSamplingProbability, PROBABILITY_REFRESH_INTERVAL)
+      this.interval = setInterval(
+        this.fetchSamplingProbability,
+        isRetry ? PROBABILITY_REFRESH_RETRY_INTERVAL : PROBABILITY_REFRESH_INTERVAL
+      )
     }
   }
 }
