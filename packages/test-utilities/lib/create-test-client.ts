@@ -10,6 +10,7 @@ import {
 import {
   createClient,
   schema,
+  InMemoryPersistence,
   type BugsnagPerformance,
   type ClientOptions,
   type Configuration,
@@ -24,7 +25,8 @@ const defaultOptions = () => ({
   resourceAttributesSource,
   spanAttributesSource,
   schema,
-  plugins: () => []
+  plugins: () => [],
+  persistence: new InMemoryPersistence()
 })
 
 function createTestClient <S extends CoreSchema, C extends Configuration> (optionOverrides: Partial<ClientOptions<S, C>> = {}): BugsnagPerformance<C> {

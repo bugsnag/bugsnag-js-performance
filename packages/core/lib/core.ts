@@ -5,6 +5,7 @@ import { type Clock } from './clock'
 import { validateConfig, type Configuration, type CoreSchema } from './config'
 import { type DeliveryFactory } from './delivery'
 import { type IdGenerator } from './id-generator'
+import { type Persistence } from './persistence'
 import { type Plugin } from './plugin'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
@@ -25,6 +26,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration> {
   spanAttributesSource: SpanAttributesSource
   schema: S
   plugins: (spanFactory: SpanFactory) => Array<Plugin<C>>
+  persistence: Persistence
 }
 
 export function createClient<S extends CoreSchema, C extends Configuration> (options: ClientOptions<S, C>): BugsnagPerformance<C> {

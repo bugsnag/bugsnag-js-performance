@@ -6,6 +6,7 @@ import { createSchema } from './config'
 import { createDefaultRoutingProvider } from './default-routing-provider'
 import createBrowserDeliveryFactory from './delivery'
 import idGenerator from './id-generator'
+import makeBrowserPersistence from './persistence'
 import createOnSettle from './on-settle'
 import createFetchRequestTracker from './request-tracker/request-tracker-fetch'
 import createXmlHttpRequestTracker from './request-tracker/request-tracker-xhr'
@@ -49,7 +50,8 @@ const BugsnagPerformance = createClient({
     ),
     new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker),
     new RouteChangePlugin(spanFactory, window.location)
-  ]
+  ],
+  persistence: makeBrowserPersistence(window)
 })
 
 export default BugsnagPerformance
