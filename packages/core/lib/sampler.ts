@@ -1,3 +1,4 @@
+import { type Delivery } from './delivery'
 import { type SpanEnded, type SpanProbability } from './span'
 
 // sampling rates are stored as a number between 0 and 2^32 - 1 (i.e. they are
@@ -9,6 +10,7 @@ function scaleProbabilityToMatchSamplingRate (probability: number): SpanProbabil
 
 class Sampler {
   private _probability: number
+  private delivery?: Delivery
 
   /**
    * The current probability scaled to match sampling rate
@@ -48,6 +50,25 @@ class Sampler {
    */
   get spanProbability (): SpanProbability {
     return this.scaledProbability
+  }
+
+  initialise (configuredProbability: number, delivery: Delivery) {
+    this.probability = configuredProbability
+    this.delivery = delivery
+
+    // make initial sampling request
+    this.fetchSamplingProbability()
+  }
+
+  async fetchSamplingProbability () {
+    if (!this.delivery) return
+
+    const payload = { resourceSpans: [] }
+    const response = await this.delivery.send(payload)
+
+    if (response.samplingProbability !== undefined) {
+      this.probability = response.samplingProbability
+    }
   }
 
   sample (span: SpanEnded): boolean {

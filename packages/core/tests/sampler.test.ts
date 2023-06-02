@@ -1,5 +1,5 @@
 import Sampler from '../lib/sampler'
-import { createEndedSpan } from '@bugsnag/js-performance-test-utilities'
+import { InMemoryDelivery, createEndedSpan } from '@bugsnag/js-performance-test-utilities'
 
 describe('Sampler', () => {
   it('uses the initial probability', () => {
@@ -13,6 +13,20 @@ describe('Sampler', () => {
     sampler.probability = 0.25
 
     expect(sampler.probability).toBe(0.25)
+  })
+
+  it('uses the provided probability when initialised', () => {
+    const sampler = new Sampler(1.0)
+    const delivery = new InMemoryDelivery()
+    sampler.initialise(0.5, delivery)
+    expect(sampler.probability).toBe(0.5)
+  })
+
+  it('makes an initial probability request when initialised', () => {
+    const sampler = new Sampler(1.0)
+    const delivery = new InMemoryDelivery()
+    sampler.initialise(0.5, delivery)
+    expect(delivery.requests[0]).toEqual({ resourceSpans: [] })
   })
 
   describe('sample', () => {
