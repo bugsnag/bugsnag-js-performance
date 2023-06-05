@@ -2,18 +2,29 @@ steps:
 
   - group: "Browser Tests"
     steps:
-      - label: ":docker: Build browser maze runner image"
-        key: "browser-maze-runner"
+      - label: ":docker: Build BitBar Maze Runner image"
+        key: "browser-maze-runner-bb"
         timeout_in_minutes: 20
         plugins:
           - docker-compose#v3.9.0:
-              build: browser-maze-runner
+              build: browser-maze-runner-bb
               image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
-              cache-from: browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
+              cache-from: browser-maze-runner-bb:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
           - docker-compose#v3.9.0:
-              push: browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
+              push: browser-maze-runner-bb:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
 
-      - label:  ":docker: Build legacy browser maze runner image"
+      - label: ":docker: Build BrowserStack Maze Runner image"
+        key: "browser-maze-runner-bs"
+        timeout_in_minutes: 20
+        plugins:
+          - docker-compose#v3.9.0:
+              build: browser-maze-runner-bs
+              image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
+              cache-from: browser-maze-runner-bs:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
+          - docker-compose#v3.9.0:
+              push: browser-maze-runner-bs:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
+
+      - label:  ":docker: Build BrowserStack legacy Maze Runner image"
         key: "browser-maze-runner-legacy"
         timeout_in_minutes: 20
         plugins:
@@ -26,7 +37,7 @@ steps:
 
       # BitBar
       - label: ":{{ matrix.browser }}: {{ matrix.version }} tests"
-        depends_on: "browser-maze-runner"
+        depends_on: "browser-maze-runner-bb"
         timeout_in_minutes: 30
         plugins:
           docker-compose#v3.9.0:
@@ -82,7 +93,7 @@ steps:
           - android_pixel_7
           - iphone_xs
           - iphone_14
-        depends_on: "browser-maze-runner"
+        depends_on: "browser-maze-runner-bs"
         timeout_in_minutes: 30
         plugins:
           docker-compose#v3.9.0:
