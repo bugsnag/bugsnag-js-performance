@@ -454,7 +454,7 @@ describe('FullPageLoadPlugin', () => {
       const testClient = createTestClient({
         clock,
         deliveryFactory: () => delivery,
-        schema: createSchema(window.location.hostname),
+        schema: createSchema(window.location.hostname, new MockRoutingProvider()),
         plugins: (spanFactory) => [
           new FullPageLoadPlugin(
             document,
@@ -472,7 +472,7 @@ describe('FullPageLoadPlugin', () => {
       jest.runAllTimers()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
-        name: '[FullPageLoad]/page-load-span-plugin',
+        name: '[FullPageLoad]/initial-route',
         events: []
       }))
     })

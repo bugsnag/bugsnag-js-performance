@@ -272,7 +272,7 @@ describe('onSettle', () => {
     )
 
     const testClient = createTestClient({
-      schema: createSchema(window.location.hostname),
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       plugins: (spanFactory) => [onSettle]
     })
 
@@ -306,7 +306,7 @@ describe('onSettle', () => {
     )
 
     const testClient = createTestClient({
-      schema: createSchema(window.location.hostname),
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       plugins: (spanFactory) => [onSettle]
     })
 
