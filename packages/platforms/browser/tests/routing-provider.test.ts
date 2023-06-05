@@ -1,29 +1,61 @@
 /**
  * @jest-environment jsdom
+ * @jest-environment-options { "url": "https://bugsnag.com/route-change-plugin" }
  */
 
+import { InMemoryDelivery, IncrementingClock, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
+import { RouteChangePlugin } from '../lib/auto-instrumentation/route-change-plugin'
+import { createSchema } from '../lib/config'
 import { createDefaultRoutingProvider } from '../lib/default-routing-provider'
 import { isRoutingProvider } from '../lib/routing-provider'
 
-const DefaultRoutingProvider = createDefaultRoutingProvider(jest.fn())
+jest.useFakeTimers()
+
+const DefaultRoutingProvider = createDefaultRoutingProvider(jest.fn((c) => { c(32) }))
 
 describe('DefaultRoutingProvider', () => {
   it('Uses a provided route resolver function', () => {
-    const routeResolverFn = jest.fn((url: URL | string) => 'resolved-route')
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+    const delivery = new InMemoryDelivery()
+    const routeResolverFn = jest.fn((url: URL | string) => '/resolved-route')
     const routingProvier = new DefaultRoutingProvider(window.location, routeResolverFn)
-    const resolvedRoute = routingProvier.resolveRoute(new URL('https://www.bugsnag.com'))
+    const testClient = createTestClient({
+      clock,
+      deliveryFactory: () => delivery,
+      schema: createSchema(window.location.hostname, routingProvier),
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock)]
+    })
 
-    expect(resolvedRoute).toBe('resolved-route')
+    testClient.start({ apiKey: VALID_API_KEY })
+
+    history.pushState({}, '', '/new-route')
+
+    jest.runAllTimers()
+
     expect(routeResolverFn).toHaveBeenCalled()
+    expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[RouteChange]/resolved-route' }))
   })
 
   describe('defaultRouteResolver', () => {
     it('Returns a route when provided a complete URL', () => {
-      const url = new URL('https://www.bugsnag.com/platforms/javascript?test=true#unit-test')
+      const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+      const delivery = new InMemoryDelivery()
       const routingProvier = new DefaultRoutingProvider(window.location)
-      const resolvedRoute = routingProvier.resolveRoute(url)
+      const testClient = createTestClient({
+        clock,
+        deliveryFactory: () => delivery,
+        schema: createSchema(window.location.hostname, routingProvier),
+        plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock)]
+      })
 
-      expect(resolvedRoute).toBe('/platforms/javascript')
+      testClient.start({ apiKey: VALID_API_KEY })
+
+      const url = new URL('https://bugsnag.com/platforms/javascript?test=true#unit-test')
+      history.pushState({}, '', url)
+
+      jest.runAllTimers()
+
+      expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[RouteChange]/platforms/javascript' }))
     })
   })
 })
@@ -40,8 +72,8 @@ describe('isRoutingProvider', () => {
     undefined,
     'a string',
     { method: () => 'test' },
-    () => ({ initialRoute: '/route', resolveRoute: () => {}, onRouteChange: () => {}, onSettle: () => {} }),
-    { initialRoute: 123, resolveRoute: () => {}, onRouteChange: () => {}, onSettle: () => {} }
+    () => ({ initialRoute: '/route', onRouteChange: () => {}, onSettle: () => {} }),
+    { initialRoute: 123, onRouteChange: () => {}, onSettle: () => {} }
   ])('Returns false for an invalid routing provider', (notRoutingProvider) => {
     expect(isRoutingProvider(notRoutingProvider)).toBe(false)
   })
