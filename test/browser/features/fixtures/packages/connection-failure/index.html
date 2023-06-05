@@ -31,14 +31,15 @@
             // it's also below 1024 so requires privileges to bind to on Linux
             // and we use HTTPS to make it even less likely to succeed if
             // something does happen to listen on this port
-            return originalFetch.call(this, 'https://localhost:994', options)
+            return originalFetch.call(this, 'https://bugsnag-js-performane.doesnotexist.smartbear.com', options)
           }
         </script>
     </head>
     <body>
         <h1>connection-failure</h1>
 
-        <button id="send-span">send span</button>
+        <button id="send-span1">send span</button>
+        <button id="send-span2">send span</button>
 
         <script src="./dist/bundle.js"></script>
     </body>
