@@ -6,6 +6,7 @@ const defaultOptions = () => ({
   // additional variables to define with '@rollup/plugin-replace'
   // e.g. '{ ABC: 123 }' is equivalent to running 'globalThis.ABC = 123'
   additionalReplacements: {},
+  external: []
 })
 
 function createRollupConfig (options = defaultOptions()) {
@@ -21,7 +22,7 @@ function createRollupConfig (options = defaultOptions()) {
         preset: 'es2015',
       },
     },
-    external: ['@bugsnag/core-performance'],
+    external: ['@bugsnag/core-performance'].concat(options.external),
     plugins: [
       replace({
         preventAssignment: true,
