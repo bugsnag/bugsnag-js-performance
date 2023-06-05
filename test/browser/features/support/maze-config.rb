@@ -12,6 +12,6 @@ Maze.config.document_server_root = File.realpath("#{__dir__}/../fixtures/package
 
 $browser = Browser.new(
   Maze.config.browser,
-  URI("http://#{Maze.config.bind_address}:#{Maze.config.port}"),
-  URI("http://#{Maze.config.document_server_bind_address}:#{Maze.config.document_server_port}")
+  URI("http://#{Maze.public_address}"),
+  URI("http://#{Maze.document_server_address}")
 )

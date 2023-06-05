@@ -47,6 +47,7 @@ services:
           - maze-runner
     ports:
       - "9000-9499:9339"
+      - "9000-9499:9340"
     volumes:
       - ./test/browser/maze_output:/app/test/browser/maze_output
       - /var/run/docker.sock:/var/run/docker.sock
