@@ -105,7 +105,7 @@ describe('Span', () => {
       const span = client.startSpan('test span', startTime)
       span.end()
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         startTimeUnixNano: '1000000'
@@ -123,7 +123,7 @@ describe('Span', () => {
       const span = client.startSpan('test span')
       span.end()
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery).toHaveSentSpan({
         spanId: 'a random 64 bit string',
@@ -146,7 +146,7 @@ describe('Span', () => {
       const span = client.startSpan('test span')
       span.end(new Date('2023-01-02T03:04:05.008Z')) // 2ms after time origin
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery).toHaveSentSpan({
         spanId: 'a random 64 bit string',
@@ -170,7 +170,7 @@ describe('Span', () => {
       const span = client.startSpan('test span')
       span.end(4321)
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery).toHaveSentSpan({
         spanId: 'a random 64 bit string',
@@ -196,7 +196,7 @@ describe('Span', () => {
       const span = client.startSpan('test span')
       span.end()
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery.requests).toHaveLength(1)
     })
@@ -213,7 +213,7 @@ describe('Span', () => {
       const span = client.startSpan('test span')
       span.end()
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery.requests).toHaveLength(0)
     })
@@ -262,7 +262,7 @@ describe('Span', () => {
       client.startSpan('span 2').end()
       client.startSpan('span 3').end()
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: 'span 1'
@@ -316,7 +316,7 @@ describe('Span', () => {
       const inForeground = client.startSpan('entirely-in-foreground')
       inForeground.end()
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery).not.toHaveSentSpan(expect.objectContaining({
         name: 'moved-to-background'

@@ -92,7 +92,7 @@ describe('BatchProcessor', () => {
 
     batchProcessor.add(createEndedSpan())
 
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
 
     expect(delivery.requests).toHaveLength(0)
   })
@@ -115,7 +115,7 @@ describe('BatchProcessor', () => {
 
     batchProcessor.add(createEndedSpan())
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).toHaveBeenCalled()
@@ -141,7 +141,7 @@ describe('BatchProcessor', () => {
 
     batchProcessor.add(createEndedSpan())
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).not.toHaveBeenCalled()
@@ -165,7 +165,7 @@ describe('BatchProcessor', () => {
 
     batchProcessor.add(createEndedSpan())
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).not.toHaveBeenCalled()
@@ -192,7 +192,7 @@ describe('BatchProcessor', () => {
 
     expect(sampler.probability).toBe(1.0)
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(sampler.probability).toBe(0.0)
     expect(delivery.requests).toHaveLength(1)
@@ -225,7 +225,7 @@ describe('BatchProcessor', () => {
     batchProcessor.add(span1)
     batchProcessor.add(span2)
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery).not.toHaveSentSpan(expect.objectContaining({
       name: 'Span 01'
@@ -265,7 +265,7 @@ describe('BatchProcessor', () => {
     batchProcessor.add(span1)
     batchProcessor.add(span2)
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery).not.toHaveSentSpan(expect.objectContaining({
       name: 'Span 01'
