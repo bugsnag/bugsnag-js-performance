@@ -1,3 +1,10 @@
 source 'https://rubygems.org'
 
-gem 'bugsnag-maze-runner', '~> 7.23', '< 7.27.0'
+# You can run against local Maze Runner branches and uncommitted changes:
+#gem 'bugsnag-maze-runner', path: '../maze-runner'
+
+# Or a specific release:
+#gem 'bugsnag-maze-runner', '~>8.0'
+
+# Or a branch
+gem 'bugsnag-maze-runner', git: 'https://github.com/bugsnag/maze-runner', branch: 'integration/v8'
