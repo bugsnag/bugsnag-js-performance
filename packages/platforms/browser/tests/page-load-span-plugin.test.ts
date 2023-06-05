@@ -76,7 +76,7 @@ describe('FullPageLoadPlugin', () => {
 
     testClient.start({ apiKey: VALID_API_KEY })
 
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/page-load-span-plugin' }))
 
@@ -118,7 +118,7 @@ describe('FullPageLoadPlugin', () => {
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentFullPageLoads: false })
 
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
 
     expect(delivery.requests).toHaveLength(0)
   })
@@ -152,7 +152,7 @@ describe('FullPageLoadPlugin', () => {
 
     testClient.start({ apiKey: VALID_API_KEY })
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery.requests).toHaveLength(0)
   })
@@ -187,7 +187,7 @@ describe('FullPageLoadPlugin', () => {
 
     testClient.start({ apiKey: VALID_API_KEY })
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery.requests).toHaveLength(0)
   })
@@ -223,7 +223,7 @@ describe('FullPageLoadPlugin', () => {
 
     backgroundingListener.sendToBackground()
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery.requests).toHaveLength(0)
   })
@@ -260,7 +260,7 @@ describe('FullPageLoadPlugin', () => {
     backgroundingListener.sendToBackground()
     backgroundingListener.sendToForeground()
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery.requests).toHaveLength(0)
   })
@@ -294,7 +294,7 @@ describe('FullPageLoadPlugin', () => {
 
     testClient.start({ apiKey: VALID_API_KEY })
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     backgroundingListener.sendToBackground()
 
@@ -336,7 +336,7 @@ describe('FullPageLoadPlugin', () => {
 
         testClient.start({ apiKey: VALID_API_KEY })
 
-        jest.runAllTimers()
+        jest.runOnlyPendingTimers()
 
         expect(delivery).toHaveSentSpan(expect.objectContaining({
           name: '[FullPageLoad]/page-load-span-plugin',
@@ -388,7 +388,7 @@ describe('FullPageLoadPlugin', () => {
 
         testClient.start({ apiKey: VALID_API_KEY })
 
-        jest.runAllTimers()
+        jest.runOnlyPendingTimers()
 
         expect(delivery).toHaveSentSpan(expect.objectContaining({
           name: '[FullPageLoad]/page-load-span-plugin',
@@ -430,7 +430,7 @@ describe('FullPageLoadPlugin', () => {
 
         testClient.start(VALID_API_KEY)
 
-        jest.runAllTimers()
+        jest.runOnlyPendingTimers()
 
         expect(delivery).toHaveSentSpan(expect.objectContaining({
           name: '[FullPageLoad]/page-load-span-plugin'
@@ -467,7 +467,7 @@ describe('FullPageLoadPlugin', () => {
 
       testClient.start({ apiKey: VALID_API_KEY })
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: '[FullPageLoad]/page-load-span-plugin',
