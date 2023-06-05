@@ -61,10 +61,6 @@ services:
       API_HOST: "${API_HOST:-maze-runner}"
     env_file:
       - ${DOCKER_ENV_FILE:-test/browser/features/fixtures/null_env}
-#    networks:
-#      default:
-#        aliases:
-#          - maze-runner
     volumes:
       - ./test/browser/maze_output:/app/test/browser/maze_output
 
@@ -81,5 +77,13 @@ services:
       USE_LEGACY_DRIVER: 1
     env_file:
       - ${DOCKER_ENV_FILE:-test/browser/features/fixtures/null_env}
+    networks:
+      default:
+        aliases:
+          - maze-runner
     volumes:
       - ./test/browser/maze_output:/app/test/browser/maze_output
+
+networks:
+  default:
+    name: ${BUILDKITE_JOB_ID:-core-maze-runner}
