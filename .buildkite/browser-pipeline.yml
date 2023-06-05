@@ -31,9 +31,9 @@ steps:
           - docker-compose#v3.9.0:
               build: browser-maze-runner-legacy
               image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
-              cache-from: browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-legacy-${BRANCH_NAME}
+              cache-from: browser-maze-runner-legacy:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-legacy-${BRANCH_NAME}
           - docker-compose#v3.9.0:
-              push: browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-legacy-${BRANCH_NAME}
+              push: browser-maze-runner-legacy:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-legacy-${BRANCH_NAME}
 
       # BitBar
       - label: ":{{ matrix.browser }}: {{ matrix.version }} tests"
