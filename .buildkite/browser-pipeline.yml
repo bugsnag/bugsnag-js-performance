@@ -6,33 +6,33 @@ steps:
         key: "browser-maze-runner-bb"
         timeout_in_minutes: 20
         plugins:
-          - docker-compose#v3.9.0:
+          - docker-compose#v4.12.0:
               build: browser-maze-runner-bb
               image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
               cache-from: browser-maze-runner-bb:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
-          - docker-compose#v3.9.0:
+          - docker-compose#v4.12.0:
               push: browser-maze-runner-bb:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
 
       - label: ":docker: Build BrowserStack Maze Runner image"
         key: "browser-maze-runner-bs"
         timeout_in_minutes: 20
         plugins:
-          - docker-compose#v3.9.0:
+          - docker-compose#v4.12.0:
               build: browser-maze-runner-bs
               image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
               cache-from: browser-maze-runner-bs:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
-          - docker-compose#v3.9.0:
+          - docker-compose#v4.12.0:
               push: browser-maze-runner-bs:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
 
       - label:  ":docker: Build BrowserStack legacy Maze Runner image"
         key: "browser-maze-runner-legacy"
         timeout_in_minutes: 20
         plugins:
-          - docker-compose#v3.9.0:
+          - docker-compose#v4.12.0:
               build: browser-maze-runner-legacy
               image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
               cache-from: browser-maze-runner-legacy:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-legacy-${BRANCH_NAME}
-          - docker-compose#v3.9.0:
+          - docker-compose#v4.12.0:
               push: browser-maze-runner-legacy:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-legacy-${BRANCH_NAME}
 
       # BitBar
@@ -40,7 +40,7 @@ steps:
         depends_on: "browser-maze-runner-bb"
         timeout_in_minutes: 30
         plugins:
-          docker-compose#v3.9.0:
+          docker-compose#v4.12.0:
             pull: browser-maze-runner-bb
             run: browser-maze-runner-bb
             use-aliases: true
@@ -67,7 +67,7 @@ steps:
         depends_on: "browser-maze-runner-legacy"
         timeout_in_minutes: 30
         plugins:
-          docker-compose#v3.9.0:
+          docker-compose#v4.12.0:
             pull: browser-maze-runner-legacy
             run: browser-maze-runner-legacy
             use-aliases: true
@@ -96,7 +96,7 @@ steps:
         depends_on: "browser-maze-runner-bs"
         timeout_in_minutes: 30
         plugins:
-          docker-compose#v3.9.0:
+          docker-compose#v4.12.0:
             pull: browser-maze-runner-bs
             run: browser-maze-runner-bs
             use-aliases: true
