@@ -6,14 +6,17 @@ const defaultOptions = () => ({
   // additional variables to define with '@rollup/plugin-replace'
   // e.g. '{ ABC: 123 }' is equivalent to running 'globalThis.ABC = 123'
   additionalReplacements: {},
-  external: []
+  // additional external dependencies, such as '@bugsnag/browser-performance'
+  external: [],
+  // the entry point for the bundle
+  internal: undefined,
 })
 
 function createRollupConfig (options = defaultOptions()) {
   const packageJson = JSON.parse(fs.readFileSync(`${process.cwd()}/package.json`))
 
   return {
-    input: 'lib/index.ts',
+    input: options.internal || 'lib/index.ts',
     output: {
       dir: 'dist',
       format: 'esm',
