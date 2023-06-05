@@ -5,10 +5,6 @@ import { type OnRouteChangeCallback } from '../../lib/routing-provider'
 class MockRoutingProvider implements RoutingProvider {
   readonly initialRoute = '/initial-route'
 
-  resolveRoute (url: URL) {
-    return url.pathname
-  }
-
   onRouteChange (callback: OnRouteChangeCallback) {
     const route = '/new-route'
     callback(route)

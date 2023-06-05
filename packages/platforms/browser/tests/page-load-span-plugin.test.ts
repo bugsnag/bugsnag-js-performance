@@ -1,6 +1,6 @@
 /**
  * @jest-environment jsdom
- * @jest-environment-options { "url": "https://bugsnag.com/page-load-span-plugin", "referrer": "https://bugsnag.com" }
+ * @jest-environment-options { "referrer": "https://bugsnag.com" }
  */
 
 import {
@@ -79,12 +79,12 @@ describe('FullPageLoadPlugin', () => {
 
     jest.runAllTimers()
 
-    expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/page-load-span-plugin' }))
+    expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/initial-route' }))
 
     const span = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
 
     expect(span).toHaveAttribute('bugsnag.span.category', 'full_page_load')
-    expect(span).toHaveAttribute('bugsnag.browser.page.route', '/page-load-span-plugin')
+    expect(span).toHaveAttribute('bugsnag.browser.page.route', '/initial-route')
     expect(span).toHaveAttribute('bugsnag.browser.page.referrer', 'https://bugsnag.com/')
     expect(span).toHaveAttribute('bugsnag.metrics.cls', 60)
 
@@ -299,7 +299,7 @@ describe('FullPageLoadPlugin', () => {
 
     backgroundingListener.sendToBackground()
 
-    expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/page-load-span-plugin' }))
+    expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/initial-route' }))
   })
 
   describe('WebVitals', () => {
@@ -340,7 +340,7 @@ describe('FullPageLoadPlugin', () => {
         jest.runAllTimers()
 
         expect(delivery).toHaveSentSpan(expect.objectContaining({
-          name: '[FullPageLoad]/page-load-span-plugin',
+          name: '[FullPageLoad]/initial-route',
           events: [
             {
               name: 'lcp',
@@ -392,7 +392,7 @@ describe('FullPageLoadPlugin', () => {
         jest.runAllTimers()
 
         expect(delivery).toHaveSentSpan(expect.objectContaining({
-          name: '[FullPageLoad]/page-load-span-plugin',
+          name: '[FullPageLoad]/initial-route',
           events: [
             {
               name: 'lcp',
@@ -434,7 +434,8 @@ describe('FullPageLoadPlugin', () => {
         jest.runAllTimers()
 
         expect(delivery).toHaveSentSpan(expect.objectContaining({
-          name: '[FullPageLoad]/page-load-span-plugin'
+          name: '[FullPageLoad]/initial-route',
+          events: []
         }))
 
         const span = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
