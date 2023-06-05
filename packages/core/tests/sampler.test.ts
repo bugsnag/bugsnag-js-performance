@@ -30,7 +30,7 @@ describe('Sampler', () => {
       const sampler = new Sampler(1.0)
       const delivery = new InMemoryDelivery()
       sampler.initialise(0.5, delivery)
-      expect(delivery.initialSamplingRequest).not.toBeUndefined()
+      expect(delivery.samplingRequests.length).toEqual(1)
     })
   })
 
@@ -164,16 +164,17 @@ describe('Sampler', () => {
       const sampler = new Sampler(1.0)
       const delivery = new InMemoryDelivery()
       sampler.initialise(1.0, delivery)
-      expect(delivery.initialSamplingRequest).not.toBeUndefined()
-      expect(delivery.requests.length).toEqual(0)
+
+      // initial request
+      expect(delivery.samplingRequests.length).toEqual(1)
 
       // just under 24 hours - no peridoic request yet
       await jest.advanceTimersByTimeAsync(86399999)
-      expect(delivery.requests.length).toEqual(0)
+      expect(delivery.samplingRequests.length).toEqual(1)
 
       // just over 24 hours - peridoic request sent
       await jest.advanceTimersByTimeAsync(2)
-      expect(delivery.requests.length).toEqual(1)
+      expect(delivery.samplingRequests.length).toEqual(2)
     })
 
     it('uses a requested probability when sampling the next batch', async () => {
@@ -182,7 +183,7 @@ describe('Sampler', () => {
       delivery.setNextSamplingProbability(0.25)
 
       sampler.initialise(1.0, delivery)
-      expect(delivery.initialSamplingRequest).not.toBeUndefined()
+      expect(delivery.samplingRequests.length).toEqual(1)
 
       // wait for the mock request to resolve
       await Promise.resolve()
