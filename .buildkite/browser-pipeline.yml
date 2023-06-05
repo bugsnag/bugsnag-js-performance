@@ -76,9 +76,9 @@ steps:
 
       - label: ":{{ matrix }}: Mobile Browser tests"
         matrix:
-          - android_pixel_7
-          - iphone_xs
-          - iphone_14
+          - android_13
+          - ios_12
+          - ios_16
         depends_on: "browser-maze-runner"
         timeout_in_minutes: 30
         plugins:
