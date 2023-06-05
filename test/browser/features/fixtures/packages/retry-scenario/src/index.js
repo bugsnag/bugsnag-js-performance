@@ -6,8 +6,11 @@ const endpoint = parameters.get('endpoint')
 
 BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 1, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false })
 
-document.getElementById("send-span").addEventListener("click", () => {
+document.getElementById("send-first-span").addEventListener("click", () => {
+  BugsnagPerformance.startSpan("Custom/Reject").end()
+})
+
+document.getElementById("send-second-span").addEventListener("click", () => {
   BugsnagPerformance.startSpan("Custom/Deliver").end()
 })
 
-BugsnagPerformance.startSpan("Custom/Reject").end()
