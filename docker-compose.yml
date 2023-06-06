@@ -14,7 +14,7 @@ services:
       context: .
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
-        MAZE_RUNNER_VERSION: latest-v7-cli
+        MAZE_RUNNER_VERSION: integration-v8-cli
     environment: &browser-maze-runner-environment
       BUILDKITE:
       BUILDKITE_BRANCH:
@@ -56,7 +56,7 @@ services:
       context: .
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
-        MAZE_RUNNER_VERSION: v7.26.1-cli-legacy
+        MAZE_RUNNER_VERSION: integration-v8-cli-legacy
     environment:
       <<: *browser-maze-runner-environment
       USE_LEGACY_DRIVER: 1

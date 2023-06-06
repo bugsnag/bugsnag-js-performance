@@ -6,16 +6,20 @@
 
         <script>
           // patch 'fetch' so that it causes a connection failure the first time
-          // it's called, then works as normal for all subsequent calls
+          // span delivery is attempted, then works as normal for all subsequent
+          // calls - the initial sampling request should be unaffected
           // this has to be outside of the bundle, otherwise BugsnagPerformance
           // will grab a reference to fetch at import time (before we patch it)
           const originalFetch = window.fetch
           let called = false
 
           window.fetch = function (resource, options) {
+            const payload = JSON.parse(options.body)
+            const isSamplingRequest = payload.resourceSpans.length === 0
+
             // we can't just swap 'window.fetch' back to the original as
             // BugsnagPerformance has stored a reference to this function
-            if (called) {
+            if (called || isSamplingRequest) {
               return originalFetch.call(this, resource, options)
             }
 
