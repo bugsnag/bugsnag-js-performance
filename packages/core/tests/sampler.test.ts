@@ -169,20 +169,20 @@ describe('Sampler', () => {
       // initial request
       expect(delivery.samplingRequests.length).toEqual(1)
 
-      await Promise.resolve()
+      // allow the async request to complete
+      await jest.advanceTimersByTimeAsync(0)
       expect(sampler.probability).toEqual(0.5)
 
       // just under 24 hours - no peridoic request yet
-      await jest.advanceTimersByTimeAsync(86399999)
+      await jest.advanceTimersByTimeAsync((24 * 60 * 60_000) - 1)
       expect(delivery.samplingRequests.length).toEqual(1)
 
       delivery.setNextSamplingProbability(0.25)
 
       // just over 24 hours - peridoic request sent
-      await jest.advanceTimersByTimeAsync(200)
+      await jest.advanceTimersByTimeAsync(2)
       expect(delivery.samplingRequests.length).toEqual(2)
 
-      await Promise.resolve()
       expect(sampler.probability).toEqual(0.25)
     })
 
@@ -195,7 +195,7 @@ describe('Sampler', () => {
       expect(delivery.samplingRequests.length).toEqual(1)
 
       // initial request
-      await Promise.resolve()
+      await jest.advanceTimersByTimeAsync(0)
       expect(sampler.probability).toEqual(0.25)
 
       const span = createEndedSpan({
@@ -214,8 +214,7 @@ describe('Sampler', () => {
 
       // initial request
       expect(delivery.samplingRequests.length).toEqual(1)
-
-      await Promise.resolve()
+      await jest.advanceTimersByTimeAsync(0)
       expect(sampler.probability).toEqual(0.5)
 
       // probability updated directly after 23 hours (should reset timer)
@@ -232,7 +231,7 @@ describe('Sampler', () => {
       await jest.advanceTimersByTimeAsync(79200000)
       expect(delivery.samplingRequests.length).toEqual(2)
 
-      await Promise.resolve()
+      // await Promise.resolve()
       expect(sampler.probability).toEqual(0.25)
     })
 
