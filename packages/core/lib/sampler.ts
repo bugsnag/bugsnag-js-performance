@@ -66,9 +66,6 @@ class Sampler {
 
     // make an initial request for the probability value
     this.fetchSamplingProbability()
-
-    // start the timer to refresh in 24 hours
-    this.interval = setInterval(this.fetchSamplingProbability, PROBABILITY_REFRESH_INTERVAL)
   }
 
   sample (span: SpanEnded): boolean {
@@ -82,12 +79,15 @@ class Sampler {
       const payload = { resourceSpans: [] }
       const response = await this.delivery.send(payload)
 
+      // if the response doesn't contain a valid probability
+      // or the request failed, retry in 30 seconds
       if (response.samplingProbability !== undefined) {
         this.probability = response.samplingProbability
-      } else if (response.state !== 'success') {
+      } else {
         this.resetTimer(true)
       }
     } catch (err) {
+      // request failed - retry
       this.resetTimer(true)
     }
   }
@@ -95,11 +95,12 @@ class Sampler {
   private resetTimer (isRetry: boolean = false) {
     if (this.interval) {
       clearInterval(this.interval)
-      this.interval = setInterval(
-        this.fetchSamplingProbability,
-        isRetry ? PROBABILITY_REFRESH_RETRY_INTERVAL : PROBABILITY_REFRESH_INTERVAL
-      )
     }
+
+    this.interval = setInterval(
+      this.fetchSamplingProbability,
+      isRetry ? PROBABILITY_REFRESH_RETRY_INTERVAL : PROBABILITY_REFRESH_INTERVAL
+    )
   }
 }
 

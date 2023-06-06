@@ -163,18 +163,27 @@ describe('Sampler', () => {
     it('requests a new sampling probability after 24 hours', async () => {
       const sampler = new Sampler(1.0)
       const delivery = new InMemoryDelivery()
+      delivery.setNextSamplingProbability(0.5)
       sampler.initialise(1.0, delivery)
 
       // initial request
       expect(delivery.samplingRequests.length).toEqual(1)
 
+      await Promise.resolve()
+      expect(sampler.probability).toEqual(0.5)
+
       // just under 24 hours - no peridoic request yet
       await jest.advanceTimersByTimeAsync(86399999)
       expect(delivery.samplingRequests.length).toEqual(1)
 
+      delivery.setNextSamplingProbability(0.25)
+
       // just over 24 hours - peridoic request sent
-      await jest.advanceTimersByTimeAsync(2)
+      await jest.advanceTimersByTimeAsync(200)
       expect(delivery.samplingRequests.length).toEqual(2)
+
+      await Promise.resolve()
+      expect(sampler.probability).toEqual(0.25)
     })
 
     it('uses a requested probability when sampling the next batch', async () => {
@@ -185,7 +194,7 @@ describe('Sampler', () => {
       sampler.initialise(1.0, delivery)
       expect(delivery.samplingRequests.length).toEqual(1)
 
-      // wait for the mock request to resolve
+      // initial request
       await Promise.resolve()
       expect(sampler.probability).toEqual(0.25)
 
@@ -197,7 +206,37 @@ describe('Sampler', () => {
       expect(sampler.sample(span)).toEqual(false)
     })
 
-    it('retries a failed request after 30 seconds (failure response)', async () => {
+    it('resets the timer when a probability value is set', async () => {
+      const sampler = new Sampler(1.0)
+      const delivery = new InMemoryDelivery()
+      delivery.setNextSamplingProbability(0.5)
+      sampler.initialise(1.0, delivery)
+
+      // initial request
+      expect(delivery.samplingRequests.length).toEqual(1)
+
+      await Promise.resolve()
+      expect(sampler.probability).toEqual(0.5)
+
+      // probability updated directly after 23 hours (should reset timer)
+      await jest.advanceTimersByTimeAsync(82800000)
+      sampler.probability = 0.75
+
+      // 25 hours (2 hours since reset) - still no request
+      await jest.advanceTimersByTimeAsync(7200000)
+      expect(delivery.samplingRequests.length).toEqual(1)
+
+      delivery.setNextSamplingProbability(0.25)
+
+      // +22 hours (24 hours since reset) - peridoic request sent
+      await jest.advanceTimersByTimeAsync(79200000)
+      expect(delivery.samplingRequests.length).toEqual(2)
+
+      await Promise.resolve()
+      expect(sampler.probability).toEqual(0.25)
+    })
+
+    it('retries the request after 30 seconds when samplingProbability is not defined', async () => {
       const sampler = new Sampler(1.0)
       const state: ResponseState = 'failure-retryable'
       const delivery = {
@@ -216,7 +255,7 @@ describe('Sampler', () => {
       expect(delivery.send).toHaveBeenCalledTimes(2)
     })
 
-    it('retries a failed request after 30 seconds (request error)', async () => {
+    it('retries the request after 30 seconds when the request errors', async () => {
       const sampler = new Sampler(1.0)
       const delivery = {
         send: jest.fn(() => {
