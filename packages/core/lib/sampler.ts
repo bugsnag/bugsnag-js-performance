@@ -1,9 +1,9 @@
 import { type Delivery } from './delivery'
 import { type SpanEnded, type SpanProbability } from './span'
 
-const PROBABILITY_REFRESH_INTERVAL = 86400000
+const PROBABILITY_REFRESH_INTERVAL = 24 * 60 * 60_000 // 24 hours in ms
 
-const PROBABILITY_REFRESH_RETRY_INTERVAL = 30000
+const PROBABILITY_REFRESH_RETRY_INTERVAL = 30_000 // 30 seconds
 
 // sampling rates are stored as a number between 0 and 2^32 - 1 (i.e. they are
 // u32s) so we need to scale the probability value to match this range as they
