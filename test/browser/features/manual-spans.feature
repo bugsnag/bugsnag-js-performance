@@ -2,8 +2,13 @@ Feature: Manual creation of spans
 
   Scenario: Manual spans can be logged
     Given I navigate to the test URL "/manual-span"
-    When I wait for 1 span
-    Then the trace "Bugsnag-Span-Sampling" header equals "1.0:1"
+    And I wait to receive a sampling request
+    And I wait for 1 span
+
+    # Check the initial probability request
+    Then the sampling request "Bugsnag-Span-Sampling" header equals "1.0:0"
+
+    And the trace "Bugsnag-Span-Sampling" header equals "1.0:1"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "Custom/ManualSpanScenario"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.kind" equals 3
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.spanId" matches the regex "^[A-Fa-f0-9]{16}$"
