@@ -8,10 +8,6 @@ BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 1, autoInstrument
 
 let spanNumber = 0
 
-document.getElementById("send-span1").addEventListener("click", () => {
-  BugsnagPerformance.startSpan(`Custom/Span ${++spanNumber}`).end()
-})
-
-document.getElementById("send-span2").addEventListener("click", () => {
+document.getElementById("send-span").addEventListener("click", () => {
   BugsnagPerformance.startSpan(`Custom/Span ${++spanNumber}`).end()
 })

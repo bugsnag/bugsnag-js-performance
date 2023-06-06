@@ -28,9 +28,9 @@ Feature: Retries
     Scenario: Batch is retried with connection failure
         Given I navigate to the test URL "/connection-failure"
 
-        When I click the element "send-span1"
-        And I click the element "send-span2"
-        And I wait to receive 2 traces
+        When I click the element "send-span"
+        And I wait for 5 seconds
+        And I click the element "send-span"
 
         Then a span name equals "Custom/Span 1"
         And a span name equals "Custom/Span 2"
