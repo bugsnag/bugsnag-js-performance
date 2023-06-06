@@ -39,48 +39,48 @@ steps:
             version: [latest]
 
       # BrowserStack
-#      - label: ":{{ matrix.browser }}: {{ matrix.version }} Browser tests"
-#        depends_on: "browser-maze-runner-legacy"
-#        timeout_in_minutes: 30
-#        plugins:
-#          docker-compose#v4.12.0:
-#            pull: browser-maze-runner-legacy
-#            run: browser-maze-runner-legacy
-#            use-aliases: true
-#            command:
-#              - --farm=bs
-#              - --browser={{ matrix.browser }}_{{ matrix.version }}
-#          artifacts#v1.5.0:
-#            upload:
-#              - "./test/browser/maze_output/failed/**/*"
-#        concurrency: 2
-#        concurrency_group: "browserstack"
-#        matrix:
-#          setup:
-#            browser: [chrome]
-#            version: [61]
-#          adjustments:
-#            - with: { browser: firefox, version: 60 }
-#            - with: { browser: edge, version: 80 }
-#            - with: { browser: safari, version: 11 }
-#
-#      - label: ":{{ matrix }}: Mobile Browser tests"
-#        matrix:
-#          - android_pixel_7
-#          - iphone_xs
-#          - iphone_14
-#        depends_on: "browser-maze-runner-bs"
-#        timeout_in_minutes: 30
-#        plugins:
-#          docker-compose#v4.12.0:
-#            pull: browser-maze-runner-bs
-#            run: browser-maze-runner-bs
-#            use-aliases: true
-#            command:
-#              - --farm=bs
-#              - --browser={{ matrix }}
-#          artifacts#v1.5.0:
-#            upload:
-#              - "./test/browser/maze_output/failed/**/*"
-#        concurrency: 2
-#        concurrency_group: "browserstack"
+      - label: ":{{ matrix.browser }}: {{ matrix.version }} Browser tests"
+        depends_on: "browser-maze-runner-legacy"
+        timeout_in_minutes: 30
+        plugins:
+          docker-compose#v4.12.0:
+            pull: browser-maze-runner-legacy
+            run: browser-maze-runner-legacy
+            use-aliases: true
+            command:
+              - --farm=bs
+              - --browser={{ matrix.browser }}_{{ matrix.version }}
+          artifacts#v1.5.0:
+            upload:
+              - "./test/browser/maze_output/failed/**/*"
+        concurrency: 2
+        concurrency_group: "browserstack"
+        matrix:
+          setup:
+            browser: [chrome]
+            version: [61]
+          adjustments:
+            - with: { browser: firefox, version: 60 }
+            - with: { browser: edge, version: 80 }
+            - with: { browser: safari, version: 11 }
+
+      - label: ":{{ matrix }}: Mobile Browser tests"
+        matrix:
+          - android_pixel_7
+          - iphone_xs
+          - iphone_14
+        depends_on: "browser-maze-runner-bs"
+        timeout_in_minutes: 30
+        plugins:
+          docker-compose#v4.12.0:
+            pull: browser-maze-runner-bs
+            run: browser-maze-runner-bs
+            use-aliases: true
+            command:
+              - --farm=bs
+              - --browser={{ matrix }}
+          artifacts#v1.5.0:
+            upload:
+              - "./test/browser/maze_output/failed/**/*"
+        concurrency: 2
+        concurrency_group: "browserstack"
