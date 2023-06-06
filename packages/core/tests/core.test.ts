@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 import { createNoopClient } from '../lib/core'
 import { type BackgroundingListener } from '../lib/backgrounding-listener'
 import {
@@ -10,6 +6,8 @@ import {
   InMemoryDelivery,
   VALID_API_KEY
 } from '@bugsnag/js-performance-test-utilities'
+
+jest.useFakeTimers()
 
 describe('Core', () => {
   describe('createClient()', () => {
