@@ -21,7 +21,7 @@ class Browser
 
   # is this a mobile device?
   def mobile?
-    @name == "android" || @name == "ios"
+    @name == "android" || @name == "ios" || @name == "iphone"
   end
 
   def url_for(path)
@@ -43,7 +43,7 @@ class Browser
       # support added in Safari 13
       @version >= 13
 
-    when "firefox", "android", "ios"
+    when "firefox", "android", "ios", "iphone"
       # firefox does not support keepalive on any version
       false
 
