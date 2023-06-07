@@ -30,7 +30,7 @@ describe('DefaultRoutingProvider', () => {
 
     history.pushState({}, '', '/new-route')
 
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
 
     expect(routeResolverFn).toHaveBeenCalled()
     expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[RouteChange]/resolved-route' }))
@@ -53,7 +53,7 @@ describe('DefaultRoutingProvider', () => {
       const url = new URL('https://bugsnag.com/platforms/javascript?test=true#unit-test')
       history.pushState({}, '', url)
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[RouteChange]/platforms/javascript' }))
     })
