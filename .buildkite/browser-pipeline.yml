@@ -2,58 +2,72 @@ steps:
 
   - group: "Browser Tests"
     steps:
-      - label: ":docker: Build browser maze runner image"
-        key: "browser-maze-runner"
+      - label: ":docker: Build BitBar Maze Runner image"
+        key: "browser-maze-runner-bb"
         timeout_in_minutes: 20
         plugins:
-          - docker-compose#v3.9.0:
-              build: browser-maze-runner
+          - docker-compose#v4.12.0:
+              build: browser-maze-runner-bb
               image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
-              cache-from: browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
-          - docker-compose#v3.9.0:
-              push: browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
+              cache-from: browser-maze-runner-bb:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
+          - docker-compose#v4.12.0:
+              push: browser-maze-runner-bb:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
 
-      - label:  ":docker: Build legacy browser maze runner image"
+      - label: ":docker: Build BrowserStack Maze Runner image"
+        key: "browser-maze-runner-bs"
+        timeout_in_minutes: 20
+        plugins:
+          - docker-compose#v4.12.0:
+              build: browser-maze-runner-bs
+              image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
+              cache-from: browser-maze-runner-bs:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
+          - docker-compose#v4.12.0:
+              push: browser-maze-runner-bs:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
+
+      - label: ":docker: Build Legacy Maze Runner image"
         key: "browser-maze-runner-legacy"
         timeout_in_minutes: 20
         plugins:
-          - docker-compose#v3.9.0:
+          - docker-compose#v4.12.0:
               build: browser-maze-runner-legacy
               image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
-              cache-from: browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-legacy-${BRANCH_NAME}
-          - docker-compose#v3.9.0:
-              push: browser-maze-runner:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-legacy-${BRANCH_NAME}
+              cache-from: browser-maze-runner-legacy:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
+          - docker-compose#v4.12.0:
+              push: browser-maze-runner-legacy:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
 
       # BitBar
-#      - label: ":{{ matrix.browser }}: {{ matrix.version }} tests"
-#        depends_on: "browser-maze-runner"
-#        timeout_in_minutes: 30
-#        plugins:
-#          docker-compose#v3.9.0:
-#            pull: browser-maze-runner
-#            run: browser-maze-runner
-#            use-aliases: true
-#            command:
-#              - --farm=bb
-#              - --browser={{ matrix.browser }}_{{ matrix.version }}
-#          artifacts#v1.5.0:
-#            upload:
-#              - "./test/browser/maze_output/failed/**/*"
-#        concurrency: 5
-#        concurrency_group: "bitbar-web"
-#        matrix:
-#          setup:
-#            browser: [chrome, firefox, edge]
-#            version: [latest]
-#          adjustments:
-#            - with: { browser: safari, version: 16 }
+      - label: ":bitbar: :{{ matrix.browser }}: {{ matrix.version }} tests"
+        depends_on: "browser-maze-runner-bb"
+        timeout_in_minutes: 30
+        plugins:
+          docker-compose#v4.12.0:
+            pull: browser-maze-runner-bb
+            run: browser-maze-runner-bb
+            use-aliases: true
+            service-ports: true
+            command:
+              - --farm=bb
+              - --browser={{ matrix.browser }}_{{ matrix.version }}
+              - --aws-public-ip
+              - --no-tunnel
+          artifacts#v1.5.0:
+            upload:
+              - "./test/browser/maze_output/failed/**/*"
+        concurrency: 5
+        concurrency_group: "bitbar-web"
+        matrix:
+          setup:
+            browser: [chrome, firefox, edge]
+            version: [latest]
+          adjustments:
+            - with: { browser: safari, version: 16 }
 
       # BrowserStack
-      - label: ":{{ matrix.browser }}: {{ matrix.version }} Browser tests"
+      - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser tests"
         depends_on: "browser-maze-runner-legacy"
         timeout_in_minutes: 30
         plugins:
-          docker-compose#v3.9.0:
+          docker-compose#v4.12.0:
             pull: browser-maze-runner-legacy
             run: browser-maze-runner-legacy
             use-aliases: true
@@ -74,17 +88,17 @@ steps:
             - with: { browser: edge, version: 80 }
             - with: { browser: safari, version: 11 }
 
-      - label: ":{{ matrix }}: Mobile Browser tests"
+      - label: ":browserstack: {{ matrix }} Mobile Browser tests"
         matrix:
           - android_pixel_7
           - iphone_xs
           - iphone_14
-        depends_on: "browser-maze-runner"
+        depends_on: "browser-maze-runner-bs"
         timeout_in_minutes: 30
         plugins:
-          docker-compose#v3.9.0:
-            pull: browser-maze-runner
-            run: browser-maze-runner
+          docker-compose#v4.12.0:
+            pull: browser-maze-runner-bs
+            run: browser-maze-runner-bs
             use-aliases: true
             command:
               - --farm=bs
