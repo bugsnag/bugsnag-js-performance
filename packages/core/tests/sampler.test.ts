@@ -231,7 +231,6 @@ describe('Sampler', () => {
       await jest.advanceTimersByTimeAsync(79200000)
       expect(delivery.samplingRequests.length).toEqual(2)
 
-      // await Promise.resolve()
       expect(sampler.probability).toEqual(0.25)
     })
 
