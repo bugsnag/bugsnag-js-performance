@@ -128,4 +128,27 @@ describe('RouteChangePlugin', () => {
     // No delivery
     expect(delivery.requests).toHaveLength(0)
   })
+
+  it('does not create route change spans with autoInstrumentFullPageLoads set to false', () => {
+    const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(32) }
+    const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle)
+    const clock = new IncrementingClock()
+    const delivery = new InMemoryDelivery()
+    const testClient = createTestClient({
+      clock,
+      deliveryFactory: () => delivery,
+      schema: createSchema(window.location.hostname, new DefaultRoutingProvider(window.location)),
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock)]
+    })
+
+    testClient.start({ apiKey: VALID_API_KEY, autoInstrumentRouteChanges: false })
+
+    history.pushState('', '', new URL('https://bugsnag.com/second-route'))
+
+    jest.runAllTimers()
+
+    expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+      name: '[RouteChange]/second-route'
+    }))
+  })
 })
