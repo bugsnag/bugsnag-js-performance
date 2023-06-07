@@ -326,4 +326,31 @@ describe('onSettle', () => {
     await jest.advanceTimersByTimeAsync(100)
     expect(settleCallback).toHaveBeenCalled()
   })
+
+  it('handles performnace.getEntriesByType not being a function (PLAT-10204)', async () => {
+    const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+
+    // @ts-expect-error unexpected type
+    performance.getEntriesByType = 'string'
+
+    const fetchRequestTracker = new RequestTracker()
+    const xhrRequestTracker = new RequestTracker()
+
+    const onSettle = createOnSettle(
+      new IncrementingClock(),
+      window,
+      fetchRequestTracker,
+      xhrRequestTracker,
+      performance
+    )
+
+    const settleCallback = jest.fn()
+
+    onSettle(settleCallback)
+    expect(settleCallback).not.toHaveBeenCalled()
+
+    await jest.advanceTimersByTimeAsync(100)
+    expect(settleCallback).toHaveBeenCalled()
+  })
 })

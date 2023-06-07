@@ -45,7 +45,8 @@ class LoadEventEndSettler extends Settler {
     const now = this.clock.now()
 
     // there's only ever one navigation entry
-    const entry = performance.getEntriesByType('navigation')[0]
+    // PLAT-10204 Prevent snags occuring due to DOM scanning bots like BuiltWith https://builtwith.com/biup
+    const entry = typeof performance.getEntriesByType === 'function' ? performance.getEntriesByType('navigation')[0] : undefined
 
     let settledTime: number
 
