@@ -36,7 +36,7 @@ steps:
               push: browser-maze-runner-legacy:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
 
       # BitBar
-      - label: ":{{ matrix.browser }}: {{ matrix.version }} tests"
+      - label: ":bitbar: :{{ matrix.browser }}: {{ matrix.version }} tests"
         depends_on: "browser-maze-runner-bb"
         timeout_in_minutes: 30
         plugins:
@@ -63,7 +63,7 @@ steps:
             - with: { browser: safari, version: 16 }
 
       # BrowserStack
-      - label: ":{{ matrix.browser }}: {{ matrix.version }} Browser tests"
+      - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser tests"
         depends_on: "browser-maze-runner-legacy"
         timeout_in_minutes: 30
         plugins:
@@ -88,7 +88,7 @@ steps:
             - with: { browser: edge, version: 80 }
             - with: { browser: safari, version: 11 }
 
-      - label: ":{{ matrix }}: Mobile Browser tests"
+      - label: ":browserstack: {{ matrix }} Mobile Browser tests"
         matrix:
           - android_pixel_7
           - iphone_xs
