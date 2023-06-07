@@ -29,8 +29,10 @@ Feature: Retries
         Given I navigate to the test URL "/connection-failure"
 
         When I click the element "send-span"
-        And I wait for 5 seconds
-        And I click the element "send-span"
+        And I wait for 10 seconds
+        Then I wait to receive 0 traces
+
+        When I click the element "send-span"
         And I wait to receive 2 traces
 
         Then a span name equals "Custom/Span 1"

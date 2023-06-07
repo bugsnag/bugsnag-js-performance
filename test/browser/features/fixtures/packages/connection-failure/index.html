@@ -31,7 +31,7 @@
             // it's also below 1024 so requires privileges to bind to on Linux
             // and we use HTTPS to make it even less likely to succeed if
             // something does happen to listen on this port
-            return originalFetch.call(this, 'https://bugsnag-js-performane.doesnotexist.smartbear.com', options)
+            return originalFetch.call(this, 'https://localhost:994', options)
           }
         </script>
     </head>
