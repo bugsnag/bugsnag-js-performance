@@ -61,10 +61,12 @@ class Sampler {
   }
 
   initialise (configuredProbability: number, delivery: Delivery) {
-    this.probability = configuredProbability
+    this._probability = configuredProbability
+    this.scaledProbability = scaleProbabilityToMatchSamplingRate(configuredProbability)
     this.delivery = delivery
 
     // make an initial request for the probability value
+    // when this completes a timer will be setup to make periodic requests
     this.fetchSamplingProbability()
   }
 
