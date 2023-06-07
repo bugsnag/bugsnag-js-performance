@@ -8,7 +8,6 @@ import { RouteChangePlugin } from '../lib/auto-instrumentation/route-change-plug
 import { createSchema } from '../lib/config'
 import { createDefaultRoutingProvider } from '../lib/default-routing-provider'
 import { type OnSettle } from '../lib/on-settle'
-import MockRoutingProvider from './utilities/mock-routing-provider'
 
 jest.useFakeTimers()
 
@@ -131,12 +130,14 @@ describe('RouteChangePlugin', () => {
   })
 
   it('does not create route change spans with autoInstrumentFullPageLoads set to false', () => {
+    const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(32) }
+    const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle)
     const clock = new IncrementingClock()
     const delivery = new InMemoryDelivery()
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      schema: createSchema(window.location.hostname, new DefaultRoutingProvider(window.location)),
       plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock)]
     })
 
