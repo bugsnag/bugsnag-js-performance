@@ -8,6 +8,7 @@ import { RouteChangePlugin } from '../lib/auto-instrumentation/route-change-plug
 import { createSchema } from '../lib/config'
 import { createDefaultRoutingProvider } from '../lib/default-routing-provider'
 import { type OnSettle } from '../lib/on-settle'
+import MockRoutingProvider from './utilities/mock-routing-provider'
 
 jest.useFakeTimers()
 
@@ -135,8 +136,8 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, jest.fn(), clock)]
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentRouteChanges: false })
