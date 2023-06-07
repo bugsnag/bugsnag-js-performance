@@ -1,16 +1,16 @@
 import { createClient } from '@bugsnag/core-performance'
-import { FullPageLoadPlugin } from './auto-instrumentation/full-page-load-plugin'
+import { FullPageLoadPlugin, NetworkRequestPlugin, RouteChangePlugin } from './auto-instrumentation'
 import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
 import { createSchema } from './config'
+import { createDefaultRoutingProvider } from './default-routing-provider'
 import createBrowserDeliveryFactory from './delivery'
 import idGenerator from './id-generator'
 import createOnSettle from './on-settle'
-import createResourceAttributesSource from './resource-attributes-source'
-import createSpanAttributesSource from './span-attributes-source'
 import createFetchRequestTracker from './request-tracker/request-tracker-fetch'
 import createXmlHttpRequestTracker from './request-tracker/request-tracker-xhr'
-import { NetworkRequestPlugin } from './auto-instrumentation/network-request-plugin'
+import createResourceAttributesSource from './resource-attributes-source'
+import createSpanAttributesSource from './span-attributes-source'
 import { WebVitals } from './web-vitals'
 
 const backgroundingListener = createBrowserBackgroundingListener(document)
@@ -20,13 +20,14 @@ const resourceAttributesSource = createResourceAttributesSource(navigator)
 const fetchRequestTracker = createFetchRequestTracker(window, clock)
 const xhrRequestTracker = createXmlHttpRequestTracker(window, clock)
 const webVitals = new WebVitals(performance, clock, window.PerformanceObserver)
-const onSettle = createOnSettle(
+export const onSettle = createOnSettle(
   clock,
   window,
   fetchRequestTracker,
   xhrRequestTracker,
   performance
 )
+export const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle)
 
 const BugsnagPerformance = createClient({
   backgroundingListener,
@@ -35,7 +36,7 @@ const BugsnagPerformance = createClient({
   spanAttributesSource,
   deliveryFactory: createBrowserDeliveryFactory(window.fetch, backgroundingListener),
   idGenerator,
-  schema: createSchema(window.location.hostname),
+  schema: createSchema(window.location.hostname, new DefaultRoutingProvider(window.location)),
   plugins: (spanFactory) => [
     onSettle,
     new FullPageLoadPlugin(
@@ -46,7 +47,8 @@ const BugsnagPerformance = createClient({
       onSettle,
       backgroundingListener
     ),
-    new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker)
+    new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker),
+    new RouteChangePlugin(spanFactory, clock)
   ]
 })
 

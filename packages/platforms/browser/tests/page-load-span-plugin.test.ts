@@ -1,6 +1,6 @@
 /**
  * @jest-environment jsdom
- * @jest-environment-options { "url": "https://bugsnag.com/page-load-span-plugin", "referrer": "https://bugsnag.com" }
+ * @jest-environment-options { "referrer": "https://bugsnag.com" }
  */
 
 import {
@@ -23,6 +23,7 @@ import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-p
 import { createSchema } from '../lib/config'
 import { type OnSettle } from '../lib/on-settle'
 import { WebVitals } from '../lib/web-vitals'
+import MockRoutingProvider from './utilities/mock-routing-provider'
 
 jest.useFakeTimers()
 
@@ -42,7 +43,7 @@ describe('FullPageLoadPlugin', () => {
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname),
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       plugins: (spanFactory) => [
         new FullPageLoadPlugin(
           document,
@@ -78,12 +79,12 @@ describe('FullPageLoadPlugin', () => {
 
     jest.runOnlyPendingTimers()
 
-    expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/page-load-span-plugin' }))
+    expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/initial-route' }))
 
     const span = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
 
     expect(span).toHaveAttribute('bugsnag.span.category', 'full_page_load')
-    expect(span).toHaveAttribute('bugsnag.browser.page.route', '/page-load-span-plugin')
+    expect(span).toHaveAttribute('bugsnag.browser.page.route', '/initial-route')
     expect(span).toHaveAttribute('bugsnag.browser.page.referrer', 'https://bugsnag.com/')
     expect(span).toHaveAttribute('bugsnag.metrics.cls', 60)
 
@@ -102,7 +103,7 @@ describe('FullPageLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const testClient = createTestClient({
-      schema: createSchema(window.location.hostname),
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       plugins: (spanFactory) => [
         new FullPageLoadPlugin(
@@ -133,7 +134,7 @@ describe('FullPageLoadPlugin', () => {
     const backgroundingListener = new ControllableBackgroundingListener()
 
     const testClient = createTestClient({
-      schema: createSchema(window.location.hostname),
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
       plugins: (spanFactory) => [
@@ -167,7 +168,7 @@ describe('FullPageLoadPlugin', () => {
     const backgroundingListener = new ControllableBackgroundingListener()
 
     const testClient = createTestClient({
-      schema: createSchema(window.location.hostname),
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
       plugins: (spanFactory) => [
@@ -204,7 +205,7 @@ describe('FullPageLoadPlugin', () => {
     const backgroundingListener = new ControllableBackgroundingListener()
 
     const testClient = createTestClient({
-      schema: createSchema(window.location.hostname),
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
       plugins: (spanFactory) => [
@@ -240,7 +241,7 @@ describe('FullPageLoadPlugin', () => {
     const backgroundingListener = new ControllableBackgroundingListener()
 
     const testClient = createTestClient({
-      schema: createSchema(window.location.hostname),
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
       plugins: (spanFactory) => [
@@ -277,7 +278,7 @@ describe('FullPageLoadPlugin', () => {
     const backgroundingListener = new ControllableBackgroundingListener()
 
     const testClient = createTestClient({
-      schema: createSchema(window.location.hostname),
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
       plugins: (spanFactory) => [
@@ -298,7 +299,7 @@ describe('FullPageLoadPlugin', () => {
 
     backgroundingListener.sendToBackground()
 
-    expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/page-load-span-plugin' }))
+    expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/initial-route' }))
   })
 
   describe('WebVitals', () => {
@@ -314,7 +315,7 @@ describe('FullPageLoadPlugin', () => {
         const testClient = createTestClient({
           clock,
           deliveryFactory: () => delivery,
-          schema: createSchema(window.location.hostname),
+          schema: createSchema(window.location.hostname, new MockRoutingProvider()),
           plugins: (spanFactory) => [
             new FullPageLoadPlugin(
               document,
@@ -339,7 +340,7 @@ describe('FullPageLoadPlugin', () => {
         jest.runOnlyPendingTimers()
 
         expect(delivery).toHaveSentSpan(expect.objectContaining({
-          name: '[FullPageLoad]/page-load-span-plugin',
+          name: '[FullPageLoad]/initial-route',
           events: [
             {
               name: 'lcp',
@@ -360,7 +361,7 @@ describe('FullPageLoadPlugin', () => {
         const testClient = createTestClient({
           clock,
           deliveryFactory: () => delivery,
-          schema: createSchema(window.location.hostname),
+          schema: createSchema(window.location.hostname, new MockRoutingProvider()),
           plugins: (spanFactory) => [
             new FullPageLoadPlugin(
               document,
@@ -391,7 +392,7 @@ describe('FullPageLoadPlugin', () => {
         jest.runOnlyPendingTimers()
 
         expect(delivery).toHaveSentSpan(expect.objectContaining({
-          name: '[FullPageLoad]/page-load-span-plugin',
+          name: '[FullPageLoad]/initial-route',
           events: [
             {
               name: 'lcp',
@@ -412,7 +413,7 @@ describe('FullPageLoadPlugin', () => {
         const testClient = createTestClient({
           clock,
           deliveryFactory: () => delivery,
-          schema: createSchema(window.location.hostname),
+          schema: createSchema(window.location.hostname, new MockRoutingProvider()),
           plugins: (spanFactory) => [
             new FullPageLoadPlugin(
               document,
@@ -433,7 +434,8 @@ describe('FullPageLoadPlugin', () => {
         jest.runOnlyPendingTimers()
 
         expect(delivery).toHaveSentSpan(expect.objectContaining({
-          name: '[FullPageLoad]/page-load-span-plugin'
+          name: '[FullPageLoad]/initial-route',
+          events: []
         }))
 
         const span = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
@@ -452,7 +454,7 @@ describe('FullPageLoadPlugin', () => {
       const testClient = createTestClient({
         clock,
         deliveryFactory: () => delivery,
-        schema: createSchema(window.location.hostname),
+        schema: createSchema(window.location.hostname, new MockRoutingProvider()),
         plugins: (spanFactory) => [
           new FullPageLoadPlugin(
             document,
@@ -470,7 +472,7 @@ describe('FullPageLoadPlugin', () => {
       jest.runOnlyPendingTimers()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
-        name: '[FullPageLoad]/page-load-span-plugin',
+        name: '[FullPageLoad]/initial-route',
         events: []
       }))
     })

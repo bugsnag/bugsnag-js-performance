@@ -2,22 +2,23 @@
  * @jest-environment jsdom
  */
 
-import createOnSettle from '../../lib/on-settle'
-import { createSchema } from '../../lib/config'
-import {
-  type RequestStartContext,
-  type RequestEndContext,
-  RequestTracker
-} from '../../lib/request-tracker/request-tracker'
 import {
   IncrementingClock,
-  createTestClient,
-  VALID_API_KEY
+  VALID_API_KEY,
+  createTestClient
 } from '@bugsnag/js-performance-test-utilities'
+import { createSchema } from '../../lib/config'
+import createOnSettle from '../../lib/on-settle'
+import {
+  RequestTracker,
+  type RequestEndContext,
+  type RequestStartContext
+} from '../../lib/request-tracker/request-tracker'
 import {
   PerformanceFake,
   createPerformanceNavigationTimingFake
 } from '../utilities'
+import MockRoutingProvider from '../utilities/mock-routing-provider'
 
 const START_CONTEXT: RequestStartContext = {
   url: 'https://www.bugsnag.com',
@@ -230,7 +231,7 @@ describe('onSettle', () => {
     )
 
     const testClient = createTestClient({
-      schema: createSchema(window.location.hostname),
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       plugins: (spanFactory) => [onSettle]
     })
 
@@ -271,7 +272,7 @@ describe('onSettle', () => {
     )
 
     const testClient = createTestClient({
-      schema: createSchema(window.location.hostname),
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       plugins: (spanFactory) => [onSettle]
     })
 
@@ -305,7 +306,7 @@ describe('onSettle', () => {
     )
 
     const testClient = createTestClient({
-      schema: createSchema(window.location.hostname),
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       plugins: (spanFactory) => [onSettle]
     })
 

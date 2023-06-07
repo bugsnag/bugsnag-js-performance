@@ -1,11 +1,11 @@
 import {
-  schema,
   isStringOrRegExpArray,
+  schema,
   type ConfigOption,
   type Configuration,
   type CoreSchema
 } from '@bugsnag/core-performance'
-import { DefaultRoutingProvider, isRoutingProvider, type RoutingProvider } from './routing-provider'
+import { isRoutingProvider, type RoutingProvider } from './routing-provider'
 
 export interface BrowserSchema extends CoreSchema {
   autoInstrumentFullPageLoads: ConfigOption<boolean>
@@ -23,7 +23,7 @@ export interface BrowserConfiguration extends Configuration {
   networkInstrumentationIgnoreUrls?: Array<string | RegExp>
 }
 
-export function createSchema (hostname: string): BrowserSchema {
+export function createSchema (hostname: string, defaultRoutingProvider: RoutingProvider): BrowserSchema {
   return {
     ...schema,
     releaseStage: {
@@ -41,7 +41,7 @@ export function createSchema (hostname: string): BrowserSchema {
       validate: (value): value is boolean => value === true || value === false
     },
     routingProvider: {
-      defaultValue: new DefaultRoutingProvider(),
+      defaultValue: defaultRoutingProvider,
       message: 'should be a routing provider',
       validate: isRoutingProvider
     },

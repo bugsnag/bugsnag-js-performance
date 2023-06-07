@@ -47,7 +47,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
       return
     }
 
-    const route = configuration.routingProvider.resolveRoute(new URL(this.location.href))
+    const route = configuration.routingProvider.initialRoute
 
     const startTime = 0 // TODO: Ensure this correctly resolves to timeOrigin
     const span = this.spanFactory.startSpan(`[FullPageLoad]${route}`, startTime)
