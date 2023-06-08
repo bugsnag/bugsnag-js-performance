@@ -1,4 +1,5 @@
 import { type InternalConfiguration, type Configuration } from './config'
+import { isNumber } from './validation'
 
 export type SpanAttribute = string | number | boolean
 
@@ -12,7 +13,7 @@ export class SpanAttributes {
   }
 
   set (name: string, value: SpanAttribute) {
-    if (typeof value === 'string' || typeof value === 'boolean' || (typeof value === 'number' && !Number.isNaN(value) && Number.isFinite(value))) {
+    if (typeof value === 'string' || typeof value === 'boolean' || isNumber(value)) {
       this.attributes.set(name, value)
     }
   }

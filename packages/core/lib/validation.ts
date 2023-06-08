@@ -4,6 +4,8 @@ import { type PersistedProbability } from './persistence'
 export const isObject = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === 'object' && !Array.isArray(value)
 
+export const isNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && !Number.isNaN(value)
+
 export const isString = (value: unknown): value is string =>
   typeof value === 'string'
 
@@ -23,6 +25,6 @@ export const isStringOrRegExpArray = (value: unknown): value is Array<string | R
 
 export function isPersistedProbabilty (value: unknown): value is PersistedProbability {
   return isObject(value) &&
-    typeof value.value === 'number' &&
-    typeof value.time === 'number'
+    isNumber(value.value) &&
+    isNumber(value.time)
 }
