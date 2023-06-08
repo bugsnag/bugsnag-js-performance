@@ -32,7 +32,7 @@ services:
       context: .
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
-        MAZE_RUNNER_VERSION: latest-v7-cli
+        MAZE_RUNNER_VERSION: integration-v8-cli
     environment:
       <<: *common-environment
       BITBAR_USERNAME:
