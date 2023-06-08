@@ -70,6 +70,10 @@ class Browser
       firefox_supported_vitals
     when "safari"
       safari_supported_vitals
+    when "android"
+      chrome_supported_vitals
+    when "iphone"
+      safari_supported_vitals
     else
       raise "Unable to determine web vitals support for browser: #{@name}"
     end
