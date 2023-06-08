@@ -6,7 +6,6 @@
     "packages/platforms/*"
   ],
   "scripts": {
-    "bootstrap": "lerna bootstrap",
     "build": "lerna run --stream build",
     "clean": "lerna run --stream --parallel clean",
     "test:lint": "eslint --max-warnings=0 .",
