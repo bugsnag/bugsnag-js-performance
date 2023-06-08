@@ -7,6 +7,8 @@ import {
   VALID_API_KEY
 } from '@bugsnag/js-performance-test-utilities'
 
+jest.useFakeTimers()
+
 describe('Core', () => {
   describe('createClient()', () => {
     it('returns a BugsnagPerformance client', () => {

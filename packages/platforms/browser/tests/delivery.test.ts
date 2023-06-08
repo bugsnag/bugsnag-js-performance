@@ -151,8 +151,19 @@ describe('Browser Delivery', () => {
 
     const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
     const delivery = deliveryFactory('test-api-key', '/test')
+    const deliveryPayload: DeliveryPayload = { resourceSpans: [] }
+    const response = await delivery.send(deliveryPayload)
 
-    const response = await delivery.send({ resourceSpans: [] })
+    expect(fetch).toHaveBeenCalledWith('/test', {
+      method: 'POST',
+      keepalive: false,
+      body: JSON.stringify(deliveryPayload),
+      headers: {
+        'Bugsnag-Api-Key': 'test-api-key',
+        'Bugsnag-Span-Sampling': '1.0:0',
+        'Content-Type': 'application/json'
+      }
+    })
 
     expect(response).toStrictEqual({
       state: 'success',

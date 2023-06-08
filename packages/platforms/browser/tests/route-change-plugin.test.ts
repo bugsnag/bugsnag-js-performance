@@ -13,6 +13,7 @@ jest.useFakeTimers()
 
 afterEach(() => {
   history.replaceState({}, 'unused', 'https://bugsnag.com/route-change-plugin')
+  jest.clearAllTimers()
 })
 
 describe('RouteChangePlugin', () => {
@@ -37,7 +38,7 @@ describe('RouteChangePlugin', () => {
 
     history.pushState({}, '', url)
 
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({
       name: '[RouteChange]/second-route',
@@ -123,7 +124,7 @@ describe('RouteChangePlugin', () => {
 
     history.pushState({}, '', url)
 
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
 
     // No delivery
     expect(delivery.requests).toHaveLength(0)

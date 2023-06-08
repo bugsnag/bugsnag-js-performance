@@ -32,7 +32,7 @@ services:
       context: .
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
-        MAZE_RUNNER_VERSION: latest-v7-cli
+        MAZE_RUNNER_VERSION: integration-v8-cli
     environment:
       <<: *common-environment
       BITBAR_USERNAME:
@@ -57,7 +57,7 @@ services:
       context: .
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
-        MAZE_RUNNER_VERSION: latest-v7-cli
+        MAZE_RUNNER_VERSION: integration-v8-cli
     environment: &browser-maze-runner-environment
       <<: *common-environment
       BROWSER_STACK_BROWSERS_USERNAME:
@@ -78,7 +78,7 @@ services:
       context: .
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
-        MAZE_RUNNER_VERSION: v7.26.1-cli-legacy
+        MAZE_RUNNER_VERSION: integration-v8-cli-legacy
     environment:
       <<: *common-environment
       BROWSER_STACK_BROWSERS_USERNAME:

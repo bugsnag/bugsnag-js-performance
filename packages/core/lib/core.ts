@@ -40,9 +40,9 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
     start: (config: C | string) => {
       const configuration = validateConfig<S, C>(config, options.schema)
 
-      sampler.probability = configuration.samplingProbability
-
       const delivery = options.deliveryFactory(configuration.apiKey, configuration.endpoint)
+
+      sampler.initialise(configuration.samplingProbability, delivery)
 
       processor = new BatchProcessor(
         delivery,

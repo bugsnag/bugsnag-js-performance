@@ -40,5 +40,5 @@ bundle exec maze-runner --farm=bs --browser=chrome_latest
 Or to run a single feature file:
 
 ```sh
-bundle exec maze-runner --farm=bs --browser=chrome_latest features/device.feature
+bundle exec maze-runner --farm=bs --browser=chrome_latest features/manual-spans.feature
 ```
