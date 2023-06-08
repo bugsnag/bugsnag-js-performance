@@ -1,4 +1,4 @@
-import { isLogger, isObject, isString, isStringArray, isStringWithLength } from './validation'
+import { isLogger, isNumber, isObject, isString, isStringArray, isStringWithLength } from './validation'
 
 export interface Logger {
   debug: (message: string) => void
@@ -82,7 +82,7 @@ export const schema: CoreSchema = {
   samplingProbability: {
     defaultValue: 1.0,
     message: 'should be a number between 0 and 1',
-    validate: (value: unknown): value is number => typeof value === 'number' && value >= 0 && value <= 1
+    validate: (value: unknown): value is number => isNumber(value) && value >= 0 && value <= 1
   }
 }
 
@@ -98,7 +98,7 @@ if (typeof __ENABLE_BUGSNAG_TEST_CONFIGURATION__ !== 'undefined' && __ENABLE_BUG
   schema.maximumBatchSize = {
     message: 'should be a number',
     defaultValue: 100,
-    validate: (value: unknown): value is number => typeof value === 'number'
+    validate: isNumber
   }
 
   // the number of seconds to wait after adding a span to a batch for that
@@ -106,14 +106,14 @@ if (typeof __ENABLE_BUGSNAG_TEST_CONFIGURATION__ !== 'undefined' && __ENABLE_BUG
   schema.batchInactivityTimeoutMs = {
     message: 'should be a number',
     defaultValue: 30 * 1000, // 30 seconds
-    validate: (value: unknown): value is number => typeof value === 'number'
+    validate: isNumber
   }
 
   // the maximum number of spans to have in a retry queue
   schema.retryQueueMaxSize = {
     message: 'should be a number',
     defaultValue: 1000,
-    validate: (value: unknown): value is number => typeof value === 'number'
+    validate: isNumber
   }
 }
 
