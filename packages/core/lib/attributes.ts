@@ -12,7 +12,7 @@ export class SpanAttributes {
   }
 
   set (name: string, value: SpanAttribute) {
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    if (typeof value === 'string' || typeof value === 'boolean' || (typeof value === 'number' && !Number.isNaN(value) && Number.isFinite(value))) {
       this.attributes.set(name, value)
     }
   }
