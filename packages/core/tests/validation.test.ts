@@ -148,4 +148,14 @@ describe('validation', () => {
       expect(validation.isPersistedProbabilty(value)).toBe(false)
     })
   })
+
+  describe('isNumber', () => {
+    it.each([-1, 0, 1, 10000, new Date().getTime(), performance.now()])('passes validation with %s', (value) => {
+      expect(validation.isNumber(value)).toBe(true)
+    })
+
+    it.each(['', 'string', true, false, undefined, null, NaN, Infinity, -Infinity, () => {}, [], {}, new Date()])('fails validation with %s', (value) => {
+      expect(validation.isNumber(value)).toBe(false)
+    })
+  })
 })
