@@ -9,7 +9,13 @@ import type Sampler from './sampler'
 import { type Time } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
 
-export interface Span {
+export interface SpanContext {
+  readonly id: string // 64 bit random string
+  readonly traceId: string // 128 bit random string
+
+  // returns true if this is still considered a valid context
+  readonly isValid: () => boolean
+}
   end: (endTime?: Time) => void
 }
 
