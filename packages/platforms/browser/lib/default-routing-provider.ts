@@ -1,16 +1,8 @@
 import { type OnSettle } from './on-settle'
 import getAbsoluteUrl from './request-tracker/url-helpers'
-import { type StartRouteChangeCallback, type RouteResolver, type RoutingProvider } from './routing-provider'
+import { type RouteResolver, type RoutingProvider, type StartRouteChangeCallback } from './routing-provider'
 
 const defaultRouteResolver: RouteResolver = (url: URL) => url.pathname
-
-const sanitizeURL = (url: URL | string) => {
-  if (url instanceof URL) {
-    return url
-  }
-
-  return new URL(getAbsoluteUrl(url, window.document.baseURI))
-}
 
 export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Location) => {
   return class DefaultRoutingProvider implements RoutingProvider {
@@ -22,7 +14,7 @@ export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Locat
 
     listenForRouteChanges (startRouteChangeSpan: StartRouteChangeCallback) {
       addEventListener('popstate', () => {
-        const url = sanitizeURL(location.pathname)
+        const url = new URL(location.href)
         const route = this.resolveRoute(url)
         const span = startRouteChangeSpan(route)
 
@@ -37,7 +29,8 @@ export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Locat
         const url = args[2]
 
         if (url) {
-          const route = resolveRoute(sanitizeURL(url))
+          const absoluteURL = new URL(getAbsoluteUrl(url.toString(), document.baseURI))
+          const route = resolveRoute(absoluteURL)
           const span = startRouteChangeSpan(route)
 
           onSettle((endTime) => {
