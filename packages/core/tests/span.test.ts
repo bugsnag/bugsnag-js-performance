@@ -84,7 +84,12 @@ describe('Span', () => {
     it('returns a Span', () => {
       const client = createTestClient()
       const span = client.startSpan('test span')
-      expect(span).toStrictEqual({ end: expect.any(Function) })
+      expect(span).toStrictEqual({
+        id: expect.any(String),
+        traceId: expect.any(String),
+        end: expect.any(Function),
+        isValid: expect.any(Function)
+      })
     })
 
     it.each([
@@ -337,6 +342,21 @@ describe('Span', () => {
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: 'entirely-in-foreground'
       }))
+    })
+  })
+
+  describe('Span.isValid()', () => {
+    it('returns false if the span has been ended', () => {
+      const delivery = new InMemoryDelivery()
+      const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+      const client = createTestClient({ deliveryFactory: () => delivery, clock })
+      client.start({ apiKey: VALID_API_KEY })
+
+      const span = client.startSpan('test span')
+      expect(span.isValid()).toEqual(true)
+
+      span.end()
+      expect(span.isValid()).toEqual(false)
     })
   })
 })

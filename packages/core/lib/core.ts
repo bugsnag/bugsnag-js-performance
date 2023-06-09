@@ -77,6 +77,13 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
       const span = spanFactory.startSpan(name, safeStartTime)
 
       return {
+        get id () {
+          return span.id
+        },
+        get traceId () {
+          return span.traceId
+        },
+        isValid: span.isValid,
         end: (endTime) => {
           const safeEndTime = timeToNumber(options.clock, endTime)
           spanFactory.endSpan(span, safeEndTime)
@@ -91,6 +98,6 @@ export function createNoopClient<C extends Configuration> (): BugsnagPerformance
 
   return {
     start: noop,
-    startSpan: () => ({ end: noop })
+    startSpan: () => ({ id: '', traceId: '', end: noop, isValid: () => false })
   }
 }

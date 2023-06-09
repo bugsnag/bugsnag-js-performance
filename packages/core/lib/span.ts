@@ -16,6 +16,8 @@ export interface SpanContext {
   // returns true if this is still considered a valid context
   readonly isValid: () => boolean
 }
+
+export interface Span extends SpanContext {
   end: (endTime?: Time) => void
 }
 
@@ -62,15 +64,16 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
   }
 }
 
-export class SpanInternal {
-  private readonly id: string
-  private readonly traceId: string
+export class SpanInternal implements SpanContext {
+  readonly id: string
+  readonly traceId: string
   private readonly startTime: number
   private readonly samplingRate: number
   private readonly kind = Kind.Client // TODO: How do we define the initial Kind?
   private readonly events = new SpanEvents()
   private readonly attributes: SpanAttributes
   private readonly name: string
+  private endTime?: number
 
   constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes) {
     this.id = id
@@ -90,6 +93,7 @@ export class SpanInternal {
   }
 
   end (endTime: number, samplingProbability: SpanProbability): SpanEnded {
+    this.endTime = endTime
     return {
       id: this.id,
       name: this.name,
@@ -102,6 +106,10 @@ export class SpanInternal {
       endTime,
       samplingProbability
     }
+  }
+
+  isValid = () => {
+    return this.endTime === undefined
   }
 }
 
