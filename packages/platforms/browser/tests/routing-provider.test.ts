@@ -11,7 +11,7 @@ import { isRoutingProvider } from '../lib/routing-provider'
 
 jest.useFakeTimers()
 
-const DefaultRoutingProvider = createDefaultRoutingProvider(jest.fn((c) => { c(32) }))
+const DefaultRoutingProvider = createDefaultRoutingProvider(jest.fn((c) => { c(32) }), window.location)
 
 describe('DefaultRoutingProvider', () => {
   it('Uses a provided route resolver function', () => {
@@ -23,7 +23,7 @@ describe('DefaultRoutingProvider', () => {
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, routingProvier),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock)]
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock, window.location)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -45,7 +45,7 @@ describe('DefaultRoutingProvider', () => {
         clock,
         deliveryFactory: () => delivery,
         schema: createSchema(window.location.hostname, routingProvier),
-        plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock)]
+        plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock, window.location)]
       })
 
       testClient.start({ apiKey: VALID_API_KEY })

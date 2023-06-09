@@ -27,7 +27,7 @@ export const onSettle = createOnSettle(
   xhrRequestTracker,
   performance
 )
-export const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle)
+export const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle, window.location)
 
 const BugsnagPerformance = createClient({
   backgroundingListener,
@@ -48,7 +48,7 @@ const BugsnagPerformance = createClient({
       backgroundingListener
     ),
     new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker),
-    new RouteChangePlugin(spanFactory, clock)
+    new RouteChangePlugin(spanFactory, clock, window.location)
   ]
 })
 

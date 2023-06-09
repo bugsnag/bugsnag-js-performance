@@ -1,6 +1,6 @@
-import { type OnSettle, type OnSettleCallback } from './on-settle'
+import { type OnSettle } from './on-settle'
 import getAbsoluteUrl from './request-tracker/url-helpers'
-import { type OnRouteChangeCallback, type RouteResolver, type RoutingProvider } from './routing-provider'
+import { type StartRouteChangeCallback, type RouteResolver, type RoutingProvider } from './routing-provider'
 
 const defaultRouteResolver: RouteResolver = (url: URL) => url.pathname
 
@@ -12,26 +12,23 @@ const sanitizeURL = (url: URL | string) => {
   return new URL(getAbsoluteUrl(url, window.document.baseURI))
 }
 
-export const createDefaultRoutingProvider = (defaultOnSettle: OnSettle) => {
+export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Location) => {
   return class DefaultRoutingProvider implements RoutingProvider {
-    location: Location
-
     resolveRoute: RouteResolver
 
     constructor (location: Location, resolveRoute = defaultRouteResolver) {
       this.resolveRoute = resolveRoute
-      this.location = location
     }
 
-    get initialRoute () {
-      return this.resolveRoute(sanitizeURL(this.location.pathname))
-    }
-
-    onRouteChange (callback: OnRouteChangeCallback) {
+    listenForRouteChanges (startRouteChangeSpan: StartRouteChangeCallback) {
       addEventListener('popstate', () => {
-        const url = sanitizeURL(this.location.pathname)
+        const url = sanitizeURL(location.pathname)
         const route = this.resolveRoute(url)
-        callback(route)
+        const span = startRouteChangeSpan(route)
+
+        onSettle((endTime) => {
+          span.end(endTime)
+        })
       })
 
       const resolveRoute = this.resolveRoute
@@ -41,15 +38,15 @@ export const createDefaultRoutingProvider = (defaultOnSettle: OnSettle) => {
 
         if (url) {
           const route = resolveRoute(sanitizeURL(url))
-          callback(route)
+          const span = startRouteChangeSpan(route)
+
+          onSettle((endTime) => {
+            span.end(endTime)
+          })
         }
 
         originalPushState.apply(this, args)
       }
-    }
-
-    onSettle (callback: OnSettleCallback) {
-      defaultOnSettle(callback)
     }
   }
 }

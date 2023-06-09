@@ -10,18 +10,20 @@ export type StartRouteChangeSpan = (route: string, options?: StartRouteOptions) 
 export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   private readonly spanFactory: SpanFactory
   private readonly clock: Clock
+  private readonly location: Location
 
-  constructor (spanFactory: SpanFactory, clock: Clock) {
+  constructor (spanFactory: SpanFactory, clock: Clock, location: Location) {
     this.spanFactory = spanFactory
     this.clock = clock
+    this.location = location
   }
 
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     if (!configuration.autoInstrumentRouteChanges) return
 
-    let previousRoute = configuration.routingProvider.initialRoute
+    let previousRoute = configuration.routingProvider.resolveRoute(new URL(this.location.href))
 
-    configuration.routingProvider.onRouteChange((newRoute: string, routeChangeTime?: Time) => {
+    configuration.routingProvider.listenForRouteChanges((newRoute: string, routeChangeTime?: Time) => {
       const startTime = routeChangeTime === undefined
         ? this.clock.now()
         : timeToNumber(this.clock, routeChangeTime)
@@ -33,13 +35,15 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
 
       previousRoute = newRoute
 
-      configuration.routingProvider.onSettle((settledTime?: Time) => {
-        const endTime = settledTime === undefined
-          ? this.clock.now()
-          : timeToNumber(this.clock, settledTime)
+      return {
+        end: (endTime?: Time) => {
+          const realEndTime = endTime === undefined
+            ? this.clock.now()
+            : timeToNumber(this.clock, endTime)
 
-        this.spanFactory.endSpan(span, endTime)
-      })
+          this.spanFactory.endSpan(span, realEndTime)
+        }
+      }
     })
   }
 }
