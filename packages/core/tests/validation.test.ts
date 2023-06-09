@@ -11,6 +11,9 @@ describe('validation', () => {
     { type: 'array', value: [] },
     { type: 'symbol', value: Symbol('test') },
     { type: 'null', value: null },
+    { type: 'NaN', value: NaN },
+    { type: 'Infinity', value: Infinity },
+    { type: '-Infinity', value: -Infinity },
     { type: 'undefined', value: undefined },
     { type: 'class', value: class { a () {} } }
   ]
