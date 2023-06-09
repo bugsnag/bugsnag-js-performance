@@ -140,26 +140,18 @@ describe('Schema validation', () => {
         expect(console.warn).not.toHaveBeenCalled()
       })
 
-      it('replaces a value <0 with the default', () => {
+      it.each([
+        { value: 1.1, type: 'a value >1' },
+        { value: -0.1, type: 'a value >0' },
+        { value: NaN, type: 'NaN' },
+        { value: Infinity, type: 'Infinity' },
+        { value: -Infinity, type: '-Infinity' }
+      ])('replaces $type with the default', ({ value, type }) => {
         jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
 
         const config = {
           apiKey: VALID_API_KEY,
-          samplingProbability: -0.1
-        }
-
-        const validConfig = validateConfig(config, coreSchema)
-        expect(validConfig.samplingProbability).toBe(1.0)
-
-        expect(console.warn).toHaveBeenCalledWith('Invalid configuration\n  - samplingProbability should be a number between 0 and 1, got number')
-      })
-
-      it('replaces a value >1 with the default', () => {
-        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
-
-        const config = {
-          apiKey: VALID_API_KEY,
-          samplingProbability: 1.1
+          samplingProbability: value
         }
 
         const validConfig = validateConfig(config, coreSchema)
