@@ -18,7 +18,7 @@ describe('DefaultRoutingProvider', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
     const routeResolverFn = jest.fn((url: URL | string) => '/resolved-route')
-    const routingProvier = new DefaultRoutingProvider(window.location, routeResolverFn)
+    const routingProvier = new DefaultRoutingProvider(routeResolverFn)
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
@@ -40,7 +40,7 @@ describe('DefaultRoutingProvider', () => {
     it('Returns a route when provided a complete URL', () => {
       const clock = new IncrementingClock('1970-01-01T00:00:00Z')
       const delivery = new InMemoryDelivery()
-      const routingProvier = new DefaultRoutingProvider(window.location)
+      const routingProvier = new DefaultRoutingProvider()
       const testClient = createTestClient({
         clock,
         deliveryFactory: () => delivery,
@@ -62,7 +62,7 @@ describe('DefaultRoutingProvider', () => {
 
 describe('isRoutingProvider', () => {
   it('Returns true for a valid routing provider', () => {
-    const routingProvider = new DefaultRoutingProvider(window.location)
+    const routingProvider = new DefaultRoutingProvider()
     expect(isRoutingProvider(routingProvider)).toBe(true)
   })
 

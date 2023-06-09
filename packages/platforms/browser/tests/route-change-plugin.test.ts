@@ -30,7 +30,7 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider(window.location)),
+      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
       plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock, window.location)]
     })
 
@@ -61,7 +61,7 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider(window.location)),
+      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
       plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock, window.location)]
     })
 
@@ -116,7 +116,7 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider(window.location)),
+      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
       plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock, window.location)]
     })
 
@@ -138,7 +138,7 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider(window.location)),
+      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
       plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock, window.location)]
     })
 

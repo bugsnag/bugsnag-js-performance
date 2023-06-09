@@ -36,7 +36,7 @@ const BugsnagPerformance = createClient({
   spanAttributesSource,
   deliveryFactory: createBrowserDeliveryFactory(window.fetch, backgroundingListener),
   idGenerator,
-  schema: createSchema(window.location.hostname, new DefaultRoutingProvider(window.location)),
+  schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
   plugins: (spanFactory) => [
     onSettle,
     new FullPageLoadPlugin(

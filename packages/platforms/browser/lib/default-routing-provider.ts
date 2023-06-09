@@ -16,7 +16,7 @@ export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Locat
   return class DefaultRoutingProvider implements RoutingProvider {
     resolveRoute: RouteResolver
 
-    constructor (location: Location, resolveRoute = defaultRouteResolver) {
+    constructor (resolveRoute = defaultRouteResolver) {
       this.resolveRoute = resolveRoute
     }
 
