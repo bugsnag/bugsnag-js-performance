@@ -10,7 +10,7 @@ import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
 import { SpanFactory, type Span } from './span'
-import { timeToNumber, type Time } from './time'
+import { type Time } from './time'
 
 export interface BugsnagPerformance<C extends Configuration> {
   start: (config: C | string) => void
@@ -33,7 +33,14 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
   let processor: Processor = bufferingProcessor
 
   const sampler = new Sampler(1.0)
-  const spanFactory = new SpanFactory(processor, sampler, options.idGenerator, options.spanAttributesSource, options.backgroundingListener)
+  const spanFactory = new SpanFactory(
+    processor,
+    sampler,
+    options.idGenerator,
+    options.spanAttributesSource,
+    options.backgroundingListener,
+    options.clock
+  )
   const plugins = options.plugins(spanFactory)
 
   return {
@@ -73,22 +80,8 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
       }
     },
     startSpan: (name, startTime) => {
-      const safeStartTime = timeToNumber(options.clock, startTime)
-      const span = spanFactory.startSpan(name, safeStartTime)
-
-      return {
-        get id () {
-          return span.id
-        },
-        get traceId () {
-          return span.traceId
-        },
-        isValid: span.isValid,
-        end: (endTime) => {
-          const safeEndTime = timeToNumber(options.clock, endTime)
-          spanFactory.endSpan(span, safeEndTime)
-        }
-      }
+      const span = spanFactory.startSpan(name, startTime)
+      return spanFactory.spanFromSpanInternal(span)
     }
   }
 }

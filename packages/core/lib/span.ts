@@ -6,7 +6,7 @@ import { SpanEvents } from './events'
 import { type IdGenerator } from './id-generator'
 import { type Processor } from './processor'
 import type Sampler from './sampler'
-import { type Time } from './time'
+import { timeToNumber, type Time } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
 
 export interface SpanContext {
@@ -130,12 +130,21 @@ export class SpanFactory {
   private sampler: Sampler
   private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
   private isInForeground: boolean = true
+  private clock: Clock
 
-  constructor (processor: Processor, sampler: Sampler, idGenerator: IdGenerator, spanAttributesSource: SpanAttributesSource, backgroundingListener: BackgroundingListener) {
+  constructor (
+    processor: Processor,
+    sampler: Sampler,
+    idGenerator: IdGenerator,
+    spanAttributesSource: SpanAttributesSource,
+    backgroundingListener: BackgroundingListener,
+    clock: Clock) {
     this.processor = processor
     this.sampler = sampler
     this.idGenerator = idGenerator
     this.spanAttributesSource = spanAttributesSource
+    this.clock = clock
+
     // this will fire immediately if the app is already backgrounded
     backgroundingListener.onStateChange(this.onBackgroundStateChange)
   }
@@ -147,11 +156,12 @@ export class SpanFactory {
     this.openSpans = new WeakSet<SpanInternal>()
   }
 
-  startSpan (name: string, startTime: number) {
+  startSpan (name: string, startTime?: Time) {
+    const safeStartTime = timeToNumber(this.clock, startTime)
     const spanId = this.idGenerator.generate(64)
     const traceId = this.idGenerator.generate(128)
     const attributes = new SpanAttributes(this.spanAttributesSource())
-    const span = new SpanInternal(spanId, traceId, name, startTime, attributes)
+    const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes)
 
     // don't track spans that are started while the app is backgrounded
     if (this.isInForeground) this.openSpans.add(span)
@@ -173,6 +183,22 @@ export class SpanFactory {
 
     if (this.sampler.sample(spanEnded)) {
       this.processor.add(spanEnded)
+    }
+  }
+
+  spanFromSpanInternal (span: SpanInternal): Span {
+    return {
+      get id () {
+        return span.id
+      },
+      get traceId () {
+        return span.traceId
+      },
+      isValid: span.isValid,
+      end: (endTime) => {
+        const safeEndTime = timeToNumber(this.clock, endTime)
+        this.endSpan(span, safeEndTime)
+      }
     }
   }
 }

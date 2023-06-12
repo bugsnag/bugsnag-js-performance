@@ -31,7 +31,7 @@ describe('RouteChangePlugin', () => {
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock, window.location)]
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -63,7 +63,7 @@ describe('RouteChangePlugin', () => {
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock, window.location)]
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location)]
     })
 
     history.pushState({}, '', '/first-route')
@@ -120,7 +120,7 @@ describe('RouteChangePlugin', () => {
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock, window.location)]
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -142,7 +142,7 @@ describe('RouteChangePlugin', () => {
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock, window.location)]
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentRouteChanges: false })

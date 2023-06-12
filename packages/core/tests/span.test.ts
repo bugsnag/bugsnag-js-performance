@@ -31,7 +31,8 @@ describe('SpanInternal', () => {
         sampler,
         new StableIdGenerator(),
         spanAttributesSource,
-        new ControllableBackgroundingListener()
+        new ControllableBackgroundingListener(),
+        clock
       )
 
       const spanInternal = spanFactory.startSpan('span-name', 1234)
@@ -61,7 +62,8 @@ describe('SpanInternal', () => {
         sampler,
         new StableIdGenerator(),
         spanAttributesSource,
-        new ControllableBackgroundingListener()
+        new ControllableBackgroundingListener(),
+        clock
       )
 
       const spanInternal = spanFactory.startSpan('span-name', 1234)
