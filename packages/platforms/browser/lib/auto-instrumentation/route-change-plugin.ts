@@ -1,11 +1,5 @@
-import { timeToNumber, type Clock, type InternalConfiguration, type Plugin, type Span, type SpanFactory, type Time } from '@bugsnag/core-performance'
+import { timeToNumber, type Clock, type InternalConfiguration, type Plugin, type SpanFactory, type Time } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
-
-interface StartRouteOptions {
-  startTime?: Time
-}
-
-export type StartRouteChangeSpan = (route: string, options?: StartRouteOptions) => Span
 
 export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   private readonly spanFactory: SpanFactory
@@ -23,12 +17,16 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
 
     let previousRoute = configuration.routingProvider.resolveRoute(new URL(this.location.href))
 
-    configuration.routingProvider.listenForRouteChanges((newRoute: string, routeChangeTime?: Time) => {
-      const startTime = timeToNumber(this.clock, routeChangeTime)
+    configuration.routingProvider.listenForRouteChanges((newRoute, options = {}) => {
+      const startTime = timeToNumber(this.clock, options.startTime)
       const span = this.spanFactory.startSpan(`[RouteChange]${newRoute}`, startTime)
       span.setAttribute('bugsnag.span.category', 'route_change')
       span.setAttribute('bugsnag.browser.page.route', newRoute)
       span.setAttribute('bugsnag.browser.page.previous_route', previousRoute)
+
+      if (options.trigger) {
+        span.setAttribute('bugsnag.browser.page.route_change.trigger', options.trigger)
+      }
 
       previousRoute = newRoute
 

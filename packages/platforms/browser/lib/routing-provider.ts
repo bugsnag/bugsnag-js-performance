@@ -1,6 +1,11 @@
 import { isObject, type Span, type Time } from '@bugsnag/core-performance'
 
-export type StartRouteChangeCallback = (newRoute: string, routeChangeTime?: Time) => Span
+interface StartRouteChangeOptions {
+  startTime?: Time
+  trigger?: string
+}
+
+export type StartRouteChangeCallback = (newRoute: string, options?: StartRouteChangeOptions) => Span
 
 export interface RoutingProvider {
   resolveRoute: (url: URL) => string

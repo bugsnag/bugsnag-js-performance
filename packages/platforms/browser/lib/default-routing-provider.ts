@@ -16,7 +16,7 @@ export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Locat
       addEventListener('popstate', () => {
         const url = new URL(location.href)
         const route = this.resolveRoute(url)
-        const span = startRouteChangeSpan(route)
+        const span = startRouteChangeSpan(route, { trigger: 'popstate' })
 
         onSettle((endTime) => {
           span.end(endTime)
@@ -31,7 +31,7 @@ export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Locat
         if (url) {
           const absoluteURL = new URL(getAbsoluteUrl(url.toString(), document.baseURI))
           const route = resolveRoute(absoluteURL)
-          const span = startRouteChangeSpan(route)
+          const span = startRouteChangeSpan(route, { trigger: 'pushState' })
 
           onSettle((endTime) => {
             span.end(endTime)
