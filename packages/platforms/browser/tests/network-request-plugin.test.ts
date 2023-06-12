@@ -46,10 +46,10 @@ describe('network span plugin', () => {
     }))
 
     fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1 })
 
     xhrTracker.start({ method: 'POST', url: TEST_URL, startTime: 2 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/POST', 2)
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/POST', { startTime: 2 })
   })
 
   it('ends a span on request end', () => {
@@ -61,7 +61,7 @@ describe('network span plugin', () => {
     }))
 
     const endRequest = fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1 })
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
 
     endRequest({ status: 200, endTime: 2, state: 'success' })
@@ -141,7 +141,7 @@ describe('network span plugin', () => {
 
     // does not match the URLs to exclude
     fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1 })
   })
 
   it('discards the span if the status is 0', () => {
@@ -153,7 +153,7 @@ describe('network span plugin', () => {
     }))
 
     const endRequest = xhrTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1 })
 
     endRequest({ endTime: 2, state: 'error' })
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
@@ -168,7 +168,7 @@ describe('network span plugin', () => {
     }))
 
     const endRequest = fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', 1)
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1 })
 
     endRequest({ state: 'error', error: new Error('woopsy'), endTime: 2 })
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
