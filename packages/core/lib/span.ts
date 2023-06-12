@@ -64,6 +64,16 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
   }
 }
 
+export function spanContextEquals (s1?: SpanContext, s2?: SpanContext) {
+  if (s1 === s2) return true
+
+  if (s1 !== undefined && s2 !== undefined) {
+    return s1.id === s2.id && s1.traceId === s2.traceId
+  }
+
+  return false
+}
+
 export class SpanInternal implements SpanContext {
   readonly id: string
   readonly traceId: string

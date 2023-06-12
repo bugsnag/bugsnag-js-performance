@@ -9,7 +9,7 @@ import {
   createTestClient,
   spanAttributesSource
 } from '@bugsnag/js-performance-test-utilities'
-import { SpanFactory, spanToJson, type SpanEnded } from '../lib'
+import { SpanFactory, spanToJson, type SpanEnded, spanContextEquals } from '../lib'
 import Sampler from '../lib/sampler'
 
 jest.useFakeTimers()
@@ -344,8 +344,10 @@ describe('Span', () => {
       }))
     })
   })
+})
 
-  describe('Span.isValid()', () => {
+describe('SpanContext', () => {
+  describe('SpanContext.isValid()', () => {
     it('returns false if the span has been ended', () => {
       const delivery = new InMemoryDelivery()
       const clock = new IncrementingClock('1970-01-01T00:00:00Z')
@@ -357,6 +359,47 @@ describe('Span', () => {
 
       span.end()
       expect(span.isValid()).toEqual(false)
+    })
+  })
+  describe('spanContextEquals()', () => {
+    it.each([
+      {
+        s1: undefined,
+        s2: undefined,
+        expected: true
+      },
+      {
+        s1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        s2: undefined,
+        expected: false
+      },
+      {
+        s1: undefined,
+        s2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        expected: false
+      },
+      {
+        s1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        s2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        expected: true
+      },
+      {
+        s1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        s2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => false },
+        expected: true
+      },
+      {
+        s1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        s2: { id: '0123456789abcdef', traceId: 'a0b1c2d3e4f5a0b1c2d3e4f5a0b1c2d3', isValid: () => true },
+        expected: false
+      },
+      {
+        s1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        s2: { id: '9876543210fedcba', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        expected: false
+      }
+    ])('returns $expected given inputs $s1 and $s2', ({ s1, s2, expected }) => {
+      expect(spanContextEquals(s1, s2)).toEqual(expected)
     })
   })
 })
