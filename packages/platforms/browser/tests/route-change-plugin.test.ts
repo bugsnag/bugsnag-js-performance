@@ -50,6 +50,7 @@ describe('RouteChangePlugin', () => {
     expect(span).toHaveAttribute('bugsnag.span.category', 'route_change')
     expect(span).toHaveAttribute('bugsnag.browser.page.route', '/second-route')
     expect(span).toHaveAttribute('bugsnag.browser.page.previous_route', '/route-change-plugin')
+    expect(span).toHaveAttribute('bugsnag.browser.page.route_change.trigger', 'pushState')
   })
 
   it('creates a route change span on popstate', () => {
@@ -91,6 +92,7 @@ describe('RouteChangePlugin', () => {
     expect(firstRouteSpan).toHaveAttribute('bugsnag.span.category', 'route_change')
     expect(firstRouteSpan).toHaveAttribute('bugsnag.browser.page.route', '/first-route')
     expect(firstRouteSpan).toHaveAttribute('bugsnag.browser.page.previous_route', '/second-route')
+    expect(firstRouteSpan).toHaveAttribute('bugsnag.browser.page.route_change.trigger', 'popstate')
 
     history.forward()
     jest.runAllTimers()
@@ -101,6 +103,7 @@ describe('RouteChangePlugin', () => {
     expect(secondRouteSpan).toHaveAttribute('bugsnag.span.category', 'route_change')
     expect(secondRouteSpan).toHaveAttribute('bugsnag.browser.page.route', '/second-route')
     expect(secondRouteSpan).toHaveAttribute('bugsnag.browser.page.previous_route', '/first-route')
+    expect(firstRouteSpan).toHaveAttribute('bugsnag.browser.page.route_change.trigger', 'popstate')
   })
 
   it.each([
