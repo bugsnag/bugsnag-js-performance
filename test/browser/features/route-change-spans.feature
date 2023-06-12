@@ -27,5 +27,5 @@ Feature: Route change spans
             | bugsnag.browser.page.title                | stringValue  | Route change spans   |
             | bugsnag.browser.page.route                | stringValue  | /route-change-spans/ |
             | bugsnag.browser.page.previous_route       | stringValue  | /route-change-spans/ |
-            | bugsnag.browser.page.route_change.trigger | stringValue  | pushState            |
+            | bugsnag.browser.page.route_change.trigger | stringValue  | route-change-spans            |
  
