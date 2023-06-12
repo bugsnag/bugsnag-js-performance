@@ -1,18 +1,15 @@
-import { isObject, type Time } from '@bugsnag/core-performance'
-import { type OnSettleCallback } from './on-settle'
+import { isObject, type Span, type Time } from '@bugsnag/core-performance'
 
-export type OnRouteChangeCallback = (newRoute: string, routeChangeTime?: Time) => void
+export type StartRouteChangeCallback = (newRoute: string, routeChangeTime?: Time) => Span
 
 export interface RoutingProvider {
-  readonly initialRoute: string
-  onRouteChange: (callback: OnRouteChangeCallback) => void
-  onSettle: (callback: OnSettleCallback) => void
+  resolveRoute: (url: URL) => string
+  listenForRouteChanges: (startRouteChangeSpan: StartRouteChangeCallback) => void
 }
 
 export type RouteResolver = (url: URL) => string
 
 export const isRoutingProvider = (value: unknown): value is RoutingProvider =>
   isObject(value) &&
-    typeof value.initialRoute === 'string' &&
-    typeof value.onRouteChange === 'function' &&
-    typeof value.onSettle === 'function'
+    typeof value.resolveRoute === 'function' &&
+    typeof value.listenForRouteChanges === 'function'

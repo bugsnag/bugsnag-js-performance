@@ -47,19 +47,20 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
       return
     }
 
-    const route = configuration.routingProvider.initialRoute
-
-    const startTime = 0 // TODO: Ensure this correctly resolves to timeOrigin
-    const span = this.spanFactory.startSpan(`[FullPageLoad]${route}`, startTime)
-
-    // Browser attributes
-    span.setAttribute('bugsnag.span.category', 'full_page_load')
-    span.setAttribute('bugsnag.browser.page.referrer', this.document.referrer)
-    span.setAttribute('bugsnag.browser.page.route', route)
+    const url = new URL(this.location.href)
 
     this.onSettle((endTime: number) => {
-      // note: we don't need to check if we were backgrounded here
-      // as the span factory already checks for backgrounding on all open spans
+      if (this.wasBackgrounded) return
+
+      const route = configuration.routingProvider.resolveRoute(url)
+
+      const startTime = 0
+      const span = this.spanFactory.startSpan(`[FullPageLoad]${route}`, startTime)
+
+      // Browser attributes
+      span.setAttribute('bugsnag.span.category', 'full_page_load')
+      span.setAttribute('bugsnag.browser.page.referrer', this.document.referrer)
+      span.setAttribute('bugsnag.browser.page.route', route)
 
       this.webVitals.attachTo(span)
       this.spanFactory.endSpan(span, endTime)

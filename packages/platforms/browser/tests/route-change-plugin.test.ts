@@ -23,15 +23,15 @@ describe('RouteChangePlugin', () => {
     { type: 'string (relative URL)', url: '/second-route' }
   ])('creates a route change span on pushState with $type', ({ url }) => {
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(32) }
-    const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle)
+    const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle, window.location)
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
 
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider(window.location)),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock)]
+      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock, window.location)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -54,15 +54,15 @@ describe('RouteChangePlugin', () => {
 
   it('creates a route change span on popstate', () => {
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(32) }
-    const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle)
+    const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle, window.location)
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
 
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider(window.location)),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock)]
+      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock, window.location)]
     })
 
     history.pushState({}, '', '/first-route')
@@ -109,15 +109,15 @@ describe('RouteChangePlugin', () => {
     { type: 'null', url: null }
   ])('does not create a route change span on pushState with $type', ({ url }) => {
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(32) }
-    const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle)
+    const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle, window.location)
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
 
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider(window.location)),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock)]
+      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock, window.location)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -132,14 +132,14 @@ describe('RouteChangePlugin', () => {
 
   it('does not create route change spans with autoInstrumentFullPageLoads set to false', () => {
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(32) }
-    const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle)
+    const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle, window.location)
     const clock = new IncrementingClock()
     const delivery = new InMemoryDelivery()
     const testClient = createTestClient({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider(window.location)),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock)]
+      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, clock, window.location)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentRouteChanges: false })

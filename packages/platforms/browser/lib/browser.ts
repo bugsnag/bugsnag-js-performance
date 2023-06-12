@@ -27,7 +27,7 @@ export const onSettle = createOnSettle(
   xhrRequestTracker,
   performance
 )
-export const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle)
+export const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle, window.location)
 
 const BugsnagPerformance = createClient({
   backgroundingListener,
@@ -36,7 +36,7 @@ const BugsnagPerformance = createClient({
   spanAttributesSource,
   deliveryFactory: createBrowserDeliveryFactory(window.fetch, backgroundingListener),
   idGenerator,
-  schema: createSchema(window.location.hostname, new DefaultRoutingProvider(window.location)),
+  schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
   plugins: (spanFactory) => [
     onSettle,
     new FullPageLoadPlugin(
@@ -48,7 +48,7 @@ const BugsnagPerformance = createClient({
       backgroundingListener
     ),
     new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker),
-    new RouteChangePlugin(spanFactory, clock)
+    new RouteChangePlugin(spanFactory, clock, window.location)
   ]
 })
 
