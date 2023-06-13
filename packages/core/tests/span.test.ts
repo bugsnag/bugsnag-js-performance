@@ -14,6 +14,17 @@ import Sampler from '../lib/sampler'
 
 jest.useFakeTimers()
 
+beforeEach(() => {
+  jest.spyOn(console, 'warn').mockImplementation(() => {})
+})
+
+const jestLogger = {
+  debug: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+  info: jest.fn()
+}
+
 describe('SpanInternal', () => {
   describe('.setAttribute()', () => {
     test.each([
@@ -32,7 +43,8 @@ describe('SpanInternal', () => {
         new StableIdGenerator(),
         spanAttributesSource,
         new IncrementingClock(),
-        new ControllableBackgroundingListener()
+        new ControllableBackgroundingListener(),
+        jestLogger
       )
 
       const spanInternal = spanFactory.startSpan('span-name', { startTime: 1234 })
@@ -63,7 +75,8 @@ describe('SpanInternal', () => {
         new StableIdGenerator(),
         spanAttributesSource,
         new IncrementingClock(),
-        new ControllableBackgroundingListener()
+        new ControllableBackgroundingListener(),
+        jestLogger
       )
 
       const spanInternal = spanFactory.startSpan('span-name', { startTime: 1234 })
@@ -309,15 +322,22 @@ describe('Span', () => {
       backgroundingListener.sendToBackground()
       movedToBackground.end()
 
+      expect(console.warn).toHaveBeenCalledWith('Attempted to end a Span which has already ended or been discarded.')
+      expect(console.warn).toHaveBeenCalledTimes(1)
+
       // started in background and ended in foreground
       const movedToForeground = client.startSpan('moved-to-foreground')
       backgroundingListener.sendToForeground()
       movedToForeground.end()
 
+      expect(console.warn).toHaveBeenCalledTimes(2)
+
       // entirely in background
       backgroundingListener.sendToBackground()
       const backgroundSpan = client.startSpan('entirely-in-background')
       backgroundSpan.end()
+
+      expect(console.warn).toHaveBeenCalledTimes(3)
 
       // started and ended in foreground but backgrounded during span
       backgroundingListener.sendToForeground()
@@ -326,11 +346,15 @@ describe('Span', () => {
       backgroundingListener.sendToForeground()
       backgroundedDuringSpan.end()
 
+      expect(console.warn).toHaveBeenCalledTimes(4)
+
       // entirely in foreground (should be delivered)
       const inForeground = client.startSpan('entirely-in-foreground')
       inForeground.end()
 
       jest.runOnlyPendingTimers()
+
+      expect(console.warn).toHaveBeenCalledTimes(4)
 
       expect(delivery).not.toHaveSentSpan(expect.objectContaining({
         name: 'moved-to-background'

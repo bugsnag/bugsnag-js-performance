@@ -5,6 +5,13 @@ import IncrementingClock from './incrementing-clock'
 import InMemoryProcessor from './in-memory-processor'
 import ControllableBackgroundingListener from './controllable-backgrounding-listener'
 
+const jestLogger = {
+  debug: jest.fn(),
+  error: jest.fn(),
+  info: jest.fn(),
+  warn: jest.fn()
+}
+
 class MockSpanFactory extends SpanFactory {
   public createdSpans: SpanEnded[]
 
@@ -18,7 +25,8 @@ class MockSpanFactory extends SpanFactory {
       new StableIdGenerator(),
       spanAttributesSource,
       new IncrementingClock(),
-      new ControllableBackgroundingListener()
+      new ControllableBackgroundingListener(),
+      jestLogger
     )
 
     this.createdSpans = processor.spans

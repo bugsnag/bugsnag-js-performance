@@ -1,6 +1,7 @@
 import { SpanAttributes, type SpanAttribute, type SpanAttributesSource } from './attributes'
 import { type BackgroundingListenerState, type BackgroundingListener } from './backgrounding-listener'
 import { type Clock } from './clock'
+import { type Logger } from './config'
 import { type DeliverySpan } from './delivery'
 import { SpanEvents } from './events'
 import { type IdGenerator } from './id-generator'
@@ -106,6 +107,7 @@ export interface SpanOptions {
 export class SpanFactory {
   private readonly idGenerator: IdGenerator
   private readonly spanAttributesSource: SpanAttributesSource
+  private logger: Logger
   private processor: Processor
   private readonly sampler: Sampler
   private readonly clock: Clock
@@ -119,11 +121,13 @@ export class SpanFactory {
     idGenerator: IdGenerator,
     spanAttributesSource: SpanAttributesSource,
     clock: Clock,
-    backgroundingListener: BackgroundingListener
+    backgroundingListener: BackgroundingListener,
+    logger: Logger
   ) {
     this.processor = processor
     this.sampler = sampler
     this.idGenerator = idGenerator
+    this.logger = logger
     this.spanAttributesSource = spanAttributesSource
     this.clock = clock
 
@@ -153,8 +157,9 @@ export class SpanFactory {
     return span
   }
 
-  updateProcessor (processor: Processor) {
+  configure (processor: Processor, logger: Logger) {
     this.processor = processor
+    this.logger = logger
   }
 
   endSpan (
@@ -162,7 +167,10 @@ export class SpanFactory {
     endTime: number
   ) {
     // if the span doesn't exist here it shouldn't be processed
-    if (!this.openSpans.delete(span)) return
+    if (!this.openSpans.delete(span)) {
+      this.logger.warn('Attempted to end a Span which has already ended or been discarded.')
+      return
+    }
 
     const spanEnded = span.end(endTime, this.sampler.spanProbability)
 
