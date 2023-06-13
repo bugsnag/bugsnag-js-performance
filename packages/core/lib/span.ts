@@ -118,7 +118,7 @@ export class SpanInternal implements SpanContext {
     }
   }
 
-  isValid = () => {
+  isValid () {
     return this.endTime === undefined
   }
 }
@@ -203,7 +203,7 @@ export class SpanFactory {
       get traceId () {
         return span.traceId
       },
-      isValid: span.isValid,
+      isValid: () => span.isValid(),
       end: (endTime) => {
         const safeEndTime = timeToNumber(this.clock, endTime)
         this.endSpan(span, safeEndTime)
