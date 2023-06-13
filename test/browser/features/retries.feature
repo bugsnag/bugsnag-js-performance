@@ -1,12 +1,15 @@
 Feature: Retries
 
     Scenario Outline: Batch is retried with specified status codes
-        Given I set the HTTP status code for the next "POST" request to <status>
-        And I navigate to the test URL "/retry-scenario"
+        Given I navigate to the test URL "/retry-scenario"
+        And I wait to receive a sampling request
+        And I set the HTTP status code for the next "POST" request to <status>
+        
+        When I click the element "send-first-span"
         And I wait to receive 1 trace
         And I discard the oldest trace
 
-        Then I click the element "send-span"
+        Then I click the element "send-second-span"
         And I wait to receive 2 traces
 
         # First payload (rejected, then retried)
@@ -29,7 +32,7 @@ Feature: Retries
         Given I navigate to the test URL "/connection-failure"
 
         When I click the element "send-span"
-        And I wait for 5 seconds
+        And I wait for 10 seconds
         Then I wait to receive 0 traces
 
         When I click the element "send-span"
@@ -39,12 +42,15 @@ Feature: Retries
         And a span name equals "Custom/Span 2"
 
     Scenario Outline: Batch is not retried with specified status codes
-        Given I set the HTTP status code for the next "POST" request to <status>
-        And I navigate to the test URL "/retry-scenario"
+        Given I navigate to the test URL "/retry-scenario"
+        And I wait to receive a sampling request
+        And I set the HTTP status code for the next "POST" request to <status>
+        
+        Then I click the element "send-first-span"
         And I wait to receive 1 trace
         And I discard the oldest trace
 
-        Given I click the element "send-span"
+        Given I click the element "send-second-span"
         And I wait for 5 seconds
         And I wait to receive 1 trace
         Then a span name equals "Custom/Deliver"
@@ -60,12 +66,15 @@ Feature: Retries
     # Status code 408 cannot be tested on certain browsers as it
     # is automatically retried and does not behave as expected
     Scenario Outline: Oldest batch is removed when max retry queue size is exceeded
-        Given I set the HTTP status code for the next 4 "POST" requests to <status>
-        And I navigate to the test URL "/oldest-batch-removed"
+        Given I navigate to the test URL "/oldest-batch-removed"
+        And I wait to receive a sampling request
+        And I set the HTTP status code for the next 4 "POST" requests to <status>
+
+        When I click the element "send-first-span"
         And I wait to receive 1 trace
         And I discard the oldest trace
 
-        Then I click the element "send-spans"
+        Then I click the element "send-retry-spans"
         And I wait to receive 3 traces
 
         # Remove failed requests

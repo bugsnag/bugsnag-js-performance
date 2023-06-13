@@ -1,12 +1,13 @@
-import BugsnagPerformance from '@bugsnag/js-performance-browser'
+import BugsnagPerformance from '@bugsnag/browser-performance'
 
-const apiKey = decodeURIComponent(window.location.search.match(/API_KEY=([^&]+)/)[1])
-const endpoint = decodeURIComponent(window.location.search.match(/ENDPOINT=([^&]+)/)[1])
+const parameters = new URLSearchParams(window.location.search)
+const apiKey = parameters.get('api_key')
+const endpoint = parameters.get('endpoint')
 
 BugsnagPerformance.startSpan("Custom/Pre Start Span 0").end()
 BugsnagPerformance.startSpan("Custom/Pre Start Span 1").end()
 BugsnagPerformance.startSpan("Custom/Pre Start Span 2").end()
 
-BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 4 })
+BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 4, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false })
 
 BugsnagPerformance.startSpan("Custom/Post Start").end()

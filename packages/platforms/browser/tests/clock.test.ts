@@ -2,28 +2,32 @@
  * @jest-environment jsdom
  */
 
+import { ControllableBackgroundingListener } from '@bugsnag/js-performance-test-utilities'
 import createClock from '../lib/clock'
+import { PerformanceFake } from './utilities'
+
+jest.useFakeTimers()
 
 describe('Browser Clock', () => {
-  afterEach(() => {
-    jest.useRealTimers()
-  })
-
   describe('clock.now()', () => {
-    it('returns a number', () => {
-      const clock = createClock(performance)
+    it('returns a number', async () => {
+      const clock = createClock(new PerformanceFake(), new ControllableBackgroundingListener())
 
-      expect(clock.now()).toBeGreaterThan(0)
+      await jest.advanceTimersByTimeAsync(100)
+
+      expect(clock.now()).toEqual(100)
     })
 
-    it('returns a greater number on every invocation (100 runs)', () => {
+    it('returns a greater number on every invocation (100 runs)', async () => {
       let lastTime = 0
+      const clock = createClock(new PerformanceFake(), new ControllableBackgroundingListener())
 
       for (let i = 0; i < 100; i++) {
-        const clock = createClock(performance)
+        await jest.advanceTimersByTimeAsync(10)
+
         const newTime = clock.now()
 
-        expect(newTime).toBeGreaterThan(lastTime)
+        expect(newTime).toEqual(lastTime + 10)
         lastTime = newTime
       }
     })
@@ -31,40 +35,81 @@ describe('Browser Clock', () => {
 
   describe('clock.convert()', () => {
     it('converts a Date into a number', () => {
-      const clock = createClock(performance)
+      const clock = createClock(new PerformanceFake(), new ControllableBackgroundingListener())
       const convertedTime = clock.convert(new Date())
 
       expect(convertedTime).toEqual(expect.any(Number))
     })
 
     it('returns the difference between provided Date and performance.timeOrigin in milliseconds', () => {
-      const performance = {
-        now: () => 1234,
-        timeOrigin: new Date('2023-01-02T00:00:00.000Z').getTime(),
-        timing: {
-          // this is different to the above date, so we know which is being used
-          navigationStart: new Date('2022-01-01T00:00:00.000Z').getTime()
-        }
-      }
+      jest.setSystemTime(new Date('2023-01-02T00:00:00.000Z'))
 
-      const clock = createClock(performance)
+      const performance = new PerformanceFake()
+
+      const clock = createClock(performance, new ControllableBackgroundingListener())
       const time = new Date('2023-01-02T00:00:00.002Z')
 
       expect(clock.convert(time)).toEqual(2) // 2ms difference
     })
 
     it('works when performance.timeOrigin is not defined', () => {
-      const performance = {
-        now: () => 1234,
-        timing: {
-          navigationStart: new Date('2023-01-01T00:00:00.000Z').getTime()
+      jest.setSystemTime(new Date('2023-01-01T00:00:00.000Z'))
+
+      const performance = new PerformanceFake({ timeOrigin: undefined })
+
+      const clock = createClock(performance, new ControllableBackgroundingListener())
+      const time = new Date('2023-01-01T00:00:00.015Z')
+
+      // undefined timeOrigin should fall back to using navigationStart (set from system time)
+      expect(clock.convert(time)).toEqual(15) // 15 ms difference
+    })
+
+    it('works when performance.timeOrigin is 0', () => {
+      jest.setSystemTime(new Date('2023-01-01T00:00:00.000Z'))
+
+      const performance = new PerformanceFake({ timeOrigin: 0 })
+
+      const clock = createClock(performance, new ControllableBackgroundingListener())
+      const time = new Date('2023-01-01T00:00:00.015Z')
+
+      // 0 timeOrigin is valid and should be used
+      expect(clock.convert(time)).toEqual(1672531200015) // offset from 0 and not system time
+    })
+
+    it('recalculates time origin when foregrounded if it has diverged more than 5 minutes', () => {
+      // fake performance with its own internal 'clock'
+      const performanceClockTime = new Date('2023-01-01T00:00:00.000Z')
+      const initialTimeOrigin = performanceClockTime.getTime()
+      const performanceFake = {
+        timeOrigin: initialTimeOrigin,
+        timing: { navigationStart: initialTimeOrigin },
+        now () {
+          return performanceClockTime.getTime() - initialTimeOrigin
         }
       }
 
-      const clock = createClock(performance)
-      const time = new Date('2023-01-01T00:00:00.015Z')
+      const backgroundingListener = new ControllableBackgroundingListener()
+      const clock = createClock(performanceFake, backgroundingListener)
 
-      expect(clock.convert(time)).toEqual(15) // 15ms difference
+      // performance clock and system clock are in sync to start
+      jest.setSystemTime(performanceClockTime)
+      expect(performanceFake.now()).toEqual(0)
+      expect(clock.convert(new Date())).toEqual(0)
+
+      // machine 'sleeps' for  exactly 5 mins
+      // system clock updates but performance clock has diverged by 5 mins
+      jest.setSystemTime(new Date('2023-01-01T00:05:00.000Z'))
+      backgroundingListener.sendToForeground()
+
+      expect(clock.convert(new Date())).toEqual(300000) // 5 minutes
+
+      // performance clock diverges from system clock by > 5 minutes
+      jest.setSystemTime(new Date('2023-01-01T00:05:00.001Z'))
+      backgroundingListener.sendToForeground()
+
+      // performance clock has diverged sufficiently from system time
+      // so timeOrigin has been recalculated from Date.now()
+      expect(clock.convert(new Date())).toEqual(0)
     })
   })
 })

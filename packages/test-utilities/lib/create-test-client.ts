@@ -8,11 +8,13 @@ import {
 } from '.'
 
 import {
+  createClient,
+  schema,
   type BugsnagPerformance,
   type ClientOptions,
-  createClient,
-  schema
-} from '@bugsnag/js-performance-core'
+  type Configuration,
+  type CoreSchema
+} from '@bugsnag/core-performance'
 
 const defaultOptions = () => ({
   backgroundingListener: new ControllableBackgroundingListener(),
@@ -21,10 +23,11 @@ const defaultOptions = () => ({
   clock: new IncrementingClock(),
   resourceAttributesSource,
   spanAttributesSource,
-  schema
+  schema,
+  plugins: () => []
 })
 
-function createTestClient (optionOverrides: Partial<ClientOptions> = {}): BugsnagPerformance {
+function createTestClient <S extends CoreSchema, C extends Configuration> (optionOverrides: Partial<ClientOptions<S, C>> = {}): BugsnagPerformance<C> {
   return createClient({ ...defaultOptions(), ...optionOverrides })
 }
 

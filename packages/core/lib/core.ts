@@ -1,58 +1,56 @@
-import { SpanAttributes, type ResourceAttributeSource, type SpanAttributesSource } from './attributes'
+import { type ResourceAttributeSource, type SpanAttributesSource } from './attributes'
 import { type BackgroundingListener } from './backgrounding-listener'
 import { BatchProcessor } from './batch-processor'
 import { type Clock } from './clock'
 import { validateConfig, type Configuration, type CoreSchema } from './config'
 import { type DeliveryFactory } from './delivery'
 import { type IdGenerator } from './id-generator'
+import { type Plugin } from './plugin'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
-import { Kind, type Span, type SpanEnded, type Time } from './span'
-import traceIdToSamplingRate from './trace-id-to-sampling-rate'
+import { SpanFactory, type Span, type SpanOptions } from './span'
+import { timeToNumber, type Time } from './time'
 
-export interface BugsnagPerformance {
-  start: (config: Configuration | string) => void
-  startSpan: (name: string, startTime?: Time) => Span
+export interface BugsnagPerformance<C extends Configuration> {
+  start: (config: C | string) => void
+  startSpan: (name: string, options?: SpanOptions) => Span
 }
 
-function sanitizeTime (clock: Clock, time?: Time): number {
-  if (typeof time === 'number') {
-    // no need to change anything - we want to store numbers anyway
-    // we assume this is nanosecond precision
-    return time
-  }
-
-  if (time instanceof Date) {
-    return clock.convert(time)
-  }
-
-  return clock.now()
-}
-
-export interface ClientOptions {
+export interface ClientOptions<S extends CoreSchema, C extends Configuration> {
   clock: Clock
   idGenerator: IdGenerator
   deliveryFactory: DeliveryFactory
   backgroundingListener: BackgroundingListener
-  resourceAttributesSource: ResourceAttributeSource
+  resourceAttributesSource: ResourceAttributeSource<C>
   spanAttributesSource: SpanAttributesSource
-  schema: CoreSchema
+  schema: S
+  plugins: (spanFactory: SpanFactory) => Array<Plugin<C>>
 }
 
-export function createClient (options: ClientOptions): BugsnagPerformance {
+export function createClient<S extends CoreSchema, C extends Configuration> (options: ClientOptions<S, C>): BugsnagPerformance<C> {
   const bufferingProcessor = new BufferingProcessor()
   let processor: Processor = bufferingProcessor
 
   const sampler = new Sampler(1.0)
+  const spanFactory = new SpanFactory(
+    processor,
+    sampler,
+    options.idGenerator,
+    options.spanAttributesSource,
+    options.clock,
+    options.backgroundingListener
+  )
+
+  const plugins = options.plugins(spanFactory)
 
   return {
-    start: (config: Configuration | string) => {
-      const configuration = validateConfig(config, options.schema)
-
-      sampler.probability = configuration.samplingProbability
+    start: (config: C | string) => {
+      const configuration = validateConfig<S, C>(config, options.schema)
 
       const delivery = options.deliveryFactory(configuration.apiKey, configuration.endpoint)
+
+      sampler.initialise(configuration.samplingProbability, delivery)
 
       processor = new BatchProcessor(
         delivery,
@@ -73,40 +71,29 @@ export function createClient (options: ClientOptions): BugsnagPerformance {
       // e.g. we can't trigger delivery until we have the apiKey and endpoint
       // from configuration
       options.backgroundingListener.onStateChange(state => {
-        (processor as BatchProcessor).flush()
+        (processor as BatchProcessor<C>).flush()
       })
+
+      spanFactory.updateProcessor(processor)
+
+      for (const plugin of plugins) {
+        plugin.configure(configuration)
+      }
     },
-    startSpan: (name, startTime) => {
-      const safeStartTime = sanitizeTime(options.clock, startTime)
-      const attributes = new SpanAttributes(options.spanAttributesSource())
+    startSpan: (name: string, spanOptions?: SpanOptions) => {
+      const span = spanFactory.startSpan(name, spanOptions)
 
       return {
-        end: (endTime) => {
-          const safeEndTime = sanitizeTime(options.clock, endTime)
-          const traceId = options.idGenerator.generate(128)
-          const samplingRate = traceIdToSamplingRate(traceId)
-
-          if (sampler.sample(samplingRate)) {
-            const span: SpanEnded = {
-              name,
-              kind: Kind.Client, // TODO: How do we define the current kind?
-              id: options.idGenerator.generate(64),
-              traceId,
-              startTime: safeStartTime,
-              endTime: safeEndTime,
-              attributes,
-              samplingRate
-            }
-
-            processor.add(span)
-          }
+        end: (endTime?: Time) => {
+          const safeEndTime = timeToNumber(options.clock, endTime)
+          spanFactory.endSpan(span, safeEndTime)
         }
       }
     }
   }
 }
 
-export function createNoopClient (): BugsnagPerformance {
+export function createNoopClient<C extends Configuration> (): BugsnagPerformance<C> {
   const noop = () => {}
 
   return {

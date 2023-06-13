@@ -32,7 +32,8 @@ describe('RetryQueue', () => {
             startTimeUnixNano: '1234',
             spanId: 'valid-span-id',
             traceId: 'valid-trace-id',
-            attributes: []
+            attributes: [],
+            events: []
           }]
         }]
       }]
@@ -123,7 +124,8 @@ function generateSpan (): DeliverySpan {
     traceId: randomUUID(),
     startTimeUnixNano: '12340000',
     endTimeUnixNano: '56780000',
-    attributes: []
+    attributes: [],
+    events: []
   }
 }
 

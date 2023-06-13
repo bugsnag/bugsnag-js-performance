@@ -1,13 +1,18 @@
-import { type DeliveryPayload, type Delivery, type ResponseState } from '@bugsnag/js-performance-core'
+import { type DeliveryPayload, type Delivery, type ResponseState } from '@bugsnag/core-performance'
 
 class InMemoryDelivery implements Delivery {
   public requests: DeliveryPayload[] = []
+  public samplingRequests: DeliveryPayload[] = []
 
   private readonly responseStateStack: ResponseState[] = []
   private readonly samplingProbabilityStack: number[] = []
 
   send (payload: DeliveryPayload) {
-    this.requests.push(payload)
+    if (payload.resourceSpans.length === 0) {
+      this.samplingRequests.push(payload)
+    } else {
+      this.requests.push(payload)
+    }
 
     const state = this.responseStateStack.pop() || 'success' as ResponseState
     const samplingProbability = this.samplingProbabilityStack.pop()

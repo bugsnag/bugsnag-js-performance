@@ -1,6 +1,6 @@
 import { expect } from '@jest/globals'
 import { type MatcherFunction } from 'expect'
-import { type SpanEnded } from '@bugsnag/js-performance-core'
+import { type SpanEnded } from '@bugsnag/core-performance'
 import { InMemoryProcessor } from '..'
 
 const toHaveProcessedSpan: MatcherFunction<[expectedSpan: unknown]> = function (processor, expectedSpan) {

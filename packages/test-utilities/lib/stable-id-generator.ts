@@ -1,4 +1,4 @@
-import { type IdGenerator, type BitLength } from '@bugsnag/js-performance-core'
+import { type IdGenerator, type BitLength } from '@bugsnag/core-performance'
 
 class StableIdGenerator implements IdGenerator {
   generate (bits: BitLength): string {

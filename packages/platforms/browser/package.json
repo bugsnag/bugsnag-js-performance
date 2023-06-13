@@ -1,13 +1,15 @@
 {
-  "name": "@bugsnag/js-performance-browser",
-  "version": "0.0.0",
-  "description": "BugsnagPerformance notifier for browsers",
-  "author": "Ben Wilson <ben.wilson@smartbear.com>",
-  "homepage": "https://github.com/bugsnag/bugsnag-js-performance#readme",
+  "name": "@bugsnag/browser-performance",
+  "version": "0.0.2",
+  "description": "BugSnag performance monitoring for browsers",
+  "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "rollup --config",
@@ -17,7 +19,7 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "dependencies": {
-    "@bugsnag/js-performance-core": "0.0.0"
+    "@bugsnag/core-performance": "^0.0.2"
   },
   "type": "module",
   "main": "dist/index.js",

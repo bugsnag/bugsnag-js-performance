@@ -1,12 +1,21 @@
-import { type Clock } from '@bugsnag/js-performance-core'
+import { type Clock } from '@bugsnag/core-performance'
+
+interface ClockOptions {
+  startDate?: string
+  currentTime?: number
+}
 
 class IncrementingClock implements Clock {
   private currentTime: number
   private readonly timeOrigin: number
 
-  constructor (startDate?: string) {
-    this.currentTime = 0
-    this.timeOrigin = startDate ? Date.parse(startDate) : Date.now()
+  constructor (options: string | ClockOptions = {}) {
+    if (typeof options === 'string') {
+      options = { startDate: options }
+    }
+
+    this.currentTime = options.currentTime || 0
+    this.timeOrigin = options.startDate ? Date.parse(options.startDate) : Date.now()
   }
 
   now () {

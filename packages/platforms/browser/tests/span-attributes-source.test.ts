@@ -2,12 +2,20 @@
  * @jest-environment jsdom
  */
 
-import spanAttributesSource from '../lib/span-attributes-source'
+import createSpanAttributesSource from '../lib/span-attributes-source'
 
 describe('spanAttributesSource', () => {
-  it('includes the page url', () => {
+  it('includes common span attributes', () => {
+    const spanAttributesSource = createSpanAttributesSource(
+      'the page title',
+      'https://www.bugsnag.com'
+    )
     const spanAttributes = spanAttributesSource()
-    const url = spanAttributes.get('browser.page.url')
-    expect(url).toMatch(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}(\.[a-z]{2,4})?\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/g)
+    expect(Array.from(spanAttributes.entries())).toEqual([
+      ['bugsnag.span.category', 'custom'],
+      ['bugsnag.span.first_class', true],
+      ['bugsnag.browser.page.url', 'https://www.bugsnag.com'],
+      ['bugsnag.browser.page.title', 'the page title']
+    ])
   })
 })

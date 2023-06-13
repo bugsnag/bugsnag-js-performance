@@ -1,12 +1,85 @@
-import { Kind } from '../lib/span'
+
+import { Kind } from '@bugsnag/core-performance'
 import {
-  createTestClient,
-  IncrementingClock,
+  ControllableBackgroundingListener,
   InMemoryDelivery,
-  VALID_API_KEY
+  IncrementingClock,
+  StableIdGenerator,
+  VALID_API_KEY,
+  createTestClient,
+  spanAttributesSource
 } from '@bugsnag/js-performance-test-utilities'
+import { SpanFactory, spanToJson, type SpanEnded } from '../lib'
+import Sampler from '../lib/sampler'
 
 jest.useFakeTimers()
+
+describe('SpanInternal', () => {
+  describe('.setAttribute()', () => {
+    test.each([
+      { parameter: 'value', key: 'stringValue' },
+      { parameter: true, key: 'boolValue' },
+      { parameter: 0.5, key: 'doubleValue' },
+      { parameter: 42, key: 'intValue', expected: '42' }
+    ])('setAttribute results in an expected $key', ({ parameter, expected, key }) => {
+      const clock = new IncrementingClock()
+      const sampler = new Sampler(0.5)
+      const delivery = { send: jest.fn() }
+      const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+      const spanFactory = new SpanFactory(
+        processor,
+        sampler,
+        new StableIdGenerator(),
+        spanAttributesSource,
+        new IncrementingClock(),
+        new ControllableBackgroundingListener()
+      )
+
+      const spanInternal = spanFactory.startSpan('span-name', { startTime: 1234 })
+      spanInternal.setAttribute('bugsnag.test.attribute', parameter)
+
+      spanFactory.endSpan(spanInternal, 5678)
+
+      expect(delivery.send).toHaveBeenCalledWith(expect.objectContaining({
+        attributes: expect.arrayContaining([{
+          key: 'bugsnag.test.attribute',
+          value: {
+            [key]: expected || parameter
+          }
+        }])
+      }))
+    })
+  })
+
+  describe('.addEvent()', () => {
+    it('enables adding Events to spans', () => {
+      const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
+      const sampler = new Sampler(0.5)
+      const delivery = { send: jest.fn() }
+      const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+      const spanFactory = new SpanFactory(
+        processor,
+        sampler,
+        new StableIdGenerator(),
+        spanAttributesSource,
+        new IncrementingClock(),
+        new ControllableBackgroundingListener()
+      )
+
+      const spanInternal = spanFactory.startSpan('span-name', { startTime: 1234 })
+      spanInternal.addEvent('bugsnag.test.event', 1234)
+
+      spanFactory.endSpan(spanInternal, 5678)
+
+      expect(delivery.send).toHaveBeenCalledWith(expect.objectContaining({
+        events: [{
+          name: 'bugsnag.test.event',
+          timeUnixNano: '1234000000'
+        }]
+      }))
+    })
+  })
+})
 
 describe('Span', () => {
   describe('client.startSpan()', () => {
@@ -16,25 +89,37 @@ describe('Span', () => {
       expect(span).toStrictEqual({ end: expect.any(Function) })
     })
 
-    it.each([
+    const invalidStartTimes: any[] = [
       { type: 'string', startTime: 'i am not a startTime' },
       { type: 'bigint', startTime: BigInt(9007199254740991) },
-      { type: 'boolean', startTime: true },
+      { type: 'true', startTime: true },
+      { type: 'false', startTime: false },
       { type: 'function', startTime: () => {} },
       { type: 'object', startTime: { property: 'test' } },
-      { type: 'object', startTime: [] },
-      { type: 'symbol', startTime: Symbol('test') }
-    ])('uses default clock implementation if startTime is invalid ($type)', ({ startTime }) => {
+      { type: 'empty array', startTime: [] },
+      { type: 'array', startTime: [1, 2, 3] },
+      { type: 'symbol', startTime: Symbol('test') },
+      { type: 'null', startTime: null },
+      { type: 'undefined', startTime: undefined }
+    ]
+
+    invalidStartTimes.push(...invalidStartTimes.map(
+      ({ type, startTime }) => ({
+        type: `{ startTime: ${type} }`,
+        startTime: { startTime }
+      }))
+    )
+
+    it.each(invalidStartTimes)('uses default clock implementation if startTime is invalid ($type)', ({ startTime }) => {
       const delivery = new InMemoryDelivery()
       const clock = new IncrementingClock('1970-01-01T00:00:00Z')
       const client = createTestClient({ deliveryFactory: () => delivery, clock })
       client.start({ apiKey: VALID_API_KEY })
 
-      // @ts-expect-error startTime will be invalid
       const span = client.startSpan('test span', startTime)
       span.end()
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         startTimeUnixNano: '1000000'
@@ -52,7 +137,7 @@ describe('Span', () => {
       const span = client.startSpan('test span')
       span.end()
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery).toHaveSentSpan({
         spanId: 'a random 64 bit string',
@@ -61,7 +146,8 @@ describe('Span', () => {
         name: 'test span',
         startTimeUnixNano: '1000000',
         endTimeUnixNano: '2000000',
-        attributes: expect.any(Object)
+        attributes: expect.any(Object),
+        events: expect.any(Array)
       })
     })
 
@@ -74,12 +160,13 @@ describe('Span', () => {
       const span = client.startSpan('test span')
       span.end(new Date('2023-01-02T03:04:05.008Z')) // 2ms after time origin
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery).toHaveSentSpan({
         spanId: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         attributes: expect.any(Object),
+        events: expect.any(Array),
         kind: Kind.Client,
         name: 'test span',
         startTimeUnixNano: '1672628645007000000',
@@ -97,12 +184,13 @@ describe('Span', () => {
       const span = client.startSpan('test span')
       span.end(4321)
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery).toHaveSentSpan({
         spanId: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         attributes: expect.any(Object),
+        events: expect.any(Array),
         kind: Kind.Client,
         name: 'test span',
         startTimeUnixNano: '1000000',
@@ -122,7 +210,7 @@ describe('Span', () => {
       const span = client.startSpan('test span')
       span.end()
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery.requests).toHaveLength(1)
     })
@@ -139,7 +227,7 @@ describe('Span', () => {
       const span = client.startSpan('test span')
       span.end()
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery.requests).toHaveLength(0)
     })
@@ -188,7 +276,7 @@ describe('Span', () => {
       client.startSpan('span 2').end()
       client.startSpan('span 3').end()
 
-      jest.runAllTimers()
+      jest.runOnlyPendingTimers()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: 'span 1'
@@ -200,6 +288,68 @@ describe('Span', () => {
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: 'span 3'
+      }))
+    })
+
+    it('will cancel any open spans if the app is backgrounded', () => {
+      const delivery = new InMemoryDelivery()
+      const backgroundingListener = new ControllableBackgroundingListener()
+      const client = createTestClient({
+        deliveryFactory: () => delivery,
+        backgroundingListener
+      })
+
+      client.start({
+        apiKey: VALID_API_KEY,
+        samplingProbability: 1
+      })
+
+      // started in foreground and ended in background
+      const movedToBackground = client.startSpan('moved-to-background')
+      backgroundingListener.sendToBackground()
+      movedToBackground.end()
+
+      // started in background and ended in foreground
+      const movedToForeground = client.startSpan('moved-to-foreground')
+      backgroundingListener.sendToForeground()
+      movedToForeground.end()
+
+      // entirely in background
+      backgroundingListener.sendToBackground()
+      const backgroundSpan = client.startSpan('entirely-in-background')
+      backgroundSpan.end()
+
+      // started and ended in foreground but backgrounded during span
+      backgroundingListener.sendToForeground()
+      const backgroundedDuringSpan = client.startSpan('backgrounded-during-span')
+      backgroundingListener.sendToBackground()
+      backgroundingListener.sendToForeground()
+      backgroundedDuringSpan.end()
+
+      // entirely in foreground (should be delivered)
+      const inForeground = client.startSpan('entirely-in-foreground')
+      inForeground.end()
+
+      jest.runOnlyPendingTimers()
+
+      expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+        name: 'moved-to-background'
+      }))
+
+      expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+        name: 'moved-to-foreground'
+      }))
+
+      expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+        name: 'entirely-in-background'
+      }))
+
+      expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+        name: 'backgrounded-during-span'
+      }))
+
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: 'entirely-in-foreground'
       }))
     })
   })

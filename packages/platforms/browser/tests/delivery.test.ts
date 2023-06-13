@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { type DeliveryPayload } from '@bugsnag/js-performance-core'
+import { type DeliveryPayload } from '@bugsnag/core-performance'
 import { ControllableBackgroundingListener } from '@bugsnag/js-performance-test-utilities'
 import createBrowserDeliveryFactory from '../lib/delivery'
 
@@ -22,7 +22,8 @@ describe('Browser Delivery', () => {
             traceId: 'test-trace-id',
             endTimeUnixNano: '56789',
             startTimeUnixNano: '12345',
-            attributes: [{ key: 'test-span', value: { intValue: '12345' } }]
+            attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+            events: []
           }]
         }]
       }]
@@ -59,7 +60,8 @@ describe('Browser Delivery', () => {
             traceId: 'test-trace-id',
             endTimeUnixNano: '56789',
             startTimeUnixNano: '12345',
-            attributes: [{ key: 'test-span', value: { intValue: '12345' } }]
+            attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+            events: []
           }]
         }]
       }]
@@ -99,7 +101,8 @@ describe('Browser Delivery', () => {
             traceId: 'test-trace-id',
             endTimeUnixNano: '56789',
             startTimeUnixNano: '12345',
-            attributes: [{ key: 'test-span', value: { intValue: '12345' } }]
+            attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+            events: []
           }]
         }]
       }]
@@ -148,8 +151,19 @@ describe('Browser Delivery', () => {
 
     const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
     const delivery = deliveryFactory('test-api-key', '/test')
+    const deliveryPayload: DeliveryPayload = { resourceSpans: [] }
+    const response = await delivery.send(deliveryPayload)
 
-    const response = await delivery.send({ resourceSpans: [] })
+    expect(fetch).toHaveBeenCalledWith('/test', {
+      method: 'POST',
+      keepalive: false,
+      body: JSON.stringify(deliveryPayload),
+      headers: {
+        'Bugsnag-Api-Key': 'test-api-key',
+        'Bugsnag-Span-Sampling': '1.0:0',
+        'Content-Type': 'application/json'
+      }
+    })
 
     expect(response).toStrictEqual({
       state: 'success',

@@ -1,4 +1,4 @@
-import { type InternalConfiguration } from './config'
+import { type InternalConfiguration, type Configuration } from './config'
 
 export type SpanAttribute = string | number | boolean
 
@@ -42,7 +42,7 @@ export class ResourceAttributes extends SpanAttributes {
   }
 }
 
-export type ResourceAttributeSource = (configuration: InternalConfiguration) => ResourceAttributes
+export type ResourceAttributeSource<C extends Configuration> = (configuration: InternalConfiguration<C>) => ResourceAttributes
 
 export interface JsonAttribute {
   key: string

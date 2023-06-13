@@ -6,4 +6,4 @@ RUN gem install license_finder
 
 WORKDIR /scan
 
-CMD npx -y lerna bootstrap && ./bin/license-finder
+CMD npm i && ./bin/license-finder

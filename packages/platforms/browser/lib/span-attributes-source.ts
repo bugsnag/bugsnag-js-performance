@@ -1,27 +1,15 @@
-import type { SpanAttribute, SpanAttributesSource } from '@bugsnag/js-performance-core'
+import type { SpanAttribute, SpanAttributesSource } from '@bugsnag/core-performance'
 
-const spanAttributesSource: SpanAttributesSource = () => {
-  const spanAttributes = new Map<string, SpanAttribute>()
-  spanAttributes.set('browser.page.url', window.location.href)
+const createSpanAttributesSource = (title: string, url: string): SpanAttributesSource => {
+  return () => {
+    const spanAttributes = new Map<string, SpanAttribute>()
+    spanAttributes.set('bugsnag.span.category', 'custom')
+    spanAttributes.set('bugsnag.span.first_class', true)
+    spanAttributes.set('bugsnag.browser.page.url', url)
+    spanAttributes.set('bugsnag.browser.page.title', title)
 
-  // 'browser.page.route': '' // TODO Implement with React, etc.
-  // 'bugsnag.span.category': '', // TODO Category attributes TBD
-
-  // TODO
-  // network spans
-  // should these populate at Span.end()
-  // -------------
-  // 'http.url': '',
-  // 'http.method': '',
-  // 'http.status_code': '',
-  // 'http.flavor': 1.0, // (1.0 | 1.1 | 2.0 | 3.0 | SPDY | QUIC)
-  // 'http.request_content_length': '',
-  // 'http.request_content_length_uncompressed': '',
-  // 'http.response_content_length': '',
-  // 'http.response_content_length_uncompressed': '',
-  // 'http.retry_count': ''
-
-  return spanAttributes
+    return spanAttributes
+  }
 }
 
-export default spanAttributesSource
+export default createSpanAttributesSource

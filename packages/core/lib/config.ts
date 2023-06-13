@@ -1,4 +1,4 @@
-import { isObject, isLogger, isString, isStringWithLength, isStringArray } from './validation'
+import { isLogger, isObject, isString, isStringArray, isStringWithLength } from './validation'
 
 export interface Logger {
   debug: (message: string) => void
@@ -17,11 +17,13 @@ export interface Configuration {
   samplingProbability?: number
 }
 
-export type InternalConfiguration = Required<Configuration> & {
+export interface TestConfiguration {
   maximumBatchSize: number
   batchInactivityTimeoutMs: number
   retryQueueMaxSize: number
 }
+
+export type InternalConfiguration<C extends Configuration> = Required<C> & Required<Configuration> & TestConfiguration
 
 export interface ConfigOption<T> {
   message: string
@@ -115,7 +117,7 @@ if (typeof __ENABLE_BUGSNAG_TEST_CONFIGURATION__ !== 'undefined' && __ENABLE_BUG
   }
 }
 
-export function validateConfig (config: unknown, schema: Schema): InternalConfiguration {
+export function validateConfig<S extends CoreSchema, C extends Configuration> (config: unknown, schema: S): InternalConfiguration<C> {
   if (typeof config === 'string') { config = { apiKey: config } }
 
   if (!isObject(config) || !isString(config.apiKey) || config.apiKey.length === 0) {
@@ -144,8 +146,8 @@ export function validateConfig (config: unknown, schema: Schema): InternalConfig
   cleanConfiguration.batchInactivityTimeoutMs = config.batchInactivityTimeoutMs || 30 * 1000
 
   if (warnings.length > 0) {
-    (cleanConfiguration as unknown as InternalConfiguration).logger.warn(`Invalid configuration${warnings}`)
+    (cleanConfiguration as unknown as InternalConfiguration<Configuration>).logger.warn(`Invalid configuration${warnings}`)
   }
 
-  return cleanConfiguration as unknown as InternalConfiguration
+  return cleanConfiguration as unknown as InternalConfiguration<C>
 }

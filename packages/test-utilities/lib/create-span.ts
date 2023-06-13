@@ -1,30 +1,26 @@
 import {
   type SpanEnded,
-  type SpanInternal,
+  type SpanProbability,
   SpanAttributes,
-  traceIdToSamplingRate
-} from '@bugsnag/js-performance-core'
+  traceIdToSamplingRate,
+  SpanEvents
+} from '@bugsnag/core-performance'
 import { randomBytes } from 'crypto'
 
-export function createSpan (overrides: Partial<SpanInternal> = {}): SpanInternal {
+export function createEndedSpan (overrides: Partial<SpanEnded> = {}): SpanEnded {
   const traceId = randomBytes(16).toString()
 
   return {
     attributes: new SpanAttributes(new Map()),
+    events: new SpanEvents(),
     id: randomBytes(8).toString('hex'),
     name: 'test span',
     kind: 1,
     startTime: 12345,
     traceId,
     samplingRate: traceIdToSamplingRate(traceId),
-    ...overrides
-  }
-}
-
-export function createEndedSpan (overrides: Partial<SpanEnded> = {}): SpanEnded {
-  return {
-    ...createSpan(),
     endTime: 23456,
+    samplingProbability: Math.floor(0.5 * 0xffffffff) as SpanProbability,
     ...overrides
   }
 }

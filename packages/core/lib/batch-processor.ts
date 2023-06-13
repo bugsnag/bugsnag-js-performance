@@ -1,20 +1,20 @@
 import { type ResourceAttributeSource } from './attributes'
 import { type Clock } from './clock'
-import { type InternalConfiguration } from './config'
-import { type Delivery } from './delivery'
+import { type Configuration, type InternalConfiguration } from './config'
+import { type Delivery, type DeliverySpan } from './delivery'
 import { type Processor } from './processor'
 import { type RetryQueue } from './retry-queue'
 import type Sampler from './sampler'
 import { spanToJson, type SpanEnded } from './span'
 
-export class BatchProcessor implements Processor {
+export class BatchProcessor<C extends Configuration> implements Processor {
   private batch: SpanEnded[] = []
   private timeout: ReturnType<typeof setTimeout> | null = null
 
   constructor (
     private delivery: Delivery,
-    private configuration: InternalConfiguration,
-    private resourceAttributeSource: ResourceAttributeSource,
+    private configuration: InternalConfiguration<C>,
+    private resourceAttributeSource: ResourceAttributeSource<C>,
     private clock: Clock,
     private retryQueue: RetryQueue,
     private sampler: Sampler
@@ -53,12 +53,12 @@ export class BatchProcessor implements Processor {
   async flush () {
     this.stop()
 
-    if (this.batch.length === 0) {
+    const batch = this.prepareBatch()
+
+    // we either had nothing in the batch originally or all spans were discarded
+    if (!batch) {
       return
     }
-
-    const batch = this.batch
-    this.batch = []
 
     const payload = {
       resourceSpans: [
@@ -66,11 +66,7 @@ export class BatchProcessor implements Processor {
           resource: {
             attributes: this.resourceAttributeSource(this.configuration).toJson()
           },
-          scopeSpans: [
-            {
-              spans: batch.map((span) => spanToJson(span, this.clock))
-            }
-          ]
+          scopeSpans: [{ spans: batch }]
         }
       ]
     }
@@ -103,5 +99,35 @@ export class BatchProcessor implements Processor {
     } catch (err) {
       this.configuration.logger.warn('delivery failed')
     }
+  }
+
+  private prepareBatch (): DeliverySpan[] | undefined {
+    if (this.batch.length === 0) {
+      return
+    }
+
+    // update sampling values if necessary and re-sample
+    const batch: DeliverySpan[] = []
+    const probability = this.sampler.spanProbability
+
+    for (const span of this.batch) {
+      if (span.samplingProbability < probability) {
+        span.samplingProbability = probability
+      }
+
+      if (this.sampler.sample(span)) {
+        batch.push(spanToJson(span, this.clock))
+      }
+    }
+
+    // clear out the current batch so we're ready to start a new one
+    this.batch = []
+
+    // if every span was discarded there's nothing to send
+    if (batch.length === 0) {
+      return
+    }
+
+    return batch
   }
 }

@@ -1,8 +1,9 @@
-import BugsnagPerformance from '@bugsnag/js-performance-browser'
+import BugsnagPerformance from '@bugsnag/browser-performance'
 
-const apiKey = decodeURIComponent(window.location.search.match(/API_KEY=([^&]+)/)[1])
-const endpoint = decodeURIComponent(window.location.search.match(/ENDPOINT=([^&]+)/)[1])
+const parameters = new URLSearchParams(window.location.search)
+const apiKey = parameters.get('api_key')
+const endpoint = parameters.get('endpoint')
 
-BugsnagPerformance.start({ apiKey, endpoint, releaseStage: 'test', enabledReleaseStages: ['production'], maximumBatchSize: 1 })
+BugsnagPerformance.start({ apiKey, endpoint, releaseStage: 'test', enabledReleaseStages: ['production'], maximumBatchSize: 1, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false })
 
 BugsnagPerformance.startSpan('Custom/Should not send').end()

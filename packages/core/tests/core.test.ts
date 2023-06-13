@@ -7,6 +7,8 @@ import {
   VALID_API_KEY
 } from '@bugsnag/js-performance-test-utilities'
 
+jest.useFakeTimers()
+
 describe('Core', () => {
   describe('createClient()', () => {
     it('returns a BugsnagPerformance client', () => {
@@ -176,11 +178,11 @@ describe('Core', () => {
 
           const client = createTestClient({ backgroundingListener })
 
-          expect(backgroundingListener.onStateChange).not.toHaveBeenCalled()
+          expect(backgroundingListener.onStateChange).toHaveBeenCalledTimes(1)
 
           client.start(VALID_API_KEY)
 
-          expect(backgroundingListener.onStateChange).toHaveBeenCalled()
+          expect(backgroundingListener.onStateChange).toHaveBeenCalledTimes(2)
           expect(console.warn).not.toHaveBeenCalled()
         })
 
@@ -229,6 +231,16 @@ describe('Core', () => {
         })
       })
     })
+
+    it('creates and configures a given plugin', () => {
+      const plugin = { configure: jest.fn() }
+      const createPlugins = jest.fn(() => [plugin])
+      const client = createTestClient({ plugins: createPlugins })
+      expect(createPlugins).toHaveBeenCalled()
+      expect(plugin.configure).not.toHaveBeenCalled()
+      client.start(VALID_API_KEY)
+      expect(plugin.configure).toHaveBeenCalled()
+    })
   })
 
   describe('createNoopClient', () => {
@@ -251,7 +263,7 @@ describe('Core', () => {
           releaseStage: 'staging'
         })
 
-        const span = client.startSpan('name', new Date())
+        const span = client.startSpan('name', { startTime: new Date() })
         span.end()
       }).not.toThrow()
     })

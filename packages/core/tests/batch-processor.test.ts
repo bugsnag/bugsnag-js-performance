@@ -92,7 +92,7 @@ describe('BatchProcessor', () => {
 
     batchProcessor.add(createEndedSpan())
 
-    jest.runAllTimers()
+    jest.runOnlyPendingTimers()
 
     expect(delivery.requests).toHaveLength(0)
   })
@@ -115,7 +115,7 @@ describe('BatchProcessor', () => {
 
     batchProcessor.add(createEndedSpan())
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).toHaveBeenCalled()
@@ -141,7 +141,7 @@ describe('BatchProcessor', () => {
 
     batchProcessor.add(createEndedSpan())
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).not.toHaveBeenCalled()
@@ -165,7 +165,7 @@ describe('BatchProcessor', () => {
 
     batchProcessor.add(createEndedSpan())
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).not.toHaveBeenCalled()
@@ -192,9 +192,89 @@ describe('BatchProcessor', () => {
 
     expect(sampler.probability).toBe(1.0)
 
-    await jest.runAllTimersAsync()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(sampler.probability).toBe(0.0)
     expect(delivery.requests).toHaveLength(1)
+  })
+
+  it('discards ended spans if samplingRate is higher than the samplingProbability', async () => {
+    const delivery = new InMemoryDelivery()
+    const sampler = new Sampler(0.5)
+    const batchProcessor = new BatchProcessor(
+      delivery,
+      createConfiguration(),
+      resourceAttributesSource,
+      new IncrementingClock('1970-01-01T00:00:00Z'),
+      { add: jest.fn(), flush: jest.fn() },
+      sampler
+    )
+
+    const span1 = createEndedSpan({
+      name: 'Span 01',
+      samplingRate: Math.floor(0.75 * 0xffffffff),
+      samplingProbability: sampler.spanProbability
+    })
+
+    const span2 = createEndedSpan({
+      name: 'Span 02',
+      samplingRate: Math.floor(0.25 * 0xffffffff),
+      samplingProbability: sampler.spanProbability
+    })
+
+    batchProcessor.add(span1)
+    batchProcessor.add(span2)
+
+    await jest.runOnlyPendingTimersAsync()
+
+    expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+      name: 'Span 01'
+    }))
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: 'Span 02'
+    }))
+
+    expect(delivery.requests).toHaveLength(1)
+  })
+
+  it('does not send a request if the entire batch is discarded', async () => {
+    const delivery = new InMemoryDelivery()
+    const sampler = new Sampler(0.5)
+    const batchProcessor = new BatchProcessor(
+      delivery,
+      createConfiguration(),
+      resourceAttributesSource,
+      new IncrementingClock('1970-01-01T00:00:00Z'),
+      { add: jest.fn(), flush: jest.fn() },
+      sampler
+    )
+
+    const span1 = createEndedSpan({
+      name: 'Span 01',
+      samplingRate: Math.floor(0.75 * 0xffffffff),
+      samplingProbability: sampler.spanProbability
+    })
+
+    const span2 = createEndedSpan({
+      name: 'Span 02',
+      samplingRate: Math.floor(0.75 * 0xffffffff),
+      samplingProbability: sampler.spanProbability
+    })
+
+    batchProcessor.add(span1)
+    batchProcessor.add(span2)
+
+    await jest.runOnlyPendingTimersAsync()
+
+    expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+      name: 'Span 01'
+    }))
+
+    expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+      name: 'Span 02'
+    }))
+
+    expect(delivery.requests).toHaveLength(0)
   })
 })

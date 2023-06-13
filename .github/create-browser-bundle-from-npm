@@ -5,7 +5,7 @@
 mkdir -p build
 
 cat <<JAVASCRIPT > build/index.js
-import BugsnagPerformance from '@bugsnag/js-performance-browser'
+import BugsnagPerformance from '@bugsnag/browser-performance'
 
 BugsnagPerformance.start('abcdefabcdefabcdefabcdefabcdef12')
 JAVASCRIPT
