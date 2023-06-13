@@ -9,12 +9,12 @@ import { type Plugin } from './plugin'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
-import { SpanFactory, type Span } from './span'
+import { SpanFactory, type Span, type SpanOptions } from './span'
 import { timeToNumber, type Time } from './time'
 
 export interface BugsnagPerformance<C extends Configuration> {
   start: (config: C | string) => void
-  startSpan: (name: string, startTime?: Time) => Span
+  startSpan: (name: string, options?: SpanOptions) => Span
 }
 
 export interface ClientOptions<S extends CoreSchema, C extends Configuration> {
@@ -33,7 +33,15 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
   let processor: Processor = bufferingProcessor
 
   const sampler = new Sampler(1.0)
-  const spanFactory = new SpanFactory(processor, sampler, options.idGenerator, options.spanAttributesSource, options.backgroundingListener)
+  const spanFactory = new SpanFactory(
+    processor,
+    sampler,
+    options.idGenerator,
+    options.spanAttributesSource,
+    options.clock,
+    options.backgroundingListener
+  )
+
   const plugins = options.plugins(spanFactory)
 
   return {
@@ -72,12 +80,11 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
         plugin.configure(configuration)
       }
     },
-    startSpan: (name, startTime) => {
-      const safeStartTime = timeToNumber(options.clock, startTime)
-      const span = spanFactory.startSpan(name, safeStartTime)
+    startSpan: (name: string, spanOptions?: SpanOptions) => {
+      const span = spanFactory.startSpan(name, spanOptions)
 
       return {
-        end: (endTime) => {
+        end: (endTime?: Time) => {
           const safeEndTime = timeToNumber(options.clock, endTime)
           spanFactory.endSpan(span, safeEndTime)
         }
