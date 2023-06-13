@@ -10,7 +10,6 @@ import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
 import { SpanFactory, type Span, type SpanOptions } from './span'
-import { type Time } from './time'
 
 export interface BugsnagPerformance<C extends Configuration> {
   start: (config: C | string) => void

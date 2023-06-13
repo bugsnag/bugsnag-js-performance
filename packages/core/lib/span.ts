@@ -136,7 +136,6 @@ export class SpanFactory {
 
   private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
   private isInForeground: boolean = true
-  private clock: Clock
 
   constructor (
     processor: Processor,

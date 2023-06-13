@@ -4,7 +4,6 @@ import spanAttributesSource from './span-attributes-source'
 import IncrementingClock from './incrementing-clock'
 import InMemoryProcessor from './in-memory-processor'
 import ControllableBackgroundingListener from './controllable-backgrounding-listener'
-import IncrementingClock from './incrementing-clock'
 
 class MockSpanFactory extends SpanFactory {
   public createdSpans: SpanEnded[]
