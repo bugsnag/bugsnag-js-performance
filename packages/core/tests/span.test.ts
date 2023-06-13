@@ -374,5 +374,39 @@ describe('Span', () => {
         name: 'entirely-in-foreground'
       }))
     })
+
+    it('will not end a span that has already been ended', () => {
+      const delivery = new InMemoryDelivery()
+      const backgroundingListener = new ControllableBackgroundingListener()
+      const logger = { warn: jest.fn(), debug: jest.fn(), error: jest.fn(), info: jest.fn() }
+      const client = createTestClient({
+        deliveryFactory: () => delivery,
+        backgroundingListener
+      })
+
+      client.start({
+        apiKey: VALID_API_KEY,
+        samplingProbability: 1,
+        logger
+      })
+
+      const span = client.startSpan('span-ended-once')
+      span.end()
+
+      jest.runOnlyPendingTimers()
+
+      expect(logger.warn).not.toHaveBeenCalled()
+      expect(delivery.requests).toHaveLength(1)
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: 'span-ended-once'
+      }))
+
+      span.end()
+
+      jest.runOnlyPendingTimers()
+
+      expect(logger.warn).toHaveBeenCalledWith('Attempted to end a Span which has already ended or been discarded.')
+      expect(delivery.requests).toHaveLength(1)
+    })
   })
 })
