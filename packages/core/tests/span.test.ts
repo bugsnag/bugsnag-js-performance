@@ -31,11 +31,11 @@ describe('SpanInternal', () => {
         sampler,
         new StableIdGenerator(),
         spanAttributesSource,
-        new ControllableBackgroundingListener(),
-        clock
+        new IncrementingClock(),
+        new ControllableBackgroundingListener()
       )
 
-      const spanInternal = spanFactory.startSpan('span-name', 1234)
+      const spanInternal = spanFactory.startSpan('span-name', { startTime: 1234 })
       spanInternal.setAttribute('bugsnag.test.attribute', parameter)
 
       spanFactory.endSpan(spanInternal, 5678)
@@ -62,11 +62,11 @@ describe('SpanInternal', () => {
         sampler,
         new StableIdGenerator(),
         spanAttributesSource,
-        new ControllableBackgroundingListener(),
-        clock
+        new IncrementingClock(),
+        new ControllableBackgroundingListener()
       )
 
-      const spanInternal = spanFactory.startSpan('span-name', 1234)
+      const spanInternal = spanFactory.startSpan('span-name', { startTime: 1234 })
       spanInternal.addEvent('bugsnag.test.event', 1234)
 
       spanFactory.endSpan(spanInternal, 5678)
@@ -94,21 +94,33 @@ describe('Span', () => {
       })
     })
 
-    it.each([
+    const invalidStartTimes: any[] = [
       { type: 'string', startTime: 'i am not a startTime' },
       { type: 'bigint', startTime: BigInt(9007199254740991) },
-      { type: 'boolean', startTime: true },
+      { type: 'true', startTime: true },
+      { type: 'false', startTime: false },
       { type: 'function', startTime: () => {} },
       { type: 'object', startTime: { property: 'test' } },
-      { type: 'object', startTime: [] },
-      { type: 'symbol', startTime: Symbol('test') }
-    ])('uses default clock implementation if startTime is invalid ($type)', ({ startTime }) => {
+      { type: 'empty array', startTime: [] },
+      { type: 'array', startTime: [1, 2, 3] },
+      { type: 'symbol', startTime: Symbol('test') },
+      { type: 'null', startTime: null },
+      { type: 'undefined', startTime: undefined }
+    ]
+
+    invalidStartTimes.push(...invalidStartTimes.map(
+      ({ type, startTime }) => ({
+        type: `{ startTime: ${type} }`,
+        startTime: { startTime }
+      }))
+    )
+
+    it.each(invalidStartTimes)('uses default clock implementation if startTime is invalid ($type)', ({ startTime }) => {
       const delivery = new InMemoryDelivery()
       const clock = new IncrementingClock('1970-01-01T00:00:00Z')
       const client = createTestClient({ deliveryFactory: () => delivery, clock })
       client.start({ apiKey: VALID_API_KEY })
 
-      // @ts-expect-error startTime will be invalid
       const span = client.startSpan('test span', startTime)
       span.end()
 

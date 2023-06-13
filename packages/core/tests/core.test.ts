@@ -263,7 +263,7 @@ describe('Core', () => {
           releaseStage: 'staging'
         })
 
-        const span = client.startSpan('name', new Date())
+        const span = client.startSpan('name', { startTime: new Date() })
         span.end()
       }).not.toThrow()
     })

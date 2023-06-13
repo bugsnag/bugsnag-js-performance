@@ -6,7 +6,7 @@ import { SpanEvents } from './events'
 import { type IdGenerator } from './id-generator'
 import { type Processor } from './processor'
 import type Sampler from './sampler'
-import { timeToNumber, type Time } from './time'
+import { type Time, timeToNumber } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
 
 export interface SpanContext {
@@ -123,11 +123,17 @@ export class SpanInternal implements SpanContext {
   }
 }
 
+export interface SpanOptions {
+  startTime?: Time
+}
+
 export class SpanFactory {
   private readonly idGenerator: IdGenerator
   private readonly spanAttributesSource: SpanAttributesSource
   private processor: Processor
-  private sampler: Sampler
+  private readonly sampler: Sampler
+  private readonly clock: Clock
+
   private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
   private isInForeground: boolean = true
   private clock: Clock
@@ -137,8 +143,9 @@ export class SpanFactory {
     sampler: Sampler,
     idGenerator: IdGenerator,
     spanAttributesSource: SpanAttributesSource,
-    backgroundingListener: BackgroundingListener,
-    clock: Clock) {
+    clock: Clock,
+    backgroundingListener: BackgroundingListener
+  ) {
     this.processor = processor
     this.sampler = sampler
     this.idGenerator = idGenerator
@@ -156,15 +163,18 @@ export class SpanFactory {
     this.openSpans = new WeakSet<SpanInternal>()
   }
 
-  startSpan (name: string, startTime?: Time) {
-    const safeStartTime = timeToNumber(this.clock, startTime)
+  startSpan (name: string, options: SpanOptions = {}) {
+    const safeStartTime = timeToNumber(this.clock, options ? options.startTime : undefined)
     const spanId = this.idGenerator.generate(64)
     const traceId = this.idGenerator.generate(128)
     const attributes = new SpanAttributes(this.spanAttributesSource())
     const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes)
 
     // don't track spans that are started while the app is backgrounded
-    if (this.isInForeground) this.openSpans.add(span)
+    if (this.isInForeground) {
+      this.openSpans.add(span)
+    }
+
     return span
   }
 

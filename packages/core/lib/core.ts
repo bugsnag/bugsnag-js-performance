@@ -9,12 +9,12 @@ import { type Plugin } from './plugin'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
-import { SpanFactory, type Span } from './span'
+import { SpanFactory, type Span, type SpanOptions } from './span'
 import { type Time } from './time'
 
 export interface BugsnagPerformance<C extends Configuration> {
   start: (config: C | string) => void
-  startSpan: (name: string, startTime?: Time) => Span
+  startSpan: (name: string, options?: SpanOptions) => Span
 }
 
 export interface ClientOptions<S extends CoreSchema, C extends Configuration> {
@@ -38,9 +38,10 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
     sampler,
     options.idGenerator,
     options.spanAttributesSource,
-    options.backgroundingListener,
-    options.clock
+    options.clock,
+    options.backgroundingListener
   )
+
   const plugins = options.plugins(spanFactory)
 
   return {
@@ -79,8 +80,8 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
         plugin.configure(configuration)
       }
     },
-    startSpan: (name, startTime) => {
-      const span = spanFactory.startSpan(name, startTime)
+    startSpan: (name, spanOptions?: SpanOptions) => {
+      const span = spanFactory.startSpan(name, spanOptions)
       return spanFactory.spanFromSpanInternal(span)
     }
   }
