@@ -171,7 +171,7 @@ describe('Core', () => {
           expect(() => { client.start(config) }).toThrow('No Bugsnag API Key set')
         })
 
-        it('registers with the backgrounding listener', () => {
+        it('registers with the backgrounding listener', async () => {
           const backgroundingListener: BackgroundingListener = {
             onStateChange: jest.fn()
           }
@@ -181,17 +181,20 @@ describe('Core', () => {
           expect(backgroundingListener.onStateChange).toHaveBeenCalledTimes(1)
 
           client.start(VALID_API_KEY)
+          await jest.runOnlyPendingTimersAsync()
 
           expect(backgroundingListener.onStateChange).toHaveBeenCalledTimes(2)
           expect(console.warn).not.toHaveBeenCalled()
         })
 
-        it('flushes the processor when the app is backgrounded', () => {
+        it('flushes the processor when the app is backgrounded', async () => {
           const delivery = new InMemoryDelivery()
           const backgroundingListener = new ControllableBackgroundingListener()
 
           const client = createTestClient({ backgroundingListener, deliveryFactory: () => delivery })
           client.start(VALID_API_KEY)
+
+          await jest.runOnlyPendingTimersAsync()
 
           client.startSpan('Span 1').end()
           client.startSpan('Span 2').end()

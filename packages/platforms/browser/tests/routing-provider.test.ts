@@ -14,7 +14,7 @@ jest.useFakeTimers()
 const DefaultRoutingProvider = createDefaultRoutingProvider(jest.fn((c) => { c(32) }), window.location)
 
 describe('DefaultRoutingProvider', () => {
-  it('Uses a provided route resolver function', () => {
+  it('Uses a provided route resolver function', async () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
     const routeResolverFn = jest.fn((url: URL | string) => '/resolved-route')
@@ -30,14 +30,14 @@ describe('DefaultRoutingProvider', () => {
 
     history.pushState({}, '', '/new-route')
 
-    jest.runOnlyPendingTimers()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(routeResolverFn).toHaveBeenCalled()
     expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[RouteChange]/resolved-route' }))
   })
 
   describe('defaultRouteResolver', () => {
-    it('Returns a route when provided a complete URL', () => {
+    it('Returns a route when provided a complete URL', async () => {
       const clock = new IncrementingClock('1970-01-01T00:00:00Z')
       const delivery = new InMemoryDelivery()
       const routingProvier = new DefaultRoutingProvider()
@@ -53,7 +53,7 @@ describe('DefaultRoutingProvider', () => {
       const url = new URL('https://bugsnag.com/platforms/javascript?test=true#unit-test')
       history.pushState({}, '', url)
 
-      jest.runOnlyPendingTimers()
+      await jest.runOnlyPendingTimersAsync()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[RouteChange]/platforms/javascript' }))
     })
