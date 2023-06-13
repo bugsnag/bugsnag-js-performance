@@ -7,6 +7,8 @@ import { type DeliveryFactory } from './delivery'
 import { type IdGenerator } from './id-generator'
 import { type Persistence } from './persistence'
 import { type Plugin } from './plugin'
+import ProbabilityFetcher from './probability-fetcher'
+import ProbabilityManager from './probability-manager'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
@@ -51,31 +53,36 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
 
       const delivery = options.deliveryFactory(configuration.apiKey, configuration.endpoint)
 
-      sampler.initialise(configuration.samplingProbability, delivery)
+      ProbabilityManager.create(
+        options.persistence,
+        sampler,
+        configuration.samplingProbability,
+        new ProbabilityFetcher(delivery)
+      ).then((manager: ProbabilityManager) => {
+        processor = new BatchProcessor(
+          delivery,
+          configuration,
+          options.resourceAttributesSource,
+          options.clock,
+          new InMemoryQueue(delivery, configuration.retryQueueMaxSize),
+          sampler
+        )
 
-      processor = new BatchProcessor(
-        delivery,
-        configuration,
-        options.resourceAttributesSource,
-        options.clock,
-        new InMemoryQueue(delivery, configuration.retryQueueMaxSize),
-        sampler
-      )
+        // ensure all spans started before .start() are added to the batch
+        for (const span of bufferingProcessor.spans) {
+          processor.add(span)
+        }
 
-      // ensure all spans started before .start() are added to the batch
-      bufferingProcessor.spans.forEach(span => {
-        processor.add(span)
+        // register with the backgrounding listener - we do this in 'start' as
+        // there's nothing to do if we're backgrounded before start is called
+        // e.g. we can't trigger delivery until we have the apiKey and endpoint
+        // from configuration
+        options.backgroundingListener.onStateChange(state => {
+          (processor as BatchProcessor<C>).flush()
+        })
+
+        spanFactory.configure(processor, configuration.logger)
       })
-
-      // register with the backgrounding listener - we do this in 'start' as
-      // there's nothing to do if we're backgrounded before start is called
-      // e.g. we can't trigger delivery until we have the apiKey and endpoint
-      // from configuration
-      options.backgroundingListener.onStateChange(state => {
-        (processor as BatchProcessor<C>).flush()
-      })
-
-      spanFactory.configure(processor, configuration.logger)
 
       for (const plugin of plugins) {
         plugin.configure(configuration)

@@ -28,7 +28,7 @@ import MockRoutingProvider from './utilities/mock-routing-provider'
 jest.useFakeTimers()
 
 describe('FullPageLoadPlugin', () => {
-  it('Automatically creates and delivers a pageLoadSpan', () => {
+  it('Automatically creates and delivers a pageLoadSpan', async () => {
     const manager = new PerformanceObserverManager()
 
     const performance = new PerformanceFake()
@@ -77,7 +77,7 @@ describe('FullPageLoadPlugin', () => {
 
     testClient.start({ apiKey: VALID_API_KEY })
 
-    jest.runOnlyPendingTimers()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/initial-route' }))
 
@@ -95,7 +95,7 @@ describe('FullPageLoadPlugin', () => {
     expect(span).toHaveEvent('lcp', '64000000')
   })
 
-  it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', () => {
+  it('Does not create a pageLoadSpan with autoInstrumentFullPageLoads set to false', async () => {
     const clock = new IncrementingClock()
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
@@ -119,7 +119,7 @@ describe('FullPageLoadPlugin', () => {
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentFullPageLoads: false })
 
-    jest.runOnlyPendingTimers()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery.requests).toHaveLength(0)
   })
@@ -304,7 +304,7 @@ describe('FullPageLoadPlugin', () => {
 
   describe('WebVitals', () => {
     describe('lcp', () => {
-      it('uses the latest lcp entry (multiple entries)', () => {
+      it('uses the latest lcp entry (multiple entries)', async () => {
         const manager = new PerformanceObserverManager()
         const performance = new PerformanceFake()
 
@@ -337,7 +337,7 @@ describe('FullPageLoadPlugin', () => {
 
         testClient.start({ apiKey: VALID_API_KEY })
 
-        jest.runOnlyPendingTimers()
+        await jest.runOnlyPendingTimersAsync()
 
         expect(delivery).toHaveSentSpan(expect.objectContaining({
           name: '[FullPageLoad]/initial-route',
@@ -350,7 +350,7 @@ describe('FullPageLoadPlugin', () => {
         }))
       })
 
-      it('uses the latest lcp entry (multiple batches)', () => {
+      it('uses the latest lcp entry (multiple batches)', async () => {
         const manager = new PerformanceObserverManager()
         const performance = new PerformanceFake()
 
@@ -389,7 +389,7 @@ describe('FullPageLoadPlugin', () => {
 
         testClient.start({ apiKey: VALID_API_KEY })
 
-        jest.runOnlyPendingTimers()
+        await jest.runOnlyPendingTimersAsync()
 
         expect(delivery).toHaveSentSpan(expect.objectContaining({
           name: '[FullPageLoad]/initial-route',
@@ -402,7 +402,7 @@ describe('FullPageLoadPlugin', () => {
         }))
       })
 
-      it('handles there being no lcp entry', () => {
+      it('handles there being no lcp entry', async () => {
         const manager = new PerformanceObserverManager()
         const performance = new PerformanceFake()
 
@@ -431,7 +431,7 @@ describe('FullPageLoadPlugin', () => {
 
         testClient.start(VALID_API_KEY)
 
-        jest.runOnlyPendingTimers()
+        await jest.runOnlyPendingTimersAsync()
 
         expect(delivery).toHaveSentSpan(expect.objectContaining({
           name: '[FullPageLoad]/initial-route',
@@ -444,7 +444,7 @@ describe('FullPageLoadPlugin', () => {
       })
     })
 
-    it('handles PerformanceObserver not being available', () => {
+    it('handles PerformanceObserver not being available', async () => {
       const performance = new PerformanceFake()
 
       const clock = new IncrementingClock('1970-01-01T00:00:00Z')
@@ -469,7 +469,7 @@ describe('FullPageLoadPlugin', () => {
 
       testClient.start({ apiKey: VALID_API_KEY })
 
-      jest.runOnlyPendingTimers()
+      await jest.runOnlyPendingTimersAsync()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: '[FullPageLoad]/initial-route',

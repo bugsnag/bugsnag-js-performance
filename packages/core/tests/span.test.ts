@@ -9,7 +9,13 @@ import {
   createTestClient,
   spanAttributesSource
 } from '@bugsnag/js-performance-test-utilities'
-import { SpanFactory, spanToJson, type SpanEnded, spanContextEquals } from '../lib'
+import {
+  InMemoryPersistence,
+  SpanFactory,
+  spanToJson,
+  spanContextEquals,
+  type SpanEnded
+} from '../lib'
 import Sampler from '../lib/sampler'
 
 jest.useFakeTimers()
@@ -124,7 +130,7 @@ describe('Span', () => {
       }))
     )
 
-    it.each(invalidStartTimes)('uses default clock implementation if startTime is invalid ($type)', ({ startTime }) => {
+    it.each(invalidStartTimes)('uses default clock implementation if startTime is invalid ($type)', async ({ startTime }) => {
       const delivery = new InMemoryDelivery()
       const clock = new IncrementingClock('1970-01-01T00:00:00Z')
       const client = createTestClient({ deliveryFactory: () => delivery, clock })
@@ -133,7 +139,7 @@ describe('Span', () => {
       const span = client.startSpan('test span', startTime)
       span.end()
 
-      jest.runOnlyPendingTimers()
+      await jest.runOnlyPendingTimersAsync()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         startTimeUnixNano: '1000000'
@@ -142,7 +148,7 @@ describe('Span', () => {
   })
 
   describe('Span.end()', () => {
-    it('can be ended without an endTime', () => {
+    it('can be ended without an endTime', async () => {
       const delivery = new InMemoryDelivery()
       const clock = new IncrementingClock('1970-01-01T00:00:00Z')
       const client = createTestClient({ deliveryFactory: () => delivery, clock })
@@ -151,7 +157,7 @@ describe('Span', () => {
       const span = client.startSpan('test span')
       span.end()
 
-      jest.runOnlyPendingTimers()
+      await jest.runOnlyPendingTimersAsync()
 
       expect(delivery).toHaveSentSpan({
         spanId: 'a random 64 bit string',
@@ -165,7 +171,7 @@ describe('Span', () => {
       })
     })
 
-    it('accepts a Date object as endTime', () => {
+    it('accepts a Date object as endTime', async () => {
       const clock = new IncrementingClock('2023-01-02T03:04:05.006Z')
       const delivery = new InMemoryDelivery()
       const client = createTestClient({ deliveryFactory: () => delivery, clock })
@@ -174,7 +180,7 @@ describe('Span', () => {
       const span = client.startSpan('test span')
       span.end(new Date('2023-01-02T03:04:05.008Z')) // 2ms after time origin
 
-      jest.runOnlyPendingTimers()
+      await jest.runOnlyPendingTimersAsync()
 
       expect(delivery).toHaveSentSpan({
         spanId: 'a random 64 bit string',
@@ -188,7 +194,7 @@ describe('Span', () => {
       })
     })
 
-    it('accepts a number of nanoseconds as endTime', () => {
+    it('accepts a number of nanoseconds as endTime', async () => {
       const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
       const delivery = new InMemoryDelivery()
 
@@ -198,7 +204,7 @@ describe('Span', () => {
       const span = client.startSpan('test span')
       span.end(4321)
 
-      jest.runOnlyPendingTimers()
+      await jest.runOnlyPendingTimersAsync()
 
       expect(delivery).toHaveSentSpan({
         spanId: 'a random 64 bit string',
@@ -212,42 +218,49 @@ describe('Span', () => {
       })
     })
 
-    it('will always be sampled when probability is 1', () => {
+    it('will always be sampled when probability is 1', async () => {
       const delivery = new InMemoryDelivery()
+      const persistence = new InMemoryPersistence()
 
-      const client = createTestClient({ deliveryFactory: () => delivery })
+      const client = createTestClient({ deliveryFactory: () => delivery, persistence })
       client.start({
         apiKey: VALID_API_KEY,
         samplingProbability: 1
       })
 
+      await jest.runOnlyPendingTimersAsync()
+
       const span = client.startSpan('test span')
       span.end()
 
-      jest.runOnlyPendingTimers()
+      await jest.runOnlyPendingTimersAsync()
 
       expect(delivery.requests).toHaveLength(1)
     })
 
-    it('will always be discarded when probability is 0', () => {
+    it('will always be discarded when probability is 0', async () => {
       const delivery = new InMemoryDelivery()
+      const persistence = new InMemoryPersistence()
 
-      const client = createTestClient({ deliveryFactory: () => delivery })
+      const client = createTestClient({ deliveryFactory: () => delivery, persistence })
       client.start({
         apiKey: VALID_API_KEY,
         samplingProbability: 0
       })
 
+      await jest.runOnlyPendingTimersAsync()
+
       const span = client.startSpan('test span')
       span.end()
 
-      jest.runOnlyPendingTimers()
+      await jest.runOnlyPendingTimersAsync()
 
       expect(delivery.requests).toHaveLength(0)
     })
 
-    it('will sample spans based on their traceId', () => {
+    it('will sample spans based on their traceId', async () => {
       const delivery = new InMemoryDelivery()
+      const persistence = new InMemoryPersistence()
 
       // trace IDs with known sampling rates; this allows us to check that the
       // first span is sampled and the second is discarded with a specific
@@ -276,7 +289,8 @@ describe('Span', () => {
 
       const client = createTestClient({
         deliveryFactory: () => delivery,
-        idGenerator
+        idGenerator,
+        persistence
       })
 
       client.start({
@@ -286,11 +300,13 @@ describe('Span', () => {
         samplingProbability: 0.14
       })
 
+      await jest.runOnlyPendingTimersAsync()
+
       client.startSpan('span 1').end()
       client.startSpan('span 2').end()
       client.startSpan('span 3').end()
 
-      jest.runOnlyPendingTimers()
+      await jest.runOnlyPendingTimersAsync()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: 'span 1'
@@ -305,7 +321,7 @@ describe('Span', () => {
       }))
     })
 
-    it('will cancel any open spans if the app is backgrounded', () => {
+    it('will cancel any open spans if the app is backgrounded', async () => {
       const delivery = new InMemoryDelivery()
       const backgroundingListener = new ControllableBackgroundingListener()
       const logger = { warn: jest.fn(), debug: jest.fn(), error: jest.fn(), info: jest.fn() }
@@ -319,6 +335,8 @@ describe('Span', () => {
         samplingProbability: 1,
         logger
       })
+
+      await jest.runOnlyPendingTimersAsync()
 
       // started in foreground and ended in background
       const movedToBackground = client.startSpan('moved-to-background')
@@ -355,7 +373,7 @@ describe('Span', () => {
       const inForeground = client.startSpan('entirely-in-foreground')
       inForeground.end()
 
-      jest.runOnlyPendingTimers()
+      await jest.runOnlyPendingTimersAsync()
 
       expect(logger.warn).toHaveBeenCalledTimes(4)
 
@@ -380,7 +398,7 @@ describe('Span', () => {
       }))
     })
 
-    it('will not end a span that has already been ended', () => {
+    it('will not end a span that has already been ended', async () => {
       const delivery = new InMemoryDelivery()
       const backgroundingListener = new ControllableBackgroundingListener()
       const logger = { warn: jest.fn(), debug: jest.fn(), error: jest.fn(), info: jest.fn() }
@@ -398,7 +416,7 @@ describe('Span', () => {
       const span = client.startSpan('span-ended-once')
       span.end()
 
-      jest.runOnlyPendingTimers()
+      await jest.runOnlyPendingTimersAsync()
 
       expect(logger.warn).not.toHaveBeenCalled()
       expect(delivery.requests).toHaveLength(1)
@@ -408,7 +426,7 @@ describe('Span', () => {
 
       span.end()
 
-      jest.runOnlyPendingTimers()
+      await jest.runOnlyPendingTimersAsync()
 
       expect(logger.warn).toHaveBeenCalledWith('Attempted to end a Span which has already ended or been discarded.')
       expect(delivery.requests).toHaveLength(1)
