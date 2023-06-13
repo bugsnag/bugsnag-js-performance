@@ -142,7 +142,7 @@ describe('Schema validation', () => {
 
       it.each([
         { value: 1.1, type: 'a value >1' },
-        { value: -0.1, type: 'a value >0' },
+        { value: -0.1, type: 'a value <0' },
         { value: NaN, type: 'NaN' },
         { value: Infinity, type: 'Infinity' },
         { value: -Infinity, type: '-Infinity' }

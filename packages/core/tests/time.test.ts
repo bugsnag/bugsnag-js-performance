@@ -15,7 +15,7 @@ describe('timeToNumber', () => {
     expect(number).toBe(1234)
   })
 
-  it.each([NaN, Infinity, -Infinity])('ignores invalid values and uses clock.now()', (time) => {
+  it.each([NaN, Infinity, -Infinity])('ignores %s and uses clock.now()', (time) => {
     const clock = { now: jest.fn(() => 1), convert: jest.fn(), toUnixTimestampNanoseconds: jest.fn() }
     const number = timeToNumber(clock, time)
     expect(clock.now).toHaveBeenCalled()
