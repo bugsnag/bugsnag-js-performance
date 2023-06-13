@@ -12,7 +12,7 @@ class Browser
     # assume we're running the latest version if there is no version present
     # this should only happen locally where the browser will auto-update
     @version =
-      if mobile? || version.nil? || version == "latest"
+      if @name == "android" || version.nil? || version == "latest"
         Float::INFINITY
       else
         Integer(version)
@@ -20,6 +20,7 @@ class Browser
   end
 
   # is this a mobile device?
+  # we assume that android devices are always using the latest version of chrome
   def mobile?
     @name == "android" || @name == "ios" || @name == "iphone"
   end
@@ -72,7 +73,7 @@ class Browser
       safari_supported_vitals
     when "android"
       chrome_supported_vitals
-    when "iphone"
+    when "ios"
       safari_supported_vitals
     else
       raise "Unable to determine web vitals support for browser: #{@name}"
