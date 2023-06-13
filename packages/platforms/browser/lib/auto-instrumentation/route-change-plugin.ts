@@ -25,7 +25,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
 
       previousRoute = route
 
-      return this.spanFactory.spanFromSpanInternal(span)
+      return this.spanFactory.toPublicApi(span)
     })
   }
 }

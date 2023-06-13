@@ -81,7 +81,7 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
     },
     startSpan: (name, spanOptions?: SpanOptions) => {
       const span = spanFactory.startSpan(name, spanOptions)
-      return spanFactory.spanFromSpanInternal(span)
+      return spanFactory.toPublicApi(span)
     }
   }
 }

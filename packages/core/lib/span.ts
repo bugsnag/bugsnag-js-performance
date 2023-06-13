@@ -195,7 +195,7 @@ export class SpanFactory {
     }
   }
 
-  spanFromSpanInternal (span: SpanInternal): Span {
+  toPublicApi (span: SpanInternal): Span {
     return {
       get id () {
         return span.id
