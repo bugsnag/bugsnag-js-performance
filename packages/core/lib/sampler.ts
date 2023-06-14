@@ -7,6 +7,16 @@ function scaleProbabilityToMatchSamplingRate (probability: number): SpanProbabil
   return Math.floor(probability * 0xffffffff) as SpanProbability
 }
 
+interface ReadonlySampler {
+  readonly probability: number
+  readonly spanProbability: SpanProbability
+  readonly sample: (span: SpanEnded) => boolean
+}
+
+interface ReadWriteSampler extends ReadonlySampler {
+  probability: number
+}
+
 class Sampler {
   private _probability: number
 
@@ -56,3 +66,4 @@ class Sampler {
 }
 
 export default Sampler
+export { type ReadonlySampler, type ReadWriteSampler }

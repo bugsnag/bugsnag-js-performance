@@ -5,7 +5,7 @@ import { type Delivery, type DeliverySpan } from './delivery'
 import { type Processor } from './processor'
 import type ProbabilityManager from './probability-manager'
 import { type RetryQueue } from './retry-queue'
-import type Sampler from './sampler'
+import { type ReadonlySampler } from './sampler'
 import { spanToJson, type SpanEnded } from './span'
 
 type MinimalProbabilityManager = Pick<ProbabilityManager, 'setProbability'>
@@ -16,7 +16,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
   private readonly resourceAttributeSource: ResourceAttributeSource<C>
   private readonly clock: Clock
   private readonly retryQueue: RetryQueue
-  private readonly sampler: Sampler
+  private readonly sampler: ReadonlySampler
   private readonly probabilityManager: MinimalProbabilityManager
 
   private batch: SpanEnded[] = []
@@ -28,7 +28,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
     resourceAttributeSource: ResourceAttributeSource<C>,
     clock: Clock,
     retryQueue: RetryQueue,
-    sampler: Sampler,
+    sampler: ReadonlySampler,
     probabilityManager: MinimalProbabilityManager
   ) {
     this.delivery = delivery

@@ -6,7 +6,7 @@ import { type DeliverySpan } from './delivery'
 import { SpanEvents } from './events'
 import { type IdGenerator } from './id-generator'
 import { type Processor } from './processor'
-import type Sampler from './sampler'
+import { type ReadonlySampler } from './sampler'
 import { type SpanContext } from './span-context'
 import { type Time, timeToNumber } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
@@ -116,7 +116,7 @@ export class SpanFactory {
   private readonly spanAttributesSource: SpanAttributesSource
   private logger: Logger
   private processor: Processor
-  private readonly sampler: Sampler
+  private readonly sampler: ReadonlySampler
   private readonly clock: Clock
 
   private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
@@ -124,7 +124,7 @@ export class SpanFactory {
 
   constructor (
     processor: Processor,
-    sampler: Sampler,
+    sampler: ReadonlySampler,
     idGenerator: IdGenerator,
     spanAttributesSource: SpanAttributesSource,
     clock: Clock,
