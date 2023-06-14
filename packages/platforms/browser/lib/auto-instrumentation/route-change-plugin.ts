@@ -1,14 +1,12 @@
-import { timeToNumber, type Clock, type InternalConfiguration, type Plugin, type SpanFactory, type Time } from '@bugsnag/core-performance'
+import { type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
 
 export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   private readonly spanFactory: SpanFactory
-  private readonly clock: Clock
   private readonly location: Location
 
-  constructor (spanFactory: SpanFactory, clock: Clock, location: Location) {
+  constructor (spanFactory: SpanFactory, location: Location) {
     this.spanFactory = spanFactory
-    this.clock = clock
     this.location = location
   }
 
@@ -27,12 +25,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
 
       previousRoute = route
 
-      return {
-        end: (endTime?: Time) => {
-          const realEndTime = timeToNumber(this.clock, endTime)
-          this.spanFactory.endSpan(span, realEndTime)
-        }
-      }
+      return this.spanFactory.toPublicApi(span)
     })
   }
 }

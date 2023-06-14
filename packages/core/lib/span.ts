@@ -9,7 +9,15 @@ import type Sampler from './sampler'
 import { type Time, timeToNumber } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
 
-export interface Span {
+export interface SpanContext {
+  readonly id: string // 64 bit random string
+  readonly traceId: string // 128 bit random string
+
+  // returns true if this is still considered a valid context
+  readonly isValid: () => boolean
+}
+
+export interface Span extends SpanContext {
   end: (endTime?: Time) => void
 }
 
@@ -56,15 +64,26 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
   }
 }
 
-export class SpanInternal {
-  private readonly id: string
-  private readonly traceId: string
+export function spanContextEquals (span1?: SpanContext, span2?: SpanContext) {
+  if (span1 === span2) return true
+
+  if (span1 !== undefined && span2 !== undefined) {
+    return span1.id === span2.id && span1.traceId === span2.traceId
+  }
+
+  return false
+}
+
+export class SpanInternal implements SpanContext {
+  readonly id: string
+  readonly traceId: string
   private readonly startTime: number
   private readonly samplingRate: number
   private readonly kind = Kind.Client // TODO: How do we define the initial Kind?
   private readonly events = new SpanEvents()
   private readonly attributes: SpanAttributes
   private readonly name: string
+  private endTime?: number
 
   constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes) {
     this.id = id
@@ -84,6 +103,7 @@ export class SpanInternal {
   }
 
   end (endTime: number, samplingProbability: SpanProbability): SpanEnded {
+    this.endTime = endTime
     return {
       id: this.id,
       name: this.name,
@@ -96,6 +116,10 @@ export class SpanInternal {
       endTime,
       samplingProbability
     }
+  }
+
+  isValid () {
+    return this.endTime === undefined
   }
 }
 
@@ -168,6 +192,22 @@ export class SpanFactory {
 
     if (this.sampler.sample(spanEnded)) {
       this.processor.add(spanEnded)
+    }
+  }
+
+  toPublicApi (span: SpanInternal): Span {
+    return {
+      get id () {
+        return span.id
+      },
+      get traceId () {
+        return span.traceId
+      },
+      isValid: () => span.isValid(),
+      end: (endTime) => {
+        const safeEndTime = timeToNumber(this.clock, endTime)
+        this.endSpan(span, safeEndTime)
+      }
     }
   }
 }

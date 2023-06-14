@@ -9,7 +9,7 @@ import {
   createTestClient,
   spanAttributesSource
 } from '@bugsnag/js-performance-test-utilities'
-import { SpanFactory, spanToJson, type SpanEnded } from '../lib'
+import { SpanFactory, spanToJson, type SpanEnded, spanContextEquals } from '../lib'
 import Sampler from '../lib/sampler'
 
 jest.useFakeTimers()
@@ -86,7 +86,12 @@ describe('Span', () => {
     it('returns a Span', () => {
       const client = createTestClient()
       const span = client.startSpan('test span')
-      expect(span).toStrictEqual({ end: expect.any(Function) })
+      expect(span).toStrictEqual({
+        id: expect.any(String),
+        traceId: expect.any(String),
+        end: expect.any(Function),
+        isValid: expect.any(Function)
+      })
     })
 
     const invalidStartTimes: any[] = [
@@ -351,6 +356,64 @@ describe('Span', () => {
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: 'entirely-in-foreground'
       }))
+    })
+  })
+})
+
+describe('SpanContext', () => {
+  describe('SpanContext.isValid()', () => {
+    it('returns false if the span has been ended', () => {
+      const delivery = new InMemoryDelivery()
+      const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+      const client = createTestClient({ deliveryFactory: () => delivery, clock })
+      client.start({ apiKey: VALID_API_KEY })
+
+      const span = client.startSpan('test span')
+      expect(span.isValid()).toEqual(true)
+
+      span.end()
+      expect(span.isValid()).toEqual(false)
+    })
+  })
+  describe('spanContextEquals()', () => {
+    it.each([
+      {
+        span1: undefined,
+        span2: undefined,
+        expected: true
+      },
+      {
+        span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        span2: undefined,
+        expected: false
+      },
+      {
+        span1: undefined,
+        span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        expected: false
+      },
+      {
+        span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        expected: true
+      },
+      {
+        span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => false },
+        expected: true
+      },
+      {
+        span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        span2: { id: '0123456789abcdef', traceId: 'a0b1c2d3e4f5a0b1c2d3e4f5a0b1c2d3', isValid: () => true },
+        expected: false
+      },
+      {
+        span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        span2: { id: '9876543210fedcba', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+        expected: false
+      }
+    ])('returns $expected given inputs $span1 and $span2', ({ span1, span2, expected }) => {
+      expect(spanContextEquals(span1, span2)).toEqual(expected)
     })
   })
 })

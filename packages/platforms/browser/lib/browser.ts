@@ -48,7 +48,7 @@ const BugsnagPerformance = createClient({
       backgroundingListener
     ),
     new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker),
-    new RouteChangePlugin(spanFactory, clock, window.location)
+    new RouteChangePlugin(spanFactory, window.location)
   ]
 })
 

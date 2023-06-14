@@ -10,7 +10,6 @@ import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
 import { SpanFactory, type Span, type SpanOptions } from './span'
-import { timeToNumber, type Time } from './time'
 
 export interface BugsnagPerformance<C extends Configuration> {
   start: (config: C | string) => void
@@ -80,15 +79,9 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
         plugin.configure(configuration)
       }
     },
-    startSpan: (name: string, spanOptions?: SpanOptions) => {
+    startSpan: (name, spanOptions?: SpanOptions) => {
       const span = spanFactory.startSpan(name, spanOptions)
-
-      return {
-        end: (endTime?: Time) => {
-          const safeEndTime = timeToNumber(options.clock, endTime)
-          spanFactory.endSpan(span, safeEndTime)
-        }
-      }
+      return spanFactory.toPublicApi(span)
     }
   }
 }
@@ -98,6 +91,6 @@ export function createNoopClient<C extends Configuration> (): BugsnagPerformance
 
   return {
     start: noop,
-    startSpan: () => ({ end: noop })
+    startSpan: () => ({ id: '', traceId: '', end: noop, isValid: () => false })
   }
 }
