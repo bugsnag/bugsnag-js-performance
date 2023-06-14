@@ -38,9 +38,9 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
     options.idGenerator,
     options.spanAttributesSource,
     options.clock,
-    options.backgroundingListener
+    options.backgroundingListener,
+    options.schema.logger.defaultValue
   )
-
   const plugins = options.plugins(spanFactory)
 
   return {
@@ -73,7 +73,7 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
         (processor as BatchProcessor<C>).flush()
       })
 
-      spanFactory.updateProcessor(processor)
+      spanFactory.configure(processor, configuration.logger)
 
       for (const plugin of plugins) {
         plugin.configure(configuration)
