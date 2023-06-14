@@ -11,4 +11,7 @@ Maze.hooks.after do
     Maze.driver.navigate.to path
     # If a further error occurs it will get thrown as normal
   end
+
+  driver = Maze.driver.instance_variable_get(:@driver)
+  hostname = driver.execute_script("window.localStorage.clear()")
 end
