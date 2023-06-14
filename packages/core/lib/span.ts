@@ -64,11 +64,11 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
   }
 }
 
-export function spanContextEquals (s1?: SpanContext, s2?: SpanContext) {
-  if (s1 === s2) return true
+export function spanContextEquals (span1?: SpanContext, span2?: SpanContext) {
+  if (span1 === span2) return true
 
-  if (s1 !== undefined && s2 !== undefined) {
-    return s1.id === s2.id && s1.traceId === s2.traceId
+  if (span1 !== undefined && span2 !== undefined) {
+    return span1.id === span2.id && span1.traceId === span2.traceId
   }
 
   return false
