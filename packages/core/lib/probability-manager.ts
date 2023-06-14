@@ -1,6 +1,6 @@
 import { type Persistence } from './persistence'
 import type ProbabilityFetcher from './probability-fetcher'
-import type Sampler from './sampler'
+import { type ReadWriteSampler } from './sampler'
 
 // the time between requests to fetch a new probability value from the server
 const PROBABILITY_REFRESH_MILLISECONDS = 24 * 60 * 60 * 1000 // 24 hours
@@ -8,7 +8,7 @@ const PROBABILITY_REFRESH_MILLISECONDS = 24 * 60 * 60 * 1000 // 24 hours
 class ProbabilityManager {
   static async create (
     persistence: Persistence,
-    sampler: Sampler,
+    sampler: ReadWriteSampler,
     configuredProbability: number,
     probabilityFetcher: ProbabilityFetcher
   ) {
@@ -54,7 +54,7 @@ class ProbabilityManager {
   }
 
   private readonly persistence: Persistence
-  private readonly sampler: Sampler
+  private readonly sampler: ReadWriteSampler
   private readonly probabilityFetcher: ProbabilityFetcher
 
   private lastProbabilityTime: number
@@ -62,7 +62,7 @@ class ProbabilityManager {
 
   private constructor (
     persistence: Persistence,
-    sampler: Sampler,
+    sampler: ReadWriteSampler,
     probabilityFetcher: ProbabilityFetcher,
     initialTimoutDuration: number,
     initialProbabilityTime: number
