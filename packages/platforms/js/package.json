@@ -10,6 +10,9 @@
     "reporting",
     "client-side"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "BugSnag",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
