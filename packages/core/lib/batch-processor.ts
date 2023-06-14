@@ -3,22 +3,41 @@ import { type Clock } from './clock'
 import { type Configuration, type InternalConfiguration } from './config'
 import { type Delivery, type DeliverySpan } from './delivery'
 import { type Processor } from './processor'
+import type ProbabilityManager from './probability-manager'
 import { type RetryQueue } from './retry-queue'
 import type Sampler from './sampler'
 import { spanToJson, type SpanEnded } from './span'
 
+type MinimalProbabilityManager = Pick<ProbabilityManager, 'setProbability'>
+
 export class BatchProcessor<C extends Configuration> implements Processor {
+  private readonly delivery: Delivery
+  private readonly configuration: InternalConfiguration<C>
+  private readonly resourceAttributeSource: ResourceAttributeSource<C>
+  private readonly clock: Clock
+  private readonly retryQueue: RetryQueue
+  private readonly sampler: Sampler
+  private readonly probabilityManager: MinimalProbabilityManager
+
   private batch: SpanEnded[] = []
   private timeout: ReturnType<typeof setTimeout> | null = null
 
   constructor (
-    private delivery: Delivery,
-    private configuration: InternalConfiguration<C>,
-    private resourceAttributeSource: ResourceAttributeSource<C>,
-    private clock: Clock,
-    private retryQueue: RetryQueue,
-    private sampler: Sampler
+    delivery: Delivery,
+    configuration: InternalConfiguration<C>,
+    resourceAttributeSource: ResourceAttributeSource<C>,
+    clock: Clock,
+    retryQueue: RetryQueue,
+    sampler: Sampler,
+    probabilityManager: MinimalProbabilityManager
   ) {
+    this.delivery = delivery
+    this.configuration = configuration
+    this.resourceAttributeSource = resourceAttributeSource
+    this.clock = clock
+    this.retryQueue = retryQueue
+    this.sampler = sampler
+    this.probabilityManager = probabilityManager
     this.flush = this.flush.bind(this)
   }
 
@@ -77,7 +96,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
       const response = await this.delivery.send(payload)
 
       if (response.samplingProbability !== undefined) {
-        this.sampler.probability = response.samplingProbability
+        this.probabilityManager.setProbability(response.samplingProbability)
       }
 
       switch (response.state) {
