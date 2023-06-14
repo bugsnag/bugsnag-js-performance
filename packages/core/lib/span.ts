@@ -7,16 +7,9 @@ import { SpanEvents } from './events'
 import { type IdGenerator } from './id-generator'
 import { type Processor } from './processor'
 import type Sampler from './sampler'
+import { type SpanContext } from './span-context'
 import { type Time, timeToNumber } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
-
-export interface SpanContext {
-  readonly id: string // 64 bit random string
-  readonly traceId: string // 128 bit random string
-
-  // returns true if this is still considered a valid context
-  readonly isValid: () => boolean
-}
 
 export interface Span extends SpanContext {
   end: (endTime?: Time) => void
@@ -63,16 +56,6 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
     attributes: span.attributes.toJson(),
     events: span.events.toJson(clock)
   }
-}
-
-export function spanContextEquals (span1?: SpanContext, span2?: SpanContext) {
-  if (span1 === span2) return true
-
-  if (span1 !== undefined && span2 !== undefined) {
-    return span1.id === span2.id && span1.traceId === span2.traceId
-  }
-
-  return false
 }
 
 export class SpanInternal implements SpanContext {
