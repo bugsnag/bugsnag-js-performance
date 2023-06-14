@@ -65,7 +65,8 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
           options.resourceAttributesSource,
           options.clock,
           new InMemoryQueue(delivery, configuration.retryQueueMaxSize),
-          sampler
+          sampler,
+          manager
         )
 
         // ensure all spans started before .start() are added to the batch

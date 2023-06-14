@@ -1,4 +1,7 @@
 import { BatchProcessor } from '../lib/batch-processor'
+import { InMemoryPersistence } from '../lib/persistence'
+import ProbabilityFetcher from '../lib/probability-fetcher'
+import ProbabilityManager from '../lib/probability-manager'
 import Sampler from '../lib/sampler'
 import {
   IncrementingClock,
@@ -19,7 +22,8 @@ describe('BatchProcessor', () => {
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
       { add: jest.fn(), flush: jest.fn() },
-      new Sampler(1.0)
+      new Sampler(1.0),
+      { setProbability () { return Promise.resolve() } }
     )
 
     // add 99 spans
@@ -42,7 +46,8 @@ describe('BatchProcessor', () => {
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
       { add: jest.fn(), flush: jest.fn() },
-      new Sampler(1.0)
+      new Sampler(1.0),
+      { setProbability () { return Promise.resolve() } }
     )
 
     batchProcessor.add(createEndedSpan())
@@ -62,7 +67,8 @@ describe('BatchProcessor', () => {
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
       { add: jest.fn(), flush: jest.fn() },
-      new Sampler(1.0)
+      new Sampler(1.0),
+      { setProbability () { return Promise.resolve() } }
     )
 
     batchProcessor.add(createEndedSpan())
@@ -87,7 +93,8 @@ describe('BatchProcessor', () => {
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
       { add: jest.fn(), flush: jest.fn() },
-      new Sampler(1.0)
+      new Sampler(1.0),
+      { setProbability () { return Promise.resolve() } }
     )
 
     batchProcessor.add(createEndedSpan())
@@ -108,7 +115,8 @@ describe('BatchProcessor', () => {
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
       retryQueue,
-      new Sampler(1.0)
+      new Sampler(1.0),
+      { setProbability () { return Promise.resolve() } }
     )
 
     delivery.setNextResponseState('failure-retryable')
@@ -134,7 +142,8 @@ describe('BatchProcessor', () => {
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
       retryQueue,
-      new Sampler(1.0)
+      new Sampler(1.0),
+      { setProbability () { return Promise.resolve() } }
     )
 
     delivery.setNextResponseState('failure-discard')
@@ -160,7 +169,8 @@ describe('BatchProcessor', () => {
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
       retryQueue,
-      new Sampler(1.0)
+      new Sampler(1.0),
+      { setProbability () { return Promise.resolve() } }
     )
 
     batchProcessor.add(createEndedSpan())
@@ -183,7 +193,13 @@ describe('BatchProcessor', () => {
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
       { add: jest.fn(), flush: jest.fn() },
-      sampler
+      sampler,
+      await ProbabilityManager.create(
+        new InMemoryPersistence(),
+        sampler,
+        1.0,
+        new ProbabilityFetcher(delivery)
+      )
     )
 
     batchProcessor.add(createEndedSpan())
@@ -207,7 +223,13 @@ describe('BatchProcessor', () => {
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
       { add: jest.fn(), flush: jest.fn() },
-      sampler
+      sampler,
+      await ProbabilityManager.create(
+        new InMemoryPersistence(),
+        sampler,
+        0.5,
+        new ProbabilityFetcher(delivery)
+      )
     )
 
     const span1 = createEndedSpan({
@@ -247,7 +269,13 @@ describe('BatchProcessor', () => {
       resourceAttributesSource,
       new IncrementingClock('1970-01-01T00:00:00Z'),
       { add: jest.fn(), flush: jest.fn() },
-      sampler
+      sampler,
+      await ProbabilityManager.create(
+        new InMemoryPersistence(),
+        sampler,
+        0.5,
+        new ProbabilityFetcher(delivery)
+      )
     )
 
     const span1 = createEndedSpan({
