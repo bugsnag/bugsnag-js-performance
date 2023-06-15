@@ -1,3 +1,5 @@
+import { type BackgroundingListenerState, type BackgroundingListener } from './backgrounding-listener'
+
 export interface SpanContext {
   readonly id: string // 64 bit random string
   readonly traceId: string // 128 bit random string
@@ -24,9 +26,12 @@ export interface SpanContextStorage extends Iterable<SpanContext> {
 
 export class DefaultSpanContextStorage implements SpanContextStorage {
   private readonly contextStack: SpanContext[]
+  private isInForeground: boolean = true
 
-  constructor (contextStack: SpanContext[] = []) {
+  constructor (backgroundingListener: BackgroundingListener, contextStack: SpanContext[] = []) {
     this.contextStack = contextStack
+
+    backgroundingListener.onStateChange(this.onBackgroundStateChange)
   }
 
   * [Symbol.iterator] (): Iterator<SpanContext> {
@@ -36,7 +41,7 @@ export class DefaultSpanContextStorage implements SpanContextStorage {
   }
 
   push (context: SpanContext) {
-    if (context.isValid()) {
+    if (context.isValid() && this.isInForeground) {
       this.contextStack.push(context)
     }
   }
@@ -63,5 +68,12 @@ export class DefaultSpanContextStorage implements SpanContextStorage {
     ) {
       this.contextStack.pop()
     }
+  }
+
+  private onBackgroundStateChange = (state: BackgroundingListenerState) => {
+    this.isInForeground = state === 'in-foreground'
+    // clear the context stack regardless of the new background state
+    // since spans are only valid if they start and end while the app is in the foreground
+    this.contextStack.length = 0
   }
 }
