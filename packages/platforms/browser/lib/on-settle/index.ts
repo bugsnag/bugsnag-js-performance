@@ -36,7 +36,7 @@ export default function createOnSettle (
     xhrRequestSettler
   ])
 
-  function onSettle (callback: OnSettleCallback): void {
+  function onSettlePlugin (callback: OnSettleCallback): void {
     const onSettle: OnSettleCallback = (settledTime: number) => {
       clearTimeout(timeout)
 
@@ -55,10 +55,25 @@ export default function createOnSettle (
       callback(settledTime)
     }, TIMEOUT_MILLISECONDS)
 
-    settler.subscribe(onSettle)
+    // if we're already settled apply a 100ms "cooldown" period in case we
+    // unsettle immediately after this call
+    // if we're not settled then this cooldown is irrelevant - we can just
+    // subscribe to the settler to be notified of when the page settles
+    const cooldown = settler.isSettled() ? 100 : 0
+    const settledTime = clock.now()
+
+    setTimeout(() => {
+      if (settler.isSettled()) {
+        // if we're still settled call the callback via "onSettle"
+        onSettle(settledTime)
+      } else {
+        // otherwise wait for the page to settle
+        settler.subscribe(onSettle)
+      }
+    }, cooldown)
   }
 
-  onSettle.configure = function (configuration: InternalConfiguration<BrowserConfiguration>): void {
+  onSettlePlugin.configure = function (configuration: InternalConfiguration<BrowserConfiguration>): void {
     const settleIgnoreUrls = configuration.settleIgnoreUrls.map(
       (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
     ).concat(RegExp(configuration.endpoint))
@@ -67,5 +82,5 @@ export default function createOnSettle (
     xhrRequestSettler.setUrlsToIgnore(settleIgnoreUrls)
   }
 
-  return onSettle
+  return onSettlePlugin
 }
