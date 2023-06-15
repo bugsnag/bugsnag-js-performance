@@ -16,7 +16,8 @@ describe('Core', () => {
 
       expect(client).toStrictEqual({
         start: expect.any(Function),
-        startSpan: expect.any(Function)
+        startSpan: expect.any(Function),
+        currentSpanContext: undefined
       })
     })
 
@@ -178,12 +179,12 @@ describe('Core', () => {
 
           const client = createTestClient({ backgroundingListener })
 
-          expect(backgroundingListener.onStateChange).toHaveBeenCalledTimes(1)
+          expect(backgroundingListener.onStateChange).toHaveBeenCalledTimes(2)
 
           client.start(VALID_API_KEY)
           await jest.runOnlyPendingTimersAsync()
 
-          expect(backgroundingListener.onStateChange).toHaveBeenCalledTimes(2)
+          expect(backgroundingListener.onStateChange).toHaveBeenCalledTimes(3)
           expect(console.warn).not.toHaveBeenCalled()
         })
 
