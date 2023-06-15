@@ -22,30 +22,6 @@ export interface SpanContextStorage extends Iterable<SpanContext> {
   readonly current: SpanContext | undefined
 }
 
-class SpanContextIterator implements Iterator<SpanContext> {
-  private readonly contexts: SpanContext[]
-  private position: number
-
-  constructor (contexts: SpanContext[]) {
-    this.contexts = contexts
-    this.position = this.contexts.length
-  }
-
-  next (): IteratorResult<SpanContext> {
-    if (this.position > 0) {
-      return {
-        done: false,
-        value: this.contexts[this.position--]
-      }
-    } else {
-      return {
-        done: true,
-        value: undefined
-      }
-    }
-  }
-}
-
 export class DefaultSpanContextStorage implements SpanContextStorage {
   private readonly contextStack: SpanContext[]
 
@@ -53,8 +29,10 @@ export class DefaultSpanContextStorage implements SpanContextStorage {
     this.contextStack = contextStack
   }
 
-  [Symbol.iterator] (): SpanContextIterator {
-    return new SpanContextIterator(this.contextStack)
+  * [Symbol.iterator] (): Iterator<SpanContext> {
+    for (let i = this.contextStack.length - 1; i >= 0; --i) {
+      yield this.contextStack[i]
+    }
   }
 
   push (context: SpanContext) {

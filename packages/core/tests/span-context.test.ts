@@ -117,13 +117,14 @@ describe('DefaultSpanContextStorage', () => {
       }
 
       // iterate over the context stack and check each item
-      let position = spanContexts.length
+      let position = spanContexts.length - 1
       for (const context of contextStorage) {
-        expect(context).toBe(spanContexts[position--])
+        expect(context).toBe(spanContexts[position])
+        position--
       }
 
       // make sure we got to the end of the collection and the stack is in tact
-      expect(position).toEqual(0)
+      expect(position).toEqual(-1)
       expect(contextStorage.current).toBe(spanContexts.pop())
     })
   })
