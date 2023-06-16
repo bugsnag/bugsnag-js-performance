@@ -1,5 +1,6 @@
 import { createNoopClient } from '../lib/core'
 import { type BackgroundingListener } from '../lib/backgrounding-listener'
+import { DefaultSpanContextStorage } from '../lib/span-context'
 import {
   ControllableBackgroundingListener,
   createTestClient,
@@ -232,6 +233,17 @@ describe('Core', () => {
           backgroundingListener.sendToBackground()
 
           expect(delivery.requests).toHaveLength(0)
+        })
+      })
+
+      describe('currentSpanContext', () => {
+        it('returns the current span context', () => {
+          const spanContextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
+          const client = createTestClient({ spanContextStorage })
+
+          const spanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
+          spanContextStorage.push(spanContext)
+          expect(client.currentSpanContext).toBe(spanContext)
         })
       })
     })
