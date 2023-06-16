@@ -43,6 +43,7 @@ export interface SpanEnded {
   readonly samplingRate: number
   readonly endTime: number // stored in the format returned from Clock.now (see clock.ts) - written once when 'end' is called
   samplingProbability: SpanProbability
+  readonly parentSpanId?: string
 }
 
 export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
@@ -51,6 +52,7 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
     kind: span.kind,
     spanId: span.id,
     traceId: span.traceId,
+    parentSpanId: span.parentSpanId,
     startTimeUnixNano: clock.toUnixTimestampNanoseconds(span.startTime),
     endTimeUnixNano: clock.toUnixTimestampNanoseconds(span.endTime),
     attributes: span.attributes.toJson(),
@@ -61,6 +63,7 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
 export class SpanInternal implements SpanContext {
   readonly id: string
   readonly traceId: string
+  private readonly parentSpanId?: string
   private readonly startTime: number
   private readonly samplingRate: number
   private readonly kind = Kind.Client // TODO: How do we define the initial Kind?
@@ -69,9 +72,10 @@ export class SpanInternal implements SpanContext {
   private readonly name: string
   private endTime?: number
 
-  constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes) {
+  constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes, parentSpanId?: string) {
     this.id = id
     this.traceId = traceId
+    this.parentSpanId = parentSpanId
     this.name = name
     this.startTime = startTime
     this.attributes = attributes
@@ -98,7 +102,8 @@ export class SpanInternal implements SpanContext {
       events: this.events,
       samplingRate: this.samplingRate,
       endTime,
-      samplingProbability
+      samplingProbability,
+      parentSpanId: this.parentSpanId
     }
   }
 
