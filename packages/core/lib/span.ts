@@ -164,7 +164,7 @@ export class SpanFactory {
     if (this.isInForeground) {
       this.openSpans.add(span)
 
-      if (options && options.makeCurrentContext === true) {
+      if (!options || options.makeCurrentContext !== false) {
         this.spanContextStorage.push(span)
       }
     }

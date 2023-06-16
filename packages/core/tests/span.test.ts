@@ -150,7 +150,29 @@ describe('Span', () => {
       }))
     })
 
-    it('becomes the current SpanContext when SpanOptions.makeCurrentContext === true', () => {
+    const makeCurrentContextOptions: any[] = [
+      { type: 'true', makeCurrentContext: true },
+      { type: 'string', makeCurrentContext: 'yes please' },
+      { type: 'bigint', makeCurrentContext: BigInt(9007199254740991) },
+      { type: 'function', makeCurrentContext: () => {} },
+      { type: 'object', makeCurrentContext: { property: 'test' } },
+      { type: 'empty array', makeCurrentContext: [] },
+      { type: 'array', makeCurrentContext: [1, 2, 3] },
+      { type: 'symbol', makeCurrentContext: Symbol('test') },
+      { type: 'null', makeCurrentContext: null },
+      { type: 'undefined', makeCurrentContext: undefined }
+    ]
+
+    it.each(makeCurrentContextOptions)('becomes the current SpanContext when makeCurrentContext is not false ($type)', (options) => {
+      const client = createTestClient()
+      client.start({ apiKey: VALID_API_KEY })
+      expect(client.currentSpanContext).toBeUndefined()
+
+      const spanIsContext = client.startSpan('context span', options)
+      expect(spanContextEquals(spanIsContext, client.currentSpanContext)).toBe(true)
+    })
+
+    it('does not become the current SpanContext when SpanOptions.makeCurrentContext is false', () => {
       const idGenerator = {
         count: 0,
         generate (bits: 64 | 128) {
@@ -167,10 +189,10 @@ describe('Span', () => {
       client.start({ apiKey: VALID_API_KEY })
       expect(client.currentSpanContext).toBeUndefined()
 
-      const spanIsContext = client.startSpan('context span', { makeCurrentContext: true })
+      const spanIsContext = client.startSpan('context span')
       expect(spanContextEquals(spanIsContext, client.currentSpanContext)).toBe(true)
 
-      const spanIsNotContext = client.startSpan('non context span')
+      const spanIsNotContext = client.startSpan('non context span', { makeCurrentContext: false })
       expect(spanContextEquals(spanIsNotContext, client.currentSpanContext)).toBe(false)
       expect(spanContextEquals(spanIsContext, client.currentSpanContext)).toBe(true)
     })
@@ -478,9 +500,9 @@ describe('Span', () => {
       client.start({ apiKey: VALID_API_KEY })
       expect(client.currentSpanContext).toBeUndefined()
 
-      const span1 = client.startSpan('span 1', { makeCurrentContext: true })
-      const span2 = client.startSpan('span 2', { makeCurrentContext: true })
-      const span3 = client.startSpan('span 3', { makeCurrentContext: true })
+      const span1 = client.startSpan('span 1')
+      const span2 = client.startSpan('span 2')
+      const span3 = client.startSpan('span 3')
       expect(spanContextEquals(span3, client.currentSpanContext)).toBe(true)
 
       // span2 is not at the top of the context stack so span3 should still be the current context
