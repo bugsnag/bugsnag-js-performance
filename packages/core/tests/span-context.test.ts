@@ -1,9 +1,10 @@
 import { type SpanContext, DefaultSpanContextStorage } from '../lib'
+import { ControllableBackgroundingListener } from '@bugsnag/js-performance-test-utilities'
 
 describe('DefaultSpanContextStorage', () => {
   describe('SpanContextStorage.push()', () => {
     it('pushes valid contexts onto the stack', () => {
-      const contextStorage = new DefaultSpanContextStorage()
+      const contextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
 
       const spanContext1 = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
       const spanContext2 = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
@@ -16,7 +17,7 @@ describe('DefaultSpanContextStorage', () => {
     })
 
     it('does not push invalid contexts onto the stack', () => {
-      const contextStorage = new DefaultSpanContextStorage()
+      const contextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
 
       const validSpanContext: SpanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
       const invalidSpanContext: SpanContext = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => false }
@@ -29,7 +30,7 @@ describe('DefaultSpanContextStorage', () => {
 
   describe('SpanContextStorage.pop()', () => {
     it('only pops the supplied context if it is the current context', () => {
-      const contextStorage = new DefaultSpanContextStorage()
+      const contextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
 
       const spanContext1 = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
       const spanContext2 = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
@@ -54,7 +55,7 @@ describe('DefaultSpanContextStorage', () => {
     })
 
     it('removes invalid contexts from the stack when popped', () => {
-      const contextStorage = new DefaultSpanContextStorage()
+      const contextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
 
       const spanContext1 = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
       const spanContext2 = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
@@ -81,7 +82,7 @@ describe('DefaultSpanContextStorage', () => {
 
   describe('SpanContextStorage.current', () => {
     it('removes invalid contexts from the stack when current is called', () => {
-      const contextStorage = new DefaultSpanContextStorage()
+      const contextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
 
       const spanContext1 = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
       const spanContext2 = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
@@ -106,7 +107,7 @@ describe('DefaultSpanContextStorage', () => {
 
   describe('Iterable<SpanContext>', () => {
     it('allows the stack to be iterated', () => {
-      const contextStorage = new DefaultSpanContextStorage()
+      const contextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
       const spanContexts = []
 
       // push some contexts onto the stack
@@ -126,6 +127,34 @@ describe('DefaultSpanContextStorage', () => {
       // make sure we got to the end of the collection and the stack is in tact
       expect(position).toEqual(-1)
       expect(contextStorage.current).toBe(spanContexts.pop())
+    })
+  })
+
+  describe('BackgroundingListener', () => {
+    it('clears the context stack when the app is backgrounded', () => {
+      const backgroundingListener = new ControllableBackgroundingListener()
+      const contextStorage = new DefaultSpanContextStorage(backgroundingListener)
+
+      const spanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
+      contextStorage.push(spanContext)
+      expect(contextStorage.current).toBe(spanContext)
+
+      backgroundingListener.sendToBackground()
+      expect(contextStorage.current).toBeUndefined()
+    })
+
+    it('does not push onto the context stack when the app is backgrounded', () => {
+      const backgroundingListener = new ControllableBackgroundingListener()
+      const contextStorage = new DefaultSpanContextStorage(backgroundingListener)
+
+      backgroundingListener.sendToBackground()
+      const spanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
+      contextStorage.push(spanContext)
+      expect(contextStorage.current).toBeUndefined()
+
+      backgroundingListener.sendToForeground()
+      contextStorage.push(spanContext)
+      expect(contextStorage.current).toBe(spanContext)
     })
   })
 })
