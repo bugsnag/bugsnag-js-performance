@@ -109,6 +109,7 @@ export class SpanInternal implements SpanContext {
 
 export interface SpanOptions {
   startTime?: Time
+  makeCurrentContext?: boolean
 }
 
 export class SpanFactory {
@@ -162,6 +163,10 @@ export class SpanFactory {
     // don't track spans that are started while the app is backgrounded
     if (this.isInForeground) {
       this.openSpans.add(span)
+
+      if (options && options.makeCurrentContext === true) {
+        this.spanContextStorage.push(span)
+      }
     }
 
     return span
@@ -183,6 +188,7 @@ export class SpanFactory {
     }
 
     const spanEnded = span.end(endTime, this.sampler.spanProbability)
+    this.spanContextStorage.pop(span)
 
     if (this.sampler.sample(spanEnded)) {
       this.processor.add(spanEnded)
