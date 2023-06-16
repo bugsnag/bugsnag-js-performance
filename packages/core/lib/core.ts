@@ -47,7 +47,8 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
     options.spanAttributesSource,
     options.clock,
     options.backgroundingListener,
-    options.schema.logger.defaultValue
+    options.schema.logger.defaultValue,
+    spanContextStorage
   )
   const plugins = options.plugins(spanFactory)
 

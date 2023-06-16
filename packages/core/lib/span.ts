@@ -7,7 +7,7 @@ import { SpanEvents } from './events'
 import { type IdGenerator } from './id-generator'
 import { type Processor } from './processor'
 import { type ReadonlySampler } from './sampler'
-import { type SpanContext } from './span-context'
+import { type SpanContext, type SpanContextStorage } from './span-context'
 import { type Time, timeToNumber } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
 
@@ -112,12 +112,13 @@ export interface SpanOptions {
 }
 
 export class SpanFactory {
-  private readonly idGenerator: IdGenerator
-  private readonly spanAttributesSource: SpanAttributesSource
-  private logger: Logger
   private processor: Processor
   private readonly sampler: ReadonlySampler
+  private readonly idGenerator: IdGenerator
+  private readonly spanAttributesSource: SpanAttributesSource
   private readonly clock: Clock
+  private readonly spanContextStorage: SpanContextStorage
+  private logger: Logger
 
   private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
   private isInForeground: boolean = true
@@ -129,14 +130,16 @@ export class SpanFactory {
     spanAttributesSource: SpanAttributesSource,
     clock: Clock,
     backgroundingListener: BackgroundingListener,
-    logger: Logger
+    logger: Logger,
+    spanContextStorage: SpanContextStorage
   ) {
     this.processor = processor
     this.sampler = sampler
     this.idGenerator = idGenerator
-    this.logger = logger
     this.spanAttributesSource = spanAttributesSource
     this.clock = clock
+    this.logger = logger
+    this.spanContextStorage = spanContextStorage
 
     // this will fire immediately if the app is already backgrounded
     backgroundingListener.onStateChange(this.onBackgroundStateChange)

@@ -1,5 +1,5 @@
 
-import { Kind } from '@bugsnag/core-performance'
+import { DefaultSpanContextStorage, Kind } from '@bugsnag/core-performance'
 import {
   ControllableBackgroundingListener,
   InMemoryDelivery,
@@ -39,14 +39,16 @@ describe('SpanInternal', () => {
       const sampler = new Sampler(0.5)
       const delivery = { send: jest.fn() }
       const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+      const backgroundingListener = new ControllableBackgroundingListener()
       const spanFactory = new SpanFactory(
         processor,
         sampler,
         new StableIdGenerator(),
         spanAttributesSource,
         new IncrementingClock(),
-        new ControllableBackgroundingListener(),
-        jestLogger
+        backgroundingListener,
+        jestLogger,
+        new DefaultSpanContextStorage(backgroundingListener)
       )
 
       const spanInternal = spanFactory.startSpan('span-name', { startTime: 1234 })
@@ -71,14 +73,16 @@ describe('SpanInternal', () => {
       const sampler = new Sampler(0.5)
       const delivery = { send: jest.fn() }
       const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+      const backgroundingListener = new ControllableBackgroundingListener()
       const spanFactory = new SpanFactory(
         processor,
         sampler,
         new StableIdGenerator(),
         spanAttributesSource,
         new IncrementingClock(),
-        new ControllableBackgroundingListener(),
-        jestLogger
+        backgroundingListener,
+        jestLogger,
+        new DefaultSpanContextStorage(backgroundingListener)
       )
 
       const spanInternal = spanFactory.startSpan('span-name', { startTime: 1234 })
