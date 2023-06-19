@@ -6,8 +6,6 @@ function createResourceAttributesSource (
   navigator: Navigator,
   persistence: Persistence
 ): ResourceAttributeSource<BrowserConfiguration> {
-  const getDeviceId = persistence.load('bugsnag-anonymous-id')
-
   return function resourceAttributesSource (config) {
     const attributes = new ResourceAttributes(
       config.releaseStage,
@@ -24,17 +22,19 @@ function createResourceAttributesSource (
       attributes.set('browser.mobile', navigator.userAgentData.mobile)
     }
 
-    getDeviceId.then(maybeDeviceId => {
-      // use the persisted value or generate a new ID
-      const deviceId = maybeDeviceId || cuid()
+    if (config.generateAnonymousId) {
+      persistence.load('bugsnag-anonymous-id').then(maybeDeviceId => {
+        // use the persisted value or generate a new ID
+        const deviceId = maybeDeviceId || cuid()
 
-      // if there was no persisted value, save the newly generated ID
-      if (!maybeDeviceId) {
-        persistence.save('bugsnag-anonymous-id', deviceId)
-      }
+        // if there was no persisted value, save the newly generated ID
+        if (!maybeDeviceId) {
+          persistence.save('bugsnag-anonymous-id', deviceId)
+        }
 
-      attributes.set('device.id', deviceId)
-    })
+        attributes.set('device.id', deviceId)
+      })
+    }
 
     return attributes
   }

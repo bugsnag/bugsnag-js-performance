@@ -6,6 +6,7 @@ function createConfiguration<C extends Configuration> (overrides: Partial<C> = {
     autoInstrumentNetworkRequests: false,
     apiKey: 'abcdefabcdefabcdefabcdefabcdef12',
     endpoint: '/traces',
+    generateAnonymousId: true,
     releaseStage: 'production',
     enabledReleaseStages: null,
     maximumBatchSize: 100,
