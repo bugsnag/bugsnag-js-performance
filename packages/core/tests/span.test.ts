@@ -198,15 +198,14 @@ describe('Span', () => {
     })
 
     it('sets traceId and parentSpanId from parentContext if specified', async () => {
-      let count = 0
+      let spanCount = 0
+      let traceCount = 0
       const idGenerator = {
         generate (bits: 64 | 128) {
           if (bits === 64) {
-            count++
-            return `span ID ${count}`
+            return `span ID ${++spanCount}`
           }
-
-          return `trace ID ${count}`
+          return `trace ID ${++traceCount}`
         }
       }
 
@@ -234,15 +233,14 @@ describe('Span', () => {
     })
 
     it('starts a new root span when parentContext is null', async () => {
-      let count = 0
+      let spanCount = 0
+      let traceCount = 0
       const idGenerator = {
         generate (bits: 64 | 128) {
           if (bits === 64) {
-            count++
-            return `span ID ${count}`
+            return `span ID ${++spanCount}`
           }
-
-          return `trace ID ${count}`
+          return `trace ID ${++traceCount}`
         }
       }
 
@@ -262,7 +260,7 @@ describe('Span', () => {
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: 'new root span',
         parentSpanId: undefined,
-        traceId: `trace ID ${count}`
+        traceId: `trace ID ${traceCount}`
       }))
     })
 
@@ -279,15 +277,14 @@ describe('Span', () => {
     ]
 
     it.each(parentContextOptions)('defaults to the current context when parentContext is invalid ($type)', async (options) => {
-      let count = 0
+      let spanCount = 0
+      let traceCount = 0
       const idGenerator = {
         generate (bits: 64 | 128) {
           if (bits === 64) {
-            count++
-            return `span ID ${count}`
+            return `span ID ${++spanCount}`
           }
-
-          return `trace ID ${count}`
+          return `trace ID ${++traceCount}`
         }
       }
 
