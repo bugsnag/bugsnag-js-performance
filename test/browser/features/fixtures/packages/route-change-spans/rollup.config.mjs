@@ -11,7 +11,8 @@ export default {
   },
   plugins: [
     nodeResolve({
-      extensions: ['.js', 'jsx']
+      extensions: ['.js', 'jsx'],
+      browser: true
     }),
     babel({
       babelHelpers: 'bundled',
