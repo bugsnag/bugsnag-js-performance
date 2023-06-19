@@ -1,5 +1,6 @@
 import {
   isStringOrRegExpArray,
+  isBoolean,
   schema,
   type ConfigOption,
   type Configuration,
@@ -35,17 +36,17 @@ export function createSchema (hostname: string, defaultRoutingProvider: RoutingP
     autoInstrumentFullPageLoads: {
       defaultValue: true,
       message: 'should be true|false',
-      validate: (value): value is boolean => value === true || value === false
+      validate: isBoolean
     },
     autoInstrumentNetworkRequests: {
       defaultValue: true,
       message: 'should be true|false',
-      validate: (value): value is boolean => value === true || value === false
+      validate: isBoolean
     },
     autoInstrumentRouteChanges: {
       defaultValue: true,
       message: 'should be true|false',
-      validate: (value): value is boolean => value === true || value === false
+      validate: isBoolean
     },
     routingProvider: {
       defaultValue: defaultRoutingProvider,
