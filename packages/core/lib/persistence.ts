@@ -5,6 +5,8 @@ export interface PersistedProbability {
 
 export interface PersistencePayloadMap {
   'bugsnag-sampling-probability': PersistedProbability
+  // used for device ID
+  'bugsnag-anonymous-id': string
 }
 
 export type PersistenceKey = keyof PersistencePayloadMap
@@ -19,7 +21,7 @@ export class InMemoryPersistence implements Persistence {
   private readonly persistedItems = new Map<PersistenceKey, PersistencePayload>()
 
   async load<K extends PersistenceKey> (key: K): Promise<PersistencePayloadMap[K] | undefined> {
-    return this.persistedItems.get(key)
+    return this.persistedItems.get(key) as PersistencePayloadMap[K] | undefined
   }
 
   async save<K extends PersistenceKey> (key: K, value: PersistencePayloadMap[K]): Promise<void> {
