@@ -10,6 +10,7 @@ import { type ReadonlySampler } from './sampler'
 import { type SpanContext, type SpanContextStorage } from './span-context'
 import { type Time, timeToNumber } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
+import { isSpanContext } from './validation'
 
 export interface Span extends SpanContext {
   end: (endTime?: Time) => void
@@ -115,6 +116,7 @@ export class SpanInternal implements SpanContext {
 export interface SpanOptions {
   startTime?: Time
   makeCurrentContext?: boolean
+  parentContext?: SpanContext | null
 }
 
 export class SpanFactory {
@@ -161,9 +163,19 @@ export class SpanFactory {
   startSpan (name: string, options: SpanOptions = {}) {
     const safeStartTime = timeToNumber(this.clock, options ? options.startTime : undefined)
     const spanId = this.idGenerator.generate(64)
-    const traceId = this.idGenerator.generate(128)
+
+    // if the parentContext option is not set use the current context
+    // if parentContext is explicitly null, or there is no current context,
+    // we are starting a new root span
+    const parentContext = options && (isSpanContext(options.parentContext) || options.parentContext === null)
+      ? options.parentContext
+      : this.spanContextStorage.current
+
+    const parentSpanId = parentContext ? parentContext.id : undefined
+    const traceId = parentContext ? parentContext.traceId : this.idGenerator.generate(128)
+
     const attributes = new SpanAttributes(this.spanAttributesSource())
-    const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes)
+    const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes, parentSpanId)
 
     // don't track spans that are started while the app is backgrounded
     if (this.isInForeground) {
