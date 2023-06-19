@@ -14,7 +14,7 @@ import {
 jest.useFakeTimers()
 
 describe('BatchProcessor', () => {
-  it('delivers after reaching the specified span limit', () => {
+  it('delivers after reaching the specified span limit', async () => {
     const delivery = new InMemoryDelivery()
     const batchProcessor = new BatchProcessor(
       delivery,
@@ -35,10 +35,12 @@ describe('BatchProcessor', () => {
 
     batchProcessor.add(createEndedSpan())
 
+    await jest.advanceTimersByTimeAsync(0)
+
     expect(delivery.requests).toHaveLength(1)
   })
 
-  it('delivers after the specified time limit', () => {
+  it('delivers after the specified time limit', async () => {
     const delivery = new InMemoryDelivery()
     const batchProcessor = new BatchProcessor(
       delivery,
@@ -54,12 +56,12 @@ describe('BatchProcessor', () => {
 
     expect(delivery.requests).toHaveLength(0)
 
-    jest.advanceTimersByTime(30_000)
+    await jest.advanceTimersByTimeAsync(30_000)
 
     expect(delivery.requests).toHaveLength(1)
   })
 
-  it('restarts the timer when calling .add()', () => {
+  it('restarts the timer when calling .add()', async () => {
     const delivery = new InMemoryDelivery()
     const batchProcessor = new BatchProcessor(
       delivery,
@@ -73,19 +75,19 @@ describe('BatchProcessor', () => {
 
     batchProcessor.add(createEndedSpan())
 
-    jest.advanceTimersByTime(20_000)
+    await jest.advanceTimersByTimeAsync(20_000)
     expect(delivery.requests).toHaveLength(0)
 
     batchProcessor.add(createEndedSpan())
 
-    jest.advanceTimersByTime(20_000)
+    await jest.advanceTimersByTimeAsync(20_000)
     expect(delivery.requests).toHaveLength(0)
 
-    jest.advanceTimersByTime(10_000)
+    await jest.advanceTimersByTimeAsync(10_000)
     expect(delivery.requests).toHaveLength(1)
   })
 
-  it('prevents delivery if releaseStage not in enabledReleaseStages', () => {
+  it('prevents delivery if releaseStage not in enabledReleaseStages', async () => {
     const delivery = new InMemoryDelivery()
     const batchProcessor = new BatchProcessor(
       delivery,
@@ -99,7 +101,7 @@ describe('BatchProcessor', () => {
 
     batchProcessor.add(createEndedSpan())
 
-    jest.runOnlyPendingTimers()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery.requests).toHaveLength(0)
   })

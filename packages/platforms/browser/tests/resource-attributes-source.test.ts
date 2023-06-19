@@ -20,11 +20,9 @@ describe('resourceAttributesSource', () => {
     expect(await persistence.load('bugsnag-anonymous-id')).toBe('c1234567890abcdefghijklmnop')
 
     const resourceAttributesSource = createResourceAttributesSource(navigator, persistence)
-    const resourceAttributes = resourceAttributesSource(
+    const resourceAttributes = await resourceAttributesSource(
       createConfiguration<BrowserConfiguration>({ releaseStage: 'test', appVersion: '1.0.0' })
     )
-
-    await new Promise<void>(resolve => { resolve() })
 
     // ensure the anyonmous ID hasn't changed
     expect(await persistence.load('bugsnag-anonymous-id')).toBe('c1234567890abcdefghijklmnop')
@@ -39,7 +37,7 @@ describe('resourceAttributesSource', () => {
     ])
   })
 
-  it('excludes service.version if appVersion is an empty string (default value)', () => {
+  it('excludes service.version if appVersion is an empty string (default value)', async () => {
     const navigator = {
       ...window.navigator,
       userAgentData: undefined,
@@ -47,17 +45,18 @@ describe('resourceAttributesSource', () => {
     }
 
     const resourceAttributesSource = createResourceAttributesSource(navigator, new InMemoryPersistence())
-    const resourceAttributes = resourceAttributesSource(createConfiguration())
+    const resourceAttributes = await resourceAttributesSource(createConfiguration())
 
     expect(resourceAttributes.toJson()).toEqual([
       { key: 'deployment.environment', value: { stringValue: 'production' } },
       { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.browser' } },
       { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
-      { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } }
+      { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } },
+      { key: 'device.id', value: { stringValue: expect.stringMatching(/^c[0-9a-z]{20,32}$/) } }
     ])
   })
 
-  it('includes browser.platform and browser.mobile if available', () => {
+  it('includes browser.platform and browser.mobile if available', async () => {
     const navigator = {
       ...window.navigator,
       userAgentData: {
@@ -68,7 +67,7 @@ describe('resourceAttributesSource', () => {
     }
 
     const resourceAttributesSource = createResourceAttributesSource(navigator, new InMemoryPersistence())
-    const resourceAttributes = resourceAttributesSource(createConfiguration())
+    const resourceAttributes = await resourceAttributesSource(createConfiguration())
 
     expect(resourceAttributes.toJson()).toEqual([
       { key: 'deployment.environment', value: { stringValue: 'production' } },
@@ -76,7 +75,8 @@ describe('resourceAttributesSource', () => {
       { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
       { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } },
       { key: 'browser.platform', value: { stringValue: 'macOS' } },
-      { key: 'browser.mobile', value: { boolValue: false } }
+      { key: 'browser.mobile', value: { boolValue: false } },
+      { key: 'device.id', value: { stringValue: expect.stringMatching(/^c[0-9a-z]{20,32}$/) } }
     ])
   })
 
@@ -92,10 +92,8 @@ describe('resourceAttributesSource', () => {
     expect(await persistence.load('bugsnag-anonymous-id')).toBeUndefined()
 
     const resourceAttributesSource = createResourceAttributesSource(navigator, persistence)
-    const resourceAttributes = resourceAttributesSource(createConfiguration())
+    const resourceAttributes = await resourceAttributesSource(createConfiguration())
 
-    // wait for the new ID to actually be persisted so we can load it
-    await new Promise<void>(resolve => { resolve() })
     const deviceId = await persistence.load('bugsnag-anonymous-id')
 
     expect(resourceAttributes.toJson()).toEqual([
@@ -121,11 +119,20 @@ describe('resourceAttributesSource', () => {
     const resourceAttributesSource = createResourceAttributesSource(navigator, persistence)
     const configuration = createConfiguration<BrowserConfiguration>()
 
-    const resourceAttributes1 = resourceAttributesSource(configuration)
-    const resourceAttributes2 = resourceAttributesSource(configuration)
-    const resourceAttributes3 = resourceAttributesSource(configuration)
+    const resourceAttributesPromise1 = resourceAttributesSource(configuration)
+    const resourceAttributesPromise2 = resourceAttributesSource(configuration)
+    const resourceAttributesPromise3 = resourceAttributesSource(configuration)
 
-    await new Promise<void>(resolve => { resolve() })
+    const [
+      resourceAttributes1,
+      resourceAttributes2,
+      resourceAttributes3
+    ] = await Promise.all([
+      resourceAttributesPromise1,
+      resourceAttributesPromise2,
+      resourceAttributesPromise3
+    ])
+
     const deviceId = await persistence.load('bugsnag-anonymous-id')
 
     expect(resourceAttributes1.toJson()).toStrictEqual([
@@ -139,9 +146,7 @@ describe('resourceAttributesSource', () => {
     expect(resourceAttributes1.toJson()).toStrictEqual(resourceAttributes2.toJson())
     expect(resourceAttributes2.toJson()).toStrictEqual(resourceAttributes3.toJson())
 
-    // device ID is now available synchronously so we don't need to wait for it
-    // to be available on this call
-    const resourceAttributes4 = resourceAttributesSource(configuration)
+    const resourceAttributes4 = await resourceAttributesSource(configuration)
     expect(resourceAttributes3.toJson()).toStrictEqual(resourceAttributes4.toJson())
 
     // device ID shouldn't have changed
@@ -160,7 +165,7 @@ describe('resourceAttributesSource', () => {
     expect(await persistence.load('bugsnag-anonymous-id')).toBeUndefined()
 
     const resourceAttributesSource = createResourceAttributesSource(navigator, persistence)
-    const resourceAttributes = resourceAttributesSource(
+    const resourceAttributes = await resourceAttributesSource(
       createConfiguration<BrowserConfiguration>({ generateAnonymousId: false })
     )
 
