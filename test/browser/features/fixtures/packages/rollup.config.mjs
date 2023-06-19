@@ -6,5 +6,5 @@ export default {
     file: 'dist/bundle.js',
     format: 'iife'
   },
-  plugins: [nodeResolve()],
+  plugins: [nodeResolve({ browser: true })],
 }
