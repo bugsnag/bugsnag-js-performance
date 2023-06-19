@@ -131,6 +131,11 @@ Then("the span named {string} is a valid full page load span") do |span_name|
   end
 end
 
+Given("I store the device ID {string}") do |device_id|
+  driver = Maze.driver.instance_variable_get(:@driver)
+  driver.execute_script("localStorage.setItem('bugsnag-anonymous-id', '#{device_id}')")
+end
+
 module Maze
   module Driver
     class Browser
