@@ -9,7 +9,7 @@ export const pageLoadPhaseSpans = (spanFactory: SpanFactory, route: string, perf
   const { startSpan, endSpan } = spanFactory
 
   if (entry) {
-    if (!shouldOmitSpan(entry.unloadEventStart, entry.unloadEventStart)) {
+    if (!shouldOmitSpan(entry.unloadEventStart, entry.unloadEventEnd)) {
       endSpan(startSpan('[PageLoadPhase/Unload]' + route, {
         startTime: entry.unloadEventStart
       }), entry.unloadEventEnd)
