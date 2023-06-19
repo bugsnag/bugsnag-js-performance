@@ -205,8 +205,8 @@ describe('Span', () => {
       client.start({ apiKey: VALID_API_KEY })
 
       // push two spans onto the context stack
-      const span1 = client.startSpan('span 1')
-      const span2 = client.startSpan('span 2')
+      const span1 = client.startSpan('should become parent')
+      const span2 = client.startSpan('should not become parent')
       expect(spanContextEquals(span2, client.currentSpanContext)).toBe(true)
 
       // start a new child span with an invalid parent context
