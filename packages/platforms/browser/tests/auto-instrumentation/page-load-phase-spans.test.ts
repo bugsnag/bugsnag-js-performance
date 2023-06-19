@@ -92,4 +92,29 @@ describe('PageLoadPhase Spans', () => {
       endTime: 21
     }))
   })
+
+  it('does not create a span if both timestamps are 0', () => {
+    const spanFactory = new MockSpanFactory()
+    const performance = new PerformanceFake()
+    performance.addEntries(createPerformanceNavigationTimingFake({
+      unloadEventStart: 0,
+      unloadEventEnd: 1,
+      redirectStart: 0,
+      redirectEnd: 0
+    }))
+
+    pageLoadPhaseSpans(spanFactory, '/page-load-phase-spans', performance as unknown as Performance)
+
+    expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
+      name: '[PageLoadPhase/Unload]/page-load-phase-spans',
+      startTime: 0,
+      endTime: 1
+    }))
+
+    expect(spanFactory.createdSpans).not.toContainEqual(expect.objectContaining({
+      name: '[PageLoadPhase/Redirect]/page-load-phase-spans',
+      startTime: 0,
+      endTime: 0
+    }))
+  })
 })
