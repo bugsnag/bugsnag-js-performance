@@ -7,7 +7,8 @@ import {
   StableIdGenerator,
   VALID_API_KEY,
   createTestClient,
-  spanAttributesSource
+  spanAttributesSource,
+  IncrementingIdGenerator
 } from '@bugsnag/js-performance-test-utilities'
 import {
   InMemoryPersistence,
@@ -198,17 +199,7 @@ describe('Span', () => {
     })
 
     it('sets traceId and parentSpanId from parentContext if specified', async () => {
-      let spanCount = 0
-      let traceCount = 0
-      const idGenerator = {
-        generate (bits: 64 | 128) {
-          if (bits === 64) {
-            return `span ID ${++spanCount}`
-          }
-          return `trace ID ${++traceCount}`
-        }
-      }
-
+      const idGenerator = new IncrementingIdGenerator()
       const delivery = new InMemoryDelivery()
       const client = createTestClient({ idGenerator, deliveryFactory: () => delivery })
       client.start({ apiKey: VALID_API_KEY })
@@ -233,17 +224,7 @@ describe('Span', () => {
     })
 
     it('starts a new root span when parentContext is null', async () => {
-      let spanCount = 0
-      let traceCount = 0
-      const idGenerator = {
-        generate (bits: 64 | 128) {
-          if (bits === 64) {
-            return `span ID ${++spanCount}`
-          }
-          return `trace ID ${++traceCount}`
-        }
-      }
-
+      const idGenerator = new IncrementingIdGenerator()
       const delivery = new InMemoryDelivery()
       const client = createTestClient({ idGenerator, deliveryFactory: () => delivery })
       client.start({ apiKey: VALID_API_KEY })
@@ -260,7 +241,7 @@ describe('Span', () => {
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: 'new root span',
         parentSpanId: undefined,
-        traceId: `trace ID ${traceCount}`
+        traceId: `trace ID ${idGenerator.traceCount}`
       }))
     })
 
@@ -277,17 +258,7 @@ describe('Span', () => {
     ]
 
     it.each(parentContextOptions)('defaults to the current context when parentContext is invalid ($type)', async (options) => {
-      let spanCount = 0
-      let traceCount = 0
-      const idGenerator = {
-        generate (bits: 64 | 128) {
-          if (bits === 64) {
-            return `span ID ${++spanCount}`
-          }
-          return `trace ID ${++traceCount}`
-        }
-      }
-
+      const idGenerator = new IncrementingIdGenerator()
       const delivery = new InMemoryDelivery()
       const client = createTestClient({ idGenerator, deliveryFactory: () => delivery })
       client.start({ apiKey: VALID_API_KEY })
