@@ -1,7 +1,8 @@
 import { NetworkRequestPlugin } from '../lib/auto-instrumentation/network-request-plugin'
-import { MockSpanFactory, createConfiguration } from '@bugsnag/js-performance-test-utilities'
+import { MockSpanFactory, createConfiguration, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { RequestTracker, type RequestStartCallback } from '../lib/request-tracker/request-tracker'
 import { type BrowserConfiguration } from '../lib/config'
+import { spanContextEquals } from '@bugsnag/core-performance'
 
 const ENDPOINT = 'http://traces.endpoint'
 const TEST_URL = 'http://test-url.com/'
@@ -46,10 +47,10 @@ describe('network span plugin', () => {
     }))
 
     fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1 })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
 
     xhrTracker.start({ method: 'POST', url: TEST_URL, startTime: 2 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/POST', { startTime: 2 })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/POST', { startTime: 2, makeCurrentContext: false })
   })
 
   it('ends a span on request end', () => {
@@ -61,7 +62,7 @@ describe('network span plugin', () => {
     }))
 
     const endRequest = fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1 })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
 
     endRequest({ status: 200, endTime: 2, state: 'success' })
@@ -141,7 +142,7 @@ describe('network span plugin', () => {
 
     // does not match the URLs to exclude
     fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1 })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
   })
 
   it('discards the span if the status is 0', () => {
@@ -153,7 +154,7 @@ describe('network span plugin', () => {
     }))
 
     const endRequest = xhrTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1 })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
 
     endRequest({ endTime: 2, state: 'error' })
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
@@ -168,9 +169,19 @@ describe('network span plugin', () => {
     }))
 
     const endRequest = fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1 })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
 
     endRequest({ state: 'error', error: new Error('woopsy'), endTime: 2 })
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
+  })
+
+  it('does not push network spans to the context stack', () => {
+    const client = createTestClient({ plugins: (spanFactory) => [new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)] })
+    const rootSpan = client.startSpan('root span')
+
+    fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
+    xhrTracker.start({ method: 'POST', url: TEST_URL, startTime: 2 })
+
+    expect(spanContextEquals(rootSpan, client.currentSpanContext)).toBe(true)
   })
 })
