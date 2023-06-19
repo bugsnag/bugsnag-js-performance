@@ -1,5 +1,5 @@
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
-import { pageLoadPhaseSpans } from '../../lib/auto-instrumentation/page-load-phase-spans'
+import { instrumentPageLoadPhaseSpans } from '../../lib/auto-instrumentation/page-load-phase-spans'
 import { PerformanceFake, createPerformanceNavigationTimingFake } from '../utilities'
 
 describe('PageLoadPhase Spans', () => {
@@ -30,7 +30,7 @@ describe('PageLoadPhase Spans', () => {
       loadEventEnd: 21
     }))
 
-    pageLoadPhaseSpans(spanFactory, '/page-load-phase-spans', performance as unknown as Performance)
+    instrumentPageLoadPhaseSpans(spanFactory, '/page-load-phase-spans', performance as unknown as Performance)
 
     expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
       name: '[PageLoadPhase/Unload]/page-load-phase-spans',
@@ -103,7 +103,7 @@ describe('PageLoadPhase Spans', () => {
       redirectEnd: 0
     }))
 
-    pageLoadPhaseSpans(spanFactory, '/page-load-phase-spans', performance as unknown as Performance)
+    instrumentPageLoadPhaseSpans(spanFactory, '/page-load-phase-spans', performance as unknown as Performance)
 
     expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
       name: '[PageLoadPhase/Unload]/page-load-phase-spans',

@@ -8,7 +8,7 @@ import { type BrowserConfiguration } from '../config'
 import { type OnSettle } from '../on-settle'
 import { type PerformanceWithTiming } from '../on-settle/load-event-end-settler'
 import { type WebVitals } from '../web-vitals'
-import { pageLoadPhaseSpans } from './page-load-phase-spans'
+import { instrumentPageLoadPhaseSpans } from './page-load-phase-spans'
 
 export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   private readonly spanFactory: SpanFactory
@@ -62,7 +62,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
       const startTime = 0
       const span = this.spanFactory.startSpan(`[FullPageLoad]${route}`, { startTime })
 
-      pageLoadPhaseSpans(this.spanFactory, route, this.performance)
+      instrumentPageLoadPhaseSpans(this.spanFactory, route, this.performance)
 
       // Browser attributes
       span.setAttribute('bugsnag.span.category', 'full_page_load')

@@ -5,7 +5,7 @@ function shouldOmitSpan (startTime: number, endTime: number) {
   return startTime === 0 && endTime === 0
 }
 
-export const pageLoadPhaseSpans = (spanFactory: SpanFactory, route: string, performance: PerformanceWithTiming) => {
+export const instrumentPageLoadPhaseSpans = (spanFactory: SpanFactory, route: string, performance: PerformanceWithTiming) => {
   const entry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
 
   if (entry) {
