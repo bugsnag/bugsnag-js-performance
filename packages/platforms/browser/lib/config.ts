@@ -12,6 +12,7 @@ export interface BrowserSchema extends CoreSchema {
   autoInstrumentFullPageLoads: ConfigOption<boolean>
   autoInstrumentNetworkRequests: ConfigOption<boolean>
   autoInstrumentRouteChanges: ConfigOption<boolean>
+  generateAnonymousId: ConfigOption<boolean>
   routingProvider: ConfigOption<RoutingProvider>
   settleIgnoreUrls: ConfigOption<Array<string | RegExp>>
   networkInstrumentationIgnoreUrls: ConfigOption<Array<string | RegExp>>
@@ -21,6 +22,7 @@ export interface BrowserConfiguration extends Configuration {
   autoInstrumentFullPageLoads?: boolean
   autoInstrumentNetworkRequests?: boolean
   autoInstrumentRouteChanges?: boolean
+  generateAnonymousId?: boolean
   routingProvider?: RoutingProvider
   settleIgnoreUrls?: Array<string | RegExp>
   networkInstrumentationIgnoreUrls?: Array<string | RegExp>
@@ -44,6 +46,11 @@ export function createSchema (hostname: string, defaultRoutingProvider: RoutingP
       validate: isBoolean
     },
     autoInstrumentRouteChanges: {
+      defaultValue: true,
+      message: 'should be true|false',
+      validate: isBoolean
+    },
+    generateAnonymousId: {
       defaultValue: true,
       message: 'should be true|false',
       validate: isBoolean

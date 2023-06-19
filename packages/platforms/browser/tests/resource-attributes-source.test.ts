@@ -104,4 +104,35 @@ describe('resourceAttributesSource', () => {
       { key: 'device.id', value: { stringValue: deviceId } }
     ])
   })
+
+  it('does not generate a device.id if generateAnonymousId is false', async () => {
+    const persistence = new InMemoryPersistence()
+    const navigator = {
+      ...window.navigator,
+      userAgentData: undefined,
+      userAgent: 'a jest test, (like Gecko and WebKit and also Blink) etc...'
+    }
+
+    // ensure no device ID is persisted
+    expect(await persistence.load('bugsnag-anonymous-id')).toBeUndefined()
+
+    const resourceAttributesSource = createResourceAttributesSource(navigator, persistence)
+    const resourceAttributes = resourceAttributesSource(
+      createConfiguration<BrowserConfiguration>({ generateAnonymousId: false })
+    )
+
+    // wait for the new ID to actually be persisted so we can load it
+    await new Promise<void>(resolve => { resolve() })
+
+    // an ID should not be generated
+    expect(await persistence.load('bugsnag-anonymous-id')).toBeUndefined()
+
+    expect(resourceAttributes.toJson()).toEqual([
+      { key: 'deployment.environment', value: { stringValue: 'production' } },
+      { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.browser' } },
+      { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
+      { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } }
+      // the device.id attribute should not exist
+    ])
+  })
 })
