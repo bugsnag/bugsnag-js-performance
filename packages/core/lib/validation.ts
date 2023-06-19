@@ -1,6 +1,9 @@
 import { type Logger } from './config'
 import { type PersistedProbability } from './persistence'
 
+export const isBoolean = (value: unknown): value is boolean =>
+  value === true || value === false
+
 export const isObject = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === 'object' && !Array.isArray(value)
 
