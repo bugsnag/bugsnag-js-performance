@@ -18,6 +18,7 @@ Feature: Manual creation of spans
     And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.name" equals "bugsnag.performance.browser"
     And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.version" equals the stored value "telemetry.sdk.version"
     And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals the stored value "environment"
+    And the trace payload field "resourceSpans.0.resource" string attribute "device.id" matches the regex "^c[0-9a-z]{20,32}$"
 
   @chromium_only @local_only
   Scenario: userAgentData is included in custom span
