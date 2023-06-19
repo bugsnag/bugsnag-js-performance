@@ -1,3 +1,4 @@
+import cuid from '@bugsnag/cuid'
 import { ResourceAttributes, type Persistence, type ResourceAttributeSource } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from './config'
 
@@ -24,9 +25,15 @@ function createResourceAttributesSource (
     }
 
     getDeviceId.then(maybeDeviceId => {
-      if (maybeDeviceId) {
-        attributes.set('device.id', maybeDeviceId)
+      // use the persisted value or generate a new ID
+      const deviceId = maybeDeviceId || cuid()
+
+      // if there was no persisted value, save the newly generated ID
+      if (!maybeDeviceId) {
+        persistence.save('bugsnag-anonymous-id', deviceId)
       }
+
+      attributes.set('device.id', deviceId)
     })
 
     return attributes
