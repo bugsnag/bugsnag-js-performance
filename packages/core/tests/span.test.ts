@@ -1,5 +1,5 @@
 
-import { DefaultSpanContextStorage, Kind, SpanContext } from '@bugsnag/core-performance'
+import { DefaultSpanContextStorage, Kind } from '@bugsnag/core-performance'
 import {
   ControllableBackgroundingListener,
   InMemoryDelivery,
