@@ -52,13 +52,16 @@ function createResourceAttributesSource (
         attributes.set('device.id', deviceId)
       } else {
         // otherwise add it when the promise resolves
-        getDeviceId.then(deviceId => {
-          attributes.set('device.id', deviceId)
-        })
+        return getDeviceId
+          .then(deviceId => {
+            attributes.set('device.id', deviceId)
+
+            return attributes
+          })
       }
     }
 
-    return attributes
+    return Promise.resolve(attributes)
   }
 }
 

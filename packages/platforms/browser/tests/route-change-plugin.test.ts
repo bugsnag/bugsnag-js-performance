@@ -71,8 +71,8 @@ describe('RouteChangePlugin', () => {
     testClient.start({ apiKey: VALID_API_KEY })
 
     history.back()
-    await jest.runOnlyPendingTimersAsync()
     jest.runAllTimers()
+    await jest.runOnlyPendingTimersAsync()
 
     const firstSpan = expect.objectContaining({
       name: '[RouteChange]/first-route',
@@ -97,6 +97,7 @@ describe('RouteChangePlugin', () => {
 
     history.forward()
     jest.runAllTimers()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery).toHaveSentSpan(secondSpan)
 

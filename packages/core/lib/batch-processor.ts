@@ -79,11 +79,13 @@ export class BatchProcessor<C extends Configuration> implements Processor {
       return
     }
 
+    const resourceAttributes = await this.resourceAttributeSource(this.configuration)
+
     const payload = {
       resourceSpans: [
         {
           resource: {
-            attributes: this.resourceAttributeSource(this.configuration).toJson()
+            attributes: resourceAttributes.toJson()
           },
           scopeSpans: [{ spans: batch }]
         }
