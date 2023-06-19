@@ -1,4 +1,5 @@
 import nodeResolve from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
 
 export default {
   input: 'src/index.js',
@@ -6,5 +7,5 @@ export default {
     file: 'dist/bundle.js',
     format: 'iife'
   },
-  plugins: [nodeResolve({ browser: true })],
+  plugins: [nodeResolve({ browser: true }), commonjs()],
 }
