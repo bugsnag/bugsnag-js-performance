@@ -161,4 +161,16 @@ describe('validation', () => {
       expect(validation.isNumber(value)).toBe(false)
     })
   })
+
+  describe('isBoolean', () => {
+    const nonBooleans = nonObjects.filter(({ value }) => typeof value !== 'boolean')
+
+    it.each(nonBooleans)('fails validation with $type', ({ value }) => {
+      expect(validation.isBoolean(value)).toBe(false)
+    })
+
+    it.each([true, false])('passes validation with %s', value => {
+      expect(validation.isBoolean(value)).toBe(true)
+    })
+  })
 })
