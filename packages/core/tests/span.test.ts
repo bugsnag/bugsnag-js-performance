@@ -1,5 +1,5 @@
 
-import { Kind } from '@bugsnag/core-performance'
+import { DefaultSpanContextStorage, Kind } from '@bugsnag/core-performance'
 import {
   ControllableBackgroundingListener,
   InMemoryDelivery,
@@ -39,14 +39,16 @@ describe('SpanInternal', () => {
       const sampler = new Sampler(0.5)
       const delivery = { send: jest.fn() }
       const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+      const backgroundingListener = new ControllableBackgroundingListener()
       const spanFactory = new SpanFactory(
         processor,
         sampler,
         new StableIdGenerator(),
         spanAttributesSource,
         new IncrementingClock(),
-        new ControllableBackgroundingListener(),
-        jestLogger
+        backgroundingListener,
+        jestLogger,
+        new DefaultSpanContextStorage(backgroundingListener)
       )
 
       const spanInternal = spanFactory.startSpan('span-name', { startTime: 1234 })
@@ -71,14 +73,16 @@ describe('SpanInternal', () => {
       const sampler = new Sampler(0.5)
       const delivery = { send: jest.fn() }
       const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+      const backgroundingListener = new ControllableBackgroundingListener()
       const spanFactory = new SpanFactory(
         processor,
         sampler,
         new StableIdGenerator(),
         spanAttributesSource,
         new IncrementingClock(),
-        new ControllableBackgroundingListener(),
-        jestLogger
+        backgroundingListener,
+        jestLogger,
+        new DefaultSpanContextStorage(backgroundingListener)
       )
 
       const spanInternal = spanFactory.startSpan('span-name', { startTime: 1234 })
@@ -144,6 +148,53 @@ describe('Span', () => {
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         startTimeUnixNano: '1000000'
       }))
+    })
+
+    const makeCurrentContextOptions: any[] = [
+      { type: 'true', makeCurrentContext: true },
+      { type: 'string', makeCurrentContext: 'yes please' },
+      { type: 'bigint', makeCurrentContext: BigInt(9007199254740991) },
+      { type: 'function', makeCurrentContext: () => {} },
+      { type: 'object', makeCurrentContext: { property: 'test' } },
+      { type: 'empty array', makeCurrentContext: [] },
+      { type: 'array', makeCurrentContext: [1, 2, 3] },
+      { type: 'symbol', makeCurrentContext: Symbol('test') },
+      { type: 'null', makeCurrentContext: null },
+      { type: 'undefined', makeCurrentContext: undefined }
+    ]
+
+    it.each(makeCurrentContextOptions)('becomes the current SpanContext when makeCurrentContext is not false ($type)', (options) => {
+      const client = createTestClient()
+      client.start({ apiKey: VALID_API_KEY })
+      expect(client.currentSpanContext).toBeUndefined()
+
+      const spanIsContext = client.startSpan('context span', options)
+      expect(spanContextEquals(spanIsContext, client.currentSpanContext)).toBe(true)
+    })
+
+    it('does not become the current SpanContext when SpanOptions.makeCurrentContext is false', () => {
+      const idGenerator = {
+        count: 0,
+        generate (bits: 64 | 128) {
+          if (bits === 64) {
+            this.count++
+            return `span ID ${this.count}`
+          }
+
+          return 'a trace ID'
+        }
+      }
+
+      const client = createTestClient({ idGenerator })
+      client.start({ apiKey: VALID_API_KEY })
+      expect(client.currentSpanContext).toBeUndefined()
+
+      const spanIsContext = client.startSpan('context span')
+      expect(spanContextEquals(spanIsContext, client.currentSpanContext)).toBe(true)
+
+      const spanIsNotContext = client.startSpan('non context span', { makeCurrentContext: false })
+      expect(spanContextEquals(spanIsNotContext, client.currentSpanContext)).toBe(false)
+      expect(spanContextEquals(spanIsContext, client.currentSpanContext)).toBe(true)
     })
   })
 
@@ -430,6 +481,41 @@ describe('Span', () => {
 
       expect(logger.warn).toHaveBeenCalledWith('Attempted to end a Span which has already ended or been discarded.')
       expect(delivery.requests).toHaveLength(1)
+    })
+
+    it('will remove the span from the context stack (if it is the current context)', () => {
+      const idGenerator = {
+        count: 0,
+        generate (bits: 64 | 128) {
+          if (bits === 64) {
+            this.count++
+            return `span ID ${this.count}`
+          }
+
+          return 'a trace ID'
+        }
+      }
+
+      const client = createTestClient({ idGenerator })
+      client.start({ apiKey: VALID_API_KEY })
+      expect(client.currentSpanContext).toBeUndefined()
+
+      const span1 = client.startSpan('span 1')
+      const span2 = client.startSpan('span 2')
+      const span3 = client.startSpan('span 3')
+      expect(spanContextEquals(span3, client.currentSpanContext)).toBe(true)
+
+      // span2 is not at the top of the context stack so span3 should still be the current context
+      span2.end()
+      expect(spanContextEquals(span3, client.currentSpanContext)).toBe(true)
+
+      // span3 is at the top of the stack so should be popped when ended
+      // span2 is already closed so span1 should now be the current context
+      span3.end()
+      expect(spanContextEquals(span1, client.currentSpanContext)).toBe(true)
+
+      span1.end()
+      expect(client.currentSpanContext).toBeUndefined()
     })
   })
 })
