@@ -2,7 +2,8 @@ import type { SpanFactory } from '@bugsnag/core-performance'
 import { type PerformanceWithTiming } from '../on-settle/load-event-end-settler'
 
 function shouldOmitSpan (startTime: number, endTime: number) {
-  return startTime === 0 && endTime === 0
+  return false
+  // return startTime === 0 && endTime === 0
 }
 
 export const instrumentPageLoadPhaseSpans = (spanFactory: SpanFactory, route: string, performance: PerformanceWithTiming) => {

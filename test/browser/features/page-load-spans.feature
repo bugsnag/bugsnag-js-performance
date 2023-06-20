@@ -6,6 +6,8 @@ Feature: Page Load spans
         And I click the element "stop-clock"
         And I wait to receive 1 traces
 
+        Then every span string attribute "non-existent" exists
+
         Then a span named "[FullPageLoad]/page-load-spans/" contains the attributes:
             | attribute                         | type             | value                                                                                 |
             | bugsnag.span.category             | stringValue      | full_page_load                                                                        |
