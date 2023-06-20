@@ -1,35 +1,20 @@
 <!DOCTYPE html>
 <html>
     <head>
+      <script>
+        // inject a meta tag to immediately redirect to another page
+        // this gives us a reliable unload event
+        const metaTag = document.createElement('meta')
+        metaTag.httpEquiv = 'refresh'
+        metaTag.content = `0; url='./redirect.html${window.location.search}'`
+        document.head.appendChild(metaTag)
+      </script>
         <meta charset="utf-8" />
         <link href="/favicon.png" rel="shortcut icon" type="image/x-icon">
         <title>Page load spans</title>
         <script src="./dist/bundle.js"></script>
     </head>
     <body>
-        <h1>page-load-spans</h1>
-
-        <button id="stop-clock">Stop</button>
-        <pre id="clock"></pre>
-
-        <p>I'm here to make the layout shift when the clock ticks :)</p>
-
-        <script>
-          // stop the page from settling until the 'stop-clock' button is
-          // clicked, otherwise we can't reliably get a first input delay event
-
-          const node = document.getElementById("clock")
-          let time = 0
-
-          const interval = setInterval(() => {
-            node.innerText += `${time++}\n`
-          }, 50)
-
-          document.getElementById("stop-clock").addEventListener("click", () => {
-            // delay stopping the clock for a bit so the performance observers
-            // have a chance to fire
-            setTimeout(() => { clearInterval(interval) }, 1000)
-          })
-        </script>
+        <h1>Redirecting...</h1>
     </body>
 </html>
