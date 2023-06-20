@@ -3,6 +3,7 @@ Feature: Page Load spans
     Scenario: Page load spans are automatically instrumented
         Given I navigate to the test URL "/page-load-spans"
         # click a button to record a first input delay metric
+        Given the element "stop-clock" is present
         And I click the element "stop-clock"
         And I wait to receive 1 traces
 
