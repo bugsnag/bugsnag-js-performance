@@ -1,5 +1,6 @@
+@requires_performance_navigation_timing
 Feature: Page Load spans
-
+    @skip_firefox_60
     Scenario: Page load spans are automatically instrumented
         Given I navigate to the test URL "/page-load-spans"
         # click a button to record a first input delay metric
