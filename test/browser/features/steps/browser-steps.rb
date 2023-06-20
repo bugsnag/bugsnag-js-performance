@@ -131,65 +131,27 @@ Then("the span named {string} is a valid full page load span") do |span_name|
   end
 end
 
-Then('a span named {string} contains attributes matching the following:') do |span_name, table|
-  spans = spans_from_request_list(Maze::Server.list_for('traces'))
-  named_spans = spans.find_all { |span| span['name'].eql?(span_name) }
-  raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{span_name}" if named_spans.empty?
-  expected_attributes = table.hashes
-  match_span_attributes_with_regex(named_spans, expected_attributes)
-end
-
-Then('if a span named {string} exists, it contains attributes matching the following:') do |span_name, table|
+Then('if a span named {string} exists, it contains the attributes:') do |span_name, table|
   spans = spans_from_request_list(Maze::Server.list_for('traces'))
   named_spans = spans.find_all { |span| span['name'].eql?(span_name) }
   if !named_spans.empty?
     expected_attributes = table.hashes
-    match_span_attributes_with_regex(named_spans, expected_attributes)
-  end
-end
 
-def match_span_attributes_with_regex(spans, expected_attributes)
-  match = false
-  spans.each do |span|
-    matches = expected_attributes.map do |expected_attribute|
-      span['attributes'].find_all { |attribute| attribute['key'].eql?(expected_attribute['attribute']) }
-        .any? { |attribute| attribute_value_matches_with_regex?(attribute['value'], expected_attribute['type'], expected_attribute['value']) }
+    match = false
+    named_spans.each do |span|
+      matches = expected_attributes.map do |expected_attribute|
+        span['attributes'].find_all { |attribute| attribute['key'].eql?(expected_attribute['attribute']) }
+          .any? { |attribute| attribute_value_matches?(attribute['value'], expected_attribute['type'], expected_attribute['value']) }
+      end
+      if matches.all? && !matches.empty?
+        match = true
+        break
+      end
     end
-    if matches.all? && !matches.empty?
-      match = true
-      break
+  
+    unless match
+      raise Test::Unit::AssertionFailedError.new "No spans were found containing all of the given attributes"
     end
-  end
-
-  unless match
-    raise Test::Unit::AssertionFailedError.new "No spans were found containing all of the given attributes"
-  end
-end
-
-def attribute_value_matches_with_regex?(attribute_value, expected_type, expected_value)
-  # Check that the required value type key is present
-  unless attribute_value.keys.include?(expected_type) || expected_type.eql?('regexStringValue') && attribute_value.keys.include?("stringValue")
-    return false
-  end
-
-  case expected_type
-  when 'regexStringValue'
-    regex = Regexp.new expected_value
-    regex.match? attribute_value['stringValue']
-  when 'bytesValue', 'stringValue'
-    expected_value.eql?(attribute_value[expected_type])
-  when 'intValue'
-    expected_value.to_i.eql?(attribute_value[expected_type].to_i)
-  when 'doubleValue'
-    expected_value.to_f.eql?(attribute_value[expected_type])
-  when 'boolValue'
-    expected_value.eql?('true').eql?(attribute_value[expected_type])
-  when 'arrayValue', 'kvlistValue'
-    $logger.error('Span attribute validation does not currently support the "arrayValue" or "kvlistValue" types')
-    false
-  else
-    $logger.error("An invalid attribute type was expected: '#{expected_type}'")
-    false
   end
 end
 
