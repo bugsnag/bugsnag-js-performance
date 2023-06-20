@@ -109,6 +109,7 @@ export class SpanInternal implements SpanContext {
 
 export interface SpanOptions {
   startTime?: Time
+  isFirstClass?: boolean
 }
 
 export class SpanFactory {
@@ -154,6 +155,11 @@ export class SpanFactory {
     const spanId = this.idGenerator.generate(64)
     const traceId = this.idGenerator.generate(128)
     const attributes = new SpanAttributes(this.spanAttributesSource())
+
+    if (options && typeof options.isFirstClass === 'boolean') {
+      attributes.set('bugsnag.span.first_class', options.isFirstClass)
+    }
+
     const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes)
 
     // don't track spans that are started while the app is backgrounded
