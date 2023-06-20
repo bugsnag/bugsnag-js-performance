@@ -199,7 +199,6 @@ describe('BatchProcessor', () => {
       await ProbabilityManager.create(
         new InMemoryPersistence(),
         sampler,
-        1.0,
         new ProbabilityFetcher(delivery)
       )
     )
@@ -218,6 +217,9 @@ describe('BatchProcessor', () => {
 
   it('discards ended spans if samplingRate is higher than the samplingProbability', async () => {
     const delivery = new InMemoryDelivery()
+    const persistence = new InMemoryPersistence()
+    await persistence.save('bugsnag-sampling-probability', { value: 0.5, time: Date.now() })
+
     const sampler = new Sampler(0.5)
     const batchProcessor = new BatchProcessor(
       delivery,
@@ -227,9 +229,8 @@ describe('BatchProcessor', () => {
       { add: jest.fn(), flush: jest.fn() },
       sampler,
       await ProbabilityManager.create(
-        new InMemoryPersistence(),
+        persistence,
         sampler,
-        0.5,
         new ProbabilityFetcher(delivery)
       )
     )
@@ -264,6 +265,9 @@ describe('BatchProcessor', () => {
 
   it('does not send a request if the entire batch is discarded', async () => {
     const delivery = new InMemoryDelivery()
+    const persistence = new InMemoryPersistence()
+    await persistence.save('bugsnag-sampling-probability', { value: 0.5, time: Date.now() })
+
     const sampler = new Sampler(0.5)
     const batchProcessor = new BatchProcessor(
       delivery,
@@ -273,9 +277,8 @@ describe('BatchProcessor', () => {
       { add: jest.fn(), flush: jest.fn() },
       sampler,
       await ProbabilityManager.create(
-        new InMemoryPersistence(),
+        persistence,
         sampler,
-        0.5,
         new ProbabilityFetcher(delivery)
       )
     )
