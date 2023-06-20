@@ -223,10 +223,7 @@ describe('Span', () => {
       const persistence = new InMemoryPersistence()
 
       const client = createTestClient({ deliveryFactory: () => delivery, persistence })
-      client.start({
-        apiKey: VALID_API_KEY,
-        samplingProbability: 1
-      })
+      client.start(VALID_API_KEY)
 
       await jest.runOnlyPendingTimersAsync()
 
@@ -241,12 +238,10 @@ describe('Span', () => {
     it('will always be discarded when probability is 0', async () => {
       const delivery = new InMemoryDelivery()
       const persistence = new InMemoryPersistence()
+      await persistence.save('bugsnag-sampling-probability', { value: 0.0, time: Date.now() })
 
       const client = createTestClient({ deliveryFactory: () => delivery, persistence })
-      client.start({
-        apiKey: VALID_API_KEY,
-        samplingProbability: 0
-      })
+      client.start(VALID_API_KEY)
 
       await jest.runOnlyPendingTimersAsync()
 
@@ -261,6 +256,10 @@ describe('Span', () => {
     it('will sample spans based on their traceId', async () => {
       const delivery = new InMemoryDelivery()
       const persistence = new InMemoryPersistence()
+
+      // 0.14 as the second span's trace ID results in a sampling rate greater
+      // than this but the other two are smaller
+      await persistence.save('bugsnag-sampling-probability', { value: 0.14, time: Date.now() })
 
       // trace IDs with known sampling rates; this allows us to check that the
       // first span is sampled and the second is discarded with a specific
@@ -293,12 +292,7 @@ describe('Span', () => {
         persistence
       })
 
-      client.start({
-        apiKey: VALID_API_KEY,
-        // 0.14 as the second span's trace ID results in a sampling rate greater
-        // than this but the other two are smaller
-        samplingProbability: 0.14
-      })
+      client.start(VALID_API_KEY)
 
       await jest.runOnlyPendingTimersAsync()
 
@@ -332,7 +326,6 @@ describe('Span', () => {
 
       client.start({
         apiKey: VALID_API_KEY,
-        samplingProbability: 1,
         logger
       })
 
@@ -409,7 +402,6 @@ describe('Span', () => {
 
       client.start({
         apiKey: VALID_API_KEY,
-        samplingProbability: 1,
         logger
       })
 

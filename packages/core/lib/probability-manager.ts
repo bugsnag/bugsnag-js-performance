@@ -9,7 +9,6 @@ class ProbabilityManager {
   static async create (
     persistence: Persistence,
     sampler: ReadWriteSampler,
-    configuredProbability: number,
     probabilityFetcher: ProbabilityFetcher
   ) {
     const persistedProbability = await persistence.load('bugsnag-sampling-probability')
@@ -19,9 +18,8 @@ class ProbabilityManager {
 
     if (persistedProbability === undefined) {
       // If there is no stored probability:
-      // - Set the initial probability value to the value from
-      //   configuration (defaults to 1.0)
-      sampler.probability = configuredProbability
+      // - Set the initial probability value to the default
+      sampler.probability = 1.0
       initialProbabilityTime = 0
 
       // - Immediately fetch a new probability value
