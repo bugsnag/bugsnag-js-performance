@@ -12,7 +12,7 @@ Feature: Page Load spans
             | bugsnag.span.first_class          | boolValue        | true                                                                                  |
             | bugsnag.browser.page.title        | stringValue      | Page load spans                                                                       |
             | bugsnag.browser.page.route        | stringValue      | /page-load-spans/                                                                     |
-            | bugsnag.browser.page.url          | regexStringValue | ^http:\/\/localhost:[0-9]{4}\/page-load-spans\/.*\/?endpoint=.*\&logs=.*\&api_key=.*$ |
+            | bugsnag.browser.page.url          | regexStringValue | ^http:\/\/[.*]:[0-9]{4}\/page-load-spans\/.*\/?endpoint=.*\&logs=.*\&api_key=.*$ |
         # Skipping until the referrer handling is implemented for mobile devices [PLAT-10176]
            #| bugsnag.browser.page.referrer     | stringValue      | /                                                                                     |
         
