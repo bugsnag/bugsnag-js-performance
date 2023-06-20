@@ -23,20 +23,18 @@ Feature: Page Load spans
         # All spans should have a page url attribute
         And every span string attribute "bugsnag.browser.page.url" matches the regex "^http:\/\/.*:[0-9]{4}\/page-load-spans\/.*\/?endpoint=.*\&logs=.*\&api_key=.*$"
 
-        # Potential page load phase spans depending on browser implementation
-        And if a span named "[PageLoadPhase/Unload]/page-load-spans/" exists, it contains the attributes:
+        And a span named "[PageLoadPhase/Unload]/page-load-spans/" contains the attributes:
             | attribute                                 | type         | value           |
             | bugsnag.span.category                     | stringValue  | custom          |
             | bugsnag.span.first_class                  | boolValue    | true            |
             | bugsnag.browser.page.title                | stringValue  | Page load spans |
 
-        And if a span named "[PageLoadPhase/Redirect]/page-load-spans/" exists, it contains the attributes:
+        And a span named "[PageLoadPhase/Redirect]/page-load-spans/" contains the attributes:
             | attribute                                 | type         | value           |
             | bugsnag.span.category                     | stringValue  | custom          |
             | bugsnag.span.first_class                  | boolValue    | true            |
             | bugsnag.browser.page.title                | stringValue  | Page load spans |
 
-        # Common page load phase spans across all browsers
         And a span named "[PageLoadPhase/LoadFromCache]/page-load-spans/" contains the attributes:
             | attribute                                 | type         | value           | 
             | bugsnag.span.category                     | stringValue  | custom          |
