@@ -14,7 +14,7 @@
     "scripts": {
         "build": "npm run build:react && npm run build:bugsnag",
         "build:react": "rollup -c", 
-        "build:bugsnag": "rollup src/index.js --file dist/bundle.js --format iife --plugin @rollup/plugin-node-resolve", 
+        "build:bugsnag": "rollup --config ../rollup.config.mjs",
         "clean": "rm -rf dist"
     }
 }

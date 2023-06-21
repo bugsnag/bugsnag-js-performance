@@ -44,6 +44,15 @@ describe('BrowserPersistence', () => {
     expect(actual).toStrictEqual(probability)
   })
 
+  it('can save anonymous ID', async () => {
+    const persistence = makeBrowserPersistence(window)
+
+    await persistence.save('bugsnag-anonymous-id', 'c1234567890abcdefghijklmnop')
+
+    const actual = await persistence.load('bugsnag-anonymous-id')
+    expect(actual).toBe('c1234567890abcdefghijklmnop')
+  })
+
   it('saves to localStorage', async () => {
     const persistence = makeBrowserPersistence(window)
     const probability = {
@@ -173,6 +182,15 @@ describe('BrowserPersistence', () => {
 
     // this load won't return anything as the stored probability is not valid
     const actual = await persistence.load('bugsnag-sampling-probability')
+    expect(actual).toBeUndefined()
+  })
+
+  it('ignores invalid anonymous ID values on load', async () => {
+    const persistence = makeBrowserPersistence(window)
+
+    await persistence.save('bugsnag-anonymous-id', 'an anonymous id :)')
+
+    const actual = await persistence.load('bugsnag-anonymous-id')
     expect(actual).toBeUndefined()
   })
 })

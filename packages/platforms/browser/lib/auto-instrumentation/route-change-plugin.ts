@@ -16,7 +16,9 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
     let previousRoute = configuration.routingProvider.resolveRoute(new URL(this.location.href))
 
     configuration.routingProvider.listenForRouteChanges((route, trigger, options) => {
-      const span = this.spanFactory.startSpan(`[RouteChange]${route}`, options)
+      const span = this.spanFactory.startSpan(`[RouteChange]${route}`, {
+        startTime: options ? options.startTime : undefined
+      })
 
       span.setAttribute('bugsnag.span.category', 'route_change')
       span.setAttribute('bugsnag.browser.page.route', route)

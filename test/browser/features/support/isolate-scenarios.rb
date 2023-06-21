@@ -1,14 +1,14 @@
 Maze.hooks.after do
-  path = $browser.url_for("/")
+  url = $url_generator.for_path("/")
 
   begin
-    $logger.debug "Navigating to: #{path}"
-    Maze.driver.navigate.to path
+    $logger.debug "Navigating to: #{url}"
+    Maze.driver.navigate.to(url)
   rescue => exception
     $logger.error("#{exception.class} occurred during navigation attempt with message: #{exception.message}")
-    $logger.error("Restarting driver and retrying navigation to: #{path}")
+    $logger.error("Restarting driver and retrying navigation to: #{url}")
     Maze.driver.restart_driver
-    Maze.driver.navigate.to path
+    Maze.driver.navigate.to(url)
     # If a further error occurs it will get thrown as normal
   end
 
