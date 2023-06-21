@@ -7,7 +7,8 @@ import {
   StableIdGenerator,
   VALID_API_KEY,
   createTestClient,
-  spanAttributesSource
+  spanAttributesSource,
+  IncrementingIdGenerator
 } from '@bugsnag/js-performance-test-utilities'
 import {
   InMemoryPersistence,
@@ -195,6 +196,90 @@ describe('Span', () => {
       const spanIsNotContext = client.startSpan('non context span', { makeCurrentContext: false })
       expect(spanContextEquals(spanIsNotContext, client.currentSpanContext)).toBe(false)
       expect(spanContextEquals(spanIsContext, client.currentSpanContext)).toBe(true)
+    })
+
+    it('sets traceId and parentSpanId from parentContext if specified', async () => {
+      const idGenerator = new IncrementingIdGenerator()
+      const delivery = new InMemoryDelivery()
+      const client = createTestClient({ idGenerator, deliveryFactory: () => delivery })
+      client.start({ apiKey: VALID_API_KEY })
+
+      // push two spans onto the context stack
+      const span1 = client.startSpan('should become parent')
+      const span2 = client.startSpan('should not become parent')
+      expect(spanContextEquals(span2, client.currentSpanContext)).toBe(true)
+
+      // start a new child span with an invalid parent context
+      const childOfSpan1 = client.startSpan('child of span 1', { parentContext: span1 })
+      childOfSpan1.end()
+
+      await jest.runOnlyPendingTimersAsync()
+
+      // child span should be nested under the first span
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: 'child of span 1',
+        parentSpanId: span1.id,
+        traceId: span1.traceId
+      }))
+    })
+
+    it('starts a new root span when parentContext is null', async () => {
+      const idGenerator = new IncrementingIdGenerator()
+      const delivery = new InMemoryDelivery()
+      const client = createTestClient({ idGenerator, deliveryFactory: () => delivery })
+      client.start({ apiKey: VALID_API_KEY })
+
+      const rootSpan = client.startSpan('root span')
+      expect(spanContextEquals(rootSpan, client.currentSpanContext)).toBe(true)
+
+      const newRootSpan = client.startSpan('new root span', { parentContext: null })
+      newRootSpan.end()
+
+      await jest.runOnlyPendingTimersAsync()
+
+      // new root span should have a new trace ID and no parentSpanId
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: 'new root span',
+        parentSpanId: undefined,
+        traceId: `trace ID ${idGenerator.traceCount}`
+      }))
+    })
+
+    const parentContextOptions: any[] = [
+      { type: 'true', parentContext: true },
+      { type: 'string', parentContext: 'yes please' },
+      { type: 'bigint', parentContext: BigInt(9007199254740991) },
+      { type: 'function', parentContext: () => {} },
+      { type: 'object', parentContext: { property: 'test' } },
+      { type: 'empty array', parentContext: [] },
+      { type: 'array', parentContext: [1, 2, 3] },
+      { type: 'symbol', parentContext: Symbol('test') },
+      { type: 'undefined', parentContext: undefined }
+    ]
+
+    it.each(parentContextOptions)('defaults to the current context when parentContext is invalid ($type)', async (options) => {
+      const idGenerator = new IncrementingIdGenerator()
+      const delivery = new InMemoryDelivery()
+      const client = createTestClient({ idGenerator, deliveryFactory: () => delivery })
+      client.start({ apiKey: VALID_API_KEY })
+
+      // push two spans onto the context stack
+      client.startSpan('root span')
+      const parentSpan = client.startSpan('parent span')
+      expect(spanContextEquals(parentSpan, client.currentSpanContext)).toBe(true)
+
+      // start a new child span with an invalid parent context
+      const childSpan = client.startSpan('child span', options)
+      childSpan.end()
+
+      await jest.runOnlyPendingTimersAsync()
+
+      // child span should be nested under the parent span
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: 'child span',
+        parentSpanId: parentSpan.id,
+        traceId: parentSpan.traceId
+      }))
     })
   })
 
