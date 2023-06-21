@@ -4,4 +4,4 @@ const parameters = new URLSearchParams(window.location.search)
 const apiKey = parameters.get('api_key')
 const endpoint = parameters.get('endpoint')
 
-BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 11, batchInactivityTimeoutMs: 5000, autoInstrumentNetworkRequests: false })
+BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 11, batchInactivityTimeoutMs: 3000, autoInstrumentNetworkRequests: false })
