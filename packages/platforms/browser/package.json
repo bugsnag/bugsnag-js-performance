@@ -12,7 +12,8 @@
     "access": "public"
   },
   "scripts": {
-    "build": "rollup --config",
+    "build": "npm run build:npm",
+    "build:npm": "rollup --config rollup.config.npm.mjs",
     "clean": "rm -rf dist/*"
   },
   "bugs": {
