@@ -152,6 +152,8 @@ Then('if a span named {string} exists, it contains the attributes:') do |span_na
     unless match
       raise Test::Unit::AssertionFailedError.new "No spans were found containing all of the given attributes"
     end
+  else
+    $logger.info("No spans were found matching the name '#{span_name}'")
   end
 end
 
