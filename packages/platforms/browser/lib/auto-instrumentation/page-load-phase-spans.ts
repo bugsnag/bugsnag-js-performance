@@ -1,7 +1,7 @@
 import type { SpanFactory } from '@bugsnag/core-performance'
 import { type PerformanceWithTiming } from '../on-settle/load-event-end-settler'
 
-function shouldOmitSpan (startTime?: number, endTime?: number) : boolean {
+function shouldOmitSpan (startTime?: number, endTime?: number): boolean {
   return !startTime && !endTime
 }
 
