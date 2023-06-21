@@ -33,7 +33,9 @@ export const instrumentPageLoadPhaseSpans = (spanFactory: SpanFactory, route: st
       }), entry.domainLookupEnd)
     }
 
-    const TCPHandshakeEnd = Math.min(entry.connectEnd, entry.secureConnectionStart)
+    // secureConectionStart will be 0 if no secure connection is used
+    // so use connectEnd in that case
+    const TCPHandshakeEnd = entry.secureConnectionStart || entry.connectEnd
     if (!shouldOmitSpan(entry.connectStart, TCPHandshakeEnd)) {
       spanFactory.endSpan(spanFactory.startSpan('[PageLoadPhase/TCPHandshake]' + route, {
         startTime: entry.connectStart
