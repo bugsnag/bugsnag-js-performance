@@ -10,15 +10,17 @@ import BugsnagPerformance from '@bugsnag/browser-performance'
 BugsnagPerformance.start('abcdefabcdefabcdefabcdefabcdef12')
 JAVASCRIPT
 
-npm install @rollup/plugin-node-resolve @rollup/plugin-terser
+npm install @rollup/plugin-node-resolve @rollup/plugin-commonjs @rollup/plugin-terser
 
 npx rollup build/index.js \
   --file build/bundle.js \
   --format iife \
-  --plugin @rollup/plugin-node-resolve
+  --plugin @rollup/plugin-commonjs \
+  --plugin '@rollup/plugin-node-resolve={ browser: true }'
 
 npx rollup build/index.js \
   --file build/bundle.min.js \
   --format iife \
-  --plugin @rollup/plugin-node-resolve \
+  --plugin @rollup/plugin-commonjs \
+  --plugin '@rollup/plugin-node-resolve={ browser: true }' \
   --plugin @rollup/plugin-terser

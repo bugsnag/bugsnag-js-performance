@@ -6,6 +6,7 @@ function createConfiguration<C extends Configuration> (overrides: Partial<C> = {
     autoInstrumentNetworkRequests: false,
     apiKey: 'abcdefabcdefabcdefabcdefabcdef12',
     endpoint: '/traces',
+    generateAnonymousId: true,
     releaseStage: 'production',
     enabledReleaseStages: null,
     maximumBatchSize: 100,
@@ -18,7 +19,6 @@ function createConfiguration<C extends Configuration> (overrides: Partial<C> = {
       error: jest.fn()
     },
     appVersion: '',
-    samplingProbability: 1.0,
     networkInstrumentationIgnoreUrls: [],
     ...overrides
   } as unknown as InternalConfiguration<C>

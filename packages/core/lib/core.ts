@@ -61,7 +61,6 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
       ProbabilityManager.create(
         options.persistence,
         sampler,
-        configuration.samplingProbability,
         new ProbabilityFetcher(delivery)
       ).then((manager: ProbabilityManager) => {
         processor = new BatchProcessor(

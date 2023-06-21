@@ -16,8 +16,9 @@ import { WebVitals } from './web-vitals'
 
 const backgroundingListener = createBrowserBackgroundingListener(document)
 const clock = createClock(performance, backgroundingListener)
+const persistence = makeBrowserPersistence(window)
 const spanAttributesSource = createSpanAttributesSource(document.title, window.location.href)
-const resourceAttributesSource = createResourceAttributesSource(navigator)
+const resourceAttributesSource = createResourceAttributesSource(navigator, persistence)
 const fetchRequestTracker = createFetchRequestTracker(window, clock)
 const xhrRequestTracker = createXmlHttpRequestTracker(window, clock)
 const webVitals = new WebVitals(performance, clock, window.PerformanceObserver)
@@ -52,7 +53,7 @@ const BugsnagPerformance = createClient({
     new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker),
     new RouteChangePlugin(spanFactory, window.location)
   ],
-  persistence: makeBrowserPersistence(window)
+  persistence
 })
 
 export default BugsnagPerformance

@@ -1,11 +1,7 @@
 require 'yaml'
 
 class Browser
-
-  def initialize(browser_spec, maze_uri, fixtures_uri)
-    @maze_uri = maze_uri
-    @fixtures_uri = fixtures_uri
-
+  def initialize(browser_spec)
     # e.g. "chrome_61", "edge_latest", "chrome"
     @name, version = browser_spec.split("_")
 
@@ -23,19 +19,6 @@ class Browser
   # we assume that android devices are always using the latest version of chrome
   def mobile?
     @name == "android" || @name == "ios" || @name == "iphone"
-  end
-
-  def url_for(path)
-    uri = URI.join(@fixtures_uri, path)
-    config_query_string = "endpoint=#{@maze_uri}/traces&logs=#{@maze_uri}/logs&api_key=#{$api_key}"
-
-    if uri.query
-      uri.query += "&#{config_query_string}"
-    else
-      uri.query = config_query_string
-    end
-
-    uri.to_s
   end
 
   def supports_fetch_keepalive?

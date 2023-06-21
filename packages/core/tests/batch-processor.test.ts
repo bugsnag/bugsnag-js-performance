@@ -14,7 +14,7 @@ import {
 jest.useFakeTimers()
 
 describe('BatchProcessor', () => {
-  it('delivers after reaching the specified span limit', () => {
+  it('delivers after reaching the specified span limit', async () => {
     const delivery = new InMemoryDelivery()
     const batchProcessor = new BatchProcessor(
       delivery,
@@ -35,10 +35,12 @@ describe('BatchProcessor', () => {
 
     batchProcessor.add(createEndedSpan())
 
+    await jest.advanceTimersByTimeAsync(0)
+
     expect(delivery.requests).toHaveLength(1)
   })
 
-  it('delivers after the specified time limit', () => {
+  it('delivers after the specified time limit', async () => {
     const delivery = new InMemoryDelivery()
     const batchProcessor = new BatchProcessor(
       delivery,
@@ -54,12 +56,12 @@ describe('BatchProcessor', () => {
 
     expect(delivery.requests).toHaveLength(0)
 
-    jest.advanceTimersByTime(30_000)
+    await jest.advanceTimersByTimeAsync(30_000)
 
     expect(delivery.requests).toHaveLength(1)
   })
 
-  it('restarts the timer when calling .add()', () => {
+  it('restarts the timer when calling .add()', async () => {
     const delivery = new InMemoryDelivery()
     const batchProcessor = new BatchProcessor(
       delivery,
@@ -73,19 +75,19 @@ describe('BatchProcessor', () => {
 
     batchProcessor.add(createEndedSpan())
 
-    jest.advanceTimersByTime(20_000)
+    await jest.advanceTimersByTimeAsync(20_000)
     expect(delivery.requests).toHaveLength(0)
 
     batchProcessor.add(createEndedSpan())
 
-    jest.advanceTimersByTime(20_000)
+    await jest.advanceTimersByTimeAsync(20_000)
     expect(delivery.requests).toHaveLength(0)
 
-    jest.advanceTimersByTime(10_000)
+    await jest.advanceTimersByTimeAsync(10_000)
     expect(delivery.requests).toHaveLength(1)
   })
 
-  it('prevents delivery if releaseStage not in enabledReleaseStages', () => {
+  it('prevents delivery if releaseStage not in enabledReleaseStages', async () => {
     const delivery = new InMemoryDelivery()
     const batchProcessor = new BatchProcessor(
       delivery,
@@ -99,7 +101,7 @@ describe('BatchProcessor', () => {
 
     batchProcessor.add(createEndedSpan())
 
-    jest.runOnlyPendingTimers()
+    await jest.runOnlyPendingTimersAsync()
 
     expect(delivery.requests).toHaveLength(0)
   })
@@ -197,7 +199,6 @@ describe('BatchProcessor', () => {
       await ProbabilityManager.create(
         new InMemoryPersistence(),
         sampler,
-        1.0,
         new ProbabilityFetcher(delivery)
       )
     )
@@ -216,6 +217,9 @@ describe('BatchProcessor', () => {
 
   it('discards ended spans if samplingRate is higher than the samplingProbability', async () => {
     const delivery = new InMemoryDelivery()
+    const persistence = new InMemoryPersistence()
+    await persistence.save('bugsnag-sampling-probability', { value: 0.5, time: Date.now() })
+
     const sampler = new Sampler(0.5)
     const batchProcessor = new BatchProcessor(
       delivery,
@@ -225,9 +229,8 @@ describe('BatchProcessor', () => {
       { add: jest.fn(), flush: jest.fn() },
       sampler,
       await ProbabilityManager.create(
-        new InMemoryPersistence(),
+        persistence,
         sampler,
-        0.5,
         new ProbabilityFetcher(delivery)
       )
     )
@@ -262,6 +265,9 @@ describe('BatchProcessor', () => {
 
   it('does not send a request if the entire batch is discarded', async () => {
     const delivery = new InMemoryDelivery()
+    const persistence = new InMemoryPersistence()
+    await persistence.save('bugsnag-sampling-probability', { value: 0.5, time: Date.now() })
+
     const sampler = new Sampler(0.5)
     const batchProcessor = new BatchProcessor(
       delivery,
@@ -271,9 +277,8 @@ describe('BatchProcessor', () => {
       { add: jest.fn(), flush: jest.fn() },
       sampler,
       await ProbabilityManager.create(
-        new InMemoryPersistence(),
+        persistence,
         sampler,
-        0.5,
         new ProbabilityFetcher(delivery)
       )
     )

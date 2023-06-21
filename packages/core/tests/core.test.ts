@@ -207,6 +207,8 @@ describe('Core', () => {
           // deliver both spans we just ended
           backgroundingListener.sendToBackground()
 
+          await jest.advanceTimersByTimeAsync(0)
+
           expect(delivery.requests).toHaveLength(1)
 
           const payload = delivery.requests[0]

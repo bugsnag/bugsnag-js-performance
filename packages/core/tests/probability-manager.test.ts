@@ -18,7 +18,6 @@ describe('ProbabilityManager', () => {
     await ProbabilityManager.create(
       persistence,
       sampler,
-      1.0,
       fetcher
     )
 
@@ -65,7 +64,6 @@ describe('ProbabilityManager', () => {
     await ProbabilityManager.create(
       persistence,
       sampler,
-      1.0,
       fetcher
     )
 
@@ -109,7 +107,6 @@ describe('ProbabilityManager', () => {
     await ProbabilityManager.create(
       persistence,
       sampler,
-      1.0,
       fetcher
     )
 
@@ -144,7 +141,6 @@ describe('ProbabilityManager', () => {
     const manager = await ProbabilityManager.create(
       persistence,
       sampler,
-      1.0,
       fetcher
     )
 
@@ -177,7 +173,6 @@ describe('ProbabilityManager', () => {
     const manager = await ProbabilityManager.create(
       persistence,
       sampler,
-      1.0,
       fetcher
     )
 

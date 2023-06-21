@@ -11,5 +11,6 @@ export { default as resourceAttributesSource } from './resource-attributes-sourc
 export { default as spanAttributesSource } from './span-attributes-source'
 export { default as StableIdGenerator } from './stable-id-generator'
 export { default as MockSpanFactory } from './mock-span-factory'
+export { default as IncrementingIdGenerator } from './incrementing-id-generator'
 
 export * from './constants'
