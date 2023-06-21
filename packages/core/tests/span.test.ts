@@ -459,7 +459,7 @@ describe('Span', () => {
       })
     })
 
-    it.skip('will always be sampled when probability is 1', async () => {
+    it('will always be sampled when probability is 1', async () => {
       const delivery = new InMemoryDelivery()
       const persistence = new InMemoryPersistence()
 
