@@ -105,9 +105,7 @@ describe('PageLoadPhase Spans', () => {
     }))
 
     expect(spanFactory.createdSpans).not.toContainEqual(expect.objectContaining({
-      name: '[PageLoadPhase/Redirect]/page-load-phase-spans',
-      startTime: 0,
-      endTime: 0
+      name: '[PageLoadPhase/Redirect]/page-load-phase-spans'
     }))
   })
 
@@ -124,15 +122,11 @@ describe('PageLoadPhase Spans', () => {
     instrumentPageLoadPhaseSpans(spanFactory, '/page-load-phase-spans', performance)
 
     expect(spanFactory.createdSpans).not.toContainEqual(expect.objectContaining({
-      name: '[PageLoadPhase/Unload]/page-load-phase-spans',
-      startTime: 0,
-      endTime: 1
+      name: '[PageLoadPhase/Unload]/page-load-phase-spans'
     }))
 
     expect(spanFactory.createdSpans).not.toContainEqual(expect.objectContaining({
-      name: '[PageLoadPhase/Redirect]/page-load-phase-spans',
-      startTime: 0,
-      endTime: 0
+      name: '[PageLoadPhase/Redirect]/page-load-phase-spans'
     }))
   })
 })
