@@ -20,6 +20,7 @@
   },
   "scripts": {
     "build": "rollup --config",
+    "build:cdn": "npm run build",
     "clean": "rm -rf dist/*"
   },
   "bugs": {

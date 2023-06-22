@@ -7,13 +7,17 @@
   ],
   "scripts": {
     "build": "lerna run --stream build",
-    "clean": "lerna run --stream --parallel clean",
+    "build:cdn": "lerna run --stream build:cdn",
+    "clean": "rm -f build/* && lerna run --stream --parallel clean",
     "test:lint": "eslint --max-warnings=0 .",
     "test:unit": "jest",
     "test:test-container-registry-login": "aws ecr get-login-password --profile=opensource --region=us-west-1 | docker login --username AWS --password-stdin 855461928731.dkr.ecr.us-west-1.amazonaws.com"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.2",
+    "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-replace": "^5.0.2",
+    "@rollup/plugin-terser": "^0.4.3",
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.11.18",
