@@ -30,67 +30,60 @@ describe('PageLoadPhase Spans', () => {
       loadEventEnd: 21
     }))
 
-    instrumentPageLoadPhaseSpans(spanFactory, '/page-load-phase-spans', performance as unknown as Performance)
+    instrumentPageLoadPhaseSpans(spanFactory, '/page-load-phase-spans', performance)
 
-    expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
-      name: '[PageLoadPhase/Unload]/page-load-phase-spans',
-      startTime: 2,
-      endTime: 3
-    }))
-
-    expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
-      name: '[PageLoadPhase/Redirect]/page-load-phase-spans',
-      startTime: 4,
-      endTime: 5
-    }))
-
-    expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
-      name: '[PageLoadPhase/LoadFromCache]/page-load-phase-spans',
-      startTime: 7,
-      endTime: 8
-    }))
-
-    expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
-      name: '[PageLoadPhase/DNSLookup]/page-load-phase-spans',
-      startTime: 8,
-      endTime: 9
-    }))
-
-    expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
-      name: '[PageLoadPhase/TCPHandshake]/page-load-phase-spans',
-      startTime: 10,
-      endTime: 11
-    }))
-
-    expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
-      name: '[PageLoadPhase/TLS]/page-load-phase-spans',
-      startTime: 11,
-      endTime: 12
-    }))
-
-    expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
-      name: '[PageLoadPhase/HTTPRequest]/page-load-phase-spans',
-      startTime: 13,
-      endTime: 14
-    }))
-
-    expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
-      name: '[PageLoadPhase/HTTPResponse]/page-load-phase-spans',
-      startTime: 14,
-      endTime: 15
-    }))
-
-    expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
-      name: '[PageLoadPhase/DomContentLoadedEvent]/page-load-phase-spans',
-      startTime: 17,
-      endTime: 18
-    }))
-
-    expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
-      name: '[PageLoadPhase/LoadEvent]/page-load-phase-spans',
-      startTime: 20,
-      endTime: 21
-    }))
+    expect(spanFactory.createdSpans).toStrictEqual([
+      expect.objectContaining({
+        name: '[PageLoadPhase/Unload]/page-load-phase-spans',
+        startTime: 2,
+        endTime: 3
+      }),
+      expect.objectContaining({
+        name: '[PageLoadPhase/Redirect]/page-load-phase-spans',
+        startTime: 4,
+        endTime: 5
+      }),
+      expect.objectContaining({
+        name: '[PageLoadPhase/LoadFromCache]/page-load-phase-spans',
+        startTime: 7,
+        endTime: 8
+      }),
+      expect.objectContaining({
+        name: '[PageLoadPhase/DNSLookup]/page-load-phase-spans',
+        startTime: 8,
+        endTime: 9
+      }),
+      expect.objectContaining({
+        name: '[PageLoadPhase/TCPHandshake]/page-load-phase-spans',
+        startTime: 10,
+        endTime: 11
+      }),
+      expect.objectContaining({
+        name: '[PageLoadPhase/TLS]/page-load-phase-spans',
+        startTime: 11,
+        endTime: 12
+      }),
+      expect.objectContaining({
+        name: '[PageLoadPhase/HTTPRequest]/page-load-phase-spans',
+        startTime: 13,
+        endTime: 14
+      }),
+      expect.objectContaining({
+        name: '[PageLoadPhase/HTTPResponse]/page-load-phase-spans',
+        startTime: 14,
+        endTime: 15
+      }),
+      expect.objectContaining({
+        name: '[PageLoadPhase/DomContentLoadedEvent]/page-load-phase-spans',
+        startTime: 17,
+        endTime: 18
+      }),
+      expect.objectContaining({
+        name: '[PageLoadPhase/LoadEvent]/page-load-phase-spans',
+        startTime: 20,
+        endTime: 21
+      })
+    ])
   })
 
   it('does not create a span if both timestamps are 0', () => {
@@ -103,7 +96,7 @@ describe('PageLoadPhase Spans', () => {
       redirectEnd: 0
     }))
 
-    instrumentPageLoadPhaseSpans(spanFactory, '/page-load-phase-spans', performance as unknown as Performance)
+    instrumentPageLoadPhaseSpans(spanFactory, '/page-load-phase-spans', performance)
 
     expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
       name: '[PageLoadPhase/Unload]/page-load-phase-spans',
@@ -128,7 +121,7 @@ describe('PageLoadPhase Spans', () => {
       redirectEnd: 2
     }))
 
-    instrumentPageLoadPhaseSpans(spanFactory, '/page-load-phase-spans', performance as unknown as Performance)
+    instrumentPageLoadPhaseSpans(spanFactory, '/page-load-phase-spans', performance)
 
     expect(spanFactory.createdSpans).not.toContainEqual(expect.objectContaining({
       name: '[PageLoadPhase/Unload]/page-load-phase-spans',
