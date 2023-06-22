@@ -18,12 +18,12 @@ import {
   createPerformanceEventTimingFake,
   createLayoutShiftFake,
   createLargestContentfulPaintFake
-} from './utilities'
-import { FullPageLoadPlugin } from '../lib/auto-instrumentation/full-page-load-plugin'
-import { createSchema } from '../lib/config'
-import { type OnSettle } from '../lib/on-settle'
-import { WebVitals } from '../lib/web-vitals'
-import MockRoutingProvider from './utilities/mock-routing-provider'
+} from '../utilities'
+import { FullPageLoadPlugin } from '../../lib/auto-instrumentation/full-page-load-plugin'
+import { createSchema } from '../../lib/config'
+import { type OnSettle } from '../../lib/on-settle'
+import { WebVitals } from '../../lib/web-vitals'
+import MockRoutingProvider from '../utilities/mock-routing-provider'
 
 jest.useFakeTimers()
 
