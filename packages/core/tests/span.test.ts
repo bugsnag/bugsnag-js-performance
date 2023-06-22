@@ -438,22 +438,21 @@ describe('Span', () => {
       backgroundingListener.sendToBackground()
       movedToBackground.end()
 
-      expect(logger.warn).toHaveBeenCalledWith('Attempted to end a Span which has already ended or been discarded.')
-      expect(logger.warn).toHaveBeenCalledTimes(1)
+      expect(logger.warn).not.toHaveBeenCalled()
 
       // started in background and ended in foreground
       const movedToForeground = client.startSpan('moved-to-foreground')
       backgroundingListener.sendToForeground()
       movedToForeground.end()
 
-      expect(logger.warn).toHaveBeenCalledTimes(2)
+      expect(logger.warn).not.toHaveBeenCalled()
 
       // entirely in background
       backgroundingListener.sendToBackground()
       const backgroundSpan = client.startSpan('entirely-in-background')
       backgroundSpan.end()
 
-      expect(logger.warn).toHaveBeenCalledTimes(3)
+      expect(logger.warn).not.toHaveBeenCalled()
 
       // started and ended in foreground but backgrounded during span
       backgroundingListener.sendToForeground()
@@ -462,7 +461,7 @@ describe('Span', () => {
       backgroundingListener.sendToForeground()
       backgroundedDuringSpan.end()
 
-      expect(logger.warn).toHaveBeenCalledTimes(4)
+      expect(logger.warn).not.toHaveBeenCalled()
 
       // entirely in foreground (should be delivered)
       const inForeground = client.startSpan('entirely-in-foreground')
@@ -470,7 +469,7 @@ describe('Span', () => {
 
       await jest.runOnlyPendingTimersAsync()
 
-      expect(logger.warn).toHaveBeenCalledTimes(4)
+      expect(logger.warn).not.toHaveBeenCalled()
 
       expect(delivery).not.toHaveSentSpan(expect.objectContaining({
         name: 'moved-to-background'
@@ -522,7 +521,7 @@ describe('Span', () => {
 
       await jest.runOnlyPendingTimersAsync()
 
-      expect(logger.warn).toHaveBeenCalledWith('Attempted to end a Span which has already ended or been discarded.')
+      expect(logger.warn).toHaveBeenCalledWith('Attempted to end a Span which has already ended.')
       expect(delivery.requests).toHaveLength(1)
     })
   })

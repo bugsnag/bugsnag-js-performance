@@ -181,7 +181,12 @@ export class SpanFactory {
   ) {
     // if the span doesn't exist here it shouldn't be processed
     if (!this.openSpans.delete(span)) {
-      this.logger.warn('Attempted to end a Span which has already ended or been discarded.')
+      // only warn if the span has already been ended explicitly rather than
+      // discarded by us
+      if (!span.isValid()) {
+        this.logger.warn('Attempted to end a Span which has already ended.')
+      }
+
       return
     }
 
