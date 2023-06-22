@@ -162,6 +162,26 @@ Then('if a span named {string} exists, it contains the attributes:') do |span_na
   end
 end
 
+Then('if a span named {string} exists, it has a parent named {string}') do |child_name, parent_name|
+  spans = spans_from_request_list(Maze::Server.list_for('traces'))
+  child_spans = spans.find_all { |span| span['name'].eql?(child_name) }
+
+  if !child_spans.empty?
+    parent_spans = spans.find_all { |span| span['name'].eql?(parent_name) }
+    raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{parent_name}" if parent_spans.empty?
+  
+    expected_parent_ids = child_spans.map { |span| span['parentSpanId'] }
+    parent_ids = parent_spans.map { |span| span['spanId'] }
+    match = expected_parent_ids.any? { |expected_id| parent_ids.include?(expected_id) }
+  
+    unless match
+      raise Test::Unit::AssertionFailedError.new "No child span named #{child_name} was found with a parent named #{parent_name}"
+    end
+  else
+    $logger.info("No spans were found matching the name '#{child_name}'")
+  end
+end
+
 module Maze
   module Driver
     class Browser
