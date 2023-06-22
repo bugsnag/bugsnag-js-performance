@@ -5,7 +5,7 @@ class InMemoryDelivery implements Delivery {
   public samplingRequests: DeliveryPayload[] = []
 
   private readonly responseStateStack: ResponseState[] = []
-  private readonly samplingProbabilityStack: number[] = []
+  private readonly samplingProbabilityStack: Array<number | undefined> = []
 
   send (payload: DeliveryPayload) {
     if (payload.resourceSpans.length === 0) {
@@ -24,8 +24,8 @@ class InMemoryDelivery implements Delivery {
     this.responseStateStack.push(state)
   }
 
-  setNextSamplingProbability (samplingProbability: number): void {
-    if (samplingProbability < 0 || samplingProbability > 1) {
+  setNextSamplingProbability (samplingProbability?: number): void {
+    if (samplingProbability !== undefined && (samplingProbability < 0 || samplingProbability > 1)) {
       throw new Error(`Invalid sampling probability. Expected a number >= 0 && <= 1, got: ${samplingProbability}`)
     }
 
