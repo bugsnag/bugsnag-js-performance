@@ -206,6 +206,7 @@ describe('BatchProcessor', () => {
     batchProcessor.add(createEndedSpan())
 
     delivery.setNextSamplingProbability(0.0)
+    delivery.setNextSamplingProbability(0.0)
 
     expect(sampler.probability).toBe(1.0)
 
