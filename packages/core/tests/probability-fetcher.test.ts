@@ -26,6 +26,8 @@ describe('ProbabilityFetcher', () => {
 
   it('retries if delivery fails until a new probability is retrieved', async () => {
     const delivery = new InMemoryDelivery()
+    delivery.setNextSamplingProbability(undefined)
+
     const fetcher = new ProbabilityFetcher(delivery)
 
     const fetcherPromise = fetcher.getNewProbability()
@@ -33,13 +35,19 @@ describe('ProbabilityFetcher', () => {
     // 1 request is made immediately, but no sampling probability is returned
     expect(delivery.samplingRequests).toHaveLength(1)
 
+    delivery.setNextSamplingProbability(undefined)
+
     // after 30 seconds another request should be made
     await jest.advanceTimersByTimeAsync(30_000)
     expect(delivery.samplingRequests).toHaveLength(2)
 
+    delivery.setNextSamplingProbability(undefined)
+
     // etc..
     await jest.advanceTimersByTimeAsync(30_000)
     expect(delivery.samplingRequests).toHaveLength(3)
+
+    delivery.setNextSamplingProbability(undefined)
 
     // etc..
     await jest.advanceTimersByTimeAsync(30_000)
