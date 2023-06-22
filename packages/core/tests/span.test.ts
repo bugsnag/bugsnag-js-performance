@@ -334,6 +334,8 @@ describe('Span', () => {
 
     it('will always be discarded when probability is 0', async () => {
       const delivery = new InMemoryDelivery()
+      delivery.setNextSamplingProbability(0.0)
+
       const persistence = new InMemoryPersistence()
       await persistence.save('bugsnag-sampling-probability', { value: 0.0, time: Date.now() })
 
@@ -351,12 +353,15 @@ describe('Span', () => {
     })
 
     it('will sample spans based on their traceId', async () => {
-      const delivery = new InMemoryDelivery()
-      const persistence = new InMemoryPersistence()
-
       // 0.14 as the second span's trace ID results in a sampling rate greater
       // than this but the other two are smaller
-      await persistence.save('bugsnag-sampling-probability', { value: 0.14, time: Date.now() })
+      const samplingProbability = 0.14
+
+      const delivery = new InMemoryDelivery()
+      delivery.setNextSamplingProbability(samplingProbability)
+
+      const persistence = new InMemoryPersistence()
+      await persistence.save('bugsnag-sampling-probability', { value: samplingProbability, time: Date.now() })
 
       // trace IDs with known sampling rates; this allows us to check that the
       // first span is sampled and the second is discarded with a specific

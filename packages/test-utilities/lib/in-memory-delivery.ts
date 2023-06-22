@@ -15,7 +15,9 @@ class InMemoryDelivery implements Delivery {
     }
 
     const state = this.responseStateStack.pop() || 'success' as ResponseState
-    const samplingProbability = this.samplingProbabilityStack.pop()
+    const samplingProbability = this.samplingProbabilityStack.length
+      ? this.samplingProbabilityStack.pop()
+      : 1.0
 
     return Promise.resolve({ state, samplingProbability })
   }
