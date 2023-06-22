@@ -6,21 +6,28 @@ function shouldOmitSpan (startTime?: number, endTime?: number): boolean {
   (startTime === 0 && endTime === 0)
 }
 
-export const instrumentPageLoadPhaseSpans = (spanFactory: SpanFactory, performance: PerformanceWithTiming, route: string, pageLoadSpan: SpanContext) => {
+export const instrumentPageLoadPhaseSpans = (
+  spanFactory: SpanFactory,
+  performance: PerformanceWithTiming,
+  route: string,
+  pageLoadSpan: SpanContext
+) => {
   const entry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
 
   if (entry) {
     if (!shouldOmitSpan(entry.unloadEventStart, entry.unloadEventEnd)) {
       spanFactory.endSpan(spanFactory.startSpan('[PageLoadPhase/Unload]' + route, {
         startTime: entry.unloadEventStart,
-        parentContext: pageLoadSpan
+        parentContext: pageLoadSpan,
+        makeCurrentContext: false
       }), entry.unloadEventEnd)
     }
 
     if (!shouldOmitSpan(entry.redirectStart, entry.redirectEnd)) {
       spanFactory.endSpan(spanFactory.startSpan('[PageLoadPhase/Redirect]' + route, {
         startTime: entry.redirectStart,
-        parentContext: pageLoadSpan
+        parentContext: pageLoadSpan,
+        makeCurrentContext: false
       }), entry.redirectEnd)
     }
 
