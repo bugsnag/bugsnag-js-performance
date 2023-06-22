@@ -27,14 +27,16 @@ export const instrumentPageLoadPhaseSpans = (spanFactory: SpanFactory, performan
     if (!shouldOmitSpan(entry.fetchStart, entry.domainLookupStart)) {
       spanFactory.endSpan(spanFactory.startSpan('[PageLoadPhase/LoadFromCache]' + route, {
         startTime: entry.fetchStart,
-        parentContext: pageLoadSpan
+        parentContext: pageLoadSpan,
+        makeCurrentContext: false
       }), entry.domainLookupStart)
     }
 
     if (!shouldOmitSpan(entry.domainLookupStart, entry.domainLookupEnd)) {
       spanFactory.endSpan(spanFactory.startSpan('[PageLoadPhase/DNSLookup]' + route, {
         startTime: entry.domainLookupStart,
-        parentContext: pageLoadSpan
+        parentContext: pageLoadSpan,
+        makeCurrentContext: false
       }), entry.domainLookupEnd)
     }
 
@@ -44,42 +46,48 @@ export const instrumentPageLoadPhaseSpans = (spanFactory: SpanFactory, performan
     if (!shouldOmitSpan(entry.connectStart, TCPHandshakeEnd)) {
       spanFactory.endSpan(spanFactory.startSpan('[PageLoadPhase/TCPHandshake]' + route, {
         startTime: entry.connectStart,
-        parentContext: pageLoadSpan
+        parentContext: pageLoadSpan,
+        makeCurrentContext: false
       }), TCPHandshakeEnd)
     }
 
     if (!shouldOmitSpan(entry.secureConnectionStart, entry.connectEnd)) {
       spanFactory.endSpan(spanFactory.startSpan('[PageLoadPhase/TLS]' + route, {
         startTime: entry.secureConnectionStart,
-        parentContext: pageLoadSpan
+        parentContext: pageLoadSpan,
+        makeCurrentContext: false
       }), entry.connectEnd)
     }
 
     if (!shouldOmitSpan(entry.requestStart, entry.responseStart)) {
       spanFactory.endSpan(spanFactory.startSpan('[PageLoadPhase/HTTPRequest]' + route, {
         startTime: entry.requestStart,
-        parentContext: pageLoadSpan
+        parentContext: pageLoadSpan,
+        makeCurrentContext: false
       }), entry.responseStart)
     }
 
     if (!shouldOmitSpan(entry.responseStart, entry.responseEnd)) {
       spanFactory.endSpan(spanFactory.startSpan('[PageLoadPhase/HTTPResponse]' + route, {
         startTime: entry.responseStart,
-        parentContext: pageLoadSpan
+        parentContext: pageLoadSpan,
+        makeCurrentContext: false
       }), entry.responseEnd)
     }
 
     if (!shouldOmitSpan(entry.domContentLoadedEventStart, entry.domContentLoadedEventEnd)) {
       spanFactory.endSpan(spanFactory.startSpan('[PageLoadPhase/DomContentLoadedEvent]' + route, {
         startTime: entry.domContentLoadedEventStart,
-        parentContext: pageLoadSpan
+        parentContext: pageLoadSpan,
+        makeCurrentContext: false
       }), entry.domContentLoadedEventEnd)
     }
 
     if (!shouldOmitSpan(entry.loadEventStart, entry.loadEventEnd)) {
       spanFactory.endSpan(spanFactory.startSpan('[PageLoadPhase/LoadEvent]' + route, {
         startTime: entry.loadEventStart,
-        parentContext: pageLoadSpan
+        parentContext: pageLoadSpan,
+        makeCurrentContext: false
       }), entry.loadEventEnd)
     }
   }
