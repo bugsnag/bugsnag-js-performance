@@ -16,24 +16,26 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
       const entries = list.getEntries() as ResourceTiming[]
 
       for (const entry of entries) {
-        // TODO: get the first context from spanContextStorage
-        // if no current context - don't do anything
+        const parentContext = this.spanFactory.firstSpanContext
 
-        const url = new URL(entry.name)
-        const name = url.href.replace(url.search, '')
+        if (parentContext) {
+          const url = new URL(entry.name)
+          const name = url.href.replace(url.search, '')
 
-        const span = this.spanFactory.startSpan(`[ResourceLoad]${name}`, {
-          startTime: entry.startTime,
-          makeCurrentContext: false
-        })
+          const span = this.spanFactory.startSpan(`[ResourceLoad]${name}`, {
+            parentContext,
+            startTime: entry.startTime,
+            makeCurrentContext: false
+          })
 
-        span.setAttribute('http.url', entry.name)
+          span.setAttribute('http.url', entry.name)
 
-        if (entry.responseStatus) {
-          span.setAttribute('http.status_code', entry.responseStatus)
+          if (entry.responseStatus) {
+            span.setAttribute('http.status_code', entry.responseStatus)
+          }
+
+          this.spanFactory.endSpan(span, entry.responseEnd)
         }
-
-        this.spanFactory.endSpan(span, entry.responseEnd)
       }
     })
 

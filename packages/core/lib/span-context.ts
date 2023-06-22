@@ -22,6 +22,7 @@ export interface SpanContextStorage extends Iterable<SpanContext> {
   push: (context: SpanContext) => void
   pop: (context: SpanContext) => void
   readonly current: SpanContext | undefined
+  readonly first: SpanContext | undefined
 }
 
 export class DefaultSpanContextStorage implements SpanContextStorage {
@@ -52,6 +53,13 @@ export class DefaultSpanContextStorage implements SpanContextStorage {
     }
 
     this.removeClosedContexts()
+  }
+
+  get first () {
+    this.removeClosedContexts()
+    return this.contextStack.length > 0
+      ? this.contextStack[0]
+      : undefined
   }
 
   get current () {

@@ -49,4 +49,45 @@ describe('ResourceLoadPlugin', () => {
       traceId: 'trace ID 1'
     }))
   })
+
+  it('does not create a ResourceLoad span if there is no current context', async () => {
+    jest.useFakeTimers()
+
+    const delivery = new InMemoryDelivery()
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const idGenerator = new IncrementingIdGenerator()
+
+    const client = createTestClient({
+      idGenerator,
+      deliveryFactory: () => delivery,
+      plugins: (spanFactory) => [
+        new ResourceLoadPlugin(spanFactory, Observer)
+      ]
+    })
+
+    client.start({ apiKey: VALID_API_KEY })
+
+    const span = client.startSpan('custom-span', { makeCurrentContext: false })
+
+    manager.queueEntry(createPerformanceResourceNavigationTimingFake({ name: 'https://bugsnag.com/image.jpg' }))
+    manager.flushQueue()
+
+    span.end()
+
+    await jest.runOnlyPendingTimersAsync()
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: 'custom-span',
+      spanId: 'span ID 1',
+      parentSpanId: undefined,
+      traceId: 'trace ID 1'
+    }))
+
+    expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+      name: '[ResourceLoad]https://bugsnag.com/image.jpg'
+    }))
+
+    expect(delivery.requests[0].resourceSpans[0].scopeSpans[0].spans).toHaveLength(1)
+  })
 })
