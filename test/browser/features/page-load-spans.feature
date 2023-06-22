@@ -21,21 +21,25 @@ Feature: Page Load spans
         And every span string attribute "bugsnag.browser.page.url" matches the regex "^http:\/\/.*:[0-9]{4}\/page-load-spans\/.*\/?endpoint=.*\&logs=.*\&api_key=.*$"
 
         # We expect the following spans to always be present
+        And a span named "[PageLoadPhase/HTTPRequest]/page-load-spans/" has a parent named "[FullPageLoad]/page-load-spans/"
         And a span named "[PageLoadPhase/HTTPRequest]/page-load-spans/" contains the attributes:
             | attribute                                 | type         | value           | 
             | bugsnag.span.category                     | stringValue  | custom          |
             | bugsnag.browser.page.title                | stringValue  | Page load spans |
 
+        And a span named "[PageLoadPhase/HTTPResponse]/page-load-spans/" has a parent named "[FullPageLoad]/page-load-spans/"
         And a span named "[PageLoadPhase/HTTPResponse]/page-load-spans/" contains the attributes:
             | attribute                                 | type         | value           | 
             | bugsnag.span.category                     | stringValue  | custom          |
             | bugsnag.browser.page.title                | stringValue  | Page load spans |
 
+        And a span named "[PageLoadPhase/DomContentLoadedEvent]/page-load-spans/" has a parent named "[FullPageLoad]/page-load-spans/"
         And a span named "[PageLoadPhase/DomContentLoadedEvent]/page-load-spans/" contains the attributes:
             | attribute                                 | type         | value           | 
             | bugsnag.span.category                     | stringValue  | custom          |
             | bugsnag.browser.page.title                | stringValue  | Page load spans |
 
+        And a span named "[PageLoadPhase/LoadEvent]/page-load-spans/" has a parent named "[FullPageLoad]/page-load-spans/"
         And a span named "[PageLoadPhase/LoadEvent]/page-load-spans/" contains the attributes:
             | attribute                                 | type         | value           | 
             | bugsnag.span.category                     | stringValue  | custom          |
@@ -45,37 +49,43 @@ Feature: Page Load spans
         # because page load phase spans are not sent if the start and end times of the
         # performance entry are 0, but may also be down to differences in browser behaviour (e.g. Redirect)
 
-        # Redirect doesn't seem to happen on Firefox
+        # Redirect may have 0 start and end times
+        And if a span named "[PageLoadPhase/Redirect]/page-load-spans/" exists, it has a parent named "[FullPageLoad]/page-load-spans/"
         And if a span named "[PageLoadPhase/Redirect]/page-load-spans/" exists, it contains the attributes:
             | attribute                                 | type         | value           |
             | bugsnag.span.category                     | stringValue  | custom          |
             | bugsnag.browser.page.title                | stringValue  | Page load spans |
 
-        # Unload may have 0 start and end times 
+        # Unload may have 0 start and end times
+        And if a span named "[PageLoadPhase/Unload]/page-load-spans/" exists, it has a parent named "[FullPageLoad]/page-load-spans/"
         And if a span named "[PageLoadPhase/Unload]/page-load-spans/" exists, it contains the attributes:
             | attribute                                 | type         | value           |
             | bugsnag.span.category                     | stringValue  | custom          |
             | bugsnag.browser.page.title                | stringValue  | Page load spans |
 
         # LoadFromCache may have 0 start and end times 
+        And if a span named "[PageLoadPhase/LoadFromCache]/page-load-spans/" exists, it has a parent named "[FullPageLoad]/page-load-spans/"
         And if a span named "[PageLoadPhase/LoadFromCache]/page-load-spans/" exists, it contains the attributes:
             | attribute                                 | type         | value           | 
             | bugsnag.span.category                     | stringValue  | custom          |
             | bugsnag.browser.page.title                | stringValue  | Page load spans |
 
         # DNSLookup may have 0 start and end times
+        And if a span named "[PageLoadPhase/DNSLookup]/page-load-spans/" exists, it has a parent named "[FullPageLoad]/page-load-spans/"
         And if a span named "[PageLoadPhase/DNSLookup]/page-load-spans/" exists, it contains the attributes:
             | attribute                                 | type         | value           | 
             | bugsnag.span.category                     | stringValue  | custom          |
             | bugsnag.browser.page.title                | stringValue  | Page load spans |
 
-        # TCPHandshake may have 0 start and end times    
+        # TCPHandshake may have 0 start and end times 
+        And if a span named "[PageLoadPhase/TCPHandshake]/page-load-spans/" exists, it has a parent named "[FullPageLoad]/page-load-spans/"
         And a span named "[PageLoadPhase/TCPHandshake]/page-load-spans/" contains the attributes:
             | attribute                                 | type         | value           | 
             | bugsnag.span.category                     | stringValue  | custom          |
             | bugsnag.browser.page.title                | stringValue  | Page load spans |
 
         # TLS may have 0 start and end times
+        And if a span named "[PageLoadPhase/TLS]/page-load-spans/" exists, it has a parent named "[FullPageLoad]/page-load-spans/"
         And if a span named "[PageLoadPhase/TLS]/page-load-spans/" exists, it contains the attributes:
             | attribute                                 | type         | value           | 
             | bugsnag.span.category                     | stringValue  | custom          |
