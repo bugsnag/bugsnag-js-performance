@@ -12,8 +12,9 @@ import ProbabilityManager from './probability-manager'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
-import { SpanFactory, type Span, type SpanOptions } from './span'
-import { type SpanContext, type SpanContextStorage, DefaultSpanContextStorage } from './span-context'
+import { type Span, type SpanOptions } from './span'
+import { DefaultSpanContextStorage, type SpanContext, type SpanContextStorage } from './span-context'
+import { SpanFactory } from './span-factory'
 
 export interface BugsnagPerformance<C extends Configuration> {
   start: (config: C | string) => void
