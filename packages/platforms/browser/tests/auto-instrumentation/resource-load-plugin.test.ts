@@ -7,10 +7,10 @@ import { ResourceLoadPlugin } from '../../lib/auto-instrumentation/resource-load
 import { PerformanceObserverManager } from '../utilities'
 import { createPerformanceResourceNavigationTimingFake } from '../utilities/performance-entry'
 
+jest.useFakeTimers()
+
 describe('ResourceLoadPlugin', () => {
   it('automatically creates a ResourceLoad span for a custom span', async () => {
-    jest.useFakeTimers()
-
     const delivery = new InMemoryDelivery()
     const manager = new PerformanceObserverManager()
     const Observer = manager.createPerformanceObserverFakeClass()
@@ -27,11 +27,13 @@ describe('ResourceLoadPlugin', () => {
     client.start({ apiKey: VALID_API_KEY })
 
     const span = client.startSpan('custom-span')
+    const span2 = client.startSpan('custom-span-2')
 
     manager.queueEntry(createPerformanceResourceNavigationTimingFake({ name: 'https://bugsnag.com/image.jpg' }))
     manager.flushQueue()
 
     span.end()
+    span2.end()
 
     await jest.runOnlyPendingTimersAsync()
 
@@ -43,16 +45,21 @@ describe('ResourceLoadPlugin', () => {
     }))
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({
-      name: '[ResourceLoad]https://bugsnag.com/image.jpg',
+      name: 'custom-span-2',
       spanId: 'span ID 2',
+      parentSpanId: 'span ID 1',
+      traceId: 'trace ID 1'
+    }))
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: '[ResourceLoad]https://bugsnag.com/image.jpg',
+      spanId: 'span ID 3',
       parentSpanId: 'span ID 1',
       traceId: 'trace ID 1'
     }))
   })
 
   it('does not create a ResourceLoad span if there is no current context', async () => {
-    jest.useFakeTimers()
-
     const delivery = new InMemoryDelivery()
     const manager = new PerformanceObserverManager()
     const Observer = manager.createPerformanceObserverFakeClass()
