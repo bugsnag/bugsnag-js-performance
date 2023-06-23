@@ -8,8 +8,8 @@ Feature: Resource Load Spans
     And I wait to receive 1 trace
 
     # Custom span (parent)
-    Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.3.name" equals "[Custom]/resource-load-spans"
-    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.3.spanId" is stored as the value "parent_span_id"
+    Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.2.name" equals "[Custom]/resource-load-spans"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2.spanId" is stored as the value "parent_span_id"
 
     # App bundle
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" matches the regex "^\[ResourceLoad\]http:\/\/.*:[0-9]{4}\/resource-load-spans\/dist\/bundle\.js$"
