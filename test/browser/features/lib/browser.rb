@@ -63,6 +63,17 @@ class Browser
     end
   end
 
+  def supports_performance_navigation_timing?
+    case @name
+    when "safari", "ios"
+      # support added in Safari 15 (technically 15.1 for mobile)
+      @version >= 15
+
+    else
+      true
+    end
+  end
+
   private
 
   def chrome_supported_vitals

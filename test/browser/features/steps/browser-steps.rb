@@ -136,6 +136,52 @@ Given("I store the device ID {string}") do |device_id|
   driver.execute_script("localStorage.setItem('bugsnag-anonymous-id', '#{device_id}')")
 end
 
+Then('if a span named {string} exists, it contains the attributes:') do |span_name, table|
+  spans = spans_from_request_list(Maze::Server.list_for('traces'))
+  named_spans = spans.find_all { |span| span['name'].eql?(span_name) }
+  if !named_spans.empty?
+    expected_attributes = table.hashes
+
+    match = false
+    named_spans.each do |span|
+      matches = expected_attributes.map do |expected_attribute|
+        span['attributes'].find_all { |attribute| attribute['key'].eql?(expected_attribute['attribute']) }
+          .any? { |attribute| attribute_value_matches?(attribute['value'], expected_attribute['type'], expected_attribute['value']) }
+      end
+      if matches.all? && !matches.empty?
+        match = true
+        break
+      end
+    end
+  
+    unless match
+      raise Test::Unit::AssertionFailedError.new "No spans were found containing all of the given attributes"
+    end
+  else
+    $logger.info("No spans were found matching the name '#{span_name}'")
+  end
+end
+
+Then('if a span named {string} exists, it has a parent named {string}') do |child_name, parent_name|
+  spans = spans_from_request_list(Maze::Server.list_for('traces'))
+  child_spans = spans.find_all { |span| span['name'].eql?(child_name) }
+
+  if !child_spans.empty?
+    parent_spans = spans.find_all { |span| span['name'].eql?(parent_name) }
+    raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{parent_name}" if parent_spans.empty?
+  
+    expected_parent_ids = child_spans.map { |span| span['parentSpanId'] }
+    parent_ids = parent_spans.map { |span| span['spanId'] }
+    match = expected_parent_ids.any? { |expected_id| parent_ids.include?(expected_id) }
+  
+    unless match
+      raise Test::Unit::AssertionFailedError.new "No child span named #{child_name} was found with a parent named #{parent_name}"
+    end
+  else
+    $logger.info("No spans were found matching the name '#{child_name}'")
+  end
+end
+
 module Maze
   module Driver
     class Browser

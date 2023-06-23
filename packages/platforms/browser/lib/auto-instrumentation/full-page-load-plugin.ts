@@ -6,7 +6,9 @@ import {
 } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
 import { type OnSettle } from '../on-settle'
+import { type PerformanceWithTiming } from '../on-settle/load-event-end-settler'
 import { type WebVitals } from '../web-vitals'
+import { instrumentPageLoadPhaseSpans } from './page-load-phase-spans'
 
 export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   private readonly spanFactory: SpanFactory
@@ -14,6 +16,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   private readonly location: Location
   private readonly onSettle: OnSettle
   private readonly webVitals: WebVitals
+  private readonly performance: PerformanceWithTiming
 
   // if the page was backgrounded at any point in the loading process a page
   // load span is invalidated as the browser will deprioritise the page
@@ -25,13 +28,15 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     spanFactory: SpanFactory,
     webVitals: WebVitals,
     onSettle: OnSettle,
-    backgroundingListener: BackgroundingListener
+    backgroundingListener: BackgroundingListener,
+    performance: PerformanceWithTiming
   ) {
     this.document = document
     this.location = location
     this.spanFactory = spanFactory
     this.webVitals = webVitals
     this.onSettle = onSettle
+    this.performance = performance
 
     backgroundingListener.onStateChange(state => {
       if (!this.wasBackgrounded && state === 'in-background') {
@@ -55,6 +60,8 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
 
       const route = configuration.routingProvider.resolveRoute(url)
       span.name += route
+
+      instrumentPageLoadPhaseSpans(this.spanFactory, this.performance, route, span)
 
       // Browser attributes
       span.setAttribute('bugsnag.span.category', 'full_page_load')

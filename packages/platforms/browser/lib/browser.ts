@@ -47,7 +47,8 @@ const BugsnagPerformance = createClient({
       spanFactory,
       webVitals,
       onSettle,
-      backgroundingListener
+      backgroundingListener,
+      performance
     ),
     new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker),
     new RouteChangePlugin(spanFactory, window.location)
