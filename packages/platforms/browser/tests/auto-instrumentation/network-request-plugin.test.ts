@@ -1,7 +1,7 @@
-import { NetworkRequestPlugin } from '../lib/auto-instrumentation/network-request-plugin'
+import { NetworkRequestPlugin } from '../../lib/auto-instrumentation/network-request-plugin'
 import { MockSpanFactory, createConfiguration, createTestClient } from '@bugsnag/js-performance-test-utilities'
-import { RequestTracker, type RequestStartCallback } from '../lib/request-tracker/request-tracker'
-import { type BrowserConfiguration } from '../lib/config'
+import { RequestTracker, type RequestStartCallback } from '../../lib/request-tracker/request-tracker'
+import { type BrowserConfiguration } from '../../lib/config'
 import { spanContextEquals } from '@bugsnag/core-performance'
 
 const ENDPOINT = 'http://traces.endpoint'

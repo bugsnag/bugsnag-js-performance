@@ -62,7 +62,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
       const startTime = 0
       const span = this.spanFactory.startSpan(`[FullPageLoad]${route}`, { startTime })
 
-      instrumentPageLoadPhaseSpans(this.spanFactory, route, this.performance)
+      instrumentPageLoadPhaseSpans(this.spanFactory, this.performance, route, span)
 
       // Browser attributes
       span.setAttribute('bugsnag.span.category', 'full_page_load')
