@@ -52,15 +52,14 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
       return
     }
 
+    const span = this.spanFactory.startSpan('[FullPageLoad]', { startTime: 0, parentContext: null })
     const url = new URL(this.location.href)
 
     this.onSettle((endTime: number) => {
       if (this.wasBackgrounded) return
 
       const route = configuration.routingProvider.resolveRoute(url)
-
-      const startTime = 0
-      const span = this.spanFactory.startSpan(`[FullPageLoad]${route}`, { startTime })
+      span.name += route
 
       instrumentPageLoadPhaseSpans(this.spanFactory, this.performance, route, span)
 

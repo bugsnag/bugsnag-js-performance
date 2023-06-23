@@ -70,7 +70,7 @@ export class SpanInternal implements SpanContext {
   private readonly kind = Kind.Client // TODO: How do we define the initial Kind?
   private readonly events = new SpanEvents()
   private readonly attributes: SpanAttributes
-  private readonly name: string
+  name: string
   private endTime?: number
 
   constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes, parentSpanId?: string) {
