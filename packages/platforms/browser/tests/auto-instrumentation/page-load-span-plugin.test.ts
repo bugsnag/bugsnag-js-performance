@@ -7,9 +7,8 @@ import {
   ControllableBackgroundingListener,
   InMemoryDelivery,
   IncrementingClock,
-  MockSpanFactory,
+  IncrementingIdGenerator,
   VALID_API_KEY,
-  createConfiguration,
   createTestClient
 } from '@bugsnag/js-performance-test-utilities'
 import {
@@ -26,7 +25,6 @@ import { createSchema } from '../../lib/config'
 import { type OnSettle } from '../../lib/on-settle'
 import { WebVitals } from '../../lib/web-vitals'
 import MockRoutingProvider from '../utilities/mock-routing-provider'
-import { type BrowserConfiguration } from '../lib/config'
 
 jest.useFakeTimers()
 
@@ -319,37 +317,57 @@ describe('FullPageLoadPlugin', () => {
     expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/initial-route' }))
   })
 
-  it('starts a page load span when configured and updates the route on settle', async () => {
-    const performance = new PerformanceFake()
-    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-    const webVitals = new WebVitals(performance, clock, undefined)
+  it('becomes the current span context on start', async () => {
+    const clock = new IncrementingClock()
+    const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => {
       Promise.resolve().then(() => { onSettleCallback(1234) })
     }
-    const spanFactory = new MockSpanFactory()
-    const plugin = new FullPageLoadPlugin(
-      document,
-      window.location,
-      spanFactory,
-      webVitals,
-      onSettle,
-      new ControllableBackgroundingListener()
-    )
+    const performance = new PerformanceFake()
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const webVitals = new WebVitals(performance, clock, Observer)
+    const testClient = createTestClient({
+      idGenerator: new IncrementingIdGenerator(),
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      deliveryFactory: () => delivery,
+      plugins: (spanFactory) => [
+        new FullPageLoadPlugin(
+          document,
+          window.location,
+          spanFactory,
+          webVitals,
+          onSettle,
+          new ControllableBackgroundingListener(),
+          performance
+        )
+      ]
+    })
 
-    plugin.configure(createConfiguration<BrowserConfiguration>({
-      autoInstrumentFullPageLoads: true,
-      routingProvider: new MockRoutingProvider()
-    }))
+    // the page load span should be started when we call start
+    testClient.start({ apiKey: VALID_API_KEY })
+    expect(testClient.currentSpanContext).not.toBeUndefined()
 
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[FullPageLoad]', { startTime: 0 })
+    // start and end a new span - this should become a child of the page load span
+    const childSpan = testClient.startSpan('child of page load span')
+    childSpan.end()
+
+    // trigger the onsettle to end the page load span
     await jest.runOnlyPendingTimersAsync()
 
-    expect(spanFactory.createdSpans).toStrictEqual([
-      expect.objectContaining({
-        name: '[FullPageLoad]/initial-route',
-        startTime: 0
-      })
-    ])
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: '[FullPageLoad]/initial-route',
+      spanId: 'span ID 1',
+      traceId: 'trace ID 1',
+      parentSpanId: undefined
+    }))
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: 'child of page load span',
+      spanId: 'span ID 2',
+      traceId: 'trace ID 1', // trace ID should match the page load span trace ID
+      parentSpanId: 'span ID 1' // parentSpanId should match the page load span ID
+    }))
   })
 
   describe('WebVitals', () => {
