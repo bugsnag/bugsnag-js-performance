@@ -47,8 +47,7 @@ function createBrowserDeliveryFactory (fetch: Fetch, backgroundingListener: Back
             headers: {
               'Bugsnag-Api-Key': apiKey,
               'Content-Type': 'application/json',
-              'Bugsnag-Span-Sampling': `1.0:${spanCount}`,
-              'Bugsnag-Sent-At': (new Date()).toISOString()
+              'Bugsnag-Span-Sampling': `1.0:${spanCount}`
             }
           })
 
