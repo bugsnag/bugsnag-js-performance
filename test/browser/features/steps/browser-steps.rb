@@ -136,6 +136,32 @@ Given("I store the device ID {string}") do |device_id|
   driver.execute_script("localStorage.setItem('bugsnag-anonymous-id', '#{device_id}')")
 end
 
+Then('if a span named {string} exists, it contains the attributes:') do |span_name, table|
+  spans = spans_from_request_list(Maze::Server.list_for('traces'))
+  named_spans = spans.find_all { |span| span['name'].eql?(span_name) }
+  if !named_spans.empty?
+    expected_attributes = table.hashes
+
+    match = false
+    named_spans.each do |span|
+      matches = expected_attributes.map do |expected_attribute|
+        span['attributes'].find_all { |attribute| attribute['key'].eql?(expected_attribute['attribute']) }
+          .any? { |attribute| attribute_value_matches?(attribute['value'], expected_attribute['type'], expected_attribute['value']) }
+      end
+      if matches.all? && !matches.empty?
+        match = true
+        break
+      end
+    end
+  
+    unless match
+      raise Test::Unit::AssertionFailedError.new "No spans were found containing all of the given attributes"
+    end
+  else
+    $logger.info("No spans were found matching the name '#{span_name}'")
+  end
+end
+
 module Maze
   module Driver
     class Browser

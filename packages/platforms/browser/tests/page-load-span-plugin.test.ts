@@ -51,7 +51,8 @@ describe('FullPageLoadPlugin', () => {
           spanFactory,
           webVitals,
           onSettle,
-          new ControllableBackgroundingListener()
+          new ControllableBackgroundingListener(),
+          performance
         )
       ]
     })
@@ -81,7 +82,8 @@ describe('FullPageLoadPlugin', () => {
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/initial-route' }))
 
-    const span = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+    const spans = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans
+    const span = spans[spans.length - 1]
 
     expect(span).toHaveAttribute('bugsnag.span.category', 'full_page_load')
     expect(span).toHaveAttribute('bugsnag.browser.page.route', '/initial-route')
@@ -100,6 +102,7 @@ describe('FullPageLoadPlugin', () => {
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
     const manager = new PerformanceObserverManager()
+    const performance = new PerformanceFake()
     const Observer = manager.createPerformanceObserverFakeClass()
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const testClient = createTestClient({
@@ -112,7 +115,8 @@ describe('FullPageLoadPlugin', () => {
           spanFactory,
           webVitals,
           onSettle,
-          new ControllableBackgroundingListener()
+          new ControllableBackgroundingListener(),
+          performance
         )
       ]
     })
@@ -132,6 +136,7 @@ describe('FullPageLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const backgroundingListener = new ControllableBackgroundingListener()
+    const performance = new PerformanceFake()
 
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
@@ -144,7 +149,8 @@ describe('FullPageLoadPlugin', () => {
           spanFactory,
           webVitals,
           onSettle,
-          backgroundingListener
+          backgroundingListener,
+          performance
         )
       ]
     })
@@ -166,6 +172,7 @@ describe('FullPageLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const backgroundingListener = new ControllableBackgroundingListener()
+    const performance = new PerformanceFake()
 
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
@@ -178,7 +185,8 @@ describe('FullPageLoadPlugin', () => {
           spanFactory,
           webVitals,
           onSettle,
-          backgroundingListener
+          backgroundingListener,
+          performance
         )
       ]
     })
@@ -200,6 +208,7 @@ describe('FullPageLoadPlugin', () => {
       Promise.resolve().then(() => { onSettleCallback(1234) })
     }
     const manager = new PerformanceObserverManager()
+    const performance = new PerformanceFake()
     const Observer = manager.createPerformanceObserverFakeClass()
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const backgroundingListener = new ControllableBackgroundingListener()
@@ -215,7 +224,8 @@ describe('FullPageLoadPlugin', () => {
           spanFactory,
           webVitals,
           onSettle,
-          backgroundingListener
+          backgroundingListener,
+          performance
         )
       ]
     })
@@ -239,6 +249,7 @@ describe('FullPageLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const backgroundingListener = new ControllableBackgroundingListener()
+    const performance = new PerformanceFake()
 
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
@@ -251,7 +262,8 @@ describe('FullPageLoadPlugin', () => {
           spanFactory,
           webVitals,
           onSettle,
-          backgroundingListener
+          backgroundingListener,
+          performance
         )
       ]
     })
@@ -276,6 +288,7 @@ describe('FullPageLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const backgroundingListener = new ControllableBackgroundingListener()
+    const performance = new PerformanceFake()
 
     const testClient = createTestClient({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
@@ -288,7 +301,8 @@ describe('FullPageLoadPlugin', () => {
           spanFactory,
           webVitals,
           onSettle,
-          backgroundingListener
+          backgroundingListener,
+          performance
         )
       ]
     })
@@ -323,7 +337,8 @@ describe('FullPageLoadPlugin', () => {
               spanFactory,
               webVitals,
               onSettle,
-              new ControllableBackgroundingListener()
+              new ControllableBackgroundingListener(),
+              performance
             )
           ]
         })
@@ -369,7 +384,8 @@ describe('FullPageLoadPlugin', () => {
               spanFactory,
               webVitals,
               onSettle,
-              new ControllableBackgroundingListener()
+              new ControllableBackgroundingListener(),
+              performance
             )
           ]
         })
@@ -421,7 +437,8 @@ describe('FullPageLoadPlugin', () => {
               spanFactory,
               webVitals,
               onSettle,
-              new ControllableBackgroundingListener()
+              new ControllableBackgroundingListener(),
+              performance
             )
           ]
         })
@@ -462,7 +479,8 @@ describe('FullPageLoadPlugin', () => {
             spanFactory,
             webVitals,
             onSettle,
-            new ControllableBackgroundingListener()
+            new ControllableBackgroundingListener(),
+            performance
           )
         ]
       })
