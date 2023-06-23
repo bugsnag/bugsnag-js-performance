@@ -15,3 +15,10 @@ steps:
   - label: ":pipeline_upload: Basic browser pipeline"
     commands:
       - buildkite-agent pipeline upload .buildkite/browser-pipeline.yml
+
+  #
+  # Conditionally trigger full pipeline
+  #
+  - label: 'Conditionally trigger full set of tests'
+    timeout_in_minutes: 30
+    command: sh -c .buildkite/pipeline_trigger.sh
