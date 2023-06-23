@@ -12,11 +12,14 @@ import ProbabilityManager from './probability-manager'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
-import { SpanFactory, type Span, type SpanOptions } from './span'
+import { type Span, type SpanOptions } from './span'
+import { DefaultSpanContextStorage, type SpanContext, type SpanContextStorage } from './span-context'
+import { SpanFactory } from './span-factory'
 
 export interface BugsnagPerformance<C extends Configuration> {
   start: (config: C | string) => void
   startSpan: (name: string, options?: SpanOptions) => Span
+  readonly currentSpanContext: SpanContext | undefined
 }
 
 export interface ClientOptions<S extends CoreSchema, C extends Configuration> {
@@ -29,11 +32,13 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration> {
   schema: S
   plugins: (spanFactory: SpanFactory) => Array<Plugin<C>>
   persistence: Persistence
+  spanContextStorage?: SpanContextStorage
 }
 
 export function createClient<S extends CoreSchema, C extends Configuration> (options: ClientOptions<S, C>): BugsnagPerformance<C> {
   const bufferingProcessor = new BufferingProcessor()
   let processor: Processor = bufferingProcessor
+  const spanContextStorage = options.spanContextStorage || new DefaultSpanContextStorage(options.backgroundingListener)
 
   const sampler = new Sampler(1.0)
   const spanFactory = new SpanFactory(
@@ -43,7 +48,8 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
     options.spanAttributesSource,
     options.clock,
     options.backgroundingListener,
-    options.schema.logger.defaultValue
+    options.schema.logger.defaultValue,
+    spanContextStorage
   )
   const plugins = options.plugins(spanFactory)
 
@@ -91,6 +97,9 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
     startSpan: (name, spanOptions?: SpanOptions) => {
       const span = spanFactory.startSpan(name, spanOptions)
       return spanFactory.toPublicApi(span)
+    },
+    get currentSpanContext () {
+      return spanContextStorage.current
     }
   }
 }
@@ -100,6 +109,7 @@ export function createNoopClient<C extends Configuration> (): BugsnagPerformance
 
   return {
     start: noop,
-    startSpan: () => ({ id: '', traceId: '', end: noop, isValid: () => false })
+    startSpan: () => ({ id: '', traceId: '', end: noop, isValid: () => false }),
+    currentSpanContext: undefined
   }
 }

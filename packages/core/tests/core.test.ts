@@ -1,5 +1,6 @@
 import { createNoopClient } from '../lib/core'
 import { type BackgroundingListener } from '../lib/backgrounding-listener'
+import { DefaultSpanContextStorage } from '../lib/span-context'
 import {
   ControllableBackgroundingListener,
   createTestClient,
@@ -16,7 +17,8 @@ describe('Core', () => {
 
       expect(client).toStrictEqual({
         start: expect.any(Function),
-        startSpan: expect.any(Function)
+        startSpan: expect.any(Function),
+        currentSpanContext: undefined
       })
     })
 
@@ -178,12 +180,12 @@ describe('Core', () => {
 
           const client = createTestClient({ backgroundingListener })
 
-          expect(backgroundingListener.onStateChange).toHaveBeenCalledTimes(1)
+          expect(backgroundingListener.onStateChange).toHaveBeenCalledTimes(2)
 
           client.start(VALID_API_KEY)
           await jest.runOnlyPendingTimersAsync()
 
-          expect(backgroundingListener.onStateChange).toHaveBeenCalledTimes(2)
+          expect(backgroundingListener.onStateChange).toHaveBeenCalledTimes(3)
           expect(console.warn).not.toHaveBeenCalled()
         })
 
@@ -233,6 +235,17 @@ describe('Core', () => {
           backgroundingListener.sendToBackground()
 
           expect(delivery.requests).toHaveLength(0)
+        })
+      })
+
+      describe('currentSpanContext', () => {
+        it('returns the current span context', () => {
+          const spanContextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
+          const client = createTestClient({ spanContextStorage })
+
+          const spanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
+          spanContextStorage.push(spanContext)
+          expect(client.currentSpanContext).toBe(spanContext)
         })
       })
     })

@@ -1,5 +1,5 @@
 
-import { Kind } from '@bugsnag/core-performance'
+import { DefaultSpanContextStorage, Kind } from '@bugsnag/core-performance'
 import {
   ControllableBackgroundingListener,
   InMemoryDelivery,
@@ -7,7 +7,8 @@ import {
   StableIdGenerator,
   VALID_API_KEY,
   createTestClient,
-  spanAttributesSource
+  spanAttributesSource,
+  IncrementingIdGenerator
 } from '@bugsnag/js-performance-test-utilities'
 import {
   InMemoryPersistence,
@@ -39,14 +40,16 @@ describe('SpanInternal', () => {
       const sampler = new Sampler(0.5)
       const delivery = { send: jest.fn() }
       const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+      const backgroundingListener = new ControllableBackgroundingListener()
       const spanFactory = new SpanFactory(
         processor,
         sampler,
         new StableIdGenerator(),
         spanAttributesSource,
         new IncrementingClock(),
-        new ControllableBackgroundingListener(),
-        jestLogger
+        backgroundingListener,
+        jestLogger,
+        new DefaultSpanContextStorage(backgroundingListener)
       )
 
       const spanInternal = spanFactory.startSpan('span-name', { startTime: 1234 })
@@ -71,14 +74,16 @@ describe('SpanInternal', () => {
       const sampler = new Sampler(0.5)
       const delivery = { send: jest.fn() }
       const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+      const backgroundingListener = new ControllableBackgroundingListener()
       const spanFactory = new SpanFactory(
         processor,
         sampler,
         new StableIdGenerator(),
         spanAttributesSource,
         new IncrementingClock(),
-        new ControllableBackgroundingListener(),
-        jestLogger
+        backgroundingListener,
+        jestLogger,
+        new DefaultSpanContextStorage(backgroundingListener)
       )
 
       const spanInternal = spanFactory.startSpan('span-name', { startTime: 1234 })
@@ -92,103 +97,6 @@ describe('SpanInternal', () => {
           timeUnixNano: '1234000000'
         }]
       }))
-    })
-  })
-})
-
-describe('SpanFactory', () => {
-  describe('startSpan', () => {
-    it('omits first class span attribute by default', () => {
-      const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
-      const sampler = new Sampler(0.5)
-      const delivery = { send: jest.fn() }
-      const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
-      const spanFactory = new SpanFactory(
-        processor,
-        sampler,
-        new StableIdGenerator(),
-        spanAttributesSource,
-        new IncrementingClock(),
-        new ControllableBackgroundingListener(),
-        jestLogger
-      )
-
-      const span = spanFactory.startSpan('name')
-
-      // @ts-expect-error 'attributes' is private but very awkward to test otherwise
-      expect(span.attributes.attributes.has('bugsnag.span.first_class')).toBe(false)
-    })
-
-    it('creates first class spans when isFirstClass is true', () => {
-      const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
-      const sampler = new Sampler(0.5)
-      const delivery = { send: jest.fn() }
-      const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
-      const spanFactory = new SpanFactory(
-        processor,
-        sampler,
-        new StableIdGenerator(),
-        spanAttributesSource,
-        new IncrementingClock(),
-        new ControllableBackgroundingListener(),
-        jestLogger
-      )
-
-      const span = spanFactory.startSpan('name', { isFirstClass: true })
-
-      // @ts-expect-error 'attributes' is private but very awkward to test otherwise
-      expect(span.attributes.attributes.get('bugsnag.span.first_class')).toBe(true)
-    })
-
-    it('does not create first class spans when isFirstClass is false', () => {
-      const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
-      const sampler = new Sampler(0.5)
-      const delivery = { send: jest.fn() }
-      const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
-      const spanFactory = new SpanFactory(
-        processor,
-        sampler,
-        new StableIdGenerator(),
-        spanAttributesSource,
-        new IncrementingClock(),
-        new ControllableBackgroundingListener(),
-        jestLogger
-      )
-
-      const span = spanFactory.startSpan('name', { isFirstClass: false })
-
-      // @ts-expect-error 'attributes' is private but very awkward to test otherwise
-      expect(span.attributes.attributes.get('bugsnag.span.first_class')).toBe(false)
-    })
-
-    it.each([
-      null,
-      undefined,
-      1,
-      0,
-      'true',
-      'false',
-      [true, false]
-    ])('omits first class attribute when isFirstClass is %s', (isFirstClass) => {
-      const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
-      const sampler = new Sampler(0.5)
-      const delivery = { send: jest.fn() }
-      const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
-      const spanFactory = new SpanFactory(
-        processor,
-        sampler,
-        new StableIdGenerator(),
-        spanAttributesSource,
-        new IncrementingClock(),
-        new ControllableBackgroundingListener(),
-        jestLogger
-      )
-
-      // @ts-expect-error 'isFirstClass' is the wrong type
-      const span = spanFactory.startSpan('name', { isFirstClass })
-
-      // @ts-expect-error 'attributes' is private but very awkward to test otherwise
-      expect(span.attributes.attributes.has('bugsnag.span.first_class')).toBe(false)
     })
   })
 })
@@ -240,6 +148,137 @@ describe('Span', () => {
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         startTimeUnixNano: '1000000'
+      }))
+    })
+
+    const makeCurrentContextOptions: any[] = [
+      { type: 'true', makeCurrentContext: true },
+      { type: 'string', makeCurrentContext: 'yes please' },
+      { type: 'bigint', makeCurrentContext: BigInt(9007199254740991) },
+      { type: 'function', makeCurrentContext: () => {} },
+      { type: 'object', makeCurrentContext: { property: 'test' } },
+      { type: 'empty array', makeCurrentContext: [] },
+      { type: 'array', makeCurrentContext: [1, 2, 3] },
+      { type: 'symbol', makeCurrentContext: Symbol('test') },
+      { type: 'null', makeCurrentContext: null },
+      { type: 'undefined', makeCurrentContext: undefined }
+    ]
+
+    it.each(makeCurrentContextOptions)('becomes the current SpanContext when makeCurrentContext is not false ($type)', (options) => {
+      const client = createTestClient()
+      client.start({ apiKey: VALID_API_KEY })
+      expect(client.currentSpanContext).toBeUndefined()
+
+      const spanIsContext = client.startSpan('context span', options)
+      expect(spanContextEquals(spanIsContext, client.currentSpanContext)).toBe(true)
+    })
+
+    it('does not become the current SpanContext when SpanOptions.makeCurrentContext is false', () => {
+      const idGenerator = {
+        count: 0,
+        generate (bits: 64 | 128) {
+          if (bits === 64) {
+            this.count++
+            return `span ID ${this.count}`
+          }
+
+          return 'a trace ID'
+        }
+      }
+
+      const client = createTestClient({ idGenerator })
+      client.start({ apiKey: VALID_API_KEY })
+      expect(client.currentSpanContext).toBeUndefined()
+
+      const spanIsContext = client.startSpan('context span')
+      expect(spanContextEquals(spanIsContext, client.currentSpanContext)).toBe(true)
+
+      const spanIsNotContext = client.startSpan('non context span', { makeCurrentContext: false })
+      expect(spanContextEquals(spanIsNotContext, client.currentSpanContext)).toBe(false)
+      expect(spanContextEquals(spanIsContext, client.currentSpanContext)).toBe(true)
+    })
+
+    it('sets traceId and parentSpanId from parentContext if specified', async () => {
+      const idGenerator = new IncrementingIdGenerator()
+      const delivery = new InMemoryDelivery()
+      const client = createTestClient({ idGenerator, deliveryFactory: () => delivery })
+      client.start({ apiKey: VALID_API_KEY })
+
+      // push two spans onto the context stack
+      const span1 = client.startSpan('should become parent')
+      const span2 = client.startSpan('should not become parent')
+      expect(spanContextEquals(span2, client.currentSpanContext)).toBe(true)
+
+      // start a new child span with an invalid parent context
+      const childOfSpan1 = client.startSpan('child of span 1', { parentContext: span1 })
+      childOfSpan1.end()
+
+      await jest.runOnlyPendingTimersAsync()
+
+      // child span should be nested under the first span
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: 'child of span 1',
+        parentSpanId: span1.id,
+        traceId: span1.traceId
+      }))
+    })
+
+    it('starts a new root span when parentContext is null', async () => {
+      const idGenerator = new IncrementingIdGenerator()
+      const delivery = new InMemoryDelivery()
+      const client = createTestClient({ idGenerator, deliveryFactory: () => delivery })
+      client.start({ apiKey: VALID_API_KEY })
+
+      const rootSpan = client.startSpan('root span')
+      expect(spanContextEquals(rootSpan, client.currentSpanContext)).toBe(true)
+
+      const newRootSpan = client.startSpan('new root span', { parentContext: null })
+      newRootSpan.end()
+
+      await jest.runOnlyPendingTimersAsync()
+
+      // new root span should have a new trace ID and no parentSpanId
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: 'new root span',
+        parentSpanId: undefined,
+        traceId: `trace ID ${idGenerator.traceCount}`
+      }))
+    })
+
+    const parentContextOptions: any[] = [
+      { type: 'true', parentContext: true },
+      { type: 'string', parentContext: 'yes please' },
+      { type: 'bigint', parentContext: BigInt(9007199254740991) },
+      { type: 'function', parentContext: () => {} },
+      { type: 'object', parentContext: { property: 'test' } },
+      { type: 'empty array', parentContext: [] },
+      { type: 'array', parentContext: [1, 2, 3] },
+      { type: 'symbol', parentContext: Symbol('test') },
+      { type: 'undefined', parentContext: undefined }
+    ]
+
+    it.each(parentContextOptions)('defaults to the current context when parentContext is invalid ($type)', async (options) => {
+      const idGenerator = new IncrementingIdGenerator()
+      const delivery = new InMemoryDelivery()
+      const client = createTestClient({ idGenerator, deliveryFactory: () => delivery })
+      client.start({ apiKey: VALID_API_KEY })
+
+      // push two spans onto the context stack
+      client.startSpan('root span')
+      const parentSpan = client.startSpan('parent span')
+      expect(spanContextEquals(parentSpan, client.currentSpanContext)).toBe(true)
+
+      // start a new child span with an invalid parent context
+      const childSpan = client.startSpan('child span', options)
+      childSpan.end()
+
+      await jest.runOnlyPendingTimersAsync()
+
+      // child span should be nested under the parent span
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: 'child span',
+        parentSpanId: parentSpan.id,
+        traceId: parentSpan.traceId
       }))
     })
   })
@@ -524,6 +563,41 @@ describe('Span', () => {
       expect(logger.warn).toHaveBeenCalledWith('Attempted to end a Span which has already ended.')
       expect(delivery.requests).toHaveLength(1)
     })
+
+    it('will remove the span from the context stack (if it is the current context)', () => {
+      const idGenerator = {
+        count: 0,
+        generate (bits: 64 | 128) {
+          if (bits === 64) {
+            this.count++
+            return `span ID ${this.count}`
+          }
+
+          return 'a trace ID'
+        }
+      }
+
+      const client = createTestClient({ idGenerator })
+      client.start({ apiKey: VALID_API_KEY })
+      expect(client.currentSpanContext).toBeUndefined()
+
+      const span1 = client.startSpan('span 1')
+      const span2 = client.startSpan('span 2')
+      const span3 = client.startSpan('span 3')
+      expect(spanContextEquals(span3, client.currentSpanContext)).toBe(true)
+
+      // span2 is not at the top of the context stack so span3 should still be the current context
+      span2.end()
+      expect(spanContextEquals(span3, client.currentSpanContext)).toBe(true)
+
+      // span3 is at the top of the stack so should be popped when ended
+      // span2 is already closed so span1 should now be the current context
+      span3.end()
+      expect(spanContextEquals(span1, client.currentSpanContext)).toBe(true)
+
+      span1.end()
+      expect(client.currentSpanContext).toBeUndefined()
+    })
   })
 })
 
@@ -540,47 +614,6 @@ describe('SpanContext', () => {
 
       span.end()
       expect(span.isValid()).toEqual(false)
-    })
-  })
-  describe('spanContextEquals()', () => {
-    it.each([
-      {
-        span1: undefined,
-        span2: undefined,
-        expected: true
-      },
-      {
-        span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
-        span2: undefined,
-        expected: false
-      },
-      {
-        span1: undefined,
-        span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
-        expected: false
-      },
-      {
-        span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
-        span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
-        expected: true
-      },
-      {
-        span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
-        span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => false },
-        expected: true
-      },
-      {
-        span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
-        span2: { id: '0123456789abcdef', traceId: 'a0b1c2d3e4f5a0b1c2d3e4f5a0b1c2d3', isValid: () => true },
-        expected: false
-      },
-      {
-        span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
-        span2: { id: '9876543210fedcba', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
-        expected: false
-      }
-    ])('returns $expected given inputs $span1 and $span2', ({ span1, span2, expected }) => {
-      expect(spanContextEquals(span1, span2)).toEqual(expected)
     })
   })
 })

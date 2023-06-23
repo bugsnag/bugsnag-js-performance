@@ -1,4 +1,4 @@
-import { type SpanContext, DefaultSpanContextStorage } from '../lib'
+import { type SpanContext, DefaultSpanContextStorage, spanContextEquals } from '../lib'
 import { ControllableBackgroundingListener } from '@bugsnag/js-performance-test-utilities'
 
 describe('DefaultSpanContextStorage', () => {
@@ -156,5 +156,47 @@ describe('DefaultSpanContextStorage', () => {
       contextStorage.push(spanContext)
       expect(contextStorage.current).toBe(spanContext)
     })
+  })
+})
+
+describe('spanContextEquals()', () => {
+  it.each([
+    {
+      span1: undefined,
+      span2: undefined,
+      expected: true
+    },
+    {
+      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+      span2: undefined,
+      expected: false
+    },
+    {
+      span1: undefined,
+      span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+      expected: false
+    },
+    {
+      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+      span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+      expected: true
+    },
+    {
+      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+      span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => false },
+      expected: true
+    },
+    {
+      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+      span2: { id: '0123456789abcdef', traceId: 'a0b1c2d3e4f5a0b1c2d3e4f5a0b1c2d3', isValid: () => true },
+      expected: false
+    },
+    {
+      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+      span2: { id: '9876543210fedcba', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+      expected: false
+    }
+  ])('returns $expected given inputs $span1 and $span2', ({ span1, span2, expected }) => {
+    expect(spanContextEquals(span1, span2)).toEqual(expected)
   })
 })

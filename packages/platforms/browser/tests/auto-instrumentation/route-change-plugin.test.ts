@@ -4,10 +4,10 @@
  */
 
 import { InMemoryDelivery, IncrementingClock, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
-import { RouteChangePlugin } from '../lib/auto-instrumentation/route-change-plugin'
-import { createSchema } from '../lib/config'
-import { createDefaultRoutingProvider } from '../lib/default-routing-provider'
-import { type OnSettle } from '../lib/on-settle'
+import { RouteChangePlugin } from '../../lib/auto-instrumentation/route-change-plugin'
+import { createSchema } from '../../lib/config'
+import { createDefaultRoutingProvider } from '../../lib/default-routing-provider'
+import { type OnSettle } from '../../lib/on-settle'
 
 jest.useFakeTimers()
 

@@ -1,5 +1,6 @@
 import { type Logger } from './config'
 import { type PersistedProbability } from './persistence'
+import { type SpanContext } from './span-context'
 
 export const isBoolean = (value: unknown): value is boolean =>
   value === true || value === false
@@ -31,3 +32,9 @@ export function isPersistedProbabilty (value: unknown): value is PersistedProbab
     isNumber(value.value) &&
     isNumber(value.time)
 }
+
+export const isSpanContext = (value: unknown): value is SpanContext =>
+  isObject(value) &&
+    typeof value.id === 'string' &&
+    typeof value.traceId === 'string' &&
+    typeof value.isValid === 'function'

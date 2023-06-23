@@ -1,14 +1,9 @@
-import { SpanAttributes, type SpanAttribute, type SpanAttributesSource } from './attributes'
-import { type BackgroundingListenerState, type BackgroundingListener } from './backgrounding-listener'
+import { type SpanAttribute, type SpanAttributes } from './attributes'
 import { type Clock } from './clock'
-import { type Logger } from './config'
 import { type DeliverySpan } from './delivery'
 import { SpanEvents } from './events'
-import { type IdGenerator } from './id-generator'
-import { type Processor } from './processor'
-import { type ReadonlySampler } from './sampler'
 import { type SpanContext } from './span-context'
-import { type Time, timeToNumber } from './time'
+import { type Time } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
 
 export interface Span extends SpanContext {
@@ -43,6 +38,7 @@ export interface SpanEnded {
   readonly samplingRate: number
   readonly endTime: number // stored in the format returned from Clock.now (see clock.ts) - written once when 'end' is called
   samplingProbability: SpanProbability
+  readonly parentSpanId?: string
 }
 
 export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
@@ -51,6 +47,7 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
     kind: span.kind,
     spanId: span.id,
     traceId: span.traceId,
+    parentSpanId: span.parentSpanId,
     startTimeUnixNano: clock.toUnixTimestampNanoseconds(span.startTime),
     endTimeUnixNano: clock.toUnixTimestampNanoseconds(span.endTime),
     attributes: span.attributes.toJson(),
@@ -61,17 +58,19 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
 export class SpanInternal implements SpanContext {
   readonly id: string
   readonly traceId: string
+  private readonly parentSpanId?: string
   private readonly startTime: number
   private readonly samplingRate: number
   private readonly kind = Kind.Client // TODO: How do we define the initial Kind?
   private readonly events = new SpanEvents()
   private readonly attributes: SpanAttributes
-  private readonly name: string
+  name: string
   private endTime?: number
 
-  constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes) {
+  constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes, parentSpanId?: string) {
     this.id = id
     this.traceId = traceId
+    this.parentSpanId = parentSpanId
     this.name = name
     this.startTime = startTime
     this.attributes = attributes
@@ -98,7 +97,8 @@ export class SpanInternal implements SpanContext {
       events: this.events,
       samplingRate: this.samplingRate,
       endTime,
-      samplingProbability
+      samplingProbability,
+      parentSpanId: this.parentSpanId
     }
   }
 
@@ -109,107 +109,7 @@ export class SpanInternal implements SpanContext {
 
 export interface SpanOptions {
   startTime?: Time
+  makeCurrentContext?: boolean
+  parentContext?: SpanContext | null
   isFirstClass?: boolean
-}
-
-export class SpanFactory {
-  private readonly idGenerator: IdGenerator
-  private readonly spanAttributesSource: SpanAttributesSource
-  private logger: Logger
-  private processor: Processor
-  private readonly sampler: ReadonlySampler
-  private readonly clock: Clock
-
-  private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
-  private isInForeground: boolean = true
-
-  constructor (
-    processor: Processor,
-    sampler: ReadonlySampler,
-    idGenerator: IdGenerator,
-    spanAttributesSource: SpanAttributesSource,
-    clock: Clock,
-    backgroundingListener: BackgroundingListener,
-    logger: Logger
-  ) {
-    this.processor = processor
-    this.sampler = sampler
-    this.idGenerator = idGenerator
-    this.logger = logger
-    this.spanAttributesSource = spanAttributesSource
-    this.clock = clock
-
-    // this will fire immediately if the app is already backgrounded
-    backgroundingListener.onStateChange(this.onBackgroundStateChange)
-  }
-
-  private onBackgroundStateChange = (state: BackgroundingListenerState) => {
-    this.isInForeground = state === 'in-foreground'
-    // clear all open spans regardless of the new background state
-    // since spans are only valid if they start and end while the app is in the foreground
-    this.openSpans = new WeakSet<SpanInternal>()
-  }
-
-  startSpan (name: string, options: SpanOptions = {}) {
-    const safeStartTime = timeToNumber(this.clock, options ? options.startTime : undefined)
-    const spanId = this.idGenerator.generate(64)
-    const traceId = this.idGenerator.generate(128)
-    const attributes = new SpanAttributes(this.spanAttributesSource())
-
-    if (options && typeof options.isFirstClass === 'boolean') {
-      attributes.set('bugsnag.span.first_class', options.isFirstClass)
-    }
-
-    const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes)
-
-    // don't track spans that are started while the app is backgrounded
-    if (this.isInForeground) {
-      this.openSpans.add(span)
-    }
-
-    return span
-  }
-
-  configure (processor: Processor, logger: Logger) {
-    this.processor = processor
-    this.logger = logger
-  }
-
-  endSpan (
-    span: SpanInternal,
-    endTime: number
-  ) {
-    // if the span doesn't exist here it shouldn't be processed
-    if (!this.openSpans.delete(span)) {
-      // only warn if the span has already been ended explicitly rather than
-      // discarded by us
-      if (!span.isValid()) {
-        this.logger.warn('Attempted to end a Span which has already ended.')
-      }
-
-      return
-    }
-
-    const spanEnded = span.end(endTime, this.sampler.spanProbability)
-
-    if (this.sampler.sample(spanEnded)) {
-      this.processor.add(spanEnded)
-    }
-  }
-
-  toPublicApi (span: SpanInternal): Span {
-    return {
-      get id () {
-        return span.id
-      },
-      get traceId () {
-        return span.traceId
-      },
-      isValid: () => span.isValid(),
-      end: (endTime) => {
-        const safeEndTime = timeToNumber(this.clock, endTime)
-        this.endSpan(span, safeEndTime)
-      }
-    }
-  }
 }
