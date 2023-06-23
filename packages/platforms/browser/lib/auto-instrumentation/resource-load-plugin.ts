@@ -58,6 +58,7 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
             makeCurrentContext: false
           })
 
+          span.setAttribute('bugsnag.span.category', 'resource_load')
           span.setAttribute('http.url', entry.name)
           span.setAttribute('http.flavor', getHTTPFlavor(entry.nextHopProtocol))
           span.setAttribute('http.response_content_length', entry.encodedBodySize)
