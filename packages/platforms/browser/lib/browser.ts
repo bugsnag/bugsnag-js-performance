@@ -1,5 +1,5 @@
 import { createClient } from '@bugsnag/core-performance'
-import { FullPageLoadPlugin, NetworkRequestPlugin, RouteChangePlugin } from './auto-instrumentation'
+import { FullPageLoadPlugin, NetworkRequestPlugin, ResourceLoadPlugin, RouteChangePlugin } from './auto-instrumentation'
 import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
 import { createSchema } from './config'
@@ -51,7 +51,8 @@ const BugsnagPerformance = createClient({
       performance
     ),
     new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker),
-    new RouteChangePlugin(spanFactory, window.location)
+    new RouteChangePlugin(spanFactory, window.location),
+    new ResourceLoadPlugin(spanFactory, PerformanceObserver)
   ],
   persistence
 })
