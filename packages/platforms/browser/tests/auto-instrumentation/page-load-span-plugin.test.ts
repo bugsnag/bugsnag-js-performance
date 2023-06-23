@@ -25,6 +25,7 @@ import { createSchema } from '../../lib/config'
 import { type OnSettle } from '../../lib/on-settle'
 import { WebVitals } from '../../lib/web-vitals'
 import MockRoutingProvider from '../utilities/mock-routing-provider'
+import { spanContextEquals } from '@bugsnag/core-performance'
 
 jest.useFakeTimers()
 
@@ -348,6 +349,10 @@ describe('FullPageLoadPlugin', () => {
     testClient.start({ apiKey: VALID_API_KEY })
     expect(testClient.currentSpanContext).not.toBeUndefined()
 
+    // we're using the incrementing ID generator so the page load span should have an ID and trace ID of 1
+    const pageLoadSpanContext = { id: 'span ID 1', traceId: 'trace ID 1', isValid: () => true }
+    expect(spanContextEquals(pageLoadSpanContext, testClient.currentSpanContext)).toBe(true)
+
     // start and end a new span - this should become a child of the page load span
     const childSpan = testClient.startSpan('child of page load span')
     childSpan.end()
@@ -367,6 +372,61 @@ describe('FullPageLoadPlugin', () => {
       spanId: 'span ID 2',
       traceId: 'trace ID 1', // trace ID should match the page load span trace ID
       parentSpanId: 'span ID 1' // parentSpanId should match the page load span ID
+    }))
+  })
+
+  it('starts a new root span if there is already an open span context', async () => {
+    const clock = new IncrementingClock()
+    const delivery = new InMemoryDelivery()
+    const onSettle: OnSettle = (onSettleCallback) => {
+      Promise.resolve().then(() => { onSettleCallback(1234) })
+    }
+    const performance = new PerformanceFake()
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const webVitals = new WebVitals(performance, clock, Observer)
+    const testClient = createTestClient({
+      idGenerator: new IncrementingIdGenerator(),
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      deliveryFactory: () => delivery,
+      plugins: (spanFactory) => [
+        new FullPageLoadPlugin(
+          document,
+          window.location,
+          spanFactory,
+          webVitals,
+          onSettle,
+          new ControllableBackgroundingListener(),
+          performance
+        )
+      ]
+    })
+
+    // start a custom root span before calling start
+    const customRootSpan = testClient.startSpan('custom root span')
+    expect(spanContextEquals(customRootSpan, testClient.currentSpanContext)).toBe(true)
+
+    testClient.start({ apiKey: VALID_API_KEY })
+
+    // trigger the onsettle to end the page load span
+    await jest.runOnlyPendingTimersAsync()
+
+    // end the custrom root span
+    customRootSpan.end()
+    await jest.runOnlyPendingTimersAsync()
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: 'custom root span',
+      spanId: 'span ID 1',
+      traceId: 'trace ID 1',
+      parentSpanId: undefined
+    }))
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: '[FullPageLoad]/initial-route',
+      spanId: 'span ID 2',
+      traceId: 'trace ID 2',
+      parentSpanId: undefined // page load span should have no parent
     }))
   })
 

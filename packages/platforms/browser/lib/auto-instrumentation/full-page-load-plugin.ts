@@ -52,7 +52,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
       return
     }
 
-    const span = this.spanFactory.startSpan('[FullPageLoad]', { startTime: 0 })
+    const span = this.spanFactory.startSpan('[FullPageLoad]', { startTime: 0, parentContext: null })
     const url = new URL(this.location.href)
 
     this.onSettle((endTime: number) => {
