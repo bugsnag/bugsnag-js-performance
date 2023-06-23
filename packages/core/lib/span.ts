@@ -1,16 +1,10 @@
-import { SpanAttributes, type SpanAttribute, type SpanAttributesSource } from './attributes'
-import { type BackgroundingListenerState, type BackgroundingListener } from './backgrounding-listener'
+import { type SpanAttribute, type SpanAttributes } from './attributes'
 import { type Clock } from './clock'
-import { type Logger } from './config'
 import { type DeliverySpan } from './delivery'
 import { SpanEvents } from './events'
-import { type IdGenerator } from './id-generator'
-import { type Processor } from './processor'
-import { type ReadonlySampler } from './sampler'
-import { type SpanContext, type SpanContextStorage } from './span-context'
-import { type Time, timeToNumber } from './time'
+import { type SpanContext } from './span-context'
+import { type Time } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
-import { isSpanContext } from './validation'
 
 export interface Span extends SpanContext {
   end: (endTime?: Time) => void
@@ -118,124 +112,4 @@ export interface SpanOptions {
   makeCurrentContext?: boolean
   parentContext?: SpanContext | null
   isFirstClass?: boolean
-}
-
-export class SpanFactory {
-  private processor: Processor
-  private readonly sampler: ReadonlySampler
-  private readonly idGenerator: IdGenerator
-  private readonly spanAttributesSource: SpanAttributesSource
-  private readonly clock: Clock
-  private readonly spanContextStorage: SpanContextStorage
-  private logger: Logger
-
-  private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
-  private isInForeground: boolean = true
-
-  constructor (
-    processor: Processor,
-    sampler: ReadonlySampler,
-    idGenerator: IdGenerator,
-    spanAttributesSource: SpanAttributesSource,
-    clock: Clock,
-    backgroundingListener: BackgroundingListener,
-    logger: Logger,
-    spanContextStorage: SpanContextStorage
-  ) {
-    this.processor = processor
-    this.sampler = sampler
-    this.idGenerator = idGenerator
-    this.spanAttributesSource = spanAttributesSource
-    this.clock = clock
-    this.logger = logger
-    this.spanContextStorage = spanContextStorage
-
-    // this will fire immediately if the app is already backgrounded
-    backgroundingListener.onStateChange(this.onBackgroundStateChange)
-  }
-
-  private onBackgroundStateChange = (state: BackgroundingListenerState) => {
-    this.isInForeground = state === 'in-foreground'
-    // clear all open spans regardless of the new background state
-    // since spans are only valid if they start and end while the app is in the foreground
-    this.openSpans = new WeakSet<SpanInternal>()
-  }
-
-  startSpan (name: string, options: SpanOptions = {}) {
-    const safeStartTime = timeToNumber(this.clock, options ? options.startTime : undefined)
-    const spanId = this.idGenerator.generate(64)
-
-    // if the parentContext option is not set use the current context
-    // if parentContext is explicitly null, or there is no current context,
-    // we are starting a new root span
-    const parentContext = options && (isSpanContext(options.parentContext) || options.parentContext === null)
-      ? options.parentContext
-      : this.spanContextStorage.current
-
-    const parentSpanId = parentContext ? parentContext.id : undefined
-    const traceId = parentContext ? parentContext.traceId : this.idGenerator.generate(128)
-
-    const attributes = new SpanAttributes(this.spanAttributesSource())
-
-    if (options && typeof options.isFirstClass === 'boolean') {
-      attributes.set('bugsnag.span.first_class', options.isFirstClass)
-    }
-
-    const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes, parentSpanId)
-
-    // don't track spans that are started while the app is backgrounded
-    if (this.isInForeground) {
-      this.openSpans.add(span)
-
-      if (!options || options.makeCurrentContext !== false) {
-        this.spanContextStorage.push(span)
-      }
-    }
-
-    return span
-  }
-
-  configure (processor: Processor, logger: Logger) {
-    this.processor = processor
-    this.logger = logger
-  }
-
-  endSpan (
-    span: SpanInternal,
-    endTime: number
-  ) {
-    // if the span doesn't exist here it shouldn't be processed
-    if (!this.openSpans.delete(span)) {
-      // only warn if the span has already been ended explicitly rather than
-      // discarded by us
-      if (!span.isValid()) {
-        this.logger.warn('Attempted to end a Span which has already ended.')
-      }
-
-      return
-    }
-
-    const spanEnded = span.end(endTime, this.sampler.spanProbability)
-    this.spanContextStorage.pop(span)
-
-    if (this.sampler.sample(spanEnded)) {
-      this.processor.add(spanEnded)
-    }
-  }
-
-  toPublicApi (span: SpanInternal): Span {
-    return {
-      get id () {
-        return span.id
-      },
-      get traceId () {
-        return span.traceId
-      },
-      isValid: () => span.isValid(),
-      end: (endTime) => {
-        const safeEndTime = timeToNumber(this.clock, endTime)
-        this.endSpan(span, safeEndTime)
-      }
-    }
-  }
 }
