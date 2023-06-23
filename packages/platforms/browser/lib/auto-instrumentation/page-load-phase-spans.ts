@@ -12,30 +12,34 @@ export const instrumentPageLoadPhaseSpans = (
   route: string,
   parentContext: SpanContext
 ) => {
-  function createPageLoadPhaseSpan (name: string, startTime: number, endTime: number) {
+  function createPageLoadPhaseSpan (phase: string, startTime: number, endTime: number) {
     if (shouldOmitSpan(startTime, endTime)) return
-    spanFactory.endSpan(spanFactory.startSpan(name + route, {
+    const span = spanFactory.startSpan(`[PageLoadPhase/${phase}]${route}`, {
       startTime,
       parentContext,
       makeCurrentContext: false
-    }), endTime)
+    })
+
+    span.setAttribute('bugsnag.span.category', 'page_load_phase')
+    span.setAttribute('bugsnag.phase', phase)
+    spanFactory.endSpan(span, endTime)
   }
 
   const entry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
   if (entry) {
-    createPageLoadPhaseSpan('[PageLoadPhase/Unload]', entry.unloadEventStart, entry.unloadEventEnd)
-    createPageLoadPhaseSpan('[PageLoadPhase/Redirect]', entry.redirectStart, entry.redirectEnd)
-    createPageLoadPhaseSpan('[PageLoadPhase/LoadFromCache]', entry.fetchStart, entry.domainLookupStart)
-    createPageLoadPhaseSpan('[PageLoadPhase/DNSLookup]', entry.domainLookupStart, entry.domainLookupEnd)
+    createPageLoadPhaseSpan('Unload', entry.unloadEventStart, entry.unloadEventEnd)
+    createPageLoadPhaseSpan('Redirect', entry.redirectStart, entry.redirectEnd)
+    createPageLoadPhaseSpan('LoadFromCache', entry.fetchStart, entry.domainLookupStart)
+    createPageLoadPhaseSpan('DNSLookup', entry.domainLookupStart, entry.domainLookupEnd)
 
     // secureConectionStart will be 0 if no secure connection is used so use connectEnd in that case
     const TCPHandshakeEnd = entry.secureConnectionStart || entry.connectEnd
-    createPageLoadPhaseSpan('[PageLoadPhase/TCPHandshake]', entry.connectStart, TCPHandshakeEnd)
+    createPageLoadPhaseSpan('TCPHandshake', entry.connectStart, TCPHandshakeEnd)
 
-    createPageLoadPhaseSpan('[PageLoadPhase/TLS]', entry.secureConnectionStart, entry.connectEnd)
-    createPageLoadPhaseSpan('[PageLoadPhase/HTTPRequest]', entry.requestStart, entry.responseStart)
-    createPageLoadPhaseSpan('[PageLoadPhase/HTTPResponse]', entry.responseStart, entry.responseEnd)
-    createPageLoadPhaseSpan('[PageLoadPhase/DomContentLoadedEvent]', entry.domContentLoadedEventStart, entry.domContentLoadedEventEnd)
-    createPageLoadPhaseSpan('[PageLoadPhase/LoadEvent]', entry.loadEventStart, entry.loadEventEnd)
+    createPageLoadPhaseSpan('TLS', entry.secureConnectionStart, entry.connectEnd)
+    createPageLoadPhaseSpan('HTTPRequest', entry.requestStart, entry.responseStart)
+    createPageLoadPhaseSpan('HTTPResponse', entry.responseStart, entry.responseEnd)
+    createPageLoadPhaseSpan('DomContentLoadedEvent', entry.domContentLoadedEventStart, entry.domContentLoadedEventEnd)
+    createPageLoadPhaseSpan('LoadEvent', entry.loadEventStart, entry.loadEventEnd)
   }
 }
