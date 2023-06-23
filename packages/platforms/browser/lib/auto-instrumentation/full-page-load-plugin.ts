@@ -54,7 +54,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
       if (this.wasBackgrounded) return
 
       const route = configuration.routingProvider.resolveRoute(url)
-      span.name += `${route}`
+      span.name += route
 
       // Browser attributes
       span.setAttribute('bugsnag.span.category', 'full_page_load')
