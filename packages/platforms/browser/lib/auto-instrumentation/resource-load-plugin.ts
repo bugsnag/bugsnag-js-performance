@@ -44,6 +44,8 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
       const entries = list.getEntries() as ResourceTiming[]
 
       for (const entry of entries) {
+        if (['fetch', 'xmlhttprequest'].includes(entry.initiatorType)) return
+
         const parentContext = this.spanFactory.firstSpanContext
 
         if (parentContext) {
