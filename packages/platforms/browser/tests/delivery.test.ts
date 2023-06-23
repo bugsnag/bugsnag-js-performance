@@ -6,9 +6,6 @@ import { type DeliveryPayload } from '@bugsnag/core-performance'
 import { ControllableBackgroundingListener } from '@bugsnag/js-performance-test-utilities'
 import createBrowserDeliveryFactory from '../lib/delivery'
 
-// the format of the Bugsnag-Sent-At header: YYYY-MM-DDTHH:mm:ss.sssZ
-const SENT_AT_FORMAT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
-
 describe('Browser Delivery', () => {
   it('delivers a span', () => {
     const fetch = jest.fn(() => Promise.resolve({} as unknown as Response))
@@ -43,8 +40,7 @@ describe('Browser Delivery', () => {
       headers: {
         'Bugsnag-Api-Key': 'test-api-key',
         'Bugsnag-Span-Sampling': '1.0:1',
-        'Content-Type': 'application/json',
-        'Bugsnag-Sent-At': expect.stringMatching(SENT_AT_FORMAT)
+        'Content-Type': 'application/json'
       }
     })
   })
@@ -85,8 +81,7 @@ describe('Browser Delivery', () => {
       headers: {
         'Bugsnag-Api-Key': 'test-api-key',
         'Bugsnag-Span-Sampling': '1.0:1',
-        'Content-Type': 'application/json',
-        'Bugsnag-Sent-At': expect.stringMatching(SENT_AT_FORMAT)
+        'Content-Type': 'application/json'
       }
     })
   })
@@ -128,8 +123,7 @@ describe('Browser Delivery', () => {
       headers: {
         'Bugsnag-Api-Key': 'test-api-key',
         'Bugsnag-Span-Sampling': '1.0:1',
-        'Content-Type': 'application/json',
-        'Bugsnag-Sent-At': expect.stringMatching(SENT_AT_FORMAT)
+        'Content-Type': 'application/json'
       }
     })
   })
@@ -167,8 +161,7 @@ describe('Browser Delivery', () => {
       headers: {
         'Bugsnag-Api-Key': 'test-api-key',
         'Bugsnag-Span-Sampling': '1.0:0',
-        'Content-Type': 'application/json',
-        'Bugsnag-Sent-At': expect.stringMatching(SENT_AT_FORMAT)
+        'Content-Type': 'application/json'
       }
     })
 
