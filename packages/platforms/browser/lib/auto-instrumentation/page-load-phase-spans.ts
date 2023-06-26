@@ -1,6 +1,18 @@
 import type { SpanContext, SpanFactory } from '@bugsnag/core-performance'
 import { type PerformanceWithTiming } from '../on-settle/load-event-end-settler'
 
+type PageLoadPhase
+  = 'Unload'
+  | 'Redirect'
+  | 'LoadFromCache'
+  | 'DNSLookup'
+  | 'TCPHandshake'
+  | 'TLS'
+  | 'HTTPRequest'
+  | 'HTTPResponse'
+  | 'DomContentLoadedEvent'
+  | 'LoadEvent'
+
 function shouldOmitSpan (startTime?: number, endTime?: number): boolean {
   return (startTime === undefined || endTime === undefined) ||
   (startTime === 0 && endTime === 0)
@@ -12,7 +24,7 @@ export const instrumentPageLoadPhaseSpans = (
   route: string,
   parentContext: SpanContext
 ) => {
-  function createPageLoadPhaseSpan (phase: string, startTime: number, endTime: number) {
+  function createPageLoadPhaseSpan (phase: PageLoadPhase, startTime: number, endTime: number) {
     if (shouldOmitSpan(startTime, endTime)) return
     const span = spanFactory.startSpan(`[PageLoadPhase/${phase}]${route}`, {
       startTime,
