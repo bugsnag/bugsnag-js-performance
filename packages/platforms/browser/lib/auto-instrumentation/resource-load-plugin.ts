@@ -44,7 +44,7 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
       const entries = list.getEntries() as ResourceTiming[]
 
       for (const entry of entries) {
-        if (['fetch', 'xmlhttprequest'].includes(entry.initiatorType)) return
+        if (['fetch', 'xmlhttprequest'].includes(entry.initiatorType)) continue
 
         const parentContext = this.spanFactory.firstSpanContext
 
@@ -61,8 +61,11 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
           span.setAttribute('bugsnag.span.category', 'resource_load')
           span.setAttribute('http.url', entry.name)
           span.setAttribute('http.flavor', getHTTPFlavor(entry.nextHopProtocol))
-          span.setAttribute('http.response_content_length', entry.encodedBodySize)
-          span.setAttribute('http.response_content_length_uncompressed', entry.decodedBodySize)
+
+          if (entry.encodedBodySize && entry.decodedBodySize) {
+            span.setAttribute('http.response_content_length', entry.encodedBodySize)
+            span.setAttribute('http.response_content_length_uncompressed', entry.decodedBodySize)
+          }
 
           if (entry.responseStatus) {
             span.setAttribute('http.status_code', entry.responseStatus)
