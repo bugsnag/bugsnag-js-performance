@@ -8,23 +8,17 @@ const showDiff = n => {
 module.exports = async function (github, context, needs) {
   const npm = {
     before: {
-      unminified: needs['base-branch'].outputs['unminified-size'],
-      minified: needs['base-branch'].outputs['minified-size'],
-      gzipped: needs['base-branch'].outputs['minified-gzip-size'],
+      package: needs['base-branch'].outputs['package-size'],
     },
 
     after: {
-      unminified: needs['head-branch'].outputs['unminified-size'],
-      minified: needs['head-branch'].outputs['minified-size'],
-      gzipped: needs['head-branch'].outputs['minified-gzip-size'],
+      package: needs['head-branch'].outputs['package-size'],
     },
   }
 
   const diff = {
     npm: {
-      unminified: npm.after.unminified - npm.before.unminified,
-      minified: npm.after.minified - npm.before.minified,
-      gzipped: npm.after.gzipped - npm.before.gzipped,
+      package: npm.after.package - npm.before.package,
     },
   }
 
@@ -33,11 +27,11 @@ module.exports = async function (github, context, needs) {
 
   **NPM build**
 
-  |        | Unminified                              | Minfied                               | Minified + gzipped                   |
-  | ------ | --------------------------------------- | ------------------------------------- | ------------------------------------ |
-  | Before | \`${formatKbs(npm.before.unminified)}\` | \`${formatKbs(npm.before.minified)}\` | \`${formatKbs(npm.before.gzipped)}\` |
-  | After  | \`${formatKbs(npm.after.unminified)}\`  | \`${formatKbs(npm.after.minified)}\`  | \`${formatKbs(npm.after.gzipped)}\`  |
-  | ±      | ${showDiff(diff.npm.unminified)}        | ${showDiff(diff.npm.minified)}        | ${showDiff(diff.npm.gzipped)}        |
+  |        | Package                                 |
+  | ------ | --------------------------------------- |
+  | Before | \`${formatKbs(npm.before.package)}\`    |
+  | After  | \`${formatKbs(npm.after.package)}\`     |
+  | ±      | ${showDiff(diff.npm.package)}           |
 
   <p align="right">
     Generated against ${context.payload.pull_request.head.sha}
