@@ -9,14 +9,26 @@ on:
     outputs:
       package-size:
         description: "The NPM package size"
-        value: ${{ jobs.record-npm-package-size.outputs.package-size }}
+        value: ${{ jobs.record-sizes.outputs.package-size }}
+      unminified-size:
+        description: "The unminified bundle size"
+        value: ${{ jobs.record-sizes.outputs.unminified-size }}
+      minified-size:
+        description: "The minified bundle size"
+        value: ${{ jobs.record-sizes.outputs.minified-size }}
+      minified-gzip-size:
+        description: "The minified bundle size after gzipping"
+        value: ${{ jobs.record-sizes.outputs.minified-gzip-size }}
 
 jobs:
-  record-npm-package-size:
+  record-sizes:
     runs-on: ubuntu-latest
 
     outputs:
       package-size: ${{ steps.package.outputs.result }}
+      unminified-size: ${{ steps.unminified.outputs.size }}
+      minified-size: ${{ steps.minified.outputs.size }}
+      minified-gzip-size: ${{ steps.minified-gzip.outputs.size }}
 
     steps:
       - uses: actions/checkout@v3
@@ -49,8 +61,33 @@ jobs:
 
             return JSON.parse(json).reduce((sum, package) => sum + package.unpackedSize, 0)
 
+      - id: unminified
+        run: |
+          SIZE="$(wc -c < build/bugsnag-performance.js)"
+          echo "Un-minified bundle size: $SIZE bytes"
+          echo "size=$SIZE" >> $GITHUB_OUTPUT
+
+      - id: minified
+        run: |
+          SIZE="$(wc -c < build/bugsnag-performance.min.js)"
+          echo "Minified bundle size: $SIZE bytes"
+          echo "size=$SIZE" >> $GITHUB_OUTPUT
+
+      - id: minified-gzip
+        run: |
+          SIZE="$(gzip < build/bugsnag-performance.min.js | wc -c)"
+          echo "Gzipped bundle size: $SIZE bytes"
+          echo "size=$SIZE" >> $GITHUB_OUTPUT
+
       - uses: actions/upload-artifact@v3
         with:
           name: packages-${{ inputs.ref }}
           path: |
             bugsnag-*.tgz
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: bundles-${{ inputs.ref }}
+          path: |
+            build/bugsnag-performance.js
+            build/bugsnag-performance.min.js
