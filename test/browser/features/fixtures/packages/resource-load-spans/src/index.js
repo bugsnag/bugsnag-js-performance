@@ -14,6 +14,8 @@ document.getElementById("end-span").addEventListener("click", () => {
     node.appendChild(img)
     img.src = "/favicon.png?height=100&width=100"
     img.onload = () => {
-        span.end()
+        setTimeout(() => {
+            span.end()
+        }, 100)
     }
 })

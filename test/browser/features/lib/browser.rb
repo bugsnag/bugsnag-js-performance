@@ -63,6 +63,25 @@ class Browser
     end
   end
 
+  def supports_performance_response_status?
+    case @name
+    when "chrome", "edge"
+      @version >= 109
+    else
+      false
+    end
+  end
+
+  def supports_performance_body_size?
+    case @name
+    when "safari", "ios"
+      # support added in Safari 16.4
+      @version >= 16
+    else
+      true
+    end
+  end
+
   def supports_performance_navigation_timing?
     case @name
     when "safari", "ios"
