@@ -7,24 +7,16 @@ on:
         required: true
         type: string
     outputs:
-      unminified-size:
-        description: "The unminified bundle size"
-        value: ${{ jobs.record-bundle-size.outputs.unminified-size }}
-      minified-size:
-        description: "The minified bundle size"
-        value: ${{ jobs.record-bundle-size.outputs.minified-size }}
-      minified-gzip-size:
-        description: "The minified bundle size after gzipping"
-        value: ${{ jobs.record-bundle-size.outputs.minified-gzip-size }}
+      package-size:
+        description: "The NPM package size"
+        value: ${{ jobs.record-npm-package-size.outputs.package-size }}
 
 jobs:
-  record-bundle-size:
+  record-npm-package-size:
     runs-on: ubuntu-latest
 
     outputs:
-      unminified-size: ${{ steps.unminified.outputs.size }}
-      minified-size: ${{ steps.minified.outputs.size }}
-      minified-gzip-size: ${{ steps.minified-gzip.outputs.size }}
+      package-size: ${{ steps.package.outputs.result }}
 
     steps:
       - uses: actions/checkout@v3
@@ -38,29 +30,27 @@ jobs:
 
       - run: npm ci
       - run: npm run build
-      - run: ./.github/create-browser-bundle-from-npm
 
-      - id: unminified
-        run: |
-          SIZE="$(wc -c < build/bundle.js)"
-          echo "Un-minified bundle size: $SIZE bytes"
-          echo "size=$SIZE" >> $GITHUB_OUTPUT
+      - id: package
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let json = ''
 
-      - id: minified
-        run: |
-          SIZE="$(wc -c < build/bundle.min.js)"
-          echo "Minified bundle size: $SIZE bytes"
-          echo "size=$SIZE" >> $GITHUB_OUTPUT
+            await exec.exec(
+              'npm',
+              ['pack', './packages/platforms/browser', './packages/core', './node_modules/@bugsnag/cuid', '--json'],
+              {
+                listeners: {
+                  stdout (data) { json += data }
+                }
+              }
+            )
 
-      - id: minified-gzip
-        run: |
-          SIZE="$(gzip < build/bundle.min.js | wc -c)"
-          echo "Gzipped bundle size: $SIZE bytes"
-          echo "size=$SIZE" >> $GITHUB_OUTPUT
+            return JSON.parse(json).reduce((sum, package) => sum + package.unpackedSize, 0)
 
       - uses: actions/upload-artifact@v3
         with:
-          name: bundles-${{ inputs.ref }}
+          name: packages-${{ inputs.ref }}
           path: |
-            build/bundle.js
-            build/bundle.min.js
+            bugsnag-*.tgz
