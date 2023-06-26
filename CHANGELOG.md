@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.1.0-alpha.0 (2023-06-26)
+## TBD
 
 ### Added
 
@@ -16,4 +16,4 @@
 
 ### Removed
 
-- (core) The `samplingProbability` configuration option has been removed. A default probability of 1.0 is used until a probability value is received from the server [#219](https://github.com/bugsnag/bugsnag-js-performance/pull/219)
+- (core) *Breaking change*: The `samplingProbability` configuration option has been removed. A default probability of 1.0 is used until a probability value is received from the server [#219](https://github.com/bugsnag/bugsnag-js-performance/pull/219)
