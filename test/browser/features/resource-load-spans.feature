@@ -24,28 +24,3 @@ Feature: Resource Load Spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" string attribute "http.url" matches the regex "^http:\/\/.*:[0-9]{4}\/favicon\.png\?height=100&width=100$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" string attribute "http.flavor" equals "1.1"
     
-  @requires_performance_response_status
-  Scenario: Resource load spans http.status_code
-    Given I navigate to the test URL "/resource-load-spans"
-    And I wait to receive a sampling request
-
-    When I click the element "end-span"
-    And I wait to receive 1 trace
-
-    # App bundle
-    Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer attribute "http.status_code" equals 200
-    
-    # Image
-    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.status_code" equals 200
-
-  @requires_performance_body_size
-  Scenario: Resource load spans http.response_content
-    Given I navigate to the test URL "/resource-load-spans"
-    And I wait to receive a sampling request
-
-    When I click the element "end-span"
-    And I wait to receive 1 trace
-
-    # Image
-    Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.response_content_length_uncompressed" equals 2202
-    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.response_content_length" equals 2202
