@@ -72,13 +72,16 @@ class Browser
     end
   end
 
-  def supports_performance_body_size?
+  def supports_resource_load_spans?
     case @name
+    when "chrome"
+      @version >= 73
     when "safari", "ios"
-      # support added in Safari 16.4
-      @version >= 16
+      @version >= 13
+    when "firefox"
+      @version >= 67
     else
-      true
+      false
     end
   end
 

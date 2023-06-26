@@ -1,5 +1,6 @@
 Feature: Resource Load Spans
 
+  @requires_resource_load_spans
   Scenario: Resource load spans are automatically instrumented
     Given I navigate to the test URL "/resource-load-spans"
     And I wait to receive a sampling request
