@@ -19,8 +19,8 @@ describe('ResourceLoadPlugin', () => {
     const client = createTestClient({
       idGenerator,
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [
-        new ResourceLoadPlugin(spanFactory, Observer)
+      plugins: (spanFactory, spanContextStorage) => [
+        new ResourceLoadPlugin(spanFactory, spanContextStorage, Observer)
       ]
     })
 
@@ -68,8 +68,8 @@ describe('ResourceLoadPlugin', () => {
     const client = createTestClient({
       idGenerator,
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [
-        new ResourceLoadPlugin(spanFactory, Observer)
+      plugins: (spanFactory, spanContextStorage) => [
+        new ResourceLoadPlugin(spanFactory, spanContextStorage, Observer)
       ]
     })
 
@@ -108,8 +108,8 @@ describe('ResourceLoadPlugin', () => {
     const client = createTestClient({
       idGenerator,
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [
-        new ResourceLoadPlugin(spanFactory, Observer)
+      plugins: (spanFactory, spanContextStorage) => [
+        new ResourceLoadPlugin(spanFactory, spanContextStorage, Observer)
       ]
     })
 

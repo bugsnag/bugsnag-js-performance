@@ -51,10 +51,6 @@ export class SpanFactory {
     this.openSpans = new WeakSet<SpanInternal>()
   }
 
-  get firstSpanContext () {
-    return this.spanContextStorage.first
-  }
-
   startSpan (name: string, options: SpanOptions = {}) {
     const safeStartTime = timeToNumber(this.clock, options ? options.startTime : undefined)
     const spanId = this.idGenerator.generate(64)

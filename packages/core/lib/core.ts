@@ -30,7 +30,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration> {
   resourceAttributesSource: ResourceAttributeSource<C>
   spanAttributesSource: SpanAttributesSource
   schema: S
-  plugins: (spanFactory: SpanFactory) => Array<Plugin<C>>
+  plugins: (spanFactory: SpanFactory, spanContextStorage: SpanContextStorage) => Array<Plugin<C>>
   persistence: Persistence
   spanContextStorage?: SpanContextStorage
 }
@@ -51,7 +51,7 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
     options.schema.logger.defaultValue,
     spanContextStorage
   )
-  const plugins = options.plugins(spanFactory)
+  const plugins = options.plugins(spanFactory, spanContextStorage)
 
   return {
     start: (config: C | string) => {

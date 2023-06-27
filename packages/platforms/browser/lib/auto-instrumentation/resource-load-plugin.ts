@@ -1,4 +1,4 @@
-import { type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
+import { type SpanContextStorage, type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
 
 interface ResourceTiming extends PerformanceResourceTiming {
@@ -34,6 +34,7 @@ function resourceLoadSupported (PerformanceObserverClass: typeof PerformanceObse
 export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
   constructor (
     private readonly spanFactory: SpanFactory,
+    private readonly spanContextStorage: SpanContextStorage,
     private readonly PerformanceObserverClass: typeof PerformanceObserver
   ) {}
 
@@ -48,7 +49,7 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
          continue
        }
 
-        const parentContext = this.spanFactory.firstSpanContext
+        const parentContext = this.spanContextStorage.first
 
         if (parentContext) {
           const url = new URL(entry.name)
