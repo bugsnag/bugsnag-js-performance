@@ -40,13 +40,20 @@ type InitiatorType
   | 'iframe'
   | 'frame'
   | 'other'
+
 type DeliveryType = 'cache' | ''
+
+interface ServerTiming {
+  description: string
+  duration: number
+  name: string
+  toJSON: () => unknown
+}
 
 // https://www.w3.org/TR/resource-timing/#dom-performanceresourcetiming
 export interface PerformanceResourceTimingFake extends PerformanceEntryFake {
   entryType: 'resource'
   initiatorType: InitiatorType
-  deliveryType: DeliveryType
   nextHopProtocol: string
   workerStart: number
   redirectStart: number
@@ -60,6 +67,7 @@ export interface PerformanceResourceTimingFake extends PerformanceEntryFake {
   requestStart: number
   responseStart: number
   responseEnd: number
+  serverTiming: ServerTiming[]
   transferSize: number
   encodedBodySize: number
   decodedBodySize: number
@@ -70,7 +78,8 @@ export interface PerformanceResourceTimingFake extends PerformanceEntryFake {
 export type NavigationTimingType = 'navigate' | 'reload' | 'back_forward' | 'prerender'
 
 // https://w3c.github.io/navigation-timing/#dom-performancenavigationtiming
-export interface PerformanceNavigationTimingFake extends Omit<PerformanceResourceTimingFake, 'entryType'>, PerformanceEntryFake {
+export interface PerformanceNavigationTimingFake extends Omit<PerformanceResourceTimingFake, 'entryType' | 'serverTiming'>, PerformanceEntryFake {
+  deliveryType: DeliveryType
   entryType: 'navigation'
   unloadEventStart: number
   unloadEventEnd: number
@@ -82,6 +91,37 @@ export interface PerformanceNavigationTimingFake extends Omit<PerformanceResourc
   loadEventEnd: number
   type: NavigationTimingType
   redirectCount: number
+}
+
+export function createPerformanceResourceNavigationTimingFake (overrides: Partial<PerformanceResourceTimingFake>): PerformanceResourceTimingFake {
+  return {
+    connectEnd: 0,
+    connectStart: 0,
+    decodedBodySize: 0,
+    domainLookupEnd: 0,
+    domainLookupStart: 0,
+    duration: 0,
+    encodedBodySize: 0,
+    entryType: 'resource',
+    fetchStart: 0,
+    initiatorType: 'img',
+    name: 'http://localhost:8000/image.jpg',
+    nextHopProtocol: 'h2',
+    redirectEnd: 0,
+    redirectStart: 0,
+    renderBlockingStatus: 'non-blocking',
+    requestStart: 0,
+    responseEnd: 0,
+    responseStart: 0,
+    responseStatus: 0,
+    secureConnectionStart: 0,
+    serverTiming: [],
+    startTime: 0,
+    transferSize: 0,
+    workerStart: 0,
+    toJSON,
+    ...overrides
+  }
 }
 
 export function createPerformanceNavigationTimingFake (

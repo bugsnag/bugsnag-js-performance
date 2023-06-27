@@ -63,6 +63,28 @@ class Browser
     end
   end
 
+  def supports_performance_response_status?
+    case @name
+    when "chrome", "edge"
+      @version >= 109
+    else
+      false
+    end
+  end
+
+  def supports_resource_load_spans?
+    case @name
+    when "chrome"
+      @version >= 73
+    when "safari", "ios"
+      @version >= 13
+    when "firefox"
+      @version >= 67
+    else
+      false
+    end
+  end
+
   def supports_performance_navigation_timing?
     case @name
     when "safari", "ios"
