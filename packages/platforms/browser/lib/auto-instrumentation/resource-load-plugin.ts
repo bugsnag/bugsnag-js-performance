@@ -5,7 +5,7 @@ interface ResourceTiming extends PerformanceResourceTiming {
   responseStatus?: number // https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming/responseStatus
 }
 
-export function getHTTPFlavor (protocol: string) {
+export function getHttpVersion (protocol: string) {
   switch (protocol) {
     case 'http/1.0':
       return '1.0'
@@ -46,8 +46,8 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
 
       for (const entry of entries) {
         if (entry.initiatorType === 'fetch' || entry.initiatorType === 'xmlhttprequest') {
-         continue
-       }
+          continue
+        }
 
         const parentContext = this.spanContextStorage.first
 
@@ -64,7 +64,7 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
 
           span.setAttribute('bugsnag.span.category', 'resource_load')
           span.setAttribute('http.url', entry.name)
-          span.setAttribute('http.flavor', getHTTPFlavor(entry.nextHopProtocol))
+          span.setAttribute('http.flavor', getHttpVersion(entry.nextHopProtocol))
 
           if (entry.encodedBodySize && entry.decodedBodySize) {
             span.setAttribute('http.response_content_length', entry.encodedBodySize)
