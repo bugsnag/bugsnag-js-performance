@@ -5,12 +5,20 @@ const semver = require('semver')
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3')
 const { CloudFrontClient, CreateInvalidationCommand } = require('@aws-sdk/client-cloudfront')
 
+function getEnvironmentVariable (name) {
+  if (process.env[name]) {
+    return process.env[name]
+  }
+
+  throw new Error(`Missing environment variable '${name}'`)
+}
+
 const packageJson = require(`${__dirname}/../packages/platforms/browser/package.json`)
 const packageName = packageJson.name
 const packageVersion = packageJson.version
-const bucketName = process.env.BUCKET_NAME || 'bugsnagcdn'
-const distributionId = process.env.DISTRIBUTION_ID || 'E205JDPNKONLN7'
-const region = process.env.AWS_REGION || 'us-east-1'
+const bucketName = getEnvironmentVariable('BUCKET_NAME')
+const distributionId = getEnvironmentVariable('DISTRIBUTION_ID')
+const region = getEnvironmentVariable('AWS_REGION')
 const callerReference = `${packageName}@${packageVersion}`
 const files = [
   'bugsnag-performance.js',
