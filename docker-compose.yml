@@ -93,6 +93,20 @@ services:
     volumes:
       - ./test/browser/maze_output:/app/test/browser/maze_output
 
+  release:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.release
+    environment:
+      GITHUB_USER:
+      GITHUB_ACCESS_TOKEN:
+      RELEASE_BRANCH:
+      RETRY_PUBLISH:
+      VERSION:
+    volumes:
+      - ~/.gitconfig:/home/releaser/.gitconfig
+      - ~/.npmrc:/home/releaser/.npmrc
+
 networks:
   default:
     name: ${BUILDKITE_JOB_ID:-core-maze-runner}
