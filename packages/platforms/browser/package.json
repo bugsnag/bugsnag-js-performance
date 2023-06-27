@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/browser-performance",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.1-alpha.0",
   "description": "BugSnag performance monitoring for browsers",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
@@ -21,7 +21,7 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "dependencies": {
-    "@bugsnag/core-performance": "^0.1.0-alpha.0",
+    "@bugsnag/core-performance": "^0.1.1-alpha.0",
     "@bugsnag/cuid": "^3.0.2"
   },
   "type": "module",
