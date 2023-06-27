@@ -15,6 +15,14 @@ class Browser
       end
   end
 
+  def name
+    @name
+  end
+
+  def version
+    @version
+  end
+
   # is this a mobile device?
   # we assume that android devices are always using the latest version of chrome
   def mobile?
@@ -60,6 +68,20 @@ class Browser
       safari_supported_vitals
     else
       raise "Unable to determine web vitals support for browser: #{@name}"
+    end
+  end
+
+  # | browser | version |
+  # | chrome  | 54      |
+  # | firefox | 45      |
+  # | edge    | 17      |
+  # | safari  | 16.4    |
+  def supports_performance_encoded_body_size?
+    case @name
+    when "safari"
+      @version >= 17 # we test on 16.3 - not sure what to do here?
+    else 
+      true
     end
   end
 

@@ -61,7 +61,8 @@ Feature: Resource Load Spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2" string attribute "http.url" matches the regex "^http:\/\/.*:[0-9]{4}\/favicon\.png\?height=100&width=100$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2" string attribute "http.flavor" equals "1.1"
         
-    # Image status code and body size have very patchy browser coverage
-    And if present, the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.status_code" equals 200
-    And if present, the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.response_content_length" equals 2202
-    And if present, the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.response_content_length_uncompressed" equals 2202
+    # Image status code and body size have patchy browser coverage
+    And on the browser Chrome 109: the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.status_code" equals 200
+
+    And on the browsers Chrome 73, Safari 13, Firefox 67: the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.response_content_length" equals 2202
+    And on the browsers Chrome 73, Safari 13, Firefox 67: the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.response_content_length_uncompressed" equals 2202

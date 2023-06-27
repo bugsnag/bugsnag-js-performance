@@ -214,8 +214,17 @@ def check_attribute_equal_if_present(field, attribute, attr_type, expected)
   end
 end
 
-Then('if present, the trace payload field {string} integer attribute {string} equals {int}') do |field, attribute, expected|
-  check_attribute_equal_if_present field, attribute, 'intValue', expected
+Then(/^on the (?:browser|browsers) (.*): (.+)/) do |spec, step_text|
+  current_platform = $browser.name
+  current_version = $browser.version
+  
+  browsers = spec.split(",")
+
+  for browser in browsers do
+    name, version = browser.split(" ")
+    step(step_text) if current_platform.casecmp(name).zero? && current_version >= version.to_i
+  end
+
 end
 
 module Maze
