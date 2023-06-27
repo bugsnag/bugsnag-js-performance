@@ -102,6 +102,10 @@ services:
       GITHUB_ACCESS_TOKEN:
       RELEASE_BRANCH:
       RETRY_PUBLISH:
+      FORCE_CDN_UPLOAD:
+      AWS_ACCESS_KEY_ID:
+      AWS_SESSION_TOKEN:
+      AWS_SECRET_ACCESS_KEY:
       VERSION:
     volumes:
       - ~/.gitconfig:/home/releaser/.gitconfig
