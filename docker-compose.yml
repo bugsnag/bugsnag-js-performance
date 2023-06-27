@@ -106,6 +106,9 @@ services:
       AWS_ACCESS_KEY_ID:
       AWS_SESSION_TOKEN:
       AWS_SECRET_ACCESS_KEY:
+      AWS_REGION:
+      BUCKET_NAME:
+      DISTRIBUTION_ID:
       VERSION:
     volumes:
       - ~/.gitconfig:/home/releaser/.gitconfig
