@@ -207,6 +207,17 @@ Then('a span named {string} does not contain the attribute {string}') do |span_n
   end
 end
 
+def check_attribute_equal_if_present(field, attribute, attr_type, expected)
+  actual = get_attribute_value field, attribute, attr_type
+  if actual != nil
+    Maze.check.equal(expected, actual)
+  end
+end
+
+Then('if present, the trace payload field {string} integer attribute {string} equals {int}') do |field, attribute, expected|
+  check_attribute_equal_if_present field, attribute, 'intValue', expected
+end
+
 module Maze
   module Driver
     class Browser

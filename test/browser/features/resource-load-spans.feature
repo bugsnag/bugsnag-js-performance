@@ -12,18 +12,23 @@ Feature: Resource Load Spans
     Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.2.name" equals "[Custom]/resource-load-spans"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2.spanId" is stored as the value "parent_span_id"
 
-    # App bundle
+    # App bundle resource load
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" matches the regex "^\[ResourceLoad\]http:\/\/.*:[0-9]{4}\/resource-load-spans\/dist\/bundle\.js$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.parentSpanId" equals the stored value "parent_span_id"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "resource_load"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.flavor" equals "1.1"
 
-    # Image
+    # Image resource load 
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.name" matches the regex "^\[ResourceLoad\]http:\/\/.*:[0-9]{4}\/favicon.png$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.parentSpanId" equals the stored value "parent_span_id"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" string attribute "bugsnag.span.category" equals "resource_load"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" string attribute "http.url" matches the regex "^http:\/\/.*:[0-9]{4}\/favicon\.png\?height=100&width=100$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" string attribute "http.flavor" equals "1.1"
+
+    # Image status code and body size have very patchy browser coverage
+    And if present, the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.status_code" equals 200
+    And if present, the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.response_content_length" equals 2202
+    And if present, the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.response_content_length_uncompressed" equals 2202
 
   @skip_on_npm_build
   @requires_resource_load_spans
@@ -55,3 +60,8 @@ Feature: Resource Load Spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2" string attribute "bugsnag.span.category" equals "resource_load"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2" string attribute "http.url" matches the regex "^http:\/\/.*:[0-9]{4}\/favicon\.png\?height=100&width=100$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2" string attribute "http.flavor" equals "1.1"
+        
+    # Image status code and body size have very patchy browser coverage
+    And if present, the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.status_code" equals 200
+    And if present, the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.response_content_length" equals 2202
+    And if present, the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" integer attribute "http.response_content_length_uncompressed" equals 2202
