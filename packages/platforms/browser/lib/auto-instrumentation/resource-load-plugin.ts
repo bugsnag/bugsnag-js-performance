@@ -44,13 +44,16 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
       const entries = list.getEntries() as ResourceTiming[]
 
       for (const entry of entries) {
-        if (['fetch', 'xmlhttprequest'].includes(entry.initiatorType)) continue
+        if (entry.initiatorType === 'fetch' || entry.initiatorType === 'xmlhttprequest') {
+         continue
+       }
 
         const parentContext = this.spanFactory.firstSpanContext
 
         if (parentContext) {
           const url = new URL(entry.name)
-          const name = url.href.replace(url.search, '')
+          url.search = ''
+          const name = url.href
 
           const span = this.spanFactory.startSpan(`[ResourceLoad]${name}`, {
             parentContext,
