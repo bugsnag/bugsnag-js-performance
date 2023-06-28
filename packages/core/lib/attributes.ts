@@ -3,7 +3,9 @@ import { isNumber } from './validation'
 
 export type SpanAttribute = string | number | boolean
 
-export type SpanAttributesSource = () => Map<string, SpanAttribute>
+export interface SpanAttributesSourceOptions { includeFirstClassAttributes: boolean }
+
+export type SpanAttributesSource = (options: SpanAttributesSourceOptions) => Map<string, SpanAttribute>
 
 export class SpanAttributes {
   private readonly attributes: Map<string, SpanAttribute>

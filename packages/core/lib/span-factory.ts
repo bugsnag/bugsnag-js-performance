@@ -65,7 +65,10 @@ export class SpanFactory {
     const parentSpanId = parentContext ? parentContext.id : undefined
     const traceId = parentContext ? parentContext.traceId : this.idGenerator.generate(128)
 
-    const attributes = new SpanAttributes(this.spanAttributesSource())
+    // Spans that don't specify whether they are first class or not are implicity first class
+    const includeFirstClassAttributes = options && typeof options.isFirstClass === 'boolean' ? options.isFirstClass : true
+
+    const attributes = new SpanAttributes(this.spanAttributesSource({ includeFirstClassAttributes }))
 
     if (options && typeof options.isFirstClass === 'boolean') {
       attributes.set('bugsnag.span.first_class', options.isFirstClass)
