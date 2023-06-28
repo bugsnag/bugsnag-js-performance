@@ -66,6 +66,8 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
       // Browser attributes
       span.setAttribute('bugsnag.span.category', 'full_page_load')
       span.setAttribute('bugsnag.browser.page.referrer', this.document.referrer)
+      span.setAttribute('bugsnag.browser.page.title', this.document.title)
+      span.setAttribute('bugsnag.browser.page.url', url.toString())
       span.setAttribute('bugsnag.browser.page.route', route)
 
       this.webVitals.attachTo(span)

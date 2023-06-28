@@ -23,7 +23,7 @@ describe('DefaultRoutingProvider', () => {
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, routingProvier),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location)]
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -45,7 +45,7 @@ describe('DefaultRoutingProvider', () => {
         clock,
         deliveryFactory: () => delivery,
         schema: createSchema(window.location.hostname, routingProvier),
-        plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location)]
+        plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
       })
 
       testClient.start({ apiKey: VALID_API_KEY })

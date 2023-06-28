@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { createRoot } from 'react-dom/client'
 import {
   BrowserRouter as Router,
@@ -49,6 +49,10 @@ function Home() {
 }
 
 function About() {
+  useEffect(() => {
+    document.title = "New Route"
+  }, [])
+
   return <h2>New Route</h2>
 }
 

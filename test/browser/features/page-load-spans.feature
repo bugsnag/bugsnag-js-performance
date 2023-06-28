@@ -9,7 +9,7 @@ Feature: Page Load spans
         Then a span named "[FullPageLoad]/page-load-spans/" contains the attributes:
             | attribute                         | type             | value                     |
             | bugsnag.span.category             | stringValue      | full_page_load            |
-            | bugsnag.browser.page.title        | stringValue      | Page load spans           |
+            | bugsnag.browser.page.title        | stringValue      | New title                 |
             | bugsnag.browser.page.route        | stringValue      | /page-load-spans/         |
         # Skipping until the referrer handling is implemented for mobile devices [PLAT-10176]
            #| bugsnag.browser.page.referrer     | stringValue      | /                         |

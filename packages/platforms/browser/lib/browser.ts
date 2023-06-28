@@ -54,7 +54,7 @@ const BugsnagPerformance = createClient({
     // span context as the parent of it's spans
     new ResourceLoadPlugin(spanFactory, spanContextStorage, window.PerformanceObserver),
     new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker),
-    new RouteChangePlugin(spanFactory, window.location)
+    new RouteChangePlugin(spanFactory, window.location, document)
   ],
   persistence
 })
