@@ -1,6 +1,6 @@
 /**
  * @jest-environment jsdom
- * @jest-environment-options { "referrer": "https://bugsnag.com" }
+ * @jest-environment-options { "referrer": "https://bugsnag.com", "url": "https://bugsnag.com/initial-route" }
  */
 
 import {
@@ -40,7 +40,9 @@ describe('FullPageLoadPlugin', () => {
 
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
-    const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
+    const onSettle: OnSettle = (onSettleCallback) => {
+      Promise.resolve().then(() => { onSettleCallback(1234) })
+    }
     const webVitals = new WebVitals(performance, clock, manager.createPerformanceObserverFakeClass())
     const testClient = createTestClient({
       clock,
@@ -78,7 +80,11 @@ describe('FullPageLoadPlugin', () => {
 
     manager.flushQueue()
 
+    document.title = 'Full page load'
+
     testClient.start({ apiKey: VALID_API_KEY })
+
+    document.title = 'Updated title'
 
     await jest.runOnlyPendingTimersAsync()
 
@@ -90,6 +96,8 @@ describe('FullPageLoadPlugin', () => {
     expect(span).toHaveAttribute('bugsnag.span.category', 'full_page_load')
     expect(span).toHaveAttribute('bugsnag.browser.page.route', '/initial-route')
     expect(span).toHaveAttribute('bugsnag.browser.page.referrer', 'https://bugsnag.com/')
+    expect(span).toHaveAttribute('bugsnag.browser.page.url', 'https://bugsnag.com/initial-route')
+    expect(span).toHaveAttribute('bugsnag.browser.page.title', 'Updated title')
     expect(span).toHaveAttribute('bugsnag.metrics.cls', 60)
 
     expect(span).toHaveEvent('fcp', '128000000')
