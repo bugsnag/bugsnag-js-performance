@@ -1,0 +1,14 @@
+FROM node:18-alpine
+RUN apk add --update git bash openssh-client curl
+
+RUN addgroup -S admins
+RUN adduser -S releaser -G admins
+
+WORKDIR /app
+
+RUN chown -R releaser:admins /app
+USER releaser
+
+COPY ./bin/release.sh ./
+
+CMD ./release.sh

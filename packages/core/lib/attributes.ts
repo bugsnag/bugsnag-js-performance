@@ -1,4 +1,5 @@
 import { type InternalConfiguration, type Configuration } from './config'
+import { isNumber } from './validation'
 
 export type SpanAttribute = string | number | boolean
 
@@ -12,7 +13,7 @@ export class SpanAttributes {
   }
 
   set (name: string, value: SpanAttribute) {
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    if (typeof value === 'string' || typeof value === 'boolean' || isNumber(value)) {
       this.attributes.set(name, value)
     }
   }
@@ -42,7 +43,8 @@ export class ResourceAttributes extends SpanAttributes {
   }
 }
 
-export type ResourceAttributeSource<C extends Configuration> = (configuration: InternalConfiguration<C>) => ResourceAttributes
+export type ResourceAttributeSource<C extends Configuration>
+  = (configuration: InternalConfiguration<C>) => Promise<ResourceAttributes>
 
 export interface JsonAttribute {
   key: string

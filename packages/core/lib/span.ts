@@ -1,15 +1,12 @@
-import { SpanAttributes, type SpanAttribute, type SpanAttributesSource } from './attributes'
-import { type BackgroundingListenerState, type BackgroundingListener } from './backgrounding-listener'
+import { type SpanAttribute, type SpanAttributes } from './attributes'
 import { type Clock } from './clock'
 import { type DeliverySpan } from './delivery'
 import { SpanEvents } from './events'
-import { type IdGenerator } from './id-generator'
-import { type Processor } from './processor'
-import type Sampler from './sampler'
-import { type Time, timeToNumber } from './time'
+import { type SpanContext } from './span-context'
+import { type Time } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
 
-export interface Span {
+export interface Span extends SpanContext {
   end: (endTime?: Time) => void
 }
 
@@ -41,6 +38,7 @@ export interface SpanEnded {
   readonly samplingRate: number
   readonly endTime: number // stored in the format returned from Clock.now (see clock.ts) - written once when 'end' is called
   samplingProbability: SpanProbability
+  readonly parentSpanId?: string
 }
 
 export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
@@ -49,6 +47,7 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
     kind: span.kind,
     spanId: span.id,
     traceId: span.traceId,
+    parentSpanId: span.parentSpanId,
     startTimeUnixNano: clock.toUnixTimestampNanoseconds(span.startTime),
     endTimeUnixNano: clock.toUnixTimestampNanoseconds(span.endTime),
     attributes: span.attributes.toJson(),
@@ -56,19 +55,22 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
   }
 }
 
-export class SpanInternal {
-  private readonly id: string
-  private readonly traceId: string
+export class SpanInternal implements SpanContext {
+  readonly id: string
+  readonly traceId: string
+  private readonly parentSpanId?: string
   private readonly startTime: number
   private readonly samplingRate: number
   private readonly kind = Kind.Client // TODO: How do we define the initial Kind?
   private readonly events = new SpanEvents()
   private readonly attributes: SpanAttributes
-  private readonly name: string
+  name: string
+  private endTime?: number
 
-  constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes) {
+  constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes, parentSpanId?: string) {
     this.id = id
     this.traceId = traceId
+    this.parentSpanId = parentSpanId
     this.name = name
     this.startTime = startTime
     this.attributes = attributes
@@ -84,6 +86,7 @@ export class SpanInternal {
   }
 
   end (endTime: number, samplingProbability: SpanProbability): SpanEnded {
+    this.endTime = endTime
     return {
       id: this.id,
       name: this.name,
@@ -94,80 +97,19 @@ export class SpanInternal {
       events: this.events,
       samplingRate: this.samplingRate,
       endTime,
-      samplingProbability
+      samplingProbability,
+      parentSpanId: this.parentSpanId
     }
+  }
+
+  isValid () {
+    return this.endTime === undefined
   }
 }
 
 export interface SpanOptions {
   startTime?: Time
-}
-
-export class SpanFactory {
-  private readonly idGenerator: IdGenerator
-  private readonly spanAttributesSource: SpanAttributesSource
-  private processor: Processor
-  private readonly sampler: Sampler
-  private readonly clock: Clock
-
-  private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
-  private isInForeground: boolean = true
-
-  constructor (
-    processor: Processor,
-    sampler: Sampler,
-    idGenerator: IdGenerator,
-    spanAttributesSource: SpanAttributesSource,
-    clock: Clock,
-    backgroundingListener: BackgroundingListener
-  ) {
-    this.processor = processor
-    this.sampler = sampler
-    this.idGenerator = idGenerator
-    this.spanAttributesSource = spanAttributesSource
-    this.clock = clock
-
-    // this will fire immediately if the app is already backgrounded
-    backgroundingListener.onStateChange(this.onBackgroundStateChange)
-  }
-
-  private onBackgroundStateChange = (state: BackgroundingListenerState) => {
-    this.isInForeground = state === 'in-foreground'
-    // clear all open spans regardless of the new background state
-    // since spans are only valid if they start and end while the app is in the foreground
-    this.openSpans = new WeakSet<SpanInternal>()
-  }
-
-  startSpan (name: string, options: SpanOptions = {}) {
-    const safeStartTime = timeToNumber(this.clock, options ? options.startTime : undefined)
-    const spanId = this.idGenerator.generate(64)
-    const traceId = this.idGenerator.generate(128)
-    const attributes = new SpanAttributes(this.spanAttributesSource())
-    const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes)
-
-    // don't track spans that are started while the app is backgrounded
-    if (this.isInForeground) {
-      this.openSpans.add(span)
-    }
-
-    return span
-  }
-
-  updateProcessor (processor: Processor) {
-    this.processor = processor
-  }
-
-  endSpan (
-    span: SpanInternal,
-    endTime: number
-  ) {
-    // if the span doesn't exist here it shouldn't be processed
-    if (!this.openSpans.delete(span)) return
-
-    const spanEnded = span.end(endTime, this.sampler.spanProbability)
-
-    if (this.sampler.sample(spanEnded)) {
-      this.processor.add(spanEnded)
-    }
-  }
+  makeCurrentContext?: boolean
+  parentContext?: SpanContext | null
+  isFirstClass?: boolean
 }

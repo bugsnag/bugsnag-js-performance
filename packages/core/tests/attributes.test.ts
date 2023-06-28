@@ -1,4 +1,15 @@
-import { attributeToJson } from '../lib/attributes'
+import { SpanAttributes, attributeToJson } from '../lib/attributes'
+
+describe('SpanAttributes', () => {
+  it('prevents adding span attributes with invalid values', () => {
+    const attributes = new SpanAttributes(new Map())
+    attributes.set('test.NaN', NaN)
+    attributes.set('test.Infinity', Infinity)
+    attributes.set('test.-Infinity', -Infinity)
+
+    expect(attributes.toJson()).toStrictEqual([])
+  })
+})
 
 describe('attributeToJson', () => {
   it('converts a string into an OTEL compliant value', () => {

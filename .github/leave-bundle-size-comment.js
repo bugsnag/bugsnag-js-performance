@@ -6,14 +6,16 @@ const showDiff = n => {
 }
 
 module.exports = async function (github, context, needs) {
-  const npm = {
+  const sizes = {
     before: {
+      package: needs['base-branch'].outputs['package-size'],
       unminified: needs['base-branch'].outputs['unminified-size'],
       minified: needs['base-branch'].outputs['minified-size'],
       gzipped: needs['base-branch'].outputs['minified-gzip-size'],
     },
 
     after: {
+      package: needs['head-branch'].outputs['package-size'],
       unminified: needs['head-branch'].outputs['unminified-size'],
       minified: needs['head-branch'].outputs['minified-size'],
       gzipped: needs['head-branch'].outputs['minified-gzip-size'],
@@ -21,11 +23,10 @@ module.exports = async function (github, context, needs) {
   }
 
   const diff = {
-    npm: {
-      unminified: npm.after.unminified - npm.before.unminified,
-      minified: npm.after.minified - npm.before.minified,
-      gzipped: npm.after.gzipped - npm.before.gzipped,
-    },
+    package: sizes.after.package - sizes.before.package,
+    unminified: sizes.after.unminified - sizes.before.unminified,
+    minified: sizes.after.minified - sizes.before.minified,
+    gzipped: sizes.after.gzipped - sizes.before.gzipped,
   }
 
   const body = `
@@ -33,11 +34,19 @@ module.exports = async function (github, context, needs) {
 
   **NPM build**
 
-  |        | Unminified                              | Minfied                               | Minified + gzipped                   |
-  | ------ | --------------------------------------- | ------------------------------------- | ------------------------------------ |
-  | Before | \`${formatKbs(npm.before.unminified)}\` | \`${formatKbs(npm.before.minified)}\` | \`${formatKbs(npm.before.gzipped)}\` |
-  | After  | \`${formatKbs(npm.after.unminified)}\`  | \`${formatKbs(npm.after.minified)}\`  | \`${formatKbs(npm.after.gzipped)}\`  |
-  | ±      | ${showDiff(diff.npm.unminified)}        | ${showDiff(diff.npm.minified)}        | ${showDiff(diff.npm.gzipped)}        |
+  |        | Package                                |
+  | ------ | -------------------------------------- |
+  | Before | \`${formatKbs(sizes.before.package)}\` |
+  | After  | \`${formatKbs(sizes.after.package)}\`  |
+  | ±      | ${showDiff(diff.package)}              |
+
+  **CDN build**
+
+  |        | Unminified                                | Minfied                                 | Minified + gzipped                     |
+  | ------ | ----------------------------------------- | --------------------------------------- | -------------------------------------- |
+  | Before | \`${formatKbs(sizes.before.unminified)}\` | \`${formatKbs(sizes.before.minified)}\` | \`${formatKbs(sizes.before.gzipped)}\` |
+  | After  | \`${formatKbs(sizes.after.unminified)}\`  | \`${formatKbs(sizes.after.minified)}\`  | \`${formatKbs(sizes.after.gzipped)}\`  |
+  | ±      | ${showDiff(diff.unminified)}              | ${showDiff(diff.minified)}              | ${showDiff(diff.gzipped)}              |
 
   <p align="right">
     Generated against ${context.payload.pull_request.head.sha}

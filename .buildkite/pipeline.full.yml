@@ -1,0 +1,8 @@
+steps:
+
+  #
+  # Upload all full pipelines
+  #
+  - label: ":pipeline_upload: Full browser pipeline"
+    commands:
+      - buildkite-agent pipeline upload .buildkite/browser-pipeline.full.yml

@@ -59,6 +59,75 @@ describe('onSettle', () => {
     expect(settleCallback).toHaveBeenCalled()
   })
 
+  it('applies a cooldown period if all the settlers have settled already', async () => {
+    const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+
+    const fetchRequestTracker = new RequestTracker()
+    const xhrRequestTracker = new RequestTracker()
+
+    const onSettle = createOnSettle(
+      new IncrementingClock(),
+      window,
+      fetchRequestTracker,
+      xhrRequestTracker,
+      performance
+    )
+
+    await jest.advanceTimersByTimeAsync(100)
+
+    const settleCallback = jest.fn()
+
+    onSettle(settleCallback)
+    expect(settleCallback).not.toHaveBeenCalled()
+
+    await jest.advanceTimersByTimeAsync(100)
+    expect(settleCallback).toHaveBeenCalled()
+
+    // ensure we don't settle multiple times by waiting a long time
+    await jest.advanceTimersByTimeAsync(1_000_000)
+    expect(settleCallback).toHaveBeenCalledTimes(1)
+  })
+
+  it('handles unsettling during the cooldown period', async () => {
+    const performance = new PerformanceFake()
+    performance.addEntry(createPerformanceNavigationTimingFake({ loadEventEnd: 100 }))
+
+    const fetchRequestTracker = new RequestTracker()
+    const xhrRequestTracker = new RequestTracker()
+
+    const onSettle = createOnSettle(
+      new IncrementingClock(),
+      window,
+      fetchRequestTracker,
+      xhrRequestTracker,
+      performance
+    )
+
+    await jest.advanceTimersByTimeAsync(100)
+
+    const settleCallback = jest.fn()
+
+    onSettle(settleCallback)
+    expect(settleCallback).not.toHaveBeenCalled()
+
+    await jest.advanceTimersByTimeAsync(90)
+    expect(settleCallback).not.toHaveBeenCalled()
+
+    // make a DOM mutation so we unsettle
+    document.body.innerHTML = ':)'
+
+    await jest.advanceTimersByTimeAsync(90)
+    expect(settleCallback).not.toHaveBeenCalled()
+
+    await jest.advanceTimersByTimeAsync(10)
+    expect(settleCallback).toHaveBeenCalledTimes(1)
+
+    // ensure we don't settle multiple times by waiting a long time
+    await jest.advanceTimersByTimeAsync(1_000_000)
+    expect(settleCallback).toHaveBeenCalledTimes(1)
+  })
+
   it('settles when all the settlers have settled (with DOM mutations)', async () => {
     document.body.innerHTML = `
       <p id="a">AAAAAAAAAAA</p>

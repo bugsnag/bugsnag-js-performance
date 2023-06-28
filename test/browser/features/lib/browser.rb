@@ -1,11 +1,7 @@
 require 'yaml'
 
 class Browser
-
-  def initialize(browser_spec, maze_uri, fixtures_uri)
-    @maze_uri = maze_uri
-    @fixtures_uri = fixtures_uri
-
+  def initialize(browser_spec)
     # e.g. "chrome_61", "edge_latest", "chrome"
     @name, version = browser_spec.split("_")
 
@@ -23,19 +19,6 @@ class Browser
   # we assume that android devices are always using the latest version of chrome
   def mobile?
     @name == "android" || @name == "ios" || @name == "iphone"
-  end
-
-  def url_for(path)
-    uri = URI.join(@fixtures_uri, path)
-    config_query_string = "endpoint=#{@maze_uri}/traces&logs=#{@maze_uri}/logs&api_key=#{$api_key}"
-
-    if uri.query
-      uri.query += "&#{config_query_string}"
-    else
-      uri.query = config_query_string
-    end
-
-    uri.to_s
   end
 
   def supports_fetch_keepalive?
@@ -77,6 +60,39 @@ class Browser
       safari_supported_vitals
     else
       raise "Unable to determine web vitals support for browser: #{@name}"
+    end
+  end
+
+  def supports_performance_response_status?
+    case @name
+    when "chrome", "edge"
+      @version >= 109
+    else
+      false
+    end
+  end
+
+  def supports_resource_load_spans?
+    case @name
+    when "chrome"
+      @version >= 73
+    when "safari", "ios"
+      @version >= 13
+    when "firefox"
+      @version >= 67
+    else
+      false
+    end
+  end
+
+  def supports_performance_navigation_timing?
+    case @name
+    when "safari", "ios"
+      # support added in Safari 15 (technically 15.1 for mobile)
+      @version >= 15
+
+    else
+      true
     end
   end
 

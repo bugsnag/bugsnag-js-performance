@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/core-performance",
-  "version": "0.0.2",
+  "version": "0.1.1-alpha.1",
   "description": "Core performance client",
   "keywords": [
     "bugsnag",
@@ -20,6 +20,7 @@
   },
   "scripts": {
     "build": "rollup --config",
+    "build:cdn": "npm run build",
     "clean": "rm -rf dist/*"
   },
   "bugs": {

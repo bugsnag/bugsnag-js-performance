@@ -93,6 +93,27 @@ services:
     volumes:
       - ./test/browser/maze_output:/app/test/browser/maze_output
 
+  release:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.release
+    environment:
+      GITHUB_USER:
+      GITHUB_ACCESS_TOKEN:
+      RELEASE_BRANCH:
+      RETRY_PUBLISH:
+      FORCE_CDN_UPLOAD:
+      AWS_ACCESS_KEY_ID:
+      AWS_SESSION_TOKEN:
+      AWS_SECRET_ACCESS_KEY:
+      AWS_REGION:
+      BUCKET_NAME:
+      DISTRIBUTION_ID:
+      VERSION:
+    volumes:
+      - ~/.gitconfig:/home/releaser/.gitconfig
+      - ~/.npmrc:/home/releaser/.npmrc
+
 networks:
   default:
     name: ${BUILDKITE_JOB_ID:-core-maze-runner}

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <!-- disable caching to ensure image resoure has consistent body size -->
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
+        <!-- use base64 encoded favicon to present resource load -->
+        <link href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+P+/HgAFhAJ/wlseKgAAAABJRU5ErkJggg==" rel="icon" type="image/x-icon">
+        <title>Resource load spans</title>
+    </head>
+    <body>
+        <h1>resource-load-spans</h1>
+        <div id="image-container"></div>
+        <button id="end-span">end span</button>
+        <script src="./dist/bundle.js"></script>
+    </body>
+</html>

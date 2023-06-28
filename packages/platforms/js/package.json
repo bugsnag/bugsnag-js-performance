@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/js-performance",
-  "version": "0.0.2",
+  "version": "0.1.1-alpha.1",
   "description": "",
   "keywords": [
     "bugsnag",
@@ -10,6 +10,9 @@
     "reporting",
     "client-side"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "BugSnag",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
@@ -28,6 +31,6 @@
   },
   "types": "dist/types/browser.d.ts",
   "dependencies": {
-    "@bugsnag/browser-performance": "^0.0.2"
+    "@bugsnag/browser-performance": "^0.1.1-alpha.1"
   }
 }

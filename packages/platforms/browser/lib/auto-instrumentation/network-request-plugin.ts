@@ -32,7 +32,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
 
     const span = this.spanFactory.startSpan(
       `[HTTP]/${startContext.method.toUpperCase()}`,
-      { startTime: startContext.startTime }
+      { startTime: startContext.startTime, makeCurrentContext: false }
     )
 
     span.setAttribute('bugsnag.span.category', 'network')

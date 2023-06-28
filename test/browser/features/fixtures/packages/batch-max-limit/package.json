@@ -2,7 +2,7 @@
     "name": "batch-max-limit",
     "private": true,
     "scripts": {
-        "build": "rollup src/index.js --file dist/bundle.js --format iife --plugin @rollup/plugin-node-resolve",
+        "build": "rollup --config ../rollup.config.mjs",
         "clean": "rm -rf dist"
     }
 }

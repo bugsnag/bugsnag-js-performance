@@ -1,8 +1,14 @@
 import { type Logger } from './config'
 import { type PersistedProbability } from './persistence'
+import { type SpanContext } from './span-context'
+
+export const isBoolean = (value: unknown): value is boolean =>
+  value === true || value === false
 
 export const isObject = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === 'object' && !Array.isArray(value)
+
+export const isNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && !Number.isNaN(value)
 
 export const isString = (value: unknown): value is string =>
   typeof value === 'string'
@@ -23,6 +29,12 @@ export const isStringOrRegExpArray = (value: unknown): value is Array<string | R
 
 export function isPersistedProbabilty (value: unknown): value is PersistedProbability {
   return isObject(value) &&
-    typeof value.value === 'number' &&
-    typeof value.time === 'number'
+    isNumber(value.value) &&
+    isNumber(value.time)
 }
+
+export const isSpanContext = (value: unknown): value is SpanContext =>
+  isObject(value) &&
+    typeof value.id === 'string' &&
+    typeof value.traceId === 'string' &&
+    typeof value.isValid === 'function'

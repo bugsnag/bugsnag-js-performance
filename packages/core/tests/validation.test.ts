@@ -11,6 +11,9 @@ describe('validation', () => {
     { type: 'array', value: [] },
     { type: 'symbol', value: Symbol('test') },
     { type: 'null', value: null },
+    { type: 'NaN', value: NaN },
+    { type: 'Infinity', value: Infinity },
+    { type: '-Infinity', value: -Infinity },
     { type: 'undefined', value: undefined },
     { type: 'class', value: class { a () {} } }
   ]
@@ -146,6 +149,28 @@ describe('validation', () => {
       { time: 1234 }
     ])('fails validation with %s', (value) => {
       expect(validation.isPersistedProbabilty(value)).toBe(false)
+    })
+  })
+
+  describe('isNumber', () => {
+    it.each([-1, 0, 1, 10000, new Date().getTime(), performance.now()])('passes validation with %s', (value) => {
+      expect(validation.isNumber(value)).toBe(true)
+    })
+
+    it.each(['', 'string', true, false, undefined, null, NaN, Infinity, -Infinity, () => {}, [], {}, new Date()])('fails validation with %s', (value) => {
+      expect(validation.isNumber(value)).toBe(false)
+    })
+  })
+
+  describe('isBoolean', () => {
+    const nonBooleans = nonObjects.filter(({ value }) => typeof value !== 'boolean')
+
+    it.each(nonBooleans)('fails validation with $type', ({ value }) => {
+      expect(validation.isBoolean(value)).toBe(false)
+    })
+
+    it.each([true, false])('passes validation with %s', value => {
+      expect(validation.isBoolean(value)).toBe(true)
     })
   })
 })

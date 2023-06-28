@@ -124,49 +124,5 @@ describe('Schema validation', () => {
         expect(validConfig.appVersion).toBe('')
       })
     })
-
-    describe('samplingProbability', () => {
-      it('accepts a valid value', () => {
-        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
-
-        const config = {
-          apiKey: VALID_API_KEY,
-          samplingProbability: 0.5
-        }
-
-        const validConfig = validateConfig(config, coreSchema)
-        expect(validConfig.samplingProbability).toBe(0.5)
-
-        expect(console.warn).not.toHaveBeenCalled()
-      })
-
-      it('replaces a value <0 with the default', () => {
-        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
-
-        const config = {
-          apiKey: VALID_API_KEY,
-          samplingProbability: -0.1
-        }
-
-        const validConfig = validateConfig(config, coreSchema)
-        expect(validConfig.samplingProbability).toBe(1.0)
-
-        expect(console.warn).toHaveBeenCalledWith('Invalid configuration\n  - samplingProbability should be a number between 0 and 1, got number')
-      })
-
-      it('replaces a value >1 with the default', () => {
-        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
-
-        const config = {
-          apiKey: VALID_API_KEY,
-          samplingProbability: 1.1
-        }
-
-        const validConfig = validateConfig(config, coreSchema)
-        expect(validConfig.samplingProbability).toBe(1.0)
-
-        expect(console.warn).toHaveBeenCalledWith('Invalid configuration\n  - samplingProbability should be a number between 0 and 1, got number')
-      })
-    })
   })
 })

@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/browser-performance",
-  "version": "0.0.2",
+  "version": "0.1.1-alpha.1",
   "description": "BugSnag performance monitoring for browsers",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
@@ -12,14 +12,17 @@
     "access": "public"
   },
   "scripts": {
-    "build": "rollup --config",
+    "build": "npm run build:npm && npm run build:cdn",
+    "build:npm": "rollup --config rollup.config.npm.mjs",
+    "build:cdn": "rollup --config rollup.config.cdn.mjs",
     "clean": "rm -rf dist/*"
   },
   "bugs": {
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "dependencies": {
-    "@bugsnag/core-performance": "^0.0.2"
+    "@bugsnag/core-performance": "^0.1.1-alpha.1",
+    "@bugsnag/cuid": "^3.0.2"
   },
   "type": "module",
   "main": "dist/index.js",
