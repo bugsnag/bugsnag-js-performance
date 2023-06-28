@@ -26,6 +26,8 @@
           }, 50)
 
           document.getElementById("stop-clock").addEventListener("click", () => {
+            document.title = "New title"
+
             // delay stopping the clock for a bit so the performance observers
             // have a chance to fire
             setTimeout(() => { clearInterval(interval) }, 1000)
