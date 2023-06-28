@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/js-performance",
-  "version": "0.1.1-alpha.1",
+  "version": "0.1.1",
   "description": "",
   "keywords": [
     "bugsnag",
@@ -31,6 +31,6 @@
   },
   "types": "dist/types/browser.d.ts",
   "dependencies": {
-    "@bugsnag/browser-performance": "^0.1.1-alpha.1"
+    "@bugsnag/browser-performance": "^0.1.1"
   }
 }
