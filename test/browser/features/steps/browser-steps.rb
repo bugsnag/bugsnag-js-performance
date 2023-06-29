@@ -112,6 +112,24 @@ Then("the span named {string} is a valid full page load span") do |span_name|
     )
   end
 
+  def get_attribute_value_from_span(span, attribute, attr_type)
+    attributes = span['attributes']
+    attribute = attributes.find { |a| a['key'] == attribute }
+    value = attribute&.dig 'value', attr_type
+    attr_type == 'intValue' && value.is_a?(String) ? value.to_i : value
+  end
+
+  # Check the string attribute "referrer" is equal to document.referrer
+  referrer = get_attribute_value_from_span(span, "bugsnag.browser.page.referrer", "stringValue")
+
+  driver = Maze.driver.instance_variable_get(:@driver)
+  scenario_referrer = driver.execute_script("return document.referrer")
+
+  Maze.check.true(
+    referrer == scenario_referrer,
+    "Attribute does not match, expected #{scenario_referrer}, got #{referrer}"
+  )
+
   if supports_cumulative_layout_shift
     cumulative_layout_shift_attributes = span["attributes"].find_all do |attribute|
       attribute["key"] == "bugsnag.metrics.cls"
@@ -135,6 +153,7 @@ Given("I store the device ID {string}") do |device_id|
   driver = Maze.driver.instance_variable_get(:@driver)
   driver.execute_script("localStorage.setItem('bugsnag-anonymous-id', '#{device_id}')")
 end
+
 
 Then('if a span named {string} exists, it contains the attributes:') do |span_name, table|
   spans = spans_from_request_list(Maze::Server.list_for('traces'))

@@ -11,8 +11,7 @@ Feature: Page Load spans
             | bugsnag.span.category             | stringValue      | full_page_load            |
             | bugsnag.browser.page.title        | stringValue      | New title                 |
             | bugsnag.browser.page.route        | stringValue      | /page-load-spans/         |
-            | bugsnag.browser.page.referrer     | stringValue      |                           |
-        
+
         # Validate all web vitals events and attributes are present, depending on browser support (browser-steps.rb)  
         And the span named "[FullPageLoad]/page-load-spans/" is a valid full page load span
 
