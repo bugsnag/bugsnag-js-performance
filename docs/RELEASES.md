@@ -9,23 +9,24 @@ graph TD;
     release/v1.2.3-. PR .->main;
 ```
 
-### Enhancements and bugfixes
+### Enhancements and bug fixes
 
 - decide on a new version number, following [semantic versioning](https://semver.org/)
 - create a new release branch based on `next` with the new version number in the branch name i.e. `release/vX.Y.Z`
 - update the version number and date in the changelog
-- make a PR from your release branch to the `main` branch entitled Release vX.Y.Z
-- get the release PR reviewed – all code changes should have been reviewed already, this should be a review of the integration of all changes to be shipped and the updates to the changelog
+- create a pull request from your release branch to the `main` branch entitled "Release vX.Y.Z"
+- get the release reviewed – all code changes should have been reviewed already, this should be a review of the integration of all changes to be shipped and the updates to the changelog
 - consider shipping a [prerelease](#prereleases) to aid testing the release
 
-Once the release PR has been approved:
+Once the pull request has been approved:
 
-- merge the PR
+- merge the pull request
 
 You are now ready to make the release. Releases are done using Docker and Docker compose. You do not need to have the release branch checked out on your local machine to make a release – the container pulls a fresh clone of the repo down from GitHub. Prerequisites:
 
-- You will need to clone the repository and have Docker running on your local machine.
+- You will need to clone the repository and have Docker running on your local machine
 - Ensure you are logged in to npm and that you have access to publish any packages in the `@bugsnag` namespace
+- If there are changes to the browser client, ensure you have permissions to upload to the CDN bucket
 - Ensure your `.gitconfig` file in your home directory is configured to contain your name and email address
 - Generate a [personal access token](https://github.com/settings/tokens/new) on GitHub and store it somewhere secure
 
@@ -70,9 +71,9 @@ Finally:
 - publish the release
 - update and push `next`:
   ```sh
-  git checkout next
-  git merge master
-  git push
+    git checkout next
+    git merge master
+    git push
   ```
 
 ### Prereleases
