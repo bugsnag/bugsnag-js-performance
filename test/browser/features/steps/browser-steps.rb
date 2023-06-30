@@ -112,13 +112,6 @@ Then("the span named {string} is a valid full page load span") do |span_name|
     )
   end
 
-  def get_attribute_value_from_span(span, attribute, attr_type)
-    attributes = span['attributes']
-    attribute = attributes.find { |a| a['key'] == attribute }
-    value = attribute&.dig 'value', attr_type
-    attr_type == 'intValue' && value.is_a?(String) ? value.to_i : value
-  end
-
   # Check the string attribute "referrer" is equal to document.referrer
   referrer = get_attribute_value_from_span(span, "bugsnag.browser.page.referrer", "stringValue")
 
@@ -219,4 +212,11 @@ module Maze
       end
     end
   end
+end
+
+def get_attribute_value_from_span(span, attribute, attr_type)
+  attributes = span['attributes']
+  attribute = attributes.find { |a| a['key'] == attribute }
+  value = attribute&.dig 'value', attr_type
+  attr_type == 'intValue' && value.is_a?(String) ? value.to_i : value
 end
