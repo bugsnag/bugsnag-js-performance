@@ -30,9 +30,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
         configuration.logger.warn(`Invalid route change span options ${warnings}`)
       }
 
-      const span = this.spanFactory.startSpan(`[RouteChange]${route}`, {
-        startTime: options ? options.startTime : undefined
-      })
+      const span = this.spanFactory.startSpan(`[RouteChange]${route}`, options)
 
       const url = getAbsoluteUrl(route, this.document.baseURI)
 
