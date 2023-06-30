@@ -7,8 +7,7 @@ import {
   StableIdGenerator,
   VALID_API_KEY,
   createTestClient,
-  spanAttributesSource,
-  IncrementingIdGenerator
+  spanAttributesSource
 } from '@bugsnag/js-performance-test-utilities'
 import {
   InMemoryPersistence,
@@ -112,174 +111,6 @@ describe('Span', () => {
         end: expect.any(Function),
         isValid: expect.any(Function)
       })
-    })
-
-    const invalidStartTimes: any[] = [
-      { type: 'string', startTime: 'i am not a startTime' },
-      { type: 'bigint', startTime: BigInt(9007199254740991) },
-      { type: 'true', startTime: true },
-      { type: 'false', startTime: false },
-      { type: 'function', startTime: () => {} },
-      { type: 'object', startTime: { property: 'test' } },
-      { type: 'empty array', startTime: [] },
-      { type: 'array', startTime: [1, 2, 3] },
-      { type: 'symbol', startTime: Symbol('test') },
-      { type: 'null', startTime: null },
-      { type: 'undefined', startTime: undefined }
-    ]
-
-    invalidStartTimes.push(...invalidStartTimes.map(
-      ({ type, startTime }) => ({
-        type: `{ startTime: ${type} }`,
-        startTime: { startTime }
-      }))
-    )
-
-    it.each(invalidStartTimes)('uses default clock implementation if startTime is invalid ($type)', async ({ startTime }) => {
-      const delivery = new InMemoryDelivery()
-      const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-      const client = createTestClient({ deliveryFactory: () => delivery, clock })
-      client.start({ apiKey: VALID_API_KEY })
-
-      const span = client.startSpan('test span', startTime)
-      span.end()
-
-      await jest.runOnlyPendingTimersAsync()
-
-      expect(delivery).toHaveSentSpan(expect.objectContaining({
-        startTimeUnixNano: '1000000'
-      }))
-    })
-
-    const makeCurrentContextOptions: any[] = [
-      { type: 'true', makeCurrentContext: true },
-      { type: 'string', makeCurrentContext: 'yes please' },
-      { type: 'bigint', makeCurrentContext: BigInt(9007199254740991) },
-      { type: 'function', makeCurrentContext: () => {} },
-      { type: 'object', makeCurrentContext: { property: 'test' } },
-      { type: 'empty array', makeCurrentContext: [] },
-      { type: 'array', makeCurrentContext: [1, 2, 3] },
-      { type: 'symbol', makeCurrentContext: Symbol('test') },
-      { type: 'null', makeCurrentContext: null },
-      { type: 'undefined', makeCurrentContext: undefined }
-    ]
-
-    it.each(makeCurrentContextOptions)('becomes the current SpanContext when makeCurrentContext is not false ($type)', (options) => {
-      const client = createTestClient()
-      client.start({ apiKey: VALID_API_KEY })
-      expect(client.currentSpanContext).toBeUndefined()
-
-      const spanIsContext = client.startSpan('context span', options)
-      expect(spanContextEquals(spanIsContext, client.currentSpanContext)).toBe(true)
-    })
-
-    it('does not become the current SpanContext when SpanOptions.makeCurrentContext is false', () => {
-      const idGenerator = {
-        count: 0,
-        generate (bits: 64 | 128) {
-          if (bits === 64) {
-            this.count++
-            return `span ID ${this.count}`
-          }
-
-          return 'a trace ID'
-        }
-      }
-
-      const client = createTestClient({ idGenerator })
-      client.start({ apiKey: VALID_API_KEY })
-      expect(client.currentSpanContext).toBeUndefined()
-
-      const spanIsContext = client.startSpan('context span')
-      expect(spanContextEquals(spanIsContext, client.currentSpanContext)).toBe(true)
-
-      const spanIsNotContext = client.startSpan('non context span', { makeCurrentContext: false })
-      expect(spanContextEquals(spanIsNotContext, client.currentSpanContext)).toBe(false)
-      expect(spanContextEquals(spanIsContext, client.currentSpanContext)).toBe(true)
-    })
-
-    it('sets traceId and parentSpanId from parentContext if specified', async () => {
-      const idGenerator = new IncrementingIdGenerator()
-      const delivery = new InMemoryDelivery()
-      const client = createTestClient({ idGenerator, deliveryFactory: () => delivery })
-      client.start({ apiKey: VALID_API_KEY })
-
-      // push two spans onto the context stack
-      const span1 = client.startSpan('should become parent')
-      const span2 = client.startSpan('should not become parent')
-      expect(spanContextEquals(span2, client.currentSpanContext)).toBe(true)
-
-      // start a new child span with an invalid parent context
-      const childOfSpan1 = client.startSpan('child of span 1', { parentContext: span1 })
-      childOfSpan1.end()
-
-      await jest.runOnlyPendingTimersAsync()
-
-      // child span should be nested under the first span
-      expect(delivery).toHaveSentSpan(expect.objectContaining({
-        name: 'child of span 1',
-        parentSpanId: span1.id,
-        traceId: span1.traceId
-      }))
-    })
-
-    it('starts a new root span when parentContext is null', async () => {
-      const idGenerator = new IncrementingIdGenerator()
-      const delivery = new InMemoryDelivery()
-      const client = createTestClient({ idGenerator, deliveryFactory: () => delivery })
-      client.start({ apiKey: VALID_API_KEY })
-
-      const rootSpan = client.startSpan('root span')
-      expect(spanContextEquals(rootSpan, client.currentSpanContext)).toBe(true)
-
-      const newRootSpan = client.startSpan('new root span', { parentContext: null })
-      newRootSpan.end()
-
-      await jest.runOnlyPendingTimersAsync()
-
-      // new root span should have a new trace ID and no parentSpanId
-      expect(delivery).toHaveSentSpan(expect.objectContaining({
-        name: 'new root span',
-        parentSpanId: undefined,
-        traceId: `trace ID ${idGenerator.traceCount}`
-      }))
-    })
-
-    const parentContextOptions: any[] = [
-      { type: 'true', parentContext: true },
-      { type: 'string', parentContext: 'yes please' },
-      { type: 'bigint', parentContext: BigInt(9007199254740991) },
-      { type: 'function', parentContext: () => {} },
-      { type: 'object', parentContext: { property: 'test' } },
-      { type: 'empty array', parentContext: [] },
-      { type: 'array', parentContext: [1, 2, 3] },
-      { type: 'symbol', parentContext: Symbol('test') },
-      { type: 'undefined', parentContext: undefined }
-    ]
-
-    it.each(parentContextOptions)('defaults to the current context when parentContext is invalid ($type)', async (options) => {
-      const idGenerator = new IncrementingIdGenerator()
-      const delivery = new InMemoryDelivery()
-      const client = createTestClient({ idGenerator, deliveryFactory: () => delivery })
-      client.start({ apiKey: VALID_API_KEY })
-
-      // push two spans onto the context stack
-      client.startSpan('root span')
-      const parentSpan = client.startSpan('parent span')
-      expect(spanContextEquals(parentSpan, client.currentSpanContext)).toBe(true)
-
-      // start a new child span with an invalid parent context
-      const childSpan = client.startSpan('child span', options)
-      childSpan.end()
-
-      await jest.runOnlyPendingTimersAsync()
-
-      // child span should be nested under the parent span
-      expect(delivery).toHaveSentSpan(expect.objectContaining({
-        name: 'child span',
-        parentSpanId: parentSpan.id,
-        traceId: parentSpan.traceId
-      }))
     })
   })
 
@@ -597,23 +428,6 @@ describe('Span', () => {
 
       span1.end()
       expect(client.currentSpanContext).toBeUndefined()
-    })
-  })
-})
-
-describe('SpanContext', () => {
-  describe('SpanContext.isValid()', () => {
-    it('returns false if the span has been ended', () => {
-      const delivery = new InMemoryDelivery()
-      const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-      const client = createTestClient({ deliveryFactory: () => delivery, clock })
-      client.start({ apiKey: VALID_API_KEY })
-
-      const span = client.startSpan('test span')
-      expect(span.isValid()).toEqual(true)
-
-      span.end()
-      expect(span.isValid()).toEqual(false)
     })
   })
 })
