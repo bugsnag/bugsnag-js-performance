@@ -127,7 +127,7 @@ Then("the span named {string} is a valid full page load span") do |span_name|
 
   Maze.check.true(
     referrer == scenario_referrer,
-    "Attribute does not match, expected #{scenario_referrer}, got #{referrer}"
+    "Referrer attribute does not match, expected #{scenario_referrer}, got #{referrer}"
   )
 
   if supports_cumulative_layout_shift
