@@ -5,7 +5,7 @@ import { type Logger } from './config'
 import { type IdGenerator } from './id-generator'
 import { type Processor } from './processor'
 import { type ReadonlySampler } from './sampler'
-import { type Span, SpanInternal, type SpanOptions } from './span'
+import { type Span, SpanInternal, type SpanOptions, validateSpanOptions } from './span'
 import { type SpanContextStorage } from './span-context'
 import { timeToNumber } from './time'
 import { isSpanContext } from './validation'
@@ -51,15 +51,17 @@ export class SpanFactory {
     this.openSpans = new WeakSet<SpanInternal>()
   }
 
-  startSpan (name: string, options: SpanOptions = {}) {
-    const safeStartTime = timeToNumber(this.clock, options ? options.startTime : undefined)
+  startSpan (name: string, options?: SpanOptions) {
+    const cleanOptions = validateSpanOptions(name, options || {}, this.logger)
+
+    const safeStartTime = timeToNumber(this.clock, cleanOptions.startTime)
     const spanId = this.idGenerator.generate(64)
 
     // if the parentContext option is not set use the current context
     // if parentContext is explicitly null, or there is no current context,
     // we are starting a new root span
-    const parentContext = options && (isSpanContext(options.parentContext) || options.parentContext === null)
-      ? options.parentContext
+    const parentContext = isSpanContext(cleanOptions.parentContext) || cleanOptions.parentContext === null
+      ? cleanOptions.parentContext
       : this.spanContextStorage.current
 
     const parentSpanId = parentContext ? parentContext.id : undefined
@@ -67,17 +69,17 @@ export class SpanFactory {
 
     const attributes = new SpanAttributes(this.spanAttributesSource())
 
-    if (options && typeof options.isFirstClass === 'boolean') {
-      attributes.set('bugsnag.span.first_class', options.isFirstClass)
+    if (typeof cleanOptions.isFirstClass === 'boolean') {
+      attributes.set('bugsnag.span.first_class', cleanOptions.isFirstClass)
     }
 
-    const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes, parentSpanId)
+    const span = new SpanInternal(spanId, traceId, cleanOptions.name, safeStartTime, attributes, parentSpanId)
 
     // don't track spans that are started while the app is backgrounded
     if (this.isInForeground) {
       this.openSpans.add(span)
 
-      if (!options || options.makeCurrentContext !== false) {
+      if (!cleanOptions || cleanOptions.makeCurrentContext !== false) {
         this.spanContextStorage.push(span)
       }
     }

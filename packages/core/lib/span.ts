@@ -1,10 +1,12 @@
 import { type SpanAttribute, type SpanAttributes } from './attributes'
 import { type Clock } from './clock'
+import { type Logger } from './config'
 import { type DeliverySpan } from './delivery'
 import { SpanEvents } from './events'
 import { type SpanContext } from './span-context'
 import { type Time } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
+import { isBoolean, isSpanContext, isTime } from './validation'
 
 export interface Span extends SpanContext {
   end: (endTime?: Time) => void
@@ -112,4 +114,50 @@ export interface SpanOptions {
   makeCurrentContext?: boolean
   parentContext?: SpanContext | null
   isFirstClass?: boolean
+}
+
+interface CleanSpanOptions extends SpanOptions {
+  name: string
+}
+
+export function validateSpanOptions (name: string, options: SpanOptions, logger: Logger): CleanSpanOptions {
+  let warnings = ''
+  const cleanOptions = {
+    name,
+    startTime: options.startTime,
+    parentContext: options.parentContext,
+    makeCurrentContext: options.makeCurrentContext,
+    isFirstClass: options.isFirstClass
+  }
+
+  if (typeof cleanOptions.name !== 'string') {
+    warnings += `\n - name should be a string, got ${typeof name}`
+    cleanOptions.name = String(name)
+  }
+
+  if (cleanOptions.startTime !== undefined && !isTime(cleanOptions.startTime)) {
+    warnings += `\n - startTime should be a number or Date, got ${typeof cleanOptions.startTime}`
+    cleanOptions.startTime = undefined
+  }
+
+  if (cleanOptions.parentContext && !isSpanContext(cleanOptions.parentContext)) {
+    warnings += `\n - parentContext should be a SpanContext, got ${typeof cleanOptions.parentContext}`
+    cleanOptions.parentContext = undefined
+  }
+
+  if (cleanOptions.makeCurrentContext !== undefined && !isBoolean(cleanOptions.makeCurrentContext)) {
+    warnings += `\n - makeCurrentContext should be true|false, got ${typeof cleanOptions.makeCurrentContext}`
+    cleanOptions.makeCurrentContext = undefined
+  }
+
+  if (cleanOptions.isFirstClass !== undefined && !isBoolean(cleanOptions.isFirstClass)) {
+    warnings += `\n - isFirstClass should be true|false, got ${typeof cleanOptions.isFirstClass}`
+    cleanOptions.isFirstClass = undefined
+  }
+
+  if (warnings.length > 0) {
+    logger.warn(`Invalid span options ${warnings}`)
+  }
+
+  return cleanOptions
 }
