@@ -15,6 +15,21 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
     let previousRoute = configuration.routingProvider.resolveRoute(new URL(this.location.href))
 
     configuration.routingProvider.listenForRouteChanges((route, trigger, options) => {
+      let warnings = ''
+      if (typeof route !== 'string') {
+        warnings += `\n - route should be a string, got ${typeof route}`
+        route = String(route)
+      }
+
+      if (typeof trigger !== 'string') {
+        warnings += `\n - trigger should be a string, got ${typeof trigger}`
+        trigger = String(trigger)
+      }
+
+      if (warnings.length > 0) {
+        configuration.logger.warn(`Invalid route change span options ${warnings}`)
+      }
+
       const span = this.spanFactory.startSpan(`[RouteChange]${route}`, {
         startTime: options ? options.startTime : undefined
       })
