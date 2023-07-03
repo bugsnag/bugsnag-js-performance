@@ -19,8 +19,8 @@ A clear and concise description of what the bug is.
 4. See error
 
 ### Environment
-* Bugsnag Performance library version:
-* Bugsnag Error Monitoring library version (if any):
+* BugSnag Performance library version:
+* BugSnag Error Monitoring library version (if any):
 * Browser framework version (if any):
     * Vue:
     * React:
