@@ -29,5 +29,13 @@ export default {
       preventAssignment: false,
       'process.env.NODE_ENV': '"development"'
     })
-  ]
+  ],
+  onLog (level, log, defaultHandler) {
+    // turn warnings into errors
+    if (level === 'warn') {
+      level = 'error'
+    }
+
+    defaultHandler(level, log)
+  },
 }
