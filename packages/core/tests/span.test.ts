@@ -4,6 +4,7 @@ import {
   ControllableBackgroundingListener,
   InMemoryDelivery,
   IncrementingClock,
+  IncrementingIdGenerator,
   StableIdGenerator,
   VALID_API_KEY,
   createTestClient,
@@ -26,6 +27,10 @@ const jestLogger = {
   error: jest.fn(),
   info: jest.fn()
 }
+
+beforeEach(() => {
+  jest.clearAllMocks()
+})
 
 describe('SpanInternal', () => {
   describe('.setAttribute()', () => {
@@ -110,6 +115,217 @@ describe('Span', () => {
         traceId: expect.any(String),
         end: expect.any(Function),
         isValid: expect.any(Function)
+      })
+    })
+
+    describe('name', () => {
+      const invalidSpanNames: any[] = [
+        { type: 'bigint', name: BigInt(9007199254740991) },
+        { type: 'true', name: true },
+        { type: 'false', name: false },
+        { type: 'function', name: () => {} },
+        { type: 'object', name: { property: 'test' } },
+        { type: 'empty array', name: [] },
+        { type: 'array', name: [1, 2, 3] },
+        { type: 'symbol', name: Symbol('test') },
+        { type: 'null', name: null }
+      ]
+
+      it.each(invalidSpanNames)('stringifies and logs when span name is invalid ($type)', async ({ name }) => {
+        const delivery = new InMemoryDelivery()
+        const client = createTestClient({ deliveryFactory: () => delivery })
+        client.start({ apiKey: VALID_API_KEY, logger: jestLogger })
+        await jest.runOnlyPendingTimersAsync()
+
+        const span = client.startSpan(name, {})
+        expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid span options\n  - name should be a string, got ${typeof name}`)
+
+        span.end()
+        await jest.runOnlyPendingTimersAsync()
+
+        expect(delivery).toHaveSentSpan(expect.objectContaining({
+          name: String(name)
+        }))
+      })
+    })
+
+    describe('options', () => {
+      const invalidSpanOptions: any[] = [
+        { type: 'string', options: 'invalid' },
+        { type: 'bigint', options: BigInt(9007199254740991) },
+        { type: 'true', options: true },
+        { type: 'false', options: false },
+        { type: 'function', options: () => {} },
+        { type: 'empty array', options: [] },
+        { type: 'array', options: [1, 2, 3] },
+        { type: 'symbol', options: Symbol('test') },
+        { type: 'null', options: null }
+      ]
+
+      it.each(invalidSpanOptions)('uses the default values and logs when options is invalid ($type)', async ({ options }) => {
+        const delivery = new InMemoryDelivery()
+        const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+        const client = createTestClient({ deliveryFactory: () => delivery, clock })
+
+        client.start({ apiKey: VALID_API_KEY, logger: jestLogger })
+        await jest.runOnlyPendingTimersAsync()
+
+        // add a root span to the context
+        const rootSpan = client.startSpan('root-span')
+        expect(spanContextEquals(rootSpan, client.currentSpanContext)).toBe(true)
+
+        // start a span with invalid options
+        const span = client.startSpan('test-span', options)
+        expect(jestLogger.warn).toHaveBeenCalledWith('Invalid span options\n  - options is not an object')
+
+        // span should become the current context by default
+        expect(spanContextEquals(span, client.currentSpanContext)).toBe(true)
+
+        span.end()
+        await jest.runOnlyPendingTimersAsync()
+
+        expect(delivery.requests.length).toBe(1)
+        const delivered = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+
+        // span should become a child of the current context by default
+        expect(delivered.parentSpanId).toEqual(rootSpan.id)
+        expect(delivered.traceId).toEqual(rootSpan.traceId)
+
+        // span should not have a first class attribute by default
+        expect(delivered).not.toHaveAttribute('bugnsag.span.first_class')
+      })
+
+      describe('startTime', () => {
+        const invalidStartTimes: any[] = [
+          { type: 'string', startTime: 'i am not a startTime' },
+          { type: 'bigint', startTime: BigInt(9007199254740991) },
+          { type: 'true', startTime: true },
+          { type: 'false', startTime: false },
+          { type: 'function', startTime: () => {} },
+          { type: 'object', startTime: { property: 'test' } },
+          { type: 'empty array', startTime: [] },
+          { type: 'array', startTime: [1, 2, 3] },
+          { type: 'symbol', startTime: Symbol('test') },
+          { type: 'null', startTime: null }
+        ]
+
+        invalidStartTimes.push(...invalidStartTimes.map(
+          ({ type, startTime }) => ({
+            type: `{ startTime: ${type} }`,
+            startTime: { startTime }
+          }))
+        )
+
+        it.each(invalidStartTimes)('uses default clock implementation and logs if startTime is invalid ($type)', async (options) => {
+          const delivery = new InMemoryDelivery()
+          const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+          const client = createTestClient({ deliveryFactory: () => delivery, clock })
+
+          client.start({ apiKey: VALID_API_KEY, logger: jestLogger })
+
+          await jest.runOnlyPendingTimersAsync()
+
+          const span = client.startSpan('test span', options)
+          expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid span options\n  - startTime should be a number or Date, got ${typeof options.startTime}`)
+
+          span.end()
+          await jest.runOnlyPendingTimersAsync()
+
+          expect(delivery).toHaveSentSpan(expect.objectContaining({
+            startTimeUnixNano: '1000000'
+          }))
+        })
+      })
+      describe('parentContext', () => {
+        const parentContextOptions: any[] = [
+          { type: 'true', parentContext: true },
+          { type: 'string', parentContext: 'yes please' },
+          { type: 'bigint', parentContext: BigInt(9007199254740991) },
+          { type: 'function', parentContext: () => {} },
+          { type: 'object', parentContext: { property: 'test' } },
+          { type: 'empty array', parentContext: [] },
+          { type: 'array', parentContext: [1, 2, 3] },
+          { type: 'symbol', parentContext: Symbol('test') }
+        ]
+
+        it.each(parentContextOptions)('defaults to undefined and logs when parentContext is invalid ($type)', async (options) => {
+          const delivery = new InMemoryDelivery()
+          const client = createTestClient({ idGenerator: new IncrementingIdGenerator(), deliveryFactory: () => delivery })
+          client.start({ apiKey: VALID_API_KEY, logger: jestLogger })
+          await jest.runOnlyPendingTimersAsync()
+
+          // push two spans onto the context stack
+          client.startSpan('root span')
+          const parentSpan = client.startSpan('parent span')
+          expect(spanContextEquals(parentSpan, client.currentSpanContext)).toBe(true)
+
+          // start a new child span with an invalid parent context
+          const childSpan = client.startSpan('child span', options)
+          expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid span options\n  - parentContext should be a SpanContext, got ${typeof options.parentContext}`)
+
+          childSpan.end()
+          await jest.runOnlyPendingTimersAsync()
+
+          // child span should be nested under the parent span
+          expect(delivery).toHaveSentSpan(expect.objectContaining({
+            name: 'child span',
+            parentSpanId: parentSpan.id,
+            traceId: parentSpan.traceId
+          }))
+        })
+      })
+      describe('makeCurrentContext', () => {
+        const makeCurrentContextOptions: any[] = [
+          { type: 'string', makeCurrentContext: 'yes please' },
+          { type: 'bigint', makeCurrentContext: BigInt(9007199254740991) },
+          { type: 'function', makeCurrentContext: () => {} },
+          { type: 'object', makeCurrentContext: { property: 'test' } },
+          { type: 'empty array', makeCurrentContext: [] },
+          { type: 'array', makeCurrentContext: [1, 2, 3] },
+          { type: 'symbol', makeCurrentContext: Symbol('test') },
+          { type: 'null', makeCurrentContext: null }
+        ]
+
+        it.each(makeCurrentContextOptions)('becomes the current SpanContext and logs when makeCurrentContext is invalid ($type)', async (options) => {
+          const client = createTestClient()
+          client.start({ apiKey: VALID_API_KEY, logger: jestLogger })
+          await jest.runOnlyPendingTimersAsync()
+
+          expect(client.currentSpanContext).toBeUndefined()
+
+          const spanIsContext = client.startSpan('context span', options)
+
+          expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid span options\n  - makeCurrentContext should be true|false, got ${typeof options.makeCurrentContext}`)
+          expect(spanContextEquals(spanIsContext, client.currentSpanContext)).toBe(true)
+        })
+      })
+
+      describe('isFirstClass', () => {
+        it.each([
+          null,
+          1,
+          0,
+          'true',
+          'false',
+          [true, false]
+        ])('omits first class attribute and logs when isFirstClass is invalid (%s)', async (isFirstClass) => {
+          const delivery = new InMemoryDelivery()
+          const client = createTestClient({ deliveryFactory: () => delivery })
+          client.start({ apiKey: VALID_API_KEY, logger: jestLogger })
+          await jest.runOnlyPendingTimersAsync()
+
+          // @ts-expect-error 'isFirstClass' is the wrong type
+          const span = client.startSpan('name', { isFirstClass })
+          expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid span options\n  - isFirstClass should be true|false, got ${typeof isFirstClass}`)
+
+          span.end()
+          await jest.runOnlyPendingTimersAsync()
+
+          expect(delivery.requests.length).toBe(1)
+
+          const delivered = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+          expect(delivered).not.toHaveAttribute('bugnsag.span.first_class')
+        })
       })
     })
   })

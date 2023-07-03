@@ -7,6 +7,8 @@ import {
   createTestClient
 } from '@bugsnag/js-performance-test-utilities'
 
+jest.useFakeTimers()
+
 describe('SpanContext', () => {
   describe('SpanContext.isValid()', () => {
     it('returns false if the span has been ended', () => {

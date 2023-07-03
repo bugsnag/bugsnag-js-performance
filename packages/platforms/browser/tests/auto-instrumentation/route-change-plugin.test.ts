@@ -8,12 +8,21 @@ import { RouteChangePlugin } from '../../lib/auto-instrumentation/route-change-p
 import { createSchema } from '../../lib/config'
 import { createDefaultRoutingProvider } from '../../lib/default-routing-provider'
 import { type OnSettle } from '../../lib/on-settle'
+import { type StartRouteChangeCallback } from '../../lib/routing-provider'
 
 jest.useFakeTimers()
+
+const jestLogger = {
+  debug: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+  info: jest.fn()
+}
 
 afterEach(() => {
   history.replaceState({}, 'unused', 'https://bugsnag.com/route-change-plugin')
   jest.clearAllTimers()
+  jest.clearAllMocks()
 })
 
 describe('RouteChangePlugin', () => {
@@ -168,5 +177,52 @@ describe('RouteChangePlugin', () => {
     expect(delivery).not.toHaveSentSpan(expect.objectContaining({
       name: '[RouteChange]/second-route'
     }))
+  })
+
+  const invalidRoutes: any[] = [
+    // eslint-disable-next-line compat/compat
+    { type: 'bigint', route: BigInt(9007199254740991) },
+    { type: 'true', route: true },
+    { type: 'false', route: false },
+    { type: 'function', route: () => {} },
+    { type: 'object', route: { property: 'test' } },
+    { type: 'empty array', route: [] },
+    { type: 'array', route: [1, 2, 3] },
+    { type: 'symbol', route: Symbol('test') },
+    { type: 'null', route: null }
+  ]
+
+  describe('validation', () => {
+    it.each(invalidRoutes)('handles invalid routes ($type)', async ({ route }) => {
+      const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(32) }
+      const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle, window.location)
+      const routingProvider = new DefaultRoutingProvider()
+      let routeChangeCallback: StartRouteChangeCallback = jest.fn()
+      routingProvider.listenForRouteChanges = (startRouteChangeSpan) => {
+        routeChangeCallback = startRouteChangeSpan
+      }
+
+      const delivery = new InMemoryDelivery()
+      const testClient = createTestClient({
+        deliveryFactory: () => delivery,
+        schema: createSchema(window.location.hostname, routingProvider),
+        plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
+      })
+
+      testClient.start({ apiKey: VALID_API_KEY, logger: jestLogger })
+      await jest.runOnlyPendingTimersAsync()
+
+      // trigger the route change
+      const span = routeChangeCallback(route, 'trigger')
+      expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid span options\n  - route should be a string, got ${typeof route}`)
+
+      span.end()
+
+      await jest.runOnlyPendingTimersAsync()
+
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: `[RouteChange]${String(route)}`
+      }))
+    })
   })
 })
