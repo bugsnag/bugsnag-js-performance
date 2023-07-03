@@ -4,9 +4,11 @@ import getAbsoluteUrl from '../request-tracker/url-helpers'
 import { type RouteChangeSpanOptions } from '../routing-provider'
 
 // exclude isFirstClass from the route change option schema
-const { isFirstClass, ...baseSpanOptionSchema } = coreSpanOptionSchema
+const { startTime, parentContext, makeCurrentContext } = coreSpanOptionSchema
 const routeChangeSpanOptionSchema: SpanOptionSchema = {
-  ...baseSpanOptionSchema,
+  startTime,
+  parentContext,
+  makeCurrentContext,
   route: {
     getDefaultValue: (value) => String(value),
     message: 'should be a string',
