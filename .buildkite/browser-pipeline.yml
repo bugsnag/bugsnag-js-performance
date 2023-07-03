@@ -1,43 +1,35 @@
 steps:
-
   - group: "Browser Tests"
     steps:
-      - label: ":docker: Build BitBar Maze Runner image"
-        key: "browser-maze-runner-bb"
+      - label: ":docker: Build BitBar Maze Runner image${EXTRA_STEP_LABEL}"
+        key: "browser-maze-runner-bb-${USE_CDN_BUILD}"
         timeout_in_minutes: 20
         plugins:
           - docker-compose#v4.12.0:
               build: browser-maze-runner-bb
               image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
-              cache-from: browser-maze-runner-bb:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
+              cache-from: browser-maze-runner-bb:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
           - docker-compose#v4.12.0:
-              push: browser-maze-runner-bb:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
+              push: browser-maze-runner-bb:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
+        env:
+          USE_CDN_BUILD: "${USE_CDN_BUILD}"
 
-      - label: ":docker: Build BrowserStack Maze Runner image"
-        key: "browser-maze-runner-bs"
-        timeout_in_minutes: 20
-        plugins:
-          - docker-compose#v4.12.0:
-              build: browser-maze-runner-bs
-              image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
-              cache-from: browser-maze-runner-bs:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
-          - docker-compose#v4.12.0:
-              push: browser-maze-runner-bs:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
-
-      - label: ":docker: Build Legacy Maze Runner image"
-        key: "browser-maze-runner-legacy"
+      - label: ":docker: Build Legacy Maze Runner image${EXTRA_STEP_LABEL}"
+        key: "browser-maze-runner-legacy-${USE_CDN_BUILD}"
         timeout_in_minutes: 20
         plugins:
           - docker-compose#v4.12.0:
               build: browser-maze-runner-legacy
               image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
-              cache-from: browser-maze-runner-legacy:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
+              cache-from: browser-maze-runner-legacy:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
           - docker-compose#v4.12.0:
-              push: browser-maze-runner-legacy:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}
+              push: browser-maze-runner-legacy:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
+        env:
+          USE_CDN_BUILD: "${USE_CDN_BUILD}"
 
       # BitBar
-      - label: ":bitbar: :{{ matrix.browser }}: {{ matrix.version }} tests"
-        depends_on: "browser-maze-runner-bb"
+      - label: ":bitbar: :{{ matrix.browser }}: {{ matrix.version }} tests${EXTRA_STEP_LABEL}"
+        depends_on: "browser-maze-runner-bb-${USE_CDN_BUILD}"
         timeout_in_minutes: 30
         plugins:
           docker-compose#v4.12.0:
@@ -63,8 +55,8 @@ steps:
             - with: { browser: safari, version: 16 }
 
       # BrowserStack
-      - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser tests"
-        depends_on: "browser-maze-runner-legacy"
+      - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser tests${EXTRA_STEP_LABEL}"
+        depends_on: "browser-maze-runner-legacy-${USE_CDN_BUILD}"
         timeout_in_minutes: 30
         plugins:
           docker-compose#v4.12.0:

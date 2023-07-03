@@ -19,7 +19,6 @@ x-common-environment: &common-environment
   MAZE_REPEATER_API_KEY:
 
 services:
-
   license-finder:
     build:
       dockerfile: dockerfiles/Dockerfile.license-finder
@@ -33,6 +32,7 @@ services:
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
         MAZE_RUNNER_VERSION: latest-v8-cli
+        USE_CDN_BUILD:
     environment:
       <<: *common-environment
       BITBAR_USERNAME:
@@ -58,6 +58,7 @@ services:
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
         MAZE_RUNNER_VERSION: latest-v8-cli
+        USE_CDN_BUILD:
     environment: &browser-maze-runner-environment
       <<: *common-environment
       BROWSER_STACK_BROWSERS_USERNAME:
