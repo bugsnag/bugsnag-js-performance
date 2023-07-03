@@ -1,3 +1,5 @@
+SDK_VERSION = File.read("#{__dir__}/../fixtures/.bugsnag-browser-version")
+
 When("I navigate to the test URL {string}") do |test_path|
   path = $url_generator.for_path(test_path)
   step("I navigate to the URL \"#{path}\"")
@@ -10,9 +12,8 @@ When("I navigate to the test URL {string}") do |test_path|
   Maze::Store.values["environment"] = environment
   Maze::Store.values["bugsnag.browser.page.url"] = url
 
-  # store app version from package.json
-  package = JSON.parse(File.read("./features/fixtures/node_modules/@bugsnag/browser-performance/package.json"))
-  Maze::Store.values["telemetry.sdk.version"] = package["version"]
+  # store package version that we stashed away in build-packages.rb
+  Maze::Store.values["telemetry.sdk.version"] = SDK_VERSION
 end
 
 When("I set the HTTP status code for the next {int} {string} requests to {int}") do |count, http_verb, status_code|

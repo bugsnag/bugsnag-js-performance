@@ -1,0 +1,4 @@
+/.bugsnag-browser-version
+/packages/bugsnag-performance*.js*
+/packages/*.tgz
+/package.json.backup
