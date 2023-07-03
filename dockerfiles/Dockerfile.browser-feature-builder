@@ -10,7 +10,9 @@ COPY . .
 # Install packages
 RUN npm ci
 WORKDIR /app/test/browser
-RUN SKIP_FIXTURE_CLEANUP=true ruby ./features/support/build-packages.rb
+
+ARG USE_CDN_BUILD
+RUN USE_CDN_BUILD=$USE_CDN_BUILD SKIP_FIXTURE_CLEANUP=true ruby ./features/support/build-packages.rb
 
 # Don't rebuild packages during e2e tests
 ENV SKIP_BUILD_PACKAGES=true
