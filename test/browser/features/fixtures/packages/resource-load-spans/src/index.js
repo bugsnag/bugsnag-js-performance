@@ -6,7 +6,7 @@ const endpoint = parameters.get("endpoint")
 
 const span = BugsnagPerformance.startSpan("[Custom]/resource-load-spans")
 
-BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 3, batchInactivityTimeoutMs: 3000, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false })
+BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 4, batchInactivityTimeoutMs: 3000, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false })
 
 document.getElementById("end-span").addEventListener("click", () => {
     const node = document.getElementById("image-container")
