@@ -16,7 +16,7 @@ Feature: Page Load spans
         And the span named "[FullPageLoad]/page-load-spans/" is a valid full page load span
 
         # All spans should have a page url attribute
-        And every span string attribute "bugsnag.browser.page.url" matches the regex "^http:\/\/.*:[0-9]{4}\/page-load-spans\/.*\/?endpoint=.*\&logs=.*\&api_key=.*$"
+        And every span string attribute "bugsnag.browser.page.url" matches the regex "^http:\/\/.*:[0-9]{4}\/page-load-spans\/.*\/\?endpoint=.*\&logs=.*\&api_key=.*$"
 
         # We expect the following spans to always be present
         And a span named "[PageLoadPhase/HTTPRequest]/page-load-spans/" has a parent named "[FullPageLoad]/page-load-spans/"

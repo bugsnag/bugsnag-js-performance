@@ -1,6 +1,5 @@
-import { type SpanOptionSchema, isString, coreSpanOptionSchema, validateSpanOptions, type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
+import { coreSpanOptionSchema, isString, validateSpanOptions, type InternalConfiguration, type Plugin, type SpanFactory, type SpanOptionSchema } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
-import getAbsoluteUrl from '../request-tracker/url-helpers'
 import { type RouteChangeSpanOptions } from '../routing-provider'
 
 // exclude isFirstClass from the route change option schema
@@ -38,7 +37,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
 
     let previousRoute = configuration.routingProvider.resolveRoute(new URL(this.location.href))
 
-    configuration.routingProvider.listenForRouteChanges((route, trigger, options) => {
+    configuration.routingProvider.listenForRouteChanges((url, route, trigger, options) => {
       // create internal options for validation
       const routeChangeSpanOptions = {
         ...options,
@@ -56,8 +55,6 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
       // update the span name using the validated route
       cleanOptions.name += cleanOptions.options.route
       const span = this.spanFactory.startSpan(cleanOptions.name, cleanOptions.options)
-
-      const url = getAbsoluteUrl(cleanOptions.options.route, this.document.baseURI)
 
       span.setAttribute('bugsnag.span.category', 'route_change')
       span.setAttribute('bugsnag.browser.page.route', route)
