@@ -15,4 +15,12 @@ export default {
     nodeResolve({ browser: true, jail: path.resolve(`${__dirname}/..`) }),
     commonjs()
   ],
+  onLog (level, log, defaultHandler) {
+    // turn warnings into errors
+    if (level === 'warn') {
+      level = 'error'
+    }
+
+    defaultHandler(level, log)
+  },
 }
