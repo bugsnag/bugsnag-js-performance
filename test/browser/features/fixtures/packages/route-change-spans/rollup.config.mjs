@@ -1,7 +1,11 @@
-import nodeResolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import babel from '@rollup/plugin-babel';
-import replace from '@rollup/plugin-replace';
+import nodeResolve from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+import babel from '@rollup/plugin-babel'
+import replace from '@rollup/plugin-replace'
+import path from 'path'
+import url from 'url'
+
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
 export default {
   input: 'src/app.jsx',
@@ -12,7 +16,8 @@ export default {
   plugins: [
     nodeResolve({
       extensions: ['.js', 'jsx'],
-      browser: true
+      browser: true,
+      jail: path.resolve(`${__dirname}/../..`),
     }),
     babel({
       babelHelpers: 'bundled',
