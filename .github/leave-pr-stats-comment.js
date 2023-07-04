@@ -52,7 +52,7 @@ module.exports = async function (github, context, coverageDiff, needs) {
 
   ### Code coverage
 
-  ${coverageDiff.diff(sizes.before.coverage, sizes.after.coverage).results}
+  ${coverageDiff.diff(JSON.parse(sizes.before.coverage), JSON.parse(sizes.after.coverage)).results}
 
   <p align="right">
     Generated against ${context.payload.pull_request.head.sha}
