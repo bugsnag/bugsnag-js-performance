@@ -19,7 +19,7 @@ jobs:
     with:
       ref: ${{ github.sha }}
 
-  compare-bundle-size:
+  compare-pr-stats:
     runs-on: ubuntu-latest
     needs: [base-branch, head-branch]
     steps:
@@ -30,6 +30,6 @@ jobs:
         with:
           script: |
             const coverageDiff = require('coverage-diff')
-            const leaveBundleSizeComment = require('./.github/leave-bundle-size-comment.js')
+            const leaveComment = require('./.github/leave-pr-stats-comment.js')
 
-            await leaveBundleSizeComment(github, context, coverageDiff, ${{ toJSON(needs) }})
+            await leaveComment(github, context, coverageDiff, ${{ toJSON(needs) }})
