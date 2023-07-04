@@ -15,23 +15,20 @@ export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Locat
     listenForRouteChanges (startRouteChangeSpan: StartRouteChangeCallback) {
       addEventListener('popstate', (ev) => {
         const url = new URL(location.href)
-        const route = this.resolveRoute(url)
-        const span = startRouteChangeSpan(location.href, route, 'popstate')
+        const span = startRouteChangeSpan(url, 'popstate')
 
         onSettle((endTime) => {
           span.end(endTime)
         })
       })
 
-      const resolveRoute = this.resolveRoute
       const originalPushState = history.pushState
       history.pushState = function (...args) {
         const url = args[2]
 
         if (url) {
           const absoluteURL = new URL(getAbsoluteUrl(url.toString(), document.baseURI))
-          const route = resolveRoute(absoluteURL)
-          const span = startRouteChangeSpan(absoluteURL.toString(), route, 'pushState')
+          const span = startRouteChangeSpan(absoluteURL, 'pushState')
 
           onSettle((endTime) => {
             span.end(endTime)

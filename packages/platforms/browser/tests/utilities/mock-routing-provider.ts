@@ -5,7 +5,7 @@ class MockRoutingProvider implements RoutingProvider {
   readonly resolveRoute = () => '/initial-route'
 
   listenForRouteChanges (startRouteChangeSpan: StartRouteChangeCallback) {
-    startRouteChangeSpan(location.href, '/new-route', 'pushState')
+    startRouteChangeSpan(new URL(location.href), 'pushState')
   }
 }
 

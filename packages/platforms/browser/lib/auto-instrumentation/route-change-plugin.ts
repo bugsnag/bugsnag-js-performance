@@ -37,7 +37,9 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
 
     let previousRoute = configuration.routingProvider.resolveRoute(new URL(this.location.href))
 
-    configuration.routingProvider.listenForRouteChanges((url, route, trigger, options) => {
+    configuration.routingProvider.listenForRouteChanges((url, trigger, options) => {
+      const route = configuration.routingProvider.resolveRoute(url)
+
       // create internal options for validation
       const routeChangeSpanOptions = {
         ...options,
@@ -58,7 +60,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
 
       span.setAttribute('bugsnag.span.category', 'route_change')
       span.setAttribute('bugsnag.browser.page.route', route)
-      span.setAttribute('bugsnag.browser.page.url', url)
+      span.setAttribute('bugsnag.browser.page.url', url.toString())
       span.setAttribute('bugsnag.browser.page.previous_route', previousRoute)
       span.setAttribute('bugsnag.browser.page.route_change.trigger', cleanOptions.options.trigger)
 
