@@ -29,6 +29,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            const coverageDiff = require('coverage-diff')
             const leaveBundleSizeComment = require('./.github/leave-bundle-size-comment.js')
 
-            await leaveBundleSizeComment(github, context, ${{ toJSON(needs) }})
+            await leaveBundleSizeComment(github, context, coverageDiff, ${{ toJSON(needs) }})
