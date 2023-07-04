@@ -85,6 +85,7 @@ jobs:
           echo "size=$SIZE" >> $GITHUB_OUTPUT
 
       - id: code-coverage
+        uses: actions/github-script@v6
         with:
           script: |
             const summary = require('./coverage/coverage-summary.json')
