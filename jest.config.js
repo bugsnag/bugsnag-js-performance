@@ -19,6 +19,14 @@ const moduleNameMapper = Object.fromEntries(
 )
 
 module.exports = {
+  collectCoverageFrom: [
+    '**/packages/*/**/*.ts',
+    '!**/packages/*/**/*.d.ts',
+    '!**/packages/*/**/tests/**/*',
+    '!<rootDir>/packages/test-utilities/**/*',
+    '!<rootDir>/test/**/*'
+  ],
+  coverageReporters: ['json-summary', 'text'],
   transform: {
     '^.+\\.m?[tj]sx?$': [
       'ts-jest',

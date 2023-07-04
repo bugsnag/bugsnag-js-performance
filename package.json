@@ -12,6 +12,7 @@
     "clean": "rm -f build/* && lerna run --stream --parallel clean",
     "test:lint": "eslint --max-warnings=0 .",
     "test:unit": "jest",
+    "test:coverage": "jest --coverage",
     "test:test-container-registry-login": "aws ecr get-login-password --profile=opensource --region=us-west-1 | docker login --username AWS --password-stdin 855461928731.dkr.ecr.us-west-1.amazonaws.com"
   },
   "devDependencies": {
