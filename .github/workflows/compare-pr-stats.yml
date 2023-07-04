@@ -36,7 +36,6 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const coverageDiff = require('coverage-diff')
             const leaveComment = require('./.github/leave-pr-stats-comment.js')
 
-            await leaveComment(github, context, coverageDiff, ${{ toJSON(needs) }})
+            await leaveComment(github, context, require, ${{ toJSON(needs) }})

@@ -5,7 +5,8 @@ const showDiff = n => {
   return '_No change_'
 }
 
-module.exports = async function (github, context, coverageDiff, needs) {
+module.exports = async function (github, context, require, needs) {
+  const coverageDiff = require('coverage-diff')
   const sizes = {
     before: {
       package: needs['base-branch'].outputs['package-size'],
