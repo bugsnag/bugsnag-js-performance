@@ -1,6 +1,6 @@
 import {
   type SpanEnded,
-  type SpanProbability,
+  type ScaledProbability,
   SpanAttributes,
   traceIdToSamplingRate,
   SpanEvents
@@ -20,7 +20,10 @@ export function createEndedSpan (overrides: Partial<SpanEnded> = {}): SpanEnded 
     traceId,
     samplingRate: traceIdToSamplingRate(traceId),
     endTime: 23456,
-    samplingProbability: Math.floor(0.5 * 0xffffffff) as SpanProbability,
+    samplingProbability: {
+      raw: 0.5,
+      scaled: Math.floor(0.5 * 0xffffffff) as ScaledProbability
+    },
     ...overrides
   }
 }

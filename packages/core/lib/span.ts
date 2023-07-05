@@ -24,8 +24,13 @@ export const enum Kind {
 // this prevents the wrong kind of number being assigned to the span's
 // samplingProbability
 // this exists only in the type system; at runtime it's a regular number
-declare const validSpanProbability: unique symbol
-export type SpanProbability = number & { [validSpanProbability]: true }
+declare const validScaledProbability: unique symbol
+export type ScaledProbability = number & { [validScaledProbability]: true }
+
+export interface SpanProbability {
+  readonly scaled: ScaledProbability
+  readonly raw: number
+}
 
 export interface SpanEnded {
   readonly id: string // 64 bit random string
