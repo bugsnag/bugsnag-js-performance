@@ -19,6 +19,9 @@ on:
       minified-gzip-size:
         description: "The minified bundle size after gzipping"
         value: ${{ jobs.record-sizes.outputs.minified-gzip-size }}
+      code-coverage:
+        description: "The code coverage report summary"
+        value: ${{ jobs.record-sizes.outputs.code-coverage }}
 
 jobs:
   record-sizes:
@@ -29,6 +32,7 @@ jobs:
       unminified-size: ${{ steps.unminified.outputs.size }}
       minified-size: ${{ steps.minified.outputs.size }}
       minified-gzip-size: ${{ steps.minified-gzip.outputs.size }}
+      code-coverage: ${{ steps.code-coverage.outputs.result }}
 
     steps:
       - uses: actions/checkout@v3
@@ -42,6 +46,7 @@ jobs:
 
       - run: npm ci
       - run: npm run build
+      - run: npm run test:coverage
 
       - id: package
         uses: actions/github-script@v6
@@ -78,6 +83,12 @@ jobs:
           SIZE="$(gzip < build/bugsnag-performance.min.js | wc -c)"
           echo "Gzipped bundle size: $SIZE bytes"
           echo "size=$SIZE" >> $GITHUB_OUTPUT
+
+      - id: code-coverage
+        uses: actions/github-script@v6
+        with:
+          script: |
+            return require('./coverage/coverage-summary.json')
 
       - uses: actions/upload-artifact@v3
         with:

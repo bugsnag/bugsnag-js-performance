@@ -5,13 +5,15 @@ const showDiff = n => {
   return '_No change_'
 }
 
-module.exports = async function (github, context, needs) {
+module.exports = async function (github, context, require, needs) {
+  const coverageDiff = require('coverage-diff')
   const sizes = {
     before: {
       package: needs['base-branch'].outputs['package-size'],
       unminified: needs['base-branch'].outputs['unminified-size'],
       minified: needs['base-branch'].outputs['minified-size'],
       gzipped: needs['base-branch'].outputs['minified-gzip-size'],
+      coverage: needs['base-branch'].outputs['code-coverage'],
     },
 
     after: {
@@ -19,6 +21,7 @@ module.exports = async function (github, context, needs) {
       unminified: needs['head-branch'].outputs['unminified-size'],
       minified: needs['head-branch'].outputs['minified-size'],
       gzipped: needs['head-branch'].outputs['minified-gzip-size'],
+      coverage: needs['head-branch'].outputs['code-coverage'],
     },
   }
 
@@ -47,6 +50,10 @@ module.exports = async function (github, context, needs) {
   | Before | \`${formatKbs(sizes.before.unminified)}\` | \`${formatKbs(sizes.before.minified)}\` | \`${formatKbs(sizes.before.gzipped)}\` |
   | After  | \`${formatKbs(sizes.after.unminified)}\`  | \`${formatKbs(sizes.after.minified)}\`  | \`${formatKbs(sizes.after.gzipped)}\`  |
   | ±      | ${showDiff(diff.unminified)}              | ${showDiff(diff.minified)}              | ${showDiff(diff.gzipped)}              |
+
+  ### Code coverage
+
+  ${coverageDiff.diff(JSON.parse(sizes.before.coverage), JSON.parse(sizes.after.coverage)).results}
 
   <p align="right">
     Generated against ${context.payload.pull_request.head.sha}

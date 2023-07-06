@@ -19,16 +19,23 @@ jobs:
     with:
       ref: ${{ github.sha }}
 
-  compare-bundle-size:
+  compare-pr-stats:
     runs-on: ubuntu-latest
     needs: [base-branch, head-branch]
     steps:
       - uses: actions/checkout@v3
 
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      
+      - run: npm ci
+
       - name: Leave comment
         uses: actions/github-script@v6
         with:
           script: |
-            const leaveBundleSizeComment = require('./.github/leave-bundle-size-comment.js')
+            const leaveComment = require('./.github/leave-pr-stats-comment.js')
 
-            await leaveBundleSizeComment(github, context, ${{ toJSON(needs) }})
+            await leaveComment(github, context, require, ${{ toJSON(needs) }})
