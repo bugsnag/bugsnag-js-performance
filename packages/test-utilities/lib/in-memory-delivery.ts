@@ -1,4 +1,9 @@
-import { type DeliveryPayload, type Delivery, type ResponseState } from '@bugsnag/core-performance'
+import {
+  type DeliveryPayload,
+  type Delivery,
+  type ResponseState,
+  type TracePayload
+} from '@bugsnag/core-performance'
 
 class InMemoryDelivery implements Delivery {
   public requests: DeliveryPayload[] = []
@@ -7,11 +12,11 @@ class InMemoryDelivery implements Delivery {
   private readonly responseStateStack: ResponseState[] = []
   private readonly samplingProbabilityStack: Array<number | undefined> = []
 
-  send (payload: DeliveryPayload) {
-    if (payload.resourceSpans.length === 0) {
-      this.samplingRequests.push(payload)
+  send (payload: TracePayload) {
+    if (payload.body.resourceSpans.length === 0) {
+      this.samplingRequests.push(payload.body)
     } else {
-      this.requests.push(payload)
+      this.requests.push(payload.body)
     }
 
     const state = this.responseStateStack.pop() || 'success' as ResponseState

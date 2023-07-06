@@ -1,12 +1,12 @@
-import { type Delivery, type DeliveryPayload } from './delivery'
+import { type Delivery, type TracePayload } from './delivery'
 
 export interface RetryQueue {
-  add: (payload: DeliveryPayload, time: number) => void
+  add: (payload: TracePayload, time: number) => void
   flush: () => Promise<void>
 }
 
 interface PayloadWithTimestamp {
-  payload: DeliveryPayload
+  payload: TracePayload
   time: number
 }
 
@@ -18,7 +18,7 @@ export class InMemoryQueue implements RetryQueue {
 
   constructor (private delivery: Delivery, private retryQueueMaxSize: number) {}
 
-  add (payload: DeliveryPayload, time: number) {
+  add (payload: TracePayload, time: number) {
     this.payloads.push({ payload, time })
 
     let spanCount = this.payloads.reduce((count, { payload }) => count + countSpansInPayload(payload), 0)
@@ -68,11 +68,11 @@ export class InMemoryQueue implements RetryQueue {
   }
 }
 
-function countSpansInPayload (payload: DeliveryPayload) {
+function countSpansInPayload (payload: TracePayload) {
   let count = 0
 
-  for (let i = 0; i < payload.resourceSpans.length; ++i) {
-    const scopeSpans = payload.resourceSpans[i].scopeSpans
+  for (let i = 0; i < payload.body.resourceSpans.length; ++i) {
+    const scopeSpans = payload.body.resourceSpans[i].scopeSpans
 
     for (let j = 0; j < scopeSpans.length; ++j) {
       count += scopeSpans[j].spans.length

@@ -3,7 +3,7 @@ import { type BackgroundingListener } from './backgrounding-listener'
 import { BatchProcessor } from './batch-processor'
 import { type Clock } from './clock'
 import { validateConfig, type Configuration, type CoreSchema } from './config'
-import { type DeliveryFactory } from './delivery'
+import { type DeliveryFactory, TracePayloadEncoder } from './delivery'
 import { type IdGenerator } from './id-generator'
 import { type Persistence } from './persistence'
 import { type Plugin } from './plugin'
@@ -57,21 +57,20 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
     start: (config: C | string) => {
       const configuration = validateConfig<S, C>(config, options.schema)
 
-      const delivery = options.deliveryFactory(configuration.apiKey, configuration.endpoint)
+      const delivery = options.deliveryFactory(configuration.endpoint)
 
       ProbabilityManager.create(
         options.persistence,
         sampler,
-        new ProbabilityFetcher(delivery)
+        new ProbabilityFetcher(delivery, configuration.apiKey)
       ).then((manager: ProbabilityManager) => {
         processor = new BatchProcessor(
           delivery,
           configuration,
-          options.resourceAttributesSource,
-          options.clock,
           new InMemoryQueue(delivery, configuration.retryQueueMaxSize),
           sampler,
-          manager
+          manager,
+          new TracePayloadEncoder(options.clock, configuration, options.resourceAttributesSource)
         )
 
         // ensure all spans started before .start() are added to the batch

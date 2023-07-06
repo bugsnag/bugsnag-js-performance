@@ -1,4 +1,5 @@
 import { BatchProcessor } from '../lib/batch-processor'
+import { TracePayloadEncoder } from '../lib/delivery'
 import { InMemoryPersistence } from '../lib/persistence'
 import ProbabilityFetcher from '../lib/probability-fetcher'
 import ProbabilityManager from '../lib/probability-manager'
@@ -16,14 +17,14 @@ jest.useFakeTimers()
 describe('BatchProcessor', () => {
   it('delivers after reaching the specified span limit', async () => {
     const delivery = new InMemoryDelivery()
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const batchProcessor = new BatchProcessor(
       delivery,
       createConfiguration(),
-      resourceAttributesSource,
-      new IncrementingClock('1970-01-01T00:00:00Z'),
       { add: jest.fn(), flush: jest.fn() },
       new Sampler(1.0),
-      { setProbability () { return Promise.resolve() } }
+      { setProbability () { return Promise.resolve() } },
+      new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
     // add 99 spans
@@ -42,14 +43,14 @@ describe('BatchProcessor', () => {
 
   it('delivers after the specified time limit', async () => {
     const delivery = new InMemoryDelivery()
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const batchProcessor = new BatchProcessor(
       delivery,
       createConfiguration(),
-      resourceAttributesSource,
-      new IncrementingClock('1970-01-01T00:00:00Z'),
       { add: jest.fn(), flush: jest.fn() },
       new Sampler(1.0),
-      { setProbability () { return Promise.resolve() } }
+      { setProbability () { return Promise.resolve() } },
+      new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
     batchProcessor.add(createEndedSpan())
@@ -63,14 +64,14 @@ describe('BatchProcessor', () => {
 
   it('restarts the timer when calling .add()', async () => {
     const delivery = new InMemoryDelivery()
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const batchProcessor = new BatchProcessor(
       delivery,
       createConfiguration(),
-      resourceAttributesSource,
-      new IncrementingClock('1970-01-01T00:00:00Z'),
       { add: jest.fn(), flush: jest.fn() },
       new Sampler(1.0),
-      { setProbability () { return Promise.resolve() } }
+      { setProbability () { return Promise.resolve() } },
+      new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
     batchProcessor.add(createEndedSpan())
@@ -89,43 +90,44 @@ describe('BatchProcessor', () => {
 
   it('prevents delivery if releaseStage not in enabledReleaseStages', async () => {
     const delivery = new InMemoryDelivery()
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+    const configuration = createConfiguration({ enabledReleaseStages: ['production'], releaseStage: 'test' })
     const batchProcessor = new BatchProcessor(
       delivery,
-      createConfiguration({ enabledReleaseStages: ['production'], releaseStage: 'test' }),
-      resourceAttributesSource,
-      new IncrementingClock('1970-01-01T00:00:00Z'),
+      configuration,
       { add: jest.fn(), flush: jest.fn() },
       new Sampler(1.0),
-      { setProbability () { return Promise.resolve() } }
+      { setProbability () { return Promise.resolve() } },
+      new TracePayloadEncoder(clock, configuration, resourceAttributesSource)
     )
 
     batchProcessor.add(createEndedSpan())
 
-    await jest.runOnlyPendingTimersAsync()
+    await batchProcessor.flush()
 
     expect(delivery.requests).toHaveLength(0)
   })
 
   it('adds delivery payload to a retry queue if delivery fails and response code is retryable', async () => {
     const delivery = new InMemoryDelivery()
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
 
     const batchProcessor = new BatchProcessor(
       delivery,
       createConfiguration({ logger }),
-      resourceAttributesSource,
-      new IncrementingClock('1970-01-01T00:00:00Z'),
       retryQueue,
       new Sampler(1.0),
-      { setProbability () { return Promise.resolve() } }
+      { setProbability () { return Promise.resolve() } },
+      new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
     delivery.setNextResponseState('failure-retryable')
 
     batchProcessor.add(createEndedSpan())
 
-    await jest.runOnlyPendingTimersAsync()
+    await batchProcessor.flush()
 
     expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).toHaveBeenCalled()
@@ -135,24 +137,24 @@ describe('BatchProcessor', () => {
 
   it('does not add delivery payload to a retry queue if delivery fails and response code is not retryable', async () => {
     const delivery = new InMemoryDelivery()
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
 
     const batchProcessor = new BatchProcessor(
       delivery,
       createConfiguration({ logger }),
-      resourceAttributesSource,
-      new IncrementingClock('1970-01-01T00:00:00Z'),
       retryQueue,
       new Sampler(1.0),
-      { setProbability () { return Promise.resolve() } }
+      { setProbability () { return Promise.resolve() } },
+      new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
     delivery.setNextResponseState('failure-discard')
 
     batchProcessor.add(createEndedSpan())
 
-    await jest.runOnlyPendingTimersAsync()
+    await batchProcessor.flush()
 
     expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).not.toHaveBeenCalled()
@@ -162,22 +164,22 @@ describe('BatchProcessor', () => {
 
   it('flushes retry queue after a successful delivery', async () => {
     const delivery = new InMemoryDelivery()
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
     const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
 
     const batchProcessor = new BatchProcessor(
       delivery,
       createConfiguration({ logger }),
-      resourceAttributesSource,
-      new IncrementingClock('1970-01-01T00:00:00Z'),
       retryQueue,
       new Sampler(1.0),
-      { setProbability () { return Promise.resolve() } }
+      { setProbability () { return Promise.resolve() } },
+      new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
     batchProcessor.add(createEndedSpan())
 
-    await jest.runOnlyPendingTimersAsync()
+    await batchProcessor.flush()
 
     expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).not.toHaveBeenCalled()
@@ -187,30 +189,29 @@ describe('BatchProcessor', () => {
 
   it('updates the sampling probability when the response returns a new probability', async () => {
     const delivery = new InMemoryDelivery()
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const sampler = new Sampler(1.0)
 
     const batchProcessor = new BatchProcessor(
       delivery,
       createConfiguration(),
-      resourceAttributesSource,
-      new IncrementingClock('1970-01-01T00:00:00Z'),
       { add: jest.fn(), flush: jest.fn() },
       sampler,
       await ProbabilityManager.create(
         new InMemoryPersistence(),
         sampler,
-        new ProbabilityFetcher(delivery)
-      )
+        new ProbabilityFetcher(delivery, 'api key')
+      ),
+      new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
     batchProcessor.add(createEndedSpan())
 
     delivery.setNextSamplingProbability(0.0)
-    delivery.setNextSamplingProbability(0.0)
 
     expect(sampler.probability).toBe(1.0)
 
-    await jest.runOnlyPendingTimersAsync()
+    await batchProcessor.flush()
 
     expect(sampler.probability).toBe(0.0)
     expect(delivery.requests).toHaveLength(1)
@@ -218,6 +219,7 @@ describe('BatchProcessor', () => {
 
   it('discards ended spans if samplingRate is higher than the samplingProbability', async () => {
     const delivery = new InMemoryDelivery()
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const persistence = new InMemoryPersistence()
     await persistence.save('bugsnag-sampling-probability', { value: 0.5, time: Date.now() })
 
@@ -225,15 +227,14 @@ describe('BatchProcessor', () => {
     const batchProcessor = new BatchProcessor(
       delivery,
       createConfiguration(),
-      resourceAttributesSource,
-      new IncrementingClock('1970-01-01T00:00:00Z'),
       { add: jest.fn(), flush: jest.fn() },
       sampler,
       await ProbabilityManager.create(
         persistence,
         sampler,
-        new ProbabilityFetcher(delivery)
-      )
+        new ProbabilityFetcher(delivery, 'api key')
+      ),
+      new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
     const span1 = createEndedSpan({
@@ -251,7 +252,7 @@ describe('BatchProcessor', () => {
     batchProcessor.add(span1)
     batchProcessor.add(span2)
 
-    await jest.runOnlyPendingTimersAsync()
+    await batchProcessor.flush()
 
     expect(delivery).not.toHaveSentSpan(expect.objectContaining({
       name: 'Span 01'
@@ -266,6 +267,7 @@ describe('BatchProcessor', () => {
 
   it('does not send a request if the entire batch is discarded', async () => {
     const delivery = new InMemoryDelivery()
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const persistence = new InMemoryPersistence()
     await persistence.save('bugsnag-sampling-probability', { value: 0.5, time: Date.now() })
 
@@ -273,15 +275,14 @@ describe('BatchProcessor', () => {
     const batchProcessor = new BatchProcessor(
       delivery,
       createConfiguration(),
-      resourceAttributesSource,
-      new IncrementingClock('1970-01-01T00:00:00Z'),
       { add: jest.fn(), flush: jest.fn() },
       sampler,
       await ProbabilityManager.create(
         persistence,
         sampler,
-        new ProbabilityFetcher(delivery)
-      )
+        new ProbabilityFetcher(delivery, 'api key')
+      ),
+      new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
     const span1 = createEndedSpan({
@@ -299,7 +300,7 @@ describe('BatchProcessor', () => {
     batchProcessor.add(span1)
     batchProcessor.add(span2)
 
-    await jest.runOnlyPendingTimersAsync()
+    await batchProcessor.flush()
 
     expect(delivery).not.toHaveSentSpan(expect.objectContaining({
       name: 'Span 01'

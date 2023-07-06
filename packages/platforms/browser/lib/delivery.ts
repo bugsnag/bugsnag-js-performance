@@ -2,6 +2,7 @@ import {
   type BackgroundingListener,
   type Delivery,
   type DeliveryFactory,
+  type TracePayload,
   responseStateFromStatusCode
 } from '@bugsnag/core-performance'
 
@@ -34,22 +35,17 @@ function createBrowserDeliveryFactory (fetch: Fetch, backgroundingListener: Back
     keepalive = state === 'in-background'
   })
 
-  return function browserDeliveryFactory (apiKey: string, endpoint: string): Delivery {
+  return function browserDeliveryFactory (endpoint: string): Delivery {
     return {
-      async send (payload) {
-        const spanCount = payload.resourceSpans.reduce((count, resourceSpan) => count + resourceSpan.scopeSpans.length, 0)
+      async send (payload: TracePayload) {
+        payload.headers['Bugsnag-Sent-At'] = (new Date()).toISOString()
 
         try {
           const response = await fetch(endpoint, {
             method: 'POST',
             keepalive,
-            body: JSON.stringify(payload),
-            headers: {
-              'Bugsnag-Api-Key': apiKey,
-              'Content-Type': 'application/json',
-              'Bugsnag-Span-Sampling': `1.0:${spanCount}`,
-              'Bugsnag-Sent-At': (new Date()).toISOString()
-            }
+            body: JSON.stringify(payload.body),
+            headers: payload.headers
           })
 
           return {
