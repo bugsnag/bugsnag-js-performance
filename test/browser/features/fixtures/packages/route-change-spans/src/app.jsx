@@ -50,7 +50,9 @@ function Home() {
 
 function About() {
   useEffect(() => {
-    document.title = "New Route"
+    setTimeout(() => {
+      document.title = "New Route"
+    }, 50)
   }, [])
 
   return <h2>New Route</h2>
