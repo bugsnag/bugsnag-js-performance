@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { type DeliveryPayload } from '@bugsnag/core-performance'
+import { type TracePayload } from '@bugsnag/core-performance'
 import { ControllableBackgroundingListener } from '@bugsnag/js-performance-test-utilities'
 import createBrowserDeliveryFactory from '../lib/delivery'
 
@@ -14,35 +14,42 @@ describe('Browser Delivery', () => {
     const fetch = jest.fn(() => Promise.resolve({} as unknown as Response))
     const backgroundingListener = new ControllableBackgroundingListener()
 
-    const deliveryPayload: DeliveryPayload = {
-      resourceSpans: [{
-        resource: { attributes: [{ key: 'test-key', value: { stringValue: 'test-value' } }] },
-        scopeSpans: [{
-          spans: [{
-            name: 'test-span',
-            kind: 1,
-            spanId: 'test-span-id',
-            traceId: 'test-trace-id',
-            endTimeUnixNano: '56789',
-            startTimeUnixNano: '12345',
-            attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
-            events: []
+    const deliveryPayload: TracePayload = {
+      body: {
+        resourceSpans: [{
+          resource: { attributes: [{ key: 'test-key', value: { stringValue: 'test-value' } }] },
+          scopeSpans: [{
+            spans: [{
+              name: 'test-span',
+              kind: 1,
+              spanId: 'test-span-id',
+              traceId: 'test-trace-id',
+              endTimeUnixNano: '56789',
+              startTimeUnixNano: '12345',
+              attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+              events: []
+            }]
           }]
         }]
-      }]
+      },
+      headers: {
+        'Bugsnag-Api-Key': 'test-api-key',
+        'Content-Type': 'application/json',
+        'Bugsnag-Span-Sampling': '1:1'
+      }
     }
 
     const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
-    const delivery = deliveryFactory('test-api-key', '/test')
+    const delivery = deliveryFactory('/test')
     delivery.send(deliveryPayload)
 
     expect(fetch).toHaveBeenCalledWith('/test', {
       method: 'POST',
       keepalive: false,
-      body: JSON.stringify(deliveryPayload),
+      body: JSON.stringify(deliveryPayload.body),
       headers: {
         'Bugsnag-Api-Key': 'test-api-key',
-        'Bugsnag-Span-Sampling': '1.0:1',
+        'Bugsnag-Span-Sampling': '1:1',
         'Content-Type': 'application/json',
         'Bugsnag-Sent-At': expect.stringMatching(SENT_AT_FORMAT)
       }
@@ -53,26 +60,33 @@ describe('Browser Delivery', () => {
     const fetch = jest.fn(() => Promise.resolve({} as unknown as Response))
     const backgroundingListener = new ControllableBackgroundingListener()
 
-    const deliveryPayload: DeliveryPayload = {
-      resourceSpans: [{
-        resource: { attributes: [{ key: 'test-key', value: { stringValue: 'test-value' } }] },
-        scopeSpans: [{
-          spans: [{
-            name: 'test-span',
-            kind: 1,
-            spanId: 'test-span-id',
-            traceId: 'test-trace-id',
-            endTimeUnixNano: '56789',
-            startTimeUnixNano: '12345',
-            attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
-            events: []
+    const deliveryPayload: TracePayload = {
+      body: {
+        resourceSpans: [{
+          resource: { attributes: [{ key: 'test-key', value: { stringValue: 'test-value' } }] },
+          scopeSpans: [{
+            spans: [{
+              name: 'test-span',
+              kind: 1,
+              spanId: 'test-span-id',
+              traceId: 'test-trace-id',
+              endTimeUnixNano: '56789',
+              startTimeUnixNano: '12345',
+              attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+              events: []
+            }]
           }]
         }]
-      }]
+      },
+      headers: {
+        'Bugsnag-Api-Key': 'test-api-key',
+        'Content-Type': 'application/json',
+        'Bugsnag-Span-Sampling': '1:1'
+      }
     }
 
     const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
-    const delivery = deliveryFactory('test-api-key', '/test')
+    const delivery = deliveryFactory('/test')
 
     backgroundingListener.sendToBackground()
 
@@ -81,10 +95,10 @@ describe('Browser Delivery', () => {
     expect(fetch).toHaveBeenCalledWith('/test', {
       method: 'POST',
       keepalive: true,
-      body: JSON.stringify(deliveryPayload),
+      body: JSON.stringify(deliveryPayload.body),
       headers: {
         'Bugsnag-Api-Key': 'test-api-key',
-        'Bugsnag-Span-Sampling': '1.0:1',
+        'Bugsnag-Span-Sampling': '1:1',
         'Content-Type': 'application/json',
         'Bugsnag-Sent-At': expect.stringMatching(SENT_AT_FORMAT)
       }
@@ -95,26 +109,33 @@ describe('Browser Delivery', () => {
     const fetch = jest.fn(() => Promise.resolve({} as unknown as Response))
     const backgroundingListener = new ControllableBackgroundingListener()
 
-    const deliveryPayload: DeliveryPayload = {
-      resourceSpans: [{
-        resource: { attributes: [{ key: 'test-key', value: { stringValue: 'test-value' } }] },
-        scopeSpans: [{
-          spans: [{
-            name: 'test-span',
-            kind: 1,
-            spanId: 'test-span-id',
-            traceId: 'test-trace-id',
-            endTimeUnixNano: '56789',
-            startTimeUnixNano: '12345',
-            attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
-            events: []
+    const deliveryPayload: TracePayload = {
+      body: {
+        resourceSpans: [{
+          resource: { attributes: [{ key: 'test-key', value: { stringValue: 'test-value' } }] },
+          scopeSpans: [{
+            spans: [{
+              name: 'test-span',
+              kind: 1,
+              spanId: 'test-span-id',
+              traceId: 'test-trace-id',
+              endTimeUnixNano: '56789',
+              startTimeUnixNano: '12345',
+              attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+              events: []
+            }]
           }]
         }]
-      }]
+      },
+      headers: {
+        'Bugsnag-Api-Key': 'test-api-key',
+        'Content-Type': 'application/json',
+        'Bugsnag-Span-Sampling': '1:1'
+      }
     }
 
     const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
-    const delivery = deliveryFactory('test-api-key', '/test')
+    const delivery = deliveryFactory('/test')
 
     backgroundingListener.sendToBackground()
     backgroundingListener.sendToForeground()
@@ -124,10 +145,10 @@ describe('Browser Delivery', () => {
     expect(fetch).toHaveBeenCalledWith('/test', {
       method: 'POST',
       keepalive: false,
-      body: JSON.stringify(deliveryPayload),
+      body: JSON.stringify(deliveryPayload.body),
       headers: {
         'Bugsnag-Api-Key': 'test-api-key',
-        'Bugsnag-Span-Sampling': '1.0:1',
+        'Bugsnag-Span-Sampling': '1:1',
         'Content-Type': 'application/json',
         'Bugsnag-Sent-At': expect.stringMatching(SENT_AT_FORMAT)
       }
@@ -156,14 +177,22 @@ describe('Browser Delivery', () => {
     const backgroundingListener = new ControllableBackgroundingListener()
 
     const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
-    const delivery = deliveryFactory('test-api-key', '/test')
-    const deliveryPayload: DeliveryPayload = { resourceSpans: [] }
+    const delivery = deliveryFactory('/test')
+    const deliveryPayload: TracePayload = {
+      body: { resourceSpans: [] },
+      headers: {
+        'Bugsnag-Api-Key': 'test-api-key',
+        'Content-Type': 'application/json',
+        'Bugsnag-Span-Sampling': '1.0:0'
+      }
+    }
+
     const response = await delivery.send(deliveryPayload)
 
     expect(fetch).toHaveBeenCalledWith('/test', {
       method: 'POST',
       keepalive: false,
-      body: JSON.stringify(deliveryPayload),
+      body: JSON.stringify({ resourceSpans: [] }),
       headers: {
         'Bugsnag-Api-Key': 'test-api-key',
         'Bugsnag-Span-Sampling': '1.0:0',
@@ -186,9 +215,17 @@ describe('Browser Delivery', () => {
     const backgroundingListener = new ControllableBackgroundingListener()
 
     const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
-    const delivery = deliveryFactory('test-api-key', '/test')
+    const delivery = deliveryFactory('/test')
+    const payload: TracePayload = {
+      body: { resourceSpans: [] },
+      headers: {
+        'Bugsnag-Api-Key': 'test-api-key',
+        'Content-Type': 'application/json',
+        'Bugsnag-Span-Sampling': '1.0:0'
+      }
+    }
 
-    const response = await delivery.send({ resourceSpans: [] })
+    const response = await delivery.send(payload)
 
     expect(response).toStrictEqual({
       state: 'success',

@@ -1,23 +1,20 @@
-import { type ResourceAttributeSource } from './attributes'
-import { type Clock } from './clock'
 import { type Configuration, type InternalConfiguration } from './config'
-import { type Delivery, type DeliverySpan } from './delivery'
+import { type Delivery, type TracePayloadEncoder } from './delivery'
 import { type Processor } from './processor'
 import type ProbabilityManager from './probability-manager'
 import { type RetryQueue } from './retry-queue'
 import { type ReadonlySampler } from './sampler'
-import { spanToJson, type SpanEnded } from './span'
+import { type SpanEnded } from './span'
 
 type MinimalProbabilityManager = Pick<ProbabilityManager, 'setProbability'>
 
 export class BatchProcessor<C extends Configuration> implements Processor {
   private readonly delivery: Delivery
   private readonly configuration: InternalConfiguration<C>
-  private readonly resourceAttributeSource: ResourceAttributeSource<C>
-  private readonly clock: Clock
   private readonly retryQueue: RetryQueue
   private readonly sampler: ReadonlySampler
   private readonly probabilityManager: MinimalProbabilityManager
+  private readonly encoder: TracePayloadEncoder<C>
 
   private batch: SpanEnded[] = []
   private timeout: ReturnType<typeof setTimeout> | null = null
@@ -25,19 +22,17 @@ export class BatchProcessor<C extends Configuration> implements Processor {
   constructor (
     delivery: Delivery,
     configuration: InternalConfiguration<C>,
-    resourceAttributeSource: ResourceAttributeSource<C>,
-    clock: Clock,
     retryQueue: RetryQueue,
     sampler: ReadonlySampler,
-    probabilityManager: MinimalProbabilityManager
+    probabilityManager: MinimalProbabilityManager,
+    encoder: TracePayloadEncoder<C>
   ) {
     this.delivery = delivery
     this.configuration = configuration
-    this.resourceAttributeSource = resourceAttributeSource
-    this.clock = clock
     this.retryQueue = retryQueue
     this.sampler = sampler
     this.probabilityManager = probabilityManager
+    this.encoder = encoder
     this.flush = this.flush.bind(this)
   }
 
@@ -79,19 +74,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
       return
     }
 
-    const resourceAttributes = await this.resourceAttributeSource(this.configuration)
-
-    const payload = {
-      resourceSpans: [
-        {
-          resource: {
-            attributes: resourceAttributes.toJson()
-          },
-          scopeSpans: [{ spans: batch }]
-        }
-      ]
-    }
-
+    const payload = await this.encoder.encode(batch)
     const batchTime = Date.now()
 
     try {
@@ -122,13 +105,13 @@ export class BatchProcessor<C extends Configuration> implements Processor {
     }
   }
 
-  private prepareBatch (): DeliverySpan[] | undefined {
+  private prepareBatch (): SpanEnded[] | undefined {
     if (this.batch.length === 0) {
       return
     }
 
     // update sampling values if necessary and re-sample
-    const batch: DeliverySpan[] = []
+    const batch: SpanEnded[] = []
     const probability = this.sampler.spanProbability
 
     for (const span of this.batch) {
@@ -137,7 +120,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
       }
 
       if (this.sampler.sample(span)) {
-        batch.push(spanToJson(span, this.clock))
+        batch.push(span)
       }
     }
 

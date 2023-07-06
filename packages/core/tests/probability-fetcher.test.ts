@@ -8,7 +8,7 @@ describe('ProbabilityFetcher', () => {
     const delivery = new InMemoryDelivery()
     delivery.setNextSamplingProbability(0.25)
 
-    const fetcher = new ProbabilityFetcher(delivery)
+    const fetcher = new ProbabilityFetcher(delivery, 'api key')
     const probability = await fetcher.getNewProbability()
 
     expect(probability).toBe(0.25)
@@ -18,7 +18,7 @@ describe('ProbabilityFetcher', () => {
     const delivery = new InMemoryDelivery()
     delivery.setNextSamplingProbability(0.0)
 
-    const fetcher = new ProbabilityFetcher(delivery)
+    const fetcher = new ProbabilityFetcher(delivery, 'api key')
     const probability = await fetcher.getNewProbability()
 
     expect(probability).toBe(0.0)
@@ -28,7 +28,7 @@ describe('ProbabilityFetcher', () => {
     const delivery = new InMemoryDelivery()
     delivery.setNextSamplingProbability(undefined)
 
-    const fetcher = new ProbabilityFetcher(delivery)
+    const fetcher = new ProbabilityFetcher(delivery, 'api key')
 
     const fetcherPromise = fetcher.getNewProbability()
 
