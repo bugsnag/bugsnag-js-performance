@@ -7,6 +7,8 @@ interface ResourceTiming extends PerformanceResourceTiming {
 
 export function getHttpVersion (protocol: string) {
   switch (protocol) {
+    case '':
+      return undefined
     case 'http/1.0':
       return '1.0'
     case 'http/1.1':
@@ -64,7 +66,11 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
 
           span.setAttribute('bugsnag.span.category', 'resource_load')
           span.setAttribute('http.url', entry.name)
-          span.setAttribute('http.flavor', getHttpVersion(entry.nextHopProtocol))
+
+          const httpFlavor = getHttpVersion(entry.nextHopProtocol)
+          if (httpFlavor) {
+            span.setAttribute('http.flavor', httpFlavor)
+          }
 
           if (entry.encodedBodySize && entry.decodedBodySize) {
             span.setAttribute('http.response_content_length', entry.encodedBodySize)
