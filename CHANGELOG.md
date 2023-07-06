@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- (browser) Only add `http.flavor` span attribute when it is a useful value [#255](https://github.com/bugsnag/bugsnag-js-performance/pull/255)
+
 ## v0.2.0 (2023-07-10)
 
 ### Added
@@ -10,7 +16,6 @@
 ### Fixed
 
 - (core) Correctly report the `Bugsnag-Span-Sampling` header [#256](https://github.com/bugsnag/bugsnag-js-performance/pull/256) [#257](https://github.com/bugsnag/bugsnag-js-performance/pull/257)
-
 
 ## v0.1.1 (2023-06-28)
 
