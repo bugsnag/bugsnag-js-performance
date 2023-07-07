@@ -1,4 +1,3 @@
-
 import { DefaultSpanContextStorage, Kind } from '@bugsnag/core-performance'
 import {
   ControllableBackgroundingListener,
@@ -7,14 +6,18 @@ import {
   IncrementingIdGenerator,
   StableIdGenerator,
   VALID_API_KEY,
+  createSamplingProbability,
   createTestClient,
   spanAttributesSource
 } from '@bugsnag/js-performance-test-utilities'
 import {
   InMemoryPersistence,
+  SpanAttributes,
   SpanFactory,
+  SpanInternal,
   spanToJson,
   spanContextEquals,
+  type SpanAttribute,
   type SpanEnded
 } from '../lib'
 import Sampler from '../lib/sampler'
@@ -101,6 +104,39 @@ describe('SpanInternal', () => {
           timeUnixNano: '1234000000'
         }]
       }))
+    })
+  })
+
+  describe('bugsnag.sampling.p', () => {
+    it.each([0.25, 0.5, 0.1, 1, 0, 0.4, 0.3])('is set to the correct value on "end"', (probability) => {
+      const span = new SpanInternal(
+        'span id',
+        'trace id',
+        'name',
+        1234,
+        new SpanAttributes(new Map<string, SpanAttribute>())
+      )
+
+      const endedSpan = span.end(5678, createSamplingProbability(probability))
+
+      // @ts-expect-error 'attributes' is private but very awkward to test otherwise
+      expect(endedSpan.attributes.attributes.get('bugsnag.sampling.p')).toBe(probability)
+    })
+
+    it.each([0.25, 0.5, 0.1, 1, 0, 0.4, 0.3])('is updated when samplingProbability is changed', (probability) => {
+      const span = new SpanInternal(
+        'span id',
+        'trace id',
+        'name',
+        1234,
+        new SpanAttributes(new Map<string, SpanAttribute>())
+      )
+
+      const endedSpan = span.end(5678, createSamplingProbability(probability))
+      endedSpan.samplingProbability = createSamplingProbability(probability + 0.1)
+
+      // @ts-expect-error 'attributes' is private but very awkward to test otherwise
+      expect(endedSpan.attributes.attributes.get('bugsnag.sampling.p')).toBe(probability + 0.1)
     })
   })
 })
@@ -415,7 +451,12 @@ describe('Span', () => {
 
       await jest.runOnlyPendingTimersAsync()
 
-      expect(delivery.requests).toHaveLength(1)
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: 'test span',
+        attributes: expect.arrayContaining([
+          { key: 'bugsnag.sampling.p', value: { doubleValue: 1 } }
+        ])
+      }))
     })
 
     it('will always be discarded when probability is 0', async () => {
@@ -491,7 +532,10 @@ describe('Span', () => {
       await jest.runOnlyPendingTimersAsync()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
-        name: 'span 1'
+        name: 'span 1',
+        attributes: expect.arrayContaining([
+          { key: 'bugsnag.sampling.p', value: { doubleValue: 0.14 } }
+        ])
       }))
 
       expect(delivery).not.toHaveSentSpan(expect.objectContaining({
@@ -499,7 +543,10 @@ describe('Span', () => {
       }))
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({
-        name: 'span 3'
+        name: 'span 3',
+        attributes: expect.arrayContaining([
+          { key: 'bugsnag.sampling.p', value: { doubleValue: 0.14 } }
+        ])
       }))
     })
 
