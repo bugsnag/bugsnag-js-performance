@@ -27,8 +27,6 @@ beforeEach(() => {
 
 describe('SpanFactory', () => {
   describe('startSpan', () => {
-    describe('startTime', () => {})
-
     describe('parentContext', () => {
       it('sets traceId and parentSpanId from parentContext if specified', async () => {
         const delivery = new InMemoryDelivery()
@@ -91,14 +89,14 @@ describe('SpanFactory', () => {
         const rootSpan = client.startSpan('root span')
         expect(spanContextEquals(rootSpan, client.currentSpanContext)).toBe(true)
 
-        const childSpan = client.startSpan('new root span', { parentContext: undefined })
+        const childSpan = client.startSpan('child span', { parentContext: undefined })
         childSpan.end()
 
         await jest.runOnlyPendingTimersAsync()
 
-        // new root span should have a new trace ID and no parentSpanId
+        // child span should be a child of the root span
         expect(delivery).toHaveSentSpan(expect.objectContaining({
-          name: 'new root span',
+          name: 'child span',
           parentSpanId: rootSpan.id,
           traceId: rootSpan.traceId
         }))
