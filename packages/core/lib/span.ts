@@ -94,6 +94,10 @@ export class SpanInternal implements SpanContext {
 
   end (endTime: number, samplingProbability: SpanProbability): SpanEnded {
     this.endTime = endTime
+    let _samplingProbability = samplingProbability
+
+    this.attributes.set('bugsnag.sampling.p', _samplingProbability.raw)
+
     return {
       id: this.id,
       name: this.name,
@@ -104,7 +108,13 @@ export class SpanInternal implements SpanContext {
       events: this.events,
       samplingRate: this.samplingRate,
       endTime,
-      samplingProbability,
+      get samplingProbability (): SpanProbability {
+        return _samplingProbability
+      },
+      set samplingProbability (samplingProbability: SpanProbability) {
+        _samplingProbability = samplingProbability
+        this.attributes.set('bugsnag.sampling.p', _samplingProbability.raw)
+      },
       parentSpanId: this.parentSpanId
     }
   }
