@@ -34,7 +34,7 @@ class MockSpanFactory extends SpanFactory {
     this.createdSpans = processor.spans
   }
 
-  startSpan = jest.fn((name: string, options?: SpanOptions) => {
+  startSpan = jest.fn((name: string, options: SpanOptions) => {
     return super.startSpan(name, options)
   })
 

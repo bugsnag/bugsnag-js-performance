@@ -12,7 +12,7 @@ import ProbabilityManager from './probability-manager'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
-import { type Span, type SpanOptions } from './span'
+import { coreSpanOptionSchema, validateSpanOptions, type Span, type SpanOptions } from './span'
 import { DefaultSpanContextStorage, type SpanContext, type SpanContextStorage } from './span-context'
 import { SpanFactory } from './span-factory'
 
@@ -39,7 +39,7 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
   const bufferingProcessor = new BufferingProcessor()
   let processor: Processor = bufferingProcessor
   const spanContextStorage = options.spanContextStorage || new DefaultSpanContextStorage(options.backgroundingListener)
-
+  let logger = options.schema.logger.defaultValue
   const sampler = new Sampler(1.0)
   const spanFactory = new SpanFactory(
     processor,
@@ -48,7 +48,7 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
     options.spanAttributesSource,
     options.clock,
     options.backgroundingListener,
-    options.schema.logger.defaultValue,
+    logger,
     spanContextStorage
   )
   const plugins = options.plugins(spanFactory, spanContextStorage)
@@ -87,7 +87,8 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
           (processor as BatchProcessor<C>).flush()
         })
 
-        spanFactory.configure(processor, configuration.logger)
+        logger = configuration.logger
+        spanFactory.configure(processor, logger)
       })
 
       for (const plugin of plugins) {
@@ -95,7 +96,8 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
       }
     },
     startSpan: (name, spanOptions?: SpanOptions) => {
-      const span = spanFactory.startSpan(name, spanOptions)
+      const cleanOptions = validateSpanOptions(name, spanOptions, coreSpanOptionSchema, logger)
+      const span = spanFactory.startSpan(cleanOptions.name, cleanOptions.options)
       return spanFactory.toPublicApi(span)
     },
     get currentSpanContext () {
