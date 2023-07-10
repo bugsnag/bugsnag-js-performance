@@ -5,7 +5,7 @@ import { type Logger } from './config'
 import { type IdGenerator } from './id-generator'
 import { type Processor } from './processor'
 import { type ReadonlySampler } from './sampler'
-import { type Span, SpanInternal, type SpanOptions } from './span'
+import { SpanInternal, type Span, type SpanOptions } from './span'
 import { type SpanContextStorage } from './span-context'
 import { timeToNumber } from './time'
 import { isSpanContext } from './validation'
@@ -51,14 +51,14 @@ export class SpanFactory {
     this.openSpans = new WeakSet<SpanInternal>()
   }
 
-  startSpan (name: string, options: SpanOptions = {}) {
-    const safeStartTime = timeToNumber(this.clock, options ? options.startTime : undefined)
+  startSpan (name: string, options: SpanOptions) {
+    const safeStartTime = timeToNumber(this.clock, options.startTime)
     const spanId = this.idGenerator.generate(64)
 
     // if the parentContext option is not set use the current context
     // if parentContext is explicitly null, or there is no current context,
     // we are starting a new root span
-    const parentContext = options && (isSpanContext(options.parentContext) || options.parentContext === null)
+    const parentContext = isSpanContext(options.parentContext) || options.parentContext === null
       ? options.parentContext
       : this.spanContextStorage.current
 
@@ -67,7 +67,7 @@ export class SpanFactory {
 
     const attributes = new SpanAttributes(this.spanAttributesSource())
 
-    if (options && typeof options.isFirstClass === 'boolean') {
+    if (typeof options.isFirstClass === 'boolean') {
       attributes.set('bugsnag.span.first_class', options.isFirstClass)
     }
 
@@ -77,7 +77,7 @@ export class SpanFactory {
     if (this.isInForeground) {
       this.openSpans.add(span)
 
-      if (!options || options.makeCurrentContext !== false) {
+      if (options.makeCurrentContext !== false) {
         this.spanContextStorage.push(span)
       }
     }

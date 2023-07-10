@@ -173,4 +173,43 @@ describe('validation', () => {
       expect(validation.isBoolean(value)).toBe(true)
     })
   })
+
+  describe('isSpanContext', () => {
+    it.each(nonObjects)('fails validation with $type', ({ value }) => {
+      expect(validation.isSpanContext(value)).toBe(false)
+    })
+
+    const invalidSpanContexts: any[] = [
+      { id: 1234, traceId: '5678', isValid: () => true },
+      { id: '1234', traceId: 5678, isValid: () => true },
+      { id: '1234', traceId: '5678', isValid: true }
+    ]
+
+    it.each(invalidSpanContexts)('fails validation with %s', (value) => {
+      expect(validation.isSpanContext(value)).toBe(false)
+    })
+
+    it('passes with valid SpanContext type', () => {
+      const spanContext = {
+        id: '1234',
+        traceId: '5678',
+        isValid: () => true
+      }
+
+      expect(validation.isSpanContext(spanContext)).toBe(true)
+
+      spanContext.isValid = () => false
+      expect(validation.isSpanContext(spanContext)).toBe(true)
+    })
+  })
+
+  describe('isTime', () => {
+    it.each([-1, 0, 1, 10000, new Date().getTime(), performance.now(), new Date()])('passes validation with %s', (value) => {
+      expect(validation.isTime(value)).toBe(true)
+    })
+
+    it.each(['', 'string', true, false, undefined, null, NaN, Infinity, -Infinity, () => {}, [], {}])('fails validation with %s', (value) => {
+      expect(validation.isTime(value)).toBe(false)
+    })
+  })
 })

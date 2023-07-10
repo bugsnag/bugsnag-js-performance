@@ -4,6 +4,7 @@ import {
   type DeliverySpan,
   type DeliveryPayload,
   type ResponseState,
+  type TracePayload,
   InMemoryQueue
 } from '../lib'
 import { InMemoryDelivery } from '@bugsnag/js-performance-test-utilities'
@@ -17,26 +18,33 @@ describe('RetryQueue', () => {
     retryQueue.add(payload, Date.now())
     await retryQueue.flush()
 
-    expect(delivery.requests).toStrictEqual([payload])
+    expect(delivery.requests).toStrictEqual([payload.body])
   })
 
   it('limits the number of spans in the queue', async () => {
-    const initialPayload: DeliveryPayload = {
-      resourceSpans: [{
-        resource: { attributes: [] },
-        scopeSpans: [{
-          spans: [{
-            name: 'Custom/Test Span',
-            kind: 3,
-            endTimeUnixNano: '5678',
-            startTimeUnixNano: '1234',
-            spanId: 'valid-span-id',
-            traceId: 'valid-trace-id',
-            attributes: [],
-            events: []
+    const initialPayload: TracePayload = {
+      body: {
+        resourceSpans: [{
+          resource: { attributes: [] },
+          scopeSpans: [{
+            spans: [{
+              name: 'Custom/Test Span',
+              kind: 3,
+              endTimeUnixNano: '5678',
+              startTimeUnixNano: '1234',
+              spanId: 'valid-span-id',
+              traceId: 'valid-trace-id',
+              attributes: [],
+              events: []
+            }]
           }]
         }]
-      }]
+      },
+      headers: {
+        'Bugsnag-Api-Key': 'an api key :)',
+        'Content-Type': 'application/json',
+        'Bugsnag-Span-Sampling': '0.5:1'
+      }
     }
 
     const delivery = new InMemoryDelivery()
@@ -49,7 +57,7 @@ describe('RetryQueue', () => {
     // add 1000 spans
     for (let i = 0; i <= 9; i++) {
       const payload = generateFullPayload()
-      expectedPayloads.push(payload)
+      expectedPayloads.push(payload.body)
 
       retryQueue.add(payload, Date.now())
     }
@@ -112,7 +120,7 @@ describe('RetryQueue', () => {
 
     await retryQueue.flush()
 
-    expect(delivery.requests).toStrictEqual([payloadToRetain])
+    expect(delivery.requests).toStrictEqual([payloadToRetain.body])
   })
 })
 
@@ -129,13 +137,20 @@ function generateSpan (): DeliverySpan {
   }
 }
 
-function generateFullPayload (spans: number = 100): DeliveryPayload {
+function generateFullPayload (spans: number = 100): TracePayload {
   return {
-    resourceSpans: [{
-      resource: { attributes: [{ key: 'bugnsag.test.attribute', value: { stringValue: '1.0.0' } }] },
-      scopeSpans: [{
-        spans: new Array(spans).fill(generateSpan())
+    body: {
+      resourceSpans: [{
+        resource: { attributes: [{ key: 'bugnsag.test.attribute', value: { stringValue: '1.0.0' } }] },
+        scopeSpans: [{
+          spans: new Array(spans).fill(generateSpan())
+        }]
       }]
-    }]
+    },
+    headers: {
+      'Bugsnag-Api-Key': 'an api key :)',
+      'Content-Type': 'application/json',
+      'Bugsnag-Span-Sampling': `0.5:${spans}`
+    }
   }
 }

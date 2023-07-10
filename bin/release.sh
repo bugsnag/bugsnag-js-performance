@@ -48,7 +48,7 @@ fi
 npm run build
 
 # push version bump commit and tags
-git push origin
+git push --follow-tags
 
 # publish
 if [ -z "${RETRY_PUBLISH:-}" ]; then

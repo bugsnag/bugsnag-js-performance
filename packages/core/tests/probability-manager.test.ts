@@ -13,7 +13,7 @@ describe('ProbabilityManager', () => {
     delivery.setNextSamplingProbability(0.5)
 
     const sampler = new Sampler(0.75)
-    const fetcher = new ProbabilityFetcher(delivery)
+    const fetcher = new ProbabilityFetcher(delivery, 'api key')
 
     await ProbabilityManager.create(
       persistence,
@@ -59,7 +59,7 @@ describe('ProbabilityManager', () => {
     delivery.setNextSamplingProbability(0.5)
 
     const sampler = new Sampler(0.5)
-    const fetcher = new ProbabilityFetcher(delivery)
+    const fetcher = new ProbabilityFetcher(delivery, 'api key')
 
     await ProbabilityManager.create(
       persistence,
@@ -102,7 +102,7 @@ describe('ProbabilityManager', () => {
     delivery.setNextSamplingProbability(0.5)
 
     const sampler = new Sampler(0.5)
-    const fetcher = new ProbabilityFetcher(delivery)
+    const fetcher = new ProbabilityFetcher(delivery, 'api key')
 
     await ProbabilityManager.create(
       persistence,
@@ -136,7 +136,7 @@ describe('ProbabilityManager', () => {
     delivery.setNextSamplingProbability(0.5)
 
     const sampler = new Sampler(0.75)
-    const fetcher = new ProbabilityFetcher(delivery)
+    const fetcher = new ProbabilityFetcher(delivery, 'api key')
 
     const manager = await ProbabilityManager.create(
       persistence,
@@ -168,7 +168,7 @@ describe('ProbabilityManager', () => {
     delivery.setNextSamplingProbability(0.5)
 
     const sampler = new Sampler(0.75)
-    const fetcher = new ProbabilityFetcher(delivery)
+    const fetcher = new ProbabilityFetcher(delivery, 'api key')
 
     const manager = await ProbabilityManager.create(
       persistence,

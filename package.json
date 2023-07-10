@@ -12,6 +12,7 @@
     "clean": "rm -f build/* && lerna run --stream --parallel clean",
     "test:lint": "eslint --max-warnings=0 .",
     "test:unit": "jest",
+    "test:coverage": "jest --coverage",
     "test:test-container-registry-login": "aws ecr get-login-password --profile=opensource --region=us-west-1 | docker login --username AWS --password-stdin 855461928731.dkr.ecr.us-west-1.amazonaws.com"
   },
   "devDependencies": {
@@ -26,6 +27,7 @@
     "@types/node": "^18.11.18",
     "@typescript-eslint/eslint-plugin": "^5.50.0",
     "@typescript-eslint/parser": "^5.50.0",
+    "coverage-diff": "^3.2.0",
     "eslint": "^8.33.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-config-standard-with-typescript": "^34.0.0",

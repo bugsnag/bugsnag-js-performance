@@ -1,10 +1,10 @@
-import { type SpanEnded, type SpanProbability } from './span'
+import { type SpanEnded, type ScaledProbability, type SpanProbability } from './span'
 
 // sampling rates are stored as a number between 0 and 2^32 - 1 (i.e. they are
 // u32s) so we need to scale the probability value to match this range as they
 // are stored as values between 0 and 1
-function scaleProbabilityToMatchSamplingRate (probability: number): SpanProbability {
-  return Math.floor(probability * 0xffffffff) as SpanProbability
+function scaleProbabilityToMatchSamplingRate (probability: number): ScaledProbability {
+  return Math.floor(probability * 0xffffffff) as ScaledProbability
 }
 
 interface ReadonlySampler {
@@ -25,7 +25,7 @@ class Sampler {
    *
    * @see scaleProbabilityToMatchSamplingRate
    */
-  private scaledProbability: SpanProbability
+  private scaledProbability: ScaledProbability
 
   constructor (initialProbability: number) {
     // we could just do 'this.probability = initialProbability' but TypeScript
@@ -57,11 +57,14 @@ class Sampler {
    * @see scaleProbabilityToMatchSamplingRate
    */
   get spanProbability (): SpanProbability {
-    return this.scaledProbability
+    return {
+      raw: this._probability,
+      scaled: this.scaledProbability
+    }
   }
 
   sample (span: SpanEnded): boolean {
-    return span.samplingRate <= span.samplingProbability
+    return span.samplingRate <= span.samplingProbability.scaled
   }
 }
 

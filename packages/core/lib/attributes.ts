@@ -60,9 +60,12 @@ export function attributeToJson (key: string, attribute: SpanAttribute): JsonAtt
       if (Number.isNaN(attribute) || !Number.isFinite(attribute)) {
         return undefined
       }
-      if (Number.isInteger(attribute)) {
+
+      // 'bugsnag.sampling.p' must always be sent as a doubleValue
+      if (key !== 'bugsnag.sampling.p' && Number.isInteger(attribute)) {
         return { key, value: { intValue: `${attribute}` } }
       }
+
       return { key, value: { doubleValue: attribute } }
     case 'boolean':
       return { key, value: { boolValue: attribute } }

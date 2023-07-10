@@ -1,5 +1,30 @@
 import { type SpanContext, DefaultSpanContextStorage, spanContextEquals } from '../lib'
-import { ControllableBackgroundingListener } from '@bugsnag/js-performance-test-utilities'
+import {
+  ControllableBackgroundingListener,
+  InMemoryDelivery,
+  IncrementingClock,
+  VALID_API_KEY,
+  createTestClient
+} from '@bugsnag/js-performance-test-utilities'
+
+jest.useFakeTimers()
+
+describe('SpanContext', () => {
+  describe('SpanContext.isValid()', () => {
+    it('returns false if the span has been ended', () => {
+      const delivery = new InMemoryDelivery()
+      const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+      const client = createTestClient({ deliveryFactory: () => delivery, clock })
+      client.start({ apiKey: VALID_API_KEY })
+
+      const span = client.startSpan('test span')
+      expect(span.isValid()).toEqual(true)
+
+      span.end()
+      expect(span.isValid()).toEqual(false)
+    })
+  })
+})
 
 describe('DefaultSpanContextStorage', () => {
   describe('SpanContextStorage.push()', () => {
