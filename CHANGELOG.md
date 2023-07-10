@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.2.0 (2023-07-10)
+
+### Added
+
+- (core, browser) Log a warning when providing invalid options to `startSpan` [#245](https://github.com/bugsnag/bugsnag-js-performance/pull/245)
+- (core) Added `bugsnag.sampling.p`` attribute [#258](https://github.com/bugsnag/bugsnag-js-performance/pull/258)
+
+### Fixed
+
+- (core) Correctly report the `Bugsnag-Span-Sampling` header [#256](https://github.com/bugsnag/bugsnag-js-performance/pull/256) [#257](https://github.com/bugsnag/bugsnag-js-performance/pull/257)
+
+
 ## v0.1.1 (2023-06-28)
 
 ### Added
