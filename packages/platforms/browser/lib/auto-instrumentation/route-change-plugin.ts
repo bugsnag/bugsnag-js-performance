@@ -8,11 +8,6 @@ const routeChangeSpanOptionSchema: SpanOptionSchema = {
   startTime,
   parentContext,
   makeCurrentContext,
-  route: {
-    getDefaultValue: (value) => String(value),
-    message: 'should be a string',
-    validate: isString
-  },
   trigger: {
     getDefaultValue: (value) => String(value),
     message: 'should be a string',
@@ -21,7 +16,7 @@ const routeChangeSpanOptionSchema: SpanOptionSchema = {
 }
 
 interface InternalRouteChangeSpanOptions extends RouteChangeSpanOptions {
-  route: string
+  url: URL
   trigger: string
 }
 
@@ -38,12 +33,29 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
     let previousRoute = configuration.routingProvider.resolveRoute(new URL(this.location.href))
 
     configuration.routingProvider.listenForRouteChanges((url, trigger, options) => {
-      const route = configuration.routingProvider.resolveRoute(url)
+      let absoluteUrl
+
+      if (url instanceof URL) {
+        absoluteUrl = url
+      } else {
+        try {
+          const stringUrl = String(url)
+          absoluteUrl = new URL(stringUrl)
+        } catch (err) {
+          configuration.logger.warn('Invalid span options\n  - url should be a URL')
+
+          return {
+            id: '',
+            traceId: '',
+            isValid: () => false,
+            end: () => {}
+          }
+        }
+      }
 
       // create internal options for validation
       const routeChangeSpanOptions = {
         ...options,
-        route,
         trigger
       }
 
@@ -54,8 +66,10 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
         configuration.logger
       )
 
+      const route = configuration.routingProvider.resolveRoute(absoluteUrl)
+
       // update the span name using the validated route
-      cleanOptions.name += cleanOptions.options.route
+      cleanOptions.name += route
       const span = this.spanFactory.startSpan(cleanOptions.name, cleanOptions.options)
 
       span.setAttribute('bugsnag.span.category', 'route_change')

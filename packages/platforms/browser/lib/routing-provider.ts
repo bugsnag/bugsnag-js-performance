@@ -1,7 +1,7 @@
 import { isObject, type Span, type SpanOptions } from '@bugsnag/core-performance'
 
 export type RouteChangeSpanOptions = Omit<SpanOptions, 'isFirstClass'>
-export type StartRouteChangeCallback = (url: URL, trigger: string, options?: RouteChangeSpanOptions) => Span
+export type StartRouteChangeCallback = (url: URL | string, trigger: string, options?: RouteChangeSpanOptions) => Span
 
 export interface RoutingProvider {
   resolveRoute: (url: URL) => string
