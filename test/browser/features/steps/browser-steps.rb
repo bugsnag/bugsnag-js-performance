@@ -214,17 +214,29 @@ def check_attribute_equal_if_present(field, attribute, attr_type, expected)
   end
 end
 
-Then(/^on the (?:browser|browsers) (.*): (.+)/) do |spec, step_text|
-  current_platform = $browser.name
-  current_version = $browser.version
-  
-  browsers = spec.split(",")
+Then(/^on ((?:[A-z]+ versions (?:>=?|<=?|==) [0-9.]+(?:, )?)+):$/) do |browser_specs, steps_to_run|
+  spec_matcher = /^([A-z]+) versions (>=?|<=?|==) ([0-9.]+)$/
 
-  for browser in browsers do
-    name, version = browser.split(" ")
-    step(step_text) if current_platform.casecmp(name).zero? && current_version >= version.to_i
+  browser_specs.split(", ").each do |browser_spec|
+    browser_spec.scan(spec_matcher) do |name, operator, version|
+      should_run_steps = $browser.name.casecmp?(name) && $browser.version.send(operator, version.to_i)
+
+      # make sure this step is debuggable!
+      $logger.debug("#{$browser.name} == #{name} && v#{$browser.version} #{operator} #{version}? #{should_run_steps}")
+
+      if should_run_steps
+        steps_to_run.each_line(chomp: true) do |step_to_run|
+          step(step_to_run)
+        end
+      else
+        indent = " " * 4
+        # e.g. "a step\nanother step\n" -> "    1) a step\n    2) another step"
+        steps_indented = steps_to_run.each_line.map.with_index(1) { |step, i| "#{indent}#{i}) #{step.chomp}" }.join("\n")
+
+        $logger.info("Skipping steps on #{$browser.name} v#{$browser.version}:\n#{steps_indented}")
+      end
+    end
   end
-
 end
 
 module Maze
