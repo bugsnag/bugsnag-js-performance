@@ -5,7 +5,7 @@
 ### Added
 
 - (core, browser) Log a warning when providing invalid options to `startSpan` [#245](https://github.com/bugsnag/bugsnag-js-performance/pull/245)
-- (core) Added `bugsnag.sampling.p`` attribute [#258](https://github.com/bugsnag/bugsnag-js-performance/pull/258)
+- (core) Added `bugsnag.sampling.p` attribute [#258](https://github.com/bugsnag/bugsnag-js-performance/pull/258)
 
 ### Fixed
 
