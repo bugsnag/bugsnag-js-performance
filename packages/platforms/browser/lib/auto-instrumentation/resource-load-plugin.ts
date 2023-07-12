@@ -7,6 +7,8 @@ interface ResourceTiming extends PerformanceResourceTiming {
 
 export function getHttpVersion (protocol: string) {
   switch (protocol) {
+    case '':
+      return undefined
     case 'http/1.0':
       return '1.0'
     case 'http/1.1':
@@ -21,7 +23,7 @@ export function getHttpVersion (protocol: string) {
     case 'spdy/3':
       return 'SPDY'
     default:
-      return undefined
+      return protocol
   }
 }
 
