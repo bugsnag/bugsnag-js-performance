@@ -8,7 +8,7 @@ import { type SpanFactory, type Plugin, type InternalConfiguration } from '@bugs
 import { type BrowserConfiguration } from '../config'
 
 export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
-  private ignoredUrls: RegExp[] = []
+  private configEndpoint: string = ''
 
   constructor (
     private spanFactory: SpanFactory,
@@ -18,7 +18,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
 
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     if (configuration.autoInstrumentNetworkRequests) {
-      this.ignoredUrls = [RegExp(configuration.endpoint)]
+      this.configEndpoint = configuration.endpoint
       this.xhrTracker.onStart(this.trackRequest)
       this.fetchTracker.onStart(this.trackRequest)
     }
@@ -45,6 +45,6 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   }
 
   private shouldTrackRequest (startContext: RequestStartContext): boolean {
-    return !this.ignoredUrls.some(url => url.test(startContext.url))
+    return !startContext.url.includes(this.configEndpoint)
   }
 }
