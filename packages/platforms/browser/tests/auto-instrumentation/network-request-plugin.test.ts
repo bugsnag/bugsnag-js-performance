@@ -142,4 +142,47 @@ describe('network span plugin', () => {
 
     expect(spanContextEquals(rootSpan, client.currentSpanContext)).toBe(true)
   })
+
+  it('prevents creating a span when networkRequestCallback returns null', () => {
+    const plugin = new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true,
+      networkRequestCallback: (networkRequestInfo) => networkRequestInfo.url === 'no-delivery' ? null : networkRequestInfo
+    }))
+
+    fetchTracker.start({ method: 'GET', url: 'no-delivery', startTime: 1 })
+    expect(spanFactory.startSpan).not.toHaveBeenCalled()
+
+    fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+  })
+
+  it('uses a modified url from networkRequestCallback', () => {
+    const plugin = new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true,
+      networkRequestCallback: (networkRequestInfo) => ({
+        type: networkRequestInfo.type,
+        url: 'modified-url'
+      })
+    }))
+
+    const endRequest = fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+
+    endRequest({ status: 200, endTime: 2, state: 'success' })
+    expect(spanFactory.endSpan).toHaveBeenCalled()
+    expect(spanFactory.createdSpans.length).toEqual(1)
+
+    const span = spanFactory.createdSpans[0]
+    expect(span.name).toEqual('[HTTP]/GET')
+    expect(span.startTime).toEqual(1)
+    expect(span.endTime).toEqual(2)
+    expect(span).toHaveAttribute('bugsnag.span.category', 'network')
+    expect(span).toHaveAttribute('http.url', 'modified-url')
+    expect(span).toHaveAttribute('http.method', 'GET')
+    expect(span).toHaveAttribute('http.status_code', 200)
+  })
 })
