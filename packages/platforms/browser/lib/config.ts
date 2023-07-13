@@ -1,11 +1,12 @@
 import {
-  isStringOrRegExpArray,
   isBoolean,
+  isStringOrRegExpArray,
   schema,
   type ConfigOption,
   type Configuration,
   type CoreSchema
 } from '@bugsnag/core-performance'
+import { defaultNetworkRequestCallback, isNetworkRequestCallback, type NetworkRequestCallback } from './network-request-callback'
 import { isRoutingProvider, type RoutingProvider } from './routing-provider'
 
 export interface BrowserSchema extends CoreSchema {
@@ -15,6 +16,8 @@ export interface BrowserSchema extends CoreSchema {
   generateAnonymousId: ConfigOption<boolean>
   routingProvider: ConfigOption<RoutingProvider>
   settleIgnoreUrls: ConfigOption<Array<string | RegExp>>
+  networkInstrumentationIgnoreUrls: ConfigOption<Array<string | RegExp>>
+  networkRequestCallback: ConfigOption<NetworkRequestCallback>
 }
 
 export interface BrowserConfiguration extends Configuration {
@@ -24,6 +27,8 @@ export interface BrowserConfiguration extends Configuration {
   generateAnonymousId?: boolean
   routingProvider?: RoutingProvider
   settleIgnoreUrls?: Array<string | RegExp>
+  networkInstrumentationIgnoreUrls?: Array<string | RegExp>
+  networkRequestCallback?: NetworkRequestCallback
 }
 
 export function createSchema (hostname: string, defaultRoutingProvider: RoutingProvider): BrowserSchema {
@@ -62,6 +67,16 @@ export function createSchema (hostname: string, defaultRoutingProvider: RoutingP
       defaultValue: [],
       message: 'should be an array of string|RegExp',
       validate: isStringOrRegExpArray
+    },
+    networkInstrumentationIgnoreUrls: {
+      defaultValue: [],
+      message: 'should be an array of string|RegExp',
+      validate: isStringOrRegExpArray
+    },
+    networkRequestCallback: {
+      defaultValue: defaultNetworkRequestCallback,
+      message: 'should be a function',
+      validate: isNetworkRequestCallback
     }
   }
 }
