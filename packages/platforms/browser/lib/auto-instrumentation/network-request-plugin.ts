@@ -30,7 +30,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private trackRequest = (startContext: RequestStartContext): RequestEndCallback | undefined => {
     if (!this.shouldTrackRequest(startContext)) return
 
-    const networkRequestInfo = this.networkRequestCallback({ url: startContext.url, type: startContext.method })
+    const networkRequestInfo = this.networkRequestCallback({ url: startContext.url, type: startContext.type })
 
     if (!networkRequestInfo) return
 

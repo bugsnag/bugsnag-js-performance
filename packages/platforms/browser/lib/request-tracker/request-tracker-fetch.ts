@@ -11,7 +11,7 @@ function createStartContext (baseUrl: string, startTime: number, input: unknown,
   const inputIsRequest = isRequest(input)
   const url = inputIsRequest ? input.url : String(input)
   const method = (!!init && (init as RequestInit).method) || (inputIsRequest && input.method) || 'GET'
-  return { url: getAbsoluteUrl(url, baseUrl), method, startTime }
+  return { url: getAbsoluteUrl(url, baseUrl), method, startTime, type: 'fetch' }
 }
 
 function isRequest (input: unknown): input is Request {

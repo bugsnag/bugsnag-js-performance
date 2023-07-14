@@ -37,6 +37,7 @@ function createXmlHttpRequestTracker (window: WindowWithXmlHttpRequest, clock: C
       if (existingHandler) this.removeEventListener('readystatechange', existingHandler)
 
       const onRequestEnd: RequestEndCallback = requestTracker.start({
+        type: 'xmlhttprequest',
         method: requestData.method,
         url: requestData.url,
         startTime: clock.now()
