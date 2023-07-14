@@ -99,7 +99,7 @@ describe('network span plugin', () => {
       autoInstrumentNetworkRequests: true
     }))
 
-    fetchTracker.start({ method: 'GET', url: `${ENDPOINT}/traces`, startTime: 1 })
+    fetchTracker.start({ method: 'GET', url: ENDPOINT, startTime: 1 })
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
   })
 

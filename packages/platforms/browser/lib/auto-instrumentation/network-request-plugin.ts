@@ -45,6 +45,6 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   }
 
   private shouldTrackRequest (startContext: RequestStartContext): boolean {
-    return !startContext.url.includes(this.configEndpoint)
+    return startContext.url !== this.configEndpoint
   }
 }
