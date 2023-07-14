@@ -5,7 +5,8 @@ Feature: Route change spans
         And I click the element "change-route"
         When I wait to receive 1 traces
 
-        Then a span named "[RouteChange]/new-route" contains the attributes: 
+        Then every span string attribute "bugsnag.browser.page.url" matches the regex "^http(s)?:\/\/.*:[0-9]{4}\/new-route$"
+        And a span named "[RouteChange]/new-route" contains the attributes: 
             | attribute                                 | type         | value                | 
             | bugsnag.span.category                     | stringValue  | route_change         |
             | bugsnag.browser.page.title                | stringValue  | New Route            |
@@ -18,6 +19,7 @@ Feature: Route change spans
         And I click the element "go-to-anchor"
         When I wait to receive 1 traces
 
+        Then every span string attribute "bugsnag.browser.page.url" matches the regex "^http(s)?:\/\/.*:[0-9]{4}\/route-change-spans(\/)?\?endpoint=.*\&logs=.*\&api_key=.*#anchor-link$"
         Then a span named "[RouteChange]/route-change-spans/" contains the attributes: 
             | attribute                                 | type         | value                | 
             | bugsnag.span.category                     | stringValue  | route_change         |
