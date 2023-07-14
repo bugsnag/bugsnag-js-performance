@@ -137,4 +137,48 @@ describe('ResourceLoadPlugin', () => {
 
     expect(delivery.requests[0].resourceSpans[0].scopeSpans[0].spans).toHaveLength(1)
   })
+
+  it('omits the http.flavor attribute when nextHopProtocol is an empty string', async () => {
+    const delivery = new InMemoryDelivery()
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const idGenerator = new IncrementingIdGenerator()
+
+    const client = createTestClient({
+      idGenerator,
+      deliveryFactory: () => delivery,
+      plugins: (spanFactory, spanContextStorage) => [
+        new ResourceLoadPlugin(spanFactory, spanContextStorage, Observer)
+      ]
+    })
+
+    client.start({ apiKey: VALID_API_KEY })
+
+    const span = client.startSpan('custom-span')
+
+    manager.queueEntry(createPerformanceResourceNavigationTimingFake({ name: 'https://bugsnag.com/image1.jpg', nextHopProtocol: 'h2' }))
+    manager.queueEntry(createPerformanceResourceNavigationTimingFake({ name: 'https://bugsnag.com/image2.jpg', nextHopProtocol: '' }))
+    manager.flushQueue()
+
+    span.end()
+
+    await jest.runOnlyPendingTimersAsync()
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: '[ResourceLoad]https://bugsnag.com/image1.jpg',
+      attributes: expect.arrayContaining([{
+        key: 'http.flavor',
+        value: {
+          stringValue: '2.0'
+        }
+      }])
+    }))
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: '[ResourceLoad]https://bugsnag.com/image2.jpg',
+      attributes: expect.not.arrayContaining([{
+        key: 'http.flavor'
+      }])
+    }))
+  })
 })
