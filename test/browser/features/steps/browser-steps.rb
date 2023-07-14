@@ -214,8 +214,8 @@ def check_attribute_equal_if_present(field, attribute, attr_type, expected)
   end
 end
 
-Then(/^on ((?:[A-z]+ versions (?:>=?|<=?|==) [0-9.]+(?:, )?)+):$/) do |browser_specs, steps_to_run|
-  spec_matcher = /^([A-z]+) versions (>=?|<=?|==) ([0-9.]+)$/
+Then(/^on ((?:[A-Za-z]+ versions (?:>=?|<=?|==) [0-9.]+(?:, )?)+):$/) do |browser_specs, steps_to_run|
+  spec_matcher = /^([A-Za-z]+) versions (>=?|<=?|==) ([0-9.]+)$/
 
   browser_specs.split(", ").each do |browser_spec|
     browser_spec.scan(spec_matcher) do |name, operator, version|
