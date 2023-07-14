@@ -6,6 +6,10 @@
 
 - (browser) Only add `http.flavor` span attribute when it is a useful value [#255](https://github.com/bugsnag/bugsnag-js-performance/pull/255)
 
+### Removed
+
+- (browser) Remove the `networkInstrumentationIgnoreUrls` config option [#261](https://github.com/bugsnag/bugsnag-js-performance/pull/261)
+
 ## v0.2.0 (2023-07-10)
 
 ### Added
