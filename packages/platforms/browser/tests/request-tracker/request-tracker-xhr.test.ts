@@ -77,6 +77,7 @@ describe('XHR Request Tracker', () => {
     expect(window.XMLHttpRequest.prototype.addEventListener).toHaveBeenCalled()
     expect(originalSend).toHaveBeenCalled()
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'xmlhttprequest',
       url: TEST_URL,
       method,
       startTime: 1
@@ -101,6 +102,7 @@ describe('XHR Request Tracker', () => {
 
     request.send()
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'xmlhttprequest',
       url: `${window.location.origin}/test`,
       method: 'GET',
       startTime: 1
@@ -125,6 +127,7 @@ describe('XHR Request Tracker', () => {
 
     request.send()
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'xmlhttprequest',
       url: TEST_URL,
       method: 'GET',
       startTime: 1
@@ -151,6 +154,7 @@ describe('XHR Request Tracker', () => {
 
     request.send()
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'xmlhttprequest',
       url: TEST_URL,
       method: 'GET',
       startTime: 1
@@ -180,6 +184,7 @@ describe('XHR Request Tracker', () => {
 
     expect(startCallback).toHaveBeenCalledTimes(1)
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'xmlhttprequest',
       url: differentUrl,
       method: 'POST',
       startTime: 1
@@ -208,6 +213,7 @@ describe('XHR Request Tracker', () => {
 
     expect(window.XMLHttpRequest.prototype.addEventListener).toHaveBeenCalledTimes(1)
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'xmlhttprequest',
       url: TEST_URL,
       method: 'GET',
       startTime: 1
@@ -229,6 +235,7 @@ describe('XHR Request Tracker', () => {
     expect(endCallback).toHaveBeenCalledTimes(2)
 
     expect(startCallback).toHaveBeenLastCalledWith({
+      type: 'xmlhttprequest',
       url: differentUrl,
       method: 'POST',
       startTime: 3

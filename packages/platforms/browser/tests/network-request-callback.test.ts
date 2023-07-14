@@ -5,7 +5,7 @@ describe('defaultNetworkRequestCallback', () => {
     const networkRequestInfo = {
       url: 'https://bugsnag.com/unit-test',
       type: 'fetch'
-    }
+    } as const
 
     const response = defaultNetworkRequestCallback(networkRequestInfo)
 

@@ -46,10 +46,10 @@ describe('network span plugin', () => {
       autoInstrumentNetworkRequests: true
     }))
 
-    fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
+    fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
 
-    xhrTracker.start({ method: 'POST', url: TEST_URL, startTime: 2 })
+    xhrTracker.start({ type: 'xmlhttprequest', method: 'POST', url: TEST_URL, startTime: 2 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/POST', { startTime: 2, makeCurrentContext: false })
   })
 
@@ -61,7 +61,7 @@ describe('network span plugin', () => {
       autoInstrumentNetworkRequests: true
     }))
 
-    const endRequest = fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
+    const endRequest = fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
 
@@ -99,7 +99,7 @@ describe('network span plugin', () => {
       autoInstrumentNetworkRequests: true
     }))
 
-    fetchTracker.start({ method: 'GET', url: ENDPOINT, startTime: 1 })
+    fetchTracker.start({ type: 'fetch', method: 'GET', url: `${ENDPOINT}`, startTime: 1 })
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
   })
 
@@ -111,7 +111,7 @@ describe('network span plugin', () => {
       autoInstrumentNetworkRequests: true
     }))
 
-    const endRequest = xhrTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
+    const endRequest = xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
 
     endRequest({ endTime: 2, state: 'error' })
@@ -126,7 +126,7 @@ describe('network span plugin', () => {
       autoInstrumentNetworkRequests: true
     }))
 
-    const endRequest = fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
+    const endRequest = fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
 
     endRequest({ state: 'error', error: new Error('woopsy'), endTime: 2 })
@@ -137,8 +137,8 @@ describe('network span plugin', () => {
     const client = createTestClient({ plugins: (spanFactory) => [new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)] })
     const rootSpan = client.startSpan('root span')
 
-    fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
-    xhrTracker.start({ method: 'POST', url: TEST_URL, startTime: 2 })
+    fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
+    xhrTracker.start({ type: 'fetch', method: 'POST', url: TEST_URL, startTime: 2 })
 
     expect(spanContextEquals(rootSpan, client.currentSpanContext)).toBe(true)
   })
@@ -151,10 +151,10 @@ describe('network span plugin', () => {
       networkRequestCallback: (networkRequestInfo) => networkRequestInfo.url === 'no-delivery' ? null : networkRequestInfo
     }))
 
-    fetchTracker.start({ method: 'GET', url: 'no-delivery', startTime: 1 })
+    fetchTracker.start({ type: 'fetch', method: 'GET', url: 'no-delivery', startTime: 1 })
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
 
-    fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
+    fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
   })
 
@@ -169,7 +169,7 @@ describe('network span plugin', () => {
       })
     }))
 
-    const endRequest = fetchTracker.start({ method: 'GET', url: TEST_URL, startTime: 1 })
+    const endRequest = fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
 
     endRequest({ status: 200, endTime: 2, state: 'success' })
