@@ -1,4 +1,4 @@
-import { type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
+import { type InternalConfiguration, type Logger, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
 import { defaultNetworkRequestCallback, type NetworkRequestCallback } from '../network-request-callback'
 import {
@@ -11,6 +11,7 @@ import {
 export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private configEndpoint: string = ''
   private networkRequestCallback: NetworkRequestCallback = defaultNetworkRequestCallback
+  private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
 
   constructor (
     private spanFactory: SpanFactory,
@@ -19,6 +20,8 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   ) {}
 
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
+    this.logger = configuration.logger
+
     if (configuration.autoInstrumentNetworkRequests) {
       this.configEndpoint = configuration.endpoint
       this.xhrTracker.onStart(this.trackRequest)
@@ -39,8 +42,13 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
       { startTime: startContext.startTime, makeCurrentContext: false }
     )
 
+    if (typeof networkRequestInfo.url === 'string') {
+      span.setAttribute('http.url', networkRequestInfo.url)
+    } else {
+      this.logger.warn(`expected url to be a string, got ${typeof networkRequestInfo.url}, http.url attribute discarded.`)
+    }
+
     span.setAttribute('bugsnag.span.category', 'network')
-    span.setAttribute('http.url', networkRequestInfo.url)
     span.setAttribute('http.method', startContext.method)
 
     return (endContext: RequestEndContext) => {

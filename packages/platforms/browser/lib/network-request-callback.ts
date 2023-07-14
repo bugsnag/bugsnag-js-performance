@@ -1,6 +1,6 @@
 export interface NetworkRequestInfo {
   url: string
-  readonly type: 'fetch' | 'xmlhttprequest'
+  readonly type: PerformanceResourceTiming['initiatorType']
 }
 
 export type NetworkRequestCallback = (networkRequestInfo: NetworkRequestInfo) => NetworkRequestInfo | null
