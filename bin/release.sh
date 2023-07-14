@@ -35,11 +35,11 @@ BROWSER_PACKAGE_CHANGED=$(npx lerna changed --parseable | grep -c packages/platf
 if [ -z "${RETRY_PUBLISH:-}" ]; then
   case $VERSION in
     "prerelease" | "prepatch" | "preminor" | "premajor")
-      npx lerna version "$VERSION" --dist-tag next --no-push
+      npx lerna version "$VERSION"  --no-push --no-private --dist-tag next
       ;;
 
     *)
-      npx lerna version "$VERSION" --no-push
+      npx lerna version "$VERSION" --no-push  --no-private
       ;;
   esac
 fi
