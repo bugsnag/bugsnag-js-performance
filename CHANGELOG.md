@@ -8,6 +8,10 @@
 
 ## v0.3.0 (2023-07-17)
 
+### Added
+
+- (browser) Added new `networkRequestCallback` config option [#262](https://github.com/bugsnag/bugsnag-js-performance/pull/262)
+
 ### Fixed
 
 - (core) Use platform clock to set the `Bugsnag-Sent-At` header [#265](https://github.com/bugsnag/bugsnag-js-performance/pull/265)
