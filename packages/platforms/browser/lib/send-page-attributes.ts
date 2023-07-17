@@ -12,7 +12,7 @@ export const defaultSendPageAttributes = {
   url: true
 }
 
-export function compileAttributes (sendPageAttributes: SendPageAttributes) {
+export function getPermittedAttributes (sendPageAttributes: SendPageAttributes) {
   return {
     ...defaultSendPageAttributes,
     ...sendPageAttributes
