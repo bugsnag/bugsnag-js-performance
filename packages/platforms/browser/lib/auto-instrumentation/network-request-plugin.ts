@@ -45,7 +45,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
     if (typeof networkRequestInfo.url === 'string') {
       span.setAttribute('http.url', networkRequestInfo.url)
     } else {
-      this.logger.warn(`expected url to be a string, got ${typeof networkRequestInfo.url}, http.url attribute discarded.`)
+      this.logger.warn(`expected url to be a string following network request callback, got ${typeof networkRequestInfo.url}, http.url attribute discarded.`)
     }
 
     span.setAttribute('bugsnag.span.category', 'network')
