@@ -33,6 +33,36 @@ describe('Browser Clock', () => {
     })
   })
 
+  describe('clock.date()', () => {
+    it('returns a Date', async () => {
+      const timeOrigin = new Date('2023-01-02T00:00:00.000Z')
+      jest.setSystemTime(timeOrigin)
+
+      const clock = createClock(new PerformanceFake(), new ControllableBackgroundingListener())
+
+      await jest.advanceTimersByTimeAsync(100)
+
+      expect(clock.date()).toEqual(new Date(timeOrigin.getTime() + 100))
+    })
+
+    it('returns a greater date on every invocation (100 runs)', async () => {
+      const timeOrigin = new Date('2023-01-02T00:00:00.000Z')
+      jest.setSystemTime(timeOrigin)
+
+      let lastDate = timeOrigin
+      const clock = createClock(new PerformanceFake(), new ControllableBackgroundingListener())
+
+      for (let i = 0; i < 100; i++) {
+        await jest.advanceTimersByTimeAsync(10)
+
+        const newDate = clock.date()
+
+        expect(newDate).toEqual(new Date(lastDate.getTime() + 10))
+        lastDate = newDate
+      }
+    })
+  })
+
   describe('clock.convert()', () => {
     it('converts a Date into a number', () => {
       const clock = createClock(new PerformanceFake(), new ControllableBackgroundingListener())

@@ -10,6 +10,10 @@ export interface Clock {
   // or any other number, so long as it is consistent to the platform
   now: () => number
 
+  // returns a Date object representing the current time using the same time
+  // source as 'now'
+  date: () => Date
+
   // a function to convert a Date object into the format returned by 'now'
   convert: (date: Date) => number
 
