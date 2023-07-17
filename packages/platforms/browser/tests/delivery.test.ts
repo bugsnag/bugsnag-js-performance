@@ -3,7 +3,10 @@
  */
 
 import { type TracePayload } from '@bugsnag/core-performance'
-import { ControllableBackgroundingListener } from '@bugsnag/js-performance-test-utilities'
+import {
+  ControllableBackgroundingListener,
+  IncrementingClock
+} from '@bugsnag/js-performance-test-utilities'
 import createBrowserDeliveryFactory from '../lib/delivery'
 
 // the format of the Bugsnag-Sent-At header: YYYY-MM-DDTHH:mm:ss.sssZ
@@ -13,6 +16,7 @@ describe('Browser Delivery', () => {
   it('delivers a span', () => {
     const fetch = jest.fn(() => Promise.resolve({} as unknown as Response))
     const backgroundingListener = new ControllableBackgroundingListener()
+    const clock = new IncrementingClock('2023-01-02T00:00:00.000Z')
 
     const deliveryPayload: TracePayload = {
       body: {
@@ -39,7 +43,7 @@ describe('Browser Delivery', () => {
       }
     }
 
-    const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
+    const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener, clock)
     const delivery = deliveryFactory('/test')
     delivery.send(deliveryPayload)
 
@@ -51,7 +55,7 @@ describe('Browser Delivery', () => {
         'Bugsnag-Api-Key': 'test-api-key',
         'Bugsnag-Span-Sampling': '1:1',
         'Content-Type': 'application/json',
-        'Bugsnag-Sent-At': expect.stringMatching(SENT_AT_FORMAT)
+        'Bugsnag-Sent-At': new Date(clock.timeOrigin + 1).toISOString()
       }
     })
   })
@@ -85,7 +89,7 @@ describe('Browser Delivery', () => {
       }
     }
 
-    const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
+    const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener, new IncrementingClock())
     const delivery = deliveryFactory('/test')
 
     backgroundingListener.sendToBackground()
@@ -134,7 +138,7 @@ describe('Browser Delivery', () => {
       }
     }
 
-    const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
+    const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener, new IncrementingClock())
     const delivery = deliveryFactory('/test')
 
     backgroundingListener.sendToBackground()
@@ -176,7 +180,7 @@ describe('Browser Delivery', () => {
     const fetch = jest.fn(() => Promise.resolve({ status: 200, headers } as unknown as Response))
     const backgroundingListener = new ControllableBackgroundingListener()
 
-    const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
+    const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener, new IncrementingClock())
     const delivery = deliveryFactory('/test')
     const deliveryPayload: TracePayload = {
       body: { resourceSpans: [] },
@@ -214,7 +218,7 @@ describe('Browser Delivery', () => {
     const fetch = jest.fn(() => Promise.resolve({ status: 200, headers } as unknown as Response))
     const backgroundingListener = new ControllableBackgroundingListener()
 
-    const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener)
+    const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener, new IncrementingClock())
     const delivery = deliveryFactory('/test')
     const payload: TracePayload = {
       body: { resourceSpans: [] },

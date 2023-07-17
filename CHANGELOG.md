@@ -1,16 +1,26 @@
 # Changelog
 
+## v0.3.0 (2023-07-17)
+
+### Fixed
+
+- (core) Use platform clock to set the `Bugsnag-Sent-At` header [#265](https://github.com/bugsnag/bugsnag-js-performance/pull/265)
+- (browser) Only add `http.flavor` span attribute when it is a useful value [#255](https://github.com/bugsnag/bugsnag-js-performance/pull/255)
+
+### Removed
+
+- (browser) Remove the `networkInstrumentationIgnoreUrls` config option [#261](https://github.com/bugsnag/bugsnag-js-performance/pull/261)
+
 ## v0.2.0 (2023-07-10)
 
 ### Added
 
 - (core, browser) Log a warning when providing invalid options to `startSpan` [#245](https://github.com/bugsnag/bugsnag-js-performance/pull/245)
-- (core) Added `bugsnag.sampling.p`` attribute [#258](https://github.com/bugsnag/bugsnag-js-performance/pull/258)
+- (core) Added `bugsnag.sampling.p` attribute [#258](https://github.com/bugsnag/bugsnag-js-performance/pull/258)
 
 ### Fixed
 
 - (core) Correctly report the `Bugsnag-Span-Sampling` header [#256](https://github.com/bugsnag/bugsnag-js-performance/pull/256) [#257](https://github.com/bugsnag/bugsnag-js-performance/pull/257)
-
 
 ## v0.1.1 (2023-06-28)
 

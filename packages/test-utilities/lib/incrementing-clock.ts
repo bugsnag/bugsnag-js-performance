@@ -6,8 +6,8 @@ interface ClockOptions {
 }
 
 class IncrementingClock implements Clock {
+  public readonly timeOrigin: number
   private currentTime: number
-  private readonly timeOrigin: number
 
   constructor (options: string | ClockOptions = {}) {
     if (typeof options === 'string') {
@@ -20,6 +20,10 @@ class IncrementingClock implements Clock {
 
   now () {
     return ++this.currentTime
+  }
+
+  date () {
+    return new Date(this.timeOrigin + this.now())
   }
 
   convert (date: Date) {

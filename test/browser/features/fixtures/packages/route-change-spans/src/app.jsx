@@ -22,7 +22,7 @@ function Navigation() {
   )
 }
 
-export default function App() {
+function App() {
   return (
     <Router>
       <Navigation />
