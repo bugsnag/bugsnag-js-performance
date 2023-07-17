@@ -1,4 +1,4 @@
-import { compileAttributes, defaultSendPageAttributes, isSendPageAttributes } from '../lib/send-page-attributes'
+import { getPermittedAttributes, defaultSendPageAttributes, isSendPageAttributes } from '../lib/send-page-attributes'
 
 describe('isSendPageAttributes', () => {
   const valid = [
@@ -46,15 +46,15 @@ describe('isSendPageAttributes', () => {
   })
 })
 
-describe('compileAttributes', () => {
+describe('getPermittedAttributes', () => {
   it('retains provided values', () => {
     const providedAttributes = { url: false, referrer: false, title: false }
-    const compiledAttributes = compileAttributes(providedAttributes)
+    const compiledAttributes = getPermittedAttributes(providedAttributes)
     expect(compiledAttributes).toStrictEqual(providedAttributes)
   })
 
   it('completes missing values', () => {
-    const compiledAttributes = compileAttributes({ url: true })
+    const compiledAttributes = getPermittedAttributes({ url: true })
     expect(compiledAttributes).toStrictEqual(defaultSendPageAttributes)
   })
 })
