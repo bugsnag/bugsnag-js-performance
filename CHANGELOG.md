@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- (browser) Add `sendPageAttributes` configuration option [#266](https://github.com/bugsnag/bugsnag-js-performance/pull/266)
+
 ### Fixed
 
 - (browser) Only add `http.flavor` span attribute when it is a useful value [#255](https://github.com/bugsnag/bugsnag-js-performance/pull/255)
