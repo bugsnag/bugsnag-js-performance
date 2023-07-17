@@ -16,7 +16,6 @@ export interface BrowserSchema extends CoreSchema {
   generateAnonymousId: ConfigOption<boolean>
   routingProvider: ConfigOption<RoutingProvider>
   settleIgnoreUrls: ConfigOption<Array<string | RegExp>>
-  networkInstrumentationIgnoreUrls: ConfigOption<Array<string | RegExp>>
   networkRequestCallback: ConfigOption<NetworkRequestCallback>
 }
 
@@ -27,7 +26,6 @@ export interface BrowserConfiguration extends Configuration {
   generateAnonymousId?: boolean
   routingProvider?: RoutingProvider
   settleIgnoreUrls?: Array<string | RegExp>
-  networkInstrumentationIgnoreUrls?: Array<string | RegExp>
   networkRequestCallback?: NetworkRequestCallback
 }
 
@@ -64,11 +62,6 @@ export function createSchema (hostname: string, defaultRoutingProvider: RoutingP
       validate: isRoutingProvider
     },
     settleIgnoreUrls: {
-      defaultValue: [],
-      message: 'should be an array of string|RegExp',
-      validate: isStringOrRegExpArray
-    },
-    networkInstrumentationIgnoreUrls: {
       defaultValue: [],
       message: 'should be an array of string|RegExp',
       validate: isStringOrRegExpArray
