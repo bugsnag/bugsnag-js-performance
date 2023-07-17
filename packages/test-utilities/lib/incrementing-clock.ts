@@ -22,6 +22,10 @@ class IncrementingClock implements Clock {
     return ++this.currentTime
   }
 
+  date () {
+    return new Date(this.timeOrigin + this.now())
+  }
+
   convert (date: Date) {
     return date.getTime() - this.timeOrigin
   }
