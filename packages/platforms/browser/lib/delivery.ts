@@ -1,5 +1,6 @@
 import {
   type BackgroundingListener,
+  type Clock,
   type Delivery,
   type DeliveryFactory,
   type TracePayload,
@@ -24,7 +25,11 @@ function samplingProbabilityFromHeaders (headers: Headers): number | undefined {
   return asNumber
 }
 
-function createBrowserDeliveryFactory (fetch: Fetch, backgroundingListener: BackgroundingListener): DeliveryFactory {
+function createBrowserDeliveryFactory (
+  fetch: Fetch,
+  backgroundingListener: BackgroundingListener,
+  clock: Clock
+): DeliveryFactory {
   // we set fetch's 'keepalive' flag if the app is backgrounded/terminated so
   // that we can flush the last batch - without 'keepalive' the browser can
   // cancel (or never start sending) this request
@@ -38,7 +43,7 @@ function createBrowserDeliveryFactory (fetch: Fetch, backgroundingListener: Back
   return function browserDeliveryFactory (endpoint: string): Delivery {
     return {
       async send (payload: TracePayload) {
-        payload.headers['Bugsnag-Sent-At'] = (new Date()).toISOString()
+        payload.headers['Bugsnag-Sent-At'] = clock.date().toISOString()
 
         try {
           const response = await fetch(endpoint, {
