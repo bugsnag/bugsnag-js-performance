@@ -1,9 +1,10 @@
 # Changelog
 
-## Unreleased
+## v0.3.0 (2023-07-17)
 
 ### Fixed
 
+- (core) Use platform clock to set the `Bugsnag-Sent-At` header [#265](https://github.com/bugsnag/bugsnag-js-performance/pull/265)
 - (browser) Only add `http.flavor` span attribute when it is a useful value [#255](https://github.com/bugsnag/bugsnag-js-performance/pull/255)
 
 ### Removed
