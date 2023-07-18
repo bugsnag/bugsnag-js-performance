@@ -2,19 +2,20 @@
  * @jest-environment jsdom
  */
 
-import createSpanAttributesSource from '../lib/span-attributes-source'
+import spanAttributesSource from '../lib/span-attributes-source'
 
 describe('spanAttributesSource', () => {
+  it('allows get/set for new attributes', () => {
+    const spanAttributes = spanAttributesSource()
+    expect(spanAttributes.get('bugsnag.test.attribute')).toBeUndefined()
+    spanAttributes.set('bugsnag.test.attribute', 'value')
+    expect(spanAttributes.get('bugsnag.test.attribute')).toBe('value')
+  })
+
   it('includes common span attributes', () => {
-    const spanAttributesSource = createSpanAttributesSource(
-      'the page title',
-      'https://www.bugsnag.com'
-    )
     const spanAttributes = spanAttributesSource()
     expect(Array.from(spanAttributes.entries())).toEqual([
-      ['bugsnag.span.category', 'custom'],
-      ['bugsnag.browser.page.url', 'https://www.bugsnag.com'],
-      ['bugsnag.browser.page.title', 'the page title']
+      ['bugsnag.span.category', 'custom']
     ])
   })
 })
