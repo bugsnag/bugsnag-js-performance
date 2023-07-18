@@ -6,6 +6,10 @@
 
 - (browser) Calculate time origin on create as well as visibility change [#268](https://github.com/bugsnag/bugsnag-js-performance/pull/268)
 
+### Removed
+
+- Removed `@bugsnag/js-performance` meta package [#264](https://github.com/bugsnag/bugsnag-js-performance/pull/264)
+
 ## v0.3.0 (2023-07-17)
 
 ### Fixed
@@ -16,7 +20,6 @@
 ### Removed
 
 - (browser) Remove the `networkInstrumentationIgnoreUrls` config option [#261](https://github.com/bugsnag/bugsnag-js-performance/pull/261)
-- Removed `@bugsnag/js-performance` meta package [#264](https://github.com/bugsnag/bugsnag-js-performance/pull/264)
 
 ## v0.2.0 (2023-07-10)
 
