@@ -20,5 +20,8 @@ export function getPermittedAttributes (sendPageAttributes: SendPageAttributes) 
 }
 
 export function isSendPageAttributes (obj: unknown): obj is SendPageAttributes {
-  return isObject(obj) && Object.values(obj).every(value => typeof value === 'boolean') && Object.keys(obj).every(key => Object.keys(defaultSendPageAttributes).includes(key))
+  const allowedTypes = ['undefined', 'boolean']
+  const keys = Object.keys(defaultSendPageAttributes)
+
+  return isObject(obj) && keys.every(key => allowedTypes.includes(typeof obj[key]))
 }
