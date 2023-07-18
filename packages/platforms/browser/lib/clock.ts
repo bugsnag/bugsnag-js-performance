@@ -17,19 +17,29 @@ interface PerformanceWithOptionalTimeOrigin {
 // maximum allowed clock divergence in milliseconds
 const MAX_CLOCK_DRIFT_MS = 300000
 
+function recalculateTimeOrigin (timeOrigin: number, performance: PerformanceWithOptionalTimeOrigin): number {
+  // if the machine has been sleeping the monatomic clock used by performance.now() may have been paused,
+  // so we need to check if this has drifted significantly from Date.now()
+  // if the drift is > 5 minutes re-set the clock's origin to bring it back in line with Date.now()
+  if (Math.abs(Date.now() - (timeOrigin + performance.now())) > MAX_CLOCK_DRIFT_MS) {
+    return Date.now() - performance.now()
+  }
+
+  return timeOrigin
+}
+
 function createClock (performance: PerformanceWithOptionalTimeOrigin, backgroundingListener: BackgroundingListener): Clock {
-  let calculatedTimeOrigin = performance.timeOrigin === undefined
+  const initialTimeOrigin = performance.timeOrigin === undefined
     ? performance.timing.navigationStart
     : performance.timeOrigin
 
-  // if the machine has been sleeping the monatomic clock used by performance.now() may have been paused,
-  // so when the app returns to the foreground we need to check if this has drifted significantly from Date.now()
-  // if the drift is > 5 minutes re-set the clock's origin to bring it back in line with Date.now()
+  // the performance clock could be shared between different tabs running in the same process
+  // so may already have diverged - for this reason we calculate a time origin when we first create the clock
+  // as well as when the app returns to the foreground
+  let calculatedTimeOrigin = recalculateTimeOrigin(initialTimeOrigin, performance)
   backgroundingListener.onStateChange(state => {
     if (state === 'in-foreground') {
-      if (Math.abs(Date.now() - (calculatedTimeOrigin + performance.now())) > MAX_CLOCK_DRIFT_MS) {
-        calculatedTimeOrigin = Date.now() - performance.now()
-      }
+      calculatedTimeOrigin = recalculateTimeOrigin(calculatedTimeOrigin, performance)
     }
   })
 
