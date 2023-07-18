@@ -11,6 +11,12 @@ describe('isSendPageAttributes', () => {
     { url: true },
     { referrer: false },
     { title: true },
+    {
+      url: true,
+      referrer: false,
+      title: false,
+      unknown: true
+    },
     {}
   ]
 
@@ -23,12 +29,6 @@ describe('isSendPageAttributes', () => {
       url: 'string',
       referrer: false,
       title: false
-    },
-    {
-      url: true,
-      referrer: false,
-      title: false,
-      unknown: true
     },
     () => [],
     [],
