@@ -35,21 +35,21 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
 
     const networkRequestInfo = this.networkRequestCallback({ url: startContext.url, type: startContext.type })
 
-    if (!networkRequestInfo) return
+    if (networkRequestInfo === null) return
+
+    if (typeof networkRequestInfo.url !== 'string') {
+      this.logger.warn(`expected url to be a string following network request callback, got ${typeof networkRequestInfo.url}`)
+      return
+    }
 
     const span = this.spanFactory.startSpan(
       `[HTTP]/${startContext.method.toUpperCase()}`,
       { startTime: startContext.startTime, makeCurrentContext: false }
     )
 
-    if (typeof networkRequestInfo.url === 'string') {
-      span.setAttribute('http.url', networkRequestInfo.url)
-    } else {
-      this.logger.warn(`expected url to be a string following network request callback, got ${typeof networkRequestInfo.url}, http.url attribute discarded.`)
-    }
-
     span.setAttribute('bugsnag.span.category', 'network')
     span.setAttribute('http.method', startContext.method)
+    span.setAttribute('http.url', networkRequestInfo.url)
 
     return (endContext: RequestEndContext) => {
       if (endContext.state === 'success') {
