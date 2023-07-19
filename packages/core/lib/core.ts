@@ -100,7 +100,6 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
       const cleanOptions = validateSpanOptions(name, spanOptions, coreSpanOptionSchema, logger)
       const span = spanFactory.startSpan(cleanOptions.name, cleanOptions.options)
       span.setAttribute('bugsnag.span.category', 'custom')
-      // set default attributes if allowed
       return spanFactory.toPublicApi(span)
     },
     get currentSpanContext () {
