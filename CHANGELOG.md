@@ -6,8 +6,6 @@
 
 - (browser) Added new `networkRequestCallback` config option [#262](https://github.com/bugsnag/bugsnag-js-performance/pull/262)
 
-## v0.3.0 (2023-07-17)
-
 ### Fixed
 
 - (browser) Calculate time origin on create as well as visibility change [#268](https://github.com/bugsnag/bugsnag-js-performance/pull/268)
