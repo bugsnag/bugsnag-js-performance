@@ -11,7 +11,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private configEndpoint: string = ''
 
   constructor (
-    private spanFactory: SpanFactory,
+    private spanFactory: SpanFactory<BrowserConfiguration>,
     private fetchTracker: RequestTracker,
     private xhrTracker: RequestTracker
   ) {}

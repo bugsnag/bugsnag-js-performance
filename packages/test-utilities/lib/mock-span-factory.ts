@@ -1,16 +1,17 @@
 import {
-  type SpanInternal,
-  type SpanEnded,
-  type SpanOptions,
+  DefaultSpanContextStorage,
   Sampler,
   SpanFactory,
-  DefaultSpanContextStorage
+  type Configuration,
+  type SpanEnded,
+  type SpanInternal,
+  type SpanOptions
 } from '@bugsnag/core-performance'
-import StableIdGenerator from './stable-id-generator'
-import spanAttributesSource from './span-attributes-source'
-import IncrementingClock from './incrementing-clock'
-import InMemoryProcessor from './in-memory-processor'
 import ControllableBackgroundingListener from './controllable-backgrounding-listener'
+import InMemoryProcessor from './in-memory-processor'
+import IncrementingClock from './incrementing-clock'
+import spanAttributesSource from './span-attributes-source'
+import StableIdGenerator from './stable-id-generator'
 
 const jestLogger = {
   debug: jest.fn(),
@@ -19,7 +20,7 @@ const jestLogger = {
   warn: jest.fn()
 }
 
-class MockSpanFactory extends SpanFactory {
+class MockSpanFactory <C extends Configuration> extends SpanFactory<C> {
   public createdSpans: SpanEnded[]
 
   constructor () {

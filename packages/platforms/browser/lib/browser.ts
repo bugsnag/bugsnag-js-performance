@@ -11,10 +11,11 @@ import makeBrowserPersistence from './persistence'
 import createFetchRequestTracker from './request-tracker/request-tracker-fetch'
 import createXmlHttpRequestTracker from './request-tracker/request-tracker-xhr'
 import createResourceAttributesSource from './resource-attributes-source'
-import spanAttributesSource from './span-attributes-source'
+import createSpanAttributesSource from './span-attributes-source'
 import { WebVitals } from './web-vitals'
 
 const backgroundingListener = createBrowserBackgroundingListener(document)
+const spanAttributesSource = createSpanAttributesSource(document)
 const clock = createClock(performance, backgroundingListener)
 const persistence = makeBrowserPersistence(window)
 const resourceAttributesSource = createResourceAttributesSource(navigator, persistence)

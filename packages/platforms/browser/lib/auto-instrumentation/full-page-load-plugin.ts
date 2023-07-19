@@ -11,7 +11,7 @@ import { type WebVitals } from '../web-vitals'
 import { instrumentPageLoadPhaseSpans } from './page-load-phase-spans'
 
 export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
-  private readonly spanFactory: SpanFactory
+  private readonly spanFactory: SpanFactory<BrowserConfiguration>
   private readonly document: Document
   private readonly location: Location
   private readonly onSettle: OnSettle
@@ -25,7 +25,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   constructor (
     document: Document,
     location: Location,
-    spanFactory: SpanFactory,
+    spanFactory: SpanFactory<BrowserConfiguration>,
     webVitals: WebVitals,
     onSettle: OnSettle,
     backgroundingListener: BackgroundingListener,
