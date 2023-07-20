@@ -35,7 +35,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
 
     const networkRequestInfo = this.networkRequestCallback({ url: startContext.url, type: startContext.type })
 
-    if (networkRequestInfo === null) return
+    if (!networkRequestInfo) return
 
     if (typeof networkRequestInfo.url !== 'string') {
       this.logger.warn(`expected url to be a string following network request callback, got ${typeof networkRequestInfo.url}`)
