@@ -14,7 +14,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
 
   constructor (
-    private spanFactory: SpanFactory,
+    private spanFactory: SpanFactory<BrowserConfiguration>,
     private fetchTracker: RequestTracker,
     private xhrTracker: RequestTracker
   ) {}

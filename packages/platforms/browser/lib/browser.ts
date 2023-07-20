@@ -15,6 +15,7 @@ import spanAttributesSource from './span-attributes-source'
 import { WebVitals } from './web-vitals'
 
 const backgroundingListener = createBrowserBackgroundingListener(document)
+const spanAttributesSource = createSpanAttributesSource(document)
 const clock = createClock(performance, backgroundingListener)
 const persistence = makeBrowserPersistence(window)
 const resourceAttributesSource = createResourceAttributesSource(navigator, persistence)

@@ -1,17 +1,17 @@
 import type { SpanContext, SpanFactory } from '@bugsnag/core-performance'
+import { type BrowserConfiguration } from '../config'
 import { type PerformanceWithTiming } from '../on-settle/load-event-end-settler'
 
-type PageLoadPhase
-  = 'Unload'
-  | 'Redirect'
-  | 'LoadFromCache'
-  | 'DNSLookup'
-  | 'TCPHandshake'
-  | 'TLS'
-  | 'HTTPRequest'
-  | 'HTTPResponse'
-  | 'DomContentLoadedEvent'
-  | 'LoadEvent'
+type PageLoadPhase = 'Unload'
+| 'Redirect'
+| 'LoadFromCache'
+| 'DNSLookup'
+| 'TCPHandshake'
+| 'TLS'
+| 'HTTPRequest'
+| 'HTTPResponse'
+| 'DomContentLoadedEvent'
+| 'LoadEvent'
 
 function shouldOmitSpan (startTime?: number, endTime?: number): boolean {
   return (startTime === undefined || endTime === undefined) ||
@@ -19,7 +19,7 @@ function shouldOmitSpan (startTime?: number, endTime?: number): boolean {
 }
 
 export const instrumentPageLoadPhaseSpans = (
-  spanFactory: SpanFactory,
+  spanFactory: SpanFactory<BrowserConfiguration>,
   performance: PerformanceWithTiming,
   route: string,
   parentContext: SpanContext

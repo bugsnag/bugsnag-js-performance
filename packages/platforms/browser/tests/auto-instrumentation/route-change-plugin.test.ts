@@ -5,7 +5,7 @@
 
 import { InMemoryDelivery, IncrementingClock, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { RouteChangePlugin } from '../../lib/auto-instrumentation/route-change-plugin'
-import { createSchema } from '../../lib/config'
+import { createSchema, type BrowserConfiguration, type BrowserSchema } from '../../lib/config'
 import { createDefaultRoutingProvider } from '../../lib/default-routing-provider'
 import { type OnSettle } from '../../lib/on-settle'
 import { type StartRouteChangeCallback } from '../../lib/routing-provider'
@@ -38,7 +38,7 @@ describe('RouteChangePlugin', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
 
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
@@ -78,7 +78,7 @@ describe('RouteChangePlugin', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
 
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
@@ -139,7 +139,7 @@ describe('RouteChangePlugin', () => {
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
 
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
@@ -161,7 +161,7 @@ describe('RouteChangePlugin', () => {
     const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle, window.location)
     const clock = new IncrementingClock()
     const delivery = new InMemoryDelivery()
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
@@ -203,7 +203,7 @@ describe('RouteChangePlugin', () => {
       }
 
       const delivery = new InMemoryDelivery()
-      const testClient = createTestClient({
+      const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         deliveryFactory: () => delivery,
         schema: createSchema(window.location.hostname, routingProvider),
         plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
@@ -248,7 +248,7 @@ describe('RouteChangePlugin', () => {
       }
 
       const delivery = new InMemoryDelivery()
-      const testClient = createTestClient({
+      const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         deliveryFactory: () => delivery,
         schema: createSchema(window.location.hostname, routingProvider),
         plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]

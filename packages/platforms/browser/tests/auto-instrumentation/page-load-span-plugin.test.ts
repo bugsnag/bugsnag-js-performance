@@ -3,6 +3,7 @@
  * @jest-environment-options { "referrer": "https://bugsnag.com", "url": "https://bugsnag.com/initial-route" }
  */
 
+import { spanContextEquals } from '@bugsnag/core-performance'
 import {
   ControllableBackgroundingListener,
   InMemoryDelivery,
@@ -11,21 +12,20 @@ import {
   VALID_API_KEY,
   createTestClient
 } from '@bugsnag/js-performance-test-utilities'
+import { FullPageLoadPlugin } from '../../lib/auto-instrumentation/full-page-load-plugin'
+import { createSchema, type BrowserConfiguration, type BrowserSchema } from '../../lib/config'
+import { type OnSettle } from '../../lib/on-settle'
+import { WebVitals } from '../../lib/web-vitals'
 import {
   PerformanceFake,
   PerformanceObserverManager,
-  createPerformanceNavigationTimingFake,
-  createPerformancePaintTimingFake,
-  createPerformanceEventTimingFake,
+  createLargestContentfulPaintFake,
   createLayoutShiftFake,
-  createLargestContentfulPaintFake
+  createPerformanceEventTimingFake,
+  createPerformanceNavigationTimingFake,
+  createPerformancePaintTimingFake
 } from '../utilities'
-import { FullPageLoadPlugin } from '../../lib/auto-instrumentation/full-page-load-plugin'
-import { createSchema } from '../../lib/config'
-import { type OnSettle } from '../../lib/on-settle'
-import { WebVitals } from '../../lib/web-vitals'
 import MockRoutingProvider from '../utilities/mock-routing-provider'
-import { spanContextEquals } from '@bugsnag/core-performance'
 
 jest.useFakeTimers()
 
@@ -44,7 +44,7 @@ describe('FullPageLoadPlugin', () => {
       Promise.resolve().then(() => { onSettleCallback(1234) })
     }
     const webVitals = new WebVitals(performance, clock, manager.createPerformanceObserverFakeClass())
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
@@ -115,7 +115,7 @@ describe('FullPageLoadPlugin', () => {
     const performance = new PerformanceFake()
     const Observer = manager.createPerformanceObserverFakeClass()
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       plugins: (spanFactory) => [
@@ -148,7 +148,7 @@ describe('FullPageLoadPlugin', () => {
     const backgroundingListener = new ControllableBackgroundingListener()
     const performance = new PerformanceFake()
 
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
@@ -184,7 +184,7 @@ describe('FullPageLoadPlugin', () => {
     const backgroundingListener = new ControllableBackgroundingListener()
     const performance = new PerformanceFake()
 
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
@@ -223,7 +223,7 @@ describe('FullPageLoadPlugin', () => {
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const backgroundingListener = new ControllableBackgroundingListener()
 
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
@@ -261,7 +261,7 @@ describe('FullPageLoadPlugin', () => {
     const backgroundingListener = new ControllableBackgroundingListener()
     const performance = new PerformanceFake()
 
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
@@ -300,7 +300,7 @@ describe('FullPageLoadPlugin', () => {
     const backgroundingListener = new ControllableBackgroundingListener()
     const performance = new PerformanceFake()
 
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
@@ -336,7 +336,7 @@ describe('FullPageLoadPlugin', () => {
     const manager = new PerformanceObserverManager()
     const Observer = manager.createPerformanceObserverFakeClass()
     const webVitals = new WebVitals(performance, clock, Observer)
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       idGenerator: new IncrementingIdGenerator(),
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
@@ -393,7 +393,7 @@ describe('FullPageLoadPlugin', () => {
     const manager = new PerformanceObserverManager()
     const Observer = manager.createPerformanceObserverFakeClass()
     const webVitals = new WebVitals(performance, clock, Observer)
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       idGenerator: new IncrementingIdGenerator(),
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
@@ -448,7 +448,7 @@ describe('FullPageLoadPlugin', () => {
         const delivery = new InMemoryDelivery()
         const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
         const webVitals = new WebVitals(performance, clock, manager.createPerformanceObserverFakeClass())
-        const testClient = createTestClient({
+        const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
           clock,
           deliveryFactory: () => delivery,
           schema: createSchema(window.location.hostname, new MockRoutingProvider()),
@@ -495,7 +495,7 @@ describe('FullPageLoadPlugin', () => {
         const delivery = new InMemoryDelivery()
         const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
         const webVitals = new WebVitals(performance, clock, manager.createPerformanceObserverFakeClass())
-        const testClient = createTestClient({
+        const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
           clock,
           deliveryFactory: () => delivery,
           schema: createSchema(window.location.hostname, new MockRoutingProvider()),
@@ -548,7 +548,7 @@ describe('FullPageLoadPlugin', () => {
         const delivery = new InMemoryDelivery()
         const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
         const webVitals = new WebVitals(performance, clock, manager.createPerformanceObserverFakeClass())
-        const testClient = createTestClient({
+        const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
           clock,
           deliveryFactory: () => delivery,
           schema: createSchema(window.location.hostname, new MockRoutingProvider()),
@@ -590,7 +590,7 @@ describe('FullPageLoadPlugin', () => {
       const delivery = new InMemoryDelivery()
       const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
       const webVitals = new WebVitals(performance, clock, undefined)
-      const testClient = createTestClient({
+      const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         clock,
         deliveryFactory: () => delivery,
         schema: createSchema(window.location.hostname, new MockRoutingProvider()),

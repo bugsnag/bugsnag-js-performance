@@ -1,21 +1,35 @@
-/**
- * @jest-environment jsdom
- */
+import { SpanAttributes, SpanInternal } from '@bugsnag/core-performance'
+import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
+import { type BrowserConfiguration } from '../lib'
+import createSpanAttributesSource from '../lib/span-attributes-source'
 
-import spanAttributesSource from '../lib/span-attributes-source'
+const mockDocument = {
+  title: 'span attributes source',
+  location: {
+    href: 'https://bugsnag.com/span-attributes-source'
+  }
+}
+
+const spanAttributesSource = createSpanAttributesSource(mockDocument as Document)
 
 describe('spanAttributesSource', () => {
-  it('allows get/set for new attributes', () => {
-    const spanAttributes = spanAttributesSource()
-    expect(spanAttributes.get('bugsnag.test.attribute')).toBeUndefined()
-    spanAttributes.set('bugsnag.test.attribute', 'value')
-    expect(spanAttributes.get('bugsnag.test.attribute')).toBe('value')
-  })
+  it('adds permitted attributes to a span', () => {
+    const browserConfiguration = createConfiguration<BrowserConfiguration>({ sendPageAttributes: { url: true, title: true } })
+    const spanAttributes = new SpanAttributes(new Map())
+    const span = new SpanInternal('id', 'traceId', 'test span', 1234, spanAttributes)
 
-  it('includes common span attributes', () => {
-    const spanAttributes = spanAttributesSource()
-    expect(Array.from(spanAttributes.entries())).toEqual([
-      ['bugsnag.span.category', 'custom']
-    ])
+    spanAttributesSource.requestAttributes(span)
+
+    // @ts-expect-error attributes not accessible on span
+    const attributes: Map<string, any> = span.attributes.attributes
+
+    expect(attributes.get('bugsnag.browser.page.title')).toBeUndefined()
+    expect(attributes.get('bugsnag.browser.page.url')).toBeUndefined()
+
+    spanAttributesSource.configure(browserConfiguration)
+    spanAttributesSource.requestAttributes(span)
+
+    expect(attributes.get('bugsnag.browser.page.title')).toBe('span attributes source')
+    expect(attributes.get('bugsnag.browser.page.url')).toBe('https://bugsnag.com/span-attributes-source')
   })
 })

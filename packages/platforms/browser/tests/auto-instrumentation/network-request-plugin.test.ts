@@ -1,8 +1,8 @@
-import { NetworkRequestPlugin } from '../../lib/auto-instrumentation/network-request-plugin'
-import { MockSpanFactory, createConfiguration, createTestClient } from '@bugsnag/js-performance-test-utilities'
-import { RequestTracker, type RequestStartCallback } from '../../lib/request-tracker/request-tracker'
-import { type BrowserConfiguration } from '../../lib/config'
 import { spanContextEquals } from '@bugsnag/core-performance'
+import { MockSpanFactory, createConfiguration, createTestClient } from '@bugsnag/js-performance-test-utilities'
+import { NetworkRequestPlugin } from '../../lib/auto-instrumentation/network-request-plugin'
+import { type BrowserSchema, type BrowserConfiguration } from '../../lib/config'
+import { RequestTracker, type RequestStartCallback } from '../../lib/request-tracker/request-tracker'
 
 const ENDPOINT = 'http://traces.endpoint'
 const TEST_URL = 'http://test-url.com/'
@@ -16,7 +16,7 @@ class MockRequestTracker extends RequestTracker {
 describe('network span plugin', () => {
   let xhrTracker: MockRequestTracker
   let fetchTracker: MockRequestTracker
-  let spanFactory: MockSpanFactory
+  let spanFactory: MockSpanFactory<BrowserConfiguration>
 
   beforeEach(() => {
     xhrTracker = new MockRequestTracker()
@@ -134,7 +134,7 @@ describe('network span plugin', () => {
   })
 
   it('does not push network spans to the context stack', () => {
-    const client = createTestClient({ plugins: (spanFactory) => [new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)] })
+    const client = createTestClient<BrowserSchema, BrowserConfiguration>({ plugins: (spanFactory) => [new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)] })
     const rootSpan = client.startSpan('root span')
 
     fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })

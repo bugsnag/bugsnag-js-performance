@@ -22,7 +22,7 @@ interface InternalRouteChangeSpanOptions extends RouteChangeSpanOptions {
 
 export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   constructor (
-    private readonly spanFactory: SpanFactory,
+    private readonly spanFactory: SpanFactory<BrowserConfiguration>,
     private readonly location: Location,
     private readonly document: Document
   ) {}
