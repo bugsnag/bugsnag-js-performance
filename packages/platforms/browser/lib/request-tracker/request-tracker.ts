@@ -2,6 +2,7 @@ export interface RequestStartContext {
   url: string
   method: string
   startTime: number
+  type: 'fetch' | 'xmlhttprequest'
 }
 
 export interface RequestEndContextSuccess {

@@ -1,14 +1,17 @@
-import {
-  type RequestTracker,
-  type RequestStartContext,
-  type RequestEndContext,
-  type RequestEndCallback
-} from '../request-tracker/request-tracker'
-import { type SpanFactory, type Plugin, type InternalConfiguration } from '@bugsnag/core-performance'
+import { type InternalConfiguration, type Logger, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
+import { defaultNetworkRequestCallback, type NetworkRequestCallback } from '../network-request-callback'
+import {
+  type RequestEndCallback,
+  type RequestEndContext,
+  type RequestStartContext,
+  type RequestTracker
+} from '../request-tracker/request-tracker'
 
 export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private configEndpoint: string = ''
+  private networkRequestCallback: NetworkRequestCallback = defaultNetworkRequestCallback
+  private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
 
   constructor (
     private spanFactory: SpanFactory,
@@ -17,15 +20,27 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   ) {}
 
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
+    this.logger = configuration.logger
+
     if (configuration.autoInstrumentNetworkRequests) {
       this.configEndpoint = configuration.endpoint
       this.xhrTracker.onStart(this.trackRequest)
       this.fetchTracker.onStart(this.trackRequest)
+      this.networkRequestCallback = configuration.networkRequestCallback
     }
   }
 
   private trackRequest = (startContext: RequestStartContext): RequestEndCallback | undefined => {
     if (!this.shouldTrackRequest(startContext)) return
+
+    const networkRequestInfo = this.networkRequestCallback({ url: startContext.url, type: startContext.type })
+
+    if (!networkRequestInfo) return
+
+    if (typeof networkRequestInfo.url !== 'string') {
+      this.logger.warn(`expected url to be a string following network request callback, got ${typeof networkRequestInfo.url}`)
+      return
+    }
 
     const span = this.spanFactory.startSpan(
       `[HTTP]/${startContext.method.toUpperCase()}`,
@@ -33,8 +48,8 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
     )
 
     span.setAttribute('bugsnag.span.category', 'network')
-    span.setAttribute('http.url', startContext.url)
     span.setAttribute('http.method', startContext.method)
+    span.setAttribute('http.url', networkRequestInfo.url)
 
     return (endContext: RequestEndContext) => {
       if (endContext.state === 'success') {

@@ -12,6 +12,7 @@ import createClock from '../../lib/clock'
 import { ControllableBackgroundingListener, IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 
 const START_CONTEXT: RequestStartContext = {
+  type: 'fetch',
   url: 'https://www.bugsnag.com',
   method: 'GET',
   startTime: 1234

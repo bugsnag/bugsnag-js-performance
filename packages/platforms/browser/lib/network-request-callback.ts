@@ -1,6 +1,6 @@
 export interface NetworkRequestInfo {
   url: string
-  readonly type: string
+  readonly type: PerformanceResourceTiming['initiatorType']
 }
 
 export type NetworkRequestCallback = (networkRequestInfo: NetworkRequestInfo) => NetworkRequestInfo | null
