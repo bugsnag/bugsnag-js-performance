@@ -445,7 +445,7 @@ describe('FullPageLoadPlugin', () => {
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { Promise.resolve().then(() => { onSettleCallback(1234) }) }
     const webVitals = new WebVitals(performance, clock, manager.createPerformanceObserverFakeClass())
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
