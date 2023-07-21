@@ -2,13 +2,24 @@
  * @jest-environment jsdom
  */
 
-import { InMemoryDelivery, IncrementingIdGenerator, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
+import { InMemoryDelivery, IncrementingClock, IncrementingIdGenerator, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { ResourceLoadPlugin } from '../../lib/auto-instrumentation/resource-load-plugin'
-import { type BrowserConfiguration, type BrowserSchema } from '../../lib/config'
-import { PerformanceObserverManager } from '../utilities'
+import { createSchema, type BrowserConfiguration, type BrowserSchema } from '../../lib/config'
+import { createDefaultRoutingProvider } from '../../lib/default-routing-provider'
+import createOnSettle from '../../lib/on-settle'
+import { RequestTracker } from '../../lib/request-tracker/request-tracker'
+import { PerformanceFake, PerformanceObserverManager } from '../utilities'
 import { createPerformanceResourceNavigationTimingFake } from '../utilities/performance-entry'
 
 jest.useFakeTimers()
+
+const performance = new PerformanceFake()
+const fetchRequestTracker = new RequestTracker()
+const xhrRequestTracker = new RequestTracker()
+
+const onSettle = createOnSettle(new IncrementingClock(), window, fetchRequestTracker, xhrRequestTracker, performance)
+const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle, window.location)
+const schema = createSchema(window.location.hostname, new DefaultRoutingProvider())
 
 describe('ResourceLoadPlugin', () => {
   it('automatically creates a ResourceLoad span for a custom span', async () => {
@@ -18,6 +29,7 @@ describe('ResourceLoadPlugin', () => {
     const idGenerator = new IncrementingIdGenerator()
 
     const client = createTestClient<BrowserSchema, BrowserConfiguration>({
+      schema,
       idGenerator,
       deliveryFactory: () => delivery,
       plugins: (spanFactory, spanContextStorage) => [
@@ -67,6 +79,7 @@ describe('ResourceLoadPlugin', () => {
     const idGenerator = new IncrementingIdGenerator()
 
     const client = createTestClient<BrowserSchema, BrowserConfiguration>({
+      schema,
       idGenerator,
       deliveryFactory: () => delivery,
       plugins: (spanFactory, spanContextStorage) => [
@@ -107,6 +120,7 @@ describe('ResourceLoadPlugin', () => {
     const idGenerator = new IncrementingIdGenerator()
 
     const client = createTestClient<BrowserSchema, BrowserConfiguration>({
+      schema,
       idGenerator,
       deliveryFactory: () => delivery,
       plugins: (spanFactory, spanContextStorage) => [
@@ -146,6 +160,7 @@ describe('ResourceLoadPlugin', () => {
     const idGenerator = new IncrementingIdGenerator()
 
     const client = createTestClient<BrowserSchema, BrowserConfiguration>({
+      schema,
       idGenerator,
       deliveryFactory: () => delivery,
       plugins: (spanFactory, spanContextStorage) => [

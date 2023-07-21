@@ -53,8 +53,10 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
 
         const parentContext = this.spanContextStorage.first
 
-        if (parentContext) {
-          const url = new URL(entry.name)
+        const networkRequestInfo = configuration.networkRequestCallback({ url: entry.name, type: entry.initiatorType })
+
+        if (parentContext && networkRequestInfo) {
+          const url = new URL(networkRequestInfo.url)
           url.search = ''
           const name = url.href
 
@@ -65,7 +67,7 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
           })
 
           span.setAttribute('bugsnag.span.category', 'resource_load')
-          span.setAttribute('http.url', entry.name)
+          span.setAttribute('http.url', networkRequestInfo.url)
 
           const httpFlavor = getHttpVersion(entry.nextHopProtocol)
           if (httpFlavor) {
