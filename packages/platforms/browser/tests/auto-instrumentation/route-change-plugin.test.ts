@@ -270,12 +270,12 @@ describe('RouteChangePlugin', () => {
     })
   })
 
-  it('sendPageAttributes', async () => {
+  it('excludes attributes specified in sendPageAttributes', async () => {
     const DefaultRoutingProvider = createDefaultRoutingProvider(mockOnSettle, window.location)
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
 
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
