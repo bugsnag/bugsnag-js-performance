@@ -7,7 +7,7 @@ import {
   VALID_API_KEY,
   createTestClient
 } from '@bugsnag/js-performance-test-utilities'
-import { createSchema } from '../../lib/config'
+import { type BrowserConfiguration, type BrowserSchema, createSchema } from '../../lib/config'
 import createOnSettle from '../../lib/on-settle'
 import {
   RequestTracker,
@@ -300,7 +300,7 @@ describe('onSettle', () => {
       performance
     )
 
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       plugins: (spanFactory) => [onSettle]
     })
@@ -341,7 +341,7 @@ describe('onSettle', () => {
       performance
     )
 
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       plugins: (spanFactory) => [onSettle]
     })
@@ -375,7 +375,7 @@ describe('onSettle', () => {
       performance
     )
 
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       plugins: (spanFactory) => [onSettle]
     })

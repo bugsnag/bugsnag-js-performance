@@ -272,6 +272,7 @@ describe('Span', () => {
           }))
         })
       })
+
       describe('parentContext', () => {
         const parentContextOptions: any[] = [
           { type: 'true', parentContext: true },

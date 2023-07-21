@@ -4,6 +4,7 @@
 
 import { InMemoryDelivery, IncrementingIdGenerator, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { ResourceLoadPlugin } from '../../lib/auto-instrumentation/resource-load-plugin'
+import { type BrowserConfiguration, type BrowserSchema } from '../../lib/config'
 import { PerformanceObserverManager } from '../utilities'
 import { createPerformanceResourceNavigationTimingFake } from '../utilities/performance-entry'
 
@@ -16,7 +17,7 @@ describe('ResourceLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const idGenerator = new IncrementingIdGenerator()
 
-    const client = createTestClient({
+    const client = createTestClient<BrowserSchema, BrowserConfiguration>({
       idGenerator,
       deliveryFactory: () => delivery,
       plugins: (spanFactory, spanContextStorage) => [
@@ -65,7 +66,7 @@ describe('ResourceLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const idGenerator = new IncrementingIdGenerator()
 
-    const client = createTestClient({
+    const client = createTestClient<BrowserSchema, BrowserConfiguration>({
       idGenerator,
       deliveryFactory: () => delivery,
       plugins: (spanFactory, spanContextStorage) => [
@@ -105,7 +106,7 @@ describe('ResourceLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const idGenerator = new IncrementingIdGenerator()
 
-    const client = createTestClient({
+    const client = createTestClient<BrowserSchema, BrowserConfiguration>({
       idGenerator,
       deliveryFactory: () => delivery,
       plugins: (spanFactory, spanContextStorage) => [
@@ -144,7 +145,7 @@ describe('ResourceLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const idGenerator = new IncrementingIdGenerator()
 
-    const client = createTestClient({
+    const client = createTestClient<BrowserSchema, BrowserConfiguration>({
       idGenerator,
       deliveryFactory: () => delivery,
       plugins: (spanFactory, spanContextStorage) => [

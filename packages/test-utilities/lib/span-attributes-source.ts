@@ -1,9 +1,12 @@
-import { type SpanAttribute } from '@bugsnag/core-performance'
+import { type Configuration, type SpanAttributesSource } from '@bugsnag/core-performance'
 
-function spanAttributesSource (): Map<string, SpanAttribute> {
-  const spanAttributes = new Map()
+const spanAttributesSource: SpanAttributesSource<Configuration> = {
+  configure () {
 
-  return spanAttributes
+  },
+  requestAttributes () {
+
+  }
 }
 
 export default spanAttributesSource

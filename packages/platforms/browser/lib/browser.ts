@@ -6,8 +6,8 @@ import { createSchema } from './config'
 import { createDefaultRoutingProvider } from './default-routing-provider'
 import createBrowserDeliveryFactory from './delivery'
 import idGenerator from './id-generator'
-import makeBrowserPersistence from './persistence'
 import createOnSettle from './on-settle'
+import makeBrowserPersistence from './persistence'
 import createFetchRequestTracker from './request-tracker/request-tracker-fetch'
 import createXmlHttpRequestTracker from './request-tracker/request-tracker-xhr'
 import createResourceAttributesSource from './resource-attributes-source'
@@ -15,9 +15,9 @@ import createSpanAttributesSource from './span-attributes-source'
 import { WebVitals } from './web-vitals'
 
 const backgroundingListener = createBrowserBackgroundingListener(document)
+const spanAttributesSource = createSpanAttributesSource(document)
 const clock = createClock(performance, backgroundingListener)
 const persistence = makeBrowserPersistence(window)
-const spanAttributesSource = createSpanAttributesSource(document.title, window.location.href)
 const resourceAttributesSource = createResourceAttributesSource(navigator, persistence)
 const fetchRequestTracker = createFetchRequestTracker(window, clock)
 const xhrRequestTracker = createXmlHttpRequestTracker(window, clock)

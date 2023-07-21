@@ -35,7 +35,7 @@ function resourceLoadSupported (PerformanceObserverClass: typeof PerformanceObse
 
 export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
   constructor (
-    private readonly spanFactory: SpanFactory,
+    private readonly spanFactory: SpanFactory<BrowserConfiguration>,
     private readonly spanContextStorage: SpanContextStorage,
     private readonly PerformanceObserverClass: typeof PerformanceObserver
   ) {}
