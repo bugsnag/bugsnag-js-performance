@@ -197,4 +197,79 @@ describe('ResourceLoadPlugin', () => {
       }])
     }))
   })
+
+  it('prevents creating a span when networkRequestCallback returns null', async () => {
+    const delivery = new InMemoryDelivery()
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const idGenerator = new IncrementingIdGenerator()
+
+    const client = createTestClient<BrowserSchema, BrowserConfiguration>({
+      schema,
+      idGenerator,
+      deliveryFactory: () => delivery,
+      plugins: (spanFactory, spanContextStorage) => [
+        new ResourceLoadPlugin(spanFactory, spanContextStorage, Observer)
+      ]
+    })
+
+    client.start({ apiKey: VALID_API_KEY, networkRequestCallback: (info) => info.url.includes('personally-identifiable-information') ? null : info })
+
+    const span = client.startSpan('custom-span')
+
+    manager.queueEntry(createPerformanceResourceNavigationTimingFake({ name: 'https://bugsnag.com/image1.jpg' }))
+    manager.queueEntry(createPerformanceResourceNavigationTimingFake({ name: 'https://bugsnag.com/personally-identifiable-information.jpg' }))
+    manager.flushQueue()
+
+    span.end()
+
+    await jest.runOnlyPendingTimersAsync()
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: '[ResourceLoad]https://bugsnag.com/image1.jpg',
+      attributes: expect.arrayContaining([{
+        key: 'http.flavor',
+        value: {
+          stringValue: '2.0'
+        }
+      }])
+    }))
+
+    expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+      name: '[ResourceLoad]https://bugsnag.com/personally-identifiable-information.jpg'
+    }))
+
+    expect(delivery.requests.length).toBe(1)
+  })
+
+  it('uses a modified url from networkRequestCallback', async () => {
+    const delivery = new InMemoryDelivery()
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const idGenerator = new IncrementingIdGenerator()
+
+    const client = createTestClient<BrowserSchema, BrowserConfiguration>({
+      schema,
+      idGenerator,
+      deliveryFactory: () => delivery,
+      plugins: (spanFactory, spanContextStorage) => [
+        new ResourceLoadPlugin(spanFactory, spanContextStorage, Observer)
+      ]
+    })
+
+    client.start({ apiKey: VALID_API_KEY, networkRequestCallback: (info) => info.url.includes('personally-identifiable-information') ? { ...info, url: 'https://bugsnag.com/redacted-url.jpg' } : info })
+
+    const span = client.startSpan('custom-span')
+
+    manager.queueEntry(createPerformanceResourceNavigationTimingFake({ name: 'https://bugsnag.com/personally-identifiable-information.jpg' }))
+    manager.flushQueue()
+
+    span.end()
+
+    await jest.runOnlyPendingTimersAsync()
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: '[ResourceLoad]https://bugsnag.com/redacted-url.jpg'
+    }))
+  })
 })
