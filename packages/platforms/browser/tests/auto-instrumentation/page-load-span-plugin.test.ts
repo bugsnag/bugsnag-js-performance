@@ -438,6 +438,47 @@ describe('FullPageLoadPlugin', () => {
     }))
   })
 
+  it('blocks span attributes based on sendPageAttributes config', async () => {
+    const performance = new PerformanceFake()
+    const manager = new PerformanceObserverManager()
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+    const delivery = new InMemoryDelivery()
+    const onSettle: OnSettle = (onSettleCallback) => { Promise.resolve().then(() => { onSettleCallback(1234) }) }
+    const webVitals = new WebVitals(performance, clock, manager.createPerformanceObserverFakeClass())
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
+      clock,
+      deliveryFactory: () => delivery,
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      plugins: (spanFactory) => [
+        new FullPageLoadPlugin(
+          document,
+          window.location,
+          spanFactory,
+          webVitals,
+          onSettle,
+          new ControllableBackgroundingListener(),
+          performance
+        )
+      ]
+    })
+
+    testClient.start({ apiKey: VALID_API_KEY, sendPageAttributes: { url: false, referrer: false, title: false } })
+
+    await jest.runOnlyPendingTimersAsync()
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/initial-route' }))
+
+    const spans = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans
+    const span = spans[spans.length - 1]
+
+    expect(span).toHaveAttribute('bugsnag.span.category', 'full_page_load')
+    expect(span).toHaveAttribute('bugsnag.browser.page.route', '/initial-route')
+
+    // excluded by spendPageAttributes
+    expect(span).not.toHaveAttribute('bugsnag.browser.page.referrer')
+    expect(span).not.toHaveAttribute('bugsnag.browser.page.url')
+    expect(span).not.toHaveAttribute('bugsnag.browser.page.title')
+  })
   describe('WebVitals', () => {
     describe('lcp', () => {
       it('uses the latest lcp entry (multiple entries)', async () => {

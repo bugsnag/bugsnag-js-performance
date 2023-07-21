@@ -5,7 +5,7 @@
 ### Added
 
 - (browser) Added new `networkRequestCallback` config option [#262](https://github.com/bugsnag/bugsnag-js-performance/pull/262)
-- (browser) Add `sendPageAttributes` configuration option [#266](https://github.com/bugsnag/bugsnag-js-performance/pull/266)
+- (browser) Add `sendPageAttributes` configuration option [#266](https://github.com/bugsnag/bugsnag-js-performance/pull/266) [#270](https://github.com/bugsnag/bugsnag-js-performance/pull/270)
 
 ### Fixed
 
