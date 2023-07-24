@@ -59,7 +59,8 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
           if (!networkRequestInfo) return
 
           if (typeof networkRequestInfo.url !== 'string') {
-            configuration.logger.warn(`expected url to be a string following network request callback, got ${typeof networkRequestInfo.url}`); return
+            configuration.logger.warn(`expected url to be a string following network request callback, got ${typeof networkRequestInfo.url}`)
+            return
           }
 
           let name = ''
@@ -68,7 +69,8 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
             url.search = ''
             name = url.href
           } catch (err) {
-            configuration.logger.warn(`Unable to parse URL returned from networkRequestCallback: ${networkRequestInfo.url}`); return
+            configuration.logger.warn(`Unable to parse URL returned from networkRequestCallback: ${networkRequestInfo.url}`)
+            return
           }
 
           const span = this.spanFactory.startSpan(`[ResourceLoad]${name}`, {
