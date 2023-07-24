@@ -56,7 +56,11 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
         if (parentContext) {
           const networkRequestInfo = configuration.networkRequestCallback({ url: entry.name, type: entry.initiatorType })
 
-          if (!networkRequestInfo || typeof networkRequestInfo.url !== 'string') return
+          if (!networkRequestInfo) return
+
+          if (typeof networkRequestInfo.url !== 'string') {
+            configuration.logger.warn(`expected url to be a string following network request callback, got ${typeof networkRequestInfo.url}`); return
+          }
 
           const url = new URL(networkRequestInfo.url)
           url.search = ''
