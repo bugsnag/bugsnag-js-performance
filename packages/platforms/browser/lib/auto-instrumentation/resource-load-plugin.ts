@@ -54,9 +54,24 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
         const parentContext = this.spanContextStorage.first
 
         if (parentContext) {
-          const url = new URL(entry.name)
-          url.search = ''
-          const name = url.href
+          const networkRequestInfo = configuration.networkRequestCallback({ url: entry.name, type: entry.initiatorType })
+
+          if (!networkRequestInfo) return
+
+          if (typeof networkRequestInfo.url !== 'string') {
+            configuration.logger.warn(`expected url to be a string following network request callback, got ${typeof networkRequestInfo.url}`)
+            return
+          }
+
+          let name = ''
+          try {
+            const url = new URL(networkRequestInfo.url)
+            url.search = ''
+            name = url.href
+          } catch (err) {
+            configuration.logger.warn(`Unable to parse URL returned from networkRequestCallback: ${networkRequestInfo.url}`)
+            return
+          }
 
           const span = this.spanFactory.startSpan(`[ResourceLoad]${name}`, {
             parentContext,
@@ -65,7 +80,7 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
           })
 
           span.setAttribute('bugsnag.span.category', 'resource_load')
-          span.setAttribute('http.url', entry.name)
+          span.setAttribute('http.url', networkRequestInfo.url)
 
           const httpFlavor = getHttpVersion(entry.nextHopProtocol)
           if (httpFlavor) {
