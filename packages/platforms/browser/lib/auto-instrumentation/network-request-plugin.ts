@@ -60,6 +60,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   }
 
   private shouldTrackRequest (startContext: RequestStartContext): boolean {
-    return startContext.url !== this.configEndpoint
+    const permittedPrefixes = ['http://', 'https://', '/', './', '../']
+    return startContext.url !== this.configEndpoint && permittedPrefixes.some((prefix) => startContext.url.startsWith(prefix))
   }
 }

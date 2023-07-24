@@ -103,6 +103,51 @@ describe('network span plugin', () => {
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
   })
 
+  const expectedProtocols = [
+    'http://bugsnag.com/image.jpg',
+    'https://bugsnag.com/image.jpg',
+    '/bugsnag.jpg',
+    './bugsnag.jpg',
+    '../bugsnag.jpg',
+    '../../images/bugsnag.jpg'
+  ]
+
+  it.each(expectedProtocols)('tracks requests over all expected protocols', (url) => {
+    const plugin = new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)
+
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true
+    }))
+
+    fetchTracker.start({ type: 'fetch', method: 'GET', url, startTime: 1 })
+    expect(spanFactory.startSpan).toHaveBeenCalled()
+  })
+
+  const unexpectedProtocols = [
+    'chrome://<settings>/<path>/[<specificSetting>]',
+    'chrome-extension://<extensionID>/<pageName>.html',
+    'properties://browser/clickID',
+    'zoommtg://zoom.us/join?confno=1234',
+    'slack://open?team=1234',
+    'javascript:<javascript to execute>',
+    'ws:websocket-address',
+    'spotify:search:bugsnag',
+    'session:help@root-level.store'
+  ]
+
+  it.each(unexpectedProtocols)('does not track requests over unexpected protocols', (url) => {
+    const plugin = new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)
+
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true
+    }))
+
+    fetchTracker.start({ type: 'fetch', method: 'GET', url, startTime: 1 })
+    expect(spanFactory.startSpan).not.toHaveBeenCalled()
+  })
+
   it('discards the span if the status is 0', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, fetchTracker, xhrTracker)
 
