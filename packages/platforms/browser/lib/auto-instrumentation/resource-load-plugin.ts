@@ -53,9 +53,11 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
 
         const parentContext = this.spanContextStorage.first
 
-        const networkRequestInfo = configuration.networkRequestCallback({ url: entry.name, type: entry.initiatorType })
+        if (parentContext) {
+          const networkRequestInfo = configuration.networkRequestCallback({ url: entry.name, type: entry.initiatorType })
 
-        if (parentContext && networkRequestInfo) {
+          if (!networkRequestInfo) return
+
           const url = new URL(networkRequestInfo.url)
           url.search = ''
           const name = url.href
