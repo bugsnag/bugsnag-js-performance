@@ -62,9 +62,14 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
             configuration.logger.warn(`expected url to be a string following network request callback, got ${typeof networkRequestInfo.url}`); return
           }
 
-          const url = new URL(networkRequestInfo.url)
-          url.search = ''
-          const name = url.href
+          let name = ''
+          try {
+            const url = new URL(networkRequestInfo.url)
+            url.search = ''
+            name = url.href
+          } catch (err) {
+            configuration.logger.warn('unable to parse url'); return
+          }
 
           const span = this.spanFactory.startSpan(`[ResourceLoad]${name}`, {
             parentContext,
