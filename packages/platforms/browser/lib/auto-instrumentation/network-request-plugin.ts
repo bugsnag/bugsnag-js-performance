@@ -8,6 +8,8 @@ import {
   type RequestTracker
 } from '../request-tracker/request-tracker'
 
+const permittedPrefixes = ['http://', 'https://', '/', './', '../']
+
 export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private configEndpoint: string = ''
   private networkRequestCallback: NetworkRequestCallback = defaultNetworkRequestCallback
@@ -60,7 +62,6 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   }
 
   private shouldTrackRequest (startContext: RequestStartContext): boolean {
-    const permittedPrefixes = ['http://', 'https://', '/', './', '../']
     return startContext.url !== this.configEndpoint && permittedPrefixes.some((prefix) => startContext.url.startsWith(prefix))
   }
 }
