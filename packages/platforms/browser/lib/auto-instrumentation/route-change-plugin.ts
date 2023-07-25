@@ -2,6 +2,7 @@ import { coreSpanOptionSchema, isString, validateSpanOptions, type InternalConfi
 import { type BrowserConfiguration } from '../config'
 import { type RouteChangeSpanOptions } from '../routing-provider'
 import { getPermittedAttributes } from '../send-page-attributes'
+import { defaultRouteResolver } from '../default-routing-provider'
 
 // exclude isFirstClass from the route change option schema
 const { startTime, parentContext, makeCurrentContext } = coreSpanOptionSchema
@@ -31,7 +32,9 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     if (!configuration.autoInstrumentRouteChanges) return
 
-    let previousRoute = configuration.routingProvider.resolveRoute(new URL(this.location.href))
+    const previousUrl = new URL(this.location.href)
+    let previousRoute = configuration.routingProvider.resolveRoute(previousUrl) || defaultRouteResolver(previousUrl)
+
     const permittedAttributes = getPermittedAttributes(configuration.sendPageAttributes)
 
     configuration.routingProvider.listenForRouteChanges((url, trigger, options) => {
@@ -68,7 +71,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
         configuration.logger
       )
 
-      const route = configuration.routingProvider.resolveRoute(absoluteUrl)
+      const route = configuration.routingProvider.resolveRoute(absoluteUrl) || defaultRouteResolver(absoluteUrl)
 
       // update the span name using the validated route
       cleanOptions.name += route
