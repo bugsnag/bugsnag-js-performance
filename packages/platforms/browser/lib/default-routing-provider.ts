@@ -2,7 +2,7 @@ import { type OnSettle } from './on-settle'
 import getAbsoluteUrl from './request-tracker/url-helpers'
 import { type RouteResolver, type RoutingProvider, type StartRouteChangeCallback } from './routing-provider'
 
-export const defaultRouteResolver: RouteResolver = (url: URL) => url.pathname || url.toString()
+export const defaultRouteResolver: RouteResolver = (url: URL) => url.pathname || '/'
 
 export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Location) => {
   return class DefaultRoutingProvider implements RoutingProvider {
