@@ -31,7 +31,9 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     if (!configuration.autoInstrumentRouteChanges) return
 
-    let previousRoute = configuration.routingProvider.resolveRoute(new URL(this.location.href))
+    const previousUrl = new URL(this.location.href)
+    let previousRoute = configuration.routingProvider.resolveRoute(previousUrl) || previousUrl.pathname
+
     const permittedAttributes = getPermittedAttributes(configuration.sendPageAttributes)
 
     configuration.routingProvider.listenForRouteChanges((url, trigger, options) => {
@@ -68,7 +70,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
         configuration.logger
       )
 
-      const route = configuration.routingProvider.resolveRoute(absoluteUrl)
+      const route = configuration.routingProvider.resolveRoute(absoluteUrl) || absoluteUrl.pathname
 
       // update the span name using the validated route
       cleanOptions.name += route
