@@ -4,6 +4,8 @@
 
 import { createDefaultRoutingProvider, defaultRouteResolver } from '../lib/default-routing-provider'
 
+jest.useFakeTimers()
+
 describe('defaultRouteResolver', () => {
   const array = [
     {
@@ -58,6 +60,8 @@ describe('DefaultRoutingProvider', () => {
       routingProvider.listenForRouteChanges(startRouteChangeSpan)
 
       history.back()
+
+      jest.runAllTimers()
 
       expect(startRouteChangeSpan).toHaveBeenCalled()
     })
