@@ -11,7 +11,7 @@
 
 - (browser) Calculate time origin on create as well as visibility change [#268](https://github.com/bugsnag/bugsnag-js-performance/pull/268)
 - (browser) Only track network requests over http(s) [#275](https://github.com/bugsnag/bugsnag-js-performance/pull/275)
-- (browser) Return full url from default route resolver when route is empty [#276](https://github.com/bugsnag/bugsnag-js-performance/pull/276)
+- (browser) Use pathname when resolved route is empty or undefined [#276](https://github.com/bugsnag/bugsnag-js-performance/pull/276)
 
 ### Removed
 
