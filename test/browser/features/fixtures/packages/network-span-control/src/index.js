@@ -46,3 +46,23 @@ document.getElementById('xhr-prevented').addEventListener('click', () => {
   xhr.open('GET', reflectEndpoint)
   xhr.send()
 })
+
+document.getElementById('page-load-full-attributes').addEventListener('click', () => {
+  BugsnagPerformance.start({
+    ...commonConfig,
+    autoInstrumentFullPageLoads: true,
+    batchInactivityTimeoutMs: 5000,
+    maximumBatchSize: 13 
+  })
+})
+
+document.getElementById('page-load-no-attributes').addEventListener('click', () => {
+  BugsnagPerformance.start({
+    ...commonConfig,
+    sendPageAttributes: { url: false, referrer: false, title: false },
+    autoInstrumentFullPageLoads: true,
+    batchInactivityTimeoutMs: 5000,
+    maximumBatchSize: 13
+  })
+})
+
