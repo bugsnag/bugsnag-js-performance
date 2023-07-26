@@ -22,7 +22,8 @@ describe('TracePayloadEncoder', () => {
         kind: 1,
         traceId: '36d2995627e423c69b09bb8dd63157b0',
         startTime: 1,
-        endTime: 2
+        endTime: 2,
+        samplingProbability: createSamplingProbability(0.5)
       }),
       createEndedSpan({
         id: '389cbf7a934bf299',
@@ -30,7 +31,8 @@ describe('TracePayloadEncoder', () => {
         kind: 1,
         traceId: '6aa28c93e95d309b7b5d9888dd2d688d',
         startTime: 3,
-        endTime: 4
+        endTime: 4,
+        samplingProbability: createSamplingProbability(0.5)
       }),
       createEndedSpan({
         id: 'e1bafc75f74e62ee',
