@@ -31,7 +31,7 @@ Feature: Network spans
         When I click the element "failed-requests"
         Then I should have received no spans
 
-    Scenario: Attributes can be modified by networkRequestCallback
+    Scenario: Attributes can be modified by networkRequestCallback using fetch
         Given I navigate to the test URL "/network-span-control"
         When I click the element "fetch-modified-url"
         And I wait to receive 1 traces
@@ -41,6 +41,7 @@ Feature: Network spans
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.url" matches the regex "^http:\/\/.+:\d{4}\/reflect\?status=200\&delay_ms=0&not-your-ordinary-url=true$"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer attribute "http.status_code" equals 200
 
+    Scenario: Attributes can be modified by networkRequestCallback using xhr
         Given I navigate to the test URL "/network-span-control"
         When I click the element "xhr-modified-url"
         And I wait to receive 1 traces
@@ -50,11 +51,12 @@ Feature: Network spans
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.url" matches the regex "^http:\/\/.+:\d{4}\/reflect\?status=200\&delay_ms=0&not-your-ordinary-url=true$"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer attribute "http.status_code" equals 200
 
-    Scenario: Delivery of spans can be prevented by networkRequestCallback
+    Scenario: Delivery of spans can be prevented by networkRequestCallback using fetch
         Given I navigate to the test URL "/network-span-control"
         When I click the element "fetch-prevented"
         Then I should have received no spans
 
+    Scenario: Delivery of spans can be prevented by networkRequestCallback using xhr
         Given I navigate to the test URL "/network-span-control"
         When I click the element "xhr-prevented"
         Then I should have received no spans
