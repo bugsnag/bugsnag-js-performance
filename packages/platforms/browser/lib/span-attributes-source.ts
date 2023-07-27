@@ -1,13 +1,32 @@
-import type { SpanAttribute, SpanAttributesSource } from '@bugsnag/core-performance'
+import type { InternalConfiguration, SpanAttributesSource, SpanInternal } from '@bugsnag/core-performance'
+import { type BrowserConfiguration } from './config'
 
-const createSpanAttributesSource = (title: string, url: string): SpanAttributesSource => {
-  return () => {
-    const spanAttributes = new Map<string, SpanAttribute>()
-    spanAttributes.set('bugsnag.span.category', 'custom')
-    spanAttributes.set('bugsnag.browser.page.url', url)
-    spanAttributes.set('bugsnag.browser.page.title', title)
+export const createSpanAttributesSource = (document: Document): SpanAttributesSource<BrowserConfiguration> => {
+  const defaultAttributes = {
+    url: {
+      name: 'bugsnag.browser.page.url',
+      getValue: () => document.location.href,
+      permitted: false
+    },
+    title: {
+      name: 'bugsnag.browser.page.title',
+      getValue: () => document.title,
+      permitted: false
+    }
+  }
 
-    return spanAttributes
+  return {
+    configure (configuration: InternalConfiguration<BrowserConfiguration>) {
+      defaultAttributes.title.permitted = configuration.sendPageAttributes.title || false
+      defaultAttributes.url.permitted = configuration.sendPageAttributes.url || false
+    },
+    requestAttributes (span: SpanInternal) {
+      for (const attribute of Object.values(defaultAttributes)) {
+        if (attribute.permitted) {
+          span.setAttribute(attribute.name, attribute.getValue())
+        }
+      }
+    }
   }
 }
 

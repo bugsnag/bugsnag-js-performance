@@ -7,11 +7,12 @@ import {
 import { type BrowserConfiguration } from '../config'
 import { type OnSettle } from '../on-settle'
 import { type PerformanceWithTiming } from '../on-settle/load-event-end-settler'
+import { getPermittedAttributes } from '../send-page-attributes'
 import { type WebVitals } from '../web-vitals'
 import { instrumentPageLoadPhaseSpans } from './page-load-phase-spans'
 
 export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
-  private readonly spanFactory: SpanFactory
+  private readonly spanFactory: SpanFactory<BrowserConfiguration>
   private readonly document: Document
   private readonly location: Location
   private readonly onSettle: OnSettle
@@ -25,7 +26,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   constructor (
     document: Document,
     location: Location,
-    spanFactory: SpanFactory,
+    spanFactory: SpanFactory<BrowserConfiguration>,
     webVitals: WebVitals,
     onSettle: OnSettle,
     backgroundingListener: BackgroundingListener,
@@ -53,6 +54,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     }
 
     const span = this.spanFactory.startSpan('[FullPageLoad]', { startTime: 0, parentContext: null })
+    const permittedAttributes = getPermittedAttributes(configuration.sendPageAttributes)
     const url = new URL(this.location.href)
 
     this.onSettle((endTime: number) => {
@@ -65,10 +67,10 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
 
       // Browser attributes
       span.setAttribute('bugsnag.span.category', 'full_page_load')
-      span.setAttribute('bugsnag.browser.page.referrer', this.document.referrer)
-      span.setAttribute('bugsnag.browser.page.title', this.document.title)
-      span.setAttribute('bugsnag.browser.page.url', url.toString())
       span.setAttribute('bugsnag.browser.page.route', route)
+      if (permittedAttributes.referrer) span.setAttribute('bugsnag.browser.page.referrer', this.document.referrer)
+      if (permittedAttributes.title) span.setAttribute('bugsnag.browser.page.title', this.document.title)
+      if (permittedAttributes.url) span.setAttribute('bugsnag.browser.page.url', url.toString())
 
       this.webVitals.attachTo(span)
       this.spanFactory.endSpan(span, endTime)

@@ -1,5 +1,23 @@
 # Changelog
 
+## v1.0.0 (2023-07-27)
+
+### Added
+
+- (browser) Added new `networkRequestCallback` config option [#262](https://github.com/bugsnag/bugsnag-js-performance/pull/262)
+- (browser) Add `sendPageAttributes` configuration option [#266](https://github.com/bugsnag/bugsnag-js-performance/pull/266) [#270](https://github.com/bugsnag/bugsnag-js-performance/pull/270) [#271](https://github.com/bugsnag/bugsnag-js-performance/pull/271)
+
+### Fixed
+
+- (browser) Calculate time origin on create as well as visibility change [#268](https://github.com/bugsnag/bugsnag-js-performance/pull/268)
+- (browser) Only track network requests over http(s) [#275](https://github.com/bugsnag/bugsnag-js-performance/pull/275)
+- (browser) Fall back to default route resolver when custom resolver returns empty string or undefined [#276](https://github.com/bugsnag/bugsnag-js-performance/pull/276)
+- (browser) Fix sampling logic when batching for delivery [#278](https://github.com/bugsnag/bugsnag-js-performance/pull/278)
+
+### Removed
+
+- Removed `@bugsnag/js-performance` meta package [#264](https://github.com/bugsnag/bugsnag-js-performance/pull/264)
+
 ## v0.3.0 (2023-07-17)
 
 ### Fixed

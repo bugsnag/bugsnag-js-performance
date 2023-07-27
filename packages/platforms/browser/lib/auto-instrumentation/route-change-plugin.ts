@@ -1,6 +1,8 @@
 import { coreSpanOptionSchema, isString, validateSpanOptions, type InternalConfiguration, type Plugin, type SpanFactory, type SpanOptionSchema } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
 import { type RouteChangeSpanOptions } from '../routing-provider'
+import { getPermittedAttributes } from '../send-page-attributes'
+import { defaultRouteResolver } from '../default-routing-provider'
 
 // exclude isFirstClass from the route change option schema
 const { startTime, parentContext, makeCurrentContext } = coreSpanOptionSchema
@@ -22,7 +24,7 @@ interface InternalRouteChangeSpanOptions extends RouteChangeSpanOptions {
 
 export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   constructor (
-    private readonly spanFactory: SpanFactory,
+    private readonly spanFactory: SpanFactory<BrowserConfiguration>,
     private readonly location: Location,
     private readonly document: Document
   ) {}
@@ -30,7 +32,10 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     if (!configuration.autoInstrumentRouteChanges) return
 
-    let previousRoute = configuration.routingProvider.resolveRoute(new URL(this.location.href))
+    const previousUrl = new URL(this.location.href)
+    let previousRoute = configuration.routingProvider.resolveRoute(previousUrl) || defaultRouteResolver(previousUrl)
+
+    const permittedAttributes = getPermittedAttributes(configuration.sendPageAttributes)
 
     configuration.routingProvider.listenForRouteChanges((url, trigger, options) => {
       let absoluteUrl
@@ -66,7 +71,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
         configuration.logger
       )
 
-      const route = configuration.routingProvider.resolveRoute(absoluteUrl)
+      const route = configuration.routingProvider.resolveRoute(absoluteUrl) || defaultRouteResolver(absoluteUrl)
 
       // update the span name using the validated route
       cleanOptions.name += route
@@ -74,9 +79,9 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
 
       span.setAttribute('bugsnag.span.category', 'route_change')
       span.setAttribute('bugsnag.browser.page.route', route)
-      span.setAttribute('bugsnag.browser.page.url', url.toString())
       span.setAttribute('bugsnag.browser.page.previous_route', previousRoute)
       span.setAttribute('bugsnag.browser.page.route_change.trigger', cleanOptions.options.trigger)
+      if (permittedAttributes.url) span.setAttribute('bugsnag.browser.page.url', url.toString())
 
       previousRoute = route
 
@@ -85,7 +90,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
         traceId: span.traceId,
         isValid: span.isValid,
         end: (endTime) => {
-          span.setAttribute('bugsnag.browser.page.title', this.document.title)
+          if (permittedAttributes.title) span.setAttribute('bugsnag.browser.page.title', this.document.title)
           this.spanFactory.toPublicApi(span).end(endTime)
         }
       }

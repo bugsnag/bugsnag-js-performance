@@ -2,12 +2,24 @@
  * @jest-environment jsdom
  */
 
-import { InMemoryDelivery, IncrementingIdGenerator, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
+import { InMemoryDelivery, IncrementingClock, IncrementingIdGenerator, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { ResourceLoadPlugin } from '../../lib/auto-instrumentation/resource-load-plugin'
-import { PerformanceObserverManager } from '../utilities'
+import { createSchema, type BrowserConfiguration, type BrowserSchema } from '../../lib/config'
+import { createDefaultRoutingProvider } from '../../lib/default-routing-provider'
+import createOnSettle from '../../lib/on-settle'
+import { RequestTracker } from '../../lib/request-tracker/request-tracker'
+import { PerformanceFake, PerformanceObserverManager } from '../utilities'
 import { createPerformanceResourceNavigationTimingFake } from '../utilities/performance-entry'
 
 jest.useFakeTimers()
+
+const performance = new PerformanceFake()
+const fetchRequestTracker = new RequestTracker()
+const xhrRequestTracker = new RequestTracker()
+
+const onSettle = createOnSettle(new IncrementingClock(), window, fetchRequestTracker, xhrRequestTracker, performance)
+const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle, window.location)
+const schema = createSchema(window.location.hostname, new DefaultRoutingProvider())
 
 describe('ResourceLoadPlugin', () => {
   it('automatically creates a ResourceLoad span for a custom span', async () => {
@@ -16,7 +28,8 @@ describe('ResourceLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const idGenerator = new IncrementingIdGenerator()
 
-    const client = createTestClient({
+    const client = createTestClient<BrowserSchema, BrowserConfiguration>({
+      schema,
       idGenerator,
       deliveryFactory: () => delivery,
       plugins: (spanFactory, spanContextStorage) => [
@@ -65,7 +78,8 @@ describe('ResourceLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const idGenerator = new IncrementingIdGenerator()
 
-    const client = createTestClient({
+    const client = createTestClient<BrowserSchema, BrowserConfiguration>({
+      schema,
       idGenerator,
       deliveryFactory: () => delivery,
       plugins: (spanFactory, spanContextStorage) => [
@@ -105,7 +119,8 @@ describe('ResourceLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const idGenerator = new IncrementingIdGenerator()
 
-    const client = createTestClient({
+    const client = createTestClient<BrowserSchema, BrowserConfiguration>({
+      schema,
       idGenerator,
       deliveryFactory: () => delivery,
       plugins: (spanFactory, spanContextStorage) => [
@@ -144,7 +159,8 @@ describe('ResourceLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const idGenerator = new IncrementingIdGenerator()
 
-    const client = createTestClient({
+    const client = createTestClient<BrowserSchema, BrowserConfiguration>({
+      schema,
       idGenerator,
       deliveryFactory: () => delivery,
       plugins: (spanFactory, spanContextStorage) => [
@@ -179,6 +195,81 @@ describe('ResourceLoadPlugin', () => {
       attributes: expect.not.arrayContaining([{
         key: 'http.flavor'
       }])
+    }))
+  })
+
+  it('prevents creating a span when networkRequestCallback returns null', async () => {
+    const delivery = new InMemoryDelivery()
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const idGenerator = new IncrementingIdGenerator()
+
+    const client = createTestClient<BrowserSchema, BrowserConfiguration>({
+      schema,
+      idGenerator,
+      deliveryFactory: () => delivery,
+      plugins: (spanFactory, spanContextStorage) => [
+        new ResourceLoadPlugin(spanFactory, spanContextStorage, Observer)
+      ]
+    })
+
+    client.start({ apiKey: VALID_API_KEY, networkRequestCallback: (info) => info.url.includes('personally-identifiable-information') ? null : info })
+
+    const span = client.startSpan('custom-span')
+
+    manager.queueEntry(createPerformanceResourceNavigationTimingFake({ name: 'https://bugsnag.com/image1.jpg' }))
+    manager.queueEntry(createPerformanceResourceNavigationTimingFake({ name: 'https://bugsnag.com/personally-identifiable-information.jpg' }))
+    manager.flushQueue()
+
+    span.end()
+
+    await jest.runOnlyPendingTimersAsync()
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: '[ResourceLoad]https://bugsnag.com/image1.jpg',
+      attributes: expect.arrayContaining([{
+        key: 'http.flavor',
+        value: {
+          stringValue: '2.0'
+        }
+      }])
+    }))
+
+    expect(delivery).not.toHaveSentSpan(expect.objectContaining({
+      name: '[ResourceLoad]https://bugsnag.com/personally-identifiable-information.jpg'
+    }))
+
+    expect(delivery.requests.length).toBe(1)
+  })
+
+  it('uses a modified url from networkRequestCallback', async () => {
+    const delivery = new InMemoryDelivery()
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const idGenerator = new IncrementingIdGenerator()
+
+    const client = createTestClient<BrowserSchema, BrowserConfiguration>({
+      schema,
+      idGenerator,
+      deliveryFactory: () => delivery,
+      plugins: (spanFactory, spanContextStorage) => [
+        new ResourceLoadPlugin(spanFactory, spanContextStorage, Observer)
+      ]
+    })
+
+    client.start({ apiKey: VALID_API_KEY, networkRequestCallback: (info) => info.url.includes('personally-identifiable-information') ? { ...info, url: 'https://bugsnag.com/redacted-url.jpg' } : info })
+
+    const span = client.startSpan('custom-span')
+
+    manager.queueEntry(createPerformanceResourceNavigationTimingFake({ name: 'https://bugsnag.com/personally-identifiable-information.jpg' }))
+    manager.flushQueue()
+
+    span.end()
+
+    await jest.runOnlyPendingTimersAsync()
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: '[ResourceLoad]https://bugsnag.com/redacted-url.jpg'
     }))
   })
 })

@@ -1,7 +1,7 @@
 import { SpanAttributes, type SpanAttributesSource } from './attributes'
 import { type BackgroundingListener, type BackgroundingListenerState } from './backgrounding-listener'
 import { type Clock } from './clock'
-import { type Logger } from './config'
+import { type Configuration, type Logger } from './config'
 import { type IdGenerator } from './id-generator'
 import { type Processor } from './processor'
 import { type ReadonlySampler } from './sampler'
@@ -10,11 +10,11 @@ import { type SpanContextStorage } from './span-context'
 import { timeToNumber } from './time'
 import { isSpanContext } from './validation'
 
-export class SpanFactory {
+export class SpanFactory <C extends Configuration> {
   private processor: Processor
   private readonly sampler: ReadonlySampler
   private readonly idGenerator: IdGenerator
-  private readonly spanAttributesSource: SpanAttributesSource
+  private readonly spanAttributesSource: SpanAttributesSource<C>
   private readonly clock: Clock
   private readonly spanContextStorage: SpanContextStorage
   private logger: Logger
@@ -26,7 +26,7 @@ export class SpanFactory {
     processor: Processor,
     sampler: ReadonlySampler,
     idGenerator: IdGenerator,
-    spanAttributesSource: SpanAttributesSource,
+    spanAttributesSource: SpanAttributesSource<C>,
     clock: Clock,
     backgroundingListener: BackgroundingListener,
     logger: Logger,
@@ -65,7 +65,7 @@ export class SpanFactory {
     const parentSpanId = parentContext ? parentContext.id : undefined
     const traceId = parentContext ? parentContext.traceId : this.idGenerator.generate(128)
 
-    const attributes = new SpanAttributes(this.spanAttributesSource())
+    const attributes = new SpanAttributes(new Map())
 
     if (typeof options.isFirstClass === 'boolean') {
       attributes.set('bugsnag.span.first_class', options.isFirstClass)
@@ -104,6 +104,8 @@ export class SpanFactory {
 
       return
     }
+
+    this.spanAttributesSource.requestAttributes(span)
 
     const spanEnded = span.end(endTime, this.sampler.spanProbability)
     this.spanContextStorage.pop(span)

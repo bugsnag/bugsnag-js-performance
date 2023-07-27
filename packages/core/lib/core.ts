@@ -28,9 +28,9 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration> {
   deliveryFactory: DeliveryFactory
   backgroundingListener: BackgroundingListener
   resourceAttributesSource: ResourceAttributeSource<C>
-  spanAttributesSource: SpanAttributesSource
+  spanAttributesSource: SpanAttributesSource<C>
   schema: S
-  plugins: (spanFactory: SpanFactory, spanContextStorage: SpanContextStorage) => Array<Plugin<C>>
+  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => Array<Plugin<C>>
   persistence: Persistence
   spanContextStorage?: SpanContextStorage
 }
@@ -58,6 +58,8 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
       const configuration = validateConfig<S, C>(config, options.schema)
 
       const delivery = options.deliveryFactory(configuration.endpoint)
+
+      options.spanAttributesSource.configure(configuration)
 
       ProbabilityManager.create(
         options.persistence,
@@ -97,6 +99,7 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
     startSpan: (name, spanOptions?: SpanOptions) => {
       const cleanOptions = validateSpanOptions(name, spanOptions, coreSpanOptionSchema, logger)
       const span = spanFactory.startSpan(cleanOptions.name, cleanOptions.options)
+      span.setAttribute('bugsnag.span.category', 'custom')
       return spanFactory.toPublicApi(span)
     },
     get currentSpanContext () {

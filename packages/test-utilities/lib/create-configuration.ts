@@ -19,6 +19,7 @@ function createConfiguration<C extends Configuration> (overrides: Partial<C> = {
       error: jest.fn()
     },
     appVersion: '',
+    networkRequestCallback: (networkRequestInfo: unknown) => networkRequestInfo,
     ...overrides
   } as unknown as InternalConfiguration<C>
 }

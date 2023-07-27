@@ -5,7 +5,7 @@
 
 import { InMemoryDelivery, IncrementingClock, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { RouteChangePlugin } from '../lib/auto-instrumentation/route-change-plugin'
-import { createSchema } from '../lib/config'
+import { type BrowserConfiguration, type BrowserSchema, createSchema } from '../lib/config'
 import { createDefaultRoutingProvider } from '../lib/default-routing-provider'
 import { isRoutingProvider } from '../lib/routing-provider'
 
@@ -19,7 +19,7 @@ describe('DefaultRoutingProvider', () => {
     const delivery = new InMemoryDelivery()
     const routeResolverFn = jest.fn((url: URL | string) => '/resolved-route')
     const routingProvier = new DefaultRoutingProvider(routeResolverFn)
-    const testClient = createTestClient({
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, routingProvier),
@@ -41,7 +41,7 @@ describe('DefaultRoutingProvider', () => {
       const clock = new IncrementingClock('1970-01-01T00:00:00Z')
       const delivery = new InMemoryDelivery()
       const routingProvier = new DefaultRoutingProvider()
-      const testClient = createTestClient({
+      const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         clock,
         deliveryFactory: () => delivery,
         schema: createSchema(window.location.hostname, routingProvier),

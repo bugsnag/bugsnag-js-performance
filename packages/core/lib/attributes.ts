@@ -1,9 +1,13 @@
-import { type InternalConfiguration, type Configuration } from './config'
+import { type Configuration, type InternalConfiguration } from './config'
+import { type SpanInternal } from './span'
 import { isNumber } from './validation'
 
 export type SpanAttribute = string | number | boolean
 
-export type SpanAttributesSource = () => Map<string, SpanAttribute>
+export interface SpanAttributesSource <C extends Configuration> {
+  configure: (configuration: InternalConfiguration<C>) => void
+  requestAttributes: (span: SpanInternal) => void
+}
 
 export class SpanAttributes {
   private readonly attributes: Map<string, SpanAttribute>

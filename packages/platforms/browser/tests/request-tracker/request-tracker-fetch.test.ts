@@ -43,6 +43,7 @@ describe('fetch Request Tracker', () => {
     expect(response.status).toEqual(status)
 
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'fetch',
       url: TEST_URL,
       method,
       startTime: 1
@@ -61,6 +62,7 @@ describe('fetch Request Tracker', () => {
 
     await expect(window.fetch(TEST_URL)).rejects.toEqual(new Error('Fail'))
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'fetch',
       url: TEST_URL,
       method: 'GET',
       startTime: 1
@@ -82,6 +84,7 @@ describe('fetch Request Tracker', () => {
     expect(response.status).toEqual(200)
 
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'fetch',
       url: TEST_URL,
       method: 'GET',
       startTime: 1
@@ -102,6 +105,7 @@ describe('fetch Request Tracker', () => {
     expect(response.status).toEqual(200)
 
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'fetch',
       url: TEST_URL,
       method: 'GET',
       startTime: 1
@@ -122,6 +126,7 @@ describe('fetch Request Tracker', () => {
     expect(response.status).toEqual(200)
 
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'fetch',
       url: TEST_URL,
       method: 'POST',
       startTime: 1
@@ -142,6 +147,7 @@ describe('fetch Request Tracker', () => {
     expect(response.status).toEqual(200)
 
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'fetch',
       url: TEST_URL,
       method: 'POST',
       startTime: 1
@@ -162,6 +168,7 @@ describe('fetch Request Tracker', () => {
     expect(response.status).toEqual(200)
 
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'fetch',
       url: `${window.location.origin}/test`,
       method: 'GET',
       startTime: 1
@@ -180,6 +187,7 @@ describe('fetch Request Tracker', () => {
 
     await expect(window.fetch(undefined as unknown as string)).rejects.toEqual(new Error('Fail'))
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'fetch',
       url: `${window.location.origin}/undefined`,
       method: 'GET',
       startTime: 1
@@ -200,6 +208,7 @@ describe('fetch Request Tracker', () => {
 
     await expect(window.fetch(null as unknown as RequestInfo)).rejects.toEqual(new Error('Fail'))
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'fetch',
       url: `${window.location.origin}/null`,
       method: 'GET',
       startTime: 1
@@ -221,6 +230,7 @@ describe('fetch Request Tracker', () => {
     const response = await window.fetch(TEST_URL, null as unknown as RequestInit)
     expect(response.status).toEqual(200)
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'fetch',
       url: TEST_URL,
       method: 'GET',
       startTime: 1
@@ -241,6 +251,7 @@ describe('fetch Request Tracker', () => {
     expect(response.status).toEqual(200)
 
     expect(startCallback).toHaveBeenCalledWith({
+      type: 'fetch',
       url: TEST_URL,
       method: 'GET',
       startTime: 1

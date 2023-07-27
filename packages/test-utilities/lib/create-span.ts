@@ -28,7 +28,7 @@ export function createEndedSpan (overrides: Partial<SpanEnded> = {}): SpanEnded 
     traceId,
     samplingRate: traceIdToSamplingRate(traceId),
     endTime: 23456,
-    samplingProbability: createSamplingProbability(0.5),
+    samplingProbability: createSamplingProbability(1),
     ...overrides
   }
 }

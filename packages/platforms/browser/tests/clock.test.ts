@@ -141,5 +141,27 @@ describe('Browser Clock', () => {
       // so timeOrigin has been recalculated from Date.now()
       expect(clock.convert(new Date())).toEqual(0)
     })
+
+    it('recalculates time origin on start if it has diverged more than 5 minutes', () => {
+      // fake performance with its own internal 'clock'
+      const performanceClockTime = new Date('2023-01-01T00:00:00.000Z')
+      const initialTimeOrigin = performanceClockTime.getTime()
+      const performanceFake = {
+        timeOrigin: initialTimeOrigin,
+        timing: { navigationStart: initialTimeOrigin },
+        now () {
+          return performanceClockTime.getTime() - initialTimeOrigin
+        }
+      }
+
+      // performance clock is > 5 minutes behind the system time
+      jest.setSystemTime(new Date('2023-01-01T00:05:00.001Z'))
+
+      const backgroundingListener = new ControllableBackgroundingListener()
+      const clock = createClock(performanceFake, backgroundingListener)
+
+      // timeOrigin should be recalculated from Date.now()
+      expect(clock.convert(new Date())).toEqual(0)
+    })
   })
 })

@@ -9,7 +9,7 @@ describe('Request Tracker', () => {
     requestTracker.onStart(startCallback)
     expect(startCallback).not.toHaveBeenCalled()
 
-    const context = { url: '/', method: 'GET', startTime: 1 }
+    const context = { type: 'fetch', url: '/', method: 'GET', startTime: 1 } as const
     requestTracker.start(context)
     expect(startCallback).toHaveBeenCalledWith(context)
   })
@@ -22,7 +22,7 @@ describe('Request Tracker', () => {
     requestTracker.onStart(startCallback)
     expect(startCallback).not.toHaveBeenCalled()
 
-    const startContext = { url: '/', method: 'GET', startTime: 1 }
+    const startContext = { type: 'fetch', url: '/', method: 'GET', startTime: 1 } as const
     const onEnd = requestTracker.start(startContext)
     expect(startCallback).toHaveBeenCalledWith(startContext)
     expect(endCallback).not.toHaveBeenCalled()
@@ -43,7 +43,7 @@ describe('Request Tracker', () => {
     expect(acceptCallback).not.toHaveBeenCalled()
     expect(rejectCallback).not.toHaveBeenCalled()
 
-    const startContext = { url: '/', method: 'GET', startTime: 1 }
+    const startContext = { type: 'fetch', url: '/', method: 'GET', startTime: 1 } as const
     const onEnd = requestTracker.start(startContext)
     expect(acceptCallback).toHaveBeenCalledWith(startContext)
     expect(rejectCallback).toHaveBeenCalledWith(startContext)
