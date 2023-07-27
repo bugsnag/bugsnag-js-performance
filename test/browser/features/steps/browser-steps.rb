@@ -195,6 +195,18 @@ Then('if a span named {string} exists, it has a parent named {string}') do |chil
   end
 end
 
+Then('a span named {string} does not contain the attribute {string}') do |span_name, expected_attribute|
+  spans = spans_from_request_list(Maze::Server.list_for('traces'))
+  named_spans = spans.find_all { |span| span['name'].eql?(span_name) }
+  raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{span_name}" if named_spans.empty?
+
+  named_spans.each do |span|    
+    if span['attributes'].any? { |attribute| attribute['key'].eql?(expected_attribute) }
+      raise Test::Unit::AssertionFailedError.new "Attribute #{expected_attribute} was present on span #{span_name}"
+    end
+  end
+end
+
 module Maze
   module Driver
     class Browser

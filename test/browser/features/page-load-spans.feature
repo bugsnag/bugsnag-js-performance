@@ -99,4 +99,11 @@ Feature: Page Load spans
             | bugsnag.browser.page.title                | stringValue  | New title       |
             | bugsnag.phase                             | stringValue  | TLS                   |
 
+    Scenario: Page load spans can have attributes dropped by sendPageAttributes config
+        Given I navigate to the test URL "/network-span-control"
+        When I click the element "page-load-no-attributes"
+        And I wait to receive 1 traces
 
+        Then a span named "[FullPageLoad]/network-span-control/" does not contain the attribute "bugsnag.browser.page.title"
+        And a span named "[FullPageLoad]/network-span-control/" does not contain the attribute "bugsnag.browser.page.url"
+        And a span named "[FullPageLoad]/network-span-control/" does not contain the attribute "bugsnag.browser.page.referrer"
