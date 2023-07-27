@@ -115,7 +115,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
     const probability = this.sampler.spanProbability
 
     for (const span of this.batch) {
-      if (span.samplingProbability.raw < probability.raw) {
+      if (span.samplingProbability.raw > probability.raw) {
         span.samplingProbability = probability
       }
 
