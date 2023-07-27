@@ -15,7 +15,7 @@ const commonConfig = {
 
 const modifiedUrlConfig = { 
   ...commonConfig,
-  networkRequestCallback: (networkRequestInfo) => ({ ...networkRequestInfo, url: 'not-your-ordinary-url' })
+  networkRequestCallback: (networkRequestInfo) => ({ ...networkRequestInfo, url: networkRequestInfo.url + '&not-your-ordinary-url=true' })
 }
 
 document.getElementById('fetch-modified-url').addEventListener('click', () => {

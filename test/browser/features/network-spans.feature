@@ -38,7 +38,7 @@ Feature: Network spans
         
         Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.method" equals "GET"
-        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.url" equals "not-your-ordinary-url"
+        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.url" matches the regex "^http:\/\/.+:\d{4}\/reflect\?status=200\&delay_ms=0&not-your-ordinary-url=true$"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer attribute "http.status_code" equals 200
 
         Given I navigate to the test URL "/network-span-control"
@@ -47,7 +47,7 @@ Feature: Network spans
         
         Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.method" equals "GET"
-        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.url" equals "not-your-ordinary-url"
+        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.url" matches the regex "^http:\/\/.+:\d{4}\/reflect\?status=200\&delay_ms=0&not-your-ordinary-url=true$"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer attribute "http.status_code" equals 200
 
     Scenario: Delivery of spans can be prevented by networkRequestCallback
