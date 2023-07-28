@@ -43,13 +43,15 @@ function createBrowserDeliveryFactory (
   return function browserDeliveryFactory (endpoint: string): Delivery {
     return {
       async send (payload: TracePayload) {
+        const body = JSON.stringify(payload.body)
+
         payload.headers['Bugsnag-Sent-At'] = clock.date().toISOString()
 
         try {
           const response = await fetch(endpoint, {
             method: 'POST',
             keepalive,
-            body: JSON.stringify(payload.body),
+            body,
             headers: payload.headers
           })
 
@@ -58,6 +60,10 @@ function createBrowserDeliveryFactory (
             samplingProbability: samplingProbabilityFromHeaders(response.headers)
           }
         } catch (err) {
+          if (body.length > 10e5) {
+            return { state: 'failure-discard' }
+          }
+
           return { state: 'failure-retryable' }
         }
       }
