@@ -46,6 +46,7 @@ function createBrowserDeliveryFactory (
         const body = JSON.stringify(payload.body)
 
         payload.headers['Bugsnag-Sent-At'] = clock.date().toISOString()
+        payload.headers['Bugsnag-Uncompressed-Content-Length'] = body.length.toString()
 
         try {
           const response = await fetch(endpoint, {

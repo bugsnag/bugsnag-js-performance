@@ -55,6 +55,7 @@ describe('Browser Delivery', () => {
       headers: {
         'Bugsnag-Api-Key': 'test-api-key',
         'Bugsnag-Span-Sampling': '1:1',
+        'Bugsnag-Uncompressed-Content-Length': '342',
         'Content-Type': 'application/json',
         'Bugsnag-Sent-At': new Date(clock.timeOrigin + 1).toISOString()
       }
@@ -104,6 +105,7 @@ describe('Browser Delivery', () => {
       headers: {
         'Bugsnag-Api-Key': 'test-api-key',
         'Bugsnag-Span-Sampling': '1:1',
+        'Bugsnag-Uncompressed-Content-Length': '342',
         'Content-Type': 'application/json',
         'Bugsnag-Sent-At': expect.stringMatching(SENT_AT_FORMAT)
       }
@@ -154,6 +156,7 @@ describe('Browser Delivery', () => {
       headers: {
         'Bugsnag-Api-Key': 'test-api-key',
         'Bugsnag-Span-Sampling': '1:1',
+        'Bugsnag-Uncompressed-Content-Length': '342',
         'Content-Type': 'application/json',
         'Bugsnag-Sent-At': expect.stringMatching(SENT_AT_FORMAT)
       }
@@ -201,6 +204,7 @@ describe('Browser Delivery', () => {
       headers: {
         'Bugsnag-Api-Key': 'test-api-key',
         'Bugsnag-Span-Sampling': '1.0:0',
+        'Bugsnag-Uncompressed-Content-Length': '20',
         'Content-Type': 'application/json',
         'Bugsnag-Sent-At': expect.stringMatching(SENT_AT_FORMAT)
       }
