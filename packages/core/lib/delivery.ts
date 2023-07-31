@@ -57,7 +57,6 @@ export interface TracePayload {
     // therefore it's 'undefined' when passed to delivery, which adds a value
     // immediately before initiating the request
     'Bugsnag-Sent-At'?: string
-    'Bugsnag-Uncompressed-Content-Length'?: string
   }
 }
 
