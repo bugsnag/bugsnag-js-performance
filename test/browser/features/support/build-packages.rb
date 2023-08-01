@@ -24,11 +24,13 @@ $logger.info("Building in #{BUILD_MODE} mode")
 PACKAGE_NAMES = [
   "@bugsnag/core-performance",
   "@bugsnag/browser-performance",
+  "@bugsnag/performance-delivery-fetch",
 ]
 
 PACKAGE_DIRECTORIES = [
   "#{ROOT}/packages/core",
   "#{ROOT}/packages/platforms/browser",
+  "#{ROOT}/packages/delivery-fetch",
 ]
 
 def run(command)
