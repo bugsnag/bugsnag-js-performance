@@ -7,6 +7,10 @@
 - (browser) Added new `VueRouterRoutingProvider` for integration with vue-router [#293](https://github.com/bugsnag/bugsnag-js-performance/pull/293)
 - (browser) Added new `ReactRouterRoutingProvider` for integration with react-router v6 [#285](https://github.com/bugsnag/bugsnag-js-performance/pull/285)
 
+### Added
+
+- (delivery-fetch) Added `@bugsnag/performance-delivery-fetch` package [#281](https://github.com/bugsnag/bugsnag-js-performance/pull/281)
+
 ### Fixed
 
 - (browser) Do not retry delivery for oversized payloads when connection fails [#280](https://github.com/bugsnag/bugsnag-js-performance/pull/280)
