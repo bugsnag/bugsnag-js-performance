@@ -1,0 +1,31 @@
+{
+  "name": "@bugsnag/performance-delivery-fetch",
+  "version": "1.0.0",
+  "description": "BugSnag performance monitoring delivery mechanism using the fetch API",
+  "homepage": "https://www.bugsnag.com/",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rollup --config",
+    "build:cdn": "npm run build",
+    "clean": "rm -rf dist/*"
+  },
+  "bugs": {
+    "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
+  },
+  "dependencies": {
+    "@bugsnag/core-performance": "^1.0.0"
+  },
+  "type": "module",
+  "main": "dist/delivery.js",
+  "types": "dist/types/delivery.d.ts",
+  "files": [
+    "dist"
+  ]
+}
