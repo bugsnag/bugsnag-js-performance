@@ -27,18 +27,21 @@ function samplingProbabilityFromHeaders (headers: Headers): number | undefined {
 
 function createFetchDeliveryFactory (
   fetch: Fetch,
-  backgroundingListener: BackgroundingListener,
-  clock: Clock
+  clock: Clock,
+  backgroundingListener?: BackgroundingListener
 ): DeliveryFactory {
-  // we set fetch's 'keepalive' flag if the app is backgrounded/terminated so
-  // that we can flush the last batch - without 'keepalive' a browser may
-  // cancel (or never start sending) this request
+  // if a backgrounding listener is supplied, set fetch's 'keepalive' flag
+  // when the app is backgrounded/terminated so that we can flush the last batch
+  // this may be required on platforms such as browser where without 'keepalive'
+  // the request may be cancelled (or never start sending) when backgrounded
   // we don't _always_ set the flag because it imposes a 64k payload limit
   let keepalive = false
 
-  backgroundingListener.onStateChange(state => {
-    keepalive = state === 'in-background'
-  })
+  if (backgroundingListener) {
+    backgroundingListener.onStateChange(state => {
+      keepalive = state === 'in-background'
+    })
+  }
 
   return function fetchDeliveryFactory (endpoint: string): Delivery {
     return {
