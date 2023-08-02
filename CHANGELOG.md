@@ -5,6 +5,7 @@
 ### Added
 
 - (delivery-fetch) Added `@bugsnag/delivery-fetch-performance` package [#281](https://github.com/bugsnag/bugsnag-js-performance/pull/281)
+- (react-native) Create simple generator for span and trace IDs [#282](https://github.com/bugsnag/bugsnag-js-performance/pull/262)
 
 ### Fixed
 
