@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@bugsnag/core-performance": "^1.0.0",
-    "@bugsnag/performance-delivery-fetch": "^1.0.0",
+    "@bugsnag/delivery-fetch-performance": "^1.0.0",
     "@bugsnag/cuid": "^3.0.2"
   },
   "type": "module",

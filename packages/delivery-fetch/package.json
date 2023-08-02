@@ -1,5 +1,5 @@
 {
-  "name": "@bugsnag/performance-delivery-fetch",
+  "name": "@bugsnag/delivery-fetch-performance",
   "version": "1.0.0",
   "description": "BugSnag performance monitoring delivery mechanism using the fetch API",
   "homepage": "https://www.bugsnag.com/",

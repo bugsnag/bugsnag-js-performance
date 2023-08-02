@@ -24,7 +24,7 @@ $logger.info("Building in #{BUILD_MODE} mode")
 PACKAGE_NAMES = [
   "@bugsnag/core-performance",
   "@bugsnag/browser-performance",
-  "@bugsnag/performance-delivery-fetch",
+  "@bugsnag/delivery-fetch-performance",
 ]
 
 PACKAGE_DIRECTORIES = [
