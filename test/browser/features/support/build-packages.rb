@@ -26,7 +26,7 @@ PACKAGE_NAMES = [
   "@bugsnag/browser-performance",
   "@bugsnag/react-router-performance",
   "@bugsnag/vue-router-performance",
-  "@bugsnag/performance-delivery-fetch"
+  "@bugsnag/delivery-fetch-performance"
 ]
 
 PACKAGE_DIRECTORIES = [

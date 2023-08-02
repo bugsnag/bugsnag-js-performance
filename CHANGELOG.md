@@ -9,7 +9,7 @@
 
 ### Added
 
-- (delivery-fetch) Added `@bugsnag/performance-delivery-fetch` package [#281](https://github.com/bugsnag/bugsnag-js-performance/pull/281)
+- (delivery-fetch) Added `@bugsnag/delivery-fetch-performance` package [#281](https://github.com/bugsnag/bugsnag-js-performance/pull/281)
 
 ### Fixed
 
