@@ -6,7 +6,7 @@ const endpoint = parameters.get("endpoint")
 
 const span = BugsnagPerformance.startSpan("[Custom]/resource-load-spans")
 
-BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 4, batchInactivityTimeoutMs: 3000, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false })
+BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 4, batchInactivityTimeoutMs: 5000, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false })
 
 document.getElementById("end-span").addEventListener("click", () => {
     const node = document.getElementById("image-container")
@@ -14,8 +14,6 @@ document.getElementById("end-span").addEventListener("click", () => {
     node.appendChild(img)
     img.src = "/favicon.png?height=100&width=100"
     img.onload = () => {
-        setTimeout(() => {
-            span.end()
-        }, 100)
+        span.end()
     }
 })
