@@ -44,7 +44,7 @@ describe('Browser Delivery', () => {
       }
     }
 
-    const deliveryFactory = createFetchDeliveryFactory(fetch, backgroundingListener, clock)
+    const deliveryFactory = createFetchDeliveryFactory(fetch, clock, backgroundingListener)
     const delivery = deliveryFactory('/test')
     delivery.send(deliveryPayload)
 
@@ -90,7 +90,7 @@ describe('Browser Delivery', () => {
       }
     }
 
-    const deliveryFactory = createFetchDeliveryFactory(fetch, backgroundingListener, new IncrementingClock())
+    const deliveryFactory = createFetchDeliveryFactory(fetch, new IncrementingClock(), backgroundingListener)
     const delivery = deliveryFactory('/test')
 
     backgroundingListener.sendToBackground()
@@ -139,7 +139,7 @@ describe('Browser Delivery', () => {
       }
     }
 
-    const deliveryFactory = createFetchDeliveryFactory(fetch, backgroundingListener, new IncrementingClock())
+    const deliveryFactory = createFetchDeliveryFactory(fetch, new IncrementingClock(), backgroundingListener)
     const delivery = deliveryFactory('/test')
 
     backgroundingListener.sendToBackground()
@@ -181,7 +181,7 @@ describe('Browser Delivery', () => {
     const fetch = jest.fn(() => Promise.resolve({ status: 200, headers } as unknown as Response))
     const backgroundingListener = new ControllableBackgroundingListener()
 
-    const deliveryFactory = createFetchDeliveryFactory(fetch, backgroundingListener, new IncrementingClock())
+    const deliveryFactory = createFetchDeliveryFactory(fetch, new IncrementingClock(), backgroundingListener)
     const delivery = deliveryFactory('/test')
     const deliveryPayload: TracePayload = {
       body: { resourceSpans: [] },
@@ -219,7 +219,7 @@ describe('Browser Delivery', () => {
     const fetch = jest.fn(() => Promise.resolve({ status: 200, headers } as unknown as Response))
     const backgroundingListener = new ControllableBackgroundingListener()
 
-    const deliveryFactory = createFetchDeliveryFactory(fetch, backgroundingListener, new IncrementingClock())
+    const deliveryFactory = createFetchDeliveryFactory(fetch, new IncrementingClock(), backgroundingListener)
     const delivery = deliveryFactory('/test')
     const payload: TracePayload = {
       body: { resourceSpans: [] },
@@ -273,7 +273,7 @@ describe('Browser Delivery', () => {
       }
     }
 
-    const deliveryFactory = createFetchDeliveryFactory(fetch, backgroundingListener, clock)
+    const deliveryFactory = createFetchDeliveryFactory(fetch, clock, backgroundingListener)
     const delivery = deliveryFactory('/test')
 
     const { state } = await delivery.send(deliveryPayload)

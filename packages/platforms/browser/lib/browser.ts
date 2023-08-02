@@ -36,7 +36,7 @@ const BugsnagPerformance = createClient({
   clock,
   resourceAttributesSource,
   spanAttributesSource,
-  deliveryFactory: createFetchDeliveryFactory(window.fetch, backgroundingListener, clock),
+  deliveryFactory: createFetchDeliveryFactory(window.fetch, clock, backgroundingListener),
   idGenerator,
   schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
   plugins: (spanFactory, spanContextStorage) => [
