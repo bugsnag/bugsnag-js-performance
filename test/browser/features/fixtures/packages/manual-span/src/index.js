@@ -6,11 +6,13 @@ const endpoint = parameters.get('endpoint')
 
 BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 1, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false })
 
-const spanOptions = {}
+document.getElementById('send-span').onclick = () => {
+  const spanOptions = {}
+  
+  if (parameters.has('isFirstClass')) {
+    spanOptions.isFirstClass = JSON.parse(parameters.get('isFirstClass'))
+  }
 
-if (parameters.has('isFirstClass')) {
-  spanOptions.isFirstClass = JSON.parse(parameters.get('isFirstClass'))
+  const span = BugsnagPerformance.startSpan("Custom/ManualSpanScenario", spanOptions)
+  span.end()
 }
-
-const span = BugsnagPerformance.startSpan("Custom/ManualSpanScenario", spanOptions)
-span.end()
