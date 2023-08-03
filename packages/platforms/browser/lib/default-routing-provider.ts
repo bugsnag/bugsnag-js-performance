@@ -1,5 +1,4 @@
 import { type OnSettle } from './on-settle'
-import getAbsoluteUrl from './request-tracker/url-helpers'
 import { type RouteResolver, type RoutingProvider, type StartRouteChangeCallback } from './routing-provider'
 
 export const defaultRouteResolver: RouteResolver = (url: URL) => url.pathname || '/'
@@ -26,8 +25,7 @@ export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Locat
         const url = args[2]
 
         if (url) {
-          const absoluteURL = new URL(getAbsoluteUrl(url.toString(), document.baseURI))
-          const span = startRouteChangeSpan(absoluteURL, 'pushState')
+          const span = startRouteChangeSpan(url, 'pushState')
 
           onSettle((endTime) => {
             span.end(endTime)

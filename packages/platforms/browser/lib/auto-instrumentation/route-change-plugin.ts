@@ -1,8 +1,8 @@
 import { coreSpanOptionSchema, isString, validateSpanOptions, type InternalConfiguration, type Plugin, type SpanFactory, type SpanOptionSchema } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
+import { defaultRouteResolver } from '../default-routing-provider'
 import { type RouteChangeSpanOptions } from '../routing-provider'
 import { getPermittedAttributes } from '../send-page-attributes'
-import { defaultRouteResolver } from '../default-routing-provider'
 
 // exclude isFirstClass from the route change option schema
 const { startTime, parentContext, makeCurrentContext } = coreSpanOptionSchema
@@ -38,19 +38,20 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
     const permittedAttributes = getPermittedAttributes(configuration.sendPageAttributes)
 
     configuration.routingProvider.listenForRouteChanges((url, trigger, options) => {
-      if (!(url instanceof URL)) {
-        try {
-          url = new URL(url)
-        } catch (err) {
-          configuration.logger.warn('Invalid span options\n  - url should be a URL')
+      if (typeof url !== 'string' && !(url instanceof URL)) {
+        configuration.logger.warn('Invalid span options\n  - url should be a URL')
 
-          return {
-            id: '',
-            traceId: '',
-            isValid: () => false,
-            end: () => {}
-          }
+        return {
+          id: '',
+          traceId: '',
+          isValid: () => false,
+          end: () => {}
         }
+      }
+
+      // convert a string to a URL for the route resolver
+      if (typeof url === 'string') {
+        url = new URL(url, this.document.baseURI)
       }
 
       // create internal options for validation
