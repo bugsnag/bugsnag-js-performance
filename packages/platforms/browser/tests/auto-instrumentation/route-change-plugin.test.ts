@@ -213,13 +213,20 @@ describe('RouteChangePlugin', () => {
       const span = routeChangeCallback(url, 'trigger')
       expect(jestLogger.warn).toHaveBeenCalledWith('Invalid span options\n  - url should be a URL')
 
+      expect(span).toStrictEqual({
+        id: '',
+        traceId: '',
+        isValid: expect.any(Function),
+        end: expect.any(Function)
+      })
+
+      expect(span.isValid()).toBe(false)
+
       span.end()
 
       await jest.runOnlyPendingTimersAsync()
 
-      expect(delivery).not.toHaveSentSpan(expect.objectContaining({
-        name: `[RouteChange]${String(url)}`
-      }))
+      expect(delivery.requests).toHaveLength(0)
     })
 
     const invalidTriggers: any[] = [
