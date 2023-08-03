@@ -3,6 +3,7 @@ Feature: Manual creation of spans
   Scenario: Manual spans can be logged
     Given I navigate to the test URL "/manual-span"
     And I wait to receive a sampling request
+    Then I click the element "send-span"
     And I wait for 1 span
 
     # Check the initial probability request
@@ -23,6 +24,7 @@ Feature: Manual creation of spans
   Scenario: isFirstClass span option can be set to false
     Given I navigate to the test URL "/manual-span?isFirstClass=false"
     And I wait to receive a sampling request
+    Then I click the element "send-span"
     And I wait for 1 span
 
     # Check the initial probability request
@@ -43,7 +45,9 @@ Feature: Manual creation of spans
   @chromium_only @local_only
   Scenario: userAgentData is included in custom span
     Given I navigate to the test URL "/manual-span"
-    When I wait for 1 span
+    And I wait to receive a sampling request
+    When I click the element "send-span"
+    And I wait for 1 span
     Then the trace payload field "resourceSpans.0.resource" bool attribute "browser.mobile" is false
     And the trace payload field "resourceSpans.0.resource" string attribute "browser.platform" is one of:
       | Android |
