@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- (browser) Allow route name in startRouteChangeSpan callback [#284](https://github.com/bugsnag/bugsnag-js-performance/pull/284)
+
 ### Fixed
 
 - (browser) Do not retry delivery for oversized payloads when connection fails [#280](https://github.com/bugsnag/bugsnag-js-performance/pull/280)
