@@ -14,8 +14,7 @@ export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Locat
 
     listenForRouteChanges (startRouteChangeSpan: StartRouteChangeCallback) {
       addEventListener('popstate', (ev) => {
-        const url = new URL(location.href)
-        const span = startRouteChangeSpan(url, 'popstate')
+        const span = startRouteChangeSpan(location.href, 'popstate')
 
         onSettle((endTime) => {
           span.end(endTime)

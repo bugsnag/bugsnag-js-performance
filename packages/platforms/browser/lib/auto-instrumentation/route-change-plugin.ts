@@ -38,14 +38,9 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
     const permittedAttributes = getPermittedAttributes(configuration.sendPageAttributes)
 
     configuration.routingProvider.listenForRouteChanges((url, trigger, options) => {
-      let absoluteUrl
-
-      if (url instanceof URL) {
-        absoluteUrl = url
-      } else {
+      if (!(url instanceof URL)) {
         try {
-          const stringUrl = String(url)
-          absoluteUrl = new URL(stringUrl)
+          url = new URL(url)
         } catch (err) {
           configuration.logger.warn('Invalid span options\n  - url should be a URL')
 
@@ -71,7 +66,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
         configuration.logger
       )
 
-      const route = configuration.routingProvider.resolveRoute(absoluteUrl) || defaultRouteResolver(absoluteUrl)
+      const route = configuration.routingProvider.resolveRoute(url) || defaultRouteResolver(url)
 
       // update the span name using the validated route
       cleanOptions.name += route
