@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- (delivery-fetch) Added `@bugsnag/delivery-fetch-performance` package [#281](https://github.com/bugsnag/bugsnag-js-performance/pull/281)
+
 ### Fixed
 
 - (browser) Do not retry delivery for oversized payloads when connection fails [#280](https://github.com/bugsnag/bugsnag-js-performance/pull/280)

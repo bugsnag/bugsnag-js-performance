@@ -4,7 +4,7 @@ import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
 import { createSchema } from './config'
 import { createDefaultRoutingProvider } from './default-routing-provider'
-import createBrowserDeliveryFactory from './delivery'
+import createFetchDeliveryFactory from '@bugsnag/delivery-fetch-performance'
 import idGenerator from './id-generator'
 import createOnSettle from './on-settle'
 import makeBrowserPersistence from './persistence'
@@ -36,7 +36,7 @@ const BugsnagPerformance = createClient({
   clock,
   resourceAttributesSource,
   spanAttributesSource,
-  deliveryFactory: createBrowserDeliveryFactory(window.fetch, backgroundingListener, clock),
+  deliveryFactory: createFetchDeliveryFactory(window.fetch, clock, backgroundingListener),
   idGenerator,
   schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
   plugins: (spanFactory, spanContextStorage) => [
