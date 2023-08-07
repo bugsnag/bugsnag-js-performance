@@ -2,7 +2,7 @@ import { coreSpanOptionSchema, isString, validateSpanOptions, type InternalConfi
 import { type BrowserConfiguration } from '../config'
 import { type RouteChangeSpanOptions } from '../routing-provider'
 import { getPermittedAttributes } from '../send-page-attributes'
-import { defaultRouteResolver } from '../default-routing-provider'
+import { defaultRouteResolver } from '../routing-provider/default-routing-provider'
 
 // exclude isFirstClass from the route change option schema
 const { startTime, parentContext, makeCurrentContext } = coreSpanOptionSchema

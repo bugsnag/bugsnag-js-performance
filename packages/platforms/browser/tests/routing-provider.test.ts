@@ -6,7 +6,7 @@
 import { InMemoryDelivery, IncrementingClock, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { RouteChangePlugin } from '../lib/auto-instrumentation/route-change-plugin'
 import { type BrowserConfiguration, type BrowserSchema, createSchema } from '../lib/config'
-import { createDefaultRoutingProvider } from '../lib/default-routing-provider'
+import { createDefaultRoutingProvider } from '../lib/routing-provider/default-routing-provider'
 import { isRoutingProvider } from '../lib/routing-provider'
 
 jest.useFakeTimers()

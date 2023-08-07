@@ -1,0 +1,15 @@
+{
+    "name": "react-router",
+    "private": true,
+    "scripts": {
+        "build": "rollup --config ../rollup.config.mjs --input src/index.jsx",
+        "clean": "rm -rf dist"
+    },
+    "devDependencies": {
+        "@babel/preset-react": "^7.22.5"
+    },
+    "dependencies": {
+        "react": "^18.2.0",
+        "react-router-dom": "^6.14.2"
+    }
+}
