@@ -1,12 +1,32 @@
 import { millisecondsToNanoseconds, type Clock } from '@bugsnag/core-performance'
 
-function createClock (timeOrigin: number, performance: Performance): Clock {
+interface Performance {
+  now: () => number
+}
+
+const createClock = (performance: Performance): Clock => {
+  // Prevent clock from running backwards
+  let previousClock = performance.now()
+  const now = () => {
+    const newClock = performance.now()
+    const oldClock = previousClock
+    previousClock = newClock
+    return newClock > oldClock ? newClock : oldClock
+  }
+
+  // Get timestamps at same point in time
+  const startWallTime = Date.now() // Wall time
+  const startPerfTime = now() // Measurable "monotonic" time
+
   return {
-    now: () => performance.now(),
-    date: () => new Date(timeOrigin + performance.now()),
-    convert: (date) => date.getTime() - timeOrigin,
+    now,
+    date: () => new Date(now() + startWallTime - startPerfTime),
+    convert: (date: Date) => date.getTime() - startWallTime + startPerfTime,
     // convert milliseconds since timeOrigin to full timestamp
-    toUnixTimestampNanoseconds: (time) => millisecondsToNanoseconds(timeOrigin + time).toString()
+    toUnixTimestampNanoseconds: (time: number) =>
+      millisecondsToNanoseconds(
+        time - startPerfTime + startWallTime
+      ).toString()
   }
 }
 
