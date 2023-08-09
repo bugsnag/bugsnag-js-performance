@@ -13,9 +13,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
           
-      - run: npm ci
+      - run: npm i
       - run: npm run build
 
   linting:
@@ -25,9 +24,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
           
-      - run: npm ci
+      - run: npm i
       - run: npm run test:lint
 
   unit_tests:
@@ -37,7 +35,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          cache: 'npm'
 
-      - run: npm ci
+      - run: npm i
       - run: npm run test:unit

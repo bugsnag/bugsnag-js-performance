@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Install packages
-RUN npm ci
+RUN npm i
 WORKDIR /app/test/browser
 
 ARG USE_CDN_BUILD
