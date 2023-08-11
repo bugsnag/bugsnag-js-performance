@@ -1,3 +1,4 @@
+@skip_chrome_61
 Feature: React router
 
     Scenario: Route change spans are automatically instrumented
