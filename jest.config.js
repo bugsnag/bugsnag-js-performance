@@ -13,28 +13,69 @@ const paths = {
 const moduleNameMapper = Object.fromEntries(
   Object.entries(paths)
     .map(([name, directories]) => [
-      `^${name}$`,
-      directories.map(directory => directory.replace('./', '<rootDir>/'))
+        `^${name}$`,
+        directories.map(directory => directory.replace('./', '<rootDir>/'))
     ])
 )
 
-module.exports = {
-  collectCoverageFrom: [
-    '**/packages/*/**/*.ts',
-    '!**/packages/*/**/*.d.ts',
-    '!**/packages/*/**/tests/**/*',
-    '!<rootDir>/packages/test-utilities/**/*',
-    '!<rootDir>/test/**/*'
-  ],
-  coverageReporters: ['json-summary', 'text'],
+const defaultModuleConfig = {
+  preset: 'ts-jest/presets/js-with-ts',
+  moduleNameMapper,
   transform: {
     '^.+\\.m?[tj]sx?$': [
       'ts-jest',
       { tsconfig: { paths } }
     ]
-  },
-  testEnvironment: 'node',
-  moduleNameMapper,
+  }
+}
+
+module.exports = {
+  projects: [
+    {
+      displayName: 'core',
+      testMatch: ['<rootDir>/packages/core/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
+    {
+      displayName: 'delivery-fetch',
+      testMatch: ['<rootDir>/packages/delivery-fetch/**/*.test.ts'],
+      ...defaultModuleConfig
+
+    },
+    {
+      displayName: 'browser',
+      testMatch: ['<rootDir>/packages/platforms/browser/**/*.test.ts'],
+      ...defaultModuleConfig
+
+    },
+    {
+      displayName: 'react-native',
+      preset: 'react-native',
+      testMatch: ['<rootDir>/packages/platforms/react-native/**/*.test.ts'],
+      coveragePathIgnorePatterns: ['<rootDir>/packages/core', '<rootDir>/packages/platforms/browser', '<rootDir>/packages/delivery-fetch'],
+      moduleNameMapper,
+      transform: {
+        '^.+\\.m?[tj]sx?$': [
+          'ts-jest',
+          {
+            tsconfig: { paths },
+            babelConfig: {
+              presets: ['module:metro-react-native-babel-preset']
+            }
+          }
+        ]
+      }
+    }
+  ],
+  collectCoverageFrom: [
+    '**/packages/*/**/*.ts',
+    '!**/packages/*/**/*.d.ts',
+    '!**/packages/*/**/*.test.ts',
+    '!**/packages/*/**/tests/**/*',
+    '!<rootDir>/packages/test-utilities/**/*',
+    '!<rootDir>/test/**/*'
+  ],
+  coverageReporters: ['json-summary', 'text'],
   reporters: process.env.CI
     ? [['github-actions', { silent: false }], 'summary']
     : ['default']

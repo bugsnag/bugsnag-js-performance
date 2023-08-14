@@ -107,3 +107,6 @@ dist
 .tern-port
 
 .verdaccio
+
+#Jest
+.jest
