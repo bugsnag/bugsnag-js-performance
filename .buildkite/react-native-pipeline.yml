@@ -1,0 +1,14 @@
+steps:
+
+  - label: ':android: Build RN test fixture APK'
+    key: "react-native-android-fixture"
+    timeout_in_minutes: 30
+    agents:
+      queue: macos-12-arm
+    env:
+      RN_VERSION: "0.72"
+      BUILD_ANDROID: "true"
+    artifact_paths:
+      - "build/react-native/0.72/reactnative.apk"
+    commands:
+      - ./bin/generate-reactnative-fixture
