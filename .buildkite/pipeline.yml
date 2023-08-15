@@ -16,9 +16,9 @@ steps:
     commands:
       - buildkite-agent pipeline upload .buildkite/browser-pipeline.yml
 
-    - label: ":pipeline_upload: React Native pipeline"
-    commands:
-      - buildkite-agent pipeline upload .buildkite/react-native-pipeline.yml
+  - label: ":pipeline_upload: React Native pipeline"
+  commands:
+    - buildkite-agent pipeline upload .buildkite/react-native-pipeline.yml
 
   #
   # Conditionally trigger full pipeline
