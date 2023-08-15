@@ -1,0 +1,43 @@
+#!/usr/bin/env node
+
+const { execSync } = require('child_process')
+const { resolve } = require('path')
+const fs = require('fs')
+
+if (!process.env.RN_VERSION) {
+  console.error('Please provide a React Native version')
+  process.exit(1)
+}
+
+const rnVersion = process.env.RN_VERSION
+const fixtureDir = process.env.OUTPUT_DIR || resolve(__dirname, '../build/react-native/', rnVersion)
+
+// remove the fixture directory if it already exists
+if (fs.existsSync(fixtureDir)) {
+  execSync(`rm -rf ${fixtureDir}`, { stdio: 'inherit' })
+}
+
+// create the test fixture
+execSync(
+  `npx react-native init reactnative --directory ${fixtureDir} --version ${rnVersion} --npm`,
+  { stdio: 'inherit' }
+)
+
+// replace the App.tsx file with our own
+fs.copyFileSync(
+  resolve(__dirname, '../test/react-native/features/fixtures/app/App.tsx'),
+  resolve(fixtureDir, 'App.tsx')
+)
+
+const scenariosDir = resolve(__dirname, '../test/react-native/features/fixtures/scenarios')
+
+// pack the scenarios into the fixture directory
+execSync(`npm pack ${scenariosDir} --pack-destination ${fixtureDir}`, { stdio: 'inherit' })
+
+// install the scenarios package
+execSync('npm install ./bugsnag-react-native-performance-scenarios-1.0.0.tgz', { cwd: fixtureDir, stdio: 'inherit' })
+
+if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
+  execSync(`./gradlew assembleRelease`, { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
+  fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
+}
