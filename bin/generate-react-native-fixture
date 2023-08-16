@@ -20,7 +20,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   // create the test fixture
   execSync(
-    `npx react-native init reactnative --package-name com.bugsnag.fixtures.reactnative --directory ${fixtureDir} --version ${rnVersion} --npm`,
+    `npx react-native init reactnative --package-name com.bugsnag.fixtures.reactnative.performance --directory ${fixtureDir} --version ${rnVersion} --npm`,
     { stdio: 'inherit' }
   )
 
@@ -52,7 +52,6 @@ if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
 } 
 
 if(process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
-  console.log('Building iOS app...')
   execSync('rm -rf reactnative.xcarchive', { cwd: fixtureDir, stdio: 'inherit' })
 
   // build the ios app
@@ -66,7 +65,6 @@ if(process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
   { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
 
   // export the archive
-  console.log('Exporting iOS app...')
   execSync('xcrun xcodebuild \
   -exportArchive \
   -archivePath reactnative.xcarchive \
