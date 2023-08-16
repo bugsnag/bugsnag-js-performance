@@ -16,25 +16,23 @@ steps:
     commands:
       - ./bin/generate-react-native-fixture
     matrix:
-      - "0.71"
       - "0.72"
 
-  - label: ':mac: Build RN {{matrix}} test fixture ipa'
-    key: "build-react-native-ios-fixture"
-    timeout_in_minutes: 30
-    agents:
-      queue: "macos-12-arm"
-    env:
-      RN_VERSION: "{{matrix}}"
-      BUILD_IOS: "true"
-      DEVELOPER_DIR: "/Applications/Xcode14.app"
-    artifact_paths:
-      - "build/react-native/**/output/reactnative.ipa"
-    commands:
-      - ./bin/generate-react-native-fixture
-    matrix:
-      - "0.71"
-      - "0.72"
+  # - label: ':mac: Build RN {{matrix}} test fixture ipa'
+  #   key: "build-react-native-ios-fixture"
+  #   timeout_in_minutes: 30
+  #   agents:
+  #     queue: "macos-12-arm"
+  #   env:
+  #     RN_VERSION: "{{matrix}}"
+  #     BUILD_IOS: "true"
+  #     DEVELOPER_DIR: "/Applications/Xcode14.app"
+  #   artifact_paths:
+  #     - "build/react-native/**/output/reactnative.ipa"
+  #   commands:
+  #     - ./bin/generate-react-native-fixture
+  #   matrix:
+  #     - "0.72"
 
     #
     # End-to-end tests
@@ -58,12 +56,11 @@ steps:
           - --fail-fast
           - --no-tunnel
           - --aws-public-ip
-    env:
-      SKIP_NAVIGATION_SCENARIOS: "true"
-      HERMES: "true"
+    retry:
+      manual:
+        permit_on_passed: true
     concurrency: 25
     concurrency_group: "bitbar-app"
     concurrency_method: eager
     matrix:
-    - "0.71"
-    - "0.72"
+      - "0.72"

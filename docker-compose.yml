@@ -96,7 +96,7 @@ services:
       - ./test/browser/maze_output:/app/test/browser/maze_output
 
   react-native-maze-runner:
-    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v8-cli
+    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner:appium-android-temp-directory-cli
     environment:
       <<: *common-environment
       BITBAR_USERNAME:

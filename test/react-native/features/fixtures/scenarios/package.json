@@ -9,6 +9,8 @@
   "author": "",
   "license": "MIT",
   "peerDependencies": {
-    "react-native": "*"
+    "react": "*",
+    "react-native": "*",
+    "react-native-file-access": "*"
   }
 }
