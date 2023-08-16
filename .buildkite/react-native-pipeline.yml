@@ -9,7 +9,7 @@ steps:
       RN_VERSION: "{{matrix}}"
       BUILD_ANDROID: "true"
     artifact_paths:
-      - "build/react-native/{{matrix}}/reactnative.apk"
+      - "build/react-native/**/reactnative.apk"
     commands:
       - ./bin/generate-react-native-fixture
     matrix:
@@ -26,7 +26,7 @@ steps:
       BUILD_IOS: "true"
       DEVELOPER_DIR: "/Applications/Xcode14.app"
     artifact_paths:
-      - "build/react-native/{{matrix}}/output/reactnative.ipa"
+      - "build/react-native/**/output/reactnative.ipa"
     commands:
       - ./bin/generate-react-native-fixture
     matrix:
