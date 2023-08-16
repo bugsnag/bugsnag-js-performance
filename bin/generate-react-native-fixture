@@ -12,32 +12,65 @@ if (!process.env.RN_VERSION) {
 const rnVersion = process.env.RN_VERSION
 const fixtureDir = process.env.OUTPUT_DIR || resolve(__dirname, '../build/react-native/', rnVersion)
 
-// remove the fixture directory if it already exists
-if (fs.existsSync(fixtureDir)) {
-  execSync(`rm -rf ${fixtureDir}`, { stdio: 'inherit' })
+if (!process.env.SKIP_GENERATE_FIXTURE) {
+    // remove the fixture directory if it already exists
+  if (fs.existsSync(fixtureDir)) {
+    execSync(`rm -rf ${fixtureDir}`, { stdio: 'inherit' })
+  }
+
+  // create the test fixture
+  execSync(
+    `npx react-native init reactnative --package-name com.bugsnag.fixtures.reactnative --directory ${fixtureDir} --version ${rnVersion} --npm`,
+    { stdio: 'inherit' }
+  )
+
+  // replace the App.tsx file with our own
+  fs.copyFileSync(
+    resolve(__dirname, '../test/react-native/features/fixtures/app/App.tsx'),
+    resolve(fixtureDir, 'App.tsx')
+  )
+
+  // copy the exportOptions.plist file
+  fs.copyFileSync(
+    resolve(__dirname, '../test/react-native/features/fixtures/app/exportOptions.plist'),
+    resolve(fixtureDir, 'exportOptions.plist')
+  )
+
+  const scenariosDir = resolve(__dirname, '../test/react-native/features/fixtures/scenarios')
+
+  // pack the scenarios into the fixture directory
+  execSync(`npm pack ${scenariosDir} --pack-destination ${fixtureDir}`, { stdio: 'inherit' })
+
+  // install the scenarios package
+  execSync('npm install ./bugsnag-react-native-performance-scenarios-1.0.0.tgz', { cwd: fixtureDir, stdio: 'inherit' })
 }
 
-// create the test fixture
-execSync(
-  `npx react-native init reactnative --directory ${fixtureDir} --version ${rnVersion} --npm`,
-  { stdio: 'inherit' }
-)
-
-// replace the App.tsx file with our own
-fs.copyFileSync(
-  resolve(__dirname, '../test/react-native/features/fixtures/app/App.tsx'),
-  resolve(fixtureDir, 'App.tsx')
-)
-
-const scenariosDir = resolve(__dirname, '../test/react-native/features/fixtures/scenarios')
-
-// pack the scenarios into the fixture directory
-execSync(`npm pack ${scenariosDir} --pack-destination ${fixtureDir}`, { stdio: 'inherit' })
-
-// install the scenarios package
-execSync('npm install ./bugsnag-react-native-performance-scenarios-1.0.0.tgz', { cwd: fixtureDir, stdio: 'inherit' })
-
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
+  // build the android app
   execSync(`./gradlew assembleRelease`, { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
   fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
+} 
+
+if(process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
+  console.log('Building iOS app...')
+  execSync('rm -rf reactnative.xcarchive', { cwd: fixtureDir, stdio: 'inherit' })
+
+  // build the ios app
+  execSync(`xcrun xcodebuild DEVELOPMENT_TEAM=7W9PZ27Y5F \
+  -workspace reactnative.xcworkspace \
+  -scheme reactnative \
+  -configuration Release \
+  -archivePath ${fixtureDir}/reactnative.xcarchive \
+  -allowProvisioningUpdates \
+  archive`,
+  { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
+
+  // export the archive
+  console.log('Exporting iOS app...')
+  execSync('xcrun xcodebuild \
+  -exportArchive \
+  -archivePath reactnative.xcarchive \
+  -exportPath output/ \
+  -exportOptionsPlist exportOptions.plist',
+  { cwd: `${fixtureDir}`, stdio: 'inherit' })
 }
