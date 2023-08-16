@@ -1,16 +1,16 @@
-import { type Configuration } from '@bugsnag/core-performance'
 import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
+import { type ReactNativeConfiguration } from '../config/config'
 import { resourceAttributesSource } from './resource-attributes-source'
 
 describe('resourceAttributesSource', () => {
   it('includes all expected attributes (iOS)', async () => {
-    const configuraiton = createConfiguration<Configuration>({ releaseStage: 'test', appVersion: '1.0.0' })
+    const configuraiton = createConfiguration<ReactNativeConfiguration>({ releaseStage: 'test', appVersion: '1.0.0', appName: 'Test App', codeBundleId: '12345678' })
     const resourceAttributes = await resourceAttributesSource(configuraiton)
 
     expect(resourceAttributes.toJson()).toEqual(expect.arrayContaining([
       {
         key: 'bugsnag.app.code_bundle_id',
-        value: { stringValue: 'unknown' }
+        value: { stringValue: '12345678' }
       },
       {
         key: 'deployment.environment',
@@ -42,7 +42,7 @@ describe('resourceAttributesSource', () => {
       },
       {
         key: 'service.name',
-        value: { stringValue: '__NAME__' }
+        value: { stringValue: 'Test App' }
       },
       {
         key: 'service.version',
