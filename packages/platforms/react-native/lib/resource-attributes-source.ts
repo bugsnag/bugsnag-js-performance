@@ -2,7 +2,7 @@ import { ResourceAttributes, type InternalConfiguration } from '@bugsnag/core-pe
 import { type ReactNativeConfiguration } from './config'
 import { Platform } from 'react-native'
 
-export function resourceAttributesSource (config: InternalConfiguration<ReactNativeConfiguration>) {
+function resourceAttributesSource (config: InternalConfiguration<ReactNativeConfiguration>) {
   const attributes = new ResourceAttributes(
     config.releaseStage,
     config.appVersion,
@@ -28,3 +28,5 @@ export function resourceAttributesSource (config: InternalConfiguration<ReactNat
 
   return Promise.resolve(attributes)
 }
+
+export default resourceAttributesSource
