@@ -20,7 +20,7 @@ steps:
     key: "build-react-native-ios-fixture"
     timeout_in_minutes: 30
     agents:
-      queue: "opensource-arm-mac-cocoa-12"
+      queue: "macos-12-arm"
     env:
       RN_VERSION: "{{matrix}}"
       BUILD_IOS: "true"
