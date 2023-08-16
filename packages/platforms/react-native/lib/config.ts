@@ -16,7 +16,7 @@ export interface ReactNativeConfiguration extends Configuration {
   codeBundleId?: string
 }
 
-export function createSchema (): ReactNativeSchema {
+function createSchema (): ReactNativeSchema {
   return {
     ...schema,
     appName: {
@@ -31,3 +31,5 @@ export function createSchema (): ReactNativeSchema {
     }
   }
 }
+
+export default createSchema
