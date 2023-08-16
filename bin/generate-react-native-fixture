@@ -48,6 +48,9 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     resolve(fixtureDir, 'exportOptions.plist')
   )
 
+  // install react-native-file-access
+  execSync('npm install --save react-native-file-access@3.0.4', { cwd: fixtureDir, stdio: 'inherit' })
+
   // pack the scenarios into the fixture directory and install
   const scenariosDir = resolve(__dirname, '../test/react-native/features/fixtures/scenarios')
   execSync(`npm pack ${scenariosDir} --pack-destination ${fixtureDir}`, { stdio: 'inherit' })
