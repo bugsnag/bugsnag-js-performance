@@ -1,5 +1,5 @@
 import {
-  isString,
+  isStringWithLength,
   schema,
   type ConfigOption,
   type Configuration,
@@ -22,12 +22,12 @@ export function createSchema (): ReactNativeSchema {
     appName: {
       defaultValue: '',
       message: 'should be a string',
-      validate: isString
+      validate: isStringWithLength
     },
     codeBundleId: {
       defaultValue: '',
       message: 'should be a string',
-      validate: isString
+      validate: isStringWithLength
     }
   }
 }
