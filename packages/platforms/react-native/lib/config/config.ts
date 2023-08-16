@@ -20,7 +20,7 @@ export function createSchema (): ReactNativeSchema {
   return {
     ...schema,
     appName: {
-      defaultValue: 'app',
+      defaultValue: '',
       message: 'should be a string',
       validate: isString
     },
