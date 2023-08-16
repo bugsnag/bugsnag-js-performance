@@ -42,7 +42,7 @@ describe('resourceAttributesSource', () => {
       },
       {
         key: 'service.name',
-        value: { stringValue: 'unknown' }
+        value: { stringValue: '__NAME__' }
       },
       {
         key: 'service.version',
