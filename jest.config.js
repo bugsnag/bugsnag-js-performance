@@ -18,40 +18,39 @@ const moduleNameMapper = Object.fromEntries(
     ])
 )
 
-const baseModules = [
-  {
-    displayName: 'core',
-    path: '<rootDir>/packages/core'
-  },
-  {
-    displayName: 'browser',
-    path: '<rootDir>/packages/platforms/browser'
-  },
-  {
-    displayName: 'delivery-fetch',
-    path: '<rootDir>/packages/delivery-fetch'
+const defaultModuleConfig = {
+  preset: 'ts-jest/presets/js-with-ts',
+  moduleNameMapper,
+  transform: {
+    '^.+\\.m?[tj]sx?$': [
+      'ts-jest',
+      { tsconfig: { paths } }
+    ]
   }
-]
+}
 
 module.exports = {
   projects: [
-    ...baseModules.map(({ displayName, path }) => ({
-      displayName,
-      testMatch: [`${path}/**/*.test.ts`],
-      preset: 'ts-jest/presets/js-with-ts',
-      moduleNameMapper,
-      transform: {
-        '^.+\\.m?[tj]sx?$': [
-          'ts-jest',
-          { tsconfig: { paths } }
-        ]
-      }
-    })),
+    {
+      displayName: 'core',
+      testMatch: ['<rootDir>/packages/core/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
+    {
+      displayName: 'delivery-fetch',
+      testMatch: ['<rootDir>/packages/delivery-fetch/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
+    {
+      displayName: 'browser',
+      testMatch: ['<rootDir>/packages/platforms/browser/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
     {
       displayName: 'react-native',
       preset: 'react-native',
       testMatch: ['<rootDir>/packages/platforms/react-native/**/*.test.ts'],
-      coveragePathIgnorePatterns: baseModules.map(({ path }) => path), // prevent other modules from being transformed again
+      coveragePathIgnorePatterns: ['<rootDir>/packages/core', '<rootDir>/packages/platforms/browser', '<rootDir>/packages/delivery-fetch'],
       moduleNameMapper,
       transform: {
         '^.+\\.m?[tj]sx?$': [
