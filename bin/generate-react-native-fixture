@@ -20,7 +20,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   // create the test fixture
   execSync(
-    `npx react-native init reactnative --package-name com.bugsnag.fixtures.reactnative.performance --directory ${fixtureDir} --version ${rnVersion} --npm`,
+    `npx react-native init reactnative --package-name com.bugsnag.fixtures.reactnative.performance --directory ${fixtureDir} --version ${rnVersion} --npm --skip-install`,
     { stdio: 'inherit' }
   )
 
@@ -30,18 +30,27 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     resolve(fixtureDir, 'App.tsx')
   )
 
+  // replace the AndroidManifest.xml file with our own
+  fs.copyFileSync(
+    resolve(__dirname, '../test/react-native/features/fixtures/app/android/AndroidManifest.xml'),
+    resolve(fixtureDir, 'android/app/src/main/AndroidManifest.xml')
+  )
+
+  // replace the Info.plist file with our own
+  fs.copyFileSync(
+    resolve(__dirname, '../test/react-native/features/fixtures/app/ios/Info.plist'),
+    resolve(fixtureDir, 'ios/reactnative/Info.plist')
+  )
+
   // copy the exportOptions.plist file
   fs.copyFileSync(
-    resolve(__dirname, '../test/react-native/features/fixtures/app/exportOptions.plist'),
+    resolve(__dirname, '../test/react-native/features/fixtures/app/ios/exportOptions.plist'),
     resolve(fixtureDir, 'exportOptions.plist')
   )
 
+  // pack the scenarios into the fixture directory and install
   const scenariosDir = resolve(__dirname, '../test/react-native/features/fixtures/scenarios')
-
-  // pack the scenarios into the fixture directory
   execSync(`npm pack ${scenariosDir} --pack-destination ${fixtureDir}`, { stdio: 'inherit' })
-
-  // install the scenarios package
   execSync('npm install ./bugsnag-react-native-performance-scenarios-1.0.0.tgz', { cwd: fixtureDir, stdio: 'inherit' })
 }
 
@@ -53,6 +62,9 @@ if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
 
 if(process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
   execSync('rm -rf reactnative.xcarchive', { cwd: fixtureDir, stdio: 'inherit' })
+
+  // install pods
+  execSync('pod install', { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
 
   // build the ios app
   execSync(`xcrun xcodebuild DEVELOPMENT_TEAM=7W9PZ27Y5F \
