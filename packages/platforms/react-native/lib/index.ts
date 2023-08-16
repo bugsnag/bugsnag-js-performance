@@ -4,23 +4,21 @@ import createClock from './clock'
 import createSchema from './config'
 import idGenerator from './id-generator'
 import resourceAttributesSource from './resource-attributes-source'
+import spanAttributesSource from './span-attributes-source'
 
 const clock = createClock(performance)
 const deliveryFactory = createFetchDeliveryFactory(fetch, clock)
 
 const BugsnagPerformance = createClient({
-  clock,
-  idGenerator,
-  deliveryFactory,
   backgroundingListener: { onStateChange: () => {} },
+  clock,
+  deliveryFactory,
+  idGenerator,
   persistence: new InMemoryPersistence(),
   plugins: (spanFactory, spanContextStorage) => [],
   resourceAttributesSource,
   schema: createSchema(),
-  spanAttributesSource: {
-    configure: () => {},
-    requestAttributes: () => {}
-  }
+  spanAttributesSource
 })
 
 export default BugsnagPerformance
