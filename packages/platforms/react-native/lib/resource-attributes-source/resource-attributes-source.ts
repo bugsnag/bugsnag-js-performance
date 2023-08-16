@@ -12,7 +12,7 @@ export function resourceAttributesSource (config: InternalConfiguration<Configur
   attributes.set('os.type', Platform.select({ android: 'linux', ios: 'darwin', default: 'unknown' }))
   attributes.set('os.name', Platform.OS)
   attributes.set('os.version', Platform.Version.toString())
-  attributes.set('service.name', 'unknown')
+  attributes.set('service.name', '__NAME__')
   attributes.set('device.id', 'unknown')
   attributes.set('bugsnag.app.code_bundle_id', 'unknown')
 
