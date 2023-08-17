@@ -51,7 +51,7 @@ steps:
         command:
           - --app=build/react-native/{{matrix}}/reactnative.apk
           - --farm=bb
-          - --device=ANDROID_12
+          - --device=ANDROID_13
           - --a11y-locator
           - --fail-fast
           - --no-tunnel

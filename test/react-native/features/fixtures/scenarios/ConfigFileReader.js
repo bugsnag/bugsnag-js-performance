@@ -18,7 +18,7 @@ const checkDirectoryExists = async () => {
     emulatedDirExists = await FileSystem.exists(emulatedDir)
     console.log(`Emulated Directory ${emulatedDir} exists: ${emulatedDirExists}`)
 
-    const fileURIDir = 'file:///sdcard/Android/data/com.bugsnag.fixtures.reactnative.performance/files/fixture_config.json'
+    const fileURIDir = 'file:///sdcard/Android/data/com.bugsnag.fixtures.reactnative.performance/files'
     fileURIDirExists = await FileSystem.exists(fileURIDir)
     console.log(`File URI Directory ${fileURIDir} exists: ${fileURIDirExists}`)
 
