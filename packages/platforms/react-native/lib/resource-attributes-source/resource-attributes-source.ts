@@ -23,7 +23,7 @@ export function resourceAttributesSource (config: InternalConfiguration<ReactNat
   // @ts-expect-error Platform.constants.Manufacturer exists on android devices
   attributes.set('device.manufacturer', Platform.select({ android: Platform.constants.Manufacturer, ios: 'Apple', default: 'unknown' }))
 
-  // @ts-expect-error Platform.constants.Serial exists on android devices
+  // @ts-expect-error Platform.constants.Model exists on android devices
   attributes.set('device.model.identifier', Platform.select({ android: Platform.constants.Model, ios: 'unknown', default: 'unknown' }))
 
   return Promise.resolve(attributes)
