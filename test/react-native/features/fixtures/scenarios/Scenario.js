@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { getMazeRunnerAddress, checkDirectoryExists, listDirectoryContents } from './ConfigFileReader'
+import { Dirs } from 'react-native-file-access'
 
 export const Scenario = () => {
   const [directoryExists, setDirectoryExists] = useState('Waiting for directory...')
@@ -30,6 +31,9 @@ export const Scenario = () => {
 
   return (
     <View style={styles.scenario}>
+      <Text>Document Directory: {Dirs.DocumentDir}</Text>
+      <Text>Main Bundle Directory: {Dirs.MainBundleDir}</Text>
+      <Text>SD Card Directory: {Dirs.SDCardDir}</Text>
       <Text>{directoryExists}</Text>
       <Text>{directoryContents}</Text>
       <Text accessibilityLabel='scenario'>{mazeAddress}</Text>
