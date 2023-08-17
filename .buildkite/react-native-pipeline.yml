@@ -51,16 +51,16 @@ steps:
         command:
           - --app=build/react-native/{{matrix}}/reactnative.apk
           - --farm=bb
-          - --device=ANDROID_13
+          - --device=ANDROID_12
           - --a11y-locator
           - --fail-fast
           - --no-tunnel
           - --aws-public-ip
-        retry:
-          manual:
-            permit_on_passed: true
+    retry:
+      manual:
+        permit_on_passed: true
     concurrency: 25
     concurrency_group: "bitbar-app"
     concurrency_method: eager
     matrix:
-    - "0.72"
+      - "0.72"
