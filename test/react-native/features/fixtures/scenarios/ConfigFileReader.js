@@ -4,95 +4,78 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 const checkDirectoryExists = async () => {
   const startTime = Date.now()
-  let directoryExists = false
+  let sdCardDirExists = false
+  let emulatedDirExists = false
 
-  while (Date.now() - startTime < 30000) {
-    directoryExists = await FileSystem.exists(Dirs.DocumentDir)
-    console.log(`Directory ${Dirs.DocumentDir} exists: ${directoryExists}`)
-
+  while (Date.now() - startTime < 60000) {
     const sdCardDir = `${Dirs.SDCardDir}/Android/data/com.bugsnag.fixtures.reactnative.performance/files/`
-    const sdCardDirExists = await FileSystem.exists(sdCardDir)
+    sdCardDirExists = await FileSystem.exists(sdCardDir)
     console.log(`Directory ${sdCardDir} exists: ${sdCardDirExists}`)
 
     const emulatedDir = '/storage/emulated/0/Android/data/com.bugsnag.fixtures.reactnative.performance/files/'
-    const emulatedDirExists = await FileSystem.exists(emulatedDir)
+    emulatedDirExists = await FileSystem.exists(emulatedDir)
     console.log(`Directory ${emulatedDir} exists: ${emulatedDirExists}`)
-
-    const externalFileDir = `file://${Dirs.SDCardDir}/Android/data/com.bugsnag.fixtures.reactnative.performance/files/`
-    const externalFileDirExists = await FileSystem.exists(externalFileDir)
-    console.log(`Directory ${externalFileDir} exists: ${externalFileDirExists}`)
 
     await delay(10000)
   }
 
-  return directoryExists
+  return sdCardDirExists || emulatedDirExists
 }
 
 const listDirectoryContents = async () => {
   const startTime = Date.now()
-  let directoryContents = []
-
-  while (Date.now() - startTime < 30000) {
-    directoryContents = await FileSystem.ls(Dirs.DocumentDir)
-    console.log(`Directory '${Dirs.DocumentDir}' contents: ${JSON.stringify(directoryContents)}`)
-
+  let sdCardDirContents = []
+  let emulatedDirContents = []
+  while (Date.now() - startTime < 60000) {
     const sdCardDir = `${Dirs.SDCardDir}/Android/data/com.bugsnag.fixtures.reactnative.performance/files/`
-    const sdCardDirContents = await FileSystem.ls(sdCardDir)
+    sdCardDirContents = await FileSystem.ls(sdCardDir)
     console.log(`Directory '${sdCardDir}' contents: ${sdCardDirContents}`)
 
     const emulatedDir = '/storage/emulated/0/Android/data/com.bugsnag.fixtures.reactnative.performance/files/'
-    const emulatedDirContents = await FileSystem.ls(emulatedDir)
+    emulatedDirContents = await FileSystem.ls(emulatedDir)
     console.log(`Directory '${emulatedDir}' contents: ${emulatedDirContents}`)
-
-    const externalFileDir = `file://${Dirs.SDCardDir}/Android/data/com.bugsnag.fixtures.reactnative.performance/files/`
-    const externalFileDirContents = await FileSystem.ls(externalFileDir)
-    console.log(`Directory '${externalFileDir}' contents: ${externalFileDirContents}`)
 
     await delay(10000)
   }
 
-  return JSON.stringify(directoryContents)
+  return sdCardDirContents.length > 0 ? JSON.stringify(sdCardDirContents) : JSON.stringify(emulatedDirContents)
 }
 
 const getMazeRunnerAddress = async () => {
   const configFilePath = `${Dirs.DocumentDir}/fixture_config.json`
   const startTime = Date.now()
-  let configFileExists = false
 
   // poll for the config file to exist
-  while (Date.now() - startTime < 30000) {
-    configFileExists = await FileSystem.exists(configFilePath)
-    console.log(`File ${configFilePath} exists: ${configFileExists}`)
-
-    const externalConfigFile = `file://${Dirs.SDCardDir}/Android/data/com.bugsnag.fixtures.reactnative.performance/files/fixture_config.json`
-    const externalConfigFileExists = await FileSystem.exists(externalConfigFile)
-    console.log(`File ${externalConfigFile} exists: ${externalConfigFileExists}`)
-
+  while (Date.now() - startTime < 60000) {
     const emulatedExternalConfigFile = '/storage/emulated/0/Android/data/com.bugsnag.fixtures.reactnative.performance/files/fixture_config.json'
+    console.log(`Emulated storage file path: ${emulatedExternalConfigFile}`)
+
     const emulatedExternalConfigFileExists = await FileSystem.exists(emulatedExternalConfigFile)
-    console.log(`File ${emulatedExternalConfigFile} exists: ${emulatedExternalConfigFileExists}`)
+    console.log(`Emulated storage file '${emulatedExternalConfigFile}' exists: ${emulatedExternalConfigFileExists}`)
 
     await delay(10000)
   }
 
+  let configFileExists = false
   try {
+    console.log('copying config file into document directory...')
     await FileSystem.cp('/storage/emulated/0/Android/data/com.bugsnag.fixtures.reactnative.performance/files/fixture_config.json', configFilePath)
-  } catch (e) {
-    console.log('error copying config file: ', e)
-  }
-
-  try {
-    await FileSystem.cp(`file://${Dirs.SDCardDir}/Android/data/com.bugsnag.fixtures.reactnative.performance/files/fixture_config.json`, configFilePath)
+    configFileExists = await FileSystem.exists(configFilePath)
+    console.log(`copied config file into document directory. success: ${configFileExists}`)
   } catch (e) {
     console.log('error copying config file: ', e)
   }
 
   if (!configFileExists) {
+    console.log('config file not fould, setting maze address to bs-local.com:9339')
     return 'bs-local.com:9339'
   }
 
+  console.log('config file exists! Attempting to read file...')
   const configFile = await FileSystem.readFile(configFilePath)
+  console.log(`config file raw contents: ${configFile}`)
   const config = JSON.parse(configFile)
+  console.log(`config file JSON contents: ${JSON.stringify(config)}`)
   return config.maze_address
 }
 
