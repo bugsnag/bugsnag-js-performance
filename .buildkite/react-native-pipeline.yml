@@ -18,21 +18,21 @@ steps:
     matrix:
       - "0.72"
 
-  # - label: ':mac: Build RN {{matrix}} test fixture ipa'
-  #   key: "build-react-native-ios-fixture"
-  #   timeout_in_minutes: 30
-  #   agents:
-  #     queue: "macos-12-arm"
-  #   env:
-  #     RN_VERSION: "{{matrix}}"
-  #     BUILD_IOS: "true"
-  #     DEVELOPER_DIR: "/Applications/Xcode14.app"
-  #   artifact_paths:
-  #     - "build/react-native/**/output/reactnative.ipa"
-  #   commands:
-  #     - ./bin/generate-react-native-fixture
-  #   matrix:
-  #     - "0.72"
+  - label: ':mac: Build RN {{matrix}} test fixture ipa'
+    key: "build-react-native-ios-fixture"
+    timeout_in_minutes: 30
+    agents:
+      queue: "macos-12-arm"
+    env:
+      RN_VERSION: "{{matrix}}"
+      BUILD_IOS: "true"
+      DEVELOPER_DIR: "/Applications/Xcode14.app"
+    artifact_paths:
+      - "build/react-native/**/output/reactnative.ipa"
+    commands:
+      - ./bin/generate-react-native-fixture
+    matrix:
+      - "0.72"
 
     #
     # End-to-end tests
@@ -59,6 +59,31 @@ steps:
     retry:
       manual:
         permit_on_passed: true
+    concurrency: 25
+    concurrency_group: "bitbar-app"
+    concurrency_method: eager
+    matrix:
+      - "0.72"
+
+  - label: ":mac: RN {{matrix}} iOS 14 end-to-end tests"
+    depends_on: "build-react-native-ios-fixture"
+    timeout_in_minutes: 60
+    plugins:
+      artifacts#v1.9.0:
+        download: "build/react-native/{{matrix}}/output/reactnative.ipa"
+        upload: ./test/react-native/maze_output/**/*
+      docker-compose#v4.12.0:
+        pull: react-native-maze-runner
+        run: react-native-maze-runner
+        use-aliases: true
+        command:
+          - --app=build/react-native/{{matrix}}/output/reactnative.ipa
+          - --farm=bb
+          - --device=IOS_14
+          - --a11y-locator
+          - --fail-fast
+          - --no-tunnel
+          - --aws-public-ip
     concurrency: 25
     concurrency_group: "bitbar-app"
     concurrency_method: eager
