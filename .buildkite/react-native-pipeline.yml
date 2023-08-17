@@ -16,7 +16,6 @@ steps:
     commands:
       - ./bin/generate-react-native-fixture
     matrix:
-      - "0.71"
       - "0.72"
 
   - label: ':mac: Build RN {{matrix}} test fixture ipa'
@@ -33,7 +32,6 @@ steps:
     commands:
       - ./bin/generate-react-native-fixture
     matrix:
-      - "0.71"
       - "0.72"
 
     #
@@ -65,5 +63,4 @@ steps:
     concurrency_group: "bitbar-app"
     concurrency_method: eager
     matrix:
-    - "0.71"
     - "0.72"
