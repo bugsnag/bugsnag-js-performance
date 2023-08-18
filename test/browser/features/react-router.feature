@@ -1,3 +1,4 @@
+# react router doesn't work in Chrome 61 as AbortController does not exist
 @skip_chrome_61
 Feature: React router
 
