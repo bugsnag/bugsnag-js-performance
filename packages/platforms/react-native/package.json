@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "@bugsnag/core-performance": "^1.0.0",
-    "@bugsnag/delivery-fetch-performance": "^1.0.0"
+    "@bugsnag/delivery-fetch-performance": "^1.0.0",
+    "@bugsnag/cuid": "^3.0.2"
   },
   "devDependencies": {
     "babel-preset-react-native": "^4.0.1"
