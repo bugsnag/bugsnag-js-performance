@@ -7,7 +7,7 @@ const getMazeRunnerAddress = async () => {
   const startTime = Date.now()
 
   // poll for the config file to exist
-  while (Date.now() - startTime < 60000) {
+  while (Date.now() - startTime < 10000) {
     const configFileDir = Platform.OS === 'android' ? '/data/local/tmp' : Dirs.DocumentDir
     const tempDirExists = await FileSystem.exists(configFileDir)
     console.log(`${configFileDir} exists?: ${tempDirExists}`)
@@ -24,7 +24,7 @@ const getMazeRunnerAddress = async () => {
       return `${config.maze_address}`
     }
 
-    await delay(5000)
+    await delay(500)
   }
 
   return 'bs-local:9339'
