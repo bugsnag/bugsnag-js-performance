@@ -24,10 +24,11 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     { stdio: 'inherit' }
   )
 
-  // replace the App.tsx file with our own
+  // replace the App.tsx file with our own App.js file
+  fs.unlinkSync(resolve(fixtureDir, 'App.tsx'))
   fs.copyFileSync(
-    resolve(__dirname, '../test/react-native/features/fixtures/app/App.tsx'),
-    resolve(fixtureDir, 'App.tsx')
+    resolve(__dirname, '../test/react-native/features/fixtures/app/App.js'),
+    resolve(fixtureDir, 'App.js')
   )
 
   // replace the AndroidManifest.xml file with our own
@@ -52,7 +53,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   execSync('npm install --save react-native-file-access@3.0.4', { cwd: fixtureDir, stdio: 'inherit' })
 
   // pack the scenarios into the fixture directory and install
-  const scenariosDir = resolve(__dirname, '../test/react-native/features/fixtures/scenarios')
+  const scenariosDir = resolve(__dirname, '../test/react-native/features/fixtures/performance-scenarios')
   execSync(`npm pack ${scenariosDir} --pack-destination ${fixtureDir}`, { stdio: 'inherit' })
   execSync('npm install ./bugsnag-react-native-performance-scenarios-1.0.0.tgz', { cwd: fixtureDir, stdio: 'inherit' })
 }
