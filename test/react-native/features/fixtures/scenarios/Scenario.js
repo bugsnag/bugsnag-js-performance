@@ -1,22 +1,25 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { getMazeRunnerAddress } from './ConfigFileReader'
+import { readCommand } from './CommandRunner'
 
 export const Scenario = () => {
-  const [mazeAddress, setMazeAddress] = useState('Waiting for maze address...')
+  const [scenario, setScenario] = useState('Waiting for maze runner command...')
+  const [endpoint, setEndpoint] = useState('Waiting for trace endpoint...')
 
   useEffect(() => {
-    const getMazeAddress = async () => {
-      const mazeAddress = await getMazeRunnerAddress()
-      setMazeAddress(mazeAddress)
+    const getScenario = async () => {
+      const command = await readCommand()
+      setScenario(command.scenario_name)
+      setEndpoint(command.endpoint)
     }
 
-    getMazeAddress()
+    getScenario()
   }, [])
 
   return (
     <View style={styles.scenario}>
-      <Text accessibilityLabel='scenario'>{mazeAddress}</Text>
+      <Text accessibilityLabel='scenario'>{scenario}</Text>
+      <Text>{endpoint}</Text>
     </View>
   )
 }
