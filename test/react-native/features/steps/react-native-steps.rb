@@ -13,7 +13,6 @@ def execute_command(action, scenario_name = '')
   command = {
     action: action,
     scenario_name: scenario_name,
-    scenario_metadata: scenario_metadata,
     endpoint: "http://#{address}/traces",
   }
   Maze::Server.commands.add command
