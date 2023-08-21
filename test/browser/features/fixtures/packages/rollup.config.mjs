@@ -1,7 +1,5 @@
 import nodeResolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
-import babel from '@rollup/plugin-babel';
-import replace from '@rollup/plugin-replace';
 import path from 'path'
 import url from 'url'
 
@@ -28,13 +26,6 @@ export default {
   plugins: [
     nodeResolve({ browser: true, jail: path.resolve(`${__dirname}/..`), extensions: ['.mjs', '.js', '.json', '.node', '.jsx'] }),
     commonjs(),
-    babel({ babelHelpers: 'bundled' }),
-    replace({
-      preventAssignment: true,
-      values: {
-        'process.env.NODE_ENV': JSON.stringify('production'),
-      },
-    })
   ],
   ...(isCdnBuild ? { external: ['@bugsnag/browser-performance'] } : {}),
   onLog (level, log, defaultHandler) {
