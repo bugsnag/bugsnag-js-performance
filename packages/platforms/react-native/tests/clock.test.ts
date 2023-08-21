@@ -1,4 +1,4 @@
-import createClock from './clock'
+import createClock from '../lib/clock'
 
 // reset timer between tests
 beforeEach(() => {
