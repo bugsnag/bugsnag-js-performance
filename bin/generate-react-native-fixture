@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { execSync } = require('child_process')
+const { execFileSync } = require('child_process')
 const { resolve } = require('path')
 const fs = require('fs')
 
@@ -19,11 +19,9 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   }
 
   // create the test fixture
-  execSync(
-    `npx react-native init reactnative --package-name com.bugsnag.fixtures.reactnative.performance --directory ${fixtureDir} --version ${rnVersion} --npm --skip-install`,
-    { stdio: 'inherit' }
-  )
-
+  const RNInitArgs = ['react-native', 'init', 'reactnative', '--package-name', 'com.bugsnag.fixtures.reactnative.performance', '--directory', fixtureDir, '--version', rnVersion, '--npm', '--skip-install']
+  execFileSync('npx', RNInitArgs, { stdio: 'inherit' })
+  
   // replace the App.tsx file with our own App.js file
   fs.unlinkSync(resolve(fixtureDir, 'App.tsx'))
   fs.copyFileSync(
@@ -49,42 +47,56 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     resolve(fixtureDir, 'exportOptions.plist')
   )
 
-  // install react-native-file-access
-  execSync('npm install --save react-native-file-access@3.0.4', { cwd: fixtureDir, stdio: 'inherit' })
-
   // pack the scenarios into the fixture directory and install
   const scenariosDir = resolve(__dirname, '../test/react-native/features/fixtures/performance-scenarios')
-  execSync(`npm pack ${scenariosDir} --pack-destination ${fixtureDir}`, { stdio: 'inherit' })
-  execSync('npm install ./bugsnag-react-native-performance-scenarios-1.0.0.tgz', { cwd: fixtureDir, stdio: 'inherit' })
+  const packArgs = ['pack', scenariosDir, '--pack-destination', fixtureDir]
+  execFileSync('npm', packArgs, { stdio: 'inherit' })
+
+  // install react-native-file-access and the scenarios
+  const installArgs = ['install', '--save', 'react-native-file-access@3.0.4', './bugsnag-react-native-performance-scenarios-1.0.0.tgz']
+  execFileSync('npm', installArgs, { cwd: fixtureDir, stdio: 'inherit' })
 }
 
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
   // build the android app
-  execSync(`./gradlew assembleRelease`, { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
+  execFileSync('./gradlew', ['assembleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
   fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
 } 
 
 if(process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
-  execSync('rm -rf reactnative.xcarchive', { cwd: fixtureDir, stdio: 'inherit' })
+  fs.rmSync(`${fixtureDir}/reactnative.xcarchive`, { recursive: true, force: true })
 
   // install pods
-  execSync('pod install', { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
+  execFileSync('pod', ['install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
 
   // build the ios app
-  execSync(`xcrun xcodebuild DEVELOPMENT_TEAM=7W9PZ27Y5F \
-  -workspace reactnative.xcworkspace \
-  -scheme reactnative \
-  -configuration Release \
-  -archivePath ${fixtureDir}/reactnative.xcarchive \
-  -allowProvisioningUpdates \
-  archive`,
-  { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
+  const archiveArgs = [
+    'xcodebuild',
+    'DEVELOPMENT_TEAM=7W9PZ27Y5F',
+    '-workspace',
+    'reactnative.xcworkspace',
+    '-scheme',
+    'reactnative',
+    '-configuration',
+    'Release',
+    '-archivePath',
+    `${fixtureDir}/reactnative.xcarchive`,
+    '-allowProvisioningUpdates',
+    'archive',
+  ]
+  execFileSync('xcrun', archiveArgs, { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
 
   // export the archive
-  execSync('xcrun xcodebuild \
-  -exportArchive \
-  -archivePath reactnative.xcarchive \
-  -exportPath output/ \
-  -exportOptionsPlist exportOptions.plist',
-  { cwd: `${fixtureDir}`, stdio: 'inherit' })
+  const exportArgs = [
+    'xcodebuild',
+    '-exportArchive',
+    '-archivePath',
+    'reactnative.xcarchive',
+    '-exportPath',
+    'output/',
+    '-exportOptionsPlist',
+    'exportOptions.plist',
+  ]
+
+  execFileSync('xcrun', exportArgs, { cwd: fixtureDir, stdio: 'inherit' })
 }
