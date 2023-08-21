@@ -1,4 +1,4 @@
-import idGenerator from './id-generator'
+import idGenerator from '../lib/id-generator'
 
 describe('React Native ID generator', () => {
   it('generates random 64 bit ID', () => {

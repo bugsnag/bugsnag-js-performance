@@ -26,7 +26,7 @@ function createFetchRequestTracker (window: WindowWithFetch, clock: Clock) {
     const startContext = createStartContext(window.document.baseURI, clock.now(), input, init)
     const onRequestEnd = requestTracker.start(startContext)
 
-    return originalFetch.call(this, input as RequestInfo | URL, init as RequestInit).then(response => {
+    return originalFetch.call(this, input as RequestInfo, init as RequestInit).then(response => {
       onRequestEnd({ status: response.status, endTime: clock.now(), state: 'success' })
       return response
     }).catch(error => {
