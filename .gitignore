@@ -110,3 +110,6 @@ dist
 
 #Jest
 .jest
+
+# Maze runner output
+maze_output.zip
