@@ -15,7 +15,7 @@ const fixtureDir = resolve(__dirname, '../build/react-native/', rnVersion)
 if (!process.env.SKIP_GENERATE_FIXTURE) {
     // remove the fixture directory if it already exists
   if (fs.existsSync(fixtureDir)) {
-    execSync(`rm -rf ${fixtureDir}`, { stdio: 'inherit' })
+    fs.rmSync(fixtureDir, { recursive: true, force: true })
   }
 
   // create the test fixture
