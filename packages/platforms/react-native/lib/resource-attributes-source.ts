@@ -1,5 +1,5 @@
 import { ResourceAttributes, type InternalConfiguration } from '@bugsnag/core-performance'
-import { type ReactNativeConfiguration } from '../config/config'
+import { type ReactNativeConfiguration } from './config'
 import { Platform } from 'react-native'
 
 export function resourceAttributesSource (config: InternalConfiguration<ReactNativeConfiguration>) {

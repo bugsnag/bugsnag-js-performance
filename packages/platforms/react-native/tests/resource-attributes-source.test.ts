@@ -1,6 +1,6 @@
 import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
-import { type ReactNativeConfiguration } from '../config/config'
-import { resourceAttributesSource } from './resource-attributes-source'
+import { type ReactNativeConfiguration } from '../lib/config'
+import { resourceAttributesSource } from '../lib/resource-attributes-source'
 
 describe('resourceAttributesSource', () => {
   it('includes all expected attributes (iOS)', async () => {
