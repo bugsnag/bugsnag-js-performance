@@ -14,6 +14,7 @@ def execute_command(action, scenario_name = '')
     action: action,
     scenario_name: scenario_name,
     endpoint: "http://#{address}/traces",
+    api_key: $api_key,
   }
   Maze::Server.commands.add command
 
