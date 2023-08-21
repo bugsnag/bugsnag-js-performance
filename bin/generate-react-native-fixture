@@ -76,6 +76,16 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   
   // install react-native-file-access plus packages
   execSync('npm install --save react-native-file-access@3.0.4 *.tgz', { cwd: fixtureDir, stdio: 'inherit' })
+
+  // install react-native-dotenv
+  execSync('npm install --save react-native-dotenv', { cwd: fixtureDir, stdio: 'inherit' })
+
+  // configure react-native-dotenv
+  fs.writeFileSync(`${fixtureDir}/.babelrc`, JSON.stringify({
+    plugins: [
+      ['module:react-native-dotenv']
+    ]
+  }))
 }
 
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
