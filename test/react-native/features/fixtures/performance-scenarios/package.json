@@ -11,6 +11,7 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-native-file-access": "*"
+    "react-native-file-access": "*",
+    "@bugsnag/react-native-performance": "*"
   }
 }
