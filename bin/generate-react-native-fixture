@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { execFileSync } = require('child_process')
+const { execFileSync, execSync } = require('child_process')
 const { resolve } = require('path')
 const fs = require('fs')
 
@@ -12,8 +12,29 @@ if (!process.env.RN_VERSION) {
 const rnVersion = process.env.RN_VERSION
 const fixtureDir = resolve(__dirname, '../build/react-native/', rnVersion)
 
+const ROOT_DIR = resolve(__dirname, '../')
+
+const PACKAGE_NAMES = [
+  '@bugsnag/core-performance',
+  '@bugsnag/react-native-performance',
+  '@bugsnag/delivery-fetch-performance',
+]
+
+const PACKAGE_DIRECTORIES = [
+  `${ROOT_DIR}/packages/core`,
+  `${ROOT_DIR}/packages/delivery-fetch`,
+  `${ROOT_DIR}/packages/platforms/react-native`,
+  `${ROOT_DIR}/test/react-native/features/fixtures/performance-scenarios`,
+]
+
+if (!process.env.SKIP_BUILD_PACKAGES) {
+  // build the packages
+  const buildArgs = ['run', 'build', '--scope', PACKAGE_NAMES.join(' --scope ')]
+  execFileSync('npm', buildArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
+}
+
 if (!process.env.SKIP_GENERATE_FIXTURE) {
-    // remove the fixture directory if it already exists
+  // remove the fixture directory if it already exists
   if (fs.existsSync(fixtureDir)) {
     fs.rmSync(fixtureDir, { recursive: true, force: true })
   }
@@ -47,14 +68,14 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     resolve(fixtureDir, 'exportOptions.plist')
   )
 
-  // pack the scenarios into the fixture directory and install
-  const scenariosDir = resolve(__dirname, '../test/react-native/features/fixtures/performance-scenarios')
-  const packArgs = ['pack', scenariosDir, '--pack-destination', fixtureDir]
-  execFileSync('npm', packArgs, { stdio: 'inherit' })
-
-  // install react-native-file-access and the scenarios
-  const installArgs = ['install', '--save', 'react-native-file-access@3.0.4', './bugsnag-react-native-performance-scenarios-1.0.0.tgz']
-  execFileSync('npm', installArgs, { cwd: fixtureDir, stdio: 'inherit' })
+  // pack the required packages into the fixture directory
+  for (const package of PACKAGE_DIRECTORIES) {
+    const libraryPackArgs = ['pack', package, '--pack-destination', fixtureDir]
+    execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
+  }
+  
+  // install react-native-file-access plus packages
+  execSync('npm install --save react-native-file-access@3.0.4 *.tgz', { cwd: fixtureDir, stdio: 'inherit' })
 }
 
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
@@ -84,6 +105,7 @@ if(process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
     '-allowProvisioningUpdates',
     'archive',
   ]
+
   execFileSync('xcrun', archiveArgs, { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
 
   // export the archive
