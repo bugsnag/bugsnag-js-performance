@@ -10,9 +10,8 @@ if (!process.env.RN_VERSION) {
 }
 
 const rnVersion = process.env.RN_VERSION
-const fixtureDir = resolve(__dirname, '../build/react-native/', rnVersion)
-
 const ROOT_DIR = resolve(__dirname, '../')
+const fixtureDir = resolve(ROOT_DIR, 'test/react-native/features/fixtures/generated/', rnVersion)
 
 const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
@@ -46,25 +45,25 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   // replace the App.tsx file with our own App.js file
   fs.unlinkSync(resolve(fixtureDir, 'App.tsx'))
   fs.copyFileSync(
-    resolve(__dirname, '../test/react-native/features/fixtures/app/App.js'),
+    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/App.js'),
     resolve(fixtureDir, 'App.js')
   )
 
   // replace the AndroidManifest.xml file with our own
   fs.copyFileSync(
-    resolve(__dirname, '../test/react-native/features/fixtures/app/android/AndroidManifest.xml'),
+    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/AndroidManifest.xml'),
     resolve(fixtureDir, 'android/app/src/main/AndroidManifest.xml')
   )
 
   // replace the Info.plist file with our own
   fs.copyFileSync(
-    resolve(__dirname, '../test/react-native/features/fixtures/app/ios/Info.plist'),
+    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/Info.plist'),
     resolve(fixtureDir, 'ios/reactnative/Info.plist')
   )
 
   // copy the exportOptions.plist file
   fs.copyFileSync(
-    resolve(__dirname, '../test/react-native/features/fixtures/app/ios/exportOptions.plist'),
+    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/exportOptions.plist'),
     resolve(fixtureDir, 'exportOptions.plist')
   )
 

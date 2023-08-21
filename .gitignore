@@ -113,3 +113,6 @@ dist
 
 # Maze runner output
 maze_output.zip
+
+# React Native test fixure
+test/react-native/features/fixtures/generated/
