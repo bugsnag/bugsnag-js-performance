@@ -1,10 +1,14 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { SafeAreaView, StyleSheet, View, Text, RootTagContext } from 'react-native'
 import { launchScenario } from '@bugsnag/react-native-performance-scenarios'
 
 const App = () => {
   const rootTag = useContext(RootTagContext)
-  launchScenario(rootTag)
+
+  useEffect(() => {
+    launchScenario(rootTag)
+  }, [rootTag])
+
   return (
     <SafeAreaView style={styles.container}>
       <View>
