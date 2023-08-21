@@ -67,6 +67,12 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     resolve(fixtureDir, 'exportOptions.plist')
   )
 
+  // copy the .env file
+  fs.copyFileSync(
+    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/env'),
+    resolve(fixtureDir, '.env')
+  )
+
   // pack the required packages into the fixture directory
   for (const package of PACKAGE_DIRECTORIES) {
     const libraryPackArgs = ['pack', package, '--pack-destination', fixtureDir]
