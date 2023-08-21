@@ -10,7 +10,7 @@ if (!process.env.RN_VERSION) {
 }
 
 const rnVersion = process.env.RN_VERSION
-const fixtureDir = process.env.OUTPUT_DIR || resolve(__dirname, '../build/react-native/', rnVersion)
+const fixtureDir = resolve(__dirname, '../build/react-native/', rnVersion)
 
 if (!process.env.SKIP_GENERATE_FIXTURE) {
     // remove the fixture directory if it already exists
