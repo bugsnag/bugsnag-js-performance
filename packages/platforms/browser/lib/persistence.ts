@@ -1,9 +1,9 @@
 import {
+  InMemoryPersistence,
+  toPersistedPayload,
   type Persistence,
   type PersistenceKey,
-  type PersistencePayloadMap,
-  isPersistedProbabilty,
-  InMemoryPersistence
+  type PersistencePayloadMap
 } from '@bugsnag/core-performance'
 
 interface LocalStorage {
@@ -26,38 +26,6 @@ function makeBrowserPersistence (window: WindowWithLocalStorage): Persistence {
 
   // store items in memory if localStorage isn't available
   return new InMemoryPersistence()
-}
-
-// NOTE: this should be kept in sync with the notifier
-// https://github.com/bugsnag/bugsnag-js/blob/next/packages/plugin-browser-device/device.js
-function isDeviceId (raw: string): boolean {
-  // make sure the persisted value looks like a valid cuid
-  return /^c[a-z0-9]{20,32}$/.test(raw)
-}
-
-function toPersistedPayload<K extends PersistenceKey> (
-  key: K,
-  raw: string
-): PersistencePayloadMap[K] | undefined {
-  switch (key) {
-    case 'bugsnag-sampling-probability': {
-      const json = JSON.parse(raw)
-
-      return isPersistedProbabilty(json)
-        ? json as PersistencePayloadMap[K]
-        : undefined
-    }
-
-    case 'bugsnag-anonymous-id':
-      return isDeviceId(raw)
-        ? raw as PersistencePayloadMap[K]
-        : undefined
-
-    default: {
-      const _exhaustiveCheck: never = key
-      return _exhaustiveCheck
-    }
-  }
 }
 
 function toString<K extends PersistenceKey> (key: K, value: PersistencePayloadMap[K]): string {
