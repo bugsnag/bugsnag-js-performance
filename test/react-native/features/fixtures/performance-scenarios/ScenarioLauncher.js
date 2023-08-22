@@ -12,6 +12,6 @@ export const launchScenario = async (rootTag) => {
   }
 
   const scenario = Scenarios[command.scenario_name]
-  AppRegistry.registerComponent('scenario', () => scenario(command.endpoint, command.api_key))
-  AppRegistry.runApplication('scenario', { initialProps: {}, rootTag })
+  AppRegistry.registerComponent(command.scenario_name, () => scenario(command.endpoint, command.api_key))
+  AppRegistry.runApplication(command.scenario_name, { initialProps: {}, rootTag })
 }
