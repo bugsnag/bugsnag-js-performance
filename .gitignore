@@ -106,10 +106,14 @@ dist
 # TernJS port file
 .tern-port
 
+# Verdaccio
 .verdaccio
 
 #Jest
 .jest
+
+#rbenv
+.ruby-version
 
 # Maze runner output
 maze_output.zip
