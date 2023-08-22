@@ -1,5 +1,5 @@
 declare module '@bugsnag/cuid' {
-  declare function cuid (): string
+  function cuid (): string
 
   export default cuid
 }
