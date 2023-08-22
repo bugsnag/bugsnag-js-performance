@@ -11,12 +11,14 @@ export interface ReactNativeSchema extends CoreSchema {
   appName: ConfigOption<string>
   codeBundleId: ConfigOption<string>
   generateAnonymousId: ConfigOption<boolean>
+  autoInstrumentAppStarts: ConfigOption<boolean>
 }
 
 export interface ReactNativeConfiguration extends Configuration {
   appName: string
   codeBundleId?: string
   generateAnonymousId?: boolean
+  autoInstrumentAppStarts?: boolean
 }
 
 function createSchema (): ReactNativeSchema {
@@ -35,6 +37,11 @@ function createSchema (): ReactNativeSchema {
     generateAnonymousId: {
       defaultValue: true,
       message: 'should be true|false',
+      validate: isBoolean
+    },
+    autoInstrumentAppStarts: {
+      defaultValue: true,
+      message: 'should be a boolean',
       validate: isBoolean
     }
   }
