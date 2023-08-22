@@ -1,6 +1,6 @@
 import { getMazeRunnerAddress } from './ConfigFileReader'
 
-const getCommand = async () => {
+const getCurrentCommand = async () => {
   const mazeAddress = await getMazeRunnerAddress()
   const commandUrl = `http://${mazeAddress}/command`
 
@@ -20,4 +20,4 @@ const getCommand = async () => {
   }
 }
 
-module.exports.getCommand = getCommand
+module.exports.getCurrentCommand = getCurrentCommand

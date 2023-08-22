@@ -1,1 +1,1 @@
-export { TestScenario } from './TestScenario'
+export { ManualSpanScenario } from './ManualSpanScenario'
