@@ -43,3 +43,10 @@ export const isSpanContext = (value: unknown): value is SpanContext =>
 export function isTime (value: unknown): value is Time {
   return isNumber(value) || value instanceof Date
 }
+
+// NOTE: this should be kept in sync with the notifier
+// https://github.com/bugsnag/bugsnag-js/blob/next/packages/plugin-browser-device/device.js
+export function isDeviceId (raw: string): boolean {
+  // make sure the persisted value looks like a valid cuid
+  return /^c[a-z0-9]{20,32}$/.test(raw)
+}
