@@ -65,7 +65,7 @@ steps:
     matrix:
       - "0.72"
 
-  - label: ":mac: RN {{matrix}} iOS 14 end-to-end tests"
+  - label: ":bitbar: :mac: RN {{matrix}} iOS 14 end-to-end tests"
     depends_on: "build-react-native-ios-fixture"
     timeout_in_minutes: 60
     plugins:
@@ -77,7 +77,7 @@ steps:
         run: react-native-maze-runner
         service-ports: true
         command:
-          - --app=/app/features/features/fixtures/generated/{{matrix}}/output/reactnative.ipa
+          - --app=/app/features/fixtures/generated/{{matrix}}/output/reactnative.ipa
           - --farm=bb
           - --device=IOS_14
           - --a11y-locator
