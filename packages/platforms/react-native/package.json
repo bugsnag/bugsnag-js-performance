@@ -23,7 +23,8 @@
     "babel-preset-react-native": "^4.0.1"
   },
   "peerDependencies": {
-    "react-native": "*"
+    "react-native": "*",
+    "@react-native-async-storage/async-storage": "*"
   },
   "scripts": {
     "build": "rollup --config",
