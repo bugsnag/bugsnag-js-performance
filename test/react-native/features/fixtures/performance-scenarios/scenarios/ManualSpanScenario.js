@@ -5,7 +5,7 @@ import BugsnagPerformance from '@bugsnag/react-native-performance'
 export const ManualSpanScenario = (endpoint, apiKey) => {
   const App = () => {
     useEffect(() => {
-      BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 1, appName: 'com.bugsnag.reactnative.performance' })
+      BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 1, appName: 'com.bugsnag.reactnative.performance', appVersion: '1.2.3' })
       BugsnagPerformance.startSpan('ManualSpanScenario').end()
     }, [])
 
