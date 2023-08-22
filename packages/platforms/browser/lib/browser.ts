@@ -3,8 +3,7 @@ import { FullPageLoadPlugin, NetworkRequestPlugin, ResourceLoadPlugin, RouteChan
 import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
 import { createSchema } from './config'
-import { createDefaultRoutingProvider } from './routing-provider/default-routing-provider'
-import { createReactRouterRoutingProvider } from './routing-provider/react-router-routing-provider'
+import { createDefaultRoutingProvider } from './default-routing-provider'
 import createBrowserDeliveryFactory from './delivery'
 import idGenerator from './id-generator'
 import createOnSettle from './on-settle'
@@ -31,7 +30,6 @@ export const onSettle = createOnSettle(
   performance
 )
 export const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle, window.location)
-export const ReactRouterRoutingProvider = createReactRouterRoutingProvider(onSettle, window.location)
 
 const BugsnagPerformance = createClient({
   backgroundingListener,

@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { createDefaultRoutingProvider, defaultRouteResolver } from '../../lib/routing-provider/default-routing-provider'
+import { createDefaultRoutingProvider, defaultRouteResolver } from '../lib/default-routing-provider'
 
 jest.useFakeTimers()
 

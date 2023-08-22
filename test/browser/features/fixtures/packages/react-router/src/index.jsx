@@ -6,7 +6,8 @@ import {
 } from 'react-router-dom';
 import Root from './routes/root';
 import Contact from './routes/contact';
-import BugsnagPerformance, { ReactRouterRoutingProvider } from '@bugsnag/browser-performance'
+import BugsnagPerformance from '@bugsnag/browser-performance'
+import { ReactRouterRoutingProvider } from '@bugsnag/react-router-performance'
 
 const parameters = new URLSearchParams(window.location.search)
 const apiKey = parameters.get('api_key')
