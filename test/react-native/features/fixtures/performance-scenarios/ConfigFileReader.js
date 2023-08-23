@@ -24,7 +24,7 @@ const getMazeRunnerAddress = async () => {
   }
 
   console.log(`no config file found at ${configFilePath}`)
-  return 'bs-local:9339'
+  return 'localhost:9339'
 }
 
 module.exports.getMazeRunnerAddress = getMazeRunnerAddress
