@@ -8,8 +8,7 @@ import {
 import type { AsyncStorageStatic } from '@react-native-async-storage/async-storage'
 
 export function getReactNativePersistence (): Persistence {
-  // accessing localStorage can throw on some browsers, so we have to catch
-  // these errors and provide a fallback
+  // use @react-native-async-storage/async-storage if it's installed
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const AsyncStorage = require('@react-native-async-storage/async-storage')
@@ -19,7 +18,7 @@ export function getReactNativePersistence (): Persistence {
     }
   } catch {}
 
-  // store items in memory if localStorage isn't available
+  // store items in memory if @react-native-async-storage/async-storage isn't available
   return new InMemoryPersistence()
 }
 
