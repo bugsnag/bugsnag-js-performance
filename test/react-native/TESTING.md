@@ -39,5 +39,3 @@ Or to run a single feature file:
 ```sh
 bundle exec maze-runner --farm=bs --device=IOS_14 --a11y-locator --app=features/fixtures/generated/0.72/output/reactnative.ipa features/manual-spans.feature
 ```
-
-__Note: It's not currently possible to run Android tests locally using BrowserStack due to a network issue.__

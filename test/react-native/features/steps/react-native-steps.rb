@@ -7,7 +7,12 @@ def execute_command(action, scenario_name = '')
                 'local:9339'
               end
             else
-              'bs-local.com:9339'
+              case Maze::Helper.get_current_platform
+                when 'android'
+                  'localhost:9339'
+                else
+                  'bs-local.com:9339'
+              end
             end
 
   command = {
