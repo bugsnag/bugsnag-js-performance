@@ -5,17 +5,12 @@ import {
   toPersistedPayload,
   InMemoryPersistence
 } from '@bugsnag/core-performance'
-import type { AsyncStorageStatic } from '@react-native-async-storage/async-storage'
+import AsyncStorage, { type AsyncStorageStatic } from '@react-native-async-storage/async-storage'
 
 export function getReactNativePersistence (): Persistence {
   // use @react-native-async-storage/async-storage if it's installed
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const AsyncStorage = require('@react-native-async-storage/async-storage')
-
-    if (AsyncStorage) {
-      return new ReactNativePersistence(AsyncStorage)
-    }
+    if (AsyncStorage) return new ReactNativePersistence(AsyncStorage)
   } catch {}
 
   // store items in memory if @react-native-async-storage/async-storage isn't available
