@@ -2,25 +2,24 @@ import React, { useEffect } from 'react'
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 
-export const ManualSpanScenario = (endpoint, apiKey) => {
-  const App = () => {
-    useEffect(() => {
-      BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 1, appName: 'com.bugsnag.reactnative.performance', appVersion: '1.2.3' })
-      BugsnagPerformance.startSpan('ManualSpanScenario').end()
-    }, [])
+export const config = {
+  maximumBatchSize: 1,
+  autoInstrumentAppStarts: false,
+  appVersion: '1.2.3'
+}
 
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.scenario}>
-          <Text accessibilityLabel='scenario'>ManualSpanScenario</Text>
-          <Text>{endpoint}</Text>
-          <Text>{apiKey}</Text>
-        </View>
-      </SafeAreaView>
-    )
-  }
+export const App = () => {
+  useEffect(() => {
+    BugsnagPerformance.startSpan('ManualSpanScenario').end()
+  }, [])
 
-  return App
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.scenario}>
+        <Text>ManualSpanScenario</Text>
+      </View>
+    </SafeAreaView>
+  )
 }
 
 const styles = StyleSheet.create({

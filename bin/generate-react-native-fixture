@@ -76,6 +76,12 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     resolve(fixtureDir, '.env')
   )
 
+  // replace the babel.config.js file
+  fs.copyFileSync(
+    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/babel.config.js'),
+    resolve(fixtureDir, 'babel.config.js')
+  )
+
   // pack the required packages into the fixture directory
   for (const package of PACKAGE_DIRECTORIES) {
     const libraryPackArgs = ['pack', package, '--pack-destination', fixtureDir]
@@ -87,13 +93,6 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   // install react-native-dotenv
   execSync('npm install --save react-native-dotenv', { cwd: fixtureDir, stdio: 'inherit' })
-
-  // configure react-native-dotenv
-  fs.writeFileSync(`${fixtureDir}/.babelrc`, JSON.stringify({
-    plugins: [
-      ['module:react-native-dotenv']
-    ]
-  }))
 }
 
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
