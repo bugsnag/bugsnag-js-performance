@@ -16,7 +16,7 @@ export interface ReactNativeSchema extends CoreSchema {
 export interface ReactNativeConfiguration extends Configuration {
   appName: string
   codeBundleId?: string
-  generateAnonymousId: boolean
+  generateAnonymousId?: boolean
 }
 
 function createSchema (): ReactNativeSchema {
