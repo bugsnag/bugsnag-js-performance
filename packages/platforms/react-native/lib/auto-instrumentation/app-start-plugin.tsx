@@ -6,20 +6,23 @@ import {
 } from '@bugsnag/core-performance'
 import { type ReactNativeConfiguration } from '../config'
 import { useEffect } from 'react'
-import { type WrapperComponentProvider, AppRegistry } from 'react-native'
+import { type WrapperComponentProvider, type AppRegistry } from 'react-native'
 
 export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
   private readonly spanFactory: SpanFactory<ReactNativeConfiguration>
   private readonly clock: Clock
   private readonly startTime: number
+  private readonly appRegistry: typeof AppRegistry
 
   constructor (
     spanFactory: SpanFactory<ReactNativeConfiguration>,
-    clock: Clock
+    clock: Clock,
+    appRegistry: typeof AppRegistry
   ) {
     this.spanFactory = spanFactory
     this.clock = clock
     this.startTime = clock.now()
+    this.appRegistry = appRegistry
   }
 
   configure (configuration: InternalConfiguration<ReactNativeConfiguration>) {
@@ -43,6 +46,6 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
       }
     }
 
-    AppRegistry.setWrapperComponentProvider(instrumentedComponentProvider)
+    this.appRegistry.setWrapperComponentProvider(instrumentedComponentProvider)
   }
 }
