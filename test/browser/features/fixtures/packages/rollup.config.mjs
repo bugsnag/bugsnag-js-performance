@@ -24,8 +24,8 @@ export default {
     ...(isCdnBuild ? cdnOutputOptions : {}),
   },
   plugins: [
-    nodeResolve({ browser: true, jail: path.resolve(`${__dirname}/..`), extensions: ['.mjs', '.js', '.json', '.node', '.jsx'] }),
-    commonjs(),
+    nodeResolve({ browser: true, jail: path.resolve(`${__dirname}/..`) }),
+    commonjs()
   ],
   ...(isCdnBuild ? { external: ['@bugsnag/browser-performance'] } : {}),
   onLog (level, log, defaultHandler) {
