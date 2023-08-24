@@ -5,7 +5,7 @@ import {
   type Clock
 } from '@bugsnag/core-performance'
 import { type ReactNativeConfiguration } from '../config'
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { type WrapperComponentProvider, type AppRegistry } from 'react-native'
 
 export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
@@ -42,7 +42,7 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
           endSpan()
         }, [])
 
-        return <>{children}</>
+        return <React.Fragment>{children}</React.Fragment>
       }
     }
 
