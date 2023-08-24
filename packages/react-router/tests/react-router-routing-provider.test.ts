@@ -2,12 +2,14 @@
  * @jest-environment jsdom
  */
 
-import { type Span, SpanAttributes, SpanInternal } from '@bugsnag/core-performance'
-import { ReactRouterRoutingProvider } from '../lib'
+import { ReactRouterRoutingProvider } from '../lib/react-router-routing-provider'
+import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
 
 jest.useFakeTimers()
 
 describe('ReactRouterRoutingProvider', () => {
+  const spanFactory = new MockSpanFactory()
+
   const routes = [
     {
       path: '/',
@@ -30,9 +32,11 @@ describe('ReactRouterRoutingProvider', () => {
   describe('listenForRouteChanges', () => {
     it('invokes the provided callback on pushState', () => {
       const routingProvider = new ReactRouterRoutingProvider(routes)
-      const spanAttributes = new SpanAttributes(new Map())
-      const span = new SpanInternal('id', 'traceId', 'test span', 1234, spanAttributes) as unknown as Span
-      const startRouteChangeSpan = jest.fn(() => span)
+      const span = spanFactory.startSpan(
+        '[FullPageLoad]/some-route',
+        { }
+      )
+      const startRouteChangeSpan = jest.fn(() => spanFactory.toPublicApi(span))
 
       routingProvider.listenForRouteChanges(startRouteChangeSpan)
 
@@ -43,7 +47,11 @@ describe('ReactRouterRoutingProvider', () => {
 
     it('invokes the provided callback on popstate', () => {
       const routingProvider = new ReactRouterRoutingProvider(routes)
-      const startRouteChangeSpan = jest.fn()
+      const span = spanFactory.startSpan(
+        '[FullPageLoad]/some-route',
+        { }
+      )
+      const startRouteChangeSpan = jest.fn(() => spanFactory.toPublicApi(span))
 
       history.pushState({}, '', '/contacts/2')
 
