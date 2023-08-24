@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/react-router-performance",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "BugSnag performance monitoring for react-router",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
