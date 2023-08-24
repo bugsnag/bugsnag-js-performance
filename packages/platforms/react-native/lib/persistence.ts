@@ -39,7 +39,8 @@ class ReactNativePersistence implements Persistence {
 
   async save<K extends PersistenceKey> (key: K, value: PersistencePayloadMap[K]): Promise<void> {
     try {
-      this.storage.setItem(key, JSON.stringify(value))
+      const stringValue = typeof value === 'string' ? value : JSON.stringify(value)
+      this.storage.setItem(key, stringValue)
     } catch {}
   }
 }
