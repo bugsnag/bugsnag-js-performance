@@ -2,7 +2,8 @@
  * @jest-environment jsdom
  */
 
-import { createReactRouterRoutingProvider } from '../lib/react-router-routing-provider'
+import { type Span, SpanAttributes, SpanInternal } from '@bugsnag/core-performance'
+import { ReactRouterRoutingProvider } from '../lib'
 
 jest.useFakeTimers()
 
@@ -28,11 +29,10 @@ describe('ReactRouterRoutingProvider', () => {
 
   describe('listenForRouteChanges', () => {
     it('invokes the provided callback on pushState', () => {
-      const onSettle = jest.fn(() => 1234)
-      const ReactRouterRoutingProvider = createReactRouterRoutingProvider(onSettle, window.location)
-
       const routingProvider = new ReactRouterRoutingProvider(routes)
-      const startRouteChangeSpan = jest.fn()
+      const spanAttributes = new SpanAttributes(new Map())
+      const span = new SpanInternal('id', 'traceId', 'test span', 1234, spanAttributes) as unknown as Span
+      const startRouteChangeSpan = jest.fn(() => span)
 
       routingProvider.listenForRouteChanges(startRouteChangeSpan)
 
@@ -42,9 +42,6 @@ describe('ReactRouterRoutingProvider', () => {
     })
 
     it('invokes the provided callback on popstate', () => {
-      const onSettle = jest.fn(() => 1234)
-      const ReactRouterRoutingProvider = createReactRouterRoutingProvider(onSettle, window.location)
-
       const routingProvider = new ReactRouterRoutingProvider(routes)
       const startRouteChangeSpan = jest.fn()
 
@@ -62,9 +59,6 @@ describe('ReactRouterRoutingProvider', () => {
 
   describe('resolveRoute', () => {
     it('uses the provided routes when resolving routes', () => {
-      const onSettle = jest.fn(() => 1234)
-      const ReactRouterRoutingProvider = createReactRouterRoutingProvider(onSettle, window.location)
-
       const routingProvider = new ReactRouterRoutingProvider(routes)
 
       expect(routingProvider.resolveRoute(new URL(window.location.href))).toBe('/contacts/:contactId')
@@ -77,9 +71,6 @@ describe('ReactRouterRoutingProvider', () => {
 
   describe('basename', () => {
     it('uses the provided basename when resolving routes', () => {
-      const onSettle = jest.fn(() => 1234)
-      const ReactRouterRoutingProvider = createReactRouterRoutingProvider(onSettle, window.location)
-
       const routingProvider = new ReactRouterRoutingProvider(routes, '/app')
 
       history.pushState({}, '', '/app/contacts/2/edit')
