@@ -56,7 +56,7 @@ module.exports = {
         '^.+\\.m?[tj]sx?$': [
           'ts-jest',
           {
-            tsconfig: { paths },
+            tsconfig: { paths, jsx: 'react-native' },
             babelConfig: {
               presets: ['module:metro-react-native-babel-preset']
             }
