@@ -6,56 +6,24 @@ describe('resourceAttributesSource', () => {
   it('includes all expected attributes (iOS)', async () => {
     const configuraiton = createConfiguration<ReactNativeConfiguration>({ releaseStage: 'test', appVersion: '1.0.0', appName: 'Test App', codeBundleId: '12345678' })
     const resourceAttributes = await resourceAttributesSource(configuraiton)
+    const jsonAttributes = resourceAttributes.toJson()
 
-    expect(resourceAttributes.toJson()).toEqual(expect.arrayContaining([
-      {
-        key: 'bugsnag.app.code_bundle_id',
-        value: { stringValue: '12345678' }
-      },
-      {
-        key: 'deployment.environment',
-        value: { stringValue: 'test' }
-      },
-      {
-        key: 'device.id',
-        value: { stringValue: 'unknown' }
-      },
-      {
-        key: 'device.manufacturer',
-        value: { stringValue: 'Apple' }
-      },
-      {
-        key: 'device.model.identifier',
-        value: { stringValue: 'unknown' }
-      },
-      {
-        key: 'os.type',
-        value: { stringValue: 'darwin' }
-      },
-      {
-        key: 'os.name',
-        value: { stringValue: 'ios' }
-      },
-      {
-        key: 'os.version',
-        value: { stringValue: '1.2.3' }
-      },
-      {
-        key: 'service.name',
-        value: { stringValue: 'Test App' }
-      },
-      {
-        key: 'service.version',
-        value: { stringValue: '1.0.0' }
-      },
-      {
-        key: 'telemetry.sdk.name',
-        value: { stringValue: 'bugsnag.performance.reactnative' }
-      },
-      {
-        key: 'telemetry.sdk.version',
-        value: { stringValue: '__VERSION__' }
-      }
-    ]))
+    function getAttribute (key: string) {
+      const matchingAttribute = jsonAttributes.find(attribute => attribute?.key === key)
+      return matchingAttribute?.value
+    }
+
+    expect(getAttribute('bugsnag.app.code_bundle_id')).toStrictEqual({ stringValue: '12345678' })
+    expect(getAttribute('deployment.environment')).toStrictEqual({ stringValue: 'test' })
+    expect(getAttribute('device.id')).toStrictEqual({ stringValue: expect.stringMatching(/^c[a-z0-9]{20,32}$/) })
+    expect(getAttribute('device.manufacturer')).toStrictEqual({ stringValue: 'Apple' })
+    expect(getAttribute('device.model.identifier')).toStrictEqual({ stringValue: 'unknown' })
+    expect(getAttribute('os.type')).toStrictEqual({ stringValue: 'darwin' })
+    expect(getAttribute('os.name')).toStrictEqual({ stringValue: 'ios' })
+    expect(getAttribute('os.version')).toStrictEqual({ stringValue: '1.2.3' })
+    expect(getAttribute('service.name')).toStrictEqual({ stringValue: 'Test App' })
+    expect(getAttribute('service.version')).toStrictEqual({ stringValue: '1.0.0' })
+    expect(getAttribute('telemetry.sdk.name')).toStrictEqual({ stringValue: 'bugsnag.performance.reactnative' })
+    expect(getAttribute('telemetry.sdk.version')).toStrictEqual({ stringValue: '__VERSION__' })
   })
 })
