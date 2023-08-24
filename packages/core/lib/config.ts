@@ -52,7 +52,7 @@ export const schema: CoreSchema = {
   endpoint: {
     defaultValue: 'https://otlp.bugsnag.com/v1/traces',
     message: 'should be a string',
-    validate: isString
+    validate: isStringWithLength
   },
   apiKey: {
     defaultValue: '',
