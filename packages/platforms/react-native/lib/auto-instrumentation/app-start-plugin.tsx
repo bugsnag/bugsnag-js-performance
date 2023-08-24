@@ -9,15 +9,23 @@ import { useEffect } from 'react'
 import { type WrapperComponentProvider, AppRegistry } from 'react-native'
 
 export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
+  private readonly spanFactory: SpanFactory<ReactNativeConfiguration>
+  private readonly clock: Clock
+  private readonly startTime: number
+
   constructor (
-    private readonly spanFactory: SpanFactory<ReactNativeConfiguration>,
-    private readonly clock: Clock
-  ) {}
+    spanFactory: SpanFactory<ReactNativeConfiguration>,
+    clock: Clock
+  ) {
+    this.spanFactory = spanFactory
+    this.clock = clock
+    this.startTime = clock.now()
+  }
 
   configure (configuration: InternalConfiguration<ReactNativeConfiguration>) {
     if (!configuration.autoInstrumentAppStarts) return
 
-    const appStartSpan = this.spanFactory.startSpan('[AppStart/ReactNativeInit]', { parentContext: null })
+    const appStartSpan = this.spanFactory.startSpan('[AppStart/ReactNativeInit]', { startTime: this.startTime, parentContext: null })
     appStartSpan.setAttribute('bugsnag.span.category', 'app_start')
     appStartSpan.setAttribute('bugsnag.app_start.type', 'ReactNativeInit')
 
