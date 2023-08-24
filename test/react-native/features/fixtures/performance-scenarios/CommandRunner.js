@@ -7,8 +7,7 @@ const getCurrentCommand = async () => {
   try {
     const response = await fetch(commandUrl)
     if (!response.ok) {
-      console.log(`Failed to read command: received a ${response.status} response from maze runner at url ${commandUrl}`)
-      return { scenario_name: 'ERROR', endpoint: 'ERROR' }
+      throw new Error(`Received ${response.status} response from maze runner`)
     }
 
     const command = await response.json()
@@ -16,7 +15,7 @@ const getCurrentCommand = async () => {
     return command
   } catch (err) {
     console.error(`Error fetching command from maze runner: ${err.message}`, err)
-    return { scenario_name: 'ERROR', endpoint: 'ERROR' }
+    throw err
   }
 }
 
