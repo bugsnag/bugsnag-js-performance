@@ -10,6 +10,7 @@ import { type PerformanceWithTiming } from '../on-settle/load-event-end-settler'
 import { getPermittedAttributes } from '../send-page-attributes'
 import { type WebVitals } from '../web-vitals'
 import { instrumentPageLoadPhaseSpans } from './page-load-phase-spans'
+import { defaultRouteResolver } from '../default-routing-provider'
 
 export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   private readonly spanFactory: SpanFactory<BrowserConfiguration>
@@ -60,7 +61,10 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     this.onSettle((endTime: number) => {
       if (this.wasBackgrounded) return
 
-      const route = configuration.routingProvider.resolveRoute(url)
+      // ensure there's always a route on this span by falling back to the
+      // default route resolver - the pipeline will ignore page load spans that
+      // don't have a route
+      const route = configuration.routingProvider.resolveRoute(url) || defaultRouteResolver(url)
       span.name += route
 
       instrumentPageLoadPhaseSpans(this.spanFactory, this.performance, route, span)
