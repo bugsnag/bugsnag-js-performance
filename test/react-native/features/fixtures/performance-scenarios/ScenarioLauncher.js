@@ -13,15 +13,13 @@ export const launchScenario = async (rootTag) => {
     command = { scenario_name: REACT_APP_SCENARIO_NAME, api_key: REACT_APP_API_KEY, endpoint: REACT_APP_ENDPOINT }
   } else {
     while (true) {
+      delay(500)
       command = await getCurrentCommand()
 
-      // If there are no commands queued, wait 500ms and try again
-      if (command.action === 'noop') {
-        delay(500)
-        continue
+      // keep polling until a scenario command is received
+      if (command.action === 'run_scenario') {
+        break
       }
-
-      break
     }
   }
 
