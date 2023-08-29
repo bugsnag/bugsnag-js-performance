@@ -14,7 +14,7 @@ To generate an Android apk and/or iOS ipa, you will additionally need to set the
 
 ### Scenarios
 
-Scenarios are written as React Native components and are packaged as a separate module under `test/react-native/features/fixtures/performance-scenarios` - these are packaged and installed into the test fixture when it's generated.
+Scenarios are written as React Native components and are packaged as a separate module under `test/react-native/features/fixtures/scenario-launcher` - these are packaged and installed into the test fixture when it's generated.
 
 When running tests using maze runner, scenarios are launched via maze runner commands (see `env.rb`). However it's also possible to launch the test fixture locally (e.g. via `npx react-native run-android`) and run scenarios outside of maze runner by setting the appropriate environment variables in the test fixture's `.env` file
 

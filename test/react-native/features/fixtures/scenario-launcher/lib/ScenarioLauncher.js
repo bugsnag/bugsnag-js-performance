@@ -1,6 +1,6 @@
 import { AppRegistry } from 'react-native'
 import { getCurrentCommand } from './CommandRunner'
-import * as Scenarios from './scenarios/Scenarios'
+import * as Scenarios from '../scenarios'
 import { REACT_APP_SCENARIO_NAME, REACT_APP_ENDPOINT, REACT_APP_API_KEY } from '@env'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 
