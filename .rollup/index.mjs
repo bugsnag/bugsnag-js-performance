@@ -10,8 +10,6 @@ const defaultOptions = () => ({
   external: [],
   // the entry point for the bundle
   internal: undefined,
-  // plugins to be injected into acorn
-  acornInjectPlugins: [],
 })
 
 function createRollupConfig (options = defaultOptions()) {
@@ -28,7 +26,6 @@ function createRollupConfig (options = defaultOptions()) {
       },
     },
     external: ['@bugsnag/core-performance'].concat(options.external),
-    acornInjectPlugins: options.acornInjectPlugins,
     plugins: [
       replace({
         preventAssignment: true,
