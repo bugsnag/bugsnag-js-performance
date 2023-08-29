@@ -23,7 +23,7 @@ const PACKAGE_DIRECTORIES = [
   `${ROOT_DIR}/packages/core`,
   `${ROOT_DIR}/packages/delivery-fetch`,
   `${ROOT_DIR}/packages/platforms/react-native`,
-  `${ROOT_DIR}/test/react-native/features/fixtures/performance-scenarios`,
+  `${ROOT_DIR}/test/react-native/features/fixtures/scenario-launcher`,
 ]
 
 if (!process.env.SKIP_BUILD_PACKAGES) {
