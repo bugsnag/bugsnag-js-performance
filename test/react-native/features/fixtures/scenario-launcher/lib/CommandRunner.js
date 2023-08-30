@@ -1,7 +1,12 @@
 import { getMazeRunnerAddress } from './ConfigFileReader'
 
+let mazeAddress
+
 const getCurrentCommand = async () => {
-  const mazeAddress = await getMazeRunnerAddress()
+  if (!mazeAddress) {
+    mazeAddress = await getMazeRunnerAddress()
+  }
+
   const commandUrl = `http://${mazeAddress}/command`
 
   try {
