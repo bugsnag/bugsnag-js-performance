@@ -4,35 +4,45 @@ const RETRY_COUNT = 20
 const INTERVAL = 500
 
 let mazeAddress
+let retries = 0
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-const fetchCommand = (url) => new Promise(async (resolve, reject) => {
-  let retries = 0
-  let finalError
-
-  while (retries < RETRY_COUNT) {
-    try {
-      await delay(INTERVAL)
-      const response = await fetch(url)
-  
-      if (!response.ok) {
-        throw new Error(`Received ${response.status} response from maze runner`)
-      }
-  
-      const command = await response.json()
-      console.error(`Received command from maze runner: ${JSON.stringify(command)}`)
-  
-      resolve(command)
-    } catch (err) {
-      console.error(`Error fetching command from maze runner: ${err.message}`, err)
-      finalError = err
+const fetchCommand = async (url) => {
+  // poll periodically for the command - if we don't get one after 10 seconds, give up
+  try {
+    const response = await fetch(url)
+    const command = await response.json()
+    
+    // keep polling until a scenario command is received
+    if (command.action !== 'noop') {
+      console.error(`[BugsnagPerformance] Received command from maze runner: ${JSON.stringify(command)}`)
+      return command
+    } 
+    else if (retries < RETRY_COUNT) {
       retries++
+      console.error(`[BugsnagPerformance] Received a noop command from maze runner, ${RETRY_COUNT - retries} retries remaining...`)
+      
+      await delay(INTERVAL)
+      return fetchCommand(url)
     }
-  }
+    
+    throw new Error('Retry limit exceeded, giving up...')
+    
+  } catch (err) {
+    console.error(`[BugsnagPerformance] Error fetching command from maze runner: ${err.message}`, err)
 
-  reject(finalError)
-})
+    if(retries < RETRY_COUNT) {
+      retries++
+      console.error(`[BugsnagPerformance] ${RETRY_COUNT - retries} retries remaining...`)
+
+      await delay(INTERVAL)
+      return fetchCommand(url)
+    }
+
+    throw err
+  }
+}
 
 const getCurrentCommand = async () => {
   if (!mazeAddress) {
@@ -40,7 +50,7 @@ const getCurrentCommand = async () => {
   }
 
   const commandUrl = `http://${mazeAddress}/command`
-  console.error(`Fetching command from ${commandUrl}`)
+  console.error(`[BugsnagPerformance] Fetching command from ${commandUrl}`)
 
   const command = await fetchCommand(commandUrl)
   return command
