@@ -1,6 +1,8 @@
 import { Platform } from 'react-native'
 import { Dirs, FileSystem } from 'react-native-file-access'
 
+const TIMEOUT = 60000
+
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 const getMazeRunnerAddress = async () => {
@@ -8,7 +10,7 @@ const getMazeRunnerAddress = async () => {
   const startTime = Date.now()
 
   // poll for the config file to exist
-  while (Date.now() - startTime < 10000) {
+  while (Date.now() - startTime < TIMEOUT) {
     const configFileDir = Platform.OS === 'android' ? '/data/local/tmp' : Dirs.DocumentDir
     configFilePath = `${configFileDir}/fixture_config.json`
     const configFileExists = await FileSystem.exists(configFilePath)
