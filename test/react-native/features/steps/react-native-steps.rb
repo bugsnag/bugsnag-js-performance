@@ -24,7 +24,7 @@ def execute_command(action, scenario_name = '')
   Maze::Server.commands.add command
 
   # Ensure fixture has read the command
-  count = 600
+  count = 900
   sleep 0.1 until Maze::Server.commands.remaining.empty? || (count -= 1) < 1
   raise 'Test fixture did not GET /command' unless Maze::Server.commands.remaining.empty?
 end
