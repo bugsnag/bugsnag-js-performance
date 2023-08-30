@@ -1,7 +1,7 @@
 import { getMazeRunnerAddress } from './ConfigFileReader'
 
-const RETRY_COUNT = 3
-const INTERVAL = 100
+const RETRY_COUNT = 20
+const INTERVAL = 500
 
 let mazeAddress
 
