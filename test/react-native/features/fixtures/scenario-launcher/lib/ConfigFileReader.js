@@ -15,7 +15,7 @@ const getMazeRunnerAddress = async () => {
 
     if (configFileExists) {
       const configFile = await FileSystem.readFile(configFilePath)
-      console.log(`found config file at '${configFilePath}'. contents: ${configFile}`)
+      console.error(`found config file at '${configFilePath}'. contents: ${configFile}`)
       const config = JSON.parse(configFile)
       return `${config.maze_address}`
     }
@@ -23,7 +23,7 @@ const getMazeRunnerAddress = async () => {
     await delay(500)
   }
 
-  console.log(`no config file found at ${configFilePath}`)
+  console.error(`no config file found at ${configFilePath}, falling back to 'localhost:9339'`)
   return 'localhost:9339'
 }
 

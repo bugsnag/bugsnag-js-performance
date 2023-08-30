@@ -21,7 +21,7 @@ const fetchCommand = (url) => new Promise(async (resolve, reject) => {
       }
   
       const command = await response.json()
-      console.log(`Received command from maze runner: ${JSON.stringify(command)}`)
+      console.error(`Received command from maze runner: ${JSON.stringify(command)}`)
   
       resolve(command)
     } catch (err) {
@@ -39,8 +39,10 @@ const getCurrentCommand = async () => {
     mazeAddress = await getMazeRunnerAddress()
   }
 
-  const command = await fetchCommand(`http://${mazeAddress}/command`)
+  const commandUrl = `http://${mazeAddress}/command`
+  console.error(`Fetching command from ${commandUrl}`)
 
+  const command = await fetchCommand(commandUrl)
   return command
 }
 
