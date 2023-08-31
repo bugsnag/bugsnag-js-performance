@@ -40,15 +40,24 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
     appStartSpan.setAttribute('bugsnag.span.category', 'app_start')
     appStartSpan.setAttribute('bugsnag.app_start.type', 'ReactNativeInit')
 
-    const Wrapper = ({children}: WrapperProps) => {
+    const AppStartWrapper = ({children}: WrapperProps) => {
       useEffect(() => {
         this.spanFactory.endSpan(appStartSpan, this.clock.now())
       }, [])
       return (<>{children}</>)
     }
 
-    const instrumentedComponentProvider: WrapperComponentProvider = () => ({ children }) => {
-      return (<Wrapper>{children}</Wrapper>)
+    const instrumentedComponentProvider: WrapperComponentProvider = (appParams) => ({ children }) => {
+      if (configuration.wrapperComponentProvider) {
+        const WrapperComponent = configuration.wrapperComponentProvider(appParams)
+        return (
+          <AppStartWrapper>
+            <WrapperComponent>{children}</WrapperComponent>
+          </AppStartWrapper>
+        )
+      }
+
+      return (<AppStartWrapper>{children}</AppStartWrapper>)
     }
 
     this.appRegistry.setWrapperComponentProvider(instrumentedComponentProvider)
