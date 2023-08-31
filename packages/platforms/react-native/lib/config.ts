@@ -41,7 +41,7 @@ function createSchema (): ReactNativeSchema {
     },
     autoInstrumentAppStarts: {
       defaultValue: true,
-      message: 'should be a boolean',
+      message: 'should be true|false',
       validate: isBoolean
     }
   }
