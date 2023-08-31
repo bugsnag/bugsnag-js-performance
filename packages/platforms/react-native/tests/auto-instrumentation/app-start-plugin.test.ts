@@ -18,22 +18,23 @@ describe('app start plugin', () => {
     } as unknown as typeof AppRegistry
   })
 
-  it('starts an app start span when autInstrumentAppStarts is true', () => {
-    const plugin = new AppStartPlugin(spanFactory, clock, appRegistry)
+  it('starts an app start span when autoInstrumentAppStarts is true', () => {
+    const appStartTime = 1234
+    const plugin = new AppStartPlugin(appStartTime, spanFactory, clock, appRegistry)
 
     plugin.configure(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: true }))
 
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[AppStart/ReactNativeInit]',
       expect.objectContaining({
-        startTime: expect.any(Number),
+        startTime: appStartTime,
         parentContext: null
       }))
 
     expect(appRegistry.setWrapperComponentProvider).toHaveBeenCalledWith(expect.any(Function))
   })
 
-  it('does not start an app start span when autInstrumentAppStarts is false', () => {
-    const plugin = new AppStartPlugin(spanFactory, clock, appRegistry)
+  it('does not start an app start span when autoInstrumentAppStarts is false', () => {
+    const plugin = new AppStartPlugin(1234, spanFactory, clock, appRegistry)
 
     plugin.configure(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: false }))
 

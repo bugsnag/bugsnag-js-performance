@@ -9,6 +9,7 @@ import { AppStartPlugin } from './auto-instrumentation/app-start-plugin'
 import { AppRegistry } from 'react-native'
 
 const clock = createClock(performance)
+const appStartTime = clock.now()
 const deliveryFactory = createFetchDeliveryFactory(fetch, clock)
 
 const BugsnagPerformance = createClient({
@@ -17,7 +18,7 @@ const BugsnagPerformance = createClient({
   deliveryFactory,
   idGenerator,
   persistence: new InMemoryPersistence(),
-  plugins: (spanFactory, spanContextStorage) => [new AppStartPlugin(spanFactory, clock, AppRegistry)],
+  plugins: (spanFactory, spanContextStorage) => [new AppStartPlugin(appStartTime, spanFactory, clock, AppRegistry)],
   resourceAttributesSource,
   schema: createSchema(),
   spanAttributesSource
