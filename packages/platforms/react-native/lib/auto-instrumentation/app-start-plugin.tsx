@@ -12,6 +12,9 @@ type WrapperProps = {
   children: ReactNode
 }
 
+export const isWrapperComponentProvider = (value: unknown): value is WrapperComponentProvider | null => 
+  value === null || typeof value === 'function'
+
 export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
   private readonly appStartTime: number
   private readonly spanFactory: SpanFactory<ReactNativeConfiguration>
