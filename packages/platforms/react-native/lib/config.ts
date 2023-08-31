@@ -6,12 +6,15 @@ import {
   type Configuration,
   type CoreSchema
 } from '@bugsnag/core-performance'
+import { type WrapperComponentProvider } from 'react-native'
+import { isWrapperComponentProvider } from './auto-instrumentation/app-start-plugin'
 
 export interface ReactNativeSchema extends CoreSchema {
   appName: ConfigOption<string>
   codeBundleId: ConfigOption<string>
   generateAnonymousId: ConfigOption<boolean>
   autoInstrumentAppStarts: ConfigOption<boolean>
+  wrapperComponentProvider: ConfigOption<WrapperComponentProvider | null>
 }
 
 export interface ReactNativeConfiguration extends Configuration {
@@ -19,6 +22,7 @@ export interface ReactNativeConfiguration extends Configuration {
   codeBundleId?: string
   generateAnonymousId?: boolean
   autoInstrumentAppStarts?: boolean
+  wrapperComponentProvider?: WrapperComponentProvider | null
 }
 
 function createSchema (): ReactNativeSchema {
@@ -43,6 +47,11 @@ function createSchema (): ReactNativeSchema {
       defaultValue: true,
       message: 'should be true|false',
       validate: isBoolean
+    },
+    wrapperComponentProvider: {
+      defaultValue: null,
+      message: 'should be a function',
+      validate: isWrapperComponentProvider
     }
   }
 }
