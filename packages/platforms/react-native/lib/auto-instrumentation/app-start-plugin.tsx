@@ -44,10 +44,8 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
       return (<>{children}</>)
     }
 
-    const instrumentedComponentProvider: WrapperComponentProvider = () => {
-      return ({children}) => {
-        return (<Wrapper>{children}</Wrapper>)
-      }
+    const instrumentedComponentProvider: WrapperComponentProvider = () => ({ children }) => {
+      return (<Wrapper>{children}</Wrapper>)
     }
 
     this.appRegistry.setWrapperComponentProvider(instrumentedComponentProvider)
