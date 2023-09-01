@@ -5,13 +5,8 @@ Scenario: Spans can be nested
   And I wait to receive a sampling request
   And I wait to receive at least 1 trace
 
-  And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "Nested Span 1"
-  And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.name" equals "Nested Span 2"
-  And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2.name" equals "Nested Span 3"
-
-  And the trace payload field "resourceSpans.0.scopeSpans.0.spans.3.name" equals "Parent Span"
-  And the trace payload field "resourceSpans.0.scopeSpans.0.spans.3.spanId" is stored as the value "parent_span_id"
-
-  And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.parentSpanId" equals the stored value "parent_span_id"
-  And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.parentSpanId" equals the stored value "parent_span_id"
-  And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2.parentSpanId" equals the stored value "parent_span_id"
+  # All child spans should have parents
+  And a span named 'Nested Span 1' has a parent named 'Parent Span'
+  And a span named 'Nested Span 2' has a parent named 'Parent Span'
+  And a span named 'Nested Span 3' has a parent named 'Parent Span'
+  
