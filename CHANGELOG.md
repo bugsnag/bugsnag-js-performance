@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- (browser) Added new `VueRouterRoutingProvider` for integration with vue-router [#293](https://github.com/bugsnag/bugsnag-js-performance/pull/293)
+
 ### Fixed
 
 - (browser) Do not retry delivery for oversized payloads when connection fails [#280](https://github.com/bugsnag/bugsnag-js-performance/pull/280)
