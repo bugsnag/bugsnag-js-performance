@@ -30,7 +30,7 @@ PACKAGE_NAMES = [
 PACKAGE_DIRECTORIES = [
   "#{ROOT}/packages/core",
   "#{ROOT}/packages/platforms/browser",
-  "#{ROOT}/packages/platforms/vue-router",
+  "#{ROOT}/packages/vue-router",
 ]
 
 def run(command)
