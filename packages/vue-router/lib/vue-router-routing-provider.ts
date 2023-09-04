@@ -29,7 +29,6 @@ export class VueRouterRoutingProvider implements RoutingProvider {
 
   listenForRouteChanges (startRouteChangeSpan: StartRouteChangeCallback) {
     this.router.beforeResolve((to, from) => {
-      console.log(to, from)
       if (!from.name) {
         // initial load
         return
