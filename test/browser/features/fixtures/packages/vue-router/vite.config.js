@@ -15,6 +15,7 @@ export default defineConfig({
     }
   },
   build: {
+    target: 'es2015',
     lib: {
       entry: path.resolve(__dirname, 'src/main.js'),
       name: 'VueRouter',
