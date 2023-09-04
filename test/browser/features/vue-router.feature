@@ -17,4 +17,4 @@ Feature: Vue router
             | bugsnag.browser.page.title                | stringValue  | Contact 1            |
             | bugsnag.browser.page.route                | stringValue  | /contacts/:contactId |
             | bugsnag.browser.page.previous_route       | stringValue  | /                    |
-            | bugsnag.browser.page.route_change.trigger | stringValue  | pushState            |
+            | bugsnag.browser.page.route_change.trigger | stringValue  | beforeResolve        |

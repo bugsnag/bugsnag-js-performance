@@ -1,17 +1,9 @@
 
-import { DefaultRoutingProvider } from '@bugsnag/browser-performance'
+import { onSettle, type RouteResolver, type RoutingProvider, type StartRouteChangeCallback } from '@bugsnag/browser-performance'
 import pathToRegexp from 'path-to-regexp'
+import { type RouteRecordRaw, type Router } from 'vue-router'
 
-export interface RouteObject {
-  path?: string
-  children?: RouteObject[]
-}
-
-export interface VueRouter {
-  getRoutes: () => RouteObject[]
-}
-
-function flattenRoutes (routes: RouteObject[], _prefix: string = ''): string[] {
+function flattenRoutes (routes: RouteRecordRaw[], _prefix: string = ''): string[] {
   const prefix = `${!_prefix || _prefix === '/' ? _prefix : `${_prefix}/`}`
   return [
     ...routes.map(route => `${prefix}${route.path || ''}`),
@@ -22,11 +14,31 @@ function flattenRoutes (routes: RouteObject[], _prefix: string = ''): string[] {
   ]
 }
 
-export class VueRouterRoutingProvider extends DefaultRoutingProvider {
-  constructor (router: VueRouter, basename?: string) {
+export class VueRouterRoutingProvider implements RoutingProvider {
+  router: Router
+  resolveRoute: RouteResolver
+
+  constructor (router: Router, basename?: string) {
+    this.router = router
+
     function resolveRoute (url: URL): string {
       return flattenRoutes(router.getRoutes()).find((fullRoutePath) => url.pathname.replace(basename ?? '', '').match(pathToRegexp(fullRoutePath))) || 'no-route-found'
     }
-    super(resolveRoute)
+    this.resolveRoute = resolveRoute
+  }
+
+  listenForRouteChanges (startRouteChangeSpan: StartRouteChangeCallback) {
+    this.router.beforeResolve((to, from) => {
+      console.log(to, from)
+      if (!from.name) {
+        // initial load
+        return
+      }
+      const absoluteURL = new URL(to.path, document.baseURI)
+      const span = startRouteChangeSpan(absoluteURL, 'beforeResolve')
+      onSettle((endTime) => {
+        span.end(endTime)
+      })
+    })
   }
 }

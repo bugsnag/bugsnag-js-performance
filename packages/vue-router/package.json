@@ -23,6 +23,7 @@
       "@bugsnag/browser-performance": "^1.0.0"
     },
     "peerDependencies": {
+      "vue-router": "^4.2.4",
       "path-to-regexp": "^1.8.0"
     },
     "type": "module",
