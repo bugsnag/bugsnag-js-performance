@@ -4,8 +4,6 @@ import * as Scenarios from '../scenarios'
 import { REACT_APP_SCENARIO_NAME, REACT_APP_ENDPOINT, REACT_APP_API_KEY } from '@env'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
-
 export const launchScenario = async (rootTag) => {
   let command
 
