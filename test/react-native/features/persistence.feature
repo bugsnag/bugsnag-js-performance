@@ -2,7 +2,8 @@ Feature: Persistence
 
   Scenario: Sampling values are persisted
     Given I set the sampling probability to "0.0"
-    And I run 'PersistSamplingValueScenario'
+    And I clear all persistence data
+    And I run 'ManualSpanScenario'
 
     # Ensure maze-runner did what we expected.
     When I wait to receive a sampling request

@@ -41,3 +41,7 @@ When('I run {string}') do |scenario_name|
       Maze::Store.values["os.type"] = 'darwin'
   end
 end
+
+When('I clear all persistence data') do
+  execute_command 'clear_data'
+end
