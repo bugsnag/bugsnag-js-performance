@@ -1,12 +1,11 @@
 import { type SpanAttribute, type SpanAttributes } from './attributes'
 import { type Clock } from './clock'
-import { type Logger } from './config'
 import { type DeliverySpan } from './delivery'
 import { SpanEvents } from './events'
 import { type SpanContext } from './span-context'
 import { type Time } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
-import { isBoolean, isObject, isSpanContext, isTime } from './validation'
+import { isBoolean, isSpanContext, isTime } from './validation'
 
 export interface Span extends SpanContext {
   end: (endTime?: Time) => void
