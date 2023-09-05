@@ -1,4 +1,4 @@
-import { InMemoryPersistence, createClient, type SpanOptions, validateSpanOptions, coreSpanOptionSchema, type SpanFactory, type SpanContextStorage, type Logger } from '@bugsnag/core-performance'
+import { InMemoryPersistence, createClient, type SpanOptions, type SpanFactory, type SpanContextStorage } from '@bugsnag/core-performance'
 import createFetchDeliveryFactory from '@bugsnag/delivery-fetch-performance'
 import createClock from './clock'
 import createSchema, { type ReactNativeConfiguration } from './config'
@@ -12,10 +12,10 @@ const clock = createClock(performance)
 const appStartTime = clock.now()
 const deliveryFactory = createFetchDeliveryFactory(fetch, clock)
 
-export const platformExtensions = (spanFactory: SpanFactory<ReactNativeConfiguration>, spanContextStorage: SpanContextStorage, getLogger: () => Logger) => ({
-  startViewLoadSpan: (name: string, spanOptions?: SpanOptions) => {
-    const cleanOptions = validateSpanOptions(name, spanOptions, coreSpanOptionSchema, getLogger())
-    const span = spanFactory.startSpan(cleanOptions.name, cleanOptions.options)
+export const platformExtensions = (spanFactory: SpanFactory<ReactNativeConfiguration>, spanContextStorage: SpanContextStorage) => ({
+  startViewLoadSpan: (routeName: string, spanOptions?: SpanOptions) => {
+    const cleanOptions = spanFactory.validateSpanOptions(routeName, spanOptions)
+    const span = spanFactory.startSpan(`[Navigation]${cleanOptions.name}`, cleanOptions.options)
     span.setAttribute('bugsnag.span.category', 'view_load')
     span.setAttribute('bugsnag.span.type', 'navigation')
     return spanFactory.toPublicApi(span)
