@@ -1,24 +1,29 @@
 import { platformExtensions } from '../lib/client'
-import { createTestClient, VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
+import { createTestClient, InMemoryDelivery, VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 
 jest.useFakeTimers()
 
-const logger = {
-  debug: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn()
-}
-
 describe('BugsnagPerformance', () => {
-  it('uses the logger from config', async () => {
-    const testClient = createTestClient({ platformExtensions })
+  describe('startViewLoadSpan', () => {
+    it('starts a view load span', async () => {
+      const delivery = new InMemoryDelivery()
+      const testClient = createTestClient({ deliveryFactory: () => delivery, platformExtensions })
+      testClient.start({ apiKey: VALID_API_KEY, appName: 'test' })
+      await jest.runOnlyPendingTimersAsync()
 
-    testClient.start({ apiKey: VALID_API_KEY, appName: 'test', logger })
-    await jest.advanceTimersByTimeAsync(0)
+      const span = testClient.startViewLoadSpan('test')
 
-    testClient.startViewLoadSpan('test')
+      span.end()
+      await jest.runOnlyPendingTimersAsync()
 
-    expect(logger.debug).toHaveBeenCalledWith('Starting view load span')
+      expect(delivery.requests.length).toBe(1)
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: '[Navigation]test',
+        attributes: expect.arrayContaining([
+          { key: 'bugsnag.span.category', value: { stringValue: 'view_load' } },
+          { key: 'bugsnag.span.type', value: { stringValue: 'navigation' } }
+        ])
+      }))
+    })
   })
 })
