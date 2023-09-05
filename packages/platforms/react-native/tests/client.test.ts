@@ -4,14 +4,14 @@ import { createTestClient, InMemoryDelivery, VALID_API_KEY } from '@bugsnag/js-p
 jest.useFakeTimers()
 
 describe('BugsnagPerformance', () => {
-  describe('startViewLoadSpan', () => {
-    it('starts a view load span', async () => {
+  describe('startNavigationSpan', () => {
+    it('creates a navigation span', async () => {
       const delivery = new InMemoryDelivery()
       const testClient = createTestClient({ deliveryFactory: () => delivery, platformExtensions })
       testClient.start({ apiKey: VALID_API_KEY, appName: 'test' })
       await jest.runOnlyPendingTimersAsync()
 
-      const span = testClient.startViewLoadSpan('test')
+      const span = testClient.startNavigationSpan('test')
 
       span.end()
       await jest.runOnlyPendingTimersAsync()
