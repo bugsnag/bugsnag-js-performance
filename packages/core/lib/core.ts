@@ -3,7 +3,7 @@ import { type ResourceAttributeSource, type SpanAttributesSource } from './attri
 import { type BackgroundingListener } from './backgrounding-listener'
 import { BatchProcessor } from './batch-processor'
 import { type Clock } from './clock'
-import { validateConfig, type Configuration, type CoreSchema, type Logger } from './config'
+import { validateConfig, type Configuration, type CoreSchema } from './config'
 import { type DeliveryFactory, TracePayloadEncoder } from './delivery'
 import { type IdGenerator } from './id-generator'
 import { type Persistence } from './persistence'
@@ -13,7 +13,7 @@ import ProbabilityManager from './probability-manager'
 import { BufferingProcessor, type Processor } from './processor'
 import { InMemoryQueue } from './retry-queue'
 import Sampler from './sampler'
-import { coreSpanOptionSchema, validateSpanOptions, type Span, type SpanOptions } from './span'
+import { type Span, type SpanOptions } from './span'
 import { DefaultSpanContextStorage, type SpanContext, type SpanContextStorage } from './span-context'
 import { SpanFactory } from './span-factory'
 
@@ -34,7 +34,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => Array<Plugin<C>>
   persistence: Persistence
   spanContextStorage?: SpanContextStorage
-  platformExtensions?: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage, getLogger: () => Logger) => T
+  platformExtensions?: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => T
 }
 
 export type BugsnagPerformance <C extends Configuration, T> = Client<C> & T
@@ -44,7 +44,6 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
   let processor: Processor = bufferingProcessor
   const spanContextStorage = options.spanContextStorage || new DefaultSpanContextStorage(options.backgroundingListener)
   let logger = options.schema.logger.defaultValue
-  const getLogger = () => logger
   const sampler = new Sampler(1.0)
   const spanFactory = new SpanFactory(
     processor,
@@ -102,7 +101,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       }
     },
     startSpan: (name, spanOptions?: SpanOptions) => {
-      const cleanOptions = validateSpanOptions(name, spanOptions, coreSpanOptionSchema, logger)
+      const cleanOptions = spanFactory.validateSpanOptions(name, spanOptions)
       const span = spanFactory.startSpan(cleanOptions.name, cleanOptions.options)
       span.setAttribute('bugsnag.span.category', 'custom')
       return spanFactory.toPublicApi(span)
@@ -110,7 +109,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     get currentSpanContext () {
       return spanContextStorage.current
     },
-    ...(options.platformExtensions && options.platformExtensions(spanFactory, spanContextStorage, getLogger))
+    ...(options.platformExtensions && options.platformExtensions(spanFactory, spanContextStorage))
   } as BugsnagPerformance<C, T>
 }
 
@@ -121,5 +120,5 @@ export function createNoopClient<C extends Configuration, T> (): BugsnagPerforma
     start: noop,
     startSpan: () => ({ id: '', traceId: '', end: noop, isValid: () => false }),
     currentSpanContext: undefined
-  } as BugsnagPerformance<C, T>
+  } as unknown as BugsnagPerformance<C, T>
 }
