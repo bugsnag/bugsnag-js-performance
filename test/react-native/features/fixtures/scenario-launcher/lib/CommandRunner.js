@@ -1,4 +1,5 @@
 import { getMazeRunnerAddress } from './ConfigFileReader'
+import { launchScenario } from './ScenarioLauncher'
 import { REACT_APP_SCENARIO_NAME, REACT_APP_ENDPOINT, REACT_APP_API_KEY } from '@env'
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { delay } from './utils'
