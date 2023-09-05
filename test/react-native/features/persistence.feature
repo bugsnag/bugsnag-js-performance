@@ -1,15 +1,15 @@
 Feature: Persistence
 
   Scenario: Sampling values are persisted
-    Given I set the sampling probability to "0.0"
-    And I clear all persistence data
+    Given I clear all persistence data
+    And I set the sampling probability to "0.0"
     And I run 'ManualSpanScenario'
+    And I wait to receive a sampling request
 
-    # Ensure maze-runner did what we expected.
-    When I wait to receive a sampling request
-    Then the sampling request "Bugsnag-Span-Sampling" header equals "0.0:0"
+    # Initial sampling request with no persisted sampling probability.
+    Then the sampling request "Bugsnag-Span-Sampling" header equals "1.0:0"
 
     # Sampling value should be persisted, meaning no sampling request is made, and no spans are delivered.
     When I run 'ManualSpanScenario'
-    # Then I should receive no sampling request
+    Then I should receive no sampling request
     And I should receive no traces
