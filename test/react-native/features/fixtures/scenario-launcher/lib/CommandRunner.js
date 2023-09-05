@@ -58,8 +58,8 @@ const getCurrentCommand = async () => {
   return command
 }
 
+// run whatever command we get from command fetcher
 export const commandRunner = async (rootTag) => {
-  // run whatever command we get from command fetcher
   let command
 
   if (REACT_APP_SCENARIO_NAME && REACT_APP_API_KEY) {
@@ -74,6 +74,7 @@ export const commandRunner = async (rootTag) => {
       break
     case 'clear_data':
       AsyncStorage.clear()
+      commandRunner(rootTag)
       break
     default:
       console.error(`[BugsnagPerformance] received unknown command ${command.action}`)
