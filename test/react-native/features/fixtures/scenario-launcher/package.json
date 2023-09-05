@@ -8,13 +8,11 @@
   },
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "@react-native-async-storage/async-storage": "^1.19.3"
-  },
   "peerDependencies": {
+    "@bugsnag/react-native-performance": "*",
+    "@react-native-async-storage/async-storage": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-file-access": "*",
-    "@bugsnag/react-native-performance": "*"
+    "react-native-file-access": "*"
   }
 }
