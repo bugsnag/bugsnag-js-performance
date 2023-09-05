@@ -1,9 +1,8 @@
 import { Platform } from 'react-native'
 import { Dirs, FileSystem } from 'react-native-file-access'
+import { delay } from './utils'
 
 const TIMEOUT = 60000
-
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 const getMazeRunnerAddress = async () => {
   let configFilePath

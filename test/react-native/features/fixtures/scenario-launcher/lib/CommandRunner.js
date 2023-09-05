@@ -1,12 +1,13 @@
 import { getMazeRunnerAddress } from './ConfigFileReader'
+import { REACT_APP_SCENARIO_NAME, REACT_APP_ENDPOINT, REACT_APP_API_KEY } from '@env'
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { delay } from './utils'
 
 const RETRY_COUNT = 20
 const INTERVAL = 500
 
 let mazeAddress
 let retries = 0
-
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 const fetchCommand = async (url) => {
   // poll periodically for the command - if we don't get one after 10 seconds, give up
@@ -56,4 +57,24 @@ const getCurrentCommand = async () => {
   return command
 }
 
-module.exports.getCurrentCommand = getCurrentCommand
+export const commandRunner = async (rootTag) => {
+  // run whatever command we get from command fetcher
+  let command
+
+  if (REACT_APP_SCENARIO_NAME && REACT_APP_API_KEY) {
+    command = { action: 'run_scenario', scenario_name: REACT_APP_SCENARIO_NAME, api_key: REACT_APP_API_KEY, endpoint: REACT_APP_ENDPOINT }
+  } else {
+    command = await getCurrentCommand()
+  }
+
+  switch (command.action) {
+    case 'run_scenario':
+      launchScenario(rootTag, command)
+      break
+    case 'clear_data':
+      AsyncStorage.clear()
+      break
+    default:
+      console.error(`[BugsnagPerformance] received unknown command ${command.action}`)
+  }
+}

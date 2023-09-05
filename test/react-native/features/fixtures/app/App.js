@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react'
 import { SafeAreaView, StyleSheet, View, Text, RootTagContext } from 'react-native'
-import { launchScenario } from '@bugsnag/react-native-performance-scenarios'
+import { commandRunner } from '@bugsnag/react-native-performance-scenarios'
 
 console.reportErrorsAsExceptions = false
 
@@ -8,7 +8,7 @@ const App = () => {
   const rootTag = useContext(RootTagContext)
 
   useEffect(() => {
-    launchScenario(rootTag)
+    commandRunner(rootTag)
   }, [rootTag])
 
   return (
