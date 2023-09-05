@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
 import { type ResourceAttributeSource, type SpanAttributesSource } from './attributes'
 import { type BackgroundingListener } from './backgrounding-listener'
 import { BatchProcessor } from './batch-processor'
 import { type Clock } from './clock'
-import { validateConfig, type Configuration, type CoreSchema } from './config'
+import { validateConfig, type Configuration, type CoreSchema, type Logger } from './config'
 import { type DeliveryFactory, TracePayloadEncoder } from './delivery'
 import { type IdGenerator } from './id-generator'
 import { type Persistence } from './persistence'
@@ -16,13 +17,13 @@ import { coreSpanOptionSchema, validateSpanOptions, type Span, type SpanOptions 
 import { DefaultSpanContextStorage, type SpanContext, type SpanContextStorage } from './span-context'
 import { SpanFactory } from './span-factory'
 
-export interface BugsnagPerformance<C extends Configuration> {
+export interface Client<C extends Configuration> {
   start: (config: C | string) => void
   startSpan: (name: string, options?: SpanOptions) => Span
   readonly currentSpanContext: SpanContext | undefined
 }
 
-export interface ClientOptions<S extends CoreSchema, C extends Configuration> {
+export interface ClientOptions<S extends CoreSchema, C extends Configuration, T> {
   clock: Clock
   idGenerator: IdGenerator
   deliveryFactory: DeliveryFactory
@@ -33,13 +34,17 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration> {
   plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => Array<Plugin<C>>
   persistence: Persistence
   spanContextStorage?: SpanContextStorage
+  platformExtensions?: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage, getLogger: () => Logger) => T
 }
 
-export function createClient<S extends CoreSchema, C extends Configuration> (options: ClientOptions<S, C>): BugsnagPerformance<C> {
+export type BugsnagPerformance <C extends Configuration, T> = Client<C> & T
+
+export function createClient<S extends CoreSchema, C extends Configuration, T> (options: ClientOptions<S, C, T>): BugsnagPerformance<C, T> {
   const bufferingProcessor = new BufferingProcessor()
   let processor: Processor = bufferingProcessor
   const spanContextStorage = options.spanContextStorage || new DefaultSpanContextStorage(options.backgroundingListener)
   let logger = options.schema.logger.defaultValue
+  const getLogger = () => logger
   const sampler = new Sampler(1.0)
   const spanFactory = new SpanFactory(
     processor,
@@ -104,16 +109,17 @@ export function createClient<S extends CoreSchema, C extends Configuration> (opt
     },
     get currentSpanContext () {
       return spanContextStorage.current
-    }
-  }
+    },
+    ...(options.platformExtensions && options.platformExtensions(spanFactory, spanContextStorage, getLogger))
+  } as BugsnagPerformance<C, T>
 }
 
-export function createNoopClient<C extends Configuration> (): BugsnagPerformance<C> {
+export function createNoopClient<C extends Configuration, T> (): BugsnagPerformance<C, T> {
   const noop = () => {}
 
   return {
     start: noop,
     startSpan: () => ({ id: '', traceId: '', end: noop, isValid: () => false }),
     currentSpanContext: undefined
-  }
+  } as BugsnagPerformance<C, T>
 }
