@@ -12,9 +12,13 @@ const clock = createClock(performance)
 const appStartTime = clock.now()
 const deliveryFactory = createFetchDeliveryFactory(fetch, clock)
 
+type NavigationSpanOptions = Omit<SpanOptions, 'isFirstClass'>
+
 export const platformExtensions = (spanFactory: SpanFactory<ReactNativeConfiguration>, spanContextStorage: SpanContextStorage) => ({
-  startNavigationSpan: (routeName: string, spanOptions?: SpanOptions) => {
+  startNavigationSpan: (routeName: string, spanOptions?: NavigationSpanOptions) => {
     const cleanOptions = spanFactory.validateSpanOptions(routeName, spanOptions)
+    cleanOptions.options.isFirstClass = true
+
     const span = spanFactory.startSpan(`[Navigation]${cleanOptions.name}`, cleanOptions.options)
     span.setAttribute('bugsnag.span.category', 'view_load')
     span.setAttribute('bugsnag.span.type', 'navigation')
