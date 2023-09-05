@@ -13,17 +13,23 @@ const rnVersion = process.env.RN_VERSION
 const ROOT_DIR = resolve(__dirname, '../')
 const fixtureDir = resolve(ROOT_DIR, 'test/react-native/features/fixtures/generated/', rnVersion)
 
+const TEST_FIXTURE_DEPENDENCIES = [
+  '@react-native-async-storage/async-storage',
+  'react-native-dotenv', 
+  'react-native-file-access@3.0.4' 
+]
+
 const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
   '@bugsnag/react-native-performance',
-  '@bugsnag/delivery-fetch-performance',
+  '@bugsnag/delivery-fetch-performance'
 ]
 
 const PACKAGE_DIRECTORIES = [
   `${ROOT_DIR}/packages/core`,
   `${ROOT_DIR}/packages/delivery-fetch`,
   `${ROOT_DIR}/packages/platforms/react-native`,
-  `${ROOT_DIR}/test/react-native/features/fixtures/scenario-launcher`,
+  `${ROOT_DIR}/test/react-native/features/fixtures/scenario-launcher`
 ]
 
 if (!process.env.SKIP_BUILD_PACKAGES) {
@@ -87,12 +93,12 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     const libraryPackArgs = ['pack', package, '--pack-destination', fixtureDir]
     execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
   }
-  
-  // install react-native-file-access plus packages
-  execSync('npm install --save react-native-file-access@3.0.4 *.tgz', { cwd: fixtureDir, stdio: 'inherit' })
 
-  // install react-native-dotenv
-  execSync('npm install --save react-native-dotenv', { cwd: fixtureDir, stdio: 'inherit' })
+  // install built packages
+  execSync('npm install --save *.tgz', { cwd: fixtureDir, stdio: 'inherit' })
+
+  // install text fixture dependencies
+  execSync(`npm install --save ${TEST_FIXTURE_DEPENDENCIES.join(' ')}`, { cwd: fixtureDir, stdio: 'inherit' })
 }
 
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
