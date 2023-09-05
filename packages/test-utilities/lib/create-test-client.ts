@@ -29,7 +29,7 @@ const defaultOptions = () => ({
   persistence: new InMemoryPersistence()
 })
 
-function createTestClient <S extends CoreSchema, C extends Configuration> (optionOverrides: Partial<ClientOptions<S, C>> = {}): BugsnagPerformance<C> {
+function createTestClient <S extends CoreSchema, C extends Configuration, T = void> (optionOverrides: Partial<ClientOptions<S, C, T>> = {}): BugsnagPerformance<C, T> {
   return createClient({ ...defaultOptions(), ...optionOverrides })
 }
 
