@@ -87,6 +87,9 @@ steps:
           - --fail-fast
           - --no-tunnel
           - --aws-public-ip
+    retry:
+      manual:
+        permit_on_passed: true
     concurrency: 25
     concurrency_group: "bitbar-app"
     concurrency_method: eager
