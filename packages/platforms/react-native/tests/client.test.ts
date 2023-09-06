@@ -20,8 +20,8 @@ describe('BugsnagPerformance', () => {
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: '[Navigation]test',
         attributes: expect.arrayContaining([
-          { key: 'bugsnag.span.category', value: { stringValue: 'view_load' } },
-          { key: 'bugsnag.span.type', value: { stringValue: 'navigation' } }
+          { key: 'bugsnag.span.category', value: { stringValue: 'navigation' } },
+          { key: 'bugsnag.navigation.route', value: { stringValue: 'test' } }
         ])
       }))
     })

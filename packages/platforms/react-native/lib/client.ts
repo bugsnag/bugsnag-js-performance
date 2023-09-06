@@ -20,8 +20,8 @@ export const platformExtensions = (spanFactory: SpanFactory<ReactNativeConfigura
     cleanOptions.options.isFirstClass = true
 
     const span = spanFactory.startSpan(`[Navigation]${cleanOptions.name}`, cleanOptions.options)
-    span.setAttribute('bugsnag.span.category', 'view_load')
-    span.setAttribute('bugsnag.span.type', 'navigation')
+    span.setAttribute('bugsnag.span.category', 'navigation')
+    span.setAttribute('bugsnag.navigation.route', cleanOptions.name)
     return spanFactory.toPublicApi(span)
   }
 })
