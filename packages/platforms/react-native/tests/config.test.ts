@@ -84,4 +84,38 @@ describe('ReactNativeSchema', () => {
       })
     })
   })
+
+  describe('wrapperComponentProvider', () => {
+    it('defaults to null', () => {
+      expect(schema.wrapperComponentProvider.defaultValue).toBe(null)
+    })
+
+    const functionOrNullValidation = [
+      { expected: true, value: () => 123 },
+      { expected: true, value: null },
+      { expected: false, value: undefined },
+      { expected: false, value: true },
+      { expected: false, value: false },
+      { expected: false, value: 123 },
+      { expected: false, value: BigInt(9007199254740991) },
+      { expected: false, value: '' },
+      { expected: false, value: /a/ },
+      { expected: false, value: {} },
+      { expected: false, value: { a: 1, b: 2 } },
+      { expected: false, value: [] },
+      { expected: false, value: [[]] },
+      { expected: false, value: [['a']] },
+      { expected: false, value: ['a', /b/, 1] },
+      { expected: false, value: Symbol('test') },
+      { expected: false, value: 'string' }
+    ]
+
+    describe('.validate()', () => {
+      it.each(functionOrNullValidation)('returns $expected for the value $value', ({ expected, value }) => {
+        const schema = createSchema()
+        const validate = schema.wrapperComponentProvider.validate
+        expect(validate(value)).toBe(expected)
+      })
+    })
+  })
 })
