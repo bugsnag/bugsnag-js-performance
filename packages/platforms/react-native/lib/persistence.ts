@@ -1,31 +1,13 @@
 import {
-  InMemoryPersistence,
-  isObject,
   toPersistedPayload,
   type Persistence,
   type PersistenceKey,
   type PersistencePayloadMap
 } from '@bugsnag/core-performance'
-import { type AsyncStorageStatic } from '@react-native-async-storage/async-storage'
-
-const isAsyncStorage = (value: unknown): value is AsyncStorageStatic => isObject(value) && typeof value.getItem === 'function' && typeof value.setItem === 'function'
+import AsyncStorage, { type AsyncStorageStatic } from '@react-native-async-storage/async-storage'
 
 export function getReactNativePersistence (): Persistence {
-  // use @react-native-async-storage/async-storage if it's installed
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const asyncStorage = require('@react-native-async-storage/async-storage').default
-    if (isAsyncStorage(asyncStorage)) {
-      return new ReactNativePersistence(asyncStorage)
-    } else {
-      console.error('[BugsnagPerformance] async storage was not valid', asyncStorage)
-    }
-  } catch (err) {
-    console.error('[BugsnagPerformance] error loading AsyncStorage', err)
-  }
-
-  // store items in memory if @react-native-async-storage/async-storage isn't available
-  return new InMemoryPersistence()
+  return new ReactNativePersistence(AsyncStorage)
 }
 
 class ReactNativePersistence implements Persistence {
@@ -38,7 +20,6 @@ class ReactNativePersistence implements Persistence {
       const raw = await this.storage.getItem(key)
 
       if (raw) {
-        console.log(`[BugsnagPerformance] raw value: ${raw}`)
         const payload = toPersistedPayload(key, raw)
         console.log(`[BugsnagPerformance] parsed value: ${payload}`)
         return payload
