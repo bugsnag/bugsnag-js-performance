@@ -1,30 +1,17 @@
-import { InMemoryPersistence, createClient, type SpanOptions, type SpanFactory, type SpanContextStorage } from '@bugsnag/core-performance'
+import { InMemoryPersistence, createClient } from '@bugsnag/core-performance'
 import createFetchDeliveryFactory from '@bugsnag/delivery-fetch-performance'
 import createClock from './clock'
-import createSchema, { type ReactNativeConfiguration } from './config'
+import createSchema from './config'
 import idGenerator from './id-generator'
 import resourceAttributesSource from './resource-attributes-source'
 import spanAttributesSource from './span-attributes-source'
 import { AppStartPlugin } from './auto-instrumentation/app-start-plugin'
 import { AppRegistry } from 'react-native'
+import { platformExtensions } from './platform-extensions'
 
 const clock = createClock(performance)
 const appStartTime = clock.now()
 const deliveryFactory = createFetchDeliveryFactory(fetch, clock)
-
-type NavigationSpanOptions = Omit<SpanOptions, 'isFirstClass'>
-
-export const platformExtensions = (spanFactory: SpanFactory<ReactNativeConfiguration>, spanContextStorage: SpanContextStorage) => ({
-  startNavigationSpan: (routeName: string, spanOptions?: NavigationSpanOptions) => {
-    const cleanOptions = spanFactory.validateSpanOptions(routeName, spanOptions)
-    cleanOptions.options.isFirstClass = true
-
-    const span = spanFactory.startSpan(`[Navigation]${cleanOptions.name}`, cleanOptions.options)
-    span.setAttribute('bugsnag.span.category', 'navigation')
-    span.setAttribute('bugsnag.navigation.route', cleanOptions.name)
-    return spanFactory.toPublicApi(span)
-  }
-})
 
 const BugsnagPerformance = createClient({
   backgroundingListener: { onStateChange: () => {} },
