@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export const config = {
   maximumBatchSize: 1,
@@ -11,6 +12,17 @@ export const config = {
 export const App = () => {
   useEffect(() => {
     BugsnagPerformance.startSpan('ManualSpanScenario').end()
+  }, [])
+
+  useEffect(() => {
+    (async () => {
+      const id = await AsyncStorage.getItem('bugsnag-anonymous-id')
+      console.log({ id })
+
+      const samplingProbability = await AsyncStorage.getItem('bugsnag-sampling-probability')
+      console.log({ samplingProbability })
+
+    })()
   }, [])
 
   return (
