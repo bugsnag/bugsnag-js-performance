@@ -58,6 +58,14 @@ const getCurrentCommand = async () => {
   return command
 }
 
+const appKeys = ['bugsnag-anonymous-id', 'bugsnag-sampling-probability']
+
+const clearData = async () => {
+  try {
+    await AsyncStorage.multiRemove(appKeys)
+  } catch {}
+}
+
 // run whatever command we get from command fetcher
 export const commandRunner = async (rootTag) => {
   let command
@@ -73,7 +81,7 @@ export const commandRunner = async (rootTag) => {
       launchScenario(rootTag, command)
       break
     case 'clear_data':
-      AsyncStorage.clear()
+      await clearData()
       commandRunner(rootTag)
       break
     default:
