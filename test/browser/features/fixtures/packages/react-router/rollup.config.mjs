@@ -12,6 +12,7 @@ const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 export default {
   ...baseConfig,
   input: 'src/index.jsx',
+  external: ['@bugsnag/react-router-performance'],
   plugins: [
     nodeResolve({ browser: true, jail: path.resolve(`${__dirname}/../..`), extensions: ['.mjs', '.js', '.json', '.node', '.jsx'] }),
     commonjs(),
