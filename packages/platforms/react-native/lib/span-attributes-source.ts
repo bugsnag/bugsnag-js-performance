@@ -1,9 +1,16 @@
 import { type SpanAttributesSource } from '@bugsnag/core-performance'
 import { type ReactNativeConfiguration } from './config'
+import { type AppStateStatic } from 'react-native'
 
-export const spanAttributesSource: SpanAttributesSource<ReactNativeConfiguration> = {
-  configure (configuration) {},
-  requestAttributes (span) {}
+export function createSpanAttributesSource (appState: AppStateStatic) {
+  const spanAttributesSource: SpanAttributesSource<ReactNativeConfiguration> = {
+    configure (configuration) {
+
+    },
+    requestAttributes (span) {
+      span.setAttribute('bugsnag.app.in_foreground', appState.currentState === 'active')
+    }
+  }
+
+  return spanAttributesSource
 }
-
-export default spanAttributesSource

@@ -1,5 +1,6 @@
 export * as AppStartScenario from './AppStartScenario'
+export * as BackgroundSpanScenario from './BackgroundSpanScenario'
 export * as ManualSpanScenario from './ManualSpanScenario'
+export * as NavigationSpanScenario from './NavigationSpanScenario'
 export * as NestedSpansScenario from './NestedSpansScenario'
 export * as WrapperComponentProviderScenario from './WrapperComponentProviderScenario'
-export * as NavigationSpanScenario from './NavigationSpanScenario'
