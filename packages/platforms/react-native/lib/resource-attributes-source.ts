@@ -36,13 +36,13 @@ export function createResourceAttributesSource (persistence: Persistence) {
       // different calls as cuids are partly time based
       if (!getDeviceId) {
         getDeviceId = persistence.load('bugsnag-anonymous-id')
-          .then(maybeAnonymousId => {
+          .then(async maybeAnonymousId => {
             // use the persisted value or generate a new ID
             const anonymousId = maybeAnonymousId || cuid()
 
             // if there was no persisted value, save the newly generated ID
             if (!maybeAnonymousId) {
-              persistence.save('bugsnag-anonymous-id', anonymousId)
+              await persistence.save('bugsnag-anonymous-id', anonymousId)
             }
 
             // store the device ID so we can set it synchronously in future

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 import AsyncStorage from '@react-native-async-storage/async-storage'

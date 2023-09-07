@@ -17,7 +17,7 @@ class ReactNativePersistence implements Persistence {
     console.log(`[BugsnagPerformance] load ${key}`)
 
     try {
-      const raw = await this.storage.getItem(key)
+      const raw = await this.storage.getItem(`@${key}`)
 
       if (raw) {
         const payload = toPersistedPayload(key, raw)
@@ -35,7 +35,8 @@ class ReactNativePersistence implements Persistence {
     try {
       const stringValue = typeof value === 'string' ? value : JSON.stringify(value)
       console.log(`[BugsnagPerformance] save ${key} with value ${stringValue}`)
-      this.storage.setItem(key, stringValue)
+      await this.storage.setItem(`@${key}`, stringValue)
+      console.log(`[BugsnagPerformance] successfully saved ${key}`)
     } catch (err) {
       console.error(`[BugsnagPerformance] error saving ${key}`, err)
     }
