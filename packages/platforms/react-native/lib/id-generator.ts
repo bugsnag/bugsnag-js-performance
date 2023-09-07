@@ -15,12 +15,13 @@ const idGenerator: IdGenerator = {
   generate (bits: BitLength): string {
     const bytes = new Uint8Array(bits / 8)
 
-    const randomValues = []
+    let randomValue = ''
+
     for (let i = 0; i < bytes.length; i++) {
-      randomValues.push((Math.random() * 255) | 0)
+      randomValue += toHex((Math.random() * 255) | 0)
     }
 
-    return Array.from(randomValues, toHex).join('')
+    return randomValue
   }
 }
 
