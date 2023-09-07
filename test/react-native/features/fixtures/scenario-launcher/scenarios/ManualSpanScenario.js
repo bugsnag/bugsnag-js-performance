@@ -10,6 +10,9 @@ export const config = {
 }
 
 export const App = () => {
+  const [id, setId] = useState('')
+  const [samplingProbability, setSamplingProbability] = useState('')
+
   useEffect(() => {
     BugsnagPerformance.startSpan('ManualSpanScenario').end()
   }, [])
@@ -17,11 +20,12 @@ export const App = () => {
   useEffect(() => {
     (async () => {
       const id = await AsyncStorage.getItem('bugsnag-anonymous-id')
-      console.log({ id })
-
+      console.log(`[BugsnagPerformance] bugsnag-anonymous-id: ${id}`)
+      setId(id)
+      
       const samplingProbability = await AsyncStorage.getItem('bugsnag-sampling-probability')
-      console.log({ samplingProbability })
-
+      console.log(`[BugsnagPerformance] bugsnag-sampling-probability: ${samplingProbability}`)
+      setSamplingProbability(samplingProbability)
     })()
   }, [])
 
@@ -29,6 +33,8 @@ export const App = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.scenario}>
         <Text>ManualSpanScenario</Text>
+        <Text>Persisted Anonymous ID: {id}</Text>
+        <Text>Persisted Sampling Probability: {samplingProbability}</Text>
       </View>
     </SafeAreaView>
   )
