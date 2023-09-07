@@ -13,14 +13,15 @@ function toHex (value: number): string {
 
 const idGenerator: IdGenerator = {
   generate (bits: BitLength): string {
-    const bytes = new Uint8Array(bits / 8)
+    const bytes = bits / 8
 
-    const randomValues = []
-    for (let i = 0; i < bytes.length; i++) {
-      randomValues.push((Math.random() * 255) | 0)
+    let randomValue = ''
+
+    for (let i = 0; i < bytes; i++) {
+      randomValue += toHex((Math.random() * 255) | 0)
     }
 
-    return Array.from(randomValues, toHex).join('')
+    return randomValue
   }
 }
 
