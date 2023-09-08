@@ -80,6 +80,7 @@ services:
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
         MAZE_RUNNER_VERSION: latest-v8-cli-legacy
+        USE_CDN_BUILD:
     environment:
       <<: *common-environment
       BROWSER_STACK_BROWSERS_USERNAME:
