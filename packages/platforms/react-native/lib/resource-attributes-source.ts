@@ -3,6 +3,7 @@ import { type ReactNativeConfiguration } from './config'
 import { Platform } from 'react-native'
 import { getReactNativePersistence } from './persistence'
 import cuid from '@bugsnag/cuid'
+import NativeBugsnagPerformance from './native'
 
 const persistence = getReactNativePersistence()
 
@@ -21,6 +22,19 @@ function resourceAttributesSource (config: InternalConfiguration<ReactNativeConf
   attributes.set('os.name', Platform.OS)
   attributes.set('os.version', Platform.Version.toString())
   attributes.set('service.name', config.appName)
+
+  if (NativeBugsnagPerformance) {
+    const deviceInfo = NativeBugsnagPerformance.getDeviceInfo()
+    attributes.set('host.arch', deviceInfo.arch)
+
+    if (deviceInfo.bundleVersion.length > 0) {
+      attributes.set('bugsnag.app.bundle_version', deviceInfo.bundleVersion)
+    }
+
+    if (deviceInfo.versionCode.length > 0) {
+      attributes.set('bugsnag.app.version_code', deviceInfo.versionCode)
+    }
+  }
 
   if (config.codeBundleId) {
     attributes.set('bugsnag.app.code_bundle_id', config.codeBundleId)
