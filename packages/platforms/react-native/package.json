@@ -35,6 +35,20 @@
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "files": [
-    "dist"
-  ]
+    "dist",
+    "android",
+    "ios",
+    "NativeBugsnagPerformance.ts",
+    "BugsnagReactNativePerformance.podspec",
+    "!android/build",
+    "!ios/build"
+  ],
+  "codegenConfig": {
+    "name": "BugsnagReactNativePerformanceSpec",
+    "type": "modules",
+    "jsSrcsDir": ".",
+    "android": {
+      "javaPackageName": "com.bugsnag.android.performance"
+    }
+  }
 }
