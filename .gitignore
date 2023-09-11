@@ -108,6 +108,7 @@ dist
 
 # Verdaccio
 .verdaccio
+verdaccio-config.yml
 
 #Jest
 .jest
