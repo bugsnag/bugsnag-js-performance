@@ -6,6 +6,7 @@ const NativeBugsnagPerformanceFake = {
   getDeviceInfo: () => {
     return {
       arch: 'arm64',
+      model: 'iPhone14,1',
       bundleVersion: '12345'
     }
   }
@@ -50,7 +51,7 @@ describe('resourceAttributesSource', () => {
     expect(getAttribute('deployment.environment')).toStrictEqual({ stringValue: 'test' })
     expect(getAttribute('device.id')).toStrictEqual({ stringValue: expect.stringMatching(/^c[a-z0-9]{20,32}$/) })
     expect(getAttribute('device.manufacturer')).toStrictEqual({ stringValue: 'Apple' })
-    expect(getAttribute('device.model.identifier')).toStrictEqual({ stringValue: 'unknown' })
+    expect(getAttribute('device.model.identifier')).toStrictEqual({ stringValue: 'iPhone14,1' })
     expect(getAttribute('os.type')).toStrictEqual({ stringValue: 'darwin' })
     expect(getAttribute('os.name')).toStrictEqual({ stringValue: 'ios' })
     expect(getAttribute('os.version')).toStrictEqual({ stringValue: '1.2.3' })
