@@ -31,13 +31,4 @@ end
 
 When('I run {string}') do |scenario_name|
   execute_command 'run_scenario', scenario_name
-
-  case Maze::Helper.get_current_platform
-    when 'android'
-      Maze::Store.values["os.name"] = 'android'
-      Maze::Store.values["os.type"] = 'linux'
-    else
-      Maze::Store.values["os.name"] = 'ios'
-      Maze::Store.values["os.type"] = 'darwin'
-  end
 end
