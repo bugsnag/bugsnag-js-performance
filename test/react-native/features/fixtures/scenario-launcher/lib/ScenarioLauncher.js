@@ -4,6 +4,8 @@ import * as Scenarios from '../scenarios'
 import { REACT_APP_SCENARIO_NAME, REACT_APP_ENDPOINT, REACT_APP_API_KEY } from '@env'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 
+const isTurboModuleEnabled = () => global.__turboModuleProxy != null
+
 export const launchScenario = async (rootTag) => {
   let command
 
@@ -23,6 +25,12 @@ export const launchScenario = async (rootTag) => {
     ...scenario.config
   })
 
+  const appParams = { rootTag }
+  if (isTurboModuleEnabled()) {
+    appParams.fabric = true
+    appParams.initialProps = { concurrentRoot: true }
+  }
+
   AppRegistry.registerComponent(command.scenario_name, () => scenario.App)
-  AppRegistry.runApplication(command.scenario_name, { initialProps: {}, rootTag })
+  AppRegistry.runApplication(command.scenario_name, appParams)
 }
