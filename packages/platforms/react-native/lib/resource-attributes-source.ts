@@ -36,6 +36,10 @@ function resourceAttributesSource (config: InternalConfiguration<ReactNativeConf
     if (deviceInfo.versionCode) {
       attributes.set('bugsnag.app.version_code', deviceInfo.versionCode)
     }
+
+    if (deviceInfo.model) {
+      attributes.set('device.model.identifier', deviceInfo.model)
+    }
   }
 
   if (config.codeBundleId) {
@@ -44,9 +48,6 @@ function resourceAttributesSource (config: InternalConfiguration<ReactNativeConf
 
   // @ts-expect-error Platform.constants.Manufacturer exists on android devices
   attributes.set('device.manufacturer', Platform.select({ android: Platform.constants.Manufacturer, ios: 'Apple', default: 'unknown' }))
-
-  // @ts-expect-error Platform.constants.Model exists on android devices
-  attributes.set('device.model.identifier', Platform.select({ android: Platform.constants.Model, ios: 'unknown', default: 'unknown' }))
 
   if (config.generateAnonymousId) {
     // ensure we only load/generate the anonymous ID once no matter how many

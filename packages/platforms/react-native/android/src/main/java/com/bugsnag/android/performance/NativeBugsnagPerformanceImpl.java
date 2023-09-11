@@ -50,6 +50,8 @@ public class NativeBugsnagPerformanceImpl extends NativeBugsnagPerformanceSpec {
       map.putString("arch", arch);
     }
 
+    map.putString("model", Build.MODEL);
+
     return map;
   }
 
