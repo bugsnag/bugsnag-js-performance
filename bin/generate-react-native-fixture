@@ -11,7 +11,15 @@ if (!process.env.RN_VERSION) {
 
 const rnVersion = process.env.RN_VERSION
 const ROOT_DIR = resolve(__dirname, '../')
-const fixtureDir = resolve(ROOT_DIR, 'test/react-native/features/fixtures/generated/', rnVersion)
+
+let fixturePath = 'test/react-native/features/fixtures/generated/'
+if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
+  fixturePath += 'newarch/'
+} else {
+  fixturePath += 'oldarch/'
+}
+
+const fixtureDir = resolve(ROOT_DIR, fixturePath, rnVersion)
 
 const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
@@ -96,6 +104,14 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 }
 
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
+  if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
+    // If we're building with the new architecture, replace the gradle.properties file
+    fs.copyFileSync(
+      resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/newarch.gradle.properties'),
+      resolve(fixtureDir, 'android/gradle.properties')
+    )
+  }
+
   // build the android app
   execFileSync('./gradlew', ['assembleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
   fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
