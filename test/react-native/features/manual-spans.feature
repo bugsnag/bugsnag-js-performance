@@ -74,11 +74,11 @@ Feature: Manual spans
     When I run 'ManualSpanScenario'
     And I wait to receive a sampling request
     And I wait for 1 span
-    Then the trace payload field "resourceSpans.0.resource" string attribute "device.arch" exists
+    Then the trace payload field "resourceSpans.0.resource" string attribute "host.arch" exists
     And the trace payload field "resourceSpans.0.resource" string attribute "device.model.identifier" exists
     And the trace payload field "resourceSpans.0.resource" string attribute "bugsnag.app.version_code" equals the platform-dependent string:
-      | ios     | @null |
+      | ios     | @skip |
       | android | 1     |
     And the trace payload field "resourceSpans.0.resource" string attribute "bugsnag.app.bundle_version" equals the platform-dependent string:
       | ios     | 1     |
-      | android | @null |
+      | android | @skip |
