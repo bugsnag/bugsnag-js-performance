@@ -24,8 +24,12 @@ static NSString *hostArch() noexcept {
     NSMutableDictionary *info = [NSMutableDictionary new];
     auto infoDictionary = NSBundle.mainBundle.infoDictionary;
     info[@"arch"] = hostArch();
-    info[@"bundleVersion"] = infoDictionary[@"CFBundleVersion"] ?: @"";
-    info[@"versionCode"] = @"";
+
+    NSString *versionCode = infoDictionary[@"CFBundleVersion"];
+    if (versionCode) {
+        info[@"bundleVersion"] = versionCode;
+    }
+     
     return info;
 }
 

@@ -25,13 +25,15 @@ function resourceAttributesSource (config: InternalConfiguration<ReactNativeConf
 
   if (NativeBugsnagPerformance) {
     const deviceInfo = NativeBugsnagPerformance.getDeviceInfo()
-    attributes.set('host.arch', deviceInfo.arch)
+    if (deviceInfo.arch) {
+      attributes.set('host.arch', deviceInfo.arch)
+    }
 
-    if (deviceInfo.bundleVersion.length > 0) {
+    if (deviceInfo.bundleVersion) {
       attributes.set('bugsnag.app.bundle_version', deviceInfo.bundleVersion)
     }
 
-    if (deviceInfo.versionCode.length > 0) {
+    if (deviceInfo.versionCode) {
       attributes.set('bugsnag.app.version_code', deviceInfo.versionCode)
     }
   }
