@@ -2,6 +2,7 @@ import { type TurboModule, TurboModuleRegistry } from 'react-native'
 
 interface DeviceInfo {
   arch?: string
+  model?: string
   versionCode?: string
   bundleVersion?: string
 }

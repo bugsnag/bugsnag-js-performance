@@ -1,4 +1,5 @@
 #import "BugsnagReactNativePerformance.h"
+#import <sys/sysctl.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import "BugsnagReactNativePerformanceSpec.h"
@@ -20,6 +21,14 @@ static NSString *hostArch() noexcept {
 #endif
 }
 
+static NSString *deviceModelIdentifier() noexcept {
+#if TARGET_OS_OSX || TARGET_OS_SIMULATOR || (defined(TARGET_OS_MACCATALYST) && TARGET_OS_MACCATALYST)
+    return sysctlString("hw.model");
+#else
+    return sysctlString("hw.machine");
+#endif
+}
+
 - (NSDictionary *)getDeviceInfo {
     NSMutableDictionary *info = [NSMutableDictionary new];
     auto infoDictionary = NSBundle.mainBundle.infoDictionary;
@@ -28,6 +37,11 @@ static NSString *hostArch() noexcept {
     NSString *versionCode = infoDictionary[@"CFBundleVersion"];
     if (versionCode) {
         info[@"bundleVersion"] = versionCode;
+    }
+
+    NSString *modelIdentifier = deviceModelIdentifier();
+    if (modelIdentifier) {
+        info[@"model"] = modelIdentifier;
     }
      
     return info;
