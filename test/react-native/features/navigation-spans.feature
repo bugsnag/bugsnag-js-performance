@@ -24,10 +24,16 @@ Scenario: Manual Navigation Spans can be logged
   And the trace payload field "resourceSpans.0.resource" string attribute "device.id" matches the regex "^c[a-z0-9]{20,32}$"
   And the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "com.bugsnag.reactnative.performance"
   And the trace payload field "resourceSpans.0.resource" string attribute "service.version" equals "1.2.3"
-
-  And the trace payload field "resourceSpans.0.resource" string attribute "os.type" equals the stored value "os.type"
-  And the trace payload field "resourceSpans.0.resource" string attribute "os.name" equals the stored value "os.name"
-
   And the trace payload field "resourceSpans.0.resource" string attribute "os.version" exists
-  And the trace payload field "resourceSpans.0.resource" string attribute "device.manufacturer" exists
-  And the trace payload field "resourceSpans.0.resource" string attribute "device.model.identifier" exists
+  And the trace payload field "resourceSpans.0.resource" string attribute "os.type" equals the platform-dependent string:
+    | ios     | darwin |
+    | android | linux  |
+  And the trace payload field "resourceSpans.0.resource" string attribute "os.name" equals the platform-dependent string:
+    | ios     | ios     |
+    | android | android |
+  And the trace payload field "resourceSpans.0.resource" string attribute "device.manufacturer" equals the platform-dependent string:
+    | ios     | Apple     |
+    | android | @not_null |
+  And the trace payload field "resourceSpans.0.resource" string attribute "device.model.identifier" equals the platform-dependent string:
+    | ios     | unknown   |
+    | android | @not_null |
