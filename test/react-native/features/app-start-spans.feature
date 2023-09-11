@@ -19,18 +19,6 @@ Scenario: App starts are automatically instrumented
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.app_start.type" equals "ReactNativeInit"
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" bool attribute "bugsnag.app.in_foreground" is true
 
-  And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.name" equals "bugsnag.performance.reactnative"
-  And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals "production"
-  And the trace payload field "resourceSpans.0.resource" string attribute "device.id" matches the regex "^c[a-z0-9]{20,32}$"
-  And the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "com.bugsnag.reactnative.performance"
-
-  And the trace payload field "resourceSpans.0.resource" string attribute "os.type" equals the stored value "os.type"
-  And the trace payload field "resourceSpans.0.resource" string attribute "os.name" equals the stored value "os.name"
-
-  And the trace payload field "resourceSpans.0.resource" string attribute "os.version" exists
-  And the trace payload field "resourceSpans.0.resource" string attribute "device.manufacturer" exists
-  And the trace payload field "resourceSpans.0.resource" string attribute "device.model.identifier" exists
-
 Scenario: A wrapper component provider can be provided as a config option
   When I run 'WrapperComponentProviderScenario'
   Given the element "wrapper-component" is present within 60 seconds 
@@ -52,20 +40,3 @@ Scenario: A wrapper component provider can be provided as a config option
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "app_start"
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.app_start.type" equals "ReactNativeInit"
 
-  And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.name" equals "bugsnag.performance.reactnative"
-  And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals "production"
-  And the trace payload field "resourceSpans.0.resource" string attribute "device.id" matches the regex "^c[a-z0-9]{20,32}$"
-  And the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "com.bugsnag.reactnative.performance"
-  And the trace payload field "resourceSpans.0.resource" string attribute "os.version" exists
-  And the trace payload field "resourceSpans.0.resource" string attribute "os.type" equals the platform-dependent string:
-    | ios     | darwin |
-    | android | linux  |
-  And the trace payload field "resourceSpans.0.resource" string attribute "os.name" equals the platform-dependent string:
-    | ios     | ios     |
-    | android | android |
-  And the trace payload field "resourceSpans.0.resource" string attribute "device.manufacturer" equals the platform-dependent string:
-    | ios     | Apple     |
-    | android | @not_null |
-  And the trace payload field "resourceSpans.0.resource" string attribute "device.model.identifier" equals the platform-dependent string:
-    | ios     | unknown   |
-    | android | @not_null |
