@@ -1,6 +1,11 @@
 package com.bugsnag.android.performance;
 
+import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.bugsnag.android.performance.NativeBugsnagPerformanceSpec;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -23,9 +28,48 @@ public class NativeBugsnagPerformanceImpl extends NativeBugsnagPerformanceSpec {
   @Override
   public WritableMap getDeviceInfo() {
     WritableMap map = Arguments.createMap();
-    map.putString("versionCode", "12345");
-    map.putString("arch", "arm64");
-    map.putString("bundleVersion", "");
+    try {
+      ReactApplicationContext reactContext = getReactApplicationContext();
+      PackageInfo packageInfo = reactContext.getPackageManager().getPackageInfo(reactContext.getPackageName(), 0);
+      map.putString("versionCode", Integer.toString(packageInfo.versionCode));
+    } catch (Exception e) {
+      // ignore
+    }
+
+    String arch = null;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      String[] supportedAbis = Build.SUPPORTED_ABIS;
+      if (supportedAbis != null && supportedAbis.length > 0) {
+        arch = abiToArchitecture(supportedAbis[0]);
+      }
+    } else {
+      arch = abiToArchitecture(Build.CPU_ABI);
+    }
+
+    if (arch != null) {
+      map.putString("arch", arch);
+    }
+
     return map;
+  }
+
+  @Nullable
+  private String abiToArchitecture(@Nullable String abi) {
+    if (abi == null) {
+      return null;
+    }
+
+    switch (abi) {
+      case "armeabi-v7a":
+        return "arm32";
+      case "arm64-v8a":
+        return "arm64";
+      case "x86":
+        return "x86";
+      case "x86_64":
+        return "amd64";
+      default:
+        return null;
+    }
   }
 }
