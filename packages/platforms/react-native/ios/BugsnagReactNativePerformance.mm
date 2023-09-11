@@ -9,6 +9,25 @@
 
 RCT_EXPORT_MODULE()
 
+static NSString *sysctlString(const char *name) noexcept {
+    char value[32];
+    auto size = sizeof value;
+    if (sysctlbyname(name, value, &size, NULL, 0) == 0) {
+        value[sizeof value - 1] = '\0';
+        return [NSString stringWithCString:value encoding:NSUTF8StringEncoding];
+    } else {
+        return nil;
+    }
+}
+
+static NSString *deviceModelIdentifier() noexcept {
+#if TARGET_OS_OSX || TARGET_OS_SIMULATOR || (defined(TARGET_OS_MACCATALYST) && TARGET_OS_MACCATALYST)
+    return sysctlString("hw.model");
+#else
+    return sysctlString("hw.machine");
+#endif
+}
+
 static NSString *hostArch() noexcept {
 #if TARGET_CPU_ARM
     return @"arm32";
@@ -18,14 +37,6 @@ static NSString *hostArch() noexcept {
     return @"x86";
 #elif TARGET_CPU_X86_64
     return @"amd64";
-#endif
-}
-
-static NSString *deviceModelIdentifier() noexcept {
-#if TARGET_OS_OSX || TARGET_OS_SIMULATOR || (defined(TARGET_OS_MACCATALYST) && TARGET_OS_MACCATALYST)
-    return sysctlString("hw.model");
-#else
-    return sysctlString("hw.machine");
 #endif
 }
 
