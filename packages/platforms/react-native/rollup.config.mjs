@@ -6,8 +6,8 @@ import jsx from 'acorn-jsx'
 function noTreeShakingPlugin () {
   return {
     name: 'no-treeshaking-plugin',
-    transform (code) {
-      if (code.indexOf('AppStartPlugin') >= 0) return { moduleSideEffects: 'no-treeshake' }
+    transform (code, id) {
+      if (id.indexOf('app-start-plugin.tsx') >= 0) return { moduleSideEffects: 'no-treeshake' }
     }
   }
 }
