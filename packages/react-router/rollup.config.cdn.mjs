@@ -7,7 +7,7 @@ import nodeResolve from '@rollup/plugin-node-resolve'
 
 // the built files for the CDN go in the top-level 'build' directory so they
 // can't accidentally be uploaded to NPM somehow
-const buildDirectory = '../../../build'
+const buildDirectory = '../../build'
 
 if (!fs.existsSync(buildDirectory)) {
   fs.mkdirSync(buildDirectory)

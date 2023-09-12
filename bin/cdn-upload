@@ -24,7 +24,11 @@ const files = [
   'bugsnag-performance.js',
   'bugsnag-performance.js.map',
   'bugsnag-performance.min.js',
-  'bugsnag-performance.min.js.map'
+  'bugsnag-performance.min.js.map',
+  'bugsnag-react-router-performance.js',
+  'bugsnag-react-router-performance.js.map',
+  'bugsnag-react-router-performance.min.js',
+  'bugsnag-react-router-performance.min.js.map'
 ].map(file => path.resolve(__dirname, '../build/', file))
 
 const s3 = new S3Client({ region })
