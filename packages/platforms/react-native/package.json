@@ -46,7 +46,7 @@
   "codegenConfig": {
     "name": "BugsnagReactNativePerformanceSpec",
     "type": "modules",
-    "jsSrcsDir": ".",
+    "jsSrcsDir": "dist",
     "android": {
       "javaPackageName": "com.bugsnag.android.performance"
     }

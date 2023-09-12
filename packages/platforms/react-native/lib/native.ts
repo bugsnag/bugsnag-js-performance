@@ -1,16 +1,6 @@
-import { type TurboModule, TurboModuleRegistry } from 'react-native'
-
-interface DeviceInfo {
-  arch?: string
-  model?: string
-  versionCode?: string
-  bundleVersion?: string
-}
-
-interface BugsnagReactNativePerformance extends TurboModule {
-  getDeviceInfo: () => DeviceInfo
-}
+import { TurboModuleRegistry } from 'react-native'
+import type { Spec } from './NativeBugsnagPerformance'
 
 const NativeBugsnagPerformance = TurboModuleRegistry.get('BugsnagReactNativePerformance') || undefined
 
-export default NativeBugsnagPerformance as unknown as BugsnagReactNativePerformance
+export default NativeBugsnagPerformance as Spec
