@@ -2,9 +2,9 @@ import { type Clock } from '@bugsnag/core-performance'
 import { type RequestEndCallback, type RequestEndContext, RequestTracker } from './request-tracker'
 import getAbsoluteUrl from './url-helpers'
 
-interface WindowWithXmlHttpRequest {
+interface GlobalWithXmlHttpRequest {
   XMLHttpRequest: typeof XMLHttpRequest
-  document: Document
+  document?: Document
 }
 
 interface RequestData {
@@ -14,21 +14,21 @@ interface RequestData {
 
 type ReadyStateChangeHandler = (this: XMLHttpRequest, ev: Event) => any
 
-function createXmlHttpRequestTracker (window: WindowWithXmlHttpRequest, clock: Clock): RequestTracker {
+function createXmlHttpRequestTracker (global: GlobalWithXmlHttpRequest, clock: Clock): RequestTracker {
   const requestTracker = new RequestTracker()
   const trackedRequests = new WeakMap<XMLHttpRequest, RequestData>()
   const requestHandlers = new WeakMap<XMLHttpRequest, ReadyStateChangeHandler>()
 
-  const originalOpen = window.XMLHttpRequest.prototype.open
-  window.XMLHttpRequest.prototype.open = function open (method, url, ...rest: any[]): void {
-    trackedRequests.set(this, { method, url: getAbsoluteUrl(String(url), window.document.baseURI) })
+  const originalOpen = global.XMLHttpRequest.prototype.open
+  global.XMLHttpRequest.prototype.open = function open (method, url, ...rest: any[]): void {
+    trackedRequests.set(this, { method, url: getAbsoluteUrl(String(url), global.document && global.document.baseURI) })
 
     // @ts-expect-error rest
     originalOpen.call(this, method, url, ...rest)
   }
 
-  const originalSend = window.XMLHttpRequest.prototype.send
-  window.XMLHttpRequest.prototype.send = function send (body?: Document | XMLHttpRequestBodyInit | null) {
+  const originalSend = global.XMLHttpRequest.prototype.send
+  global.XMLHttpRequest.prototype.send = function send (body?: Document | XMLHttpRequestBodyInit | null) {
     const requestData = trackedRequests.get(this)
     if (requestData) {
       // if there is an existing event listener this request instance is being reused,
@@ -44,7 +44,7 @@ function createXmlHttpRequestTracker (window: WindowWithXmlHttpRequest, clock: C
       })
 
       const onReadyStateChange: ReadyStateChangeHandler = (evt) => {
-        if (this.readyState === window.XMLHttpRequest.DONE && onRequestEnd) {
+        if (this.readyState === global.XMLHttpRequest.DONE && onRequestEnd) {
           // If the status is 0 the request did not complete so report this as an error
           const endContext: RequestEndContext = this.status > 0
             ? { endTime: clock.now(), status: this.status, state: 'success' }

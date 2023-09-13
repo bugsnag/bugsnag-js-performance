@@ -2,12 +2,12 @@ import { type Clock } from '@bugsnag/core-performance'
 import { type RequestStartContext, RequestTracker } from './request-tracker'
 import getAbsoluteUrl from './url-helpers'
 
-interface WindowWithFetch {
+interface GlobalWithFetch {
   fetch: typeof fetch
-  document: Document
+  document?: Document
 }
 
-function createStartContext (baseUrl: string, startTime: number, input: unknown, init?: unknown): RequestStartContext {
+function createStartContext (startTime: number, input: unknown, init?: unknown, baseUrl?: string): RequestStartContext {
   const inputIsRequest = isRequest(input)
   const url = inputIsRequest ? input.url : String(input)
   const method = (!!init && (init as RequestInit).method) || (inputIsRequest && input.method) || 'GET'
@@ -18,12 +18,12 @@ function isRequest (input: unknown): input is Request {
   return !!input && typeof input === 'object' && !(input instanceof URL)
 }
 
-function createFetchRequestTracker (window: WindowWithFetch, clock: Clock) {
+function createFetchRequestTracker (global: GlobalWithFetch, clock: Clock) {
   const requestTracker = new RequestTracker()
-  const originalFetch = window.fetch
+  const originalFetch = global.fetch
 
-  window.fetch = function fetch (input?: unknown, init?: unknown) {
-    const startContext = createStartContext(window.document.baseURI, clock.now(), input, init)
+  global.fetch = function fetch (input?: unknown, init?: unknown) {
+    const startContext = createStartContext(clock.now(), input, init, global.document && global.document.baseURI)
     const onRequestEnd = requestTracker.start(startContext)
 
     return originalFetch.call(this, input as RequestInfo, init as RequestInit).then(response => {
