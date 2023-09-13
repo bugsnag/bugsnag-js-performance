@@ -1,0 +1,31 @@
+{
+  "name": "@bugsnag/request-tracker-performance",
+  "version": "1.0.0",
+  "description": "BugSnag performance request tracker for monitoring XHR and fetch requests",
+  "homepage": "https://www.bugsnag.com/",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rollup --config",
+    "build:cdn": "npm run build",
+    "clean": "rm -rf dist/*"
+  },
+  "bugs": {
+    "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
+  },
+  "dependencies": {
+    "@bugsnag/core-performance": "^1.0.0"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ]
+}
