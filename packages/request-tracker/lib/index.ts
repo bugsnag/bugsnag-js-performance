@@ -1,5 +1,4 @@
-import getAbsoluteUrl from './url-helpers'
-import createFetchRequestTracker from './request-tracker-fetch'
-import createXmlHttpRequestTracker from './request-tracker-xhr'
-
-export { getAbsoluteUrl, createFetchRequestTracker, createXmlHttpRequestTracker }
+export * from './request-tracker'
+export { default as createFetchRequestTracker } from './request-tracker-fetch'
+export { default as createXmlHttpRequestTracker } from './request-tracker-xhr'
+export { default as getAbsoluteUrl } from './url-helpers'
