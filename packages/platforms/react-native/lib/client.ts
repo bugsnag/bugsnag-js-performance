@@ -1,5 +1,6 @@
 import { InMemoryQueue, createClient } from '@bugsnag/core-performance'
 import createFetchDeliveryFactory from '@bugsnag/delivery-fetch-performance'
+import { NetworkRequestPlugin, createFetchRequestTracker, createXmlHttpRequestTracker } from '@bugsnag/request-tracker-performance'
 import { AppRegistry, AppState } from 'react-native'
 import { AppStartPlugin } from './auto-instrumentation/app-start-plugin'
 import createClock from './clock'
@@ -19,13 +20,19 @@ const spanAttributesSource = createSpanAttributesSource(AppState)
 const persistence = persistenceFactory(FileSystem)
 const resourceAttributesSource = resourceAttributesSourceFactory(persistence)
 
+const fetchRequestTracker = createFetchRequestTracker({ fetch }, clock)
+const xhrRequestTracker = createXmlHttpRequestTracker({ XMLHttpRequest }, clock)
+
 const BugsnagPerformance = createClient({
   backgroundingListener: { onStateChange: () => {} },
   clock,
   deliveryFactory,
   idGenerator,
   persistence,
-  plugins: (spanFactory, spanContextStorage) => [new AppStartPlugin(appStartTime, spanFactory, clock, AppRegistry)],
+  plugins: (spanFactory, spanContextStorage) => [
+    new AppStartPlugin(appStartTime, spanFactory, clock, AppRegistry),
+    new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker)
+  ],
   resourceAttributesSource,
   schema: createSchema(),
   spanAttributesSource,
