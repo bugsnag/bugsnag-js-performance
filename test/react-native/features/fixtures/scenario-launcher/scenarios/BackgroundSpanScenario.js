@@ -1,5 +1,5 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { AppState, Text, View } from 'react-native'
 
 export const config = {
@@ -8,13 +8,19 @@ export const config = {
   appVersion: '1.2.3'
 }
 
-AppState.addEventListener('change', (state) => {
-    if (state === 'background') {
-        BugsnagPerformance.startSpan('BackgroundSpan').end()
-    }
-})
-
 export const App = () => {
+  useEffect(() => {
+    const handler = (state) => {
+      if (state === 'background') {
+        BugsnagPerformance.startSpan('BackgroundSpan').end()
+      }
+    }
+
+    AppState.addEventListener('change', handler)
+
+    return () => { AppState.removeEventListener('change', handler) }
+  }, [])
+
   return (
     <View>
         <Text>BackgroundSpanScenario</Text>
