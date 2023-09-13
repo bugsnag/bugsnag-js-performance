@@ -76,6 +76,7 @@ begin
       # in CDN mode copy the bundles & sourcemaps (for debugging) into the
       # fixture directory
       run("cp build/bugsnag-performance*.js* #{FIXTURES_DIRECTORY}/packages/")
+      run("cp build/bugsnag-react-router-performance*.js* #{FIXTURES_DIRECTORY}/packages/")
     end
   end
 
