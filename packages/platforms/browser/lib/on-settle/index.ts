@@ -3,7 +3,7 @@ import LoadEventEndSettler, { type PerformanceWithTiming } from './load-event-en
 import RequestSettler from './request-settler'
 import SettlerAggregate from './settler-aggregate'
 import { type BrowserConfiguration } from '../config'
-import { type RequestTracker } from '../request-tracker/request-tracker'
+import { type RequestTracker } from '@bugsnag/request-tracker-performance'
 import { type Clock, type InternalConfiguration, type Plugin } from '@bugsnag/core-performance'
 
 export type OnSettle = (callback: OnSettleCallback) => void

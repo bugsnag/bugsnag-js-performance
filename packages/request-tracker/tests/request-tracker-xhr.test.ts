@@ -2,8 +2,8 @@
  * @jest-environment jsdom
  */
 
-import createXmlHttpRequestTracker from '../../lib/request-tracker/request-tracker-xhr'
-import { type RequestEndCallback, type RequestStartCallback } from '../../lib/request-tracker/request-tracker'
+import createXmlHttpRequestTracker from '../lib/request-tracker-xhr'
+import { type RequestEndCallback, type RequestStartCallback } from '../lib/request-tracker'
 import { IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 import { type Clock } from '@bugsnag/core-performance'
 

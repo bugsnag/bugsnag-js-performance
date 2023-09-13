@@ -7,7 +7,7 @@ import { ResourceLoadPlugin } from '../../lib/auto-instrumentation/resource-load
 import { createSchema, type BrowserConfiguration, type BrowserSchema } from '../../lib/config'
 import { createDefaultRoutingProvider } from '../../lib/default-routing-provider'
 import createOnSettle from '../../lib/on-settle'
-import { RequestTracker } from '../../lib/request-tracker/request-tracker'
+import { RequestTracker } from '@bugsnag/request-tracker-performance'
 import { PerformanceFake, PerformanceObserverManager } from '../utilities'
 import { createPerformanceResourceNavigationTimingFake } from '../utilities/performance-entry'
 
