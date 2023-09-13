@@ -1,34 +1,40 @@
-import { type InternalConfiguration, type Logger, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
-import { type BrowserConfiguration } from '../config'
-import { defaultNetworkRequestCallback, type NetworkRequestCallback } from '../network-request-callback'
+import { type Configuration, type InternalConfiguration, type Logger, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
+import { defaultNetworkRequestCallback, type NetworkRequestCallback } from './network-request-callback'
 import {
   type RequestEndCallback,
   type RequestEndContext,
   type RequestStartContext,
   type RequestTracker
-} from '@bugsnag/request-tracker-performance'
+} from '../request-tracker'
 
 const permittedPrefixes = ['http://', 'https://', '/', './', '../']
 
-export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
+export interface NetworkInstrumentationConfiguration extends Configuration {
+  autoInstrumentNetworkRequests?: boolean
+  networkRequestCallback?: NetworkRequestCallback
+}
+
+export class NetworkRequestPlugin<C extends NetworkInstrumentationConfiguration> implements Plugin<C> {
   private configEndpoint: string = ''
   private networkRequestCallback: NetworkRequestCallback = defaultNetworkRequestCallback
   private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
 
   constructor (
-    private spanFactory: SpanFactory<BrowserConfiguration>,
+    private spanFactory: SpanFactory<C>,
     private fetchTracker: RequestTracker,
     private xhrTracker: RequestTracker
   ) {}
 
-  configure (configuration: InternalConfiguration<BrowserConfiguration>) {
+  configure (configuration: InternalConfiguration<C>) {
     this.logger = configuration.logger
 
     if (configuration.autoInstrumentNetworkRequests) {
       this.configEndpoint = configuration.endpoint
       this.xhrTracker.onStart(this.trackRequest)
       this.fetchTracker.onStart(this.trackRequest)
-      this.networkRequestCallback = configuration.networkRequestCallback
+      if (configuration.networkRequestCallback) {
+        this.networkRequestCallback = configuration.networkRequestCallback
+      }
     }
   }
 

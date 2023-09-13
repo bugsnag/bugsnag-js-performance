@@ -1,8 +1,7 @@
 import { spanContextEquals } from '@bugsnag/core-performance'
 import { MockSpanFactory, createConfiguration, createTestClient } from '@bugsnag/js-performance-test-utilities'
-import { NetworkRequestPlugin } from '../../lib/auto-instrumentation/network-request-plugin'
 import { type BrowserSchema, type BrowserConfiguration } from '../../lib/config'
-import { RequestTracker, type RequestStartCallback } from '@bugsnag/request-tracker-performance'
+import { NetworkRequestPlugin, RequestTracker, type RequestStartCallback } from '@bugsnag/request-tracker-performance'
 
 const ENDPOINT = 'http://traces.endpoint'
 const TEST_URL = 'http://test-url.com/'
