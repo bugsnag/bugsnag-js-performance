@@ -1,4 +1,4 @@
-export default function getAbsoluteUrl (url: string, baseUrl: string): string {
+export default function getAbsoluteUrl (url: string, baseUrl?: string): string {
   // if it looks like an absolute url do nothing
   if (url.indexOf('https://') === 0 || url.indexOf('http://') === 0) return url
 
