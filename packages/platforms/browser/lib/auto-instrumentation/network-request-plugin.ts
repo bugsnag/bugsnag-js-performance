@@ -6,7 +6,7 @@ import {
   type RequestEndContext,
   type RequestStartContext,
   type RequestTracker
-} from '../request-tracker/request-tracker'
+} from '@bugsnag/request-tracker-performance'
 
 const permittedPrefixes = ['http://', 'https://', '/', './', '../']
 

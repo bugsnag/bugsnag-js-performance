@@ -5,7 +5,8 @@
 // we want to run Jest against the TS source
 const paths = {
   '@bugsnag/core-performance': ['./packages/core/lib/index.ts'],
-  '@bugsnag/browser-performance': ['./packages/platforms/browser/lib/index.ts']
+  '@bugsnag/browser-performance': ['./packages/platforms/browser/lib/index.ts'],
+  '@bugsnag/request-tracker-performance': ['./packages/request-tracker/lib/index.ts']
 }
 
 // convert the tsconfig "paths" option into Jest's "moduleNameMapper" option
@@ -44,6 +45,11 @@ module.exports = {
     {
       displayName: 'browser',
       testMatch: ['<rootDir>/packages/platforms/browser/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
+    {
+      displayName: 'request-tracker',
+      testMatch: ['<rootDir>/packages/request-tracker/**/*.test.ts'],
       ...defaultModuleConfig
     },
     {
