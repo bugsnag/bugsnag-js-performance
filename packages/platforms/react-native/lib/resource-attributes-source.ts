@@ -3,6 +3,7 @@ import { type ReactNativeConfiguration } from './config'
 import { Platform } from 'react-native'
 import { getReactNativePersistence } from './persistence'
 import cuid from '@bugsnag/cuid'
+import NativeBugsnagPerformance from './native'
 
 const persistence = getReactNativePersistence()
 
@@ -22,15 +23,31 @@ function resourceAttributesSource (config: InternalConfiguration<ReactNativeConf
   attributes.set('os.version', Platform.Version.toString())
   attributes.set('service.name', config.appName)
 
+  if (NativeBugsnagPerformance) {
+    const deviceInfo = NativeBugsnagPerformance.getDeviceInfo()
+    if (deviceInfo.arch) {
+      attributes.set('host.arch', deviceInfo.arch)
+    }
+
+    if (deviceInfo.bundleVersion) {
+      attributes.set('bugsnag.app.bundle_version', deviceInfo.bundleVersion)
+    }
+
+    if (deviceInfo.versionCode) {
+      attributes.set('bugsnag.app.version_code', deviceInfo.versionCode)
+    }
+
+    if (deviceInfo.model) {
+      attributes.set('device.model.identifier', deviceInfo.model)
+    }
+  }
+
   if (config.codeBundleId) {
     attributes.set('bugsnag.app.code_bundle_id', config.codeBundleId)
   }
 
   // @ts-expect-error Platform.constants.Manufacturer exists on android devices
   attributes.set('device.manufacturer', Platform.select({ android: Platform.constants.Manufacturer, ios: 'Apple', default: 'unknown' }))
-
-  // @ts-expect-error Platform.constants.Model exists on android devices
-  attributes.set('device.model.identifier', Platform.select({ android: Platform.constants.Model, ios: 'unknown', default: 'unknown' }))
 
   if (config.generateAnonymousId) {
     // ensure we only load/generate the anonymous ID once no matter how many

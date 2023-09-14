@@ -1,3 +1,4 @@
+import fs from 'fs'
 import createRollupConfig from '../../../.rollup/index.mjs'
 import jsx from 'acorn-jsx'
 
@@ -6,8 +7,23 @@ import jsx from 'acorn-jsx'
 function noTreeShakingPlugin () {
   return {
     name: 'no-treeshaking-plugin',
-    transform (code) {
-      if (code.indexOf('AppStartPlugin') >= 0) return { moduleSideEffects: 'no-treeshake' }
+    transform (code, id) {
+      if (id.indexOf('app-start-plugin.tsx') >= 0) return { moduleSideEffects: 'no-treeshake' }
+    }
+  }
+}
+
+// output the react native turbo module spec file as a prebuilt chunk
+function reactNativeSpecPlugin () {
+  return {
+    name: 'react-native-spec-plugin',
+    buildStart () { 
+      this.emitFile({
+        type: 'prebuilt-chunk',
+        id: 'lib/NativeBugsnagPerformance.ts',
+        fileName: 'NativeBugsnagPerformance.ts',
+        code: fs.readFileSync('lib/NativeBugsnagPerformance.ts', 'utf8')
+      })
     }
   }
 }
@@ -16,7 +32,7 @@ const config = createRollupConfig({
   external: ['@bugsnag/delivery-fetch-performance', 'react-native', 'react', '@bugsnag/cuid', '@react-native-async-storage/async-storage']
 })
 
-config.plugins = config.plugins.concat(noTreeShakingPlugin())
+config.plugins = config.plugins.concat([noTreeShakingPlugin(), reactNativeSpecPlugin()])
 config.acornInjectPlugins = [jsx()]
 
 export default config

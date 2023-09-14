@@ -1,5 +1,15 @@
-def execute_command(action, scenario_name = '')
+When('I run {string}') do |scenario_name|
+  execute_command 'run_scenario', scenario_name
+end
 
+Then('the trace payload field {string} string attribute {string} equals the platform-dependent string:') do |field, attribute, platform_values|
+  expected_value = get_expected_platform_value(platform_values)
+  if !expected_value.eql?('@skip')
+    check_attribute_equal_with_nullability field, attribute, 'stringValue', expected_value
+  end
+end
+
+def execute_command(action, scenario_name = '')
   address = if Maze.config.farm == :bb
               if Maze.config.aws_public_ip
                 Maze.public_address
@@ -29,15 +39,33 @@ def execute_command(action, scenario_name = '')
   raise 'Test fixture did not GET /command' unless Maze::Server.commands.remaining.empty?
 end
 
-When('I run {string}') do |scenario_name|
-  execute_command 'run_scenario', scenario_name
+def get_expected_platform_value(platform_values)
+  os = Maze::Helper.get_current_platform
+  expected_value = Hash[platform_values.raw][os.downcase]
+  raise("There is no expected value for the current platform \"#{os}\"") if expected_value.nil?
 
-  case Maze::Helper.get_current_platform
-    when 'android'
-      Maze::Store.values["os.name"] = 'android'
-      Maze::Store.values["os.type"] = 'linux'
-    else
-      Maze::Store.values["os.name"] = 'ios'
-      Maze::Store.values["os.type"] = 'darwin'
+  expected_value
+end
+
+def get_attribute_value(field, attribute, attr_type)
+  list = Maze::Server.list_for 'trace'
+  attributes = Maze::Helper.read_key_path list.current[:body], "#{field}.attributes"
+  attribute = attributes.find { |a| a['key'] == attribute }
+  return nil if attribute.nil?
+
+  value = attribute&.dig 'value', attr_type
+  attr_type == 'intValue' && value.is_a?(String) ? value.to_i : value
+end
+
+def check_attribute_equal_with_nullability(field, attribute, attr_type, expected)
+  actual = get_attribute_value field, attribute, attr_type
+
+  case expected
+  when '@null'
+    Maze.check.nil(actual)
+  when '@not_null'
+    Maze.check.not_nil(actual)
+  else
+    Maze.check.equal(expected, actual)
   end
 end

@@ -23,13 +23,16 @@ Feature: Manual spans
     And the trace payload field "resourceSpans.0.resource" string attribute "device.id" matches the regex "^c[a-z0-9]{20,32}$"
     And the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "com.bugsnag.reactnative.performance"
     And the trace payload field "resourceSpans.0.resource" string attribute "service.version" equals "1.2.3"
-
-    And the trace payload field "resourceSpans.0.resource" string attribute "os.type" equals the stored value "os.type"
-    And the trace payload field "resourceSpans.0.resource" string attribute "os.name" equals the stored value "os.name"
-
     And the trace payload field "resourceSpans.0.resource" string attribute "os.version" exists
-    And the trace payload field "resourceSpans.0.resource" string attribute "device.manufacturer" exists
-    And the trace payload field "resourceSpans.0.resource" string attribute "device.model.identifier" exists
+    And the trace payload field "resourceSpans.0.resource" string attribute "os.type" equals the platform-dependent string:
+      | ios     | darwin |
+      | android | linux  |
+    And the trace payload field "resourceSpans.0.resource" string attribute "os.name" equals the platform-dependent string:
+      | ios     | ios     |
+      | android | android |
+    And the trace payload field "resourceSpans.0.resource" string attribute "device.manufacturer" equals the platform-dependent string:
+      | ios     | Apple     |
+      | android | @not_null |
 
   Scenario: Spans can be logged from the background
     When I run 'BackgroundSpanScenario'
@@ -55,10 +58,27 @@ Feature: Manual spans
     And the trace payload field "resourceSpans.0.resource" string attribute "device.id" matches the regex "^c[a-z0-9]{20,32}$"
     And the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "com.bugsnag.reactnative.performance"
     And the trace payload field "resourceSpans.0.resource" string attribute "service.version" equals "1.2.3"
-
-    And the trace payload field "resourceSpans.0.resource" string attribute "os.type" equals the stored value "os.type"
-    And the trace payload field "resourceSpans.0.resource" string attribute "os.name" equals the stored value "os.name"
-
     And the trace payload field "resourceSpans.0.resource" string attribute "os.version" exists
-    And the trace payload field "resourceSpans.0.resource" string attribute "device.manufacturer" exists
+    And the trace payload field "resourceSpans.0.resource" string attribute "os.type" equals the platform-dependent string:
+      | ios     | darwin |
+      | android | linux  |
+    And the trace payload field "resourceSpans.0.resource" string attribute "os.name" equals the platform-dependent string:
+      | ios     | ios     |
+      | android | android |
+    And the trace payload field "resourceSpans.0.resource" string attribute "device.manufacturer" equals the platform-dependent string:
+      | ios     | Apple     |
+      | android | @not_null |
+
+  @skip_ios_old_arch
+  Scenario: Native resource attributes are recorded
+    When I run 'ManualSpanScenario'
+    And I wait to receive a sampling request
+    And I wait for 1 span
+    Then the trace payload field "resourceSpans.0.resource" string attribute "host.arch" exists
     And the trace payload field "resourceSpans.0.resource" string attribute "device.model.identifier" exists
+    And the trace payload field "resourceSpans.0.resource" string attribute "bugsnag.app.version_code" equals the platform-dependent string:
+      | ios     | @skip |
+      | android | 1     |
+    And the trace payload field "resourceSpans.0.resource" string attribute "bugsnag.app.bundle_version" equals the platform-dependent string:
+      | ios     | 1     |
+      | android | @skip |

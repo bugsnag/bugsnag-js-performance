@@ -4,7 +4,7 @@ const wrapperComponentProvider = () =>  ({ children }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.scenario}>
-        <Text accessibilityLabel='wrapper-component'>WrapperComponentProviderScenario</Text>
+        <Text accessibilityLabel='wrapper-component' testID='wrapper-component'>WrapperComponentProviderScenario</Text>
         {children}
       </View>
     </SafeAreaView>
@@ -17,7 +17,7 @@ export const config = {
 }
 
 export const App = () => {
-  return (<Text accessibilityLabel='app-component'>Wrapped App Component</Text>)
+  return (<Text accessibilityLabel='app-component' testID='app-component'>Wrapped App Component</Text>)
 }
 
 const styles = StyleSheet.create({
