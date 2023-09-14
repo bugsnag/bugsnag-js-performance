@@ -25,11 +25,13 @@ const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
   '@bugsnag/react-native-performance',
   '@bugsnag/delivery-fetch-performance',
+  '@bugsnag/request-tracker-performance',
 ]
 
 const PACKAGE_DIRECTORIES = [
   `${ROOT_DIR}/packages/core`,
   `${ROOT_DIR}/packages/delivery-fetch`,
+  `${ROOT_DIR}/packages/request-tracker`,
   `${ROOT_DIR}/packages/platforms/react-native`,
   `${ROOT_DIR}/test/react-native/features/fixtures/scenario-launcher`,
 ]
