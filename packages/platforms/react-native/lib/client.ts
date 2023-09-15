@@ -1,6 +1,6 @@
 import { InMemoryQueue, createClient } from '@bugsnag/core-performance'
 import createFetchDeliveryFactory from '@bugsnag/delivery-fetch-performance'
-import { NetworkRequestPlugin, createFetchRequestTracker, createXmlHttpRequestTracker } from '@bugsnag/request-tracker-performance'
+import { NetworkRequestPlugin, createXmlHttpRequestTracker } from '@bugsnag/request-tracker-performance'
 import { AppRegistry, AppState } from 'react-native'
 import { AppStartPlugin } from './auto-instrumentation/app-start-plugin'
 import createClock from './clock'
@@ -20,7 +20,7 @@ const spanAttributesSource = createSpanAttributesSource(AppState)
 const persistence = persistenceFactory(FileSystem)
 const resourceAttributesSource = resourceAttributesSourceFactory(persistence)
 
-const fetchRequestTracker = createFetchRequestTracker({ fetch }, clock)
+// React Native's fetch polyfill uses xhr under the hood, so we only track xhr requests
 const xhrRequestTracker = createXmlHttpRequestTracker({ XMLHttpRequest }, clock)
 
 const BugsnagPerformance = createClient({
@@ -31,7 +31,7 @@ const BugsnagPerformance = createClient({
   persistence,
   plugins: (spanFactory, spanContextStorage) => [
     new AppStartPlugin(appStartTime, spanFactory, clock, AppRegistry),
-    new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker)
+    new NetworkRequestPlugin(spanFactory, xhrRequestTracker)
   ],
   resourceAttributesSource,
   schema: createSchema(),

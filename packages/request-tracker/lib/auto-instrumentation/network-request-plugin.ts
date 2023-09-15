@@ -21,8 +21,8 @@ export class NetworkRequestPlugin<C extends NetworkInstrumentationConfiguration>
 
   constructor (
     private spanFactory: SpanFactory<C>,
-    private fetchTracker: RequestTracker,
-    private xhrTracker: RequestTracker
+    private xhrTracker: RequestTracker,
+    private fetchTracker?: RequestTracker
   ) {}
 
   configure (configuration: InternalConfiguration<C>) {
@@ -31,7 +31,11 @@ export class NetworkRequestPlugin<C extends NetworkInstrumentationConfiguration>
     if (configuration.autoInstrumentNetworkRequests) {
       this.configEndpoint = configuration.endpoint
       this.xhrTracker.onStart(this.trackRequest)
-      this.fetchTracker.onStart(this.trackRequest)
+
+      if (this.fetchTracker) {
+        this.fetchTracker.onStart(this.trackRequest)
+      }
+
       if (configuration.networkRequestCallback) {
         this.networkRequestCallback = configuration.networkRequestCallback
       }
