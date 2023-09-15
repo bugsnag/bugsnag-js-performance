@@ -1,7 +1,7 @@
 import { createClient, InMemoryQueue } from '@bugsnag/core-performance'
 import createFetchDeliveryFactory from '@bugsnag/delivery-fetch-performance'
-import { createFetchRequestTracker, createXmlHttpRequestTracker, NetworkRequestPlugin } from '@bugsnag/request-tracker-performance'
-import { FullPageLoadPlugin, ResourceLoadPlugin, RouteChangePlugin } from './auto-instrumentation'
+import { createFetchRequestTracker, createXmlHttpRequestTracker } from '@bugsnag/request-tracker-performance'
+import { FullPageLoadPlugin, NetworkRequestPlugin, ResourceLoadPlugin, RouteChangePlugin } from './auto-instrumentation'
 import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
 import { createSchema } from './config'
@@ -52,7 +52,7 @@ const BugsnagPerformance = createClient({
     // ResourceLoadPlugin should always come after FullPageLoad plugin, as it should use that
     // span context as the parent of it's spans
     new ResourceLoadPlugin(spanFactory, spanContextStorage, window.PerformanceObserver),
-    new NetworkRequestPlugin(spanFactory, xhrRequestTracker, fetchRequestTracker),
+    new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker),
     new RouteChangePlugin(spanFactory, window.location, document)
   ],
   persistence,

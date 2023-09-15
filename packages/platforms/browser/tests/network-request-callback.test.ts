@@ -1,4 +1,4 @@
-import { defaultNetworkRequestCallback, isNetworkRequestCallback } from '../lib/auto-instrumentation/network-request-callback'
+import { defaultNetworkRequestCallback, isNetworkRequestCallback } from '../lib/network-request-callback'
 
 describe('defaultNetworkRequestCallback', () => {
   it('returns an unmodified networkRequestInfo object', () => {
@@ -23,6 +23,7 @@ describe('isNetworkRequestCallback', () => {
 
   const invalidCallbacks = [
     { type: 'array', callback: [] },
+    // eslint-disable-next-line compat/compat
     { type: 'bigint', callback: BigInt(9007199254740991) },
     { type: 'boolean', callback: true },
     { type: 'number', callback: 1234 },

@@ -3,11 +3,12 @@ import {
   isStringWithLength,
   schema,
   type ConfigOption,
-  type CoreSchema
+  type CoreSchema,
+  type Configuration
 } from '@bugsnag/core-performance'
 import { type WrapperComponentProvider } from 'react-native'
 import { isWrapperComponentProvider } from './auto-instrumentation/app-start-plugin'
-import { defaultNetworkRequestCallback, isNetworkRequestCallback, type NetworkRequestCallback, type NetworkInstrumentationConfiguration } from '@bugsnag/request-tracker-performance'
+import { defaultNetworkRequestCallback, isNetworkRequestCallback, type NetworkRequestCallback } from './network-request-callback'
 
 export interface ReactNativeSchema extends CoreSchema {
   appName: ConfigOption<string>
@@ -19,12 +20,14 @@ export interface ReactNativeSchema extends CoreSchema {
   networkRequestCallback: ConfigOption<NetworkRequestCallback>
 }
 
-export interface ReactNativeConfiguration extends NetworkInstrumentationConfiguration {
+export interface ReactNativeConfiguration extends Configuration {
   appName: string
   codeBundleId?: string
   generateAnonymousId?: boolean
   autoInstrumentAppStarts?: boolean
   wrapperComponentProvider?: WrapperComponentProvider | null
+  autoInstrumentNetworkRequests?: boolean
+  networkRequestCallback?: NetworkRequestCallback
 }
 
 function createSchema (): ReactNativeSchema {
