@@ -5,9 +5,28 @@ import replace from '@rollup/plugin-replace';
 import path from 'path'
 import url from 'url'
 
-import baseConfig from '../rollup.config.mjs'
+import baseConfig, { isCdnBuild } from '../rollup.config.mjs'
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
+
+const cdnConfig = {
+  // mark everything other than 'src/index.jsx' as an external module when
+  // using the CDN build
+  // this stops rollup trying to resolve these modules as we don't run
+  // 'npm install' when using the CDN build to avoid accidentally testing
+  // against NPM packages
+  external: id => id !== 'src/index.jsx' && !id.endsWith('packages/react-router/src/index.jsx'),
+  output: {
+    ...baseConfig.output,
+    globals: {
+      ...baseConfig.output.globals,
+      react: 'React',
+      'react-dom/client': 'ReactDom',
+      'react-router-dom': 'ReactRouterDom',
+      '@bugsnag/react-router-performance': 'BugsnagReactRouterPerformance',
+    },
+  }
+}
 
 export default {
   ...baseConfig,
@@ -23,4 +42,5 @@ export default {
       },
     })
   ],
+  ...(isCdnBuild ? cdnConfig : {})
 }

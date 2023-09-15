@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 import {
   createBrowserRouter,
   RouterProvider,
+  Link,
+  Outlet
 } from 'react-router-dom';
-import Root from './routes/root';
-import Contact from './routes/contact';
 import BugsnagPerformance from '@bugsnag/browser-performance'
 import { ReactRouterRoutingProvider } from '@bugsnag/react-router-performance'
 
@@ -14,6 +14,25 @@ const apiKey = parameters.get('api_key')
 const endpoint = parameters.get('endpoint')
 
 const basename = '/react-router'
+
+function Root() {
+  return (
+    <>
+      <Link id="change-route" to="/contacts/1">
+        Contact 1
+      </Link>
+      <Outlet />
+    </>
+  )
+}
+
+function Contact() {
+  useEffect(() => {
+    document.title = 'Contact 1'
+  }, [])
+
+  return <div id="contact">Contact</div>
+}
 
 const routes = [
     {
@@ -38,7 +57,6 @@ BugsnagPerformance.start({
     autoInstrumentNetworkRequests: false,
     routingProvider: new ReactRouterRoutingProvider(routes, basename)
 })
-
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
