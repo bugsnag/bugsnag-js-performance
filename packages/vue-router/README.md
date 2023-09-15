@@ -9,7 +9,7 @@ import BugsnagPerformance from '@bugsnag/browser-performance'
 import { VueRouterRoutingProvider } from '@bugsnag/vue-router-performance'
 import { createRouter, createWebHistory } from 'vue-router'
 
-const base = 'my-app
+const base = '/my-app'
 
 const router = createRouter({
   history: createWebHistory(base),
