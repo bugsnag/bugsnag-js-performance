@@ -26,7 +26,8 @@ PACKAGE_NAMES = [
   "@bugsnag/browser-performance",
   "@bugsnag/react-router-performance",
   "@bugsnag/vue-router-performance",
-  "@bugsnag/delivery-fetch-performance"
+  "@bugsnag/delivery-fetch-performance",
+  "@bugsnag/request-tracker-performance"
 ]
 
 PACKAGE_DIRECTORIES = [
@@ -34,7 +35,8 @@ PACKAGE_DIRECTORIES = [
   "#{ROOT}/packages/platforms/browser",
   "#{ROOT}/packages/react-router",
   "#{ROOT}/packages/vue-router",
-  "#{ROOT}/packages/delivery-fetch"
+  "#{ROOT}/packages/delivery-fetch",
+  "#{ROOT}/packages/request-tracker"
 ]
 
 def run(command)
