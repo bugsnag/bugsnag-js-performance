@@ -3,7 +3,7 @@ Feature: Vue router
     Scenario: Route change spans are automatically instrumented
         Given I navigate to the test URL "/vue-router"
         And I click the element "change-route"
-        When I wait to receive 1 traces
+        When I wait to receive 1 trace
 
         Then a span named "[FullPageLoad]/" contains the attributes:
             | attribute                         | type             | value                    |
