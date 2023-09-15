@@ -7,23 +7,43 @@ export const config = {
   appVersion: '1.2.3'
 }
 
+const fetchSuccess = async () => {
+  try {
+    await fetch('https://google.com/?fetch=true')
+  } 
+  catch (e) {
+    console.error('[BugsnagPerformance] error sending fetch request', e)
+  }
+}
+
+const xhrSuccess = async () => {
+  return new Promise((resolve) => {
+    const xhrSuccess = new XMLHttpRequest()
+   
+    xhrSuccess.onload = () => {
+      if (xhrSuccess.readyState === 4) {
+        resolve() 
+      }
+    }
+
+    xhrSuccess.onerror = () => {
+      console.error('[BugsnagPerformance] error sending xhr request', xhr)
+      resolve()
+    }
+
+    xhrSuccess.open('GET', 'https://google.com/?xhr=true')
+    xhrSuccess.send()
+  })
+}
+
 export const App = () => {
   useEffect(() => {
-    // fetch
-    fetch('https://google.com/?fetch=true')
-    .then(() => {
-      // xhr
-      const xhr = new XMLHttpRequest()
-      xhr.onerror = () => {
-        console.error('[BugsnagPerformance] error sending xhr request', xhr)
-      }
+    const makeRequests = async () => {
+      await fetchSuccess()
+      await xhrSuccess()
+    }
 
-      xhr.open('GET', 'https://google.com/?xhr=true')
-      xhr.send()
-    })
-    .catch((err) => {
-      console.error('[BugsnagPerformance] error sending fetch request', err)
-    })
+    makeRequests()
   }, [])
 
   return (
