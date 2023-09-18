@@ -3,7 +3,7 @@ Feature: Network spans
     Scenario: Network spans are automatically instrumented for completed XHR requests
         Given I navigate to the test URL "/network-spans"
         When I click the element "xhr-success"
-        And I wait to receive 1 traces
+        And I wait to receive 1 trace
 
         Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "network"
@@ -16,7 +16,7 @@ Feature: Network spans
     Scenario: Network spans are automatically instrumented for completed fetch requests
         Given I navigate to the test URL "/network-spans"
         When I click the element "fetch-success"
-        And I wait to receive 1 traces
+        And I wait to receive 1 trace
 
         Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "network"
@@ -34,7 +34,7 @@ Feature: Network spans
     Scenario: Attributes can be modified by networkRequestCallback using fetch
         Given I navigate to the test URL "/network-span-control"
         When I click the element "fetch-modified-url"
-        And I wait to receive 1 traces
+        And I wait to receive 1 trace
         
         Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.method" equals "GET"
@@ -44,7 +44,7 @@ Feature: Network spans
     Scenario: Attributes can be modified by networkRequestCallback using xhr
         Given I navigate to the test URL "/network-span-control"
         When I click the element "xhr-modified-url"
-        And I wait to receive 1 traces
+        And I wait to receive 1 trace
         
         Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.method" equals "GET"
