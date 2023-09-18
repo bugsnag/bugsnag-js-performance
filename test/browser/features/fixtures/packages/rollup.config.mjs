@@ -14,7 +14,6 @@ const cdnOutputOptions = {
     : 'import BugsnagPerformance from "/bugsnag-performance.min.js"\n',
   globals: {
     '@bugsnag/browser-performance': 'BugsnagPerformance',
-    '@bugsnag/vue-router-performance': 'BugsnagVueRouterPerformance',
   },
 }
 
@@ -29,7 +28,7 @@ export default {
     nodeResolve({ browser: true, jail: path.resolve(`${__dirname}/..`) }),
     commonjs()
   ],
-  ...(isCdnBuild ? { external: ['@bugsnag/browser-performance', '@bugsnag/vue-router-performance'] } : {}),
+  ...(isCdnBuild ? { external: ['@bugsnag/browser-performance'] } : {}),
   onLog (level, log, defaultHandler) {
     // turn warnings into errors
     if (level === 'warn') {
