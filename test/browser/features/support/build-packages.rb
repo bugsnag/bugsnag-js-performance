@@ -24,11 +24,15 @@ $logger.info("Building in #{BUILD_MODE} mode")
 PACKAGE_NAMES = [
   "@bugsnag/core-performance",
   "@bugsnag/browser-performance",
+  "@bugsnag/react-router-performance",
+  "@bugsnag/vue-router-performance",
 ]
 
 PACKAGE_DIRECTORIES = [
   "#{ROOT}/packages/core",
   "#{ROOT}/packages/platforms/browser",
+  "#{ROOT}/packages/react-router",
+  "#{ROOT}/packages/vue-router",
 ]
 
 def run(command)

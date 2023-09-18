@@ -4,7 +4,7 @@ Feature: Page Load spans
         Given I navigate to the test URL "/page-load-spans"
         # click a button to record a first input delay metric
         And I click the element "stop-clock"
-        And I wait to receive 1 traces
+        And I wait to receive 1 trace
 
         Then a span named "[FullPageLoad]/page-load-spans/" contains the attributes:
             | attribute                         | type             | value                     |
@@ -102,7 +102,7 @@ Feature: Page Load spans
     Scenario: Page load spans can have attributes dropped by sendPageAttributes config
         Given I navigate to the test URL "/network-span-control"
         When I click the element "page-load-no-attributes"
-        And I wait to receive 1 traces
+        And I wait to receive 1 trace
 
         Then a span named "[FullPageLoad]/network-span-control/" does not contain the attribute "bugsnag.browser.page.title"
         And a span named "[FullPageLoad]/network-span-control/" does not contain the attribute "bugsnag.browser.page.url"

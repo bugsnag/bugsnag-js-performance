@@ -3,6 +3,7 @@
  */
 
 import { type TracePayload } from '@bugsnag/core-performance'
+import { type JsonEvent } from '@bugsnag/core-performance/lib'
 import {
   ControllableBackgroundingListener,
   IncrementingClock
@@ -235,5 +236,48 @@ describe('Browser Delivery', () => {
       state: 'success',
       samplingProbability: undefined
     })
+  })
+
+  it('does not retry with a dropped connection due to oversized payloads', async () => {
+    const fetch = jest.fn(() => Promise.reject(new Error('oversized!')))
+    const backgroundingListener = new ControllableBackgroundingListener()
+    const clock = new IncrementingClock('2023-01-02T00:00:00.000Z')
+
+    const events: JsonEvent[] = []
+    while (JSON.stringify(events).length < 10e5) {
+      events.push({ name: 'long repetitive string'.repeat(1000), timeUnixNano: '' })
+    }
+
+    const deliveryPayload: TracePayload = {
+      body: {
+        resourceSpans: [{
+          resource: { attributes: [{ key: 'test-key', value: { stringValue: 'test-value' } }] },
+          scopeSpans: [{
+            spans: [{
+              name: 'test-span',
+              kind: 1,
+              spanId: 'test-span-id',
+              traceId: 'test-trace-id',
+              endTimeUnixNano: '56789',
+              startTimeUnixNano: '12345',
+              attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+              events
+            }]
+          }]
+        }]
+      },
+      headers: {
+        'Bugsnag-Api-Key': 'test-api-key',
+        'Content-Type': 'application/json',
+        'Bugsnag-Span-Sampling': '1:1'
+      }
+    }
+
+    const deliveryFactory = createBrowserDeliveryFactory(fetch, backgroundingListener, clock)
+    const delivery = deliveryFactory('/test')
+
+    const { state } = await delivery.send(deliveryPayload)
+
+    expect(state).toBe('failure-discard')
   })
 })

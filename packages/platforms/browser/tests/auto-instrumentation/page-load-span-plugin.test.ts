@@ -326,6 +326,104 @@ describe('FullPageLoadPlugin', () => {
     expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/initial-route' }))
   })
 
+  it('can use a custom route resolver', async () => {
+    const clock = new IncrementingClock()
+    const delivery = new InMemoryDelivery()
+    const onSettle: OnSettle = (onSettleCallback) => {
+      Promise.resolve().then(() => { onSettleCallback(1234) })
+    }
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
+    const backgroundingListener = new ControllableBackgroundingListener()
+    const performance = new PerformanceFake()
+
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      deliveryFactory: () => delivery,
+      backgroundingListener,
+      plugins: (spanFactory) => [
+        new FullPageLoadPlugin(
+          document,
+          window.location,
+          spanFactory,
+          webVitals,
+          onSettle,
+          backgroundingListener,
+          performance
+        )
+      ]
+    })
+
+    testClient.start({
+      apiKey: VALID_API_KEY,
+      routingProvider: {
+        resolveRoute (url: URL): string {
+          return `a route name for ${url.pathname}`
+        },
+
+        listenForRouteChanges (startRouteChangeSpan): void {}
+      }
+    })
+
+    await jest.runOnlyPendingTimersAsync()
+
+    backgroundingListener.sendToBackground()
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: '[FullPageLoad]a route name for /initial-route'
+    }))
+  })
+
+  it('falls back to the default route resolver if custom routing provider does not return a route', async () => {
+    const clock = new IncrementingClock()
+    const delivery = new InMemoryDelivery()
+    const onSettle: OnSettle = (onSettleCallback) => {
+      Promise.resolve().then(() => { onSettleCallback(1234) })
+    }
+    const manager = new PerformanceObserverManager()
+    const Observer = manager.createPerformanceObserverFakeClass()
+    const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
+    const backgroundingListener = new ControllableBackgroundingListener()
+    const performance = new PerformanceFake()
+
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
+      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      deliveryFactory: () => delivery,
+      backgroundingListener,
+      plugins: (spanFactory) => [
+        new FullPageLoadPlugin(
+          document,
+          window.location,
+          spanFactory,
+          webVitals,
+          onSettle,
+          backgroundingListener,
+          performance
+        )
+      ]
+    })
+
+    testClient.start({
+      apiKey: VALID_API_KEY,
+      routingProvider: {
+        resolveRoute (url: URL): string {
+          return ''
+        },
+
+        listenForRouteChanges (startRouteChangeSpan): void {}
+      }
+    })
+
+    await jest.runOnlyPendingTimersAsync()
+
+    backgroundingListener.sendToBackground()
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: '[FullPageLoad]/initial-route'
+    }))
+  })
+
   it('becomes the current span context on start', async () => {
     const clock = new IncrementingClock()
     const delivery = new InMemoryDelivery()
