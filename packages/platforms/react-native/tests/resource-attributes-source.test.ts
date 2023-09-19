@@ -1,6 +1,7 @@
+import { InMemoryPersistence } from '@bugsnag/core-performance'
 import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
 import { type ReactNativeConfiguration } from '../lib/config'
-import resourceAttributesSource from '../lib/resource-attributes-source'
+import resourceAttributesSourceFactory from '../lib/resource-attributes-source'
 
 const NativeBugsnagPerformanceFake = {
   getDeviceInfo: () => {
@@ -37,6 +38,7 @@ jest.mock('react-native', () => {
 describe('resourceAttributesSource', () => {
   it('includes all expected attributes (iOS)', async () => {
     const configuraiton = createConfiguration<ReactNativeConfiguration>({ releaseStage: 'test', appVersion: '1.0.0', appName: 'Test App', codeBundleId: '12345678' })
+    const resourceAttributesSource = resourceAttributesSourceFactory(new InMemoryPersistence())
     const resourceAttributes = await resourceAttributesSource(configuraiton)
     const jsonAttributes = resourceAttributes.toJson()
 
