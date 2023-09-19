@@ -95,10 +95,8 @@ export class BatchProcessor<C extends Configuration> implements Processor {
           this.configuration.logger.info('delivery failed, adding to retry queue')
           this.retryQueue.add(payload, batchTime)
           break
-        default: {
-          const _exhaustiveCheck: never = response.state
-          return _exhaustiveCheck
-        }
+        default:
+          response.state satisfies never
       }
     } catch (err) {
       this.configuration.logger.warn('delivery failed')

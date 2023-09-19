@@ -57,10 +57,8 @@ export class InMemoryQueue implements RetryQueue {
             case 'failure-retryable':
               this.add(payload, time)
               break
-            default: {
-              const _exhaustiveCheck: never = state
-              return _exhaustiveCheck
-            }
+            default:
+              state satisfies never
           }
         } catch (err) {}
       }
