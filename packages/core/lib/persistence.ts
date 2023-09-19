@@ -1,4 +1,4 @@
-import { isDeviceId, isPersistedProbabilty } from './validation'
+import { isDeviceId, isPersistedProbability } from './validation'
 
 export interface PersistedProbability {
   value: number
@@ -39,7 +39,7 @@ export function toPersistedPayload<K extends PersistenceKey> (
     case 'bugsnag-sampling-probability': {
       const json = JSON.parse(raw)
 
-      return isPersistedProbabilty(json)
+      return isPersistedProbability(json)
         ? json as PersistencePayloadMap[K]
         : undefined
     }
