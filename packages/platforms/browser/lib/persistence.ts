@@ -36,10 +36,9 @@ function toString<K extends PersistenceKey> (key: K, value: PersistencePayloadMa
     case 'bugsnag-anonymous-id':
       return value as string
 
-    default: {
-      const _exhaustiveCheck: never = key
-      return _exhaustiveCheck
-    }
+    default:
+      key satisfies never
+      return key
   }
 }
 
