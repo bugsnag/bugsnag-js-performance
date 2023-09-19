@@ -3,7 +3,7 @@ import { getMazeRunnerAddress } from './ConfigFileReader'
 const RETRY_COUNT = 20
 const INTERVAL = 500
 
-let mazeAddress
+export let mazeAddress
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
