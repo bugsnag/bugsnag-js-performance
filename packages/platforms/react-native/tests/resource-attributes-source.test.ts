@@ -62,4 +62,21 @@ describe('resourceAttributesSource', () => {
     expect(getAttribute('telemetry.sdk.name')).toStrictEqual({ stringValue: 'bugsnag.performance.reactnative' })
     expect(getAttribute('telemetry.sdk.version')).toStrictEqual({ stringValue: '__VERSION__' })
   })
+
+  it('uses the persisted device ID if one exists', async () => {
+    const persistence = new InMemoryPersistence()
+    await persistence.save('bugsnag-anonymous-id', 'an device ID :)')
+
+    const configuraiton = createConfiguration<ReactNativeConfiguration>()
+    const resourceAttributesSource = resourceAttributesSourceFactory(persistence)
+    const resourceAttributes = await resourceAttributesSource(configuraiton)
+    const jsonAttributes = resourceAttributes.toJson()
+
+    function getAttribute (key: string) {
+      const matchingAttribute = jsonAttributes.find(attribute => attribute?.key === key)
+      return matchingAttribute?.value
+    }
+
+    expect(getAttribute('device.id')).toStrictEqual({ stringValue: 'an device ID :)' })
+  })
 })
