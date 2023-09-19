@@ -1,16 +1,9 @@
-GEM
-  remote: https://rubygems.org/
+GIT
+  remote: https://github.com/bugsnag/maze-runner
+  revision: c201d0bd3e8e7b500ab7c7d23197c34754cdf2c9
+  branch: gingerbenw/regex-string-value
   specs:
-    appium_lib (12.0.1)
-      appium_lib_core (~> 5.0)
-      nokogiri (~> 1.8, >= 1.8.1)
-      tomlrb (>= 1.1, < 3.0)
-    appium_lib_core (5.4.0)
-      faye-websocket (~> 0.11.0)
-      selenium-webdriver (~> 4.2, < 4.6)
-    bugsnag (6.26.0)
-      concurrent-ruby (~> 1.0)
-    bugsnag-maze-runner (8.4.0)
+    bugsnag-maze-runner (8.6.0)
       appium_lib (~> 12.0.0)
       appium_lib_core (~> 5.4.0)
       bugsnag (~> 6.24)
@@ -27,6 +20,19 @@ GEM
       selenium-webdriver (~> 4.0)
       test-unit (~> 3.5.2)
       webrick (~> 1.7.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    appium_lib (12.0.1)
+      appium_lib_core (~> 5.0)
+      nokogiri (~> 1.8, >= 1.8.1)
+      tomlrb (>= 1.1, < 3.0)
+    appium_lib_core (5.4.0)
+      faye-websocket (~> 0.11.0)
+      selenium-webdriver (~> 4.2, < 4.6)
+    bugsnag (6.26.0)
+      concurrent-ruby (~> 1.0)
     builder (3.2.4)
     childprocess (4.1.0)
     concurrent-ruby (1.2.2)
@@ -78,10 +84,12 @@ GEM
       regexp_parser (~> 2.0)
       simpleidn (~> 0.2)
       uri_template (~> 0.7)
-    mime-types (3.5.0)
+    mime-types (3.5.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2023.0808)
     multi_test (0.1.2)
+    nokogiri (1.15.4-arm64-darwin)
+      racc (~> 1.4)
     nokogiri (1.15.4-x86_64-darwin)
       racc (~> 1.4)
     optimist (3.0.1)
@@ -110,16 +118,17 @@ GEM
     unf_ext (0.0.8.2)
     uri_template (0.7.0)
     webrick (1.7.0)
-    websocket (1.2.9)
+    websocket (1.2.10)
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
 
 PLATFORMS
+  arm64-darwin-21
   x86_64-darwin-20
 
 DEPENDENCIES
-  bugsnag-maze-runner (~> 8.0)
+  bugsnag-maze-runner!
 
 BUNDLED WITH
    2.4.15
