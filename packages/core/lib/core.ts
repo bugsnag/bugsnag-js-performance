@@ -11,7 +11,7 @@ import { type Plugin } from './plugin'
 import ProbabilityFetcher from './probability-fetcher'
 import ProbabilityManager from './probability-manager'
 import { BufferingProcessor, type Processor } from './processor'
-import { InMemoryQueue } from './retry-queue'
+import { type RetryQueueFactory } from './retry-queue'
 import Sampler from './sampler'
 import { type Span, type SpanOptions } from './span'
 import { DefaultSpanContextStorage, type SpanContext, type SpanContextStorage } from './span-context'
@@ -33,6 +33,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   schema: S
   plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => Array<Plugin<C>>
   persistence: Persistence
+  retryQueueFactory: RetryQueueFactory
   spanContextStorage?: SpanContextStorage
   platformExtensions?: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => T
 }
@@ -73,7 +74,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         processor = new BatchProcessor(
           delivery,
           configuration,
-          new InMemoryQueue(delivery, configuration.retryQueueMaxSize),
+          options.retryQueueFactory(delivery, configuration.retryQueueMaxSize),
           sampler,
           manager,
           new TracePayloadEncoder(options.clock, configuration, options.resourceAttributesSource)

@@ -1,4 +1,4 @@
-import { createClient } from '@bugsnag/core-performance'
+import { createClient, InMemoryQueue } from '@bugsnag/core-performance'
 import { FullPageLoadPlugin, NetworkRequestPlugin, ResourceLoadPlugin, RouteChangePlugin } from './auto-instrumentation'
 import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
@@ -56,7 +56,8 @@ const BugsnagPerformance = createClient({
     new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker),
     new RouteChangePlugin(spanFactory, window.location, document)
   ],
-  persistence
+  persistence,
+  retryQueueFactory: (delivery, retryQueueMaxSize) => new InMemoryQueue(delivery, retryQueueMaxSize)
 })
 
 export default BugsnagPerformance

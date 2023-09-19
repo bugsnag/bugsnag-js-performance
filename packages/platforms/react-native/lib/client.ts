@@ -1,4 +1,4 @@
-import { InMemoryPersistence, createClient } from '@bugsnag/core-performance'
+import { InMemoryPersistence, InMemoryQueue, createClient } from '@bugsnag/core-performance'
 import createFetchDeliveryFactory from '@bugsnag/delivery-fetch-performance'
 import { AppRegistry, AppState } from 'react-native'
 import { AppStartPlugin } from './auto-instrumentation/app-start-plugin'
@@ -24,6 +24,7 @@ const BugsnagPerformance = createClient({
   resourceAttributesSource,
   schema: createSchema(),
   spanAttributesSource,
+  retryQueueFactory: (delivery, retryQueueMaxSize) => new InMemoryQueue(delivery, retryQueueMaxSize),
   platformExtensions
 })
 
