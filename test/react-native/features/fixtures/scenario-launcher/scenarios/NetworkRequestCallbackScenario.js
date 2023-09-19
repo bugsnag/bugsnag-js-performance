@@ -20,7 +20,7 @@ export const config = {
 
 const fetchSuccess = async () => {
   try {
-    await fetch(`https://${mazeAddress}/?fetch=true`)
+    await fetch(`https://${mazeAddress}/reflect?fetch=true`)
   } catch (e) {
     console.error('[BugsnagPerformance] error sending fetch request', e)
   }
@@ -41,7 +41,7 @@ const xhrSuccess = async () => {
       reject()
     }
 
-    xhrSuccess.open('GET', `https://${mazeAddress}/?xhr=true`)
+    xhrSuccess.open('GET', `https://${mazeAddress}/reflect?xhr=true`)
     xhrSuccess.send()
   })
 }
