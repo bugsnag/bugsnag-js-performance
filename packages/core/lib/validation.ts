@@ -28,7 +28,7 @@ export const isStringArray = (value: unknown): value is string[] => Array.isArra
 
 export const isStringOrRegExpArray = (value: unknown): value is Array<string | RegExp> => Array.isArray(value) && value.every(item => isStringWithLength(item) || item instanceof RegExp)
 
-export function isPersistedProbabilty (value: unknown): value is PersistedProbability {
+export function isPersistedProbability (value: unknown): value is PersistedProbability {
   return isObject(value) &&
     isNumber(value.value) &&
     isNumber(value.time)
