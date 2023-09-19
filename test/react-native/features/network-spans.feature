@@ -9,13 +9,13 @@ Feature: Network spans
             | attribute             | type             | value                                   |
             | bugsnag.span.category | stringValue      | network                                 |
             | http.method           | stringValue      | GET                                     |
-            | http.url              | regexStringValue | ^https?:\/\/.*(:[0-9]+)?\/?\?fetch=true |
+            | http.url              | regexStringValue | ^https?:\/\/.*(:[0-9]+)?\/reflect\?fetch=true |
             | http.status_code      | intValue         | 200                                     |
         And a span named "[HTTP]/GET" contains the attributes:
             | attribute             | type             | value                                 |
             | bugsnag.span.category | stringValue      | network                               |
             | http.method           | stringValue      | GET                                   |
-            | http.url              | regexStringValue | ^https?:\/\/.*(:[0-9]+)?\/?\?xhr=true |
+            | http.url              | regexStringValue | ^https?:\/\/.*(:[0-9]+)?\/reflect\?xhr=true |
             | http.status_code      | intValue         | 200                                   |
 
     Scenario: Network spans are not instrumented for failed requests
@@ -32,5 +32,5 @@ Feature: Network spans
             | attribute             | type             | value                                                              |
             | bugsnag.span.category | stringValue      | network                                                            |
             | http.method           | stringValue      | GET                                                                |
-            | http.url              | regexStringValue | ^https?:\/\/.*(:[0-9]+)?\/?\?fetch=true&not-your-ordinary-url=true |
+            | http.url              | regexStringValue | ^https?:\/\/.*(:[0-9]+)?\/reflect\?fetch=true&not-your-ordinary-url=true |
             | http.status_code      | intValue         | 200                                                                |
