@@ -127,18 +127,18 @@ describe('validation', () => {
     })
   })
 
-  describe('isPersistedProbabilty', () => {
+  describe('isPersistedProbability', () => {
     it('passes with valid PersistedProbabilty type', () => {
       const probability = {
         value: 1234,
         time: 5678
       }
 
-      expect(validation.isPersistedProbabilty(probability)).toBe(true)
+      expect(validation.isPersistedProbability(probability)).toBe(true)
     })
 
     it.each(nonObjects)('fails validation with $type', (value) => {
-      expect(validation.isPersistedProbabilty(value)).toBe(false)
+      expect(validation.isPersistedProbability(value)).toBe(false)
     })
 
     it.each([
@@ -148,7 +148,7 @@ describe('validation', () => {
       { value: 1234 },
       { time: 1234 }
     ])('fails validation with %s', (value) => {
-      expect(validation.isPersistedProbabilty(value)).toBe(false)
+      expect(validation.isPersistedProbability(value)).toBe(false)
     })
   })
 
