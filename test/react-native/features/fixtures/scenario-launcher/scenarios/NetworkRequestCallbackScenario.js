@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
-import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { mazeAddress } from '../lib/CommandRunner'
 
 export const config = {
   maximumBatchSize: 1,
@@ -19,15 +20,14 @@ export const config = {
 
 const fetchSuccess = async () => {
   try {
-    await fetch('https://google.com/?fetch=true')
-  } 
-  catch (e) {
+    await fetch(`https://${mazeAddress}/?fetch=true`)
+  } catch (e) {
     console.error('[BugsnagPerformance] error sending fetch request', e)
   }
 }
 
 const xhrSuccess = async () => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const xhrSuccess = new XMLHttpRequest()
    
     xhrSuccess.onload = () => {
@@ -38,22 +38,18 @@ const xhrSuccess = async () => {
 
     xhrSuccess.onerror = () => {
       console.error('[BugsnagPerformance] error sending xhr request', xhr)
-      resolve()
+      reject()
     }
 
-    xhrSuccess.open('GET', 'https://google.com/?xhr=true')
+    xhrSuccess.open('GET', `https://${mazeAddress}/?xhr=true`)
     xhrSuccess.send()
   })
 }
 
 export const App = () => {
   useEffect(() => {
-    const makeRequests = async () => {
-      await fetchSuccess()
-      await xhrSuccess()
-    }
-
-    makeRequests()
+    fetchSuccess()
+    xhrSuccess()
   }, [])
 
   return (
