@@ -6,20 +6,22 @@ import createClock from './clock'
 import createSchema from './config'
 import idGenerator from './id-generator'
 import { platformExtensions } from './platform-extensions'
-import resourceAttributesSource from './resource-attributes-source'
+import resourceAttributesSourceFactory from './resource-attributes-source'
 import { createSpanAttributesSource } from './span-attributes-source'
 
 const clock = createClock(performance)
 const appStartTime = clock.now()
 const deliveryFactory = createFetchDeliveryFactory(fetch, clock)
 const spanAttributesSource = createSpanAttributesSource(AppState)
+const persistence = new InMemoryPersistence()
+const resourceAttributesSource = resourceAttributesSourceFactory(persistence)
 
 const BugsnagPerformance = createClient({
   backgroundingListener: { onStateChange: () => {} },
   clock,
   deliveryFactory,
   idGenerator,
-  persistence: new InMemoryPersistence(),
+  persistence,
   plugins: (spanFactory, spanContextStorage) => [new AppStartPlugin(appStartTime, spanFactory, clock, AppRegistry)],
   resourceAttributesSource,
   schema: createSchema(),
