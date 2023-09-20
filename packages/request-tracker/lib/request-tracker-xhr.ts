@@ -9,14 +9,14 @@ interface RequestData {
 
 type ReadyStateChangeHandler = (this: XMLHttpRequest, ev: Event) => any
 
-function createXmlHttpRequestTracker (xhr: typeof XMLHttpRequest, document: Document, clock: Clock): RequestTracker {
+function createXmlHttpRequestTracker (xhr: typeof XMLHttpRequest, clock: Clock, document?: Document): RequestTracker {
   const requestTracker = new RequestTracker()
   const trackedRequests = new WeakMap<XMLHttpRequest, RequestData>()
   const requestHandlers = new WeakMap<XMLHttpRequest, ReadyStateChangeHandler>()
 
   const originalOpen = xhr.prototype.open
   xhr.prototype.open = function open (method, url, ...rest: any[]): void {
-    trackedRequests.set(this, { method, url: getAbsoluteUrl(String(url), document.baseURI) })
+    trackedRequests.set(this, { method, url: getAbsoluteUrl(String(url), document && document.baseURI) })
 
     // @ts-expect-error rest
     originalOpen.call(this, method, url, ...rest)
