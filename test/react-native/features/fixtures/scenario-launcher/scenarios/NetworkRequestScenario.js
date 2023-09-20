@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
-import { mazeAddress } from '../lib/CommandRunner'
 
 export const config = {
   maximumBatchSize: 2,
@@ -11,8 +10,7 @@ export const config = {
 const fetchSuccess = async () => {
   try {
     await fetch(`https://bugsnag.com?fetch=true`)
-  } 
-  catch (e) {
+  } catch (e) {
     console.error('[BugsnagPerformance] error sending fetch request', e)
   }
 }
