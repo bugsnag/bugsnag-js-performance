@@ -5,7 +5,7 @@ import { AppStartPlugin } from './auto-instrumentation/app-start-plugin'
 import createClock from './clock'
 import createSchema from './config'
 import idGenerator from './id-generator'
-import FileBasedPersistence from './persistence'
+import persistenceFactory from './persistence'
 import { platformExtensions } from './platform-extensions'
 import resourceAttributesSourceFactory from './resource-attributes-source'
 import { createSpanAttributesSource } from './span-attributes-source'
@@ -16,7 +16,7 @@ const clock = createClock(performance)
 const appStartTime = clock.now()
 const deliveryFactory = createFetchDeliveryFactory(fetch, clock)
 const spanAttributesSource = createSpanAttributesSource(AppState)
-const persistence = new FileBasedPersistence(FileSystem)
+const persistence = persistenceFactory(FileSystem)
 const resourceAttributesSource = resourceAttributesSourceFactory(persistence)
 
 const BugsnagPerformance = createClient({
