@@ -19,7 +19,7 @@ const clock = createClock(performance, backgroundingListener)
 const persistence = makeBrowserPersistence(window)
 const resourceAttributesSource = createResourceAttributesSource(navigator, persistence)
 const fetchRequestTracker = createFetchRequestTracker(window, clock)
-const xhrRequestTracker = createXmlHttpRequestTracker(window, clock)
+const xhrRequestTracker = createXmlHttpRequestTracker(XMLHttpRequest, document, clock)
 const webVitals = new WebVitals(performance, clock, window.PerformanceObserver)
 export const onSettle = createOnSettle(
   clock,

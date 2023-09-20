@@ -21,7 +21,7 @@ const persistence = persistenceFactory(FileSystem)
 const resourceAttributesSource = resourceAttributesSourceFactory(persistence)
 
 // React Native's fetch polyfill uses xhr under the hood, so we only track xhr requests
-const xhrRequestTracker = createXmlHttpRequestTracker({ XMLHttpRequest }, clock)
+const xhrRequestTracker = createXmlHttpRequestTracker(XMLHttpRequest, document, clock)
 
 const BugsnagPerformance = createClient({
   backgroundingListener: { onStateChange: () => {} },
