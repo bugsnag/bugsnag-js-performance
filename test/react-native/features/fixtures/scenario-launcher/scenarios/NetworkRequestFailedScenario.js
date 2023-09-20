@@ -11,18 +11,17 @@ export const config = {
 const fetchError = async () => {
   try {
     await fetch('http://localhost:65536')
-  }
-  catch (e) {
+  } catch (e) {
     console.error('[BugsnagPerformance] error sending fetch request', e)
   }
 }
 
 const xhrError = () => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const xhrError = new XMLHttpRequest()
     xhrError.onerror = () => {
       console.error('[BugsnagPerformance] error sending xhr request', xhr)
-      resolve()
+      reject()
     }
 
     xhrError.open('GET', 'http://localhost:65536')
@@ -32,12 +31,8 @@ const xhrError = () => {
 
 export const App = () => {
   useEffect(() => {
-    const makeRequests = async () => {
-      await fetchError()
-      await xhrError()
-    }
-
-    makeRequests()
+    fetchError()
+    xhrError()
   }, [])
 
   return (
