@@ -1,4 +1,4 @@
-import { defaultNetworkRequestCallback, isNetworkRequestCallback } from '../lib/network-request-callback'
+import { defaultNetworkRequestCallback, isNetworkRequestCallback } from '@bugsnag/request-tracker-performance'
 
 describe('defaultNetworkRequestCallback', () => {
   it('returns an unmodified networkRequestInfo object', () => {

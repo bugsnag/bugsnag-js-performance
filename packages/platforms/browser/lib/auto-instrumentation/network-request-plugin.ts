@@ -1,18 +1,24 @@
 import { type InternalConfiguration, type Logger, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
-import { type BrowserConfiguration } from '../config'
-import { defaultNetworkRequestCallback, type NetworkRequestCallback } from '../network-request-callback'
 import {
+  defaultNetworkRequestCallback,
+  type NetworkRequestCallback,
+  type NetworkRequestInfo,
   type RequestEndCallback,
   type RequestEndContext,
   type RequestStartContext,
   type RequestTracker
 } from '@bugsnag/request-tracker-performance'
+import { type BrowserConfiguration } from '../config'
+
+export interface BrowserNetworkRequestInfo extends NetworkRequestInfo {
+  readonly type: PerformanceResourceTiming['initiatorType']
+}
 
 const permittedPrefixes = ['http://', 'https://', '/', './', '../']
 
 export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private configEndpoint: string = ''
-  private networkRequestCallback: NetworkRequestCallback = defaultNetworkRequestCallback
+  private networkRequestCallback: NetworkRequestCallback<BrowserNetworkRequestInfo> = defaultNetworkRequestCallback
   private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
 
   constructor (
