@@ -171,6 +171,16 @@ class FileSystemMock {
   public ls = jest.fn(async (_path: string) => ['file1', 'file2']);
 
   /**
+   * Make a directory.
+   *
+   * This is a noop as the mock file system does not differentiate between files
+   * and directories
+   *
+   * NOTE: this method was added by bugsnag
+   */
+  public mkdir = jest.fn(async () => {})
+
+  /**
    * Move a file.
    */
   public mv = jest.fn(async (source: string, target: string) => {
