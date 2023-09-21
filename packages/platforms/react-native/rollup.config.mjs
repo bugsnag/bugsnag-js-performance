@@ -29,7 +29,13 @@ function reactNativeSpecPlugin () {
 }
 
 const config = createRollupConfig({
-  external: ['@bugsnag/delivery-fetch-performance', 'react-native', 'react', '@bugsnag/cuid', '@react-native-async-storage/async-storage']
+  external: [
+    '@bugsnag/delivery-fetch-performance',
+    'react-native',
+    'react',
+    '@bugsnag/cuid',
+    'react-native-file-access'
+  ]
 })
 
 config.plugins = config.plugins.concat([noTreeShakingPlugin(), reactNativeSpecPlugin()])

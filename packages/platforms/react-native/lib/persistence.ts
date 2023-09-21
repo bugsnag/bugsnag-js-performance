@@ -1,46 +1,21 @@
 import {
-  InMemoryPersistence,
-  isObject,
-  toPersistedPayload,
   type Persistence,
   type PersistenceKey,
   type PersistencePayloadMap
 } from '@bugsnag/core-performance'
-import { type AsyncStorageStatic } from '@react-native-async-storage/async-storage'
+import { type FileSystem } from 'react-native-file-access'
 
-const isAsyncStorage = (value: unknown): value is AsyncStorageStatic => isObject(value) && typeof value.getItem === 'function' && typeof value.setItem === 'function'
+export default class FileBasedPersistence implements Persistence {
+  private fileSystem: typeof FileSystem
 
-export function getReactNativePersistence (): Persistence {
-  // use @react-native-async-storage/async-storage if it's installed
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const asyncStorage = require('@react-native-async-storage/async-storage').default
-    if (isAsyncStorage(asyncStorage)) {
-      return new ReactNativePersistence(asyncStorage)
-    }
-  } catch {}
-
-  // store items in memory if @react-native-async-storage/async-storage isn't available
-  return new InMemoryPersistence()
-}
-
-class ReactNativePersistence implements Persistence {
-  constructor (private readonly storage: AsyncStorageStatic) {}
+  constructor (fileSystem: typeof FileSystem) {
+    this.fileSystem = fileSystem
+  }
 
   async load<K extends PersistenceKey> (key: K): Promise<PersistencePayloadMap[K] | undefined> {
-    try {
-      const raw = await this.storage.getItem(key)
-
-      if (raw) {
-        return toPersistedPayload(key, raw)
-      }
-    } catch {}
+    return undefined
   }
 
   async save<K extends PersistenceKey> (key: K, value: PersistencePayloadMap[K]): Promise<void> {
-    try {
-      const stringValue = typeof value === 'string' ? value : JSON.stringify(value)
-      this.storage.setItem(key, stringValue)
-    } catch {}
   }
 }
