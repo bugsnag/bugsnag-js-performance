@@ -57,6 +57,23 @@ describe('XHR Request Tracker', () => {
     startCallback = jest.fn(context => endCallback)
   })
 
+  it('does not require document parameter', () => {
+    const xhrTracker = createXmlHttpRequestTracker(XMLHttpRequest, clock)
+
+    xhrTracker.onStart(startCallback)
+
+    const request = new XMLHttpRequest()
+    request.open('GET', '/relative-url')
+    request.send()
+
+    expect(startCallback).toHaveBeenCalledWith({
+      type: 'xmlhttprequest',
+      url: '/relative-url',
+      method: 'GET',
+      startTime: 1
+    })
+  })
+
   it.each([['GET', 200], ['PUT', 200], ['POST', 201], ['DELETE', 204]])('should track a %s request', (method, status) => {
     window.XMLHttpRequest = createXmlHttpRequestFake(true, status) as unknown as typeof XMLHttpRequest
     const originalOpen = window.XMLHttpRequest.prototype.open
