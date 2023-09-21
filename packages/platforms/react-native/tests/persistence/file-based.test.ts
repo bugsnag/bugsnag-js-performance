@@ -264,5 +264,25 @@ describe('FileBasedPersistence', () => {
     ])
   })
 
-  it.todo('can handle concurrent calls to save')
+  it('can handle concurrent calls to save', async () => {
+    const file = new File(PATH, FileSystem)
+    const persistence = new FileBasedPersistence(file)
+
+    await Promise.all([
+      persistence.save('bugsnag-sampling-probability', { value: 0.1, time: 11111 }),
+      persistence.save('bugsnag-anonymous-id', 'cuidcuidcuidcuidcuidcuidcuidcuid1'),
+      persistence.save('bugsnag-sampling-probability', { value: 0.2, time: 22222 }),
+      persistence.save('bugsnag-sampling-probability', { value: 0.3, time: 33333 }),
+      persistence.save('bugsnag-anonymous-id', 'cuidcuidcuidcuidcuidcuidcuidcuid2'),
+      persistence.save('bugsnag-sampling-probability', { value: 0.4, time: 44444 }),
+      persistence.save('bugsnag-sampling-probability', { value: 0.5, time: 55555 }),
+      persistence.save('bugsnag-anonymous-id', 'cuidcuidcuidcuidcuidcuidcuidcuid3'),
+      persistence.save('bugsnag-anonymous-id', 'cuidcuidcuidcuidcuidcuidcuidcuid4')
+    ])
+
+    expect(JSON.parse(await file.read())).toStrictEqual({
+      'device-id': 'cuidcuidcuidcuidcuidcuidcuidcuid4',
+      'sampling-probability': { value: 0.5, time: 55555 }
+    })
+  })
 })

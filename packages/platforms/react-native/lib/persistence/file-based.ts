@@ -18,6 +18,7 @@ interface DataToBePersisted {
 
 export default class FileBasedPersistence implements Persistence {
   private readonly file: File
+  private saveQueue: Promise<void> = Promise.resolve()
 
   constructor (file: File) {
     this.file = file
@@ -42,37 +43,41 @@ export default class FileBasedPersistence implements Persistence {
   }
 
   async save<K extends PersistenceKey> (key: K, value: PersistencePayloadMap[K]): Promise<void> {
-    const existing = await this.readJson()
-    const dataToBePersisted: DataToBePersisted = {}
+    this.saveQueue = this.saveQueue.then(async () => {
+      const existing = await this.readJson()
+      const dataToBePersisted: DataToBePersisted = {}
 
-    // validate the existing data (if there is any) to try to keep the file as
-    // clean as possible
-    // this also ensures no extra keys end up in the file
-    if (isDeviceId(existing['device-id'])) {
-      dataToBePersisted['device-id'] = existing['device-id']
-    }
+      // validate the existing data (if there is any) to try to keep the file as
+      // clean as possible
+      // this also ensures no extra keys end up in the file
+      if (isDeviceId(existing['device-id'])) {
+        dataToBePersisted['device-id'] = existing['device-id']
+      }
 
-    if (isPersistedProbability(existing['sampling-probability'])) {
-      dataToBePersisted['sampling-probability'] = existing['sampling-probability']
-    }
+      if (isPersistedProbability(existing['sampling-probability'])) {
+        dataToBePersisted['sampling-probability'] = existing['sampling-probability']
+      }
 
-    // map the key from core to the key we use in the file
-    switch (key) {
-      case 'bugsnag-anonymous-id':
-        dataToBePersisted['device-id'] = value as string
-        break
+      // map the key from core to the key we use in the file
+      switch (key) {
+        case 'bugsnag-anonymous-id':
+          dataToBePersisted['device-id'] = value as string
+          break
 
-      case 'bugsnag-sampling-probability':
-        dataToBePersisted['sampling-probability'] = value as PersistedProbability
-        break
+        case 'bugsnag-sampling-probability':
+          dataToBePersisted['sampling-probability'] = value as PersistedProbability
+          break
 
-      default:
-        key satisfies never
-    }
+        default:
+          key satisfies never
+      }
 
-    try {
-      await this.file.write(JSON.stringify(dataToBePersisted))
-    } catch {}
+      try {
+        await this.file.write(JSON.stringify(dataToBePersisted))
+      } catch {}
+    })
+
+    await this.saveQueue
   }
 
   private async readJson (): Promise<PersistedData> {
