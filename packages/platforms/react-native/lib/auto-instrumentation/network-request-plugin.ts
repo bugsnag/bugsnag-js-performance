@@ -1,18 +1,29 @@
-import { type InternalConfiguration, type Logger, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
-import { type ReactNativeConfiguration } from '../config'
-import { defaultNetworkRequestCallback, type NetworkRequestCallback } from '../network-request-callback'
 import {
+  type InternalConfiguration,
+  type Logger,
+  type Plugin,
+  type SpanFactory
+} from '@bugsnag/core-performance'
+import {
+  defaultNetworkRequestCallback,
+  type NetworkRequestCallback,
+  type NetworkRequestInfo,
   type RequestEndCallback,
   type RequestEndContext,
   type RequestStartContext,
   type RequestTracker
 } from '@bugsnag/request-tracker-performance'
+import { type ReactNativeConfiguration } from '../config'
 
 const permittedPrefixes = ['http://', 'https://', '/', './', '../']
 
+export interface ReactNativeNetworkRequestInfo extends NetworkRequestInfo {
+  readonly type: 'xmlhttprequest'
+}
+
 export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
   private configEndpoint: string = ''
-  private networkRequestCallback: NetworkRequestCallback = defaultNetworkRequestCallback
+  private networkRequestCallback: NetworkRequestCallback<ReactNativeNetworkRequestInfo> = defaultNetworkRequestCallback
   private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
 
   constructor (

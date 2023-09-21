@@ -3,10 +3,11 @@ import {
   isStringOrRegExpArray,
   schema,
   type ConfigOption,
-  type CoreSchema,
-  type Configuration
+  type Configuration,
+  type CoreSchema
 } from '@bugsnag/core-performance'
-import { defaultNetworkRequestCallback, isNetworkRequestCallback, type NetworkRequestCallback } from './network-request-callback'
+import { type NetworkRequestCallback, defaultNetworkRequestCallback, isNetworkRequestCallback } from '@bugsnag/request-tracker-performance'
+import { type BrowserNetworkRequestInfo } from './auto-instrumentation'
 import { isRoutingProvider, type RoutingProvider } from './routing-provider'
 import { defaultSendPageAttributes, isSendPageAttributes, type SendPageAttributes } from './send-page-attributes'
 
@@ -17,7 +18,7 @@ export interface BrowserSchema extends CoreSchema {
   generateAnonymousId: ConfigOption<boolean>
   routingProvider: ConfigOption<RoutingProvider>
   settleIgnoreUrls: ConfigOption<Array<string | RegExp>>
-  networkRequestCallback: ConfigOption<NetworkRequestCallback>
+  networkRequestCallback: ConfigOption<NetworkRequestCallback<BrowserNetworkRequestInfo>>
   sendPageAttributes: ConfigOption<SendPageAttributes>
 }
 
@@ -28,7 +29,7 @@ export interface BrowserConfiguration extends Configuration {
   generateAnonymousId?: boolean
   routingProvider?: RoutingProvider
   settleIgnoreUrls?: Array<string | RegExp>
-  networkRequestCallback?: NetworkRequestCallback
+  networkRequestCallback?: NetworkRequestCallback<BrowserNetworkRequestInfo>
   sendPageAttributes?: SendPageAttributes
 }
 

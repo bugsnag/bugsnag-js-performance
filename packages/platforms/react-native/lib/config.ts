@@ -3,12 +3,13 @@ import {
   isStringWithLength,
   schema,
   type ConfigOption,
-  type CoreSchema,
-  type Configuration
+  type Configuration,
+  type CoreSchema
 } from '@bugsnag/core-performance'
+import { defaultNetworkRequestCallback, isNetworkRequestCallback, type NetworkRequestCallback } from '@bugsnag/request-tracker-performance'
 import { type WrapperComponentProvider } from 'react-native'
+import { type ReactNativeNetworkRequestInfo } from './auto-instrumentation'
 import { isWrapperComponentProvider } from './auto-instrumentation/app-start-plugin'
-import { defaultNetworkRequestCallback, isNetworkRequestCallback, type NetworkRequestCallback } from './network-request-callback'
 
 export interface ReactNativeSchema extends CoreSchema {
   appName: ConfigOption<string>
@@ -17,7 +18,7 @@ export interface ReactNativeSchema extends CoreSchema {
   autoInstrumentAppStarts: ConfigOption<boolean>
   wrapperComponentProvider: ConfigOption<WrapperComponentProvider | null>
   autoInstrumentNetworkRequests: ConfigOption<boolean>
-  networkRequestCallback: ConfigOption<NetworkRequestCallback>
+  networkRequestCallback: ConfigOption<NetworkRequestCallback<ReactNativeNetworkRequestInfo>>
 }
 
 export interface ReactNativeConfiguration extends Configuration {
@@ -27,7 +28,7 @@ export interface ReactNativeConfiguration extends Configuration {
   autoInstrumentAppStarts?: boolean
   wrapperComponentProvider?: WrapperComponentProvider | null
   autoInstrumentNetworkRequests?: boolean
-  networkRequestCallback?: NetworkRequestCallback
+  networkRequestCallback?: NetworkRequestCallback<ReactNativeNetworkRequestInfo>
 }
 
 function createSchema (): ReactNativeSchema {
