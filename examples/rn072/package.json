@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@bugsnag/react-native-performance": "file:../../packages/platforms/react-native",
     "react": "18.2.0",
     "react-native": "0.72.5"
   },
@@ -29,6 +30,11 @@
     "prettier": "^2.4.1",
     "react-test-renderer": "18.2.0",
     "typescript": "4.8.4"
+  },
+  "resolutions": {
+    "@bugsnag/core-performance": "file:../../packages/core",
+    "@bugsnag/delivery-fetch-performance": "file:../../packages/delivery-fetch",
+    "@bugsnag/request-tracker-performance": "file:../../packages/request-tracker"
   },
   "engines": {
     "node": ">=16"
