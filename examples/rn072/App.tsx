@@ -5,25 +5,27 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import BugsnagPerformance from "@bugsnag/react-native-performance";
+import { type PropsWithChildren } from 'react';
 import {
+  Button,
+  Image,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
+  useColorScheme,
 } from 'react-native';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const API_KEY = ""
+
+BugsnagPerformance.start({
+  appName: "rn072",
+  apiKey: API_KEY
+})
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -71,25 +73,22 @@ function App(): JSX.Element {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <Header />
+        <Image source={require('./icon.png')} style={{ width: 300, height: 90 }} />
+        <Text style= {{ padding: 24 }}>Press the buttons below to test examples of Bugsnag functionality. App start spans will be automatically started. Please make sure you have set your API key in App.tsx.</Text>
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
+          <Section title="Custom span">
+            <Button title="Send" onPress={() => { BugsnagPerformance.startSpan("Custom span").end() }} />
           </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
+          <Section title="Network span">
+            <Button title="Send" onPress={() => { 
+              fetch("http://localhost").catch((err) => {
+                // failed requests on android throw an error, so we catch it here
+              })
+            }} />
           </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
         </View>
       </ScrollView>
     </SafeAreaView>
