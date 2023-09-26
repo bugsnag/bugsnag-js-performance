@@ -1,6 +1,6 @@
 import { TurboModuleRegistry } from 'react-native'
-import type { Spec } from './NativeBugsnagPerformance'
+import { type Spec } from './NativeBugsnagPerformance'
 
-const NativeBugsnagPerformance = TurboModuleRegistry.get('BugsnagReactNativePerformance') || undefined
+const NativeBugsnagPerformance = TurboModuleRegistry.get('BugsnagReactNativePerformance')
 
-export default NativeBugsnagPerformance as Spec
+export default NativeBugsnagPerformance as Spec | null
