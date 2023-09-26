@@ -118,6 +118,17 @@ const BugsnagReactNativePerformance = {
       case 'other':
         return {}
     }
+  },
+
+  getBundleIdentifier (): string | null {
+    switch (Platform.OS) {
+      case 'ios':
+        return 'my.cool.app'
+
+      case 'android':
+      case 'other':
+        return null
+    }
   }
 }
 
