@@ -55,6 +55,11 @@ public class NativeBugsnagPerformanceImpl extends NativeBugsnagPerformanceSpec {
     return map;
   }
 
+  @Override
+  public String getBundleIdentifier() {
+    return null;
+  }
+
   @Nullable
   private String abiToArchitecture(@Nullable String abi) {
     if (abi == null) {
