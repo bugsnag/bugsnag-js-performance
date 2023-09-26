@@ -25,12 +25,14 @@ PACKAGE_NAMES = [
   "@bugsnag/core-performance",
   "@bugsnag/browser-performance",
   "@bugsnag/delivery-fetch-performance",
+  "@bugsnag/request-tracker-performance",
 ]
 
 PACKAGE_DIRECTORIES = [
   "#{ROOT}/packages/core",
   "#{ROOT}/packages/platforms/browser",
   "#{ROOT}/packages/delivery-fetch",
+  "#{ROOT}/packages/request-tracker",
 ]
 
 def run(command)

@@ -1,4 +1,4 @@
-import { type RequestEndContext, RequestTracker } from '../../lib/request-tracker/request-tracker'
+import { type RequestEndContext, RequestTracker } from '../lib/request-tracker'
 
 describe('Request Tracker', () => {
   it('should invoke start callbacks on onStart', () => {

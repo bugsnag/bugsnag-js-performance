@@ -4,13 +4,13 @@ describe('defaultNetworkRequestCallback', () => {
   it('returns an unmodified networkRequestInfo object', () => {
     const networkRequestInfo = {
       url: 'https://bugsnag.com/unit-test',
-      type: 'fetch'
+      type: 'xmlhttprequest'
     } as const
 
     const response = defaultNetworkRequestCallback(networkRequestInfo)
 
     expect(response.url).toBe('https://bugsnag.com/unit-test')
-    expect(response.type).toBe('fetch')
+    expect(response.type).toBe('xmlhttprequest')
     expect(response).toBe(networkRequestInfo)
   })
 })
@@ -23,7 +23,7 @@ describe('isNetworkRequestCallback', () => {
 
   const invalidCallbacks = [
     { type: 'array', callback: [] },
-    // eslint-disable-next-line compat/compat
+
     { type: 'bigint', callback: BigInt(9007199254740991) },
     { type: 'boolean', callback: true },
     { type: 'number', callback: 1234 },

@@ -1,4 +1,9 @@
-import { type InternalConfiguration, type Logger, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
+import {
+  type InternalConfiguration,
+  type Logger,
+  type Plugin,
+  type SpanFactory
+} from '@bugsnag/core-performance'
 import {
   defaultNetworkRequestCallback,
   type NetworkRequestCallback,
@@ -8,32 +13,30 @@ import {
   type RequestStartContext,
   type RequestTracker
 } from '@bugsnag/request-tracker-performance'
-import { type BrowserConfiguration } from '../config'
-
-export interface BrowserNetworkRequestInfo extends NetworkRequestInfo {
-  readonly type: PerformanceResourceTiming['initiatorType']
-}
+import { type ReactNativeConfiguration } from '../config'
 
 const permittedPrefixes = ['http://', 'https://', '/', './', '../']
 
-export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
+export interface ReactNativeNetworkRequestInfo extends NetworkRequestInfo {
+  readonly type: 'xmlhttprequest'
+}
+
+export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
   private configEndpoint: string = ''
-  private networkRequestCallback: NetworkRequestCallback<BrowserNetworkRequestInfo> = defaultNetworkRequestCallback
+  private networkRequestCallback: NetworkRequestCallback<ReactNativeNetworkRequestInfo> = defaultNetworkRequestCallback
   private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
 
   constructor (
-    private spanFactory: SpanFactory<BrowserConfiguration>,
-    private fetchTracker: RequestTracker,
+    private spanFactory: SpanFactory<ReactNativeConfiguration>,
     private xhrTracker: RequestTracker
   ) {}
 
-  configure (configuration: InternalConfiguration<BrowserConfiguration>) {
+  configure (configuration: InternalConfiguration<ReactNativeConfiguration>) {
     this.logger = configuration.logger
 
     if (configuration.autoInstrumentNetworkRequests) {
       this.configEndpoint = configuration.endpoint
       this.xhrTracker.onStart(this.trackRequest)
-      this.fetchTracker.onStart(this.trackRequest)
       this.networkRequestCallback = configuration.networkRequestCallback
     }
   }
@@ -41,7 +44,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private trackRequest = (startContext: RequestStartContext): RequestEndCallback | undefined => {
     if (!this.shouldTrackRequest(startContext)) return
 
-    const networkRequestInfo = this.networkRequestCallback({ url: startContext.url, type: startContext.type })
+    const networkRequestInfo = this.networkRequestCallback({ url: startContext.url, type: 'xmlhttprequest' })
 
     if (!networkRequestInfo) return
 

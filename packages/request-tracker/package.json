@@ -1,7 +1,7 @@
 {
-  "name": "@bugsnag/browser-performance",
+  "name": "@bugsnag/request-tracker-performance",
   "version": "1.0.0",
-  "description": "BugSnag performance monitoring for browsers",
+  "description": "BugSnag performance request tracker for monitoring XHR and fetch requests",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
   "repository": {
@@ -12,19 +12,15 @@
     "access": "public"
   },
   "scripts": {
-    "build": "npm run build:npm && npm run build:cdn",
-    "build:npm": "rollup --config rollup.config.npm.mjs",
-    "build:cdn": "rollup --config rollup.config.cdn.mjs",
+    "build": "rollup --config",
+    "build:cdn": "npm run build",
     "clean": "rm -rf dist/*"
   },
   "bugs": {
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "dependencies": {
-    "@bugsnag/core-performance": "^1.0.0",
-    "@bugsnag/delivery-fetch-performance": "^1.0.0",
-    "@bugsnag/request-tracker-performance": "^1.0.0",
-    "@bugsnag/cuid": "^3.0.2"
+    "@bugsnag/core-performance": "^1.0.0"
   },
   "type": "module",
   "main": "dist/index.js",

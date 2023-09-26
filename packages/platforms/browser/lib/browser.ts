@@ -1,15 +1,14 @@
 import { createClient, InMemoryQueue } from '@bugsnag/core-performance'
+import createFetchDeliveryFactory from '@bugsnag/delivery-fetch-performance'
+import { createFetchRequestTracker, createXmlHttpRequestTracker } from '@bugsnag/request-tracker-performance'
 import { FullPageLoadPlugin, NetworkRequestPlugin, ResourceLoadPlugin, RouteChangePlugin } from './auto-instrumentation'
 import createBrowserBackgroundingListener from './backgrounding-listener'
 import createClock from './clock'
 import { createSchema } from './config'
 import { createDefaultRoutingProvider } from './default-routing-provider'
-import createFetchDeliveryFactory from '@bugsnag/delivery-fetch-performance'
 import idGenerator from './id-generator'
 import createOnSettle from './on-settle'
 import makeBrowserPersistence from './persistence'
-import createFetchRequestTracker from './request-tracker/request-tracker-fetch'
-import createXmlHttpRequestTracker from './request-tracker/request-tracker-xhr'
 import createResourceAttributesSource from './resource-attributes-source'
 import createSpanAttributesSource from './span-attributes-source'
 import { WebVitals } from './web-vitals'
@@ -20,7 +19,7 @@ const clock = createClock(performance, backgroundingListener)
 const persistence = makeBrowserPersistence(window)
 const resourceAttributesSource = createResourceAttributesSource(navigator, persistence)
 const fetchRequestTracker = createFetchRequestTracker(window, clock)
-const xhrRequestTracker = createXmlHttpRequestTracker(window, clock)
+const xhrRequestTracker = createXmlHttpRequestTracker(XMLHttpRequest, clock, document)
 const webVitals = new WebVitals(performance, clock, window.PerformanceObserver)
 export const onSettle = createOnSettle(
   clock,
