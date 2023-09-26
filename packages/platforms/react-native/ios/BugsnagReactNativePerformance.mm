@@ -58,6 +58,10 @@ static NSString *hostArch() noexcept {
     return info;
 }
 
+- (NSString *)getBundleIdentifier {
+  return [[NSBundle mainBundle] bundleIdentifier];
+}
+
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params
