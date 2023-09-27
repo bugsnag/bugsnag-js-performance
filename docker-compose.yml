@@ -100,6 +100,7 @@ services:
       <<: *common-environment
       BITBAR_USERNAME:
       BITBAR_ACCESS_KEY:
+      RCT_NEW_ARCH_ENABLED:
     ports:
       - "9000-9499:9339"
     networks:
