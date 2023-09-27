@@ -73,7 +73,7 @@ function App(): JSX.Element {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <Image source={require('./icon.png')} style={{ width: 300, height: 90 }} />
+        <Image source={require('./icon.png')} style={{ height: 96, width:  96, marginTop: 24, alignSelf: 'center' }} />
         <Text style= {{ padding: 24 }}>Press the buttons below to test examples of Bugsnag functionality. App start spans will be automatically started. Please make sure you have set your API key in App.tsx.</Text>
         <View
           style={{
