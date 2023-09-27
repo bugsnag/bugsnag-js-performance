@@ -20,11 +20,11 @@ import {
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
-const API_KEY = ""
+const YOUR_API_KEY = ""
 
 BugsnagPerformance.start({
   appName: "rn072",
-  apiKey: API_KEY
+  apiKey: YOUR_API_KEY
 })
 
 type SectionProps = PropsWithChildren<{
