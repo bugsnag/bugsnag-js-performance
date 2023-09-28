@@ -35,7 +35,8 @@ const config = createRollupConfig({
     '@bugsnag/cuid',
     'react-native-file-access',
     '@react-native-async-storage/async-storage', 
-    '@bugsnag/request-tracker-performance'
+    '@bugsnag/request-tracker-performance',
+    '@react-native-community/netinfo'
   ]
 })
 

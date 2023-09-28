@@ -18,7 +18,9 @@
     "@bugsnag/core-performance": "^1.2.0",
     "@bugsnag/cuid": "^3.0.2",
     "@bugsnag/delivery-fetch-performance": "^1.2.0",
-    "@bugsnag/request-tracker-performance": "^1.2.0"
+    "@bugsnag/request-tracker-performance": "^1.2.0",
+    "@react-native-community/netinfo": "^9.4.1",
+    "react-native-file-access": "^3.0.4"
   },
   "devDependencies": {
     "@types/react": "^18.2.24",
