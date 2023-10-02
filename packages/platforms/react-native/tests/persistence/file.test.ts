@@ -1,14 +1,31 @@
-import File from '../../lib/persistence/file'
+import { File, ReadOnlyFile, NullFile } from '../../lib/persistence/file'
 import { FileSystem } from 'react-native-file-access'
 
-describe('File', () => {
-  beforeEach(() => {
-    // reset the FileSystem mock between tests, otherwise they will interfere
-    // with each other
-    // @ts-expect-error this exists on 'FileSystemMock' (see '__mocks__')
-    FileSystem.filesystem = new Map<string, string>()
+beforeEach(() => {
+  // reset the FileSystem mock between tests, otherwise they will interfere
+  // with each other
+  // @ts-expect-error this exists on 'FileSystemMock' (see '__mocks__')
+  FileSystem.filesystem = new Map<string, string>()
+})
+
+describe('ReadOnlyFile', () => {
+  it('can read from the given file path', async () => {
+    const file = new ReadOnlyFile('/aaa/bbb.txt', FileSystem)
+
+    await FileSystem.writeFile('/aaa/bbb.txt', 'beep boop')
+
+    expect(await file.read()).toStrictEqual('beep boop')
   })
 
+  it('throws when reading from the file when it does not exist', async () => {
+    expect.assertions(1)
+    const file = new ReadOnlyFile('/does/not/exist :)', FileSystem)
+
+    await expect(file.read()).rejects.toThrow()
+  })
+})
+
+describe('File', () => {
   it('can write to the given file path', async () => {
     const file = new File('/a/file/path', FileSystem)
 
@@ -65,5 +82,21 @@ describe('File', () => {
 
     await file.write('beep')
     expect(await file.read()).toStrictEqual('beep')
+  })
+})
+
+describe('NullFile', () => {
+  it('returns an empty string from "read"', async () => {
+    const file = new NullFile()
+
+    expect(await file.read()).toStrictEqual('')
+  })
+
+  it('does not write anything when "write" is called', async () => {
+    const file = new NullFile()
+
+    await file.write('(: hello :)')
+
+    expect(await file.read()).toStrictEqual('')
   })
 })
