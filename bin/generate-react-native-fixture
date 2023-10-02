@@ -103,6 +103,9 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   // install react-native-dotenv
   execSync('npm install --save react-native-dotenv', { cwd: fixtureDir, stdio: 'inherit' })
+  
+  // install @react-native-community/netinfo
+  execSync('npm install --save  @react-native-community/netinfo', { cwd: fixtureDir, stdio: 'inherit' })
 }
 
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
