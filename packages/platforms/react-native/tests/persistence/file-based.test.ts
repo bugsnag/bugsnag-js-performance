@@ -1,8 +1,16 @@
-import File from '../../lib/persistence/file'
+import { File, ReadOnlyFile } from '../../lib/persistence/file'
 import FileBasedPersistence from '../../lib/persistence/file-based'
 import { FileSystem } from 'react-native-file-access'
+import { Platform } from 'react-native'
 
 const PATH = '/test/path/persistent-state.json'
+const NATIVE_DEVICE_ID_PATH_IOS = '/mock/CacheDir/bugsnag-shared-my.cool.app/device-id.json'
+const NATIVE_DEVICE_ID_PATH_ANDROID = '/mock/DocumentDir/device-id'
+
+const getNativeDeviceIdFile = () => new ReadOnlyFile(
+  Platform.OS === 'ios' ? NATIVE_DEVICE_ID_PATH_IOS : NATIVE_DEVICE_ID_PATH_ANDROID,
+  FileSystem
+)
 
 describe('FileBasedPersistence', () => {
   beforeEach(() => {
@@ -13,7 +21,7 @@ describe('FileBasedPersistence', () => {
   })
 
   it('returns undefined for a key with no persisted value', async () => {
-    const persistence = new FileBasedPersistence(new File(PATH, FileSystem))
+    const persistence = new FileBasedPersistence(new File(PATH, FileSystem), getNativeDeviceIdFile())
 
     expect(await persistence.load('bugsnag-anonymous-id')).toBeUndefined()
     expect(await persistence.load('bugsnag-sampling-probability')).toBeUndefined()
@@ -21,7 +29,7 @@ describe('FileBasedPersistence', () => {
 
   it('can save sampling probability', async () => {
     const file = new File(PATH, FileSystem)
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
     const samplingProbability = { value: 0.5, time: 12345678 }
 
     await persistence.save('bugsnag-sampling-probability', samplingProbability)
@@ -32,7 +40,7 @@ describe('FileBasedPersistence', () => {
 
   it('can save device ID', async () => {
     const file = new File(PATH, FileSystem)
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
 
     await persistence.save('bugsnag-anonymous-id', 'cuidcuidcuidcuidcuidcuidcuidcuid')
 
@@ -42,7 +50,7 @@ describe('FileBasedPersistence', () => {
 
   it('can save both keys', async () => {
     const file = new File(PATH, FileSystem)
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
     const samplingProbability = { value: 0.5, time: 12345678 }
 
     await persistence.save('bugsnag-anonymous-id', 'cuidcuidcuidcuidcuidcuidcuidcuid')
@@ -59,7 +67,7 @@ describe('FileBasedPersistence', () => {
 
   it('can overwrite an existing persisted sampling probability', async () => {
     const file = new File(PATH, FileSystem)
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
     const samplingProbability1 = {
       value: 1.0,
       time: 987654321
@@ -83,7 +91,7 @@ describe('FileBasedPersistence', () => {
 
   it('can overwrite an existing persisted device ID', async () => {
     const file = new File(PATH, FileSystem)
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
 
     await persistence.save('bugsnag-anonymous-id', 'cuidcuidcuidcuidcuidcuidcuidcuid')
 
@@ -104,7 +112,7 @@ describe('FileBasedPersistence', () => {
       'sampling-probability': samplingProbability
     }))
 
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
 
     await persistence.save('bugsnag-anonymous-id', 'cuidabcabcabcabcabcabcabcabc')
 
@@ -124,7 +132,7 @@ describe('FileBasedPersistence', () => {
       'sampling-probability': samplingProbability1
     }))
 
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
 
     const samplingProbability2 = { value: 0.5, time: 98765 }
     await persistence.save('bugsnag-sampling-probability', samplingProbability2)
@@ -141,7 +149,7 @@ describe('FileBasedPersistence', () => {
     const samplingProbability = { value: 0.75, time: 987654321 }
     const file = new File(PATH, FileSystem)
     await file.write(JSON.stringify({ 'sampling-probability': samplingProbability }))
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
 
     expect(await persistence.load('bugsnag-sampling-probability')).toStrictEqual(samplingProbability)
   })
@@ -150,7 +158,7 @@ describe('FileBasedPersistence', () => {
     const file = new File(PATH, FileSystem)
     await file.write('{ "sampling-probability": 1234 }')
 
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
 
     expect(await persistence.load('bugsnag-sampling-probability')).toBeUndefined()
     expect(await file.read()).toStrictEqual('{ "sampling-probability": 1234 }')
@@ -162,7 +170,7 @@ describe('FileBasedPersistence', () => {
 
     expect(await file.read()).toStrictEqual('{ "sampling-probability": 1234 }')
 
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
     await persistence.save('bugsnag-anonymous-id', 'cuidcuidcuidcuidcuidcuidcuidcuid')
 
     expect(JSON.parse(await file.read())).toStrictEqual({
@@ -174,7 +182,7 @@ describe('FileBasedPersistence', () => {
     const file = new File(PATH, FileSystem)
     await file.write('{ "device-id": "cuidcuidcuidcuidcuidcuidcuidcuid" }')
 
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
 
     expect(await persistence.load('bugsnag-anonymous-id')).toStrictEqual('cuidcuidcuidcuidcuidcuidcuidcuid')
   })
@@ -183,7 +191,7 @@ describe('FileBasedPersistence', () => {
     const file = new File(PATH, FileSystem)
     await file.write('{ "device-id": "not a cuid" }')
 
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
 
     expect(await persistence.load('bugsnag-anonymous-id')).toBeUndefined()
     expect(await file.read()).toStrictEqual('{ "device-id": "not a cuid" }')
@@ -195,7 +203,7 @@ describe('FileBasedPersistence', () => {
 
     expect(await file.read()).toStrictEqual('{ "device-id": "abc" }')
 
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
     const samplingProbability = { value: 0.1, time: 1234 }
 
     await persistence.save('bugsnag-sampling-probability', samplingProbability)
@@ -209,7 +217,7 @@ describe('FileBasedPersistence', () => {
     const file = new File(PATH, FileSystem)
     await file.write('')
 
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
 
     expect(await persistence.load('bugsnag-anonymous-id')).toBeUndefined()
     expect(await persistence.load('bugsnag-sampling-probability')).toBeUndefined()
@@ -223,7 +231,7 @@ describe('FileBasedPersistence', () => {
     const file = new File(PATH, FileSystem)
     await file.write('{ "device-id": "cuidabcabcabcabcabcabcabcabc", "sampling-probability": {')
 
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
 
     expect(await persistence.load('bugsnag-anonymous-id')).toBeUndefined()
     expect(await persistence.load('bugsnag-sampling-probability')).toBeUndefined()
@@ -241,7 +249,7 @@ describe('FileBasedPersistence', () => {
       'sampling-probability': { value: 0.9, time: 999 }
     }))
 
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
 
     const loads = await Promise.all([
       persistence.load('bugsnag-sampling-probability'),
@@ -266,7 +274,7 @@ describe('FileBasedPersistence', () => {
 
   it('can handle concurrent calls to save', async () => {
     const file = new File(PATH, FileSystem)
-    const persistence = new FileBasedPersistence(file)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
 
     await Promise.all([
       persistence.save('bugsnag-sampling-probability', { value: 0.1, time: 11111 }),
@@ -283,6 +291,80 @@ describe('FileBasedPersistence', () => {
     expect(JSON.parse(await file.read())).toStrictEqual({
       'device-id': 'cuidcuidcuidcuidcuidcuidcuidcuid4',
       'sampling-probability': { value: 0.5, time: 55555 }
+    })
+  })
+
+  it('can read from native device ID file on iOS', async () => {
+    const file = new File(PATH, FileSystem)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
+
+    await FileSystem.writeFile(NATIVE_DEVICE_ID_PATH_IOS, '{ "deviceID": "ios-device-id" }')
+    await FileSystem.writeFile(NATIVE_DEVICE_ID_PATH_ANDROID, '{ "id": "android-device-id" }')
+
+    expect(await persistence.load('bugsnag-anonymous-id')).toStrictEqual('ios-device-id')
+  })
+
+  it('ignores native device ID file when empty on iOS', async () => {
+    const file = new File(PATH, FileSystem)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
+
+    await FileSystem.writeFile(NATIVE_DEVICE_ID_PATH_IOS, '')
+    await FileSystem.writeFile(NATIVE_DEVICE_ID_PATH_ANDROID, '{ "id": "android-device-id" }')
+
+    expect(await FileSystem.exists(NATIVE_DEVICE_ID_PATH_IOS)).toBe(true)
+    expect(await persistence.load('bugsnag-anonymous-id')).toBeUndefined()
+  })
+
+  it('ignores native device ID file when invalid JSON on iOS', async () => {
+    const file = new File(PATH, FileSystem)
+    const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
+
+    await FileSystem.writeFile(NATIVE_DEVICE_ID_PATH_IOS, '{ "deviceID": "ios-device-id" hello :)')
+    await FileSystem.writeFile(NATIVE_DEVICE_ID_PATH_ANDROID, '{ "id": "android-device-id" }')
+
+    expect(await persistence.load('bugsnag-anonymous-id')).toBeUndefined()
+  })
+
+  it('can read from native device ID file on Android', async () =>
+    // @ts-expect-error 'bugsnagWithTestPlatformSetTo' is an extension added by
+    //                  our Platform mock (see '__mocks__/react-native.ts')
+    Platform.bugsnagWithTestPlatformSetTo('android', async () => {
+      const file = new File(PATH, FileSystem)
+      const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
+
+      await FileSystem.writeFile(NATIVE_DEVICE_ID_PATH_IOS, '{ "deviceID": "ios-device-id" }')
+      await FileSystem.writeFile(NATIVE_DEVICE_ID_PATH_ANDROID, '{ "id": "android-device-id" }')
+
+      expect(await persistence.load('bugsnag-anonymous-id')).toStrictEqual('android-device-id')
+    })
+  )
+
+  it('ignores native device ID file when empty on Android', async () => {
+    // @ts-expect-error 'bugsnagWithTestPlatformSetTo' is an extension added by
+    //                  our Platform mock (see '__mocks__/react-native.ts')
+    Platform.bugsnagWithTestPlatformSetTo('android', async () => {
+      const file = new File(PATH, FileSystem)
+      const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
+
+      await FileSystem.writeFile(NATIVE_DEVICE_ID_PATH_IOS, '{ "deviceID": "ios-device-id" }')
+      await FileSystem.writeFile(NATIVE_DEVICE_ID_PATH_ANDROID, '')
+
+      expect(await FileSystem.exists(NATIVE_DEVICE_ID_PATH_ANDROID)).toBe(true)
+      expect(await persistence.load('bugsnag-anonymous-id')).toBeUndefined()
+    })
+  })
+
+  it('ignores native device ID file when invalid JSON on Android', async () => {
+    // @ts-expect-error 'bugsnagWithTestPlatformSetTo' is an extension added by
+    //                  our Platform mock (see '__mocks__/react-native.ts')
+    Platform.bugsnagWithTestPlatformSetTo('android', async () => {
+      const file = new File(PATH, FileSystem)
+      const persistence = new FileBasedPersistence(file, getNativeDeviceIdFile())
+
+      await FileSystem.writeFile(NATIVE_DEVICE_ID_PATH_IOS, '{ "deviceID": "ios-device-id" }')
+      await FileSystem.writeFile(NATIVE_DEVICE_ID_PATH_ANDROID, '{ "id": "ios-device-id" hello :)')
+
+      expect(await persistence.load('bugsnag-anonymous-id')).toBeUndefined()
     })
   })
 })
