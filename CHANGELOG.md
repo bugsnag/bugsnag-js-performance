@@ -1,5 +1,12 @@
 # Changelog
 
+## TBD
+
+### Fixed
+
+- (react-router) Allow `/` as a basename
+- (vue-router) Allow `/` as a basename
+
 ## v1.1.0 (2023-09-18)
 
 ### Added

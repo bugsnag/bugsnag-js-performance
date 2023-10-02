@@ -142,5 +142,11 @@ describe('VueRouterRoutingProvider', () => {
 
       expect(routingProvider.resolveRoute(new URL('/app/contacts/2/edit', window.origin))).toBe('/contacts/:contactId/edit')
     })
+
+    it('allows "/" as a basename', () => {
+      const routingProvider = new VueRouterRoutingProvider(router, '/')
+
+      expect(routingProvider.resolveRoute(new URL('/contacts/2/edit', window.origin))).toBe('/contacts/:contactId/edit')
+    })
   })
 })
