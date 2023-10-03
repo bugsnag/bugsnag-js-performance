@@ -98,7 +98,7 @@ steps:
           manual:
             permit_on_passed: true
         concurrency: 25
-        concurrency_group: "bitbar-app"
+        concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
           - "0.71"
@@ -129,7 +129,7 @@ steps:
           manual:
             permit_on_passed: true
         concurrency: 25
-        concurrency_group: "bitbar-app"
+        concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
           - "0.71"
@@ -158,7 +158,7 @@ steps:
           manual:
             permit_on_passed: true
         concurrency: 25
-        concurrency_group: "bitbar-app"
+        concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
           - "0.71"
@@ -189,7 +189,7 @@ steps:
           manual:
             permit_on_passed: true
         concurrency: 25
-        concurrency_group: "bitbar-app"
+        concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
           - "0.71"
