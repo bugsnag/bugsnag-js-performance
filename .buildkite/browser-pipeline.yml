@@ -45,8 +45,8 @@ steps:
           artifacts#v1.5.0:
             upload:
               - "./test/browser/maze_output/failed/**/*"
-        concurrency: 5
-        concurrency_group: "bitbar-web"
+        concurrency: 25
+        concurrency_group: "bitbar"
         matrix:
           setup:
             browser: [chrome, firefox, edge]
