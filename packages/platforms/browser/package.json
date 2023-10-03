@@ -21,7 +21,7 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "dependencies": {
-    "@bugsnag/core-performance": "^1.1.0",
+    "@bugsnag/core-performance": "^1.0.0",
     "@bugsnag/delivery-fetch-performance": "^1.0.0",
     "@bugsnag/request-tracker-performance": "^1.0.0",
     "@bugsnag/cuid": "^3.0.2"
