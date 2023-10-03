@@ -34,10 +34,10 @@ const tsRuleOverrides = {
   '@typescript-eslint/prefer-optional-chain': 'off'
 }
 
-const jestRuleOverrides = {
-  // Disable preferring Promise-based async tests
-  'jest/no-test-callback': 'off'
-}
+// const jestRuleOverrides = {
+//   // Disable preferring Promise-based async tests
+//   'jest/no-test-callback': 'off'
+// }
 
 module.exports = {
   root: true,
@@ -52,13 +52,6 @@ module.exports = {
     {
       files: ['**/*.js'],
       extends: ['standard']
-    },
-    {
-      files: ['**/*.test.js'],
-      extends: ['standard'],
-      plugins: ['eslint-plugin-jest'],
-      rules: { ...jestRuleOverrides },
-      env: { jest: true }
     },
     // linting for ts files
     {
@@ -78,24 +71,24 @@ module.exports = {
       parserOptions: {
         project: 'tsconfig.json'
       }
-    },
-    {
-      files: [
-        '**/*.test.ts?(x)'
-      ],
-      env: {
-        jest: true,
-        browser: true
-      },
-      plugins: ['eslint-plugin-jest'],
-      extends: [
-        'standard-with-typescript',
-        'plugin:jest/recommended'
-      ],
-      rules: {
-        ...tsRuleOverrides,
-        ...jestRuleOverrides
-      }
     }
+    // {
+    //   files: [
+    //     '**/*.test.ts?(x)'
+    //   ],
+    //   env: {
+    //     jest: true,
+    //     browser: true
+    //   },
+    //   plugins: ['eslint-plugin-jest'],
+    //   extends: [
+    //     'standard-with-typescript',
+    //     'plugin:jest/recommended'
+    //   ],
+    //   rules: {
+    //     ...tsRuleOverrides,
+    //     ...jestRuleOverrides
+    //   }
+    // }
   ]
 }

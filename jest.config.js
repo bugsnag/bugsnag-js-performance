@@ -6,6 +6,7 @@
 const paths = {
   '@bugsnag/core-performance': ['./packages/core/lib/index.ts'],
   '@bugsnag/browser-performance': ['./packages/platforms/browser/lib/index.ts'],
+  '@bugsnag/react-native-performance': ['./packages/platforms/react-native/lib/index.ts'],
   '@bugsnag/request-tracker-performance': ['./packages/request-tracker/lib/index.ts']
 }
 
@@ -55,14 +56,14 @@ module.exports = {
     {
       displayName: 'react-native',
       preset: 'react-native',
-      testMatch: ['<rootDir>/packages/platforms/react-native/**/*.test.ts'],
+      testMatch: ['<rootDir>/packages/platforms/react-native/tests/**/*.test.ts'],
       coveragePathIgnorePatterns: ['<rootDir>/packages/core', '<rootDir>/packages/platforms/browser', '<rootDir>/packages/delivery-fetch'],
       moduleNameMapper,
       transform: {
         '^.+\\.m?[tj]sx?$': [
           'ts-jest',
           {
-            tsconfig: { paths },
+            tsconfig: { paths, jsx: 'react-native' },
             babelConfig: {
               presets: ['module:metro-react-native-babel-preset']
             }
