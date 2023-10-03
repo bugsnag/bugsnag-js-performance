@@ -30,6 +30,9 @@ Feature: Manual spans
     And the trace payload field "resourceSpans.0.resource" string attribute "os.name" equals the platform-dependent string:
       | ios     | ios     |
       | android | android |
+    And the trace payload field "resourceSpans.0.resource" string attribute "bugsnag.app.platform" equals the platform-dependent string:
+      | ios     | ios     |
+      | android | android |
     And the trace payload field "resourceSpans.0.resource" string attribute "device.manufacturer" equals the platform-dependent string:
       | ios     | Apple     |
       | android | @not_null |
@@ -63,6 +66,9 @@ Feature: Manual spans
       | ios     | darwin |
       | android | linux  |
     And the trace payload field "resourceSpans.0.resource" string attribute "os.name" equals the platform-dependent string:
+      | ios     | ios     |
+      | android | android |
+    And the trace payload field "resourceSpans.0.resource" string attribute "bugsnag.app.platform" equals the platform-dependent string:
       | ios     | ios     |
       | android | android |
     And the trace payload field "resourceSpans.0.resource" string attribute "device.manufacturer" equals the platform-dependent string:
