@@ -12,7 +12,8 @@
   "dependencies": {
     "@bugsnag/react-native-performance": "file:../../packages/platforms/react-native",
     "react": "18.2.0",
-    "react-native": "0.72.5"
+    "react-native": "0.72.5",
+    "react-native-file-access": "^3.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

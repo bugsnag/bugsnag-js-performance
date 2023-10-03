@@ -5,7 +5,7 @@
  * @format
  */
 
-import BugsnagPerformance from "@bugsnag/react-native-performance";
+import BugsnagPerformance from '@bugsnag/react-native-performance';
 import { type PropsWithChildren } from 'react';
 import {
   Button,
@@ -19,17 +19,20 @@ import {
   useColorScheme,
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { name, version } from './package.json';
 
-const YOUR_API_KEY = ""
+const YOUR_API_KEY = '';
 
 BugsnagPerformance.start({
-  appName: "rn072",
+  appName: name,
+  appVersion: version,
   apiKey: YOUR_API_KEY
-})
+});
 
 type SectionProps = PropsWithChildren<{
   title: string;
 }>;
+
 
 function Section({children, title}: SectionProps): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -73,21 +76,50 @@ function App(): JSX.Element {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <Image source={require('./icon.png')} style={{ height: 96, width:  96, marginTop: 24, alignSelf: 'center' }} />
-        <Text style= {{ padding: 24 }}>Press the buttons below to test examples of Bugsnag functionality. App start spans will be automatically started. Please make sure you have set your API key in App.tsx.</Text>
+        <Image
+          source={require('./icon.png')}
+          style={{height: 96, width: 96, marginTop: 24, alignSelf: 'center'}}
+        />
+        <Text style={{padding: 24}}>
+          Press the buttons below to test examples of Bugsnag functionality. App
+          start spans will be automatically started. Please make sure you have
+          set your API key in App.tsx.
+        </Text>
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
           <Section title="Custom span">
-            <Button title="Send" onPress={() => { BugsnagPerformance.startSpan("Custom span").end() }} />
+            <Button
+              title="Send"
+              onPress={() => {
+                const span = BugsnagPerformance.startSpan('Custom span')
+                setTimeout(() => {
+                  span.end();
+                }, 250)
+              }}
+            />
           </Section>
           <Section title="Network span">
-            <Button title="Send" onPress={() => { 
-              fetch("http://localhost").catch((err) => {
-                // failed requests on android throw an error, so we catch it here
-              })
-            }} />
+            <Button
+              title="Send"
+              onPress={() => {
+                fetch('https://picsum.photos/200').catch(err => {
+                  // failed requests on android throw an error, so we catch it here
+                });
+              }}
+            />
+          </Section>
+          <Section title="Navigation span">
+              <Button
+                title="Send"
+                onPress={() => {
+                  const span = BugsnagPerformance.startNavigationSpan('HomeScreen')
+                  setTimeout(() => {
+                    span.end()
+                  }, 150)
+                }}
+              />
           </Section>
         </View>
       </ScrollView>

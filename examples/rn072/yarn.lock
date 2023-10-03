@@ -1151,6 +1151,33 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@bugsnag/core-performance@^1.0.0", "@bugsnag/core-performance@file:../../packages/core":
+  version "1.0.0"
+
+"@bugsnag/cuid@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@bugsnag/cuid/-/cuid-3.0.2.tgz#544f8e6e7e3768c8cb618ca5c5fb1eea6aacbb7e"
+  integrity sha512-cIwzC93r3PQ/INeuwtZwkZIG2K8WWN0rRLZQhu+mr48Ay+i6sEki4GYfTsflse7hZ1BeDWrNb/Q9vgY3B31xHQ==
+
+"@bugsnag/delivery-fetch-performance@^1.0.0", "@bugsnag/delivery-fetch-performance@file:../../packages/delivery-fetch":
+  version "1.0.0"
+  dependencies:
+    "@bugsnag/core-performance" "^1.0.0"
+
+"@bugsnag/react-native-performance@file:../../packages/platforms/react-native":
+  version "1.0.0"
+  dependencies:
+    "@bugsnag/core-performance" "^1.0.0"
+    "@bugsnag/cuid" "^3.0.2"
+    "@bugsnag/delivery-fetch-performance" "^1.0.0"
+    "@bugsnag/request-tracker-performance" "^1.0.0"
+    react-native-file-access "^3.0.4"
+
+"@bugsnag/request-tracker-performance@^1.0.0", "@bugsnag/request-tracker-performance@file:../../packages/request-tracker":
+  version "1.0.0"
+  dependencies:
+    "@bugsnag/core-performance" "^1.0.0"
+
 "@eslint-community/eslint-utils@^4.2.0":
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/@eslint-community/eslint-utils/-/eslint-utils-4.4.0.tgz#a23514e8fb9af1269d5f7788aa556798d61c6b59"
@@ -5454,6 +5481,11 @@ react-is@^17.0.1:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
+
+react-native-file-access@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/react-native-file-access/-/react-native-file-access-3.0.4.tgz#cc760232d6a153db152497f6a073c71c4cb911b0"
+  integrity sha512-sDmGeIIiSlLSrdtvEtADQ1uMoF+Zoegvu/Wr0z0Ej9lU8tHX0C1q+fJnCEBJSUjQ31rSzlabjWgQDKbpOEBdWg==
 
 react-native@0.72.5:
   version "0.72.5"
