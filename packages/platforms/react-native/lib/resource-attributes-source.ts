@@ -23,6 +23,7 @@ export default function resourceAttributesSourceFactory (persistence: Persistenc
 
     attributes.set('os.type', Platform.select({ android: 'linux', ios: 'darwin', default: 'unknown' }))
     attributes.set('os.name', Platform.OS)
+    attributes.set('bugsnag.app.platform', Platform.OS)
     attributes.set('os.version', Platform.Version.toString())
     attributes.set('service.name', config.appName)
 
