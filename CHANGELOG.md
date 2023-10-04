@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## v1.1.0 (2023-09-18)
+
+### Added
+
+- (browser) Added new `VueRouterRoutingProvider` for integration with vue-router [#293](https://github.com/bugsnag/bugsnag-js-performance/pull/293)
+- (browser) Added new `ReactRouterRoutingProvider` for integration with react-router v6 [#285](https://github.com/bugsnag/bugsnag-js-performance/pull/285)
 
 ### Added
 
@@ -10,6 +15,7 @@
 ### Fixed
 
 - (browser) Do not retry delivery for oversized payloads when connection fails [#280](https://github.com/bugsnag/bugsnag-js-performance/pull/280)
+- (browser) Fallback to the default route resolver for full page load spans if the configured `routingProvider` does not return a route [#300](https://github.com/bugsnag/bugsnag-js-performance/pull/300)
 
 ## v1.0.0 (2023-07-27)
 

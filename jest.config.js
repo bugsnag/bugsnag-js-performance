@@ -25,7 +25,7 @@ const defaultModuleConfig = {
   transform: {
     '^.+\\.m?[tj]sx?$': [
       'ts-jest',
-      { tsconfig: { paths } }
+      { tsconfig: { paths, allowJs: true } }
     ]
   }
 }

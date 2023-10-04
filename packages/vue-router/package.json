@@ -1,0 +1,35 @@
+{
+  "name": "@bugsnag/vue-router-performance",
+  "version": "1.1.0",
+  "description": "BugSnag performance monitoring for vue-router",
+  "homepage": "https://www.bugsnag.com/",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "npm run build:npm",
+    "build:npm": "rollup --config rollup.config.npm.mjs",
+    "clean": "rm -rf dist/*"
+  },
+  "bugs": {
+    "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
+  },
+  "dependencies": {
+    "@bugsnag/browser-performance": "^1.1.0"
+  },
+  "peerDependencies": {
+    "path-to-regexp": "^1.8.0",
+    "vue-router": "^4.2.4"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ]
+}

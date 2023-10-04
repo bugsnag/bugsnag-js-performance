@@ -1,0 +1,35 @@
+{
+  "name": "@bugsnag/react-router-performance",
+  "version": "1.1.0",
+  "description": "BugSnag performance monitoring for react-router",
+  "homepage": "https://www.bugsnag.com/",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "npm run build:npm && npm run build:cdn",
+    "build:npm": "rollup --config rollup.config.npm.mjs",
+    "build:cdn": "rollup --config rollup.config.cdn.mjs",
+    "clean": "rm -rf dist/*"
+  },
+  "bugs": {
+    "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
+  },
+  "dependencies": {
+    "@bugsnag/browser-performance": "^1.1.0"
+  },
+  "peerDependencies": {
+    "react-router-dom": "^6.0.0"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ]
+}

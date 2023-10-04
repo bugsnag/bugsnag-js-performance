@@ -95,6 +95,9 @@ module.exports = {
       rules: {
         ...tsRuleOverrides,
         ...jestRuleOverrides
+      },
+      parserOptions: {
+        project: './tsconfig.json'
       }
     }
   ]
