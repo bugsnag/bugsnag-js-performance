@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/browser-performance",
-  "version": "1.0.0",
+  "version": "1.2.0-alpha.0",
   "description": "BugSnag performance monitoring for browsers",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
@@ -21,10 +21,10 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "dependencies": {
-    "@bugsnag/core-performance": "^1.0.0",
-    "@bugsnag/delivery-fetch-performance": "^1.0.0",
-    "@bugsnag/request-tracker-performance": "^1.0.0",
-    "@bugsnag/cuid": "^3.0.2"
+    "@bugsnag/core-performance": "^1.2.0-alpha.0",
+    "@bugsnag/cuid": "^3.0.2",
+    "@bugsnag/delivery-fetch-performance": "^1.2.0-alpha.0",
+    "@bugsnag/request-tracker-performance": "^1.2.0-alpha.0"
   },
   "type": "module",
   "main": "dist/index.js",
