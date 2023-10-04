@@ -18,14 +18,15 @@
     "@bugsnag/core-performance": "^1.0.0",
     "@bugsnag/cuid": "^3.0.2",
     "@bugsnag/delivery-fetch-performance": "^1.0.0",
-    "@bugsnag/request-tracker-performance": "^1.0.0",
-    "react-native-file-access": "^3.0.4"
+    "@bugsnag/request-tracker-performance": "^1.0.0"
   },
   "devDependencies": {
-    "babel-preset-react-native": "^4.0.1"
+    "babel-preset-react-native": "^4.0.1",
+    "react-native-file-access": "^3.0.4"
   },
   "peerDependencies": {
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-file-access": "^3.0.4"
   },
   "scripts": {
     "build": "rollup --config",
