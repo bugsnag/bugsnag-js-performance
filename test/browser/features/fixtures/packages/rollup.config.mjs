@@ -5,7 +5,8 @@ import url from 'url'
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
-const isCdnBuild = process.env.USE_CDN_BUILD === "1" || process.env.USE_CDN_BUILD === "true"
+export const isCdnBuild = process.env.USE_CDN_BUILD === "1" || process.env.USE_CDN_BUILD === "true"
+
 const cdnOutputOptions = {
   // import BugsnagPerformance from the CDN build
   banner: process.env.DEBUG
@@ -13,6 +14,7 @@ const cdnOutputOptions = {
     : 'import BugsnagPerformance from "/bugsnag-performance.min.js"\n',
   globals: {
     '@bugsnag/browser-performance': 'BugsnagPerformance',
+    '@bugsnag/react-router-performance': 'BugsnagReactRouterPerformance',
   },
 }
 
@@ -27,7 +29,7 @@ export default {
     nodeResolve({ browser: true, jail: path.resolve(`${__dirname}/..`) }),
     commonjs()
   ],
-  ...(isCdnBuild ? { external: ['@bugsnag/browser-performance'] } : {}),
+  ...(isCdnBuild ? { external: ['@bugsnag/browser-performance', '@bugsnag/react-router-performance'] } : {}),
   onLog (level, log, defaultHandler) {
     // turn warnings into errors
     if (level === 'warn') {

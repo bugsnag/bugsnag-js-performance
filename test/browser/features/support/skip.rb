@@ -13,3 +13,7 @@ end
 Before("@skip_on_npm_build") do
   skip_this_scenario("Skipping scenario: Not suitable for NPM build") if $build_mode.npm?
 end
+
+Before("@skip_chrome_61") do
+  skip_this_scenario("Skipping scenario: Not supported") if Maze.config.browser == "chrome_61"
+end
