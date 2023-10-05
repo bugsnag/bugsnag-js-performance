@@ -20,7 +20,6 @@ function reactNativeSpecPlugin () {
     buildStart () { 
       this.emitFile({
         type: 'prebuilt-chunk',
-        id: 'lib/NativeBugsnagPerformance.ts',
         fileName: 'NativeBugsnagPerformance.ts',
         code: fs.readFileSync('lib/NativeBugsnagPerformance.ts', 'utf8')
       })

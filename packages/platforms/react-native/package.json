@@ -21,10 +21,12 @@
     "@bugsnag/request-tracker-performance": "^1.1.0-alpha.0"
   },
   "devDependencies": {
+    "@types/react": "^18.2.24",
     "babel-preset-react-native": "^4.0.1",
     "react-native-file-access": "^3.0.4"
   },
   "peerDependencies": {
+    "react": "*",
     "react-native": "*",
     "react-native-file-access": "^3.0.4"
   },

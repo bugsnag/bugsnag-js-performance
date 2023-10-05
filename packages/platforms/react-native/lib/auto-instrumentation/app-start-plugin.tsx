@@ -5,7 +5,7 @@ import {
   type Clock
 } from '@bugsnag/core-performance'
 import { type ReactNativeConfiguration } from '../config'
-import {type ReactNode, useEffect } from 'react'
+import { type ReactNode, useEffect } from 'react'
 import { type WrapperComponentProvider, type AppRegistry } from 'react-native'
 
 type WrapperProps = {
@@ -40,16 +40,18 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
     appStartSpan.setAttribute('bugsnag.span.category', 'app_start')
     appStartSpan.setAttribute('bugsnag.app_start.type', 'ReactNativeInit')
 
-    const AppStartWrapper = ({children}: WrapperProps) => {
+    const AppStartWrapper = ({ children }: WrapperProps) => {
       useEffect(() => {
         this.spanFactory.endSpan(appStartSpan, this.clock.now())
       }, [])
-      return (<>{children}</>)
+
+      return <>{children}</>
     }
 
     const instrumentedComponentProvider: WrapperComponentProvider = (appParams) => ({ children }) => {
       if (configuration.wrapperComponentProvider) {
         const WrapperComponent = configuration.wrapperComponentProvider(appParams)
+
         return (
           <AppStartWrapper>
             <WrapperComponent>{children}</WrapperComponent>
@@ -57,7 +59,7 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
         )
       }
 
-      return (<AppStartWrapper>{children}</AppStartWrapper>)
+      return <AppStartWrapper>{children}</AppStartWrapper>
     }
 
     this.appRegistry.setWrapperComponentProvider(instrumentedComponentProvider)
