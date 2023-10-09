@@ -35,6 +35,9 @@ Feature: Manual spans
     And the trace payload field "resourceSpans.0.resource" string attribute "device.manufacturer" equals the platform-dependent string:
       | ios     | Apple     |
       | android | @not_null |
+    And the trace payload field "resourceSpans.0.resource" string attribute "bugsnag.device.android_api_version" equals the platform-dependent string:
+      | ios     | @skip     |
+      | android | @not_null |
 
   Scenario: Spans can be logged from the background
     When I run 'BackgroundSpanScenario'
@@ -71,6 +74,9 @@ Feature: Manual spans
       | android | android |
     And the trace payload field "resourceSpans.0.resource" string attribute "device.manufacturer" equals the platform-dependent string:
       | ios     | Apple     |
+      | android | @not_null |
+    And the trace payload field "resourceSpans.0.resource" string attribute "bugsnag.device.android_api_version" equals the platform-dependent string:
+      | ios     | @skip     |
       | android | @not_null |
 
   @skip_ios_old_arch

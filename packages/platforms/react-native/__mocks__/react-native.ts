@@ -1,7 +1,7 @@
 type Os = 'android' | 'ios' | 'other'
 interface SelectOptions<T> { android: T, ios: T, default: T }
 type PlatformConstants
-  = { Manufacturer: string, Model: string }
+  = { Manufacturer: string, Model: string, Release: string }
   | Record<string, never>
 
 export const Platform = new class {
@@ -75,7 +75,8 @@ export const Platform = new class {
       case 'android':
         return {
           Manufacturer: 'bug',
-          Model: 'snag'
+          Model: 'snag',
+          Release: 'Snag OS 12'
         }
     }
   }

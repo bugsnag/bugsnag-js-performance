@@ -1,13 +1,13 @@
 import {
   ResourceAttributes,
-  type ResourceAttributeSource,
   type InternalConfiguration,
-  type Persistence
+  type Persistence,
+  type ResourceAttributeSource
 } from '@bugsnag/core-performance'
-import { type ReactNativeConfiguration } from './config'
-import { Platform } from 'react-native'
 import cuid from '@bugsnag/cuid'
+import { Platform } from 'react-native'
 import { type DeviceInfo } from './NativeBugsnagPerformance'
+import { type ReactNativeConfiguration } from './config'
 
 export default function resourceAttributesSourceFactory (persistence: Persistence, deviceInfo?: DeviceInfo): ResourceAttributeSource<ReactNativeConfiguration> {
   return function resourceAttributesSource (config: InternalConfiguration<ReactNativeConfiguration>): Promise<ResourceAttributes> {
@@ -24,7 +24,13 @@ export default function resourceAttributesSourceFactory (persistence: Persistenc
     attributes.set('os.type', Platform.select({ android: 'linux', ios: 'darwin', default: 'unknown' }))
     attributes.set('os.name', Platform.OS)
     attributes.set('bugsnag.app.platform', Platform.OS)
-    attributes.set('os.version', Platform.Version.toString())
+    // @ts-expect-error Platform.constants.Release exists on android devices
+
+    attributes.set('os.version', Platform.select({ ios: Platform.Version.toString(), android: Platform.constants.Release, default: 'unknown' }))
+
+    if (Platform.OS === 'android') {
+      attributes.set('bugsnag.device.android_api_version', Platform.Version.toString())
+    }
 
     if (deviceInfo) {
       if (deviceInfo.arch) {
