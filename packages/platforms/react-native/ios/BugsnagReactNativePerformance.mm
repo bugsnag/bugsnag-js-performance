@@ -45,7 +45,7 @@ static NSString *hostArch() noexcept {
     auto infoDictionary = NSBundle.mainBundle.infoDictionary;
     info[@"arch"] = hostArch();
 
-    NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+    NSString *bundleIdentifier = infoDictionary[@"CFBundleIdentifier"];
     if (bundleIdentifier) {
         info[@"bundleIdentifier"] = bundleIdentifier;
     }
