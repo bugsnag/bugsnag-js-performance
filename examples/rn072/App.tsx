@@ -19,12 +19,11 @@ import {
   useColorScheme,
 } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import { name, version } from './package.json';
+import { version } from './package.json';
 
 const YOUR_API_KEY = '';
 
 BugsnagPerformance.start({
-  appName: name,
   appVersion: version,
   apiKey: YOUR_API_KEY
 });
