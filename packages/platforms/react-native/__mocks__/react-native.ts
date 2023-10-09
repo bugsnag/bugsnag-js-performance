@@ -76,7 +76,7 @@ export const Platform = new class {
         return {
           Manufacturer: 'bug',
           Model: 'snag',
-          Release: '123'
+          Release: 'Snag OS 12'
         }
     }
   }
