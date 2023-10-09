@@ -43,20 +43,6 @@ const booleanValidation = [
 describe('ReactNativeSchema', () => {
   const schema = createSchema()
 
-  describe('appName', () => {
-    it('defaults to an empty string', () => {
-      expect(schema.appName.defaultValue).toBe('')
-    })
-
-    describe('.validate()', () => {
-      it.each(stringValidation)('returns $expected for the value $value', ({ expected, value }) => {
-        const schema = createSchema()
-        const validate = schema.appName.validate
-        expect(validate(value)).toBe(expected)
-      })
-    })
-  })
-
   describe('codeBundleId', () => {
     it('defaults to an empty string', () => {
       expect(schema.codeBundleId.defaultValue).toBe('')

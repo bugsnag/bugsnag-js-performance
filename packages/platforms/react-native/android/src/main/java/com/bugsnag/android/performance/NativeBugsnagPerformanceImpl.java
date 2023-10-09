@@ -30,7 +30,9 @@ public class NativeBugsnagPerformanceImpl extends NativeBugsnagPerformanceSpec {
     WritableMap map = Arguments.createMap();
     try {
       ReactApplicationContext reactContext = getReactApplicationContext();
-      PackageInfo packageInfo = reactContext.getPackageManager().getPackageInfo(reactContext.getPackageName(), 0);
+      String bundleIdentifier = reactContext.getPackageName();
+      map.putString("bundleIdentifier", bundleIdentifier);
+      PackageInfo packageInfo = reactContext.getPackageManager().getPackageInfo(bundleIdentifier, 0);
       map.putString("versionCode", Integer.toString(packageInfo.versionCode));
     } catch (Exception e) {
       // ignore
@@ -53,11 +55,6 @@ public class NativeBugsnagPerformanceImpl extends NativeBugsnagPerformanceSpec {
     map.putString("model", Build.MODEL);
 
     return map;
-  }
-
-  @Override
-  public String getBundleIdentifier() {
-    return null;
   }
 
   @Nullable

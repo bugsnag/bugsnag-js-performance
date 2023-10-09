@@ -21,7 +21,6 @@ Feature: Manual spans
     And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.name" equals "bugsnag.performance.reactnative"
     And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals "production"
     And the trace payload field "resourceSpans.0.resource" string attribute "device.id" matches the regex "^c[a-z0-9]{20,32}$"
-    And the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "com.bugsnag.reactnative.performance"
     And the trace payload field "resourceSpans.0.resource" string attribute "service.version" equals "1.2.3"
     And the trace payload field "resourceSpans.0.resource" string attribute "os.version" exists
     And the trace payload field "resourceSpans.0.resource" string attribute "os.type" equals the platform-dependent string:
@@ -59,7 +58,6 @@ Feature: Manual spans
     And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.name" equals "bugsnag.performance.reactnative"
     And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals "production"
     And the trace payload field "resourceSpans.0.resource" string attribute "device.id" matches the regex "^c[a-z0-9]{20,32}$"
-    And the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "com.bugsnag.reactnative.performance"
     And the trace payload field "resourceSpans.0.resource" string attribute "service.version" equals "1.2.3"
     And the trace payload field "resourceSpans.0.resource" string attribute "os.version" exists
     And the trace payload field "resourceSpans.0.resource" string attribute "os.type" equals the platform-dependent string:
@@ -80,7 +78,8 @@ Feature: Manual spans
     When I run 'ManualSpanScenario'
     And I wait to receive a sampling request
     And I wait for 1 span
-    Then the trace payload field "resourceSpans.0.resource" string attribute "host.arch" exists
+    Then the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "com.bugsnag.fixtures.reactnative.performance"
+    And the trace payload field "resourceSpans.0.resource" string attribute "host.arch" exists
     And the trace payload field "resourceSpans.0.resource" string attribute "device.model.identifier" exists
     And the trace payload field "resourceSpans.0.resource" string attribute "bugsnag.app.version_code" equals the platform-dependent string:
       | ios     | @skip |

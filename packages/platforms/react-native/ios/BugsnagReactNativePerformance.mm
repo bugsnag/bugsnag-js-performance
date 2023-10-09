@@ -45,6 +45,11 @@ static NSString *hostArch() noexcept {
     auto infoDictionary = NSBundle.mainBundle.infoDictionary;
     info[@"arch"] = hostArch();
 
+    NSString *bundleIdentifier = infoDictionary[@"CFBundleIdentifier"];
+    if (bundleIdentifier) {
+        info[@"bundleIdentifier"] = bundleIdentifier;
+    }
+
     NSString *versionCode = infoDictionary[@"CFBundleVersion"];
     if (versionCode) {
         info[@"bundleVersion"] = versionCode;
@@ -56,10 +61,6 @@ static NSString *hostArch() noexcept {
     }
      
     return info;
-}
-
-- (NSString *)getBundleIdentifier {
-  return [[NSBundle mainBundle] bundleIdentifier];
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED

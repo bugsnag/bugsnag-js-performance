@@ -7,9 +7,9 @@ import {
 import { type ReactNativeConfiguration } from './config'
 import { Platform } from 'react-native'
 import cuid from '@bugsnag/cuid'
-import NativeBugsnagPerformance from './native'
+import { type DeviceInfo } from './NativeBugsnagPerformance'
 
-export default function resourceAttributesSourceFactory (persistence: Persistence): ResourceAttributeSource<ReactNativeConfiguration> {
+export default function resourceAttributesSourceFactory (persistence: Persistence, deviceInfo?: DeviceInfo): ResourceAttributeSource<ReactNativeConfiguration> {
   return function resourceAttributesSource (config: InternalConfiguration<ReactNativeConfiguration>): Promise<ResourceAttributes> {
     let getDeviceId: Promise<string> | undefined
     let deviceId: string | undefined
@@ -25,10 +25,8 @@ export default function resourceAttributesSourceFactory (persistence: Persistenc
     attributes.set('os.name', Platform.OS)
     attributes.set('bugsnag.app.platform', Platform.OS)
     attributes.set('os.version', Platform.Version.toString())
-    attributes.set('service.name', config.appName)
 
-    if (NativeBugsnagPerformance) {
-      const deviceInfo = NativeBugsnagPerformance.getDeviceInfo()
+    if (deviceInfo) {
       if (deviceInfo.arch) {
         attributes.set('host.arch', deviceInfo.arch)
       }
@@ -43,6 +41,10 @@ export default function resourceAttributesSourceFactory (persistence: Persistenc
 
       if (deviceInfo.model) {
         attributes.set('device.model.identifier', deviceInfo.model)
+      }
+
+      if (deviceInfo.bundleIdentifier) {
+        attributes.set('service.name', deviceInfo.bundleIdentifier)
       }
     }
 

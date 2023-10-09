@@ -7,11 +7,11 @@ export type DeviceInfo = {
   model?: string
   versionCode?: string // Android only
   bundleVersion?: string // iOS only
+  bundleIdentifier?: string
 }
 
 export interface Spec extends TurboModule {
   getDeviceInfo: () => DeviceInfo
-  getBundleIdentifier: () => string | null
 }
 
 export default TurboModuleRegistry.get<Spec>(

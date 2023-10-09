@@ -85,12 +85,14 @@ interface DeviceInfoIos {
   arch: string
   model: string
   bundleVersion: string
+  bundleIdentifier: string
 }
 
 interface DeviceInfoAndroid {
   arch: string
   model: string
   versionCode: string
+  bundleIdentifier: string
 }
 
 type DeviceInfo
@@ -105,29 +107,20 @@ const BugsnagReactNativePerformance = {
         return {
           arch: 'arm64',
           model: 'iPhone14,1',
-          bundleVersion: '12345'
+          bundleVersion: '12345',
+          bundleIdentifier: 'my.cool.app'
         }
 
       case 'android':
         return {
           arch: 'x86',
           model: 'TheGoodPhone1',
-          versionCode: '6789'
+          versionCode: '6789',
+          bundleIdentifier: 'my.cool.app'
         }
 
       case 'other':
         return {}
-    }
-  },
-
-  getBundleIdentifier (): string | null {
-    switch (Platform.OS) {
-      case 'ios':
-        return 'my.cool.app'
-
-      case 'android':
-      case 'other':
-        return null
     }
   }
 }

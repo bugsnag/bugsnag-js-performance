@@ -30,7 +30,6 @@ export const launchScenario = async (rootTag) => {
   BugsnagPerformance.start({
     apiKey: command.api_key,
     endpoint: command.endpoint,
-    appName: 'com.bugsnag.reactnative.performance',
     ...scenario.config
   })
 
