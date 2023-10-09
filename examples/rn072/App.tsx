@@ -80,7 +80,7 @@ function App(): JSX.Element {
           style={{height: 96, width: 96, marginTop: 24, alignSelf: 'center'}}
         />
         <Text style={{padding: 24}}>
-          Press the buttons below to test examples of Bugsnag functionality. App
+          Press the buttons below to test examples of BugSnag functionality. App
           start spans will be automatically started. Please make sure you have
           set your API key in App.tsx.
         </Text>
