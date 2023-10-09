@@ -43,6 +43,11 @@ export default function resourceAttributesSourceFactory (persistence: Persistenc
       if (deviceInfo.model) {
         attributes.set('device.model.identifier', deviceInfo.model)
       }
+
+      const bundleId = NativeBugsnagPerformance.getBundleIdentifier()
+      if (bundleId) {
+        attributes.set('service.name', bundleId)
+      }
     }
 
     if (config.codeBundleId) {

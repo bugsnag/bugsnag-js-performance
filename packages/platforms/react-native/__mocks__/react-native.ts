@@ -123,9 +123,9 @@ const BugsnagReactNativePerformance = {
   getBundleIdentifier (): string | null {
     switch (Platform.OS) {
       case 'ios':
+      case 'android':
         return 'my.cool.app'
 
-      case 'android':
       case 'other':
         return null
     }

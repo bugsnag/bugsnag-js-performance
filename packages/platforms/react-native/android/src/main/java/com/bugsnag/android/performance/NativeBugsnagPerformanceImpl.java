@@ -57,7 +57,12 @@ public class NativeBugsnagPerformanceImpl extends NativeBugsnagPerformanceSpec {
 
   @Override
   public String getBundleIdentifier() {
-    return null;
+      try {
+      ReactApplicationContext reactContext = getReactApplicationContext();
+      return reactContext.getPackageName()
+    } catch (Exception e) {
+      // ignore
+    }
   }
 
   @Nullable
