@@ -12,7 +12,6 @@ import { type ReactNativeNetworkRequestInfo } from './auto-instrumentation'
 import { isWrapperComponentProvider } from './auto-instrumentation/app-start-plugin'
 
 export interface ReactNativeSchema extends CoreSchema {
-  appName: ConfigOption<string>
   codeBundleId: ConfigOption<string>
   generateAnonymousId: ConfigOption<boolean>
   autoInstrumentAppStarts: ConfigOption<boolean>
@@ -22,7 +21,6 @@ export interface ReactNativeSchema extends CoreSchema {
 }
 
 export interface ReactNativeConfiguration extends Configuration {
-  appName: string
   codeBundleId?: string
   generateAnonymousId?: boolean
   autoInstrumentAppStarts?: boolean
@@ -34,11 +32,6 @@ export interface ReactNativeConfiguration extends Configuration {
 function createSchema (): ReactNativeSchema {
   return {
     ...schema,
-    appName: {
-      defaultValue: '',
-      message: 'should be a string',
-      validate: isStringWithLength
-    },
     codeBundleId: {
       defaultValue: '',
       message: 'should be a string',

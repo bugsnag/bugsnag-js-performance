@@ -6,7 +6,7 @@ import resourceAttributesSourceFactory from '../lib/resource-attributes-source'
 
 describe('resourceAttributesSource', () => {
   it('includes all expected attributes (iOS)', async () => {
-    const configuration = createConfiguration<ReactNativeConfiguration>({ releaseStage: 'test', appVersion: '1.0.0', appName: 'Test App', codeBundleId: '12345678' })
+    const configuration = createConfiguration<ReactNativeConfiguration>({ releaseStage: 'test', appVersion: '1.0.0', codeBundleId: '12345678' })
     const resourceAttributesSource = resourceAttributesSourceFactory(new InMemoryPersistence())
     const resourceAttributes = await resourceAttributesSource(configuration)
     const jsonAttributes = resourceAttributes.toJson()
@@ -25,7 +25,6 @@ describe('resourceAttributesSource', () => {
     expect(getAttribute('os.type')).toStrictEqual({ stringValue: 'darwin' })
     expect(getAttribute('os.name')).toStrictEqual({ stringValue: 'ios' })
     expect(getAttribute('os.version')).toStrictEqual({ stringValue: '1.2.3' })
-    expect(getAttribute('service.name')).toStrictEqual({ stringValue: 'Test App' })
     expect(getAttribute('service.version')).toStrictEqual({ stringValue: '1.0.0' })
     expect(getAttribute('telemetry.sdk.name')).toStrictEqual({ stringValue: 'bugsnag.performance.reactnative' })
     expect(getAttribute('telemetry.sdk.version')).toStrictEqual({ stringValue: '__VERSION__' })
@@ -35,7 +34,7 @@ describe('resourceAttributesSource', () => {
     // @ts-expect-error 'bugsnagWithTestPlatformSetTo' is an extension added by
     //                  our Platform mock (see '__mocks__/react-native.ts')
     await Platform.bugsnagWithTestPlatformSetTo('android', async () => {
-      const configuration = createConfiguration<ReactNativeConfiguration>({ releaseStage: 'test', appVersion: '1.0.0', appName: 'Test App', codeBundleId: '12345678' })
+      const configuration = createConfiguration<ReactNativeConfiguration>({ releaseStage: 'test', appVersion: '1.0.0', codeBundleId: '12345678' })
       const resourceAttributesSource = resourceAttributesSourceFactory(new InMemoryPersistence())
       const resourceAttributes = await resourceAttributesSource(configuration)
       const jsonAttributes = resourceAttributes.toJson()
@@ -54,7 +53,6 @@ describe('resourceAttributesSource', () => {
       expect(getAttribute('os.type')).toStrictEqual({ stringValue: 'linux' })
       expect(getAttribute('os.name')).toStrictEqual({ stringValue: 'android' })
       expect(getAttribute('os.version')).toStrictEqual({ stringValue: '123' })
-      expect(getAttribute('service.name')).toStrictEqual({ stringValue: 'Test App' })
       expect(getAttribute('service.version')).toStrictEqual({ stringValue: '1.0.0' })
       expect(getAttribute('telemetry.sdk.name')).toStrictEqual({ stringValue: 'bugsnag.performance.reactnative' })
       expect(getAttribute('telemetry.sdk.version')).toStrictEqual({ stringValue: '__VERSION__' })

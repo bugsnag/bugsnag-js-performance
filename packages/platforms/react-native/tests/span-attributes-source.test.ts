@@ -12,7 +12,7 @@ describe('spanAttributesSource', () => {
       const delivery = new InMemoryDelivery()
       const testClient = createTestClient({ spanAttributesSource, deliveryFactory: () => delivery })
 
-      testClient.start({ apiKey: VALID_API_KEY, appName: 'test' })
+      testClient.start({ apiKey: VALID_API_KEY })
       testClient.startSpan('foreground span').end()
 
       await jest.runOnlyPendingTimersAsync()
