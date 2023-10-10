@@ -6,7 +6,7 @@ Feature: Resource Load Spans
     And I wait to receive a sampling request
 
     When I click the element "end-span"
-    And I wait to receive at least 3 spans
+    And I wait for 3 spans
 
     # App bundle
     And a span matching the regex "^\[ResourceLoad\]http:\/\/.*:[0-9]{4}\/resource-load-spans\/dist\/bundle\.js$" has a parent named "[Custom]/resource-load-spans"
@@ -30,7 +30,7 @@ Feature: Resource Load Spans
     And I wait to receive a sampling request
 
     When I click the element "end-span"
-    And I wait to receive at least 4 spans
+    And I wait for 4 spans
 
     # Custom span (parent)
     Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.3.name" equals "[Custom]/resource-load-spans"
