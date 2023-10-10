@@ -37,6 +37,11 @@
     "@bugsnag/delivery-fetch-performance": "file:../../packages/delivery-fetch",
     "@bugsnag/request-tracker-performance": "file:../../packages/request-tracker"
   },
+  "overrides": {
+    "@bugsnag/core-performance": "file:../../packages/core",
+    "@bugsnag/delivery-fetch-performance": "file:../../packages/delivery-fetch",
+    "@bugsnag/request-tracker-performance": "file:../../packages/request-tracker"
+  },
   "engines": {
     "node": ">=16"
   }
