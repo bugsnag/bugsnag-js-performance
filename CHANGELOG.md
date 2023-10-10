@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-This release adds support for React Native
+This release adds support for running BugSnag Performance in React Native apps. See [online docs](https://docs.bugsnag.com/performance/integration-guides/react-native) for details.
 
 ## v1.1.0 (2023-09-18)
 
