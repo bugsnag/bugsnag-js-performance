@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+This release adds support for React Native
+
 ## v1.1.0 (2023-09-18)
 
 ### Added
@@ -10,7 +14,6 @@
 ### Added
 
 - (delivery-fetch) Added `@bugsnag/delivery-fetch-performance` package [#281](https://github.com/bugsnag/bugsnag-js-performance/pull/281)
-- (react-native) Create simple generator for span and trace IDs [#282](https://github.com/bugsnag/bugsnag-js-performance/pull/262)
 
 ### Fixed
 
