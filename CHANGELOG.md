@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.2.0 (2023-10-11)
+## v1.2.0 (2023-10-12)
 
 This release adds support for running BugSnag Performance in React Native apps. See [online docs](https://docs.bugsnag.com/performance/integration-guides/react-native) for details.
 
