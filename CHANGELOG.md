@@ -1,8 +1,12 @@
 # Changelog
 
-## Unreleased
+## v1.2.0 (2023-10-11)
 
 This release adds support for running BugSnag Performance in React Native apps. See [online docs](https://docs.bugsnag.com/performance/integration-guides/react-native) for details.
+
+### Added
+
+- (delivery-fetch) Added `@bugsnag/delivery-fetch-performance` package [#281](https://github.com/bugsnag/bugsnag-js-performance/pull/281)
 
 ## v1.1.0 (2023-09-18)
 
@@ -10,10 +14,6 @@ This release adds support for running BugSnag Performance in React Native apps. 
 
 - (browser) Added new `VueRouterRoutingProvider` for integration with vue-router [#293](https://github.com/bugsnag/bugsnag-js-performance/pull/293)
 - (browser) Added new `ReactRouterRoutingProvider` for integration with react-router v6 [#285](https://github.com/bugsnag/bugsnag-js-performance/pull/285)
-
-### Added
-
-- (delivery-fetch) Added `@bugsnag/delivery-fetch-performance` package [#281](https://github.com/bugsnag/bugsnag-js-performance/pull/281)
 
 ### Fixed
 
