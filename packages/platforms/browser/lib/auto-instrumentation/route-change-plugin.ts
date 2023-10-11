@@ -1,4 +1,4 @@
-import { coreSpanOptionSchema, isString, validateSpanOptions, type InternalConfiguration, type Plugin, type SpanFactory, type SpanOptionSchema } from '@bugsnag/core-performance'
+import { coreSpanOptionSchema, isString, type InternalConfiguration, type Plugin, type SpanFactory, type SpanOptionSchema } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
 import { type RouteChangeSpanOptions } from '../routing-provider'
 import { getPermittedAttributes } from '../send-page-attributes'
@@ -64,11 +64,10 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
         trigger
       }
 
-      const cleanOptions = validateSpanOptions<InternalRouteChangeSpanOptions>(
+      const cleanOptions = this.spanFactory.validateSpanOptions<InternalRouteChangeSpanOptions>(
         '[RouteChange]',
         routeChangeSpanOptions,
-        routeChangeSpanOptionSchema,
-        configuration.logger
+        routeChangeSpanOptionSchema
       )
 
       const route = configuration.routingProvider.resolveRoute(absoluteUrl) || defaultRouteResolver(absoluteUrl)

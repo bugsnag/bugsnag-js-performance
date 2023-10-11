@@ -7,7 +7,7 @@ import {
   type RequestStartContext,
   type RequestEndContext,
   RequestTracker
-} from '../../lib/request-tracker/request-tracker'
+} from '@bugsnag/request-tracker-performance'
 import createClock from '../../lib/clock'
 import { ControllableBackgroundingListener, IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 

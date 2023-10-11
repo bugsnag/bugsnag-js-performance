@@ -1,0 +1,12 @@
+{
+  "extends": "../../../tsconfig.json",
+  "include": [
+    "lib/*"
+  ],
+  "exclude": [
+    "lib/NativeBugsnagPerformance.ts"
+  ],
+  "compilerOptions": {
+    "types": ["../../../cuid"]
+  }
+}

@@ -106,4 +106,18 @@ dist
 # TernJS port file
 .tern-port
 
+# Verdaccio
 .verdaccio
+verdaccio-config.yml
+
+#Jest
+.jest
+
+#rbenv
+.ruby-version
+
+# Maze runner output
+maze_output.zip
+
+# React Native test fixure
+test/react-native/features/fixtures/generated/

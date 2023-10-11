@@ -5,6 +5,8 @@ export interface RetryQueue {
   flush: () => Promise<void>
 }
 
+export type RetryQueueFactory = (delivery: Delivery, retryQueueMaxSize: number) => RetryQueue
+
 interface PayloadWithTimestamp {
   payload: TracePayload
   time: number
@@ -55,10 +57,8 @@ export class InMemoryQueue implements RetryQueue {
             case 'failure-retryable':
               this.add(payload, time)
               break
-            default: {
-              const _exhaustiveCheck: never = state
-              return _exhaustiveCheck
-            }
+            default:
+              state satisfies never
           }
         } catch (err) {}
       }

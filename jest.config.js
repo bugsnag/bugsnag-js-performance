@@ -5,7 +5,8 @@
 // we want to run Jest against the TS source
 const paths = {
   '@bugsnag/core-performance': ['./packages/core/lib/index.ts'],
-  '@bugsnag/browser-performance': ['./packages/platforms/browser/lib/index.ts']
+  '@bugsnag/browser-performance': ['./packages/platforms/browser/lib/index.ts'],
+  '@bugsnag/request-tracker-performance': ['./packages/request-tracker/lib/index.ts']
 }
 
 // convert the tsconfig "paths" option into Jest's "moduleNameMapper" option
@@ -13,28 +14,72 @@ const paths = {
 const moduleNameMapper = Object.fromEntries(
   Object.entries(paths)
     .map(([name, directories]) => [
-      `^${name}$`,
-      directories.map(directory => directory.replace('./', '<rootDir>/'))
+        `^${name}$`,
+        directories.map(directory => directory.replace('./', '<rootDir>/'))
     ])
 )
 
+const defaultModuleConfig = {
+  preset: 'ts-jest/presets/js-with-ts',
+  moduleNameMapper,
+  transform: {
+    '^.+\\.m?[tj]sx?$': [
+      'ts-jest',
+      { tsconfig: { paths, allowJs: true } }
+    ]
+  }
+}
+
 module.exports = {
+  projects: [
+    {
+      displayName: 'core',
+      testMatch: ['<rootDir>/packages/core/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
+    {
+      displayName: 'delivery-fetch',
+      testMatch: ['<rootDir>/packages/delivery-fetch/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
+    {
+      displayName: 'browser',
+      testMatch: ['<rootDir>/packages/platforms/browser/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
+    {
+      displayName: 'request-tracker',
+      testMatch: ['<rootDir>/packages/request-tracker/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
+    {
+      displayName: 'react-native',
+      preset: 'react-native',
+      testMatch: ['<rootDir>/packages/platforms/react-native/**/*.test.ts'],
+      coveragePathIgnorePatterns: ['<rootDir>/packages/core', '<rootDir>/packages/platforms/browser', '<rootDir>/packages/delivery-fetch'],
+      moduleNameMapper,
+      transform: {
+        '^.+\\.m?[tj]sx?$': [
+          'ts-jest',
+          {
+            tsconfig: { paths },
+            babelConfig: {
+              presets: ['module:metro-react-native-babel-preset']
+            }
+          }
+        ]
+      }
+    }
+  ],
   collectCoverageFrom: [
     '**/packages/*/**/*.ts',
     '!**/packages/*/**/*.d.ts',
+    '!**/packages/*/**/*.test.ts',
     '!**/packages/*/**/tests/**/*',
     '!<rootDir>/packages/test-utilities/**/*',
     '!<rootDir>/test/**/*'
   ],
   coverageReporters: ['json-summary', 'text'],
-  transform: {
-    '^.+\\.m?[tj]sx?$': [
-      'ts-jest',
-      { tsconfig: { paths } }
-    ]
-  },
-  testEnvironment: 'node',
-  moduleNameMapper,
   reporters: process.env.CI
     ? [['github-actions', { silent: false }], 'summary']
     : ['default']

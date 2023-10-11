@@ -95,6 +95,25 @@ services:
     volumes:
       - ./test/browser/maze_output:/app/test/browser/maze_output
 
+  react-native-maze-runner:
+    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v8-cli
+    environment:
+      <<: *common-environment
+      BITBAR_USERNAME:
+      BITBAR_ACCESS_KEY:
+      RCT_NEW_ARCH_ENABLED:
+    ports:
+      - "9000-9499:9339"
+    networks:
+      default:
+        aliases:
+          - maze-runner
+    volumes:
+      - ./build:/app/build
+      - ./test/react-native/features/:/app/features
+      - ./test/react-native/maze_output:/app/maze_output
+      - /var/run/docker.sock:/var/run/docker.sock
+
   release:
     build:
       context: .
