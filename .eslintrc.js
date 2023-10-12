@@ -28,7 +28,10 @@ const tsRuleOverrides = {
   '@typescript-eslint/no-implied-eval': 'off',
   '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'off',
   '@typescript-eslint/prefer-includes': 'off',
-  '@typescript-eslint/no-for-in-array': 'off'
+  '@typescript-eslint/no-for-in-array': 'off',
+
+  // Optional chaining compiles to a lot more code
+  '@typescript-eslint/prefer-optional-chain': 'off'
 }
 
 const jestRuleOverrides = {
@@ -92,6 +95,9 @@ module.exports = {
       rules: {
         ...tsRuleOverrides,
         ...jestRuleOverrides
+      },
+      parserOptions: {
+        project: './tsconfig.json'
       }
     }
   ]

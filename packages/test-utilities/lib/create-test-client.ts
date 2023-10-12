@@ -11,10 +11,12 @@ import {
   createClient,
   schema,
   InMemoryPersistence,
+  InMemoryQueue,
   type BugsnagPerformance,
   type ClientOptions,
   type Configuration,
-  type CoreSchema
+  type CoreSchema,
+  type Delivery
 } from '@bugsnag/core-performance'
 
 const defaultOptions = () => ({
@@ -26,10 +28,11 @@ const defaultOptions = () => ({
   spanAttributesSource,
   schema,
   plugins: () => [],
-  persistence: new InMemoryPersistence()
+  persistence: new InMemoryPersistence(),
+  retryQueueFactory: (delivery: Delivery, retryQueueMaxSize: number) => new InMemoryQueue(delivery, retryQueueMaxSize)
 })
 
-function createTestClient <S extends CoreSchema, C extends Configuration> (optionOverrides: Partial<ClientOptions<S, C>> = {}): BugsnagPerformance<C> {
+function createTestClient <S extends CoreSchema, C extends Configuration, T = void> (optionOverrides: Partial<ClientOptions<S, C, T>> = {}): BugsnagPerformance<C, T> {
   return createClient({ ...defaultOptions(), ...optionOverrides })
 }
 

@@ -1,0 +1,17 @@
+{
+  "name": "@bugsnag/react-native-performance-scenarios",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-file-access": "*",
+    "@bugsnag/react-native-performance": "*"
+  }
+}

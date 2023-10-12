@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2.0 (2023-10-12)
+
+This release adds support for running BugSnag Performance in React Native apps. See [online docs](https://docs.bugsnag.com/performance/integration-guides/react-native) for details.
+
+### Added
+
+- (delivery-fetch) Added `@bugsnag/delivery-fetch-performance` package [#281](https://github.com/bugsnag/bugsnag-js-performance/pull/281)
+
 ## v1.1.0 (2023-09-18)
 
 ### Added

@@ -1,3 +1,5 @@
+import { isDeviceId, isPersistedProbability } from './validation'
+
 export interface PersistedProbability {
   value: number
   time: number
@@ -27,4 +29,26 @@ export class InMemoryPersistence implements Persistence {
   async save<K extends PersistenceKey> (key: K, value: PersistencePayloadMap[K]): Promise<void> {
     this.persistedItems.set(key, value)
   }
+}
+
+export function toPersistedPayload<K extends PersistenceKey> (
+  key: K,
+  raw: string
+): PersistencePayloadMap[K] | undefined {
+  switch (key) {
+    case 'bugsnag-sampling-probability': {
+      const json = JSON.parse(raw)
+
+      return isPersistedProbability(json)
+        ? json as PersistencePayloadMap[K]
+        : undefined
+    }
+
+    case 'bugsnag-anonymous-id':
+      return isDeviceId(raw)
+        ? raw as PersistencePayloadMap[K]
+        : undefined
+  }
+
+  key satisfies never
 }
