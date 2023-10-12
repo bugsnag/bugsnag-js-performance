@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/react-router-performance",
-  "version": "1.1.0-alpha.0",
+  "version": "1.2.0",
   "description": "BugSnag performance monitoring for react-router",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
@@ -21,7 +21,7 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "dependencies": {
-    "@bugsnag/browser-performance": "^1.1.0-alpha.0"
+    "@bugsnag/browser-performance": "^1.2.0"
   },
   "peerDependencies": {
     "react-router-dom": "^6.0.0"
