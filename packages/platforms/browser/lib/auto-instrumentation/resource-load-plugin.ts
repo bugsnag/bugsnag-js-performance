@@ -101,6 +101,11 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
       }
     })
 
-    observer.observe({ type: 'resource', buffered: true })
+    try {
+      observer.observe({ type: 'resource', buffered: true })
+    } catch (err) {
+      configuration.logger.warn('Unable to get previous resource loads as buffered observer not supported, only showing resource loads from this point on')
+      observer.observe({ entryTypes: ['resource'] })
+    }
   }
 }
