@@ -6,11 +6,6 @@ type FileSystemEntry
 
 type FileSystem = Map<string, FileSystemEntry>
 
-// TODO: keep?
-// function basename (path: string): string {
-//   return path.split('/').pop() || '/'
-// }
-
 function dirname (path: string): string {
   return path.split('/').slice(0, -1).join('/')
 }
