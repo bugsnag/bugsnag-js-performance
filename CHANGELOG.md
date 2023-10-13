@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- (browser) Fall back to unbuffered performance observer when buffer is not supported [#352](https://github.com/bugsnag/bugsnag-js-performance/pull/352) 
+
 ## v1.2.0 (2023-10-12)
 
 This release adds support for running BugSnag Performance in React Native apps. See [online docs](https://docs.bugsnag.com/performance/integration-guides/react-native) for details.
