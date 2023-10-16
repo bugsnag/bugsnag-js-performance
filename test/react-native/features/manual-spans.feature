@@ -18,15 +18,11 @@ Feature: Manual spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "custom"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" bool attribute "bugsnag.app.in_foreground" is true
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "net.host.connection.type" is one of:
-      | unknown |
-      | none |
-      | cellular |
-      | wifi |
-      | bluetooth |
-      | ethernet |
-      | wimax |
-      | vpn |
-      | other |
+      | 'wifi'        | 
+      | 'wired'       |
+      | 'cell'        |
+      | 'unavailable' |
+      | 'unknown'     |
 
     And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.name" equals "bugsnag.performance.reactnative"
     And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals "production"
