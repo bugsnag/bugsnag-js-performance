@@ -39,7 +39,7 @@ steps:
             service-ports: true
             command:
               - --farm=bb
-              - --exclude={{ matrix.exlusions }}
+              - --exclude={{ matrix.exclusions }}
               - --browser={{ matrix.browser }}_{{ matrix.version }}
               - --aws-public-ip
               - --no-tunnel
