@@ -28,7 +28,7 @@ steps:
           USE_CDN_BUILD: "${USE_CDN_BUILD}"
 
       # BitBar
-      - label: ":bitbar: :{{ matrix.browser }}: {{ matrix.version }} tests${EXTRA_STEP_LABEL}"
+      - label: ":bitbar: :{{ matrix.browser }}: {{ matrix.version }} tests${EXTRA_STEP_LABEL} excluding {{ matrix.exclusions }}"
         depends_on: "browser-maze-runner-bb-${USE_CDN_BUILD}"
         timeout_in_minutes: 30
         plugins:
@@ -52,7 +52,7 @@ steps:
           setup:
             browser: [chrome, firefox, edge]
             version: [latest]
-            exclusions: ["--exclude=features/[^r-z].*.feature", "--exclude=features/[^a-p].*.feature"]
+            exclusions: ["features/[^r-z].*.feature", "features/[^a-p].*.feature"]
           adjustments:
             - with: { browser: safari, version: 16, exclusions: "" }
 
