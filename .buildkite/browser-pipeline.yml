@@ -54,7 +54,7 @@ steps:
             version: [latest]
             exclusions: ["--exclude=features/[^r-z].*.feature", "--exclude=features/[^a-p].*.feature"]
           adjustments:
-            - with: { browser: safari, version: 16 }
+            - with: { browser: safari, version: 16, exclusions: ["--exclude=features/[^r-z].*.feature", "--exclude=features/[^a-p].*.feature"] }
 
       # BrowserStack
       - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser tests${EXTRA_STEP_LABEL}"
