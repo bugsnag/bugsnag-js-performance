@@ -4,8 +4,10 @@ import { type DeviceInfo } from '../NativeBugsnagPerformance'
 import { File, NullFile, ReadOnlyFile } from './file'
 import FileBasedPersistence from './file-based'
 
-const PERSISTED_STATE_VERSION = 1
-const PERSISTED_STATE_PATH = `${Dirs.CacheDir}/bugsnag-performance-react-native/v${PERSISTED_STATE_VERSION}/persisted-state.json`
+const PERSISTENCE_VERSION = 1
+export const PERSISTENCE_DIRECTORY = `${Dirs.CacheDir}/bugsnag-performance-react-native/v${PERSISTENCE_VERSION}`
+
+const PERSISTED_STATE_PATH = `${PERSISTENCE_DIRECTORY}/persisted-state.json`
 
 export default function persistenceFactory (fileSystem: typeof FileSystem, deviceInfo?: DeviceInfo): FileBasedPersistence {
   const nativeDeviceIdFilePath = Platform.select({

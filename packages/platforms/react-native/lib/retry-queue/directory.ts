@@ -2,7 +2,7 @@ import { isObject } from '@bugsnag/core-performance'
 import { Util, type FileSystem } from 'react-native-file-access'
 import timestampFromFilename from './timestamp-from-filename'
 
-type MinimalFileSystem = Pick<typeof FileSystem, 'ls' | 'exists' | 'isDir' | 'readFile' | 'writeFile' | 'mkdir' | 'unlink'>
+export type MinimalFileSystem = Pick<typeof FileSystem, 'ls' | 'exists' | 'isDir' | 'readFile' | 'writeFile' | 'mkdir' | 'unlink'>
 
 // sort filenames by newest -> oldest, i.e. the largest timestamps come first
 // any invalid filenames (where we can't parse a timestamp) are put at the end
