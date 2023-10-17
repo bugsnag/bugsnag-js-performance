@@ -1,17 +1,8 @@
 import { isObject } from '@bugsnag/core-performance'
 import { Util, type FileSystem } from 'react-native-file-access'
+import timestampFromFilename from './timestamp-from-filename'
 
 type MinimalFileSystem = Pick<typeof FileSystem, 'ls' | 'exists' | 'isDir' | 'readFile' | 'writeFile' | 'mkdir' | 'unlink'>
-
-const FILENAME_REGEX = /^retry-([0-9]+)-.+\.json$/
-
-function timestampFromFilename (filename: string): bigint | undefined {
-  const match = FILENAME_REGEX.exec(filename)
-
-  if (match) {
-    return BigInt(match[1])
-  }
-}
 
 // sort filenames by newest -> oldest, i.e. the largest timestamps come first
 // any invalid filenames (where we can't parse a timestamp) are put at the end
