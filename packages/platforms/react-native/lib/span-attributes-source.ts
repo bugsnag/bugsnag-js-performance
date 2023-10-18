@@ -5,12 +5,11 @@ import { type ReactNativeConfiguration } from './config'
 import getNetworkConnectionType from './get-network-connection-type'
 
 export function createSpanAttributesSource (appState: AppStateStatic) {
-  let connectionType = 'unknown' // TODO: do we need to set an initial value or will the event listener fire in the first instance?
+  let connectionType = 'unknown'
 
   // Subscribe to network changes
   NetInfo.addEventListener(state => {
     connectionType = getNetworkConnectionType(state.type)
-    console.log(`[BusgnagPerformance] connection state: ${JSON.stringify(state)}`)
   })
 
   const spanAttributesSource: SpanAttributesSource<ReactNativeConfiguration> = {
