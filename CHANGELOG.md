@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- (react-native) Added `net.host.connection.type` span attribute [#334](https://github.com/bugsnag/bugsnag-js-performance/pull/334)
+
 ### Fixed
 
 - (browser) Fall back to unbuffered performance observer when buffer is not supported [#352](https://github.com/bugsnag/bugsnag-js-performance/pull/352) 
