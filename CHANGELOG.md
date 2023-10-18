@@ -8,7 +8,7 @@
 
 ### Fixed
 
-- (browser) Fall back to unbuffered performance observer when buffer is not supported [#352](https://github.com/bugsnag/bugsnag-js-performance/pull/352) 
+- (browser) Fall back to unbuffered performance observer when buffer is not supported [#352](https://github.com/bugsnag/bugsnag-js-performance/pull/352)
 
 ## v1.2.0 (2023-10-12)
 
