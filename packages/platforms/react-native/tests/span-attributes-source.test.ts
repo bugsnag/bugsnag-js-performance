@@ -33,7 +33,8 @@ describe('spanAttributesSource', () => {
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: 'background span',
         attributes: expect.arrayContaining([
-          { key: 'bugsnag.app.in_foreground', value: { boolValue: false } }
+          { key: 'bugsnag.app.in_foreground', value: { boolValue: false } },
+          { key: 'net.host.connection.type', value: { stringValue: 'unknown' } }
         ])
       }))
     })
