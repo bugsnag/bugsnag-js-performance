@@ -2,10 +2,10 @@ import { type SpanAttributesSource } from '@bugsnag/core-performance'
 import NetInfo from '@react-native-community/netinfo'
 import { type AppStateStatic } from 'react-native'
 import { type ReactNativeConfiguration } from './config'
-import getNetworkConnectionType from './get-network-connection-type'
+import getNetworkConnectionType, { type NetworkConnectionType } from './get-network-connection-type'
 
 export function createSpanAttributesSource (appState: AppStateStatic) {
-  let connectionType = 'unknown'
+  let connectionType: NetworkConnectionType = 'unknown'
 
   // Subscribe to network changes
   NetInfo.addEventListener(state => {
