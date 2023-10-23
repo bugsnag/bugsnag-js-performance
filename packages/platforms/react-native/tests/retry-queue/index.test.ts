@@ -37,6 +37,27 @@ describe('File based retry queue factory', () => {
     expect(delivery.requests).toHaveLength(1)
   })
 
+  it('flushes the retry queue immediately', async () => {
+    const fileSystem = new FileSystemFake()
+    const retryQueueFactory = createRetryQueueFactory(fileSystem)
+
+    const delivery = new InMemoryDelivery()
+
+    const validEndTime = BigInt(Date.now()) * BigInt(1_000_000)
+    const payload = createPayload({ spanId: 'xyz', endTimeUnixNano: validEndTime.toString() })
+
+    await fileSystem.mkdir(EXPECTED_PATH)
+    await fileSystem.writeFile(`${EXPECTED_PATH}/retry-${validEndTime}-xyz.json`, JSON.stringify(payload))
+
+    expect(delivery.requests).toHaveLength(0)
+
+    retryQueueFactory(delivery, 20)
+    await flushPromises()
+
+    expect(delivery.requests[0]).toStrictEqual(payload.body)
+    expect(delivery.requests).toHaveLength(1)
+  })
+
   it.each(
     ['active', 'inactive', 'background']
   )('flushes the retry queue when the app state status changes to "%s"', async (status) => {

@@ -14,6 +14,9 @@ export default function createRetryQueueFactory (fileSystem: MinimalFileSystem):
     const directory = new RetryQueueDirectory(fileSystem, `${PERSISTENCE_DIRECTORY}/retry-queue`)
     const retryQueue = new FileBasedRetryQueue(delivery, directory)
 
+    // send any currently stored payloads from previous launches
+    retryQueue.flush()
+
     // flush the retry queue when the app changes from background -> foreground
     // or vice versa
     AppState.addEventListener('change', (_status: AppStateStatus): void => {
