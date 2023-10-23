@@ -41,7 +41,7 @@ if (!process.env.SKIP_BUILD_PACKAGES) {
   execFileSync('npm', ['install'], { cwd: ROOT_DIR, stdio: 'inherit' })
 
   // build the packages
-  const buildArgs = ['run', 'build', '--scope', PACKAGE_NAMES.join(' --scope ')]
+  const buildArgs = ['run', 'build', '--', '--scope', PACKAGE_NAMES.join(' --scope ')]
   execFileSync('npm', buildArgs, { cwd: ROOT_DIR, stdio: 'inherit', env: { ...process.env, ENABLE_TEST_CONFIGURATION: 1 } })
 }
 
