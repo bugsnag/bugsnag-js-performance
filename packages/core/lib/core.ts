@@ -3,7 +3,7 @@ import { type ResourceAttributeSource, type SpanAttributesSource } from './attri
 import { type BackgroundingListener } from './backgrounding-listener'
 import { BatchProcessor } from './batch-processor'
 import { type Clock } from './clock'
-import { validateConfig, type Configuration, type CoreSchema } from './config'
+import { validateConfig, type Configuration, type CoreSchema, type InternalConfiguration } from './config'
 import { type DeliveryFactory, TracePayloadEncoder } from './delivery'
 import { type IdGenerator } from './id-generator'
 import { type Persistence } from './persistence'
@@ -36,6 +36,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   retryQueueFactory: RetryQueueFactory
   spanContextStorage?: SpanContextStorage
   platformExtensions?: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => T
+  onStart?: (configuration: InternalConfiguration<C>) => void
 }
 
 export type BugsnagPerformance <C extends Configuration, T> = Client<C> & T
@@ -62,9 +63,16 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     start: (config: C | string) => {
       const configuration = validateConfig<S, C>(config, options.schema)
 
-      const delivery = options.deliveryFactory(configuration.endpoint)
+      if (options.onStart) {
+        options.onStart(configuration)
+      }
 
+      const delivery = options.deliveryFactory(configuration.endpoint)
       options.spanAttributesSource.configure(configuration)
+
+      for (const plugin of plugins) {
+        plugin.configure(configuration)
+      }
 
       ProbabilityManager.create(
         options.persistence,
@@ -96,10 +104,6 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         logger = configuration.logger
         spanFactory.configure(processor, logger)
       })
-
-      for (const plugin of plugins) {
-        plugin.configure(configuration)
-      }
     },
     startSpan: (name, spanOptions?: SpanOptions) => {
       const cleanOptions = spanFactory.validateSpanOptions(name, spanOptions)

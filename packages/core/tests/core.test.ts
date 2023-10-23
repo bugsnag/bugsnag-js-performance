@@ -236,6 +236,33 @@ describe('Core', () => {
 
           expect(delivery.requests).toHaveLength(0)
         })
+
+        it('calls the "onStart" callback if given', () => {
+          const onStart = jest.fn()
+          const client = createTestClient({ onStart })
+
+          expect(onStart).not.toHaveBeenCalled()
+
+          client.start({ apiKey: VALID_API_KEY, appVersion: ':)', releaseStage: 'staging' })
+
+          expect(onStart).toHaveBeenCalledTimes(1)
+          expect(onStart).toHaveBeenCalledWith({
+            apiKey: VALID_API_KEY,
+            appVersion: ':)',
+            batchInactivityTimeoutMs: 30000,
+            enabledReleaseStages: null,
+            endpoint: 'https://otlp.bugsnag.com/v1/traces',
+            logger: {
+              debug: expect.any(Function),
+              error: expect.any(Function),
+              info: expect.any(Function),
+              warn: expect.any(Function)
+            },
+            maximumBatchSize: 100,
+            releaseStage: 'staging',
+            samplingProbability: 1
+          })
+        })
       })
 
       describe('currentSpanContext', () => {
