@@ -2,6 +2,8 @@ import { type NetInfoStateType } from '@react-native-community/netinfo'
 
 export type NetworkConnectionType = 'wifi' | 'wired' | 'cell' | 'unavailable' | 'unknown'
 
+export type CellularGeneration = '2g' | '3g' | '4g' | '5g'
+
 function getNetworkConnectionType (state: NetInfoStateType): NetworkConnectionType {
   switch (state) {
     case 'none':

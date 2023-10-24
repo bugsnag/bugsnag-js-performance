@@ -56,10 +56,13 @@ describe('spanAttributesSource', () => {
 
       await jest.runOnlyPendingTimersAsync()
 
-      const attiributes = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes
-
-      expect(attiributes).toStrictEqual(expect.arrayContaining([
-        { key: 'net.host.connection.type', value: { stringValue: 'cell' } }
+      const deliveredSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+      expect(deliveredSpan.attributes).toStrictEqual(expect.arrayContaining([
+        { key: 'bugsnag.span.category', value: { stringValue: 'custom' } },
+        { key: 'bugsnag.app.in_foreground', value: { boolValue: true } },
+        { key: 'net.host.connection.type', value: { stringValue: 'cell' } },
+        { key: 'net.host.connection.subtype', value: { stringValue: '4g' } },
+        { key: 'bugsnag.sampling.p', value: { doubleValue: 1 } }
       ]))
     })
 
@@ -71,6 +74,7 @@ describe('spanAttributesSource', () => {
 
       testClient.start({ apiKey: VALID_API_KEY })
 
+      // First network change (slower network)
       notifyNetworkStateChange({
         isConnected: true,
         isInternetReachable: true,
@@ -82,6 +86,7 @@ describe('spanAttributesSource', () => {
         }
       })
 
+      // Second network change (wifi)
       notifyNetworkStateChange({
         isConnected: true,
         isInternetReachable: true,
@@ -104,11 +109,14 @@ describe('spanAttributesSource', () => {
 
       await jest.runOnlyPendingTimersAsync()
 
-      const attiributes = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes
-
-      expect(attiributes).toStrictEqual(expect.arrayContaining([
-        { key: 'net.host.connection.type', value: { stringValue: 'wifi' } }
-      ]))
+      const deliveredSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+      expect(deliveredSpan.attributes).toStrictEqual([
+        { key: 'bugsnag.span.category', value: { stringValue: 'custom' } },
+        { key: 'bugsnag.app.in_foreground', value: { boolValue: true } },
+        { key: 'net.host.connection.type', value: { stringValue: 'wifi' } },
+        // net.host.connection.subtype should not be present for a wifi connection
+        { key: 'bugsnag.sampling.p', value: { doubleValue: 1 } }
+      ])
     })
   })
 })
