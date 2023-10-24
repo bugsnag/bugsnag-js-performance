@@ -1,6 +1,6 @@
+import jsx from 'acorn-jsx'
 import fs from 'fs'
 import createRollupConfig from '../../../.rollup/index.mjs'
-import jsx from 'acorn-jsx'
 
 // when functional components are used in JSX tags, rollup doesn't recognise them as actually being used and tree-shakes them away
 // this plugin prevents that from happening by explicity telling rollup not to tree-shake the module
@@ -29,13 +29,13 @@ function reactNativeSpecPlugin () {
 
 const config = createRollupConfig({
   external: [
-    '@bugsnag/delivery-fetch-performance',
-    'react-native',
-    'react',
     '@bugsnag/cuid',
+    '@bugsnag/delivery-fetch-performance',
+    '@bugsnag/request-tracker-performance',
+    '@react-native-community/netinfo',
+    'react',
+    'react-native',
     'react-native-file-access',
-    '@react-native-async-storage/async-storage', 
-    '@bugsnag/request-tracker-performance'
   ]
 })
 
