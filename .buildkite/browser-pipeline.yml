@@ -13,6 +13,10 @@ steps:
               push: browser-maze-runner-bb:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
         env:
           USE_CDN_BUILD: "${USE_CDN_BUILD}"
+        retry:
+          automatic:
+            - exit_status: "*"
+              limit: 1
 
       - label: ":docker: Build Legacy Maze Runner image${EXTRA_STEP_LABEL}"
         key: "browser-maze-runner-legacy-${USE_CDN_BUILD}"
@@ -26,6 +30,10 @@ steps:
               push: browser-maze-runner-legacy:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
         env:
           USE_CDN_BUILD: "${USE_CDN_BUILD}"
+        retry:
+          automatic:
+            - exit_status: "*"
+              limit: 1
 
       # BitBar
       - label: ":bitbar: :{{ matrix.browser }}: {{ matrix.version }} tests${EXTRA_STEP_LABEL}"
