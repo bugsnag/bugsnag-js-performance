@@ -73,6 +73,7 @@ const enum FlushOutcome { DeleteFile, LeaveFile }
 export default class FileBasedRetryQueue implements RetryQueue {
   private readonly delivery: Delivery
   private readonly directory: Directory
+  private requestQueue: Promise<void> = Promise.resolve()
 
   constructor (delivery: Delivery, directory: Directory) {
     this.delivery = delivery
@@ -101,18 +102,22 @@ export default class FileBasedRetryQueue implements RetryQueue {
   }
 
   async flush (): Promise<void> {
-    const files = await this.directory.files()
+    this.requestQueue = this.requestQueue.then(async () => {
+      const files = await this.directory.files()
 
-    for (const filename of files) {
-      try {
-        const outcome = await this.flushFile(filename)
+      for (const filename of files) {
+        try {
+          const outcome = await this.flushFile(filename)
 
-        if (outcome === FlushOutcome.DeleteFile) {
-          await this.directory.delete(filename)
+          if (outcome === FlushOutcome.DeleteFile) {
+            await this.directory.delete(filename)
+          }
+        } catch {
         }
-      } catch {
       }
-    }
+    })
+
+    await this.requestQueue
   }
 
   private async flushFile (filename: string): Promise<FlushOutcome> {
