@@ -39,7 +39,7 @@ const initialState: NetInfoState = {
 let listeners: NetInfoChangeHandler[] = []
 
 const MockNetInfo: typeof NetInfo = {
-  fetch: jest.fn(),
+  fetch: jest.fn(() => Promise.resolve(initialState)),
   refresh: jest.fn(),
   configure: jest.fn(),
   addEventListener: jest.fn((listener) => {
