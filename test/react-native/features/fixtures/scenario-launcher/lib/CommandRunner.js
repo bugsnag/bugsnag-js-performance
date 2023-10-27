@@ -7,7 +7,14 @@ let mazeAddress
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-const fetchCommand = async (url) => {
+export async function getCurrentCommand () {
+  if (!mazeAddress) {
+    mazeAddress = await getMazeRunnerAddress()
+  }
+
+  const url = `http://${mazeAddress}/command`
+  console.error(`[BugsnagPerformance] Fetching command from ${url}`)
+
   let retries = 0
 
   while (retries++ < RETRY_COUNT) {
@@ -32,17 +39,3 @@ const fetchCommand = async (url) => {
 
   throw new Error('Retry limit exceeded, giving up...')
 }
-
-const getCurrentCommand = async () => {
-  if (!mazeAddress) {
-    mazeAddress = await getMazeRunnerAddress()
-  }
-
-  const commandUrl = `http://${mazeAddress}/command`
-  console.error(`[BugsnagPerformance] Fetching command from ${commandUrl}`)
-
-  const command = await fetchCommand(commandUrl)
-  return command
-}
-
-module.exports.getCurrentCommand = getCurrentCommand
