@@ -1,4 +1,4 @@
-import { InMemoryQueue, createClient } from '@bugsnag/core-performance'
+import { createClient } from '@bugsnag/core-performance'
 import createFetchDeliveryFactory from '@bugsnag/delivery-fetch-performance'
 import { createXmlHttpRequestTracker } from '@bugsnag/request-tracker-performance'
 import { AppRegistry, AppState } from 'react-native'
@@ -11,6 +11,7 @@ import NativeBugsnagPerformance from './native'
 import persistenceFactory from './persistence'
 import { platformExtensions } from './platform-extensions'
 import resourceAttributesSourceFactory from './resource-attributes-source'
+import createRetryQueueFactory from './retry-queue'
 import { createSpanAttributesSource } from './span-attributes-source'
 
 const clock = createClock(performance)
@@ -37,7 +38,7 @@ const BugsnagPerformance = createClient({
   resourceAttributesSource,
   schema: createSchema(),
   spanAttributesSource,
-  retryQueueFactory: (delivery, retryQueueMaxSize) => new InMemoryQueue(delivery, retryQueueMaxSize),
+  retryQueueFactory: createRetryQueueFactory(FileSystem),
   platformExtensions
 })
 
