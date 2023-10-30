@@ -72,7 +72,7 @@ Finally:
 - update and push `next`:
   ```sh
     git checkout next
-    git merge master
+    git merge main
     git push
   ```
 
