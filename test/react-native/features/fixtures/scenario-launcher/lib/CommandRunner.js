@@ -1,13 +1,17 @@
 import { getMazeRunnerAddress } from './ConfigFileReader'
 
-const RETRY_COUNT = 20
+const DEFAULT_RETRY_COUNT = 20
 const INTERVAL = 500
 
 let mazeAddress
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-export async function getCurrentCommand () {
+export async function getCurrentCommand (allowedRetries = DEFAULT_RETRY_COUNT) {
+  if (allowedRetries <= 0) {
+    throw new Error(`allowedRetries must be a number >0, got '${allowedRetries}'`)
+  }
+
   if (!mazeAddress) {
     mazeAddress = await getMazeRunnerAddress()
   }
@@ -17,10 +21,13 @@ export async function getCurrentCommand () {
 
   let retries = 0
 
-  while (retries++ < RETRY_COUNT) {
+  while (retries++ < allowedRetries) {
     try {
       const response = await fetch(url)
-      const command = await response.json()
+      const text = await response.text()
+      console.error(`[BugsnagPerformance] Response from maze runner: ${text}`)
+
+      const command = JSON.parse(text)
 
       // keep polling until a scenario command is received
       if (command.action !== 'noop') {
@@ -32,7 +39,7 @@ export async function getCurrentCommand () {
       console.error(`[BugsnagPerformance] Error fetching command from maze runner: ${err.message}`, err)
     }
 
-    console.error(`[BugsnagPerformance] ${RETRY_COUNT - retries} retries remaining...`)
+    console.error(`[BugsnagPerformance] ${allowedRetries - retries} retries remaining...`)
 
     await delay(INTERVAL)
   }
