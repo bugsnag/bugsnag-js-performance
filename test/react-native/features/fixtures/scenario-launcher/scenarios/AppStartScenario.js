@@ -1,7 +1,7 @@
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 
 export const config = {
-  maximumBatchSize: 1
+  maximumBatchSize: 4
 }
 
 export const App = () => {

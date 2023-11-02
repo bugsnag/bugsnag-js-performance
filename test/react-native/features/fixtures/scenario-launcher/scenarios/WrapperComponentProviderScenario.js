@@ -12,7 +12,7 @@ const wrapperComponentProvider = () =>  ({ children }) => {
 }
 
 export const config = {
-  maximumBatchSize: 1,
+  maximumBatchSize: 4,
   wrapperComponentProvider
 }
 
