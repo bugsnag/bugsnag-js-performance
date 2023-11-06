@@ -24,10 +24,12 @@
     "@react-native-community/netinfo": "^9.4.1",
     "@types/react": "^18.2.24",
     "babel-preset-react-native": "^4.0.1",
-    "react-native-file-access": "^3.0.4"
+    "react-native-file-access": "^3.0.4",
+    "@react-navigation/native": "^6.1.9"
   },
   "peerDependencies": {
     "@react-native-community/netinfo": "^9.4.1",
+    "@react-navigation/native": "*",
     "react": "*",
     "react-native": "*",
     "react-native-file-access": "^3.0.4"
