@@ -105,7 +105,7 @@ export async function launchScenario (rootTag, clearPersistedData = true) {
       return await launchScenario(rootTag, false)
 
     case 'set-invalid-sampling-probability':
-      await setSamplingProbability(0, 12345)
+      await setSamplingProbability('invalid', 12345)
 
       return await launchScenario(rootTag, false)
 
