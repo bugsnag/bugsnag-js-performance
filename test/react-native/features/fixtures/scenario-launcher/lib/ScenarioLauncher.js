@@ -105,7 +105,13 @@ export async function launchScenario (rootTag, clearPersistedData = true) {
       return await launchScenario(rootTag, false)
 
     case 'set-invalid-sampling-probability':
-      await setSamplingProbability(0, 12345)
+      await setSamplingProbability('this is not a valid sampling probability')
+
+      return await launchScenario(rootTag, false)
+
+    case 'set-expired-sampling-probability':
+      // Friday February 13th 2009 23:31:30
+      await setSamplingProbability(0, 1234567890)
 
       return await launchScenario(rootTag, false)
 
