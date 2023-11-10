@@ -35,7 +35,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   persistence: Persistence
   retryQueueFactory: RetryQueueFactory
   spanContextStorage?: SpanContextStorage
-  platformExtensions?: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => T
+  platformExtensions?: (spanFactory: SpanFactory<C>, clock: Clock) => T
 }
 
 export type BugsnagPerformance <C extends Configuration, T> = Client<C> & T
@@ -110,7 +110,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     get currentSpanContext () {
       return spanContextStorage.current
     },
-    ...(options.platformExtensions && options.platformExtensions(spanFactory, spanContextStorage))
+    ...(options.platformExtensions && options.platformExtensions(spanFactory, options.clock))
   } as BugsnagPerformance<C, T>
 }
 
