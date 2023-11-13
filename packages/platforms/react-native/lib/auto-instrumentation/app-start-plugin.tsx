@@ -104,5 +104,27 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
 
     this.spanFactory.endSpan(clientStartedSpan, this.clock.now())
     this.appRegistry.setWrapperComponentProvider(instrumentedComponentProvider)
+
+    // monkey patch setWrapperComponentProvider to ensure that subsequent calls do not overwrite our instrumentation
+    const originalSetWrapperComponentProvider = this.appRegistry.setWrapperComponentProvider
+    this.appRegistry.setWrapperComponentProvider = (provider) => {
+
+      const span = this.spanFactory.startSpan('AppRegistry.setWrapperComponentProvider called', { startTime: this.clock.now() })
+      this.spanFactory.endSpan(span, this.clock.now())
+
+      const patchedComponentProvider: WrapperComponentProvider = (appParams) => ({ children }) => {
+        const OriginalProviderComponent = provider(appParams)
+
+        return (
+          <AppStartWrapper>
+            <OriginalProviderComponent>
+              {children}
+            </OriginalProviderComponent>
+          </AppStartWrapper>
+        );
+      }
+
+      originalSetWrapperComponentProvider(patchedComponentProvider);
+    }
   }
 }
