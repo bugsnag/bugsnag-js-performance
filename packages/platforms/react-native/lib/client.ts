@@ -9,7 +9,7 @@ import createSchema from './config'
 import idGenerator from './id-generator'
 import NativeBugsnagPerformance from './native'
 import persistenceFactory from './persistence'
-import { platformExtensions } from './platform-extensions'
+import { createPlatformExtensions } from './platform-extensions'
 import resourceAttributesSourceFactory from './resource-attributes-source'
 import { createSpanAttributesSource } from './span-attributes-source'
 
@@ -38,7 +38,7 @@ const BugsnagPerformance = createClient({
   schema: createSchema(),
   spanAttributesSource,
   retryQueueFactory: (delivery, retryQueueMaxSize) => new InMemoryQueue(delivery, retryQueueMaxSize),
-  platformExtensions
+  platformExtensions: createPlatformExtensions(appStartTime)
 })
 
 export default BugsnagPerformance

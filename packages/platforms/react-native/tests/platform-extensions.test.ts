@@ -1,4 +1,4 @@
-import { platformExtensions } from '../lib/platform-extensions'
+import { createPlatformExtensions } from '../lib/platform-extensions'
 import { createTestClient, InMemoryDelivery, VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 
 jest.useFakeTimers()
@@ -6,7 +6,7 @@ jest.useFakeTimers()
 describe('startNavigationSpan', () => {
   it('creates a navigation span', async () => {
     const delivery = new InMemoryDelivery()
-    const testClient = createTestClient({ deliveryFactory: () => delivery, platformExtensions })
+    const testClient = createTestClient({ deliveryFactory: () => delivery, platformExtensions: createPlatformExtensions(0) })
     testClient.start({ apiKey: VALID_API_KEY })
     await jest.runOnlyPendingTimersAsync()
 
