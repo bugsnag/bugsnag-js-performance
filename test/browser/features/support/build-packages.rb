@@ -24,6 +24,7 @@ $logger.info("Building in #{BUILD_MODE} mode")
 PACKAGE_NAMES = [
   "@bugsnag/core-performance",
   "@bugsnag/browser-performance",
+  "@bugsnag/angular-performance",
   "@bugsnag/react-router-performance",
   "@bugsnag/vue-router-performance",
   "@bugsnag/delivery-fetch-performance",
@@ -33,6 +34,7 @@ PACKAGE_NAMES = [
 PACKAGE_DIRECTORIES = [
   "#{ROOT}/packages/core",
   "#{ROOT}/packages/platforms/browser",
+  "#{ROOT}/packages/angular",
   "#{ROOT}/packages/react-router",
   "#{ROOT}/packages/vue-router",
   "#{ROOT}/packages/delivery-fetch",
@@ -112,7 +114,7 @@ begin
     end
   end
 ensure
-  run("rm -f #{FIXTURES_DIRECTORY}/*.tgz")
+  # run("rm -f #{FIXTURES_DIRECTORY}/*.tgz")
   run("mv #{FIXTURES_DIRECTORY}/package.json.backup #{FIXTURES_DIRECTORY}/package.json")
 end
 

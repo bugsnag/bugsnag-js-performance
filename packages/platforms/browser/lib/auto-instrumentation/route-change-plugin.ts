@@ -1,6 +1,6 @@
-import { coreSpanOptionSchema, isString, type InternalConfiguration, type Plugin, type SpanFactory, type SpanOptionSchema } from '@bugsnag/core-performance'
+import { coreSpanOptionSchema, isString, type InternalConfiguration, type Plugin, type SpanFactory, type SpanOptionSchema, type Time, isObject } from '@bugsnag/core-performance'
 import { type BrowserConfiguration } from '../config'
-import { type RouteChangeSpanOptions } from '../routing-provider'
+import { RouteChangeSpanEndOptions, type RouteChangeSpanOptions } from '../routing-provider'
 import { getPermittedAttributes } from '../send-page-attributes'
 import { defaultRouteResolver } from '../default-routing-provider'
 
@@ -88,11 +88,38 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
         id: span.id,
         traceId: span.traceId,
         isValid: span.isValid,
-        end: (endTime) => {
-          if (permittedAttributes.title) span.setAttribute('bugsnag.browser.page.title', this.document.title)
-          this.spanFactory.toPublicApi(span).end(endTime)
+        end: (endTimeOrOptions?: Time | RouteChangeSpanEndOptions): void => {
+          const options: RouteChangeSpanEndOptions = isObject(endTimeOrOptions) ? endTimeOrOptions : { endTime: endTimeOrOptions }
+
+          if (permittedAttributes.title) {
+            span.setAttribute('bugsnag.browser.page.title', this.document.title)
+          }
+
+          if (options.url) {
+            const urlObject = ensureUrl(options.url) // convert strings to URL if necessary
+            const route = configuration.routingProvider.resolveRoute(urlObject) || defaultRouteResolver(urlObject)
+
+            span.name = `[RouteChange]${route}`
+            span.setAttribute('bugsnag.browser.page.route', route)
+            previousRoute = route
+
+            // update the URL attribute as well
+            if (permittedAttributes.url) {
+              span.setAttribute('bugsnag.browser.page.url', urlObject.toString())
+            }
+          }
+
+          this.spanFactory.toPublicApi(span).end(options.endTime)
         }
+
       }
     })
   }
+}
+
+function ensureUrl (url: string | URL): URL {
+  if (typeof url === 'string') {
+    return new URL(url)
+  }
+  return url
 }
