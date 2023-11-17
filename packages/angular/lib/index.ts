@@ -17,7 +17,6 @@ export const bugsnagBootstrapper = {
 
 export class AngularRoutingProvider implements RoutingProvider {
   resolveRoute (url: URL): string {
-    debugger
     if (globalRouterRef) {
       let route = globalRouterRef.routerState.snapshot.root
       let path = ''
