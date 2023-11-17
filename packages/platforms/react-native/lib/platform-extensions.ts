@@ -1,11 +1,11 @@
-import { type Clock, type SpanFactory, type SpanOptions } from '@bugsnag/core-performance'
+import { type Logger, type Clock, type SpanFactory, type SpanOptions } from '@bugsnag/core-performance'
 import { type ReactNativeConfiguration } from './config'
 import { createWrapperComponent } from './auto-instrumentation/wrapper-component'
 
 type NavigationSpanOptions = Omit<SpanOptions, 'isFirstClass'>
 
 export const createPlatformExtensions = (appStartTime: number) => {
-  return (spanFactory: SpanFactory<ReactNativeConfiguration>, clock: Clock) => {
+  return (spanFactory: SpanFactory<ReactNativeConfiguration>, clock: Clock, logger: Logger) => {
     return {
       startNavigationSpan: (routeName: string, spanOptions?: NavigationSpanOptions) => {
         const cleanOptions = spanFactory.validateSpanOptions(routeName, spanOptions)
@@ -16,7 +16,7 @@ export const createPlatformExtensions = (appStartTime: number) => {
         span.setAttribute('bugsnag.navigation.route', cleanOptions.name)
         return spanFactory.toPublicApi(span)
       },
-      WrapperComponent: createWrapperComponent(appStartTime, spanFactory, clock)
+      WrapperComponent: createWrapperComponent(appStartTime, spanFactory, clock, logger)
     }
   }
 }
