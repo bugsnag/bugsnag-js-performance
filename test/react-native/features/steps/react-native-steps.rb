@@ -1,5 +1,9 @@
 When('I run {string}') do |scenario_name|
-  execute_command 'run_scenario', scenario_name
+  execute_command 'run-scenario', scenario_name
+end
+
+When('I execute the command {string}') do |command|
+  execute_command(command)
 end
 
 Then('the trace payload field {string} string attribute {string} equals the platform-dependent string:') do |field, attribute, platform_values|
@@ -31,6 +35,8 @@ def execute_command(action, scenario_name = '')
     endpoint: "http://#{address}/traces",
     api_key: $api_key,
   }
+
+  $logger.debug("Queuing command: #{command}")
   Maze::Server.commands.add command
 
   # Ensure fixture has read the command

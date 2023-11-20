@@ -1,5 +1,19 @@
 # Changelog
 
+## v2.0.0 (2023-11-20)
+
+### Added
+
+- (react-native) Added `net.host.connection.type` span attribute [#334](https://github.com/bugsnag/bugsnag-js-performance/pull/334)
+- (react-native) Added `net.host.connection.subtype` span attribute [#360](https://github.com/bugsnag/bugsnag-js-performance/pull/360)
+- (react-native) Added persistence to retry queue [#357](https://github.com/bugsnag/bugsnag-js-performance/pull/357)
+
+### Fixed
+
+- (browser) Fall back to unbuffered performance observer when buffer is not supported [#352](https://github.com/bugsnag/bugsnag-js-performance/pull/352)
+- (browser) Listen for pagehide and pageshow events in backgrounding listener [#362](https://github.com/bugsnag/bugsnag-js-performance/pull/362)
+- (core) Round timestamps to the nearest integer [#364](https://github.com/bugsnag/bugsnag-js-performance/pull/364)
+
 ## v1.2.0 (2023-10-12)
 
 This release adds support for running BugSnag Performance in React Native apps. See [online docs](https://docs.bugsnag.com/performance/integration-guides/react-native) for details.

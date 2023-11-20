@@ -13,7 +13,7 @@ class InMemoryDelivery implements Delivery {
   private readonly samplingProbabilityStack: Array<number | undefined> = []
 
   send (payload: TracePayload) {
-    if (payload.body.resourceSpans.length === 0) {
+    if (payload.body?.resourceSpans?.length === 0) {
       this.samplingRequests.push(payload.body)
     } else {
       this.requests.push(payload.body)

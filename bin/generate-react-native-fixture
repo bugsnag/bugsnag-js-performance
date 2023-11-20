@@ -98,11 +98,8 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
   }
   
-  // install react-native-file-access plus packages
-  execSync('npm install --save react-native-file-access@3.0.4 *.tgz', { cwd: fixtureDir, stdio: 'inherit' })
-
-  // install react-native-dotenv
-  execSync('npm install --save react-native-dotenv', { cwd: fixtureDir, stdio: 'inherit' })
+  // install react-native-file-access, react-native-dotenv, @react-native-community/netinfo and local packages
+  execSync('npm install --save react-native-dotenv @react-native-community/netinfo react-native-file-access@3.0.4 *.tgz', { cwd: fixtureDir, stdio: 'inherit' })
 }
 
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {

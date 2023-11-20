@@ -137,3 +137,27 @@ export const TurboModuleRegistry = {
     }
   }
 }
+
+export type AppStateStatus = 'active' | 'inactive' | 'background'
+type AppStateChangeCallback = (status: AppStateStatus) => void
+
+export const AppState = new class {
+  #status: AppStateStatus = 'active'
+  readonly #eventListeners: AppStateChangeCallback[] = []
+
+  addEventListener (event: string, listener: AppStateChangeCallback): void {
+    this.#eventListeners.push(listener)
+  }
+
+  get currentState (): AppStateStatus {
+    return this.#status
+  }
+
+  bugsnagChangeAppStateStatus (status: AppStateStatus): void {
+    this.#status = status
+
+    for (const listener of this.#eventListeners) {
+      listener(this.#status)
+    }
+  }
+}()
