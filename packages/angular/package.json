@@ -20,7 +20,7 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "peerDependencies": {
-    "@bugsnag/browser-performance": "^1.2.0",
+    "@bugsnag/browser-performance": "^2.0.0",
     "@angular/core": "*",
     "@angular/router": "*"
   },
