@@ -91,7 +91,7 @@ begin
     # backup the package json so we can undo the changes we're about to make
     run("cp package.json package.json.backup")
 
-    install_command = "npm install --no-package-lock"
+    install_command = "npm install --no-package-lock --legacy-peer-deps"
     build_command = "npm run build --workspaces"
 
     if BUILD_MODE == :npm
@@ -114,7 +114,7 @@ begin
     end
   end
 ensure
-  # run("rm -f #{FIXTURES_DIRECTORY}/*.tgz")
+  run("rm -f #{FIXTURES_DIRECTORY}/*.tgz")
   run("mv #{FIXTURES_DIRECTORY}/package.json.backup #{FIXTURES_DIRECTORY}/package.json")
 end
 
