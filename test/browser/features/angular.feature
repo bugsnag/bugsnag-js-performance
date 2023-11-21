@@ -11,10 +11,10 @@ Feature: Vue router
             | bugsnag.browser.page.title        | stringValue      | Angular                  |
             | bugsnag.browser.page.route        | stringValue      | /                        |
 
-        And a span named "[RouteChange]/customers/" contains the attributes: 
-            | attribute                                 | type         | value                | 
-            | bugsnag.span.category                     | stringValue  | route_change         |
-            | bugsnag.browser.page.title                | stringValue  | Customers            |
-            | bugsnag.browser.page.route                | stringValue  | /customers/          |
-            | bugsnag.browser.page.previous_route       | stringValue  | /                    |
-            | bugsnag.browser.page.route_change.trigger | stringValue  | imperative           |
+        And a span named "[RouteChange]/customers/:customerId" contains the attributes: 
+            | attribute                                 | type         | value                  | 
+            | bugsnag.span.category                     | stringValue  | route_change           |
+            | bugsnag.browser.page.title                | stringValue  | Customer 1             |
+            | bugsnag.browser.page.route                | stringValue  | /customers/:customerId |
+            | bugsnag.browser.page.previous_route       | stringValue  | /                      |
+            | bugsnag.browser.page.route_change.trigger | stringValue  | imperative             |

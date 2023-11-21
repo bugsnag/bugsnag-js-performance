@@ -7,10 +7,6 @@ const routes: Routes = [
     loadChildren: () => import('./customers/customers.module').then(m => m.CustomersModule)
   },
   {
-    path: 'orders',
-    loadChildren: () => import('./orders/orders.module').then(m => m.OrdersModule)
-  },
-  {
     path: '',
     redirectTo: '',
     pathMatch: 'full'
@@ -23,7 +19,7 @@ const routes: Routes = [
   ],
   exports: [RouterModule],
   providers: [],
-  bootstrap: [/* */]
+  bootstrap: []
 })
 export class AppRoutingModule {
 }

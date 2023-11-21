@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Title } from "@angular/platform-browser";
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-customers',
@@ -7,8 +8,9 @@ import { Title } from "@angular/platform-browser";
   styleUrls: []
 })
 export class CustomersComponent {
-  constructor(private titleService:Title) {
-    this.titleService.setTitle("Customers");
+  constructor(private titleService: Title, private route: ActivatedRoute) {
+    const customerId = this.route.snapshot.paramMap.get('customerId')
+    this.titleService.setTitle(`Customer ${customerId}`);
   }
 }
 
