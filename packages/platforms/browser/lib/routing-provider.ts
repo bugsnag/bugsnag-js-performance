@@ -1,4 +1,4 @@
-import { isObject, Time, type Span, type SpanOptions } from '@bugsnag/core-performance'
+import { isObject, type Time, type Span, type SpanOptions } from '@bugsnag/core-performance'
 
 export type RouteChangeSpanOptions = Omit<SpanOptions, 'isFirstClass'>
 export type StartRouteChangeCallback = (url: URL | string, trigger: string, options?: RouteChangeSpanOptions) => RouteChangeSpan
