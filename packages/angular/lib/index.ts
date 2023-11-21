@@ -1,6 +1,11 @@
 import { APP_INITIALIZER } from '@angular/core'
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router'
-import type { RouteChangeSpan, RoutingProvider, StartRouteChangeCallback } from '@bugsnag/browser-performance'
+import {
+  onSettle,
+  type RouteChangeSpan,
+  type RoutingProvider,
+  type StartRouteChangeCallback
+} from '@bugsnag/browser-performance'
 
 let globalRouterRef: Router | undefined
 
@@ -57,7 +62,7 @@ export class AngularRoutingProvider implements RoutingProvider {
           url,
           span: startRouteChangeSpan(
             url,
-            event.navigationTrigger || 'TODO'
+            event.navigationTrigger || 'routeChange'
           )
         }
       } else if (
@@ -67,9 +72,10 @@ export class AngularRoutingProvider implements RoutingProvider {
           event instanceof NavigationError
         )
       ) {
-        // TODO: should we use onSettle here?
-        navigation.span.end({ url: navigation.url })
-        navigation = undefined
+        onSettle((endTime) => {
+          navigation?.span.end({ endTime, url: navigation.url })
+          navigation = undefined
+        })
       }
     })
   }
