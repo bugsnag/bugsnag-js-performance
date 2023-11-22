@@ -40,6 +40,8 @@ Feature: Manual spans
       | ios     | @skip     |
       | android | @not_null |
 
+  # This test will be removed as part of PLAT-11214
+  @skip
   Scenario: Spans can be logged from the background
     When I run 'BackgroundSpanScenario'
     And I wait to receive a sampling request
