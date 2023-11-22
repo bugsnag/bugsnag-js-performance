@@ -16,7 +16,7 @@ BugsnagPerformance.start({
   apiKey,
   endpoint,
   // @ts-expect-error undocumented config for testing purposes
-  maximumBatchSize: 14,
+  maximumBatchSize: 16,
   batchInactivityTimeoutMs: 5000,
   autoInstrumentNetworkRequests: false,
   autoInstrumentRouteChanges: true,

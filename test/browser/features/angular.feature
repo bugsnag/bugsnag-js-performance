@@ -6,7 +6,7 @@ Feature: Angular
     Scenario: Route change spans are automatically instrumented
         Given I navigate to the test URL "/angular/dist"
         And I click the element "customers"
-        When I wait to receive 2 traces
+        When I wait to receive 1 trace
 
         Then a span named "[FullPageLoad]/" contains the attributes:
             | attribute                         | type             | value                    |
@@ -25,7 +25,7 @@ Feature: Angular
     Scenario: Route with a custom URL matcher
         Given I navigate to the test URL "/angular/dist"
         And I click the element "customMatching"
-        When I wait to receive 2 traces
+        When I wait to receive 1 trace
 
         And a span named "[RouteChange]/<custom URL matcher>" contains the attributes: 
             | attribute                                 | type         | value                  | 
