@@ -21,3 +21,16 @@ Feature: Angular
             | bugsnag.browser.page.route                | stringValue  | /customers/:customerId |
             | bugsnag.browser.page.previous_route       | stringValue  | /                      |
             | bugsnag.browser.page.route_change.trigger | stringValue  | imperative             |
+
+    Scenario: Route with a custom URL matcher
+        Given I navigate to the test URL "/angular/dist"
+        And I click the element "customMatching"
+        When I wait to receive 2 traces
+
+        And a span named "[RouteChange]/<custom URL matcher>" contains the attributes: 
+            | attribute                                 | type         | value                  | 
+            | bugsnag.span.category                     | stringValue  | route_change           |
+            | bugsnag.browser.page.title                | stringValue  | Angular                |
+            | bugsnag.browser.page.route                | stringValue  | /<custom URL matcher>  |
+            | bugsnag.browser.page.previous_route       | stringValue  | /                      |
+            | bugsnag.browser.page.route_change.trigger | stringValue  | imperative             |

@@ -6,10 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import BugsnagPerformance from '@bugsnag/browser-performance';
 import { AngularRoutingProvider, bugsnagBootstrapper } from '@bugsnag/angular-performance';
-
-const parameters = new URLSearchParams(window.location.search)
-const apiKey = parameters.get('api_key')!
-const endpoint = parameters.get('endpoint')!
+import { ProfileComponent } from './profile/profile.component';
 
 BugsnagPerformance.start({
   apiKey,
@@ -24,7 +21,8 @@ BugsnagPerformance.start({
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,
