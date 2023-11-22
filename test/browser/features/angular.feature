@@ -1,4 +1,4 @@
-Feature: Vue router
+Feature: Angular
 
     Scenario: Route change spans are automatically instrumented
         Given I navigate to the test URL "/angular/dist"
