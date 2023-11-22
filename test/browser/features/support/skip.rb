@@ -17,3 +17,11 @@ end
 Before("@skip_chrome_61") do
   skip_this_scenario("Skipping scenario: Not supported") if Maze.config.browser == "chrome_61"
 end
+
+Before("@skip_firefox_60") do
+  skip_this_scenario("Skipping scenario: Not supported") if Maze.config.browser == "firefox_60"
+end
+
+Before("@skip_safari_11") do
+  skip_this_scenario("Skipping scenario: Not supported") if Maze.config.browser == "safari_11"
+end

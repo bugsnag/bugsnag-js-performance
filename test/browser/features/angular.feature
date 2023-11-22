@@ -1,3 +1,6 @@
+@skip_chrome_61
+@skip_firefox_60
+@skip_safari_11
 Feature: Angular
 
     Scenario: Route change spans are automatically instrumented
