@@ -13,6 +13,3 @@ export class CustomersComponent {
     this.titleService.setTitle(`Customer ${customerId}`);
   }
 }
-
-
-
