@@ -6,7 +6,10 @@
 const paths = {
   '@bugsnag/core-performance': ['./packages/core/lib/index.ts'],
   '@bugsnag/browser-performance': ['./packages/platforms/browser/lib/index.ts'],
-  '@bugsnag/request-tracker-performance': ['./packages/request-tracker/lib/index.ts']
+  '@bugsnag/request-tracker-performance': ['./packages/request-tracker/lib/index.ts'],
+  '@bugsnag/react-router-performance': ['./packages/react-router/lib/index.ts'],
+  '@bugsnag/vue-router-performance': ['./packages/vue-router/lib/index.ts'],
+  '@bugsnag/angular-performance': ['./packages/angular/lib/index.ts']
 }
 
 // convert the tsconfig "paths" option into Jest's "moduleNameMapper" option
@@ -51,6 +54,24 @@ module.exports = {
       displayName: 'request-tracker',
       testMatch: ['<rootDir>/packages/request-tracker/**/*.test.ts'],
       ...defaultModuleConfig
+    },
+    {
+      displayName: 'vue-router',
+      testMatch: ['<rootDir>/packages/vue-router/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
+    {
+      displayName: 'react-router',
+      testMatch: ['<rootDir>/packages/react-router/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
+    {
+      displayName: 'angular',
+      preset: 'jest-preset-angular',
+      setupFilesAfterEnv: ['<rootDir>/jest/setup-jest-angular.ts'],
+      testMatch: ['<rootDir>/packages/angular/**/*.test.ts'],
+      ...defaultModuleConfig,
+      transformIgnorePatterns: ['/node_modules/(?!(@angular)/)']
     },
     {
       displayName: 'react-native',
