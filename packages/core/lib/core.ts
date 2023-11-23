@@ -3,7 +3,7 @@ import { type ResourceAttributeSource, type SpanAttributesSource } from './attri
 import { type BackgroundingListener } from './backgrounding-listener'
 import { BatchProcessor } from './batch-processor'
 import { type Clock } from './clock'
-import { validateConfig, type Configuration, type CoreSchema, type Logger } from './config'
+import { validateConfig, type Configuration, type CoreSchema } from './config'
 import { type DeliveryFactory, TracePayloadEncoder } from './delivery'
 import { type IdGenerator } from './id-generator'
 import { type Persistence } from './persistence'
@@ -35,7 +35,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   persistence: Persistence
   retryQueueFactory: RetryQueueFactory
   spanContextStorage?: SpanContextStorage
-  platformExtensions?: (spanFactory: SpanFactory<C>, clock: Clock, logger: Logger) => T
+  platformExtensions?: (spanFactory: SpanFactory<C>, clock: Clock) => T
 }
 
 export type BugsnagPerformance <C extends Configuration, T> = Client<C> & T
@@ -110,7 +110,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     get currentSpanContext () {
       return spanContextStorage.current
     },
-    ...(options.platformExtensions && options.platformExtensions(spanFactory, options.clock, logger))
+    ...(options.platformExtensions && options.platformExtensions(spanFactory, options.clock))
   } as BugsnagPerformance<C, T>
 }
 

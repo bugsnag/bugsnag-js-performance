@@ -10,26 +10,21 @@ import { type WrapperComponentProvider, type AppRegistry } from 'react-native'
 
 type DiagnosticWrapperProps = PropsWithChildren<{
   spanFactory: SpanFactory<ReactNativeConfiguration>,
-  clock: Clock,
-  logger: ReactNativeConfiguration["logger"]
+  clock: Clock
 }>
 
 export const isWrapperComponentProvider = (value: unknown): value is WrapperComponentProvider | null => 
   value === null || typeof value === 'function'
-
-const logPrefix = () => `[BugsnagPerformance] ${new Date().toISOString()} - `
 
 class DiagnosticWrapper extends React.Component<DiagnosticWrapperProps> {
   private readonly span: ReturnType<SpanFactory<ReactNativeConfiguration>['startSpan']>
 
   constructor (props: DiagnosticWrapperProps) {
     super(props)
-    props.logger?.debug(`${logPrefix()}DiagnosticWrapper (CC) constructor`)
     this.span = props.spanFactory.startSpan('DiagnosticWrapper (CC) rendered', { startTime: props.clock.now() })
   }
 
   componentDidMount(): void {
-    this.props.logger?.debug(`${logPrefix()}DiagnosticWrapper (CC) componentDidMount`)
     if (this.span) {
       this.props.spanFactory.endSpan(this.span, this.props.clock.now())
     }
@@ -68,7 +63,6 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
     const clientStartedSpan = this.spanFactory.startSpan('BugSnag client started', { startTime: this.clock.now(), parentContext: appStartSpan })
 
     const AppStartWrapper = ({ children }: PropsWithChildren) => {
-      configuration.logger.debug(`${logPrefix()}AppStartWrapper (FC) called`)
       const [appStarted, setAppStarted] = useState(false)
       const wrapperComponentSpan = useRef<any>(null)
       
@@ -77,7 +71,6 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
       }
 
       useEffect(() => {
-        configuration.logger.debug(`${logPrefix()}AppStartWrapper (FC) useEffect`)
         setAppStarted(true)
         this.spanFactory.endSpan(wrapperComponentSpan.current, this.clock.now())
         this.spanFactory.endSpan(appStartSpan, this.clock.now())
@@ -88,12 +81,10 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
 
     const diagnosticWrapperProps = {
       spanFactory: this.spanFactory,
-      clock: this.clock,
-      logger: configuration.logger
+      clock: this.clock
     }
 
     const instrumentedComponentProvider: WrapperComponentProvider = (appParams) => ({ children }) => {
-      configuration.logger.debug(`${logPrefix()}instrumentedComponentProvider called. ${configuration.wrapperComponentProvider ? 'config.wrapperComponentProvider exists' : 'config.wrapperComponentProvider does not exist'}`)
       if (configuration.wrapperComponentProvider) {
         const OriginalWrapper = configuration.wrapperComponentProvider(appParams)
 
@@ -106,25 +97,22 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
         )
       }
 
-
       return <AppStartWrapper>
               <DiagnosticWrapper {...diagnosticWrapperProps}>{children}</DiagnosticWrapper>
             </AppStartWrapper>
     }
 
     this.spanFactory.endSpan(clientStartedSpan, this.clock.now())
-    configuration.logger.debug(`${logPrefix()}Calling setWrapperComponentProvider...`)
     this.appRegistry.setWrapperComponentProvider(instrumentedComponentProvider)
 
     // monkey patch setWrapperComponentProvider to ensure that subsequent calls do not overwrite our instrumentation
     const originalSetWrapperComponentProvider = this.appRegistry.setWrapperComponentProvider
     this.appRegistry.setWrapperComponentProvider = (provider) => {
-      configuration.logger.debug(`${logPrefix()}setWrapperComponentProvider called by something other than Bugsnag`)
+
       const span = this.spanFactory.startSpan('AppRegistry.setWrapperComponentProvider called', { startTime: this.clock.now() })
       this.spanFactory.endSpan(span, this.clock.now())
 
       const patchedComponentProvider: WrapperComponentProvider = (appParams) => ({ children }) => {
-        configuration.logger.debug(`${logPrefix()}patchedComponentProvider called`)
         const OriginalProviderComponent = provider(appParams)
 
         return (

@@ -10,8 +10,6 @@ import { type SpanContextStorage } from './span-context'
 import { timeToNumber } from './time'
 import { isObject, isSpanContext } from './validation'
 
-const logPrefix = () => `[BugsnagPerformance] ${new Date().toISOString()} - `
-
 export class SpanFactory <C extends Configuration> {
   private processor: Processor
   private readonly sampler: ReadonlySampler
@@ -74,7 +72,7 @@ export class SpanFactory <C extends Configuration> {
     }
 
     const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes, parentSpanId)
-    this.logger.debug(`${logPrefix()}Starting span '${name}' with options: ${JSON.stringify(options)} id: ${spanId}, parentSpanId: ${parentSpanId}, traceId: ${traceId}, inForeGround: ${this.isInForeground}`)
+
     // don't track spans that are started while the app is backgrounded
     if (this.isInForeground) {
       this.openSpans.add(span)
@@ -96,8 +94,6 @@ export class SpanFactory <C extends Configuration> {
     span: SpanInternal,
     endTime: number
   ) {
-    // @ts-expect-error parentSpanId is private
-    this.logger.debug(`${logPrefix()}Ending span '${span.name}', id: ${span.id}, traceId: ${span.traceId}, parentSpanId: ${span.parentSpanId}, inForeGround: ${this.isInForeground}`)
     // if the span doesn't exist here it shouldn't be processed
     if (!this.openSpans.delete(span)) {
       // only warn if the span has already been ended explicitly rather than
