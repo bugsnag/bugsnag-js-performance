@@ -117,9 +117,11 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
 
         return (
           <AppStartWrapper>
-            <OriginalProviderComponent>
-              {children}
-            </OriginalProviderComponent>
+            <DiagnosticWrapper {...diagnosticWrapperProps}>
+              <OriginalProviderComponent>
+                {children}
+              </OriginalProviderComponent>
+            </DiagnosticWrapper>
           </AppStartWrapper>
         );
       }
