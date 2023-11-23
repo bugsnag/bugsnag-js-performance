@@ -52,8 +52,10 @@ class LoadEventEndSettler extends Settler {
 
     if (isPerformanceNavigationTiming(entry)) {
       settledTime = entry.loadEventEnd
-    } else {
+    } else if (performance.timing) {
       settledTime = performance.timing.loadEventEnd - performance.timing.navigationStart
+    } else {
+      settledTime = 0
     }
 
     // if the settled time is obviously wrong then use the current time instead
