@@ -270,6 +270,40 @@ describe('RouteChangePlugin', () => {
     })
   })
 
+  it('allows setting the URL on span end', async () => {
+    const DefaultRoutingProvider = createDefaultRoutingProvider(mockOnSettle, window.location)
+    const routingProvider = new DefaultRoutingProvider()
+    let routeChangeCallback: StartRouteChangeCallback = jest.fn()
+    routingProvider.listenForRouteChanges = (startRouteChangeSpan) => {
+      routeChangeCallback = startRouteChangeSpan
+    }
+
+    const delivery = new InMemoryDelivery()
+    const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
+      deliveryFactory: () => delivery,
+      schema: createSchema(window.location.hostname, routingProvider),
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
+    })
+
+    testClient.start({ apiKey: VALID_API_KEY, logger: jestLogger })
+    await jest.runOnlyPendingTimersAsync()
+
+    // trigger the route change
+    const span = routeChangeCallback(new URL('https://bugsnag.com/current-route'), 'trigger', {})
+
+    span.end({ url: new URL('https://bugsnag.com/updated-route') })
+
+    await jest.runOnlyPendingTimersAsync()
+
+    expect(delivery).toHaveSentSpan(expect.objectContaining({
+      name: '[RouteChange]/updated-route'
+    }))
+
+    const routeChangeSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+    expect(routeChangeSpan).toHaveAttribute('bugsnag.browser.page.route', '/updated-route')
+    expect(routeChangeSpan).toHaveAttribute('bugsnag.browser.page.url', 'https://bugsnag.com/updated-route')
+  })
+
   it('excludes attributes specified in sendPageAttributes', async () => {
     const DefaultRoutingProvider = createDefaultRoutingProvider(mockOnSettle, window.location)
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
