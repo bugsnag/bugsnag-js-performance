@@ -22,6 +22,8 @@ describe('app start plugin', () => {
     const appStartTime = 1234
     const plugin = new AppStartPlugin(appStartTime, spanFactory, clock, appRegistry)
 
+    const originalSetWrapperComponentProvider = appRegistry.setWrapperComponentProvider as jest.MockedFunction<typeof appRegistry.setWrapperComponentProvider>
+
     plugin.configure(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: true }))
 
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[AppStart/ReactNativeInit]',
@@ -30,15 +32,15 @@ describe('app start plugin', () => {
         parentContext: null
       }))
 
-    // expect(appRegistry.setWrapperComponentProvider).toHaveBeenCalledWith(expect.any(Function))
+    expect(originalSetWrapperComponentProvider).toHaveBeenCalledWith(expect.any(Function))
   })
 
   it('does not start an app start span when autoInstrumentAppStarts is false', () => {
     const plugin = new AppStartPlugin(1234, spanFactory, clock, appRegistry)
-
+    const originalSetWrapperComponentProvider = appRegistry.setWrapperComponentProvider as jest.MockedFunction<typeof appRegistry.setWrapperComponentProvider>
     plugin.configure(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: false }))
 
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
-    // expect(appRegistry.setWrapperComponentProvider).not.toHaveBeenCalled()
+    expect(originalSetWrapperComponentProvider).not.toHaveBeenCalled()
   })
 })
