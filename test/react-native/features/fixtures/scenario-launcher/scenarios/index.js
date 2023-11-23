@@ -7,3 +7,4 @@ export * as NetworkRequestCallbackScenario from './NetworkRequestCallbackScenari
 export * as NetworkRequestFailedScenario from './NetworkRequestFailedScenario'
 export * as NetworkRequestScenario from './NetworkRequestScenario'
 export * as WrapperComponentProviderScenario from './WrapperComponentProviderScenario'
+export * as AppStartDiagnosticScenario from './AppStartDiagnosticScenario'

@@ -39,6 +39,10 @@ export const launchScenario = async (rootTag) => {
     appParams.initialProps = { concurrentRoot: true }
   }
 
+  if(scenario.wrapperComponentProvider) {
+    AppRegistry.setWrapperComponentProvider(scenario.wrapperComponentProvider)
+  }
+
   AppRegistry.registerComponent(command.scenario_name, () => scenario.App)
   AppRegistry.runApplication(command.scenario_name, appParams)
 }
