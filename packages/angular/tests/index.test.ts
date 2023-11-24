@@ -11,14 +11,14 @@ jest.useFakeTimers()
 describe('angular integration', () => {
   const spanFactory = new MockSpanFactory()
 
-  const router = {
-    events: {
-      subscribe: jest.fn()
-    }
-  } as unknown as Router
-
   describe('listenForRouteChanges', () => {
     it('attaches a handler to router events and calls startRouteChangeSpan when fired', () => {
+      const router = {
+        events: {
+          subscribe: jest.fn()
+        }
+      } as unknown as Router
+
       const routingProvider = new AngularRoutingProvider()
       bugsnagBootstrapper.useFactory(router)
 
@@ -55,6 +55,80 @@ describe('angular integration', () => {
 
       const routeChangeSpan = startRouteChangeSpan.mock.results[0].value
       expect(routeChangeSpan.end).toHaveBeenCalledWith(expect.objectContaining({ url: new URL('http://localhost/url') }))
+    })
+  })
+
+  describe('resolveRoute', () => {
+    it('resolves the current router state to a route', () => {
+      const router = {
+        routerState: {
+          snapshot: {
+            root: {
+              firstChild: {
+                routeConfig: {
+                  path: 'customers'
+                },
+                firstChild: {
+                  routeConfig: {
+                    path: ':customerId'
+                  }
+                }
+              }
+            }
+          }
+        }
+      } as unknown as Router
+
+      const routingProvider = new AngularRoutingProvider()
+      bugsnagBootstrapper.useFactory(router)
+
+      expect(routingProvider.resolveRoute(new URL('/anything', window.origin))).toBe('/customers/:customerId')
+    })
+
+    it('uses the pathname of the supplied URL if there is no router state', () => {
+      const router = {
+        routerState: {
+          snapshot: {
+            root: {}
+          }
+        }
+      } as unknown as Router
+
+      const routingProvider = new AngularRoutingProvider()
+      bugsnagBootstrapper.useFactory(router)
+
+      expect(routingProvider.resolveRoute(new URL(window.origin))).toBe('/')
+    })
+
+    it('inserts a placeholder for segments using custom matchers', () => {
+      const router = {
+        routerState: {
+          snapshot: {
+            root: {
+              firstChild: {
+                routeConfig: {
+                  path: 'customers'
+                },
+                firstChild: {
+                  routeConfig: {
+                    matcher: () => {}
+                  },
+                  firstChild: {
+                    routeConfig: {
+                      path: ':customerId'
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      } as unknown as Router
+
+      const routingProvider = new AngularRoutingProvider()
+      bugsnagBootstrapper.useFactory(router)
+
+      expect(routingProvider.resolveRoute(new URL(window.origin))).toBe('/customers/<custom URL matcher>/:customerId')
     })
   })
 })
