@@ -1,4 +1,6 @@
 import type { BitLength, IdGenerator } from '@bugsnag/core-performance'
+import type { Spec as NativeBugsnag } from './NativeBugsnagPerformance'
+import createEntropySource from './entropy-source'
 
 function toHex (value: number): string {
   const hex = value.toString(16)
@@ -11,18 +13,24 @@ function toHex (value: number): string {
   return hex
 }
 
-const idGenerator: IdGenerator = {
-  generate (bits: BitLength): string {
-    const bytes = bits / 8
+function createIdGenerator (NativeBugsnagPerformance: NativeBugsnag | null): IdGenerator {
+  const { nextByte } = createEntropySource(NativeBugsnagPerformance)
 
-    let randomValue = ''
+  const idGenerator: IdGenerator = {
+    generate (bits: BitLength): string {
+      const bytes = bits / 8
 
-    for (let i = 0; i < bytes; i++) {
-      randomValue += toHex((Math.random() * 255) | 0)
+      let randomValue = ''
+
+      for (let i = 0; i < bytes; i++) {
+        randomValue += toHex(nextByte())
+      }
+
+      return randomValue
     }
-
-    return randomValue
   }
+
+  return idGenerator
 }
 
-export default idGenerator
+export default createIdGenerator

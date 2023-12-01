@@ -6,7 +6,7 @@ import { FileSystem } from 'react-native-file-access'
 import { AppStartPlugin, NetworkRequestPlugin } from './auto-instrumentation'
 import createClock from './clock'
 import createSchema from './config'
-import idGenerator from './id-generator'
+import createIdGenerator from './id-generator'
 import NativeBugsnagPerformance from './native'
 import persistenceFactory from './persistence'
 import { platformExtensions } from './platform-extensions'
@@ -24,6 +24,8 @@ const resourceAttributesSource = resourceAttributesSourceFactory(persistence, de
 
 // React Native's fetch polyfill uses xhr under the hood, so we only track xhr requests
 const xhrRequestTracker = createXmlHttpRequestTracker(XMLHttpRequest, clock)
+
+const idGenerator = createIdGenerator(NativeBugsnagPerformance)
 
 const BugsnagPerformance = createClient({
   backgroundingListener: { onStateChange: () => {} },
