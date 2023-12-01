@@ -82,7 +82,6 @@ Feature: Manual spans
       | ios     | @skip     |
       | android | @not_null |
 
-  @skip_ios_old_arch
   Scenario: Native resource attributes are recorded
     When I run 'ManualSpanScenario'
     And I wait to receive a sampling request
