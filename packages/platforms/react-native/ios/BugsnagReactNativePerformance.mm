@@ -40,7 +40,7 @@ static NSString *hostArch() noexcept {
 #endif
 }
 
-- (NSDictionary *)getDeviceInfo {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getDeviceInfo) {
     NSMutableDictionary *info = [NSMutableDictionary new];
     auto infoDictionary = NSBundle.mainBundle.infoDictionary;
     info[@"arch"] = hostArch();
