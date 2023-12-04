@@ -18,7 +18,8 @@ describe('Core', () => {
       expect(client).toStrictEqual({
         start: expect.any(Function),
         startSpan: expect.any(Function),
-        currentSpanContext: undefined
+        currentSpanContext: undefined,
+        getPlugin: expect.any(Function)
       })
     })
 
@@ -246,6 +247,52 @@ describe('Core', () => {
           const spanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
           spanContextStorage.push(spanContext)
           expect(client.currentSpanContext).toBe(spanContext)
+        })
+      })
+
+      describe('getPlugin()', () => {
+        it('returns an instance of a plugin', () => {
+          const listener = jest.fn()
+
+          class TestPlugin {
+            configure () {}
+
+            test () {
+              listener()
+            }
+          }
+
+          const client = createTestClient()
+
+          client.start({ apiKey: VALID_API_KEY, plugins: [new TestPlugin()] })
+
+          const plugin = client.getPlugin(TestPlugin)
+
+          expect(plugin).toBeInstanceOf(TestPlugin)
+
+          expect(listener).not.toHaveBeenCalled()
+
+          plugin?.test()
+
+          expect(listener).toHaveBeenCalled()
+        })
+
+        it('does not return a plugin if it has not been provided', () => {
+          class TestPlugin {
+            configure () {}
+          }
+
+          class AnotherPlugin {
+            configure () {}
+          }
+
+          const client = createTestClient()
+
+          client.start({ apiKey: VALID_API_KEY, plugins: [new TestPlugin()] })
+
+          const plugin = client.getPlugin(AnotherPlugin)
+
+          expect(plugin).toBeUndefined()
         })
       })
     })

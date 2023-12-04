@@ -17,10 +17,13 @@ import { type Span, type SpanOptions } from './span'
 import { DefaultSpanContextStorage, type SpanContext, type SpanContextStorage } from './span-context'
 import { SpanFactory } from './span-factory'
 
+interface Constructor<T> { new(): T, prototype: T }
+
 export interface Client<C extends Configuration> {
   start: (config: C | string) => void
   startSpan: (name: string, options?: SpanOptions) => Span
   readonly currentSpanContext: SpanContext | undefined
+  getPlugin: <T extends Plugin<C>> (Constructor: Constructor<T>) => T | undefined
 }
 
 export interface ClientOptions<S extends CoreSchema, C extends Configuration, T> {
@@ -97,6 +100,10 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         spanFactory.configure(processor, logger)
       })
 
+      for (const plugin of configuration.plugins) {
+        plugins.push(plugin)
+      }
+
       for (const plugin of plugins) {
         plugin.configure(configuration)
       }
@@ -106,6 +113,13 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       const span = spanFactory.startSpan(cleanOptions.name, cleanOptions.options)
       span.setAttribute('bugsnag.span.category', 'custom')
       return spanFactory.toPublicApi(span)
+    },
+    getPlugin: (Constructor) => {
+      for (const plugin of plugins) {
+        if (plugin instanceof Constructor) {
+          return plugin
+        }
+      }
     },
     get currentSpanContext () {
       return spanContextStorage.current
