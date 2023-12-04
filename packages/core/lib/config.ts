@@ -1,4 +1,5 @@
-import { isLogger, isNumber, isObject, isString, isStringArray, isStringWithLength } from './validation'
+import { type Plugin } from './plugin'
+import { isLogger, isNumber, isObject, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
 
 export interface Logger {
   debug: (message: string) => void
@@ -15,6 +16,7 @@ export interface Configuration {
   appVersion?: string
   enabledReleaseStages?: string[] | null
   samplingProbability?: number
+  plugins?: Array<Plugin<Configuration>>
 }
 
 export interface TestConfiguration {
@@ -41,6 +43,7 @@ export interface CoreSchema extends Schema {
   appVersion: ConfigOption<string>
   enabledReleaseStages: ConfigOption<string[] | null>
   samplingProbability: ConfigOption<number>
+  plugins: ConfigOption<Array<Plugin<Configuration>>>
 }
 
 export const schema: CoreSchema = {
@@ -83,6 +86,11 @@ export const schema: CoreSchema = {
     defaultValue: 1.0,
     message: 'should be a number between 0 and 1',
     validate: (value: unknown): value is number => isNumber(value) && value >= 0 && value <= 1
+  },
+  plugins: {
+    defaultValue: [],
+    message: 'should be an array of plugin objects',
+    validate: isPluginArray
   }
 }
 
