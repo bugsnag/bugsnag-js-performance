@@ -48,14 +48,12 @@ class LoadEventEndSettler extends Settler {
     // PLAT-10204 Prevent snags occuring due to DOM scanning bots like BuiltWith https://builtwith.com/biup
     const entry = typeof performance.getEntriesByType === 'function' ? performance.getEntriesByType('navigation')[0] : undefined
 
-    let settledTime: number
+    let settledTime = 0
 
     if (isPerformanceNavigationTiming(entry)) {
       settledTime = entry.loadEventEnd
     } else if (performance.timing) {
       settledTime = performance.timing.loadEventEnd - performance.timing.navigationStart
-    } else {
-      settledTime = 0
     }
 
     // if the settled time is obviously wrong then use the current time instead
