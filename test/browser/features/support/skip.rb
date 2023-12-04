@@ -14,14 +14,10 @@ Before("@skip_on_npm_build") do
   skip_this_scenario("Skipping scenario: Not suitable for NPM build") if $build_mode.npm?
 end
 
-Before("@skip_chrome_61") do
-  skip_this_scenario("Skipping scenario: Not supported") if Maze.config.browser == "chrome_61"
-end
-
-Before("@skip_firefox_60") do
-  skip_this_scenario("Skipping scenario: Not supported") if Maze.config.browser == "firefox_60"
-end
-
-Before("@skip_safari_11") do
-  skip_this_scenario("Skipping scenario: Not supported") if Maze.config.browser == "safari_11"
+["chrome", "firefox", "safari", "edge"].each do |browser|
+  1.upto(1_000) do |version|
+    Before("@skip_#{browser}_#{version}") do
+      skip_this_scenario("Skipping scenario: Not supported") if Maze.config.browser == "#{browser}_#{version}"
+    end
+  end
 end
