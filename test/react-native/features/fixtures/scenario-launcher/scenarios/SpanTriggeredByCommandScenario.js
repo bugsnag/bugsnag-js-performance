@@ -9,26 +9,29 @@ export const config = {
 }
 
 export function App () {
-  const [currentCommand, setCurrentCommand] = useState(null)
+  const [id, setId] = useState(1)
 
   useEffect(() => {
-    getCurrentCommand(Infinity).then(command => {
-      setCurrentCommand(command)
+    (async () => {
+      console.error(`[BugsnagPerformance] SpanTriggeredByCommandScenario waiting for command...`)
+      const command = await getCurrentCommand(Infinity)
 
       console.error(`[BugsnagPerformance] SpanTriggeredByCommandScenario got command: ${JSON.stringify(command)}`)
+      console.error(`[BugsnagPerformance] SpanTriggeredByCommandScenario has id: ${id}`)
 
       if (command.action === 'start-span') {
-        BugsnagPerformance.startSpan('SpanTriggeredByCommandScenario').end()
+        BugsnagPerformance.startSpan(`SpanTriggeredByCommandScenario ${id}`).end()
+        setId(a => a + 1)
       } else {
         throw new Error(`Unknown command: ${JSON.stringify(command)}`)
       }
-    })
-  })
+    })()
+  }, [id])
 
   return (
     <View>
       <Text>SpanTriggeredByCommandScenario</Text>
-      <Text>Current command: {JSON.stringify(currentCommand)}</Text>
+      <Text>ID: {id}</Text>
     </View>
   )
 }
