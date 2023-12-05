@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- (angular) Added new integration for angular apps [#293](https://github.com/bugsnag/bugsnag-js-performance/pull/293)
+
 ## v2.0.0 (2023-11-20)
 
 ### Added
