@@ -28,7 +28,7 @@ export const isStringArray = (value: unknown): value is string[] => Array.isArra
 
 export const isStringOrRegExpArray = (value: unknown): value is Array<string | RegExp> => Array.isArray(value) && value.every(item => isStringWithLength(item) || item instanceof RegExp)
 
-export function isPersistedProbabilty (value: unknown): value is PersistedProbability {
+export function isPersistedProbability (value: unknown): value is PersistedProbability {
   return isObject(value) &&
     isNumber(value.value) &&
     isNumber(value.time)
@@ -42,4 +42,11 @@ export const isSpanContext = (value: unknown): value is SpanContext =>
 
 export function isTime (value: unknown): value is Time {
   return isNumber(value) || value instanceof Date
+}
+
+// NOTE: this should be kept in sync with the notifier
+// https://github.com/bugsnag/bugsnag-js/blob/next/packages/plugin-browser-device/device.js
+export function isDeviceId (value: unknown): value is string {
+  // make sure the persisted value looks like a valid cuid
+  return typeof value === 'string' && /^c[a-z0-9]{20,32}$/.test(value)
 }

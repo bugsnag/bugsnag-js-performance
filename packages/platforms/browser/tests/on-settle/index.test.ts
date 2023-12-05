@@ -13,7 +13,7 @@ import {
   RequestTracker,
   type RequestEndContext,
   type RequestStartContext
-} from '../../lib/request-tracker/request-tracker'
+} from '@bugsnag/request-tracker-performance'
 import {
   PerformanceFake,
   createPerformanceNavigationTimingFake

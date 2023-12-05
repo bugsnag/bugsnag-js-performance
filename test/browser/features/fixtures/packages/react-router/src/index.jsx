@@ -52,7 +52,7 @@ const router = createBrowserRouter(routes, { basename })
 BugsnagPerformance.start({
     apiKey,
     endpoint,
-    maximumBatchSize: 13,
+    maximumBatchSize: 14,
     batchInactivityTimeoutMs: 5000,
     autoInstrumentNetworkRequests: false,
     routingProvider: new ReactRouterRoutingProvider(routes, basename)

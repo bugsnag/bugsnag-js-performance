@@ -1,5 +1,9 @@
-
-import { onSettle, type RouteResolver, type RoutingProvider, type StartRouteChangeCallback } from '@bugsnag/browser-performance'
+import {
+  onSettle,
+  type RouteResolver,
+  type RoutingProvider,
+  type StartRouteChangeCallback
+} from '@bugsnag/browser-performance'
 import pathToRegexp from 'path-to-regexp'
 import { type RouteRecordRaw, type Router } from 'vue-router'
 

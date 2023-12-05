@@ -1,0 +1,58 @@
+{
+  "name": "@bugsnag/react-native-performance",
+  "version": "2.0.0",
+  "description": "BugSnag performance monitoring for React Native",
+  "homepage": "https://www.bugsnag.com/",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "bugs": {
+    "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
+  },
+  "dependencies": {
+    "@bugsnag/core-performance": "^2.0.0",
+    "@bugsnag/cuid": "^3.0.2",
+    "@bugsnag/delivery-fetch-performance": "^2.0.0",
+    "@bugsnag/request-tracker-performance": "^2.0.0"
+  },
+  "devDependencies": {
+    "@react-native-community/netinfo": "^9.4.1",
+    "@types/react": "^18.2.24",
+    "babel-preset-react-native": "^4.0.1",
+    "react-native-file-access": "^3.0.4"
+  },
+  "peerDependencies": {
+    "@react-native-community/netinfo": "^9.4.1",
+    "react": "*",
+    "react-native": "*",
+    "react-native-file-access": "^3.0.4"
+  },
+  "scripts": {
+    "build": "rollup --config",
+    "clean": "rm -rf dist/*"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "android",
+    "ios",
+    "BugsnagReactNativePerformance.podspec",
+    "!android/build",
+    "!ios/build"
+  ],
+  "codegenConfig": {
+    "name": "BugsnagReactNativePerformanceSpec",
+    "type": "modules",
+    "jsSrcsDir": "dist",
+    "android": {
+      "javaPackageName": "com.bugsnag.android.performance"
+    }
+  }
+}

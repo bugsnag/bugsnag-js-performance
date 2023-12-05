@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 
+import { type RouteChangeSpan } from '@bugsnag/browser-performance'
 import { ReactRouterRoutingProvider } from '../lib/react-router-routing-provider'
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
 
@@ -36,7 +37,7 @@ describe('ReactRouterRoutingProvider', () => {
         '[FullPageLoad]/some-route',
         { }
       )
-      const startRouteChangeSpan = jest.fn(() => spanFactory.toPublicApi(span))
+      const startRouteChangeSpan = jest.fn(() => spanFactory.toPublicApi(span) as RouteChangeSpan)
 
       routingProvider.listenForRouteChanges(startRouteChangeSpan)
 
@@ -51,7 +52,7 @@ describe('ReactRouterRoutingProvider', () => {
         '[FullPageLoad]/some-route',
         { }
       )
-      const startRouteChangeSpan = jest.fn(() => spanFactory.toPublicApi(span))
+      const startRouteChangeSpan = jest.fn(() => spanFactory.toPublicApi(span) as RouteChangeSpan)
 
       history.pushState({}, '', '/contacts/2')
 

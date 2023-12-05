@@ -5,7 +5,7 @@ import {
   type RequestEndCallback,
   type RequestEndContext,
   type RequestTracker
-} from '../request-tracker/request-tracker'
+} from '@bugsnag/request-tracker-performance'
 
 class RequestSettler extends Settler {
   private timeout: ReturnType<typeof setTimeout> | undefined = undefined

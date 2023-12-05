@@ -1,0 +1,28 @@
+{
+  "name": "angular",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "ng build",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@angular/common": "17.0.4",
+    "@angular/compiler": "17.0.4",
+    "@angular/core": "17.0.4",
+    "@angular/platform-browser": "17.0.4",
+    "@angular/platform-browser-dynamic": "17.0.4",
+    "@angular/router": "17.0.4",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.14.2"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "17.*",
+    "@angular/cli": "16.*",
+    "@angular/compiler-cli": "17.0.4",
+    "copyfiles": "^2.4.1",
+    "ts-node": "~10.9.0",
+    "typescript": "~5.2.2"
+  }
+}
