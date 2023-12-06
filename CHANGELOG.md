@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Fixed
+
+- (react-router) Allow `/` as a basename
+- (vue-router) Allow `/` as a basename
+
 ### Added
 
 - (angular) Added new integration for angular apps [#293](https://github.com/bugsnag/bugsnag-js-performance/pull/293)

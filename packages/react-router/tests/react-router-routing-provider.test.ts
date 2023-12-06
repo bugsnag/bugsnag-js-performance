@@ -86,5 +86,11 @@ describe('ReactRouterRoutingProvider', () => {
 
       expect(routingProvider.resolveRoute(new URL(window.location.href))).toBe('/contacts/:contactId/edit')
     })
+
+    it('allows "/" as a basename', () => {
+      const routingProvider = new ReactRouterRoutingProvider(routes, '/')
+
+      expect(routingProvider.resolveRoute(new URL('/contacts/2/edit', window.origin))).toBe('/contacts/:contactId/edit')
+    })
   })
 })
