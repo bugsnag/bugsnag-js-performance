@@ -20,7 +20,9 @@
     },
     "devDependencies": {
         "@bugsnag/react-native-performance": "*",
-        "@react-navigation/native": "*"
+        "@react-navigation/native": "*",
+        "@testing-library/react-native": "*",
+        "@testing-library/jest-native": "*"
     },
     "peerDependencies": {
         "@bugsnag/core-performance": "*",
