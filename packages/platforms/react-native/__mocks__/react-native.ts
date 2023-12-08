@@ -102,11 +102,7 @@ type DeviceInfo
   | Record<string, never>
 
 const createPool = () => {
-  const pool: number[] = []
-  for (let i = 0; i < pool.length; i++) {
-    pool[i] = (Math.random() * 255) | 0
-  }
-  return pool
+  return '0123456789abcdef'.repeat(128)
 }
 
 const BugsnagReactNativePerformance = {

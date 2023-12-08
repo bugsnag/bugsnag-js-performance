@@ -40,19 +40,18 @@ static NSString *hostArch() noexcept {
 #endif
 }
 
-static NSArray *getRandomBytes() noexcept {
+static NSString *getRandomBytes() noexcept {
     const int POOL_SIZE = 1024;
     UInt8 bytes[POOL_SIZE];
-    NSMutableArray *arr = [NSMutableArray new];
+    NSMutableString *hexStr = [NSMutableString stringWithCapacity:POOL_SIZE * 2];
     int status = SecRandomCopyBytes(kSecRandomDefault, POOL_SIZE, &bytes);
     if (status == errSecSuccess) {
         for (int i = 0; i < POOL_SIZE; i++) {
-            NSNumber *num = [NSNumber numberWithUnsignedChar:bytes[i]];
-            [arr addObject:num];
+            [hexStr appendFormat:@"%02x", bytes[i]];
         }
     }
     
-    return arr;
+    return hexStr;
 }
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getDeviceInfo) {
@@ -79,15 +78,15 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getDeviceInfo) {
 }
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(requestEntropy) {
-    NSArray *arr = getRandomBytes();
-    return arr;
+    NSString *hexStr = getRandomBytes();
+    return hexStr;
 }
 
  RCT_EXPORT_METHOD(requestEntropyAsync:(RCTPromiseResolveBlock)resolve
                    rejecter:(RCTPromiseRejectBlock)reject)
  {
-     NSArray *arr = getRandomBytes();
-     resolve(arr);
+     NSString *hexStr = getRandomBytes();
+     resolve(hexStr);
  }
 
 #ifdef RCT_NEW_ARCH_ENABLED

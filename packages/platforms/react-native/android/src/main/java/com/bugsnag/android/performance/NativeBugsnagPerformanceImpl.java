@@ -18,6 +18,8 @@ public class NativeBugsnagPerformanceImpl extends NativeBugsnagPerformanceSpec {
   
   static final String NAME = "BugsnagReactNativePerformance";
   
+  private final SecureRandom random = new SecureRandom();
+
   public NativeBugsnagPerformanceImpl(ReactApplicationContext reactContext) {
     super(reactContext);
   }
@@ -61,17 +63,19 @@ public class NativeBugsnagPerformanceImpl extends NativeBugsnagPerformanceSpec {
   }
 
   @Override
-  public WritableArray requestEntropy() {
-    SecureRandom random = new SecureRandom();
-    byte[] bytes = random.generateSeed(1024);
+  public String requestEntropy() {
+    byte[] bytes = new byte[1024];
+    random.nextBytes(bytes);
 
-    // convert bytes to an integer array in Java
-    WritableArray array = Arguments.createArray();
-    for (byte b : bytes) {
-      array.pushInt(Byte.toUnsignedInt(b));
+    StringBuilder hex = new StringBuilder(bytes.length * 2);
+    for(byte b : bytes) {
+        int byteValue = ((int)b & 0xff);
+        if(byteValue < 16) {
+            hex.append('0');
+        }
+        hex.append(Integer.toHexString(byteValue));
     }
-
-    return array;
+    return hex.toString();
   }
 
   @Override
