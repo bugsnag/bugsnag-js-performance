@@ -82,11 +82,11 @@ module.exports = {
     {
       displayName: 'react-native',
       preset: 'react-native',
-      testMatch: ['<rootDir>/packages/platforms/react-native/**/*.test.ts'],
+      testMatch: ['<rootDir>/packages/platforms/react-native/test/**/*.test.ts'],
       coveragePathIgnorePatterns: ['<rootDir>/packages/core', '<rootDir>/packages/platforms/browser', '<rootDir>/packages/delivery-fetch'],
       moduleNameMapper,
       transform: {
-        '^.+\\.m?[tj]sx?$': [
+        '^.+\\.m?tsx?$': [
           'ts-jest',
           {
             tsconfig: { paths },
