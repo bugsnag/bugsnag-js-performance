@@ -68,4 +68,24 @@ describe('NavigationContextProvider', () => {
     jest.advanceTimersByTime(100)
     expect(testSpan.end).toHaveBeenCalled()
   })
+
+  it('Does not end a navigation span while multiple components are blocking', () => {
+    render(
+      <NavigationContextProvider client={client} currentRoute="test-route" >
+          <Example />
+      </NavigationContextProvider>
+    )
+
+    fireEvent.press(screen.getByText('Trigger Navigation End'))
+    fireEvent.press(screen.getByText('Block Navigation'))
+    fireEvent.press(screen.getByText('Block Navigation'))
+    jest.advanceTimersByTime(100)
+    expect(testSpan.end).not.toHaveBeenCalled()
+    fireEvent.press(screen.getByText('Unblock Navigation'))
+    jest.advanceTimersByTime(100)
+    expect(testSpan.end).not.toHaveBeenCalled()
+    fireEvent.press(screen.getByText('Unblock Navigation'))
+    jest.advanceTimersByTime(100)
+    expect(testSpan.end).toHaveBeenCalled()
+  })
 })
