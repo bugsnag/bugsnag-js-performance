@@ -1,6 +1,11 @@
 import type { BitLength, IdGenerator } from '@bugsnag/core-performance'
+import { type Spec as NativeBugsnag } from './NativeBugsnagPerformance'
 
-function toHex (value: number): string {
+const POOL_SIZE = 1024
+
+const CALLS_BEFORE_POOL_REFRESH = 1000
+
+export function toHex (value: number): string {
   const hex = value.toString(16)
 
   // pad hex with a leading 0 if it's not already 2 characters
@@ -11,18 +16,53 @@ function toHex (value: number): string {
   return hex
 }
 
-const idGenerator: IdGenerator = {
-  generate (bits: BitLength): string {
-    const bytes = bits / 8
+export function createRandomString (): string {
+  let random = ''
 
-    let randomValue = ''
-
-    for (let i = 0; i < bytes; i++) {
-      randomValue += toHex((Math.random() * 255) | 0)
-    }
-
-    return randomValue
+  for (let i = 0; i < POOL_SIZE; i++) {
+    random += toHex((Math.random() * 255) | 0)
   }
+
+  return random
 }
 
-export default idGenerator
+function createIdGenerator (NativeBugsnagPerformance: NativeBugsnag | null): IdGenerator {
+  // If the native module is not available for any reason, fall back to a JS implementation
+  const requestEntropy = NativeBugsnagPerformance ? NativeBugsnagPerformance.requestEntropy : createRandomString
+  const requestEntropyAsync = NativeBugsnagPerformance ? NativeBugsnagPerformance.requestEntropyAsync : async () => createRandomString()
+
+  // initialise the pool synchronously
+  const randomValues = requestEntropy()
+  let randomPool = randomValues.length > 0 ? randomValues : createRandomString()
+
+  const regeneratePool = async () => {
+    const randomValues = await requestEntropyAsync()
+    randomPool = randomValues.length > 0 ? randomValues : createRandomString()
+  }
+
+  let numberOfCalls = 0
+  const idGenerator: IdGenerator = {
+    generate (bits: BitLength): string {
+      const chars = bits / 4
+      let id = ''
+
+      // pick characters from the pool semi-randomly
+      for (let i = 0; i < chars; i++) {
+        const randomIndex = (Math.random() * (randomPool.length - 1)) | 0
+        id += randomPool[randomIndex]
+      }
+
+      // if the max number of calls has been reached, refresh the pool asynchronously
+      if (++numberOfCalls >= CALLS_BEFORE_POOL_REFRESH) {
+        numberOfCalls = 0
+        regeneratePool()
+      }
+
+      return id
+    }
+  }
+
+  return idGenerator
+}
+
+export default createIdGenerator

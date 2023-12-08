@@ -4,8 +4,9 @@
 
 ### Fixed
 
-- (react-router) Allow `/` as a basename
-- (vue-router) Allow `/` as a basename
+- (react-router) Allow `/` as a basename [#337](https://github.com/bugsnag/bugsnag-js-performance/pull/337)
+- (vue-router) Allow `/` as a basename [#337](https://github.com/bugsnag/bugsnag-js-performance/pull/337)
+- (react-native) Generate random bytes natively for ID generation [#380](https://github.com/bugsnag/bugsnag-js-performance/pull/380)
 
 ### Added
 
