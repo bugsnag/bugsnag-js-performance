@@ -18,7 +18,7 @@ import createBrowserBackgroundingListener from './backgrounding-listener'
 const clock = createClock(performance)
 const appStartTime = clock.now()
 const deliveryFactory = createFetchDeliveryFactory(fetch, clock)
-const spanAttributesSource = createSpanAttributesSource(AppState)
+const spanAttributesSource = createSpanAttributesSource()
 const deviceInfo = NativeBugsnagPerformance ? NativeBugsnagPerformance.getDeviceInfo() : undefined
 const persistence = persistenceFactory(FileSystem, deviceInfo)
 const resourceAttributesSource = resourceAttributesSourceFactory(persistence, deviceInfo)
