@@ -34,7 +34,7 @@ export default function createBrowserBackgroundingListener (appState: AppStateSt
   }
 
   appState.addEventListener('change', (state: AppStateStatus) => {
-    const newState = state === 'active'
+    const newState = state === 'active' || appState.currentState === 'unknown'
       ? 'in-foreground'
       : 'in-background'
 
