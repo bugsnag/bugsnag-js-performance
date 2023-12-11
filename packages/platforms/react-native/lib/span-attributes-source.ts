@@ -1,10 +1,9 @@
 import { type SpanAttributesSource } from '@bugsnag/core-performance'
 import NetInfo from '@react-native-community/netinfo'
-import { type AppStateStatic } from 'react-native'
 import { type ReactNativeConfiguration } from './config'
 import getNetworkConnectionType, { type CellularGeneration, type NetworkConnectionType } from './get-network-connection-type'
 
-export function createSpanAttributesSource (appState: AppStateStatic) {
+export function createSpanAttributesSource () {
   let connectionType: NetworkConnectionType = 'unknown'
   let cellularGeneration: CellularGeneration
 
@@ -20,7 +19,6 @@ export function createSpanAttributesSource (appState: AppStateStatic) {
 
     },
     requestAttributes (span) {
-      span.setAttribute('bugsnag.app.in_foreground', appState.currentState === 'active')
       span.setAttribute('net.host.connection.type', connectionType)
 
       if (cellularGeneration && connectionType === 'cell') {
