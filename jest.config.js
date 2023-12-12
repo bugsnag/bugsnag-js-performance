@@ -106,11 +106,10 @@ module.exports = {
     '<rootDir>/jest/config/react-navigation.js'
   ],
   collectCoverageFrom: [
-    '<rootDir>/packages/**/*.ts',
-    '!<rootDir>/packages/**/*.d.ts',
-    '!<rootDir>/packages/**/*.test.ts',
-    '!<rootDir>/packages/**/tests/**/*',
-    '!<rootDir>/examples/**/*',
+    '**/packages/*/**/*.ts',
+    '!**/packages/*/**/*.d.ts',
+    '!**/packages/*/**/*.test.ts',
+    '!**/packages/*/**/tests/**/*',
     '!<rootDir>/packages/test-utilities/**/*',
     '!<rootDir>/test/**/*'
   ],
