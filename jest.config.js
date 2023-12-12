@@ -36,7 +36,6 @@ const defaultModuleConfig = {
 
 module.exports = {
   projects: [
-    '<rootDir>/jest/config/react-navigation.js',
     {
       displayName: 'core',
       testMatch: ['<rootDir>/packages/core/**/*.test.ts'],
@@ -98,7 +97,8 @@ module.exports = {
           }
         ]
       }
-    }
+    },
+    '<rootDir>/jest/config/react-navigation.js'
   ],
   collectCoverageFrom: [
     '**/packages/*/**/*.ts',
