@@ -20,10 +20,8 @@
   "bugs": {
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
-  "dependencies": {
-    "@bugsnag/browser-performance": "^2.0.0"
-  },
   "peerDependencies": {
+    "@bugsnag/browser-performance": "^2.0.0",
     "react-router-dom": "^6.0.0"
   },
   "type": "module",

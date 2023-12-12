@@ -95,6 +95,19 @@ describe('network span plugin', () => {
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
   })
 
+  it('does not track requests to the NetInfo reachability URL', () => {
+    const plugin = new NetworkRequestPlugin(spanFactory, xhrTracker)
+    const NET_INFO_REACHABILITY_URL = 'https://clients3.google.com/generate_204?_=1701691583660'
+
+    plugin.configure(createConfiguration<ReactNativeConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true
+    }))
+
+    xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: NET_INFO_REACHABILITY_URL, startTime: 1 })
+    expect(spanFactory.startSpan).not.toHaveBeenCalled()
+  })
+
   const expectedProtocols = [
     'http://bugsnag.com/image.jpg',
     'https://bugsnag.com/image.jpg',

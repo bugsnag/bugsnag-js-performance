@@ -1,0 +1,33 @@
+{
+  "name": "@bugsnag/angular-performance",
+  "version": "1.1.0",
+  "description": "BugSnag performance monitoring for angular applications",
+  "homepage": "https://www.bugsnag.com/",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "npm run build:npm",
+    "build:npm": "rollup --config rollup.config.npm.mjs",
+    "clean": "rm -rf dist/*"
+  },
+  "bugs": {
+    "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
+  },
+  "peerDependencies": {
+    "@bugsnag/browser-performance": "^2.0.0",
+    "@angular/core": "*",
+    "@angular/router": "*"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ]
+}

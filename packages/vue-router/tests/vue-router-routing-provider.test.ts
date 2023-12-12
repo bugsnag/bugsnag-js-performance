@@ -5,6 +5,7 @@
 import { type Router } from 'vue-router'
 import { VueRouterRoutingProvider } from '../lib/vue-router-routing-provider'
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
+import { type RouteChangeSpan, type StartRouteChangeCallback } from '@bugsnag/browser-performance'
 
 jest.useFakeTimers()
 
@@ -44,7 +45,7 @@ describe('VueRouterRoutingProvider', () => {
         '[FullPageLoad]/some-route',
         { }
       )
-      const startRouteChangeSpan = jest.fn(() => spanFactory.toPublicApi(span))
+      const startRouteChangeSpan: StartRouteChangeCallback = jest.fn(() => spanFactory.toPublicApi(span) as RouteChangeSpan)
 
       routingProvider.listenForRouteChanges(startRouteChangeSpan)
 
@@ -87,7 +88,7 @@ describe('VueRouterRoutingProvider', () => {
         '[FullPageLoad]/some-route',
         { }
       )
-      const startRouteChangeSpan = jest.fn(() => spanFactory.toPublicApi(span))
+      const startRouteChangeSpan: StartRouteChangeCallback = jest.fn(() => spanFactory.toPublicApi(span) as RouteChangeSpan)
 
       routingProvider.listenForRouteChanges(startRouteChangeSpan)
 
@@ -141,6 +142,12 @@ describe('VueRouterRoutingProvider', () => {
       const routingProvider = new VueRouterRoutingProvider(router, '/app')
 
       expect(routingProvider.resolveRoute(new URL('/app/contacts/2/edit', window.origin))).toBe('/contacts/:contactId/edit')
+    })
+
+    it('allows "/" as a basename', () => {
+      const routingProvider = new VueRouterRoutingProvider(router, '/')
+
+      expect(routingProvider.resolveRoute(new URL('/contacts/2/edit', window.origin))).toBe('/contacts/:contactId/edit')
     })
   })
 })

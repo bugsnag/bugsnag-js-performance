@@ -25,8 +25,10 @@ export class VueRouterRoutingProvider implements RoutingProvider {
   constructor (router: Router, basename?: string) {
     this.router = router
 
+    const normalizedBasename = !basename || basename === '/' ? '' : basename
+
     function resolveRoute (url: URL): string {
-      return flattenRoutes(router.getRoutes()).find((fullRoutePath) => url.pathname.replace(basename ?? '', '').match(pathToRegexp(fullRoutePath))) || 'no-route-found'
+      return flattenRoutes(router.getRoutes()).find((fullRoutePath) => url.pathname.replace(normalizedBasename ?? '', '').match(pathToRegexp(fullRoutePath))) || 'no-route-found'
     }
     this.resolveRoute = resolveRoute
   }

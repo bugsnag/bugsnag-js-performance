@@ -1,5 +1,18 @@
 # Changelog
 
+## v2.1.0 (2023-12-12)
+
+### Fixed
+
+- (react-router) Allow `/` as a basename [#337](https://github.com/bugsnag/bugsnag-js-performance/pull/337)
+- (vue-router) Allow `/` as a basename [#337](https://github.com/bugsnag/bugsnag-js-performance/pull/337)
+- (react-native) Generate random bytes natively for ID generation [#380](https://github.com/bugsnag/bugsnag-js-performance/pull/380)
+- (react-native) Discard spans when the app is in the background [#384](https://github.com/bugsnag/bugsnag-js-performance/pull/384)
+
+### Added
+
+- (angular) Added new integration for angular apps [#293](https://github.com/bugsnag/bugsnag-js-performance/pull/293)
+
 ## v2.0.0 (2023-11-20)
 
 ### Added

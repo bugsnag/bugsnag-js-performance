@@ -17,12 +17,16 @@ import { type ReactNativeConfiguration } from '../config'
 
 const permittedPrefixes = ['http://', 'https://', '/', './', '../']
 
+// The NetInfo module makes requests to this URL to detect if the device is connected to the internet - we don't want to track these
+// see https://github.com/react-native-netinfo/react-native-netinfo/blob/1cd754de6c1fb102a491af418e3b6e831f58855a/src/internal/defaultConfiguration.ts#L4
+const NET_INFO_REACHABILITY_URL = 'https://clients3.google.com/generate_204'
+
 export interface ReactNativeNetworkRequestInfo extends NetworkRequestInfo {
   readonly type: 'xmlhttprequest'
 }
 
 export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
-  private configEndpoint: string = ''
+  private ignoredUrls: string[] = [NET_INFO_REACHABILITY_URL]
   private networkRequestCallback: NetworkRequestCallback<ReactNativeNetworkRequestInfo> = defaultNetworkRequestCallback
   private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
 
@@ -35,7 +39,7 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
     this.logger = configuration.logger
 
     if (configuration.autoInstrumentNetworkRequests) {
-      this.configEndpoint = configuration.endpoint
+      this.ignoredUrls.push(configuration.endpoint)
       this.xhrTracker.onStart(this.trackRequest)
       this.networkRequestCallback = configuration.networkRequestCallback
     }
@@ -71,6 +75,6 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
   }
 
   private shouldTrackRequest (startContext: RequestStartContext): boolean {
-    return startContext.url !== this.configEndpoint && permittedPrefixes.some((prefix) => startContext.url.startsWith(prefix))
+    return !this.ignoredUrls.some(url => startContext.url.startsWith(url)) && permittedPrefixes.some((prefix) => startContext.url.startsWith(prefix))
   }
 }

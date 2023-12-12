@@ -121,3 +121,6 @@ maze_output.zip
 
 # React Native test fixure
 test/react-native/features/fixtures/generated/
+
+# React Native Android gradle files
+.gradle/

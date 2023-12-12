@@ -19,8 +19,10 @@ function flattenRoutes (routes: RouteObject[], _prefix: string = ''): string[] {
 
 export class ReactRouterRoutingProvider extends DefaultRoutingProvider {
   constructor (routes: RouteObject[], basename?: string) {
+    const normalizedBasename = !basename || basename === '/' ? '' : basename
+
     function resolveRoute (url: URL): string {
-      return flattenRoutes(routes).find((fullRoutePath) => matchPath(fullRoutePath, url.pathname.replace(basename ?? '', ''))?.pattern.path) || 'no-route-found'
+      return flattenRoutes(routes).find((fullRoutePath) => matchPath(fullRoutePath, url.pathname.replace(normalizedBasename ?? '', ''))?.pattern.path) || 'no-route-found'
     }
     super(resolveRoute)
   }

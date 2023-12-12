@@ -1,5 +1,4 @@
 import { InMemoryDelivery, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
-import { type AppStateStatus } from 'react-native/Libraries/AppState/AppState'
 import { createSpanAttributesSource } from '../lib/span-attributes-source'
 
 // eslint-disable-next-line jest/no-mocks-import
@@ -13,41 +12,8 @@ afterEach(() => {
 
 describe('spanAttributesSource', () => {
   describe('.requestAttributes()', () => {
-    it('sets the bugsnag.app.in_foreground attribute', async () => {
-      const mockAppState = { currentState: 'active' as AppStateStatus, isAvailable: true, addEventListener: jest.fn() }
-      const spanAttributesSource = createSpanAttributesSource(mockAppState)
-      const delivery = new InMemoryDelivery()
-      const testClient = createTestClient({ spanAttributesSource, deliveryFactory: () => delivery })
-
-      testClient.start({ apiKey: VALID_API_KEY })
-      testClient.startSpan('foreground span').end()
-
-      await jest.runOnlyPendingTimersAsync()
-
-      expect(delivery).toHaveSentSpan(expect.objectContaining({
-        name: 'foreground span',
-        attributes: expect.arrayContaining([
-          { key: 'bugsnag.app.in_foreground', value: { boolValue: true } }
-        ])
-      }))
-
-      mockAppState.currentState = 'background'
-
-      testClient.startSpan('background span').end()
-
-      await jest.runOnlyPendingTimersAsync()
-
-      expect(delivery).toHaveSentSpan(expect.objectContaining({
-        name: 'background span',
-        attributes: expect.arrayContaining([
-          { key: 'bugsnag.app.in_foreground', value: { boolValue: false } }
-        ])
-      }))
-    })
-
     it('sets the net.host.connection.type attribute', async () => {
-      const mockAppState = { currentState: 'active' as AppStateStatus, isAvailable: true, addEventListener: jest.fn() }
-      const spanAttributesSource = createSpanAttributesSource(mockAppState)
+      const spanAttributesSource = createSpanAttributesSource()
       const delivery = new InMemoryDelivery()
       const testClient = createTestClient({ spanAttributesSource, deliveryFactory: () => delivery })
 
@@ -59,7 +25,6 @@ describe('spanAttributesSource', () => {
       const deliveredSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
       expect(deliveredSpan.attributes).toStrictEqual(expect.arrayContaining([
         { key: 'bugsnag.span.category', value: { stringValue: 'custom' } },
-        { key: 'bugsnag.app.in_foreground', value: { boolValue: true } },
         { key: 'net.host.connection.type', value: { stringValue: 'cell' } },
         { key: 'net.host.connection.subtype', value: { stringValue: '4g' } },
         { key: 'bugsnag.sampling.p', value: { doubleValue: 1 } }
@@ -67,8 +32,7 @@ describe('spanAttributesSource', () => {
     })
 
     it('detects network changes and reports the latest net.host.connection.type attribute', async () => {
-      const mockAppState = { currentState: 'active' as AppStateStatus, isAvailable: true, addEventListener: jest.fn() }
-      const spanAttributesSource = createSpanAttributesSource(mockAppState)
+      const spanAttributesSource = createSpanAttributesSource()
       const delivery = new InMemoryDelivery()
       const testClient = createTestClient({ spanAttributesSource, deliveryFactory: () => delivery })
 
@@ -112,7 +76,6 @@ describe('spanAttributesSource', () => {
       const deliveredSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
       expect(deliveredSpan.attributes).toStrictEqual([
         { key: 'bugsnag.span.category', value: { stringValue: 'custom' } },
-        { key: 'bugsnag.app.in_foreground', value: { boolValue: true } },
         { key: 'net.host.connection.type', value: { stringValue: 'wifi' } },
         // net.host.connection.subtype should not be present for a wifi connection
         { key: 'bugsnag.sampling.p', value: { doubleValue: 1 } }

@@ -24,6 +24,7 @@ $logger.info("Building in #{BUILD_MODE} mode")
 PACKAGE_NAMES = [
   "@bugsnag/core-performance",
   "@bugsnag/browser-performance",
+  "@bugsnag/angular-performance",
   "@bugsnag/react-router-performance",
   "@bugsnag/vue-router-performance",
   "@bugsnag/delivery-fetch-performance",
@@ -33,6 +34,7 @@ PACKAGE_NAMES = [
 PACKAGE_DIRECTORIES = [
   "#{ROOT}/packages/core",
   "#{ROOT}/packages/platforms/browser",
+  "#{ROOT}/packages/angular",
   "#{ROOT}/packages/react-router",
   "#{ROOT}/packages/vue-router",
   "#{ROOT}/packages/delivery-fetch",
@@ -94,7 +96,7 @@ begin
 
     if BUILD_MODE == :npm
       # in NPM mode we need to also install the tarballs from 'npm pack'
-      install_command += " *.tgz"
+      run("npm install --no-package-lock --legacy-peer-deps *.tgz")
     else
       # in CDN mode we need to tell the JS build to also use CDN mode
       build_command = "USE_CDN_BUILD=1 " + build_command
