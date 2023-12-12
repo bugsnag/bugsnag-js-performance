@@ -1,7 +1,8 @@
-import { NavigationContextProvider, NavigationContext } from '../lib/navigation-context'
+import { type Span } from '@bugsnag/core-performance'
+import { fireEvent, render, screen } from '@testing-library/react-native'
 import React, { useContext } from 'react'
-import { View, Button } from 'react-native'
-import { render, screen, fireEvent } from '@testing-library/react-native'
+import { Button, View } from 'react-native'
+import { NavigationContext, NavigationContextProvider } from '../lib/navigation-context'
 
 beforeAll(() => {
   jest.useFakeTimers()
@@ -11,39 +12,41 @@ afterAll(() => {
   jest.useRealTimers()
 })
 
-function Example () {
+const createTestClient = (testSpan: Span) => ({
+  start: jest.fn(),
+  startSpan: jest.fn(),
+  startNavigationSpan: jest.fn(() => testSpan),
+  currentSpanContext: testSpan,
+  getPlugin: jest.fn()
+})
+
+const TestApp = () => {
   const { blockNavigationEnd, unblockNavigationEnd, triggerNavigationEnd } = useContext(NavigationContext)
 
   return (
-      <View>
-        <Button title="Trigger Navigation End" onPress={triggerNavigationEnd} />
-        <Button title="Block Navigation" onPress={blockNavigationEnd} />
-        <Button title="Unblock Navigation" onPress={unblockNavigationEnd} />
-      </View>
+    <View>
+      <Button title="Trigger Navigation End" onPress={triggerNavigationEnd} />
+      <Button title="Block Navigation" onPress={blockNavigationEnd} />
+      <Button title="Unblock Navigation" onPress={unblockNavigationEnd} />
+    </View>
   )
 }
 
 describe('NavigationContextProvider', () => {
-  const testSpan = {
-    id: 'test-id',
-    traceId: 'test-trace-id',
-    isValid: () => true,
-    end: jest.fn()
-  }
-
-  const client = {
-    start: jest.fn(),
-    startSpan: jest.fn(),
-    startNavigationSpan: jest.fn(() => testSpan),
-    currentSpanContext: testSpan,
-    getPlugin: jest.fn()
-  }
-
   it('Automatically creates a navigation span when currentRoute is provided', () => {
+    const testSpan = {
+      id: 'test-id',
+      traceId: 'test-trace-id',
+      isValid: () => true,
+      end: jest.fn()
+    }
+
+    const client = createTestClient(testSpan)
+
     render(
-        <NavigationContextProvider client={client} currentRoute="test-route" >
-            <Example />
-        </NavigationContextProvider>
+      <NavigationContextProvider client={client} currentRoute="test-route" >
+        <TestApp />
+      </NavigationContextProvider>
     )
 
     fireEvent.press(screen.getByText('Trigger Navigation End'))
@@ -52,9 +55,18 @@ describe('NavigationContextProvider', () => {
   })
 
   it('Prevents a navigation span from ending when navigation is blocked', () => {
+    const testSpan = {
+      id: 'test-id',
+      traceId: 'test-trace-id',
+      isValid: () => true,
+      end: jest.fn()
+    }
+
+    const client = createTestClient(testSpan)
+
     render(
         <NavigationContextProvider client={client} currentRoute="test-route" >
-            <Example />
+            <TestApp />
         </NavigationContextProvider>
     )
 
@@ -70,9 +82,18 @@ describe('NavigationContextProvider', () => {
   })
 
   it('Does not end a navigation span while multiple components are blocking', () => {
+    const testSpan = {
+      id: 'test-id',
+      traceId: 'test-trace-id',
+      isValid: () => true,
+      end: jest.fn()
+    }
+
+    const client = createTestClient(testSpan)
+
     render(
       <NavigationContextProvider client={client} currentRoute="test-route" >
-          <Example />
+          <TestApp />
       </NavigationContextProvider>
     )
 

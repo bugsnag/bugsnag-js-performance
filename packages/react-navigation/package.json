@@ -5,35 +5,34 @@
     "homepage": "https://www.bugsnag.com/",
     "license": "MIT",
     "repository": {
-      "type": "git",
-      "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+        "type": "git",
+        "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
     },
     "publishConfig": {
-      "access": "public"
+        "access": "public"
     },
     "scripts": {
-      "build": "rollup --config rollup.config.mjs",
-      "clean": "rm -rf dist/*"
+        "build": "rollup --config rollup.config.mjs",
+        "clean": "rm -rf dist/*"
     },
     "bugs": {
-      "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
+        "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
     },
     "devDependencies": {
-      "@bugsnag/react-native-performance": "*",
-      "@react-navigation/native": "^6.1.9",
-      "@testing-library/react-native": "^12.4.1",
-      "@testing-library/jest-native": "^5.4.3",
-      "react-native": "^0.73.0",
-      "react": "^18.2.0"
+        "@bugsnag/core-performance": "*",
+        "@bugsnag/react-native-performance": "*",
+        "@react-navigation/native": "^6.1.9",
+        "@testing-library/react-native": "^12.4.1"
     },
     "peerDependencies": {
-      "@bugsnag/core-performance": "*",
-      "@bugsnag/react-native-performance": "*",
-      "@react-navigation/native": "*"
+        "@bugsnag/core-performance": "*",
+        "@bugsnag/react-native-performance": "*",
+        "@react-navigation/native": "*"
     },
     "type": "module",
     "main": "dist/index.js",
     "types": "dist/types/index.d.ts",
-    "files": ["dist"]
-  }
-  
+    "files": [
+        "dist"
+    ]
+}
