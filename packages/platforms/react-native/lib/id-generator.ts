@@ -5,6 +5,12 @@ const POOL_SIZE = 1024
 
 const CALLS_BEFORE_POOL_REFRESH = 1000
 
+const isNativeModuleEnabled = (nativeModule: NativeBugsnag | null): nativeModule is NativeBugsnag => {
+  return nativeModule !== null &&
+  typeof nativeModule.requestEntropy === 'function' &&
+  typeof nativeModule.requestEntropyAsync === 'function'
+}
+
 export function toHex (value: number): string {
   const hex = value.toString(16)
 
@@ -28,8 +34,8 @@ export function createRandomString (): string {
 
 function createIdGenerator (NativeBugsnagPerformance: NativeBugsnag | null): IdGenerator {
   // If the native module is not available for any reason, fall back to a JS implementation
-  const requestEntropy = NativeBugsnagPerformance ? NativeBugsnagPerformance.requestEntropy : createRandomString
-  const requestEntropyAsync = NativeBugsnagPerformance ? NativeBugsnagPerformance.requestEntropyAsync : async () => createRandomString()
+  const requestEntropy = isNativeModuleEnabled(NativeBugsnagPerformance) ? NativeBugsnagPerformance.requestEntropy : createRandomString
+  const requestEntropyAsync = isNativeModuleEnabled(NativeBugsnagPerformance) ? NativeBugsnagPerformance.requestEntropyAsync : async () => createRandomString()
 
   // initialise the pool synchronously
   const randomValues = requestEntropy()
