@@ -10,7 +10,6 @@ steps:
         agents:
           queue: macos-12-arm
         env:
-          NODE_VERSION: 18
           RN_VERSION: "{{matrix}}"
           BUILD_ANDROID: "true"
         artifact_paths:
@@ -31,7 +30,6 @@ steps:
         agents:
           queue: macos-12-arm
         env:
-          NODE_VERSION: 18
           RN_VERSION: "{{matrix}}"
           RCT_NEW_ARCH_ENABLED: "true"
           BUILD_ANDROID: "true"
@@ -53,7 +51,6 @@ steps:
         agents:
           queue: "macos-12-arm"
         env:
-          NODE_VERSION: 18
           RN_VERSION: "{{matrix}}"
           BUILD_IOS: "true"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
@@ -75,7 +72,6 @@ steps:
         agents:
           queue: "macos-12-arm"
         env:
-          NODE_VERSION: 18
           RN_VERSION: "{{matrix}}"
           RCT_NEW_ARCH_ENABLED: "1"
           BUILD_IOS: "true"
