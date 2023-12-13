@@ -18,8 +18,8 @@ const paths = {
 const moduleNameMapper = Object.fromEntries(
   Object.entries(paths)
     .map(([name, directories]) => [
-        `^${name}$`,
-        directories.map(directory => directory.replace('./', '<rootDir>/'))
+          `^${name}$`,
+          directories.map(directory => directory.replace('./', '<rootDir>/'))
     ])
 )
 
@@ -69,7 +69,7 @@ module.exports = {
     {
       displayName: 'angular',
       preset: 'jest-preset-angular',
-      setupFilesAfterEnv: ['<rootDir>/jest/setup-jest-angular.ts'],
+      setupFilesAfterEnv: ['<rootDir>/jest/setup/angular.ts'],
       testMatch: ['<rootDir>/packages/angular/**/*.test.ts'],
       ...defaultModuleConfig,
       transformIgnorePatterns: ['/node_modules/(?!(@angular)/)']
@@ -77,11 +77,17 @@ module.exports = {
     {
       displayName: 'react-native',
       preset: 'react-native',
-      testMatch: ['<rootDir>/packages/platforms/react-native/**/*.test.ts'],
+      testMatch: ['<rootDir>/packages/platforms/react-native/tests/**/*.test.ts'],
       coveragePathIgnorePatterns: ['<rootDir>/packages/core', '<rootDir>/packages/platforms/browser', '<rootDir>/packages/delivery-fetch'],
       moduleNameMapper,
       transform: {
-        '^.+\\.m?[tj]sx?$': [
+        '^.+\\.jsx?$': [
+          'babel-jest',
+          {
+            presets: ['module:metro-react-native-babel-preset']
+          }
+        ],
+        '^.+\\.m?tsx?$': [
           'ts-jest',
           {
             tsconfig: { paths },
@@ -91,7 +97,8 @@ module.exports = {
           }
         ]
       }
-    }
+    },
+    '<rootDir>/jest/config/react-navigation.js'
   ],
   collectCoverageFrom: [
     '**/packages/*/**/*.ts',
