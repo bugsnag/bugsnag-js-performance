@@ -11,6 +11,8 @@ const config = createRollupConfig({
     '@react-native-community/netinfo',
     '@react-navigation/native',
     'react',
+    'react-native',
+    'react-native-file-access'
   ]
 })
 

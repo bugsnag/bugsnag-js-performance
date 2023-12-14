@@ -9,7 +9,7 @@ import {
   NetInfoStateType,
   notifyNetworkStateChange,
   resetEventListeners
-} from '../../__mocks__/@react-native-community/netinfo'
+} from '../../../../../__mocks__/@react-native-community/netinfo'
 
 afterEach(resetEventListeners)
 
@@ -78,7 +78,7 @@ describe('File based retry queue factory', () => {
 
     const validEndTime = BigInt(Date.now()) * BigInt(1_000_000)
     const payload = createPayload({ spanId: 'abcd', endTimeUnixNano: validEndTime.toString() })
-    await queue.add(payload, 0)
+    queue.add(payload, 0)
 
     expect(delivery.requests).toHaveLength(0)
 
@@ -100,7 +100,7 @@ describe('File based retry queue factory', () => {
 
     const validEndTime = BigInt(Date.now()) * BigInt(1_000_000)
     const payload = createPayload({ spanId: 'abcd', endTimeUnixNano: validEndTime.toString() })
-    await queue.add(payload, 0)
+    queue.add(payload, 0)
 
     expect(delivery.requests).toHaveLength(0)
 
