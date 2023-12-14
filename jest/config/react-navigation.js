@@ -7,7 +7,6 @@ const paths = {
   '@bugsnag/core-performance': ['../../packages/core/lib/index.ts'],
   '@bugsnag/delivery-fetch-performance': ['../../packages/delivery-fetch/lib/delivery.ts'],
   '@bugsnag/react-native-performance': ['../../packages/platforms/react-native/lib/index.ts'],
-  '@bugsnag/request-tracker-performance': ['../../packages/request-tracker/lib/index.ts']
 }
 
 const moduleNameMapper = {
