@@ -9,7 +9,7 @@ import {
   NetInfoStateType,
   notifyNetworkStateChange,
   resetEventListeners
-} from '../../../../../__mocks__/@react-native-community/netinfo'
+} from '../../__mocks__/@react-native-community/netinfo'
 
 afterEach(resetEventListeners)
 

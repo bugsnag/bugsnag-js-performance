@@ -4,15 +4,8 @@ import jsx from 'acorn-jsx'
 
 const config = createRollupConfig({
   external: [
-    '@bugsnag/cuid',
-    '@bugsnag/delivery-fetch-performance',
     '@bugsnag/react-native-performance',
-    '@bugsnag/request-tracker-performance',
-    '@react-native-community/netinfo',
-    '@react-navigation/native',
-    'react',
-    'react-native',
-    'react-native-file-access'
+    '@react-navigation/native'
   ]
 })
 
