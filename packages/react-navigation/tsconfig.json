@@ -1,5 +1,9 @@
 {
     "extends": "../../tsconfig.json",
-    "include": ["lib/*"]
+    "include": ["lib/*"],
+    "compilerOptions": {
+      "target": "ES2020",
+      "types": ["node", "jest", "../../../cuid"]
+    }
   }
   

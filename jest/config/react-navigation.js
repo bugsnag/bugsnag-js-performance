@@ -5,12 +5,16 @@ const path = require('path')
 // we want to run Jest against the TS source
 const paths = {
   '@bugsnag/core-performance': ['../../packages/core/lib/index.ts'],
-  '@bugsnag/react-native-performance': ['../../packages/platforms/react-native/lib/index.ts']
+  '@bugsnag/delivery-fetch-performance': ['../../packages/delivery-fetch/lib/delivery.ts'],
+  '@bugsnag/react-native-performance': ['../../packages/platforms/react-native/lib/index.ts'],
+  '@bugsnag/request-tracker-performance': ['../../packages/request-tracker/lib/index.ts']
 }
 
 const moduleNameMapper = {
   '^@bugsnag/core-performance$': path.join(__dirname, '../../packages/core/lib/index.ts'),
-  '^@bugsnag/react-native-performance$': path.join(__dirname, '../../packages/platforms/react-native/lib/index.ts')
+  '^@bugsnag/delivery-fetch-performance$': path.join(__dirname, '../../packages/delivery-fetch/lib/delivery.ts'),
+  '^@bugsnag/react-native-performance$': path.join(__dirname, '../../packages/platforms/react-native/lib/index.ts'),
+  '^@bugsnag/request-tracker-performance$': path.join(__dirname, '../../packages/request-tracker/lib/index.ts')
 }
 
 module.exports = {
@@ -22,6 +26,7 @@ module.exports = {
     '<rootDir>/**/*.test.tsx'
   ],
   moduleNameMapper,
+  setupFilesAfterEnv: ['../../jest/setup/react-navigation.js'],
   transform: {
     '^.+\\.jsx?$': [
       'babel-jest',
