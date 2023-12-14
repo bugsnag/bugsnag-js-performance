@@ -3,7 +3,7 @@ import { type AppStateStatus } from 'react-native/Libraries/AppState/AppState'
 import { createSpanAttributesSource } from '../lib/span-attributes-source'
 
 // eslint-disable-next-line jest/no-mocks-import
-import { NetInfoCellularGeneration, NetInfoStateType, notifyNetworkStateChange, resetEventListeners } from '../__mocks__/@react-native-community/netinfo'
+import { NetInfoCellularGeneration, NetInfoStateType, notifyNetworkStateChange, resetEventListeners } from '../../../../__mocks__/@react-native-community/netinfo'
 
 jest.useFakeTimers()
 
