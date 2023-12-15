@@ -5,7 +5,8 @@ import jsx from 'acorn-jsx'
 const config = createRollupConfig({
   external: [
     '@bugsnag/react-native-performance',
-    '@react-navigation/native'
+    '@react-navigation/native',
+    '@react-navigation/native-stack'
   ]
 })
 
