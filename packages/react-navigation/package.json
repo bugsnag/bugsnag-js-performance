@@ -20,9 +20,7 @@
     },
     "devDependencies": {
         "@bugsnag/core-performance": "*",
-        "@bugsnag/delivery-fetch-performance": "*",
         "@bugsnag/react-native-performance": "*",
-        "@bugsnag/request-tracker-performance": "*",
         "@react-navigation/native": "^6.1.9",
         "@react-navigation/native-stack": "^6.9.17",
         "@react-native/babel-preset": "^0.74.0",
