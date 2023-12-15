@@ -1,7 +1,5 @@
 const path = require('path')
 
-// const { defaults } = require('jest-config')
-
 // these paths must be specified because otherwise typescript relies on the
 // "main" field in each package.json file, which points to the compiled JS and
 // we want to run Jest against the TS source
@@ -32,11 +30,6 @@ module.exports = {
     ...internalModuleMap,
     '\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': 'identity-obj-proxy'
   },
-  setupFiles: [
-    // 'react-native-gesture-handler/jestSetup.js',
-    // '../../jest/setup/react-navigation.ts'
-  ],
-  // transformIgnorePatterns: [],
   transform: {
     '^.+\\.jsx?$': [
       'babel-jest',
