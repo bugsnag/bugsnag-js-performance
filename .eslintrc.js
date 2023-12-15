@@ -80,7 +80,9 @@ module.exports = {
       }
     },
     {
-      files: ['**/*.test.tsx?'],
+      files: [
+        '**/*.test.ts?(x)'
+      ],
       env: {
         jest: true,
         browser: true

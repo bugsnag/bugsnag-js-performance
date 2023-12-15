@@ -20,14 +20,14 @@ describe('createNavigationContainer', () => {
     )
 
     fireEvent.press(screen.getByText('Go to route 2'))
-    
+
     expect(screen.getByText('Route 2')).toBeOnTheScreen()
-    
+
     expect(BugsnagPerformance.startNavigationSpan).toHaveBeenCalledTimes(1)
     expect(BugsnagPerformance.startNavigationSpan).toHaveBeenCalledWith('Route 2')
-    
+
     fireEvent.press(screen.getByText('Go back'))
-    
+
     expect(screen.getByText('Route 1')).toBeOnTheScreen()
 
     expect(BugsnagPerformance.startNavigationSpan).toHaveBeenCalledTimes(2)
