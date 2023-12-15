@@ -4,7 +4,6 @@ import FileSystemFake from '../utilities/file-system-fake'
 import { InMemoryDelivery, makePayloadCreator } from '@bugsnag/js-performance-test-utilities'
 import { AppState } from 'react-native'
 
-// eslint-disable-next-line jest/no-mocks-import
 import {
   NetInfoStateType,
   notifyNetworkStateChange,
