@@ -1,11 +1,11 @@
+import BugsnagPerformance from '@bugsnag/react-native-performance'
 import { NavigationContainer, type ParamListBase } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import '@testing-library/jest-native/extend-expect'
 import { fireEvent, render, screen } from '@testing-library/react-native'
+import * as React from 'react'
 import { Button, Text, View } from 'react-native'
 import { createNavigationContainer } from '../lib/create-navigation-container'
-
-import '@testing-library/jest-native/extend-expect'
-import BugsnagPerformance from '@bugsnag/react-native-performance'
 
 jest.mock('@bugsnag/react-native-performance')
 

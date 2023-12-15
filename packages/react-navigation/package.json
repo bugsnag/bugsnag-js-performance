@@ -24,8 +24,11 @@
         "@bugsnag/react-native-performance": "*",
         "@bugsnag/request-tracker-performance": "*",
         "@react-navigation/native": "^6.1.9",
+        "@react-navigation/native-stack": "^6.9.17",
         "@react-native/babel-preset": "^0.74.0",
-        "@testing-library/react-native": "^12.4.1"
+        "@testing-library/react-native": "^12.4.1",
+        "@testing-library/jest-native": "^5.4.3",
+        "identity-obj-proxy": "^3.0.0"
     },
     "peerDependencies": {
         "@bugsnag/core-performance": "*",
