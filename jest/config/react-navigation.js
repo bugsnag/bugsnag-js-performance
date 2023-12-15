@@ -1,7 +1,5 @@
 const path = require('path')
 
-// const { defaults } = require('jest-config')
-
 // these paths must be specified because otherwise typescript relies on the
 // "main" field in each package.json file, which points to the compiled JS and
 // we want to run Jest against the TS source
