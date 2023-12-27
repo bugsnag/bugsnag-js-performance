@@ -1,5 +1,9 @@
 # Changelog
 
+## TBD
+
+- (browser) Export noops from browser package when window or document is undefined [#390](https://github.com/bugsnag/bugsnag-js-performance/pull/390)
+
 ## v2.1.0 (2023-12-12)
 
 ### Fixed
