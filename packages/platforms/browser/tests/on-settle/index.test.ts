@@ -5,10 +5,11 @@
 import {
   IncrementingClock,
   VALID_API_KEY,
-  createTestClient
+  createTestClient,
+  createConfiguration
 } from '@bugsnag/js-performance-test-utilities'
 import { type BrowserConfiguration, type BrowserSchema, createSchema } from '../../lib/config'
-import createOnSettle from '../../lib/on-settle'
+import createOnSettle, { createNoopOnSettle } from '../../lib/on-settle'
 import {
   RequestTracker,
   type RequestEndContext,
@@ -422,5 +423,15 @@ describe('onSettle', () => {
 
     await jest.advanceTimersByTimeAsync(100)
     expect(settleCallback).toHaveBeenCalled()
+  })
+})
+
+describe('createNoopOnSettle', () => {
+  it('implements the expected API', () => {
+    expect(() => {
+      const noopOnSettle = createNoopOnSettle()
+      noopOnSettle(() => {})
+      noopOnSettle.configure(createConfiguration())
+    }).not.toThrow()
   })
 })

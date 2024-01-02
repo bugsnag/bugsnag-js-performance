@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { createDefaultRoutingProvider, defaultRouteResolver } from '../lib/default-routing-provider'
+import { createDefaultRoutingProvider, createNoopRoutingProvider, defaultRouteResolver } from '../lib/default-routing-provider'
 
 jest.useFakeTimers()
 
@@ -81,5 +81,19 @@ describe('DefaultRoutingProvider', () => {
       expect(route).toBe('new route')
       expect(routeResolver).toHaveBeenCalled()
     })
+  })
+})
+
+describe('noopRoutingProvider', () => {
+  it('implements the expected API', () => {
+    expect(() => {
+      const NoopRoutingProvider = createNoopRoutingProvider()
+      const routeResolver = jest.fn(() => 'new route')
+      const routingProvider = new NoopRoutingProvider(routeResolver)
+
+      routingProvider.listenForRouteChanges(jest.fn())
+      expect(routingProvider.resolveRoute(new URL(window.location.href))).toBe('new route')
+      expect(routeResolver).toHaveBeenCalled()
+    }).not.toThrow()
   })
 })
