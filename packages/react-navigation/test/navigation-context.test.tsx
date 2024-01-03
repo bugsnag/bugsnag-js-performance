@@ -1,9 +1,9 @@
+import { type Span } from '@bugsnag/core-performance'
+import BugsnagPerformance from '@bugsnag/react-native-performance'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import React, { useContext } from 'react'
 import { Button, View } from 'react-native'
 import { NavigationContext, NavigationContextProvider } from '../lib/navigation-context'
-import BugsnagPerformance from '@bugsnag/react-native-performance'
-import { type Span } from '@bugsnag/core-performance'
 
 // Get the latest span from the context stack
 function getCurrentSpan () {
