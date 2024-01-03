@@ -1,8 +1,8 @@
-import { type Span } from '@bugsnag/core-performance'
 import { fireEvent, render, screen } from '@testing-library/react-native'
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { Button, View } from 'react-native'
 import { NavigationContext, NavigationContextProvider } from '../lib/navigation-context'
+import { createTestClient, createTestSpan } from './utils'
 
 beforeAll(() => {
   jest.useFakeTimers()
@@ -10,14 +10,6 @@ beforeAll(() => {
 
 afterAll(() => {
   jest.useRealTimers()
-})
-
-const createTestClient = (testSpan: Span) => ({
-  start: jest.fn(),
-  startSpan: jest.fn(),
-  startNavigationSpan: jest.fn(() => testSpan),
-  currentSpanContext: testSpan,
-  getPlugin: jest.fn()
 })
 
 const TestApp = () => {
@@ -34,17 +26,11 @@ const TestApp = () => {
 
 describe('NavigationContextProvider', () => {
   it('Automatically creates a navigation span when currentRoute is provided', () => {
-    const testSpan = {
-      id: 'test-id',
-      traceId: 'test-trace-id',
-      isValid: () => true,
-      end: jest.fn()
-    }
-
-    const client = createTestClient(testSpan)
+    const testSpan = createTestSpan()
+    const testClient = createTestClient(testSpan)
 
     render(
-      <NavigationContextProvider client={client} currentRoute="test-route" >
+      <NavigationContextProvider client={testClient} currentRoute="test-route" >
         <TestApp />
       </NavigationContextProvider>
     )
@@ -55,19 +41,13 @@ describe('NavigationContextProvider', () => {
   })
 
   it('Prevents a navigation span from ending when navigation is blocked', () => {
-    const testSpan = {
-      id: 'test-id',
-      traceId: 'test-trace-id',
-      isValid: () => true,
-      end: jest.fn()
-    }
-
-    const client = createTestClient(testSpan)
+    const testSpan = createTestSpan()
+    const testClient = createTestClient(testSpan)
 
     render(
-        <NavigationContextProvider client={client} currentRoute="test-route" >
-            <TestApp />
-        </NavigationContextProvider>
+      <NavigationContextProvider client={testClient} currentRoute="test-route" >
+        <TestApp />
+      </NavigationContextProvider>
     )
 
     fireEvent.press(screen.getByText('Trigger Navigation End'))
@@ -82,18 +62,12 @@ describe('NavigationContextProvider', () => {
   })
 
   it('Does not end a navigation span while multiple components are blocking', () => {
-    const testSpan = {
-      id: 'test-id',
-      traceId: 'test-trace-id',
-      isValid: () => true,
-      end: jest.fn()
-    }
-
-    const client = createTestClient(testSpan)
+    const testSpan = createTestSpan()
+    const testClient = createTestClient(testSpan)
 
     render(
-      <NavigationContextProvider client={client} currentRoute="test-route" >
-          <TestApp />
+      <NavigationContextProvider client={testClient} currentRoute="test-route" >
+        <TestApp />
       </NavigationContextProvider>
     )
 
