@@ -8,10 +8,15 @@ const paths = {
   '@bugsnag/react-native-performance': ['../../packages/platforms/react-native/lib/index.ts']
 }
 
-const moduleNameMapper = {
-  '^@bugsnag/core-performance$': path.join(__dirname, '../../packages/core/lib/index.ts'),
-  '^@bugsnag/react-native-performance$': path.join(__dirname, '../../packages/platforms/react-native/lib/index.ts')
-}
+// convert the tsconfig "paths" option into Jest's "moduleNameMapper" option
+// e.g.: "{ 'path': ['./a/b'] }" -> "{ '^path$': ['<rootDir>/a/b'] }"
+const internalModuleMap = Object.fromEntries(
+  Object.entries(paths)
+    .map(([name, directories]) => [
+      `^${name}$`,
+      directories.map(directory => path.join(__dirname, directory))
+    ])
+)
 
 module.exports = {
   rootDir: '../../packages/react-navigation',
@@ -21,12 +26,15 @@ module.exports = {
     '<rootDir>/**/*.test.ts',
     '<rootDir>/**/*.test.tsx'
   ],
-  moduleNameMapper,
+  moduleNameMapper: {
+    ...internalModuleMap,
+    '\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': 'identity-obj-proxy'
+  },
   transform: {
     '^.+\\.jsx?$': [
       'babel-jest',
       {
-        presets: ['module:@react-native/babel-preset']
+        presets: ['module:metro-react-native-babel-preset']
       }
     ],
     '^.+\\.tsx?$': [
@@ -34,7 +42,7 @@ module.exports = {
       {
         tsconfig: { paths },
         babelConfig: {
-          presets: ['module:@react-native/babel-preset']
+          presets: ['module:metro-react-native-babel-preset']
         }
       }
     ]
