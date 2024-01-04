@@ -1,23 +1,13 @@
 import jsx from 'acorn-jsx'
 import fs from 'fs'
 import createRollupConfig from '../../../.rollup/index.mjs'
-
-// when functional components are used in JSX tags, rollup doesn't recognise them as actually being used and tree-shakes them away
-// this plugin prevents that from happening by explicity telling rollup not to tree-shake the module
-function noTreeShakingPlugin () {
-  return {
-    name: 'no-treeshaking-plugin',
-    transform (code, id) {
-      if (id.indexOf('app-start-plugin.tsx') >= 0) return { moduleSideEffects: 'no-treeshake' }
-    }
-  }
-}
+import noTreeShakingPlugin from '../../../.rollup/no-tree-shaking.plugin.mjs'
 
 // output the react native turbo module spec file as a prebuilt chunk
-function reactNativeSpecPlugin () {
+function reactNativeSpecPlugin() {
   return {
     name: 'react-native-spec-plugin',
-    buildStart () { 
+    buildStart() {
       this.emitFile({
         type: 'prebuilt-chunk',
         fileName: 'NativeBugsnagPerformance.ts',
@@ -39,7 +29,7 @@ const config = createRollupConfig({
   ]
 })
 
-config.plugins = config.plugins.concat([noTreeShakingPlugin(), reactNativeSpecPlugin()])
+config.plugins = config.plugins.concat([noTreeShakingPlugin(['app-start-plugin.tsx']), reactNativeSpecPlugin()])
 config.acornInjectPlugins = [jsx()]
 
 export default config
