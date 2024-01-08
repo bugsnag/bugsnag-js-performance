@@ -21,7 +21,6 @@ describe('CompleteNavigation', () => {
     expect(blockNavigationEnd).toHaveBeenCalled()
 
     // wait for next tick
-    // Can we do this with real timers? maybe await a promise?
     jest.advanceTimersByTime(1)
 
     expect(unblockNavigationEnd).toHaveBeenCalled()
@@ -48,7 +47,6 @@ describe('CompleteNavigation', () => {
     expect(blockNavigationEnd).toHaveBeenCalled()
 
     // wait for next tick
-    // Can we do this with real timers? maybe await a promise?
     jest.advanceTimersByTime(1)
 
     expect(unblockNavigationEnd).not.toHaveBeenCalled()

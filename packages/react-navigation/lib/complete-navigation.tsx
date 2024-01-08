@@ -5,7 +5,7 @@ interface Props extends PropsWithChildren {
   on: 'mount' | 'unmount';
 }
 
-/** Do some cool stuff */
+/** End the current navigation span when the component is mounted, unmounted or the `on` prop is `true` */
 export class CompleteNavigation extends React.Component<Props> {
   static contextType = NavigationContext;
   
