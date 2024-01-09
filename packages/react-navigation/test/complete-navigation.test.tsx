@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react-native'
-import { CompleteNavigation } from '../lib/complete-navigation'
-import { NavigationContext } from '../lib/navigation-context'
 import React, { useState } from 'react'
 import { Button } from 'react-native'
+import { CompleteNavigation } from '../lib/complete-navigation'
+import { NavigationContext } from '../lib/navigation-context'
 
 jest.useFakeTimers()
 

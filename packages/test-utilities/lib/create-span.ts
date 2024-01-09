@@ -1,10 +1,11 @@
 import {
-  type SpanEnded,
-  type SpanProbability,
-  type ScaledProbability,
   SpanAttributes,
+  SpanEvents,
   traceIdToSamplingRate,
-  SpanEvents
+  type ScaledProbability,
+  type Span,
+  type SpanEnded,
+  type SpanProbability
 } from '@bugsnag/core-performance'
 import { randomBytes } from 'crypto'
 
@@ -12,6 +13,15 @@ export function createSamplingProbability (rawProbability: number): SpanProbabil
   return {
     raw: rawProbability,
     scaled: Math.floor(rawProbability * 0xffffffff) as ScaledProbability
+  }
+}
+
+export function createSpan (name: string): Span {
+  return {
+    id: 'test-id',
+    traceId: 'test-trace-id',
+    isValid: () => true,
+    end: jest.fn()
   }
 }
 

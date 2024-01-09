@@ -1,18 +1,13 @@
-const testSpan = {
-  id: 'test-id',
-  traceId: 'test-trace-id',
-  isValid: () => true,
-  end: jest.fn()
-}
+import { createSpan, createTestClient } from '@bugsnag/js-performance-test-utilities'
 
-const createTestClient = () => ({
-  start: jest.fn(),
-  startSpan: jest.fn(() => testSpan),
-  startNavigationSpan: jest.fn(() => testSpan),
-  currentSpanContext: testSpan,
-  getPlugin: jest.fn()
+const client = createTestClient({
+  platformExtensions: (spanFactory, spanContextStorage) => ({
+    startNavigationSpan: jest.fn((name) => {
+      const span = createSpan(name)
+      spanContextStorage.push(span)
+      return span
+    })
+  })
 })
-
-const client = createTestClient()
 
 export default client

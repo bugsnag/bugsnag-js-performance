@@ -7,8 +7,6 @@ import * as React from 'react'
 import { Button, Text, View } from 'react-native'
 import { createNavigationContainer } from '../lib/create-navigation-container'
 
-jest.mock('@bugsnag/react-native-performance')
-
 describe('createNavigationContainer', () => {
   it('creates a navigation span when the route changes', () => {
     const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer)
