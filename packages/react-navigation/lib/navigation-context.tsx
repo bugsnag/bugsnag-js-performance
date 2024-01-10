@@ -19,6 +19,8 @@ interface State {
   lastRenderTime: number
 }
 
+const DISCARDED = -1;
+
 export class NavigationContextProvider extends React.Component<Props, State> {
   private currentSpan: Span | undefined;
   private timerRef: NodeJS.Timeout | undefined;
@@ -63,7 +65,14 @@ export class NavigationContextProvider extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props) {
     const { currentRoute, client } = this.props;
 
-    if (currentRoute && currentRoute !== this.state.previousRoute) {
+    if (currentRoute && currentRoute !== prevProps.currentRoute) {
+
+      // If there is already an active navigation span, end it with an 
+      // invalid time to cause it to be discarded from the context stack.
+      if (this.currentSpan) {
+        this.currentSpan.end(DISCARDED);
+      }
+
       this.currentSpan = client.startNavigationSpan(currentRoute);
 
       this.setState(prevState => ({

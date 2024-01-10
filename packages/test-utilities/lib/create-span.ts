@@ -18,6 +18,8 @@ export function createSamplingProbability (rawProbability: number): SpanProbabil
 
 export function createSpan (name: string): Span {
   return {
+    // @ts-expect-error added property for testing purposes
+    name,
     id: 'test-id',
     traceId: 'test-trace-id',
     isValid: () => true,
