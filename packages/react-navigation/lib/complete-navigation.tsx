@@ -9,7 +9,7 @@ interface Props extends PropsWithChildren {
 export class CompleteNavigation extends React.Component<Props> {
   static contextType = NavigationContext;
   
-  context!: React.ContextType<typeof NavigationContext>;
+  declare context: React.ContextType<typeof NavigationContext>;
 
   constructor(props: Props, context: React.ContextType<typeof NavigationContext>) {
     super(props);
