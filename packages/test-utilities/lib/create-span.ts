@@ -3,7 +3,6 @@ import {
   SpanEvents,
   traceIdToSamplingRate,
   type ScaledProbability,
-  type Span,
   type SpanEnded,
   type SpanProbability
 } from '@bugsnag/core-performance'
@@ -13,17 +12,6 @@ export function createSamplingProbability (rawProbability: number): SpanProbabil
   return {
     raw: rawProbability,
     scaled: Math.floor(rawProbability * 0xffffffff) as ScaledProbability
-  }
-}
-
-export function createSpan (name: string): Span {
-  return {
-    // @ts-expect-error added property for testing purposes
-    name,
-    id: 'test-id',
-    traceId: 'test-trace-id',
-    isValid: () => true,
-    end: jest.fn()
   }
 }
 
