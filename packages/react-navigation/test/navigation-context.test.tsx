@@ -48,11 +48,7 @@ const Route = () => {
   )
 }
 
-interface AppProps {
-  client: typeof client
-}
-
-const App = ({ client }: AppProps) => {
+const App = () => {
   const [currentRoute, setCurrentRoute] = React.useState('initial-route')
 
   return (
@@ -66,16 +62,15 @@ const App = ({ client }: AppProps) => {
 
 describe('NavigationContextProvider', () => {
   it('Creates a navigation span when the currentRoute changes', async () => {
-    client.start({ apiKey: VALID_API_KEY })
+    render(<App />)
 
-    render(<App client={client} />)
+    client.start({ apiKey: VALID_API_KEY })
 
     // Initial route should not create a span
     expect(getCurrentSpan()).toBeUndefined()
 
     // Route change should create a navigation span
     fireEvent.press(screen.getByText('Change to route 1'))
-    fireEvent.press(screen.getByText('Trigger Navigation End'))
     const span = getCurrentSpan()
     expect(span.name).toBe('[Navigation]route-1')
 
@@ -89,9 +84,9 @@ describe('NavigationContextProvider', () => {
   })
 
   it('Discards the active navigation span when the route changes', async () => {
-    client.start({ apiKey: VALID_API_KEY })
+    render(<App />)
 
-    render(<App client={client} />)
+    client.start({ apiKey: VALID_API_KEY })
 
     // Change to a new route and block navigation
     fireEvent.press(screen.getByText('Change to route 1'))
@@ -120,9 +115,9 @@ describe('NavigationContextProvider', () => {
   })
 
   it('Prevents a navigation span from ending when navigation is blocked', async () => {
-    client.start({ apiKey: VALID_API_KEY })
+    render(<App />)
 
-    render(<App client={client} />)
+    client.start({ apiKey: VALID_API_KEY })
 
     // Start a navigation
     fireEvent.press(screen.getByText('Change to route 1'))
@@ -141,9 +136,9 @@ describe('NavigationContextProvider', () => {
   })
 
   it('Does not end a navigation span while multiple components are blocking', async () => {
-    client.start({ apiKey: VALID_API_KEY })
+    render(<App />)
 
-    render(<App client={client} />)
+    client.start({ apiKey: VALID_API_KEY })
 
     fireEvent.press(screen.getByText('Change to route 1'))
     const navigationSpan = getCurrentSpan()
