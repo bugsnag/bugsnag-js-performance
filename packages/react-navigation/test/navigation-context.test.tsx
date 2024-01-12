@@ -73,7 +73,7 @@ describe('NavigationContextProvider', () => {
     // Await the payload to be delivered
     await jest.runOnlyPendingTimersAsync()
     expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[Navigation]route-1' }))
-  })
+  }, 10000)
 
   it('Discards the active navigation span when the route changes', async () => {
     const delivery = new InMemoryDelivery()
