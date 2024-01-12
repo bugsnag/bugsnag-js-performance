@@ -1,10 +1,11 @@
 import { type Span } from '@bugsnag/core-performance'
-import { InMemoryDelivery, VALID_API_KEY, createTestClient, reactNativePlatformExtensions } from '@bugsnag/js-performance-test-utilities'
+import { InMemoryDelivery, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import type BugsnagPerformance from '@bugsnag/react-native-performance'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import React, { useContext } from 'react'
 import { Button, View } from 'react-native'
 import { NavigationContext, NavigationContextProvider } from '../lib/navigation-context'
+import reactNativePlatformExtensions from './utils/react-native-platform-extensions'
 
 beforeAll(() => {
   jest.useFakeTimers()
