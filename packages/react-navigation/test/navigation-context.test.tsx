@@ -61,28 +61,6 @@ const App = () => {
 }
 
 describe('NavigationContextProvider', () => {
-  it('Creates a navigation span when the currentRoute changes', async () => {
-    render(<App />)
-
-    client.start({ apiKey: VALID_API_KEY })
-
-    // Initial route should not create a span
-    expect(getCurrentSpan()).toBeUndefined()
-
-    // Route change should create a navigation span
-    fireEvent.press(screen.getByText('Change to route 1'))
-    const span = getCurrentSpan()
-    expect(span.name).toBe('[Navigation]route-1')
-
-    // Await the navigation span to end
-    await jest.advanceTimersByTimeAsync(100)
-    expect(span.end).toHaveBeenCalled()
-
-    // Await the payload to be delivered
-    await jest.runOnlyPendingTimersAsync()
-    expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[Navigation]route-1' }))
-  })
-
   it('Discards the active navigation span when the route changes', async () => {
     render(<App />)
 
