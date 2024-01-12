@@ -75,6 +75,7 @@ describe('NavigationContextProvider', () => {
 
     // Route change should create a navigation span
     fireEvent.press(screen.getByText('Change to route 1'))
+    fireEvent.press(screen.getByText('Trigger Navigation End'))
     const span = getCurrentSpan()
     expect(span.name).toBe('[Navigation]route-1')
 
