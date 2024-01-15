@@ -1,12 +1,6 @@
 import type { BugsnagPerformance, Span } from '@bugsnag/core-performance';
-import type { ReactNativeConfiguration, PlatformExtensions } from '@bugsnag/react-native-performance';
-import React, {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import type { PlatformExtensions, ReactNativeConfiguration } from '@bugsnag/react-native-performance';
+import React, { PropsWithChildren } from 'react';
 
 export const NavigationContext = React.createContext({
   blockNavigationEnd: () => {},
@@ -19,67 +13,86 @@ interface Props extends PropsWithChildren {
   client: BugsnagPerformance<ReactNativeConfiguration, PlatformExtensions>
 }
 
-export function NavigationContextProvider({ currentRoute, client, ...rest }: Props) {
-  const span = useRef<Span>();
-  const timerRef = React.useRef<NodeJS.Timeout>();
+interface State {
+  componentsLoading: number
+  previousRoute?: string
+  lastRenderTime: number
+}
 
-  const [componentsLoading, setComponentsLoading] = useState(0)
-  const [lastRenderTime, setLastRenderTime] = useState(performance.now()) // is there a better way to get the initial render time?
+export class NavigationContextProvider extends React.Component<Props, State> {
+  private currentSpan: Span | undefined;
+  private timerRef: NodeJS.Timeout | undefined;
 
-  const blockNavigationEnd = useCallback(() => {
-    setComponentsLoading(prev => prev + 1);
-    setLastRenderTime(0)
-  }, []);
+  state = {
+    previousRoute: undefined,
+    componentsLoading: 0,
+    lastRenderTime: performance.now()
+  };
 
-  const unblockNavigationEnd = useCallback(() => {
-    setComponentsLoading(prev => Math.max(prev - 1, 0));
-    setLastRenderTime(performance.now())
-  }, []);
+  blockNavigationEnd = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      componentsLoading: prevState.componentsLoading + 1,
+      lastRenderTime: 0
+    }));
+  };
 
-  // End the current span in 100ms if no more components are loading
-  const triggerNavigationEnd = useCallback(() => {
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      if (componentsLoading === 0) {
-        if (span.current) {
-          span.current.end(lastRenderTime);
-          span.current = undefined;
-        }
+  unblockNavigationEnd = () => {
+    this.setState(prevState => ({
+      ...prevState,
+      componentsLoading: Math.max(prevState.componentsLoading - 1, 0),
+      lastRenderTime: performance.now()
+    }), () => {
+      if (this.state.componentsLoading === 0) {
+        this.triggerNavigationEnd()
+      }
+    });
+  };
+
+  triggerNavigationEnd = () => {
+    clearTimeout(this.timerRef);
+
+    this.timerRef = setTimeout(() => {
+      if (this.state.componentsLoading === 0 && this.currentSpan) {
+        this.currentSpan.end(this.state.lastRenderTime);
+        this.currentSpan = undefined;
       }
     }, 100);
-  }, [lastRenderTime, componentsLoading]);
+  };
 
-  // On route update, start a new span
-  useEffect(() => {
-    if (currentRoute) {
-      span.current = client.startNavigationSpan(currentRoute); // TODO: can we pass a reference to BugsnagPerformance instead of importing?
+  componentDidUpdate(prevProps: Props) {
+    const { currentRoute, client } = this.props;
 
-      // on next tick, trigger navigation end
+    if (currentRoute && currentRoute !== this.state.previousRoute) {
+      this.currentSpan = client.startNavigationSpan(currentRoute);
+
+      this.setState(prevState => ({
+        ...prevState,
+        previousRoute: currentRoute
+      }))
+
       setTimeout(() => {
-        triggerNavigationEnd();
+        this.triggerNavigationEnd();
       });
     }
-  }, [currentRoute, triggerNavigationEnd]);
+  }
 
-  // When loading has finished, trigger navigation end
-  useEffect(() => {
-    if (componentsLoading > 0) {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    } else {
-      triggerNavigationEnd();
-    }
-  }, [componentsLoading, triggerNavigationEnd]);
+  componentWillUnmount() {
+    clearTimeout(this.timerRef);
+  }
 
-  return (
-    <NavigationContext.Provider
-      {...rest}
-      value={{
-        blockNavigationEnd,
-        unblockNavigationEnd,
-        triggerNavigationEnd
-      }}
-    />
-  );
+  render() {
+    const { ...rest } = this.props;
+
+    return (
+      <NavigationContext.Provider
+        {...rest}
+        value={{
+          blockNavigationEnd: this.blockNavigationEnd,
+          unblockNavigationEnd: this.unblockNavigationEnd,
+          triggerNavigationEnd: this.triggerNavigationEnd
+        }}
+      />
+    );
+  }
 }
