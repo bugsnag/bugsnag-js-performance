@@ -62,7 +62,7 @@ module.exports = {
     },
     // linting for ts files
     {
-      files: ['**/*.ts'],
+      files: ['**/*.ts?(x)'],
       extends: ['standard-with-typescript'],
       rules: { ...tsRuleOverrides },
       parserOptions: {
