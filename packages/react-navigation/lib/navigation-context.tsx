@@ -1,5 +1,5 @@
-import type { BugsnagPerformance, Span } from '@bugsnag/core-performance'
-import type { PlatformExtensions, ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import type { SpanFactory, SpanInternal } from '@bugsnag/core-performance'
+import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import React, { type PropsWithChildren } from 'react'
 
 export const NavigationContext = React.createContext({
@@ -10,7 +10,7 @@ export const NavigationContext = React.createContext({
 
 interface Props extends PropsWithChildren {
   currentRoute?: string
-  client: BugsnagPerformance<ReactNativeConfiguration, PlatformExtensions>
+  spanFactory: SpanFactory<ReactNativeConfiguration>
 }
 
 interface State {
@@ -22,8 +22,8 @@ interface State {
 const DISCARDED = -1
 
 export class NavigationContextProvider extends React.Component<Props, State> {
-  private currentSpan: Span | undefined
-  private timerRef: NodeJS.Timeout | undefined
+  private currentSpan?: SpanInternal
+  private timerRef?: NodeJS.Timeout
 
   state = {
     previousRoute: undefined,
@@ -56,23 +56,29 @@ export class NavigationContextProvider extends React.Component<Props, State> {
 
     this.timerRef = setTimeout(() => {
       if (this.state.componentsLoading === 0 && this.currentSpan) {
-        this.currentSpan.end(this.state.lastRenderTime)
+        this.currentSpan.setAttribute('bugsnag.span.category', 'navigation')
+
+        this.props.spanFactory.endSpan(this.currentSpan, this.state.lastRenderTime)
         this.currentSpan = undefined
       }
     }, 100)
   }
 
   componentDidUpdate (prevProps: Props) {
-    const { currentRoute, client } = this.props
+    const { currentRoute, spanFactory } = this.props
 
     if (currentRoute && currentRoute !== prevProps.currentRoute) {
       // If there is already an active navigation span, end it with an
       // invalid time to cause it to be discarded from the context stack.
       if (this.currentSpan) {
-        this.currentSpan.end(DISCARDED)
+        spanFactory.endSpan(this.currentSpan, DISCARDED)
       }
 
-      this.currentSpan = client.startNavigationSpan(currentRoute)
+      this.currentSpan = spanFactory.startSpan(`[Navigation]${currentRoute}`, {
+        isFirstClass: false,
+        makeCurrentContext: true,
+        parentContext: null
+      })
 
       this.setState(prevState => ({
         ...prevState,

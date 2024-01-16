@@ -1,4 +1,4 @@
-import BugsnagPerformance from '@bugsnag/react-native-performance'
+import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
 import { NavigationContainer, type ParamListBase } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import '@testing-library/jest-native/extend-expect'
@@ -9,7 +9,8 @@ import { createNavigationContainer } from '../lib/create-navigation-container'
 
 describe('createNavigationContainer', () => {
   it('creates a navigation span when the route changes', () => {
-    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer)
+    const spanFactory = new MockSpanFactory()
+    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, spanFactory)
 
     render(
       <BugsnagNavigationContainer>
@@ -21,15 +22,15 @@ describe('createNavigationContainer', () => {
 
     expect(screen.getByText('Route 2')).toBeOnTheScreen()
 
-    expect(BugsnagPerformance.startNavigationSpan).toHaveBeenCalledTimes(1)
-    expect(BugsnagPerformance.startNavigationSpan).toHaveBeenCalledWith('Route 2')
+    expect(spanFactory.startSpan).toHaveBeenCalledTimes(1)
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 2', { isFirstClass: false, makeCurrentContext: true, parentContext: null })
 
     fireEvent.press(screen.getByText('Go back'))
 
     expect(screen.getByText('Route 1')).toBeOnTheScreen()
 
-    expect(BugsnagPerformance.startNavigationSpan).toHaveBeenCalledTimes(2)
-    expect(BugsnagPerformance.startNavigationSpan).toHaveBeenCalledWith('Route 1')
+    expect(spanFactory.startSpan).toHaveBeenCalledTimes(2)
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 1', { isFirstClass: false, makeCurrentContext: true, parentContext: null })
   })
 })
 

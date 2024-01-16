@@ -101,11 +101,11 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       })
 
       for (const plugin of configuration.plugins) {
-        plugins.push(plugin)
+        plugins.push(plugin as unknown as Plugin<C>)
       }
 
       for (const plugin of plugins) {
-        plugin.configure(configuration)
+        plugin.configure(configuration, spanFactory)
       }
     },
     startSpan: (name, spanOptions?: SpanOptions) => {

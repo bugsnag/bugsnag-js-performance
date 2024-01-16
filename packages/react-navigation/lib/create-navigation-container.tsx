@@ -1,11 +1,12 @@
-import BugsnagPerformance from '@bugsnag/react-native-performance'
-import { NavigationContainer, type NavigationContainerProps, type NavigationContainerRef, useNavigationContainerRef } from '@react-navigation/native'
+import { type SpanFactory } from '@bugsnag/core-performance'
+import { type ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import { NavigationContainer, useNavigationContainerRef, type NavigationContainerProps, type NavigationContainerRef } from '@react-navigation/native'
 import React, { forwardRef, useRef } from 'react'
 import { NavigationContextProvider } from './navigation-context'
 
-type EmptyObject = Record<string, unknown>
+type ParamList = Record<string, unknown>
 
-export const createNavigationContainer = <P extends EmptyObject>(Container = NavigationContainer) =>
+export const createNavigationContainer = <P extends ParamList>(Container = NavigationContainer, spanFactory: SpanFactory<ReactNativeConfiguration>) =>
   forwardRef<NavigationContainerRef<P>, NavigationContainerProps>(
     (props, _ref) => {
       const { onStateChange, ...rest } = props
@@ -30,7 +31,7 @@ export const createNavigationContainer = <P extends EmptyObject>(Container = Nav
       }
 
       return (
-        <NavigationContextProvider client={BugsnagPerformance} currentRoute={routeName}>
+        <NavigationContextProvider spanFactory={spanFactory} currentRoute={routeName}>
           <Container
             {...rest}
             onStateChange={wrappedOnStateChange}
