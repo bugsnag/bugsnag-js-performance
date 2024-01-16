@@ -2,7 +2,7 @@ import React, { type PropsWithChildren } from 'react'
 import { NavigationContext } from './navigation-context'
 
 interface Props extends PropsWithChildren {
-  on: 'mount' | 'unmount'
+  on: 'mount' | 'unmount' | boolean
 }
 
 /** End the current navigation span when the component is mounted, unmounted or the `on` prop is `true` */
@@ -20,14 +20,22 @@ export class CompleteNavigation extends React.Component<Props> {
   componentDidMount () {
     if (this.props.on === 'mount') {
       setTimeout(() => {
-        this.context.unblockNavigationEnd()
+        this.context.unblockNavigationEnd('mount')
       })
     }
   }
 
   componentWillUnmount () {
     if (this.props.on === 'unmount') {
-      this.context.unblockNavigationEnd()
+      this.context.unblockNavigationEnd('unmount')
+    }
+  }
+
+  componentDidUpdate (prevProps: Readonly<Props>) {
+    if (typeof this.props.on === 'boolean') {
+      if (this.props.on && !prevProps.on) {
+        this.context.unblockNavigationEnd('condition')
+      }
     }
   }
 

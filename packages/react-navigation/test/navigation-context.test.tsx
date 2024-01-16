@@ -31,6 +31,9 @@ describe('NavigationContextProvider', () => {
     expect(span.name).toEqual('[Navigation]route-1')
     expect(span).toHaveAttribute('bugsnag.span.category', 'navigation')
     expect(span).toHaveAttribute('bugsnag.span.first_class', false)
+    expect(span).toHaveAttribute('bugsnag.navigation.route', 'route-1')
+    expect(span).toHaveAttribute('bugsnag.navigation.ended_by', 'immediate')
+    expect(span).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-navigation-performance')
   })
 
   it('Discards the active navigation span when the route changes', () => {
@@ -125,7 +128,7 @@ const Route = () => {
     <View>
       <Button title='Trigger Navigation End' onPress={triggerNavigationEnd} />
       <Button title='Block Navigation' onPress={blockNavigationEnd} />
-      <Button title='Unblock Navigation' onPress={unblockNavigationEnd} />
+      <Button title='Unblock Navigation' onPress={() => { unblockNavigationEnd('condition') }} />
     </View>
   )
 }

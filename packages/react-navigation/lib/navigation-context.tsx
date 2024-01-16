@@ -4,7 +4,7 @@ import React, { type PropsWithChildren } from 'react'
 
 export const NavigationContext = React.createContext({
   blockNavigationEnd: () => {},
-  unblockNavigationEnd: () => {},
+  unblockNavigationEnd: (condition: EndCondition) => {},
   triggerNavigationEnd: () => {}
 })
 
@@ -19,11 +19,14 @@ interface State {
   lastRenderTime: number
 }
 
+type EndCondition = 'condition' | 'mount' | 'unmount' | 'immediate'
+
 const DISCARDED = -1
 
 export class NavigationContextProvider extends React.Component<Props, State> {
   private currentSpan?: SpanInternal
   private timerRef?: NodeJS.Timeout
+  private endCondition: EndCondition = 'immediate'
 
   state = {
     previousRoute: undefined,
@@ -39,13 +42,14 @@ export class NavigationContextProvider extends React.Component<Props, State> {
     }))
   }
 
-  unblockNavigationEnd = () => {
+  unblockNavigationEnd = (condition: EndCondition) => {
     this.setState(prevState => ({
       ...prevState,
       componentsLoading: Math.max(prevState.componentsLoading - 1, 0),
       lastRenderTime: performance.now()
     }), () => {
       if (this.state.componentsLoading === 0) {
+        this.endCondition = condition
         this.triggerNavigationEnd()
       }
     })
@@ -56,8 +60,7 @@ export class NavigationContextProvider extends React.Component<Props, State> {
 
     this.timerRef = setTimeout(() => {
       if (this.state.componentsLoading === 0 && this.currentSpan) {
-        this.currentSpan.setAttribute('bugsnag.span.category', 'navigation')
-
+        this.currentSpan.setAttribute('bugsnag.navigation.ended_by', this.endCondition)
         this.props.spanFactory.endSpan(this.currentSpan, this.state.lastRenderTime)
         this.currentSpan = undefined
       }
@@ -74,11 +77,18 @@ export class NavigationContextProvider extends React.Component<Props, State> {
         spanFactory.endSpan(this.currentSpan, DISCARDED)
       }
 
-      this.currentSpan = spanFactory.startSpan(`[Navigation]${currentRoute}`, {
+      const span = spanFactory.startSpan(`[Navigation]${currentRoute}`, {
         isFirstClass: false,
         makeCurrentContext: true,
         parentContext: null
       })
+
+      span.setAttribute('bugsnag.span.category', 'navigation')
+      span.setAttribute('bugsnag.navigation.route', currentRoute)
+      span.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-navigation-performance')
+
+      this.currentSpan = span
+      this.endCondition = 'immediate'
 
       this.setState(prevState => ({
         ...prevState,
