@@ -75,11 +75,6 @@ module.exports = {
       transformIgnorePatterns: ['/node_modules/(?!(@angular)/)']
     },
     {
-      displayName: 'react-navigation',
-      testMatch: ['<rootDir>/packages/react-navigation/**/*.test.ts'],
-      ...defaultModuleConfig
-    },
-    {
       displayName: 'react-native',
       preset: 'react-native',
       testMatch: ['<rootDir>/packages/platforms/react-native/tests/**/*.test.ts'],

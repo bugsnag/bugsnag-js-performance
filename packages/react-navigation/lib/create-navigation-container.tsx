@@ -1,7 +1,7 @@
-import BugsnagPerformance from "@bugsnag/react-native-performance";
-import { NavigationContainer, NavigationContainerProps, NavigationContainerRef, useNavigationContainerRef } from "@react-navigation/native";
+import BugsnagPerformance from '@bugsnag/react-native-performance';
+import { NavigationContainer, NavigationContainerProps, NavigationContainerRef, useNavigationContainerRef } from '@react-navigation/native';
 import React, { forwardRef, useRef } from 'react';
-import { NavigationContextProvider } from "./navigation-context";
+import { NavigationContextProvider } from './navigation-context';
 
 export const createNavigationContainer = <P extends {}>(Container = NavigationContainer) =>
   forwardRef<NavigationContainerRef<P>, NavigationContainerProps>(
