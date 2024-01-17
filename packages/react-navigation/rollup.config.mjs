@@ -6,7 +6,8 @@ const config = createRollupConfig({
   external: [
     '@bugsnag/react-native-performance',
     '@react-navigation/native',
-    '@react-navigation/native-stack'
+    '@react-navigation/native-stack',
+    'react'
   ]
 })
 
