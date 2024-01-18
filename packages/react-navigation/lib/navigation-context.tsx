@@ -1,16 +1,16 @@
-import type { BugsnagPerformance, Span } from '@bugsnag/core-performance';
-import type { PlatformExtensions, ReactNativeConfiguration } from '@bugsnag/react-native-performance';
-import React, { PropsWithChildren } from 'react';
+import type { SpanFactory, SpanInternal } from '@bugsnag/core-performance'
+import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import React, { type PropsWithChildren } from 'react'
 
 export const NavigationContext = React.createContext({
   blockNavigationEnd: () => {},
-  unblockNavigationEnd: () => {},
+  unblockNavigationEnd: (condition: EndCondition) => {},
   triggerNavigationEnd: () => {}
 })
 
 interface Props extends PropsWithChildren {
-  currentRoute?: string;
-  client: BugsnagPerformance<ReactNativeConfiguration, PlatformExtensions>
+  currentRoute?: string
+  spanFactory: SpanFactory<ReactNativeConfiguration>
 }
 
 interface State {
@@ -19,61 +19,76 @@ interface State {
   lastRenderTime: number
 }
 
-const DISCARDED = -1;
+type EndCondition = 'condition' | 'mount' | 'unmount' | 'immediate'
+
+const DISCARDED = -1
 
 export class NavigationContextProvider extends React.Component<Props, State> {
-  private currentSpan: Span | undefined;
-  private timerRef: NodeJS.Timeout | undefined;
+  private currentSpan?: SpanInternal
+  private timerRef?: NodeJS.Timeout
+  private endCondition: EndCondition = 'immediate'
 
   state = {
     previousRoute: undefined,
     componentsLoading: 0,
     lastRenderTime: performance.now()
-  };
+  }
 
   blockNavigationEnd = () => {
     this.setState(prevState => ({
       ...prevState,
       componentsLoading: prevState.componentsLoading + 1,
       lastRenderTime: 0
-    }));
-  };
+    }))
+  }
 
-  unblockNavigationEnd = () => {
+  unblockNavigationEnd = (condition: EndCondition) => {
     this.setState(prevState => ({
       ...prevState,
       componentsLoading: Math.max(prevState.componentsLoading - 1, 0),
       lastRenderTime: performance.now()
     }), () => {
       if (this.state.componentsLoading === 0) {
+        this.endCondition = condition
         this.triggerNavigationEnd()
       }
-    });
-  };
+    })
+  }
 
   triggerNavigationEnd = () => {
-    clearTimeout(this.timerRef);
+    clearTimeout(this.timerRef)
 
     this.timerRef = setTimeout(() => {
       if (this.state.componentsLoading === 0 && this.currentSpan) {
-        this.currentSpan.end(this.state.lastRenderTime);
-        this.currentSpan = undefined;
+        this.currentSpan.setAttribute('bugsnag.navigation.ended_by', this.endCondition)
+        this.props.spanFactory.endSpan(this.currentSpan, this.state.lastRenderTime)
+        this.currentSpan = undefined
       }
-    }, 100);
-  };
+    }, 100)
+  }
 
-  componentDidUpdate(prevProps: Props) {
-    const { currentRoute, client } = this.props;
+  componentDidUpdate (prevProps: Props) {
+    const { currentRoute, spanFactory } = this.props
 
     if (currentRoute && currentRoute !== prevProps.currentRoute) {
-
-      // If there is already an active navigation span, end it with an 
+      // If there is already an active navigation span, end it with an
       // invalid time to cause it to be discarded from the context stack.
       if (this.currentSpan) {
-        this.currentSpan.end(DISCARDED);
+        spanFactory.endSpan(this.currentSpan, DISCARDED)
       }
 
-      this.currentSpan = client.startNavigationSpan(currentRoute);
+      const span = spanFactory.startSpan(`[Navigation]${currentRoute}`, {
+        isFirstClass: false,
+        makeCurrentContext: true,
+        parentContext: null
+      })
+
+      span.setAttribute('bugsnag.span.category', 'navigation')
+      span.setAttribute('bugsnag.navigation.route', currentRoute)
+      span.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-navigation-performance')
+
+      this.currentSpan = span
+      this.endCondition = 'immediate'
 
       this.setState(prevState => ({
         ...prevState,
@@ -81,17 +96,17 @@ export class NavigationContextProvider extends React.Component<Props, State> {
       }))
 
       setTimeout(() => {
-        this.triggerNavigationEnd();
-      });
+        this.triggerNavigationEnd()
+      })
     }
   }
 
-  componentWillUnmount() {
-    clearTimeout(this.timerRef);
+  componentWillUnmount () {
+    clearTimeout(this.timerRef)
   }
 
-  render() {
-    const { ...rest } = this.props;
+  render () {
+    const { ...rest } = this.props
 
     return (
       <NavigationContext.Provider
@@ -102,6 +117,6 @@ export class NavigationContextProvider extends React.Component<Props, State> {
           triggerNavigationEnd: this.triggerNavigationEnd
         }}
       />
-    );
+    )
   }
 }
