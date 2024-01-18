@@ -2,7 +2,7 @@ import BugsnagPerformance from '@bugsnag/react-native-performance'
 import { ReactNavigationNativePlugin } from '@bugsnag/react-navigation-performance'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
-import { SafeAreaView, Text } from 'react-native'
+import { SafeAreaView, Text, Button } from 'react-native'
 
 export const config = {
     maximumBatchSize: 1,
@@ -14,6 +14,8 @@ export const config = {
 const Stack = createNativeStackNavigator()
 
 export function App() {
+
+    // These methods must be called after Bugsnag has been started
     const plugin = BugsnagPerformance.getPlugin(ReactNavigationNativePlugin)
     const BugsnagNavigationContainer = plugin.createNavigationContainer()
 
@@ -59,5 +61,3 @@ function DetailsScreen({ navigation }) {
         </SafeAreaView>
     )
 }
-
-// export default App;
