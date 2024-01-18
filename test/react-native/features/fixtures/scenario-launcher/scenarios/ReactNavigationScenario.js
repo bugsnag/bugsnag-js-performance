@@ -1,7 +1,7 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 import { ReactNavigationNativePlugin } from '@bugsnag/react-navigation-performance'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { SafeAreaView, Text, Button } from 'react-native'
 
 export const config = {
@@ -31,6 +31,10 @@ export function App() {
 }
 
 function HomeScreen({ navigation }) {
+    useEffect(() => {
+        navigation.navigate('Details')
+    }, [])
+
     return (
         <SafeAreaView>
             <Text>HomeScreen</Text>
