@@ -15,6 +15,8 @@ class Browser
       end
   end
 
+  attr_reader :name, :version
+
   # is this a mobile device?
   # we assume that android devices are always using the latest version of chrome
   def mobile?

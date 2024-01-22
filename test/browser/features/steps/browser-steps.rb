@@ -207,6 +207,43 @@ Then('a span named {string} does not contain the attribute {string}') do |span_n
   end
 end
 
+def check_attribute_equal_if_present(field, attribute, attr_type, expected)
+  actual = get_attribute_value field, attribute, attr_type
+  if actual != nil
+    Maze.check.equal(expected, actual)
+  end
+end
+
+Then(/^on ((?:[A-Za-z]+ versions (?:>=?|<=?|==) [0-9.]+(?:, )?)+):$/) do |browser_specs, steps_to_run|
+  spec_matcher = /^([A-Za-z]+) versions (>=?|<=?|==) ([0-9.]+)$/
+  run_steps = false
+
+  browser_specs.split(", ").each do |browser_spec|
+    browser_spec.scan(spec_matcher) do |name, operator, version|
+      should_run_steps = $browser.name.casecmp?(name) && $browser.version.send(operator, version.to_i)
+
+      # make sure this step is debuggable!
+      $logger.debug("#{$browser.name} == #{name} && v#{$browser.version} #{operator} #{version}? #{should_run_steps}")     
+      
+      if should_run_steps
+        run_steps = true
+      end
+    end
+  end
+  
+  if run_steps
+    steps_to_run.each_line(chomp: true) do |step_to_run|
+      step(step_to_run)
+    end
+  else   
+    indent = " " * 4
+    # e.g. "a step\nanother step\n" -> "    1) a step\n    2) another step"
+    steps_indented = steps_to_run.each_line.map.with_index(1) { |step, i| "#{indent}#{i}) #{step.chomp}" }.join("\n")
+
+    $logger.info("Skipping steps on #{$browser.name} v#{$browser.version}:\n#{steps_indented}")
+  end
+end
+
 module Maze
   module Driver
     class Browser
