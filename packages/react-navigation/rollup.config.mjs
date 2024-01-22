@@ -13,7 +13,7 @@ const config = createRollupConfig({
 
 config.acornInjectPlugins = [jsx()]
 config.plugins = config.plugins.concat([
-  noTreeShakingPlugin(['create-navigation-container.tsx', 'navigation-context.tsx']
+  noTreeShakingPlugin(['create-navigation-container.tsx', 'navigation-context.tsx', 'complete-navigation.tsx']
 )])
 
 export default config
