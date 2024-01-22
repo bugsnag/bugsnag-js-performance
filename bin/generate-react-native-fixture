@@ -101,7 +101,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   }
 
   // install test fixture dependencies and local packages
-  execSync('npm install --save react-native-dotenv @react-native-community/netinfo react-native-file-access@3.0.4 @react-navigation/native @react-navigation/native-stack react-native-screens *.tgz', { cwd: fixtureDir, stdio: 'inherit' })
+  execSync('npm install --save react-native-dotenv @react-native-community/netinfo react-native-file-access@3.0.4 @react-navigation/native @react-navigation/native-stack react-native-screens react-native-safe-area-context *.tgz', { cwd: fixtureDir, stdio: 'inherit' })
 }
 
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
