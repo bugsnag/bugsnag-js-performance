@@ -12,7 +12,7 @@ class ReactNavigationNativePlugin implements Plugin<ReactNativeConfiguration> {
 
   createNavigationContainer = () => {
     if (!this.spanFactory) throw new Error('Bugsnag: ReactNavigationNativePlugin not configured')
-    createNavigationContainer(NavigationContainer, this.spanFactory)
+    return createNavigationContainer(NavigationContainer, this.spanFactory)
   }
 }
 

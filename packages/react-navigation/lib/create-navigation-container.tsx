@@ -6,6 +6,9 @@ import { NavigationContextProvider } from './navigation-context'
 
 type ParamList = Record<string, unknown>
 
+// Prevent rollup plugin from tree shaking NavigationContextProvider
+const Provider = NavigationContextProvider
+
 export const createNavigationContainer = <P extends ParamList>(Container = NavigationContainer, spanFactory: SpanFactory<ReactNativeConfiguration>) =>
   forwardRef<NavigationContainerRef<P>, NavigationContainerProps>(
     (props, _ref) => {
@@ -31,13 +34,13 @@ export const createNavigationContainer = <P extends ParamList>(Container = Navig
       }
 
       return (
-        <NavigationContextProvider spanFactory={spanFactory} currentRoute={routeName}>
+        <Provider spanFactory={spanFactory} currentRoute={routeName}>
           <Container
             {...rest}
             onStateChange={wrappedOnStateChange}
             ref={navigationContainerRef}
           />
-        </NavigationContextProvider>
+        </Provider>
       )
     }
   )
