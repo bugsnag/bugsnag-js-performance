@@ -4,9 +4,6 @@ import { NavigationContainer, useNavigationContainerRef, type NavigationContaine
 import React, { forwardRef, useRef } from 'react'
 import { NavigationContextProvider } from './navigation-context'
 
-// Prevent rollup plugin from tree shaking the ContextProvider
-const Provider = NavigationContextProvider
-
 type ParamList = Record<string, unknown>
 
 // Prevent rollup plugin from tree shaking NavigationContextProvider
