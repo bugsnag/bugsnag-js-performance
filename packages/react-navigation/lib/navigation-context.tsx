@@ -31,7 +31,7 @@ export class NavigationContextProvider extends React.Component<Props, State> {
   state = {
     previousRoute: undefined,
     componentsLoading: 0,
-    lastRenderTime: performance.now()
+    lastRenderTime: 0
   }
 
   blockNavigationEnd = () => {
@@ -58,10 +58,14 @@ export class NavigationContextProvider extends React.Component<Props, State> {
   triggerNavigationEnd = () => {
     clearTimeout(this.timerRef)
 
+    // Spans ended without a specific end condition will need to use the time `triggerNavigationEnd` was called
+    const triggerNavigationEndTime = performance.now()
+
     this.timerRef = setTimeout(() => {
       if (this.state.componentsLoading === 0 && this.currentSpan) {
         this.currentSpan.setAttribute('bugsnag.navigation.ended_by', this.endCondition)
-        this.props.spanFactory.endSpan(this.currentSpan, this.state.lastRenderTime)
+        const endTime = this.state.lastRenderTime === 0 ? triggerNavigationEndTime : this.state.lastRenderTime
+        this.props.spanFactory.endSpan(this.currentSpan, endTime)
         this.currentSpan = undefined
       }
     }, 100)
