@@ -12,9 +12,21 @@ if (!process.env.RN_VERSION) {
 const rnVersion = process.env.RN_VERSION
 const ROOT_DIR = resolve(__dirname, '../')
 
+const fixtureDependencies = [
+  '@react-native-community/netinfo',
+  'react-native-dotenv',
+  'react-native-file-access@3.0.4' // Why this version specifically?
+]
+
 let fixturePath = 'test/react-native/features/fixtures/generated/'
 if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
   fixturePath += 'newarch/'
+  fixtureDependencies.concat([
+    '@react-navigation/native',
+    '@react-navigation/native-stack',
+    'react-native-screens',
+    'react-native-safe-area-context'
+  ])
 } else {
   fixturePath += 'oldarch/'
 }
@@ -100,8 +112,10 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
   }
 
+  const fixtureDependencyArgs = fixtureDependencies.join(' ')
+
   // install test fixture dependencies and local packages
-  execSync('npm install --save react-native-dotenv @react-native-community/netinfo react-native-file-access@3.0.4 @react-navigation/native @react-navigation/native-stack react-native-screens@3.19.0 react-native-safe-area-context@4.5.3 *.tgz', { cwd: fixtureDir, stdio: 'inherit' })
+  execSync(`npm install --save ${fixtureDependencyArgs} *.tgz`, { cwd: fixtureDir, stdio: 'inherit' })
 }
 
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {

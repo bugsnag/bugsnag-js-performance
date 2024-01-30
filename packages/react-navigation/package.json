@@ -32,7 +32,8 @@
     "peerDependencies": {
         "@bugsnag/core-performance": "*",
         "@bugsnag/react-native-performance": "*",
-        "@react-navigation/native": "*"
+        "@react-navigation/native": "*",
+        "react": "*"
     },
     "type": "module",
     "main": "dist/index.js",
