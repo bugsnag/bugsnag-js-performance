@@ -21,14 +21,14 @@ const fixtureDependencies = [
 let fixturePath = 'test/react-native/features/fixtures/generated/'
 if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
   fixturePath += 'newarch/'
+} else {
+  fixturePath += 'oldarch/'
   fixtureDependencies.concat([
     '@react-navigation/native',
     '@react-navigation/native-stack',
-    'react-native-screens@3.19.0',
-    'react-native-safe-area-context@4.5.3'
+    'react-native-screens', // 3.19.0
+    'react-native-safe-area-context@' // 4.5.3
   ])
-} else {
-  fixturePath += 'oldarch/'
 }
 
 const fixtureDir = resolve(ROOT_DIR, fixturePath, rnVersion)
@@ -82,11 +82,13 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     resolve(fixtureDir, 'android/app/src/main/AndroidManifest.xml')
   )
 
-  // replace the MainActivity file with our own
-  fs.copyFileSync(
-    resolve(ROOT_DIR, `test/react-native/features/fixtures/app/android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${process.env.RN_VERSION}.java`),
-    resolve(fixtureDir, 'android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.java')
-  )
+  // if (!!process.env.RCT_NEW_ARCH_ENABLED) {
+  //   // replace the MainActivity file with our own
+  //   fs.copyFileSync(
+  //       resolve(ROOT_DIR, `test/react-native/features/fixtures/app/android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${process.env.RN_VERSION}.java`),
+  //       resolve(fixtureDir, 'android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.java')
+  //     )
+  // }
 
   // replace the Info.plist file with our own
   fs.copyFileSync(
