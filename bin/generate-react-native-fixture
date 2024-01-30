@@ -82,6 +82,12 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     resolve(fixtureDir, 'android/app/src/main/AndroidManifest.xml')
   )
 
+  // replace the MainActivity file with our own
+  fs.copyFileSync(
+    resolve(ROOT_DIR, `test/react-native/features/fixtures/app/android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${process.env.RN_VERSION}.java`),
+    resolve(fixtureDir, 'android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.java')
+  )
+
   // replace the Info.plist file with our own
   fs.copyFileSync(
     resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/Info.plist'),
