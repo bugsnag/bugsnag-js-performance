@@ -12,19 +12,6 @@ if (!process.env.RN_VERSION) {
 const rnVersion = process.env.RN_VERSION
 const ROOT_DIR = resolve(__dirname, '../')
 
-const fixtureDependencies = [
-  '@react-native-community/netinfo',
-  'react-native-dotenv',
-  'react-native-file-access@3.0.4' // Why this version specifically?
-]
-
-const reactNavigationDependencies = [
-  '@react-navigation/native',
-  '@react-navigation/native-stack',
-  'react-native-screens', // 3.19.0
-  'react-native-safe-area-context' // 4.5.3
-]
-
 let fixturePath = 'test/react-native/features/fixtures/generated/'
 if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
   fixturePath += 'newarch/'
@@ -49,6 +36,19 @@ const PACKAGE_DIRECTORIES = [
   `${ROOT_DIR}/packages/request-tracker`,
   `${ROOT_DIR}/packages/platforms/react-native`,
   `${ROOT_DIR}/test/react-native/features/fixtures/scenario-launcher`,
+]
+
+const DEPENDENCIES = [
+  '@react-native-community/netinfo',
+  'react-native-dotenv',
+  'react-native-file-access@3.0.4' // Why this version specifically?
+]
+
+const REACT_NAVIGATION_DEPENDENCIES = [
+  '@react-navigation/native',
+  '@react-navigation/native-stack',
+  'react-native-screens',
+  'react-native-safe-area-context'
 ]
 
 if (!process.env.SKIP_BUILD_PACKAGES) {
@@ -109,7 +109,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   // react navigation setup
   if (!process.env.RCT_NEW_ARCH_ENABLED) {
-    fixtureDependencies.push(...reactNavigationDependencies)
+    DEPENDENCIES.push(...REACT_NAVIGATION_DEPENDENCIES)
     
     // replace the MainActivity file with our own
     if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
@@ -126,7 +126,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
   }
 
-  const fixtureDependencyArgs = fixtureDependencies.join(' ')
+  const fixtureDependencyArgs = DEPENDENCIES.join(' ')
 
   // install test fixture dependencies and local packages
   execSync(`npm install --save ${fixtureDependencyArgs} *.tgz`, { cwd: fixtureDir, stdio: 'inherit' })
