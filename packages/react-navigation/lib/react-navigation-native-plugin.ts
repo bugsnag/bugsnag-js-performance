@@ -1,5 +1,5 @@
 import type { Plugin, SpanFactory } from '@bugsnag/core-performance'
-import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance/lib/config'
+import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import { createNavigationContainer } from './create-navigation-container'
 import { NavigationContainer } from '@react-navigation/native'
 
