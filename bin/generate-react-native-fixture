@@ -24,16 +24,31 @@ const fixtureDir = resolve(ROOT_DIR, fixturePath, rnVersion)
 const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
   '@bugsnag/react-native-performance',
+  '@bugsnag/react-navigation-performance',
   '@bugsnag/delivery-fetch-performance',
-  '@bugsnag/request-tracker-performance',
+  '@bugsnag/request-tracker-performance'
 ]
 
 const PACKAGE_DIRECTORIES = [
   `${ROOT_DIR}/packages/core`,
   `${ROOT_DIR}/packages/delivery-fetch`,
+  `${ROOT_DIR}/packages/react-navigation`,
   `${ROOT_DIR}/packages/request-tracker`,
   `${ROOT_DIR}/packages/platforms/react-native`,
   `${ROOT_DIR}/test/react-native/features/fixtures/scenario-launcher`,
+]
+
+const DEPENDENCIES = [
+  '@react-native-community/netinfo',
+  'react-native-dotenv',
+  'react-native-file-access@3.0.4' // Why this version specifically?
+]
+
+const REACT_NAVIGATION_DEPENDENCIES = [
+  '@react-navigation/native',
+  '@react-navigation/native-stack',
+  'react-native-screens',
+  'react-native-safe-area-context'
 ]
 
 if (!process.env.SKIP_BUILD_PACKAGES) {
@@ -92,14 +107,29 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     resolve(fixtureDir, 'babel.config.js')
   )
 
+  // react navigation setup
+  if (!process.env.RCT_NEW_ARCH_ENABLED) {
+    DEPENDENCIES.push(...REACT_NAVIGATION_DEPENDENCIES)
+    
+    // replace the MainActivity file with our own
+    if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
+      fs.copyFileSync(
+        resolve(ROOT_DIR, `test/react-native/features/fixtures/app/android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${process.env.RN_VERSION}.java`),
+        resolve(fixtureDir, 'android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.java')
+      )
+    }
+  }
+
   // pack the required packages into the fixture directory
   for (const package of PACKAGE_DIRECTORIES) {
     const libraryPackArgs = ['pack', package, '--pack-destination', fixtureDir]
     execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
   }
-  
-  // install react-native-file-access, react-native-dotenv, @react-native-community/netinfo and local packages
-  execSync('npm install --save react-native-dotenv @react-native-community/netinfo react-native-file-access@3.0.4 *.tgz', { cwd: fixtureDir, stdio: 'inherit' })
+
+  const fixtureDependencyArgs = DEPENDENCIES.join(' ')
+
+  // install test fixture dependencies and local packages
+  execSync(`npm install --save ${fixtureDependencyArgs} *.tgz`, { cwd: fixtureDir, stdio: 'inherit' })
 }
 
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {

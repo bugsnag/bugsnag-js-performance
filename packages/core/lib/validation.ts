@@ -1,5 +1,6 @@
-import { type Logger } from './config'
+import { type Configuration, type Logger } from './config'
 import { type PersistedProbability } from './persistence'
+import { type Plugin } from './plugin'
 import { type SpanContext } from './span-context'
 import { type Time } from './time'
 
@@ -49,4 +50,12 @@ export function isTime (value: unknown): value is Time {
 export function isDeviceId (value: unknown): value is string {
   // make sure the persisted value looks like a valid cuid
   return typeof value === 'string' && /^c[a-z0-9]{20,32}$/.test(value)
+}
+
+export function isPlugin (value: unknown): value is Plugin<unknown extends Configuration ? unknown : Configuration> {
+  return isObject(value) && typeof value.configure === 'function'
+}
+
+export function isPluginArray (value: unknown): value is Array<Plugin<unknown extends Configuration ? unknown : Configuration>> {
+  return Array.isArray(value) && value.every(plugin => isPlugin(plugin))
 }

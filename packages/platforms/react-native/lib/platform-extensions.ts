@@ -14,3 +14,5 @@ export const platformExtensions = (spanFactory: SpanFactory<ReactNativeConfigura
     return spanFactory.toPublicApi(span)
   }
 })
+
+export type PlatformExtensions = ReturnType<typeof platformExtensions>

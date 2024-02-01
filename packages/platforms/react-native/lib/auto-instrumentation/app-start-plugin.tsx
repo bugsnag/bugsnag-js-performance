@@ -8,11 +8,11 @@ import { type ReactNativeConfiguration } from '../config'
 import { type ReactNode, useEffect } from 'react'
 import { type WrapperComponentProvider, type AppRegistry } from 'react-native'
 
-type WrapperProps = {
+interface WrapperProps {
   children: ReactNode
 }
 
-export const isWrapperComponentProvider = (value: unknown): value is WrapperComponentProvider | null => 
+export const isWrapperComponentProvider = (value: unknown): value is WrapperComponentProvider | null =>
   value === null || typeof value === 'function'
 
 export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
