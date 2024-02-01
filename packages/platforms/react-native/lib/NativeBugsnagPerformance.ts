@@ -12,6 +12,8 @@ export type DeviceInfo = {
 
 export interface Spec extends TurboModule {
   getDeviceInfo: () => DeviceInfo
+  requestEntropy: () => string
+  requestEntropyAsync: () => Promise<string>
 }
 
 export default TurboModuleRegistry.get<Spec>(

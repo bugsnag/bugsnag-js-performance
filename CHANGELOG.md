@@ -1,11 +1,17 @@
 # Changelog
 
-## Unreleased
+## TBD
+
+- (browser) Export noops from browser package when window or document is undefined [#390](https://github.com/bugsnag/bugsnag-js-performance/pull/390)
+
+## v2.1.0 (2023-12-12)
 
 ### Fixed
 
-- (react-router) Allow `/` as a basename
-- (vue-router) Allow `/` as a basename
+- (react-router) Allow `/` as a basename [#337](https://github.com/bugsnag/bugsnag-js-performance/pull/337)
+- (vue-router) Allow `/` as a basename [#337](https://github.com/bugsnag/bugsnag-js-performance/pull/337)
+- (react-native) Generate random bytes natively for ID generation [#380](https://github.com/bugsnag/bugsnag-js-performance/pull/380)
+- (react-native) Discard spans when the app is in the background [#384](https://github.com/bugsnag/bugsnag-js-performance/pull/384)
 
 ### Added
 

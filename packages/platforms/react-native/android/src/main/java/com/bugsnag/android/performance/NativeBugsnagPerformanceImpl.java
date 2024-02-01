@@ -8,13 +8,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.bugsnag.android.performance.NativeBugsnagPerformanceSpec;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
+import java.security.SecureRandom;
 
 public class NativeBugsnagPerformanceImpl extends NativeBugsnagPerformanceSpec {
   
   static final String NAME = "BugsnagReactNativePerformance";
   
+  private final SecureRandom random = new SecureRandom();
+
   public NativeBugsnagPerformanceImpl(ReactApplicationContext reactContext) {
     super(reactContext);
   }
@@ -55,6 +60,27 @@ public class NativeBugsnagPerformanceImpl extends NativeBugsnagPerformanceSpec {
     map.putString("model", Build.MODEL);
 
     return map;
+  }
+
+  @Override
+  public String requestEntropy() {
+    byte[] bytes = new byte[1024];
+    random.nextBytes(bytes);
+
+    StringBuilder hex = new StringBuilder(bytes.length * 2);
+    for(byte b : bytes) {
+        int byteValue = ((int)b & 0xff);
+        if(byteValue < 16) {
+            hex.append('0');
+        }
+        hex.append(Integer.toHexString(byteValue));
+    }
+    return hex.toString();
+  }
+
+  @Override
+  public void requestEntropyAsync(Promise promise) {
+    promise.resolve(requestEntropy());
   }
 
   @Nullable

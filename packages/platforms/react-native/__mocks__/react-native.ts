@@ -101,6 +101,10 @@ type DeviceInfo
   | DeviceInfoAndroid
   | Record<string, never>
 
+const createPool = () => {
+  return '0123456789abcdef'.repeat(128)
+}
+
 const BugsnagReactNativePerformance = {
   getDeviceInfo (): DeviceInfo {
     switch (Platform.OS) {
@@ -123,7 +127,13 @@ const BugsnagReactNativePerformance = {
       case 'other':
         return {}
     }
-  }
+  },
+  requestEntropy: jest.fn(() => {
+    return createPool()
+  }),
+  requestEntropyAsync: jest.fn(() => {
+    return Promise.resolve(createPool())
+  })
 }
 
 export const TurboModuleRegistry = {

@@ -40,7 +40,21 @@ static NSString *hostArch() noexcept {
 #endif
 }
 
-- (NSDictionary *)getDeviceInfo {
+static NSString *getRandomBytes() noexcept {
+    const int POOL_SIZE = 1024;
+    UInt8 bytes[POOL_SIZE];
+    NSMutableString *hexStr = [NSMutableString stringWithCapacity:POOL_SIZE * 2];
+    int status = SecRandomCopyBytes(kSecRandomDefault, POOL_SIZE, &bytes);
+    if (status == errSecSuccess) {
+        for (int i = 0; i < POOL_SIZE; i++) {
+            [hexStr appendFormat:@"%02x", bytes[i]];
+        }
+    }
+    
+    return hexStr;
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getDeviceInfo) {
     NSMutableDictionary *info = [NSMutableDictionary new];
     auto infoDictionary = NSBundle.mainBundle.infoDictionary;
     info[@"arch"] = hostArch();
@@ -59,9 +73,21 @@ static NSString *hostArch() noexcept {
     if (modelIdentifier) {
         info[@"model"] = modelIdentifier;
     }
-     
+
     return info;
 }
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(requestEntropy) {
+    NSString *hexStr = getRandomBytes();
+    return hexStr;
+}
+
+ RCT_EXPORT_METHOD(requestEntropyAsync:(RCTPromiseResolveBlock)resolve
+                   rejecter:(RCTPromiseRejectBlock)reject)
+ {
+     NSString *hexStr = getRandomBytes();
+     resolve(hexStr);
+ }
 
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:

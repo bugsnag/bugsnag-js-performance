@@ -12,6 +12,12 @@ export type OnSettlePlugin = Plugin<BrowserConfiguration> & OnSettle
 
 const TIMEOUT_MILLISECONDS = 60 * 1000
 
+export function createNoopOnSettle (): OnSettlePlugin {
+  const noop = () => {}
+  noop.configure = () => {}
+  return noop as OnSettlePlugin
+}
+
 export default function createOnSettle (
   clock: Clock,
   window: Window,

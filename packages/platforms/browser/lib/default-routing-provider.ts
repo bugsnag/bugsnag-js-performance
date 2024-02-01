@@ -4,6 +4,18 @@ import { type RouteResolver, type RoutingProvider, type StartRouteChangeCallback
 
 export const defaultRouteResolver: RouteResolver = (url: URL) => url.pathname || '/'
 
+export const createNoopRoutingProvider = () => {
+  return class NoopRoutingProvider implements RoutingProvider {
+    resolveRoute: RouteResolver
+
+    constructor (resolveRoute = defaultRouteResolver) {
+      this.resolveRoute = resolveRoute
+    }
+
+    listenForRouteChanges (startRouteChangeSpan: StartRouteChangeCallback) {}
+  }
+}
+
 export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Location) => {
   return class DefaultRoutingProvider implements RoutingProvider {
     resolveRoute: RouteResolver
