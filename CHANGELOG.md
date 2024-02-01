@@ -1,6 +1,6 @@
 # Changelog
 
-## TBD
+## v2.2.0 (2024-02-01)
 
 This release adds support for automatic span instrumentation when using React Navigation in React Native apps. See [online docs](https://docs.bugsnag.com/performance/integration-guides/react-native/navigation-libraries) for details.
 
