@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/react-native-performance",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "BugSnag performance monitoring for React Native",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
@@ -15,16 +15,16 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "dependencies": {
-    "@bugsnag/core-performance": "^2.1.0",
+    "@bugsnag/core-performance": "^2.2.0",
     "@bugsnag/cuid": "^3.0.2",
-    "@bugsnag/delivery-fetch-performance": "^2.1.0",
-    "@bugsnag/request-tracker-performance": "^2.1.0"
+    "@bugsnag/delivery-fetch-performance": "^2.2.0",
+    "@bugsnag/request-tracker-performance": "^2.2.0"
   },
   "devDependencies": {
     "@react-native-community/netinfo": "^9.4.1",
     "@types/react": "^18.2.24",
-    "metro-react-native-babel-preset": "^0.77.0",
     "babel-preset-react-native": "^4.0.1",
+    "metro-react-native-babel-preset": "^0.77.0",
     "react-native-file-access": "^3.0.4"
   },
   "peerDependencies": {
