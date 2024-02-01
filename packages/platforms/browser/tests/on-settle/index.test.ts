@@ -6,7 +6,8 @@ import {
   IncrementingClock,
   VALID_API_KEY,
   createTestClient,
-  createConfiguration
+  createConfiguration,
+  MockSpanFactory
 } from '@bugsnag/js-performance-test-utilities'
 import { type BrowserConfiguration, type BrowserSchema, createSchema } from '../../lib/config'
 import createOnSettle, { createNoopOnSettle } from '../../lib/on-settle'
@@ -430,8 +431,9 @@ describe('createNoopOnSettle', () => {
   it('implements the expected API', () => {
     expect(() => {
       const noopOnSettle = createNoopOnSettle()
+      const spanFactory = new MockSpanFactory()
       noopOnSettle(() => {})
-      noopOnSettle.configure(createConfiguration())
+      noopOnSettle.configure(createConfiguration(), spanFactory)
     }).not.toThrow()
   })
 })
