@@ -12,3 +12,7 @@ end
 Before('@skip_ios_old_arch') do |scenario|
   skip_this_scenario("Skipping scenario") if Maze::Helper.get_current_platform == 'ios' && !ENV["RCT_NEW_ARCH_ENABLED"]
 end
+
+Before('@skip_new_arch') do |scenario|
+  skip_this_scenario("Skipping scenario: Not supported with new architecture") if ENV["RCT_NEW_ARCH_ENABLED"]
+end

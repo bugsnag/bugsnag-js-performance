@@ -2,6 +2,8 @@
 
 ## TBD
 
+This release adds support for automatic span instrumentation when using React Navigation in React Native apps. See [online docs](https://docs.bugsnag.com/performance/integration-guides/react-native/navigation-libraries) for details.
+
 - (browser) Export noops from browser package when window or document is undefined [#390](https://github.com/bugsnag/bugsnag-js-performance/pull/390)
 
 ## v2.1.0 (2023-12-12)

@@ -1,10 +1,10 @@
 import {
-  type SpanEnded,
-  type SpanProbability,
-  type ScaledProbability,
   SpanAttributes,
+  SpanEvents,
   traceIdToSamplingRate,
-  SpanEvents
+  type ScaledProbability,
+  type SpanEnded,
+  type SpanProbability
 } from '@bugsnag/core-performance'
 import { randomBytes } from 'crypto'
 

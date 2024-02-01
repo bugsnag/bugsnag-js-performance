@@ -212,4 +212,19 @@ describe('validation', () => {
       expect(validation.isTime(value)).toBe(false)
     })
   })
+
+  describe('isPlugin', () => {
+    const validPlugins = [
+      { configure: jest.fn() },
+      { configure: jest.fn(), additional: jest.fn() }
+    ]
+
+    it.each(validPlugins)('passes validation with %s', (value) => {
+      expect(validation.isPlugin(value)).toBe(true)
+    })
+
+    it.each(nonObjects)('fails validation with %s', (value) => {
+      expect(validation.isPlugin(value)).toBe(false)
+    })
+  })
 })
