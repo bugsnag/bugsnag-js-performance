@@ -94,7 +94,8 @@ export class WebVitals {
   }
 
   private firstContentfulPaint () {
-    const entry = this.performance.getEntriesByName('first-contentful-paint', 'paint')[0]
+    const entries = this.performance.getEntriesByName('first-contentful-paint', 'paint')
+    const entry = Array.isArray(entries) && entries[0]
 
     if (entry) {
       return entry.startTime
@@ -102,7 +103,8 @@ export class WebVitals {
   }
 
   private timeToFirstByte () {
-    const entry = this.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
+    const entries = this.performance.getEntriesByType('navigation') as PerformanceNavigationTiming[]
+    const entry = Array.isArray(entries) && entries[0]
 
     let responseStart: number
 
@@ -121,7 +123,8 @@ export class WebVitals {
   }
 
   private firstInputDelay () {
-    const entry = this.performance.getEntriesByType('first-input')[0] as PerformanceEventTiming
+    const entries = this.performance.getEntriesByType('first-input') as PerformanceEventTiming[]
+    const entry = Array.isArray(entries) && entries[0]
 
     if (entry) {
       return {
