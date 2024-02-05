@@ -37,7 +37,9 @@ export const instrumentPageLoadPhaseSpans = (
     spanFactory.endSpan(span, endTime)
   }
 
-  const entry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming
+  const entries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[]
+  const entry = Array.isArray(entries) && entries[0]
+
   if (entry) {
     createPageLoadPhaseSpan('Unload', entry.unloadEventStart, entry.unloadEventEnd)
     createPageLoadPhaseSpan('Redirect', entry.redirectStart, entry.redirectEnd)
