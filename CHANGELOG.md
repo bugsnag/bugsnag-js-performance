@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- (browser) Prevent throwing an error in edge cases when `performance.getEntriesByType()` returns undefined [#401](https://github.com/bugsnag/bugsnag-js-performance/pull/401)
+
 ## v2.2.0 (2024-02-01)
 
 This release adds support for automatic span instrumentation when using React Navigation in React Native apps. See [online docs](https://docs.bugsnag.com/performance/integration-guides/react-native/navigation-libraries) for details.
