@@ -1,0 +1,38 @@
+{
+    "name": "@bugsnag/react-native-navigation-performance",
+    "version": "0.0.1",
+    "description": "BugSnag performance monitoring for react-native-navigation",
+    "homepage": "https://www.bugsnag.com/",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "build": "rollup --config rollup.config.mjs",
+        "clean": "rm -rf dist/*"
+    },
+    "bugs": {
+        "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
+    },
+    "dependencies": {},
+    "peerDependencies": {
+        "@bugsnag/core-performance": "^2.2.0",
+        "@bugsnag/react-native-performance": "^2.2.0",
+        "react-native-navigation": "^7.37.2"
+    },
+    "devDependencies": {
+        "@bugsnag/core-performance": "*",
+        "@bugsnag/react-native-performance": "*",
+        "react-native-navigation": "^7.37.2"
+    },
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/types/index.d.ts",
+    "files": [
+        "dist"
+    ]
+}
