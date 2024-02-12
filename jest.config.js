@@ -98,7 +98,8 @@ module.exports = {
         ]
       }
     },
-    '<rootDir>/jest/config/react-navigation.js'
+    '<rootDir>/jest/config/react-navigation.js',
+    '<rootDir>/jest/config/react-native-navigation.js'
   ],
   collectCoverageFrom: [
     '**/packages/*/**/*.ts',
