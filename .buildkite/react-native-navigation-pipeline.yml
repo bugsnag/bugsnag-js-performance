@@ -1,24 +1,24 @@
 steps:
   - group: "React native navigation android tests"
     steps:
-      - label: ":android: Build react-native-navigation fixture - rn_{{matrix.version}} - {{matrix.arch}}"
+      - label: ":android: Build react-native-navigation fixture - rn_{{matrix.rn_version}} - {{matrix.rn_arch}}"
         key: "build-react-native-navigation-android-fixture"
         timeout_in_minutes: 30
         agents:
           queue: macos-12-arm
         env:
           BUILD_ANDROID: "true"
-          NEW_ARCH_ENABLED: "{{matrix.arch == 'new-arch'}}"
-          REACT_NATIVE_VERSION: "{{matrix.version}}"
+          RCT_NEW_ARCH_ENABLED: "{{matrix.rn_arch == 'new-arch'}}"
+          RN_VERSION: "{{matrix.rn_version}}"
         artifact_paths:
           - "test/react-native-navigation/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
           - ./bin/generate-react-native-navigation-fixture
         matrix:
-          arch:
+          rn_arch:
             - "new-arch"
             - "old-arch"
-          verison:
+          rn_version:
             - "0.71"
             - "0.72"
             - "0.73"
