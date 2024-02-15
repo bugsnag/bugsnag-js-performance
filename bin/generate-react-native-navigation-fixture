@@ -4,16 +4,16 @@ const { execFileSync, execSync } = require('child_process')
 const { resolve } = require('path')
 const fs = require('fs')
 
-if (!process.env.REACT_NATIVE_VERSION) {
+if (!process.env.RN_VERSION) {
   console.error('Please provide a React Native version')
   process.exit(1)
 }
 
-const reactNativeVersion = process.env.REACT_NATIVE_VERSION
+const reactNativeVersion = process.env.RN_VERSION
 const ROOT_DIR = resolve(__dirname, '../')
 
 let fixturePath = 'test/react-native/features/fixtures/generated/react-native-navigation/'
-if (process.env.NEW_ARCH_ENABLED === 'true' || process.env.NEW_ARCH_ENABLED === '1') {
+if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
   fixturePath += 'new-arch/'
 } else {
   fixturePath += 'old-arch/'
@@ -92,7 +92,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
 // Generate Android Fixture
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
-  if (process.env.NEW_ARCH_ENABLED === 'true' || process.env.NEW_ARCH_ENABLED === '1') {
+  if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
     // If we're building with the new architecture, replace the gradle.properties file
     fs.copyFileSync(
       resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/newarch.gradle.properties'),
