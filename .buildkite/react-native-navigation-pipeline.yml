@@ -15,13 +15,14 @@ steps:
         commands:
           - ./bin/generate-react-native-navigation-fixture
         matrix:
-          rn_arch:
-            - "new-arch"
-            - "old-arch"
-          rn_version:
-            - "0.71"
-            - "0.72"
-            - "0.73"
+          setup:
+            rn_arch:
+              - "new-arch"
+              - "old-arch"
+            rn_version:
+              - "0.71"
+              - "0.72"
+              - "0.73"
         retry:
           automatic:
             - exit_status: "*"
