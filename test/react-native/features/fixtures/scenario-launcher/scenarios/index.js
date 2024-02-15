@@ -6,6 +6,11 @@ export * as NestedSpansScenario from './NestedSpansScenario'
 export * as NetworkRequestCallbackScenario from './NetworkRequestCallbackScenario'
 export * as NetworkRequestFailedScenario from './NetworkRequestFailedScenario'
 export * as NetworkRequestScenario from './NetworkRequestScenario'
-export * as ReactNavigationScenario from './ReactNavigationScenario'
 export * as SpanTriggeredByCommandScenario from './SpanTriggeredByCommandScenario'
 export * as WrapperComponentProviderScenario from './WrapperComponentProviderScenario'
+
+// React Native Navigation Scenarios
+export * as RNNChangeRouteScenario from './react-native-navigation/ChangeRouteScenario'
+
+// React Navigation Scenarios
+export * as ReactNavigationScenario from './react-navigation/AutomatedInstrumentationScenario'
