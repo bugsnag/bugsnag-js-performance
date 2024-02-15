@@ -28,10 +28,10 @@
     "react-native-file-access": "^3.0.4"
   },
   "peerDependencies": {
-    "@react-native-community/netinfo": "^9.4.1",
+    "@react-native-community/netinfo": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-file-access": "^3.0.4"
+    "react-native-file-access": "*"
   },
   "scripts": {
     "build": "rollup --config",
