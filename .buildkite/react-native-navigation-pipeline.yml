@@ -13,7 +13,7 @@ steps:
           BUILD_ANDROID: "true"
           RN_VERSION: "{{matrix.rn_version}}"
         artifact_paths:
-          - "test/react-native-navigation/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
+          - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
           - ./bin/generate-react-native-navigation-fixture
         matrix:
@@ -36,7 +36,7 @@ steps:
           RN_VERSION: "{{matrix.rn_version}}"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
         artifact_paths:
-          - "test/react-native-navigation/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
+          - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
         commands:
           - ./bin/generate-react-native-navigation-fixture
         matrix:
@@ -52,19 +52,19 @@ steps:
       #
       # End-to-end tests
       #
-      - label: ":bitbar: :android: RN {{matrix.rn_version}} Android {{matrix.android_version}} (Old Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix.rn_version}} (Old Arch) Android {{matrix.android_version}} end-to-end tests"
         depends_on: "build-react-native-navigation-android-fixture-old-arch"
         timeout_in_minutes: 60
         plugins:
           artifacts#v1.9.0:
-            download: "test/react-native-navigation/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative.apk"
+            download: "test/react-native/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative.apk"
             upload: ./test/react-native/maze_output/**/*
           docker-compose#v4.7.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
             service-ports: true
             command:
-              - --app=/app/features/fixtures/generated/old-arch/{{matrix.rn_version}}/reactnative.apk
+              - --app=/app/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative.apk
               - --farm=bb
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
