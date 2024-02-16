@@ -22,7 +22,6 @@ steps:
             rn_version:
               - "0.71"
               - "0.72"
-              - "0.73"
         retry:
           automatic:
             - exit_status: "*"
