@@ -4,52 +4,27 @@ steps:
       #
       # Test fixtures
       #
-      - label: ":building_construction: :android: Build RN {{matrix}} (Old Arch) test fixture"
+      - label: ":building_construction: :android: Build RN {{matrix.rn_version}} (Old Arch) test fixture"
         key: "build-react-native-navigation-android-fixture-old-arch"
         timeout_in_minutes: 30
         agents:
           queue: macos-12-arm
         env:
           BUILD_ANDROID: "true"
-          RN_VERSION: "{{matrix}}"
+          RN_VERSION: "{{matrix.rn_version}}"
         artifact_paths:
-          - "test/react-native-navigation/features/fixtures/generated/react-native-navigation/old-arch/**/reactnative.apk"
+          - "test/react-native-navigation/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative.apk"
         commands:
           - ./bin/generate-react-native-navigation-fixture
         matrix:
-          - "0.71"
-          - "0.72"
+          setup:
+            rn_version:
+              - "0.71"
+              - "0.72"
         retry:
           automatic:
             - exit_status: "*"
               limit: 1
-
-      # - label: ':building_construction: :mac: Build react-native-navigation fixture ipa - RN {{matrix.rn_version}} {{matrix.rn_arch}}"'
-      #   key: "build-react-native-navigation-ios-fixture"
-      #   timeout_in_minutes: 30
-      #   agents:
-      #     queue: "macos-12-arm"
-      #   env:
-      #     BUILD_IOS: "true"
-      #     RCT_NEW_ARCH_ENABLED: "{{matrix.rn_arch == 'new-arch'}}"
-      #     RN_VERSION: "{{matrix.rn_version}}"
-      #     DEVELOPER_DIR: "/Applications/Xcode14.app"
-      #   artifact_paths:
-      #     - "test/react-native-navigation/features/fixtures/generated/react-native-navigation/{{matrix.rn_arch}}/{{matrix.rn_version}}/reactnative.ipa"
-      #   commands:
-      #     - ./bin/generate-react-native-navigation-fixture
-      #   matrix:
-      #     setup:
-      #       rn_arch:
-      #         - "new-arch"
-      #         - "old-arch"
-      #       rn_version:
-      #         - "0.71"
-      #         - "0.72"
-      #   retry:
-      #     automatic:
-      #       - exit_status: "*"
-      #         limit: 1
 
       #
       # End-to-end tests
