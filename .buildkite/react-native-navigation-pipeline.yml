@@ -2,7 +2,7 @@ steps:
   - group: "React native navigation android tests"
     steps:
       #
-      # Test fixtures
+      # Build test fixtures
       #
       - label: ":building_construction: :android: Build RN {{matrix.rn_version}} (Old Arch) test fixture"
         key: "build-react-native-navigation-android-fixture-old-arch"
@@ -14,6 +14,29 @@ steps:
           RN_VERSION: "{{matrix.rn_version}}"
         artifact_paths:
           - "test/react-native-navigation/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
+        commands:
+          - ./bin/generate-react-native-navigation-fixture
+        matrix:
+          setup:
+            rn_version:
+              - "0.71"
+              - "0.72"
+        retry:
+          automatic:
+            - exit_status: "*"
+              limit: 1
+
+      - label: ':building_construction: :mac: Build RN {{matrix.rn_version}} (Old Arch) test fixture'
+        key: "build-react-native-navigation-ios-fixture-old-arch"
+        timeout_in_minutes: 30
+        agents:
+          queue: "macos-12-arm"
+        env:
+          BUILD_IOS: "true"
+          RN_VERSION: "{{matrix.rn_version}}"
+          DEVELOPER_DIR: "/Applications/Xcode14.app"
+        artifact_paths:
+          - "test/react-native-navigation/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
         commands:
           - ./bin/generate-react-native-navigation-fixture
         matrix:
