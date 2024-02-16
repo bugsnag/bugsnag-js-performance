@@ -32,10 +32,10 @@ const DEPENDENCIES = [
 // -----------------------
 const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
-  '@bugsnag/react-native-performance',
-  '@bugsnag/react-native-navigation',
-  '@bugsnag/react-navigation-performance',
   '@bugsnag/delivery-fetch-performance',
+  '@bugsnag/react-native-performance',
+  '@bugsnag/react-native-navigation-performance',
+  '@bugsnag/react-navigation-performance',
   '@bugsnag/request-tracker-performance'
 ]
 
