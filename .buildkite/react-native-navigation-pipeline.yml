@@ -13,7 +13,7 @@ steps:
           BUILD_ANDROID: "true"
           RN_VERSION: "{{matrix.rn_version}}"
         artifact_paths:
-          - "test/react-native-navigation/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative.apk"
+          - "test/react-native-navigation/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
           - ./bin/generate-react-native-navigation-fixture
         matrix:
