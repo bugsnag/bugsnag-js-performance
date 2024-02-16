@@ -13,4 +13,4 @@ export * as WrapperComponentProviderScenario from './WrapperComponentProviderSce
 export * as RNNChangeRouteScenario from './react-native-navigation/ChangeRouteScenario'
 
 // React Navigation Scenarios
-export * as ReactNavigationScenario from './react-navigation/AutomatedInstrumentationScenario'
+export * as ReactNavigationScenario from './ReactNavigationScenario'
