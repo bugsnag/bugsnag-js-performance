@@ -1,7 +1,7 @@
 steps:
   - group: "React native navigation android tests"
     steps:
-      - label: ":android: Build react-native-navigation fixture - rn_{{matrix.rn_version}} - {{matrix.rn_arch}}"
+      - label: ":building_construction: :android: Build react-native-navigation fixture - RN {{matrix.rn_version}} - {{matrix.rn_arch}}"
         key: "build-react-native-navigation-android-fixture"
         timeout_in_minutes: 30
         agents:
@@ -11,7 +11,7 @@ steps:
           RCT_NEW_ARCH_ENABLED: "{{matrix.rn_arch == 'new-arch'}}"
           RN_VERSION: "{{matrix.rn_version}}"
         artifact_paths:
-          - "test/react-native-navigation/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
+          - "test/react-native-navigation/features/fixtures/generated/react-native-navigation/{{matrix.rn_arch}}/{{matrix.rn_version}}/reactnative.apk"
         commands:
           - ./bin/generate-react-native-navigation-fixture
         matrix:
@@ -26,3 +26,66 @@ steps:
           automatic:
             - exit_status: "*"
               limit: 1
+
+      - label: ':building_construction: :mac: Build react-native-navigation fixture ipa - RN {{matrix.rn_version}} {{matrix.rn_arch}}"'
+        key: "build-react-native-navigation-ios-fixture"
+        timeout_in_minutes: 30
+        agents:
+          queue: "macos-12-arm"
+        env:
+          BUILD_IOS: "true"
+          RCT_NEW_ARCH_ENABLED: "{{matrix.rn_arch == 'new-arch'}}"
+          RN_VERSION: "{{matrix.rn_version}}"
+          DEVELOPER_DIR: "/Applications/Xcode14.app"
+        artifact_paths:
+          - "test/react-native-navigation/features/fixtures/generated/react-native-navigation/{{matrix.rn_arch}}/{{matrix.rn_version}}/reactnative.ipa"
+        commands:
+          - ./bin/generate-react-native-navigation-fixture
+        matrix:
+          setup:
+            rn_arch:
+              - "new-arch"
+              - "old-arch"
+            rn_version:
+              - "0.71"
+              - "0.72"
+        retry:
+          automatic:
+            - exit_status: "*"
+              limit: 1
+
+      - label: ":bitbar: :android: RN {{matrix.rn_version}} Android {{matrix.android_version}} end-to-end tests ({{matrix.rn_arch}})"
+        depends_on: "build-react-native-android-fixture-old-arch"
+        timeout_in_minutes: 60
+        plugins:
+          artifacts#v1.9.0:
+            download: "test/react-native-navigation/features/fixtures/generated/react-native-navigation/{{matrix.rn_arch}}/{{matrix.rn_version}}/reactnative.apk"
+            upload: ./test/react-native/maze_output/**/*
+          docker-compose#v4.7.0:
+            pull: react-native-maze-runner
+            run: react-native-maze-runner
+            service-ports: true
+            command:
+              - --app=/app/features/fixtures/generated/{{matrix.rn_arch}}/{{matrix.rn_version}}/reactnative.apk
+              - --farm=bb
+              - --device=ANDROID_12
+              - --a11y-locator
+              - --fail-fast
+              - --no-tunnel
+              - --aws-public-ip
+        retry:
+          manual:
+            permit_on_passed: true
+        concurrency: 25
+        concurrency_group: "bitbar"
+        concurrency_method: eager
+        matrix:
+          setup:
+            android_version:
+              - "12"
+            rn_arch:
+              - "new-arch"
+              - "old-arch"
+            rn_version:
+              - "0.71"
+              - "0.72"
