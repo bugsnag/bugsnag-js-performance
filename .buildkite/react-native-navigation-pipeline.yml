@@ -4,7 +4,7 @@ steps:
       #
       # Test fixtures
       #
-      - label: ":building_construction: :android: Build RN {{matrix}} test fixture APK (Old Arch)"
+      - label: ":building_construction: :android: Build RN {{matrix}} (Old Arch) test fixture"
         key: "build-react-native-navigation-android-fixture-old-arch"
         timeout_in_minutes: 30
         agents:
@@ -55,7 +55,7 @@ steps:
       # End-to-end tests
       #
       - label: ":bitbar: :android: RN {{matrix.rn_version}} Android {{matrix.android_version}} (Old Arch) end-to-end tests"
-        depends_on: "build-react-native-android-fixture-old-arch"
+        depends_on: "build-react-native-navigation-android-fixture-old-arch"
         timeout_in_minutes: 60
         plugins:
           artifacts#v1.9.0:
