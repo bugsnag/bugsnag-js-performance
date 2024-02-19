@@ -11,6 +11,7 @@ steps:
           queue: macos-12-arm
         env:
           BUILD_ANDROID: "true"
+          REACT_NATIVE_NAVIGATION: "true"
           RN_VERSION: "{{matrix.rn_version}}"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
@@ -33,6 +34,7 @@ steps:
           queue: "macos-12-arm"
         env:
           BUILD_IOS: "true"
+          REACT_NATIVE_NAVIGATION: "true"
           RN_VERSION: "{{matrix.rn_version}}"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
         artifact_paths:
@@ -55,6 +57,8 @@ steps:
       - label: ":bitbar: :android: RN {{matrix.rn_version}} (Old Arch) Android {{matrix.android_version}} end-to-end tests"
         depends_on: "build-react-native-navigation-android-fixture-old-arch"
         timeout_in_minutes: 60
+        env: 
+          REACT_NATIVE_NAVIGATION: "true"
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative.apk"
