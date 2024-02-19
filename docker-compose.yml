@@ -103,6 +103,7 @@ services:
       BITBAR_USERNAME:
       BITBAR_ACCESS_KEY:
       RCT_NEW_ARCH_ENABLED:
+      REACT_NATIVE_NAVIGATION:
     ports:
       - "9000-9499:9339"
     networks:
