@@ -1,3 +1,4 @@
+@skip_react_native_navigation
 Feature: Backgrounding listener
 
   Scenario: Spans are discarded when app is in the background
