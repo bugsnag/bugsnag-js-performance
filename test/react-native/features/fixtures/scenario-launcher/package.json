@@ -13,7 +13,6 @@
     "@react-navigation/native-stack": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-file-access": "*",
-    "react-native-navigation": "*"
+    "react-native-file-access": "*"
   }
 }
