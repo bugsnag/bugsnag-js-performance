@@ -25,7 +25,7 @@ const DEPENDENCIES = [
   '@react-native-community/netinfo',
   'react-native-dotenv',
   'react-native-file-access',
-  'react-native-navigation'
+  'react-native-navigation@7.37.2' // higher than this version causes a build error
 ]
 
 // TODO: Use lerna to manage local dependencies, and ditch this packaging process
