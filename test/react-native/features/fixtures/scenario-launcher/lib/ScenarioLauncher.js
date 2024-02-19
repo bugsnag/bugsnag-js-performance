@@ -11,6 +11,23 @@ const PERSISTED_STATE_VERSION = 1
 const PERSISTED_STATE_DIRECTORY = `${Dirs.CacheDir}/bugsnag-performance-react-native/v${PERSISTED_STATE_VERSION}`
 const PERSISTED_STATE_PATH = `${PERSISTED_STATE_DIRECTORY}/persisted-state.json`
 
+
+function loadReactNavigationScenario (scenario) {
+  if (scenario.load) {
+    scenario.load()
+  } else {
+    const Navigation = require('react-native-navigation')
+    Navigation.registerComponent('Scenario', () => scenario.App)
+    Navigation.setRoot({
+      root: {
+        component: {
+          name: 'Scenario'
+        }
+      }
+    })
+  }
+}
+
 async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
   console.error(`[BugsnagPerformance] Launching scenario: ${scenarioName}`)
   const scenario = Scenarios[scenarioName]
@@ -30,14 +47,18 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
     ...scenario.config
   })
 
-  const appParams = { rootTag }
-  if (isTurboModuleEnabled()) {
-    appParams.fabric = true
-    appParams.initialProps = { concurrentRoot: true }
+  if (process.env.REACT_NATIVE_NAVIGATION) {
+    loadReactNavigationScenario()
+  } else {
+    const appParams = { rootTag }
+    if (isTurboModuleEnabled()) {
+      appParams.fabric = true
+      appParams.initialProps = { concurrentRoot: true }
+    }
+  
+    AppRegistry.registerComponent(scenarioName, () => scenario.App)
+    AppRegistry.runApplication(scenarioName, appParams)
   }
-
-  AppRegistry.registerComponent(scenarioName, () => scenario.App)
-  AppRegistry.runApplication(scenarioName, appParams)
 }
 
 async function writePersistedStateFile (contents) {

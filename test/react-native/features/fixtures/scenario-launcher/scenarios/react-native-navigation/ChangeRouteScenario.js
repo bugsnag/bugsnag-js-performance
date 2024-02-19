@@ -10,11 +10,11 @@ export const config = {
     plugins: [new ReactNativeNavigationPlugin(Navigation)]
 }
 
-export function getRoot() {
+export function load() {
     Navigation.registerComponent('Screen 1', () => Screen1);
     Navigation.registerComponent('Screen 2', () => Screen2);
 
-    return {
+    Navigation.setRoot({
         root: {
             stack: {
                 children: [
@@ -26,7 +26,7 @@ export function getRoot() {
                 ]
             }
         }
-    }
+    })
 }
 
 function Screen1(props) {

@@ -1,4 +1,4 @@
-import { launchReactNativeNavigationScenario } from '@bugsnag/react-native-performance-scenarios'
+import { launchScenario } from '@bugsnag/react-native-performance-scenarios'
 import { useContext, useEffect } from 'react'
 import { RootTagContext, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { Navigation } from 'react-native-navigation'
@@ -9,7 +9,7 @@ const App = () => {
     const rootTag = useContext(RootTagContext)
 
     useEffect(() => {
-        launchReactNativeNavigationScenario(rootTag)
+        launchScenario(rootTag)
     }, [rootTag])
 
     return (
