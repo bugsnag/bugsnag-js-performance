@@ -1,5 +1,6 @@
 Feature: App Start spans
 
+@skip_react_native_navigation
 Scenario: App starts are automatically instrumented
   When I run 'AppStartScenario'
   And I wait to receive a sampling request
@@ -18,6 +19,7 @@ Scenario: App starts are automatically instrumented
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "app_start"
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.app_start.type" equals "ReactNativeInit"
 
+@skip_react_native_navigation
 Scenario: A wrapper component provider can be provided as a config option
   When I run 'WrapperComponentProviderScenario'
   Given the element "wrapper-component" is present within 60 seconds 
@@ -38,4 +40,3 @@ Scenario: A wrapper component provider can be provided as a config option
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.endTimeUnixNano" matches the regex "^[0-9]+$"
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "app_start"
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.app_start.type" equals "ReactNativeInit"
-
