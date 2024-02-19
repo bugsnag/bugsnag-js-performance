@@ -68,7 +68,6 @@ steps:
             run: react-native-maze-runner
             service-ports: true
             command:
-              - features/react-native-navigation
               - --app=/app/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative.apk
               - --farm=bb
               - --device=ANDROID_{{matrix.android_version}}
