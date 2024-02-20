@@ -103,7 +103,7 @@ steps:
             service-ports: true
             command:
               - features/react-native-navigation.feature
-              - --app=/app/features/fixtures/react-native/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/output/reactnative.ipa
+              - --app=/app/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/output/reactnative.ipa
               - --farm=bb
               - --device=IOS_{{matrix.ios_version}}
               - --a11y-locator
