@@ -15,6 +15,7 @@ steps:
         artifact_paths:
           - "test/react-native/features/fixtures/generated/oldarch/**/reactnative.apk"
         commands:
+          - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
           - "0.71"
@@ -36,6 +37,7 @@ steps:
         artifact_paths:
           - "test/react-native/features/fixtures/generated/newarch/**/reactnative.apk"
         commands:
+          - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
           - "0.71"
@@ -57,6 +59,7 @@ steps:
         artifact_paths:
           - "test/react-native/features/fixtures/generated/oldarch/**/output/reactnative.ipa"
         commands:
+          - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
           - "0.71"
@@ -79,6 +82,7 @@ steps:
         artifact_paths:
           - "test/react-native/features/fixtures/generated/newarch/**/output/reactnative.ipa"
         commands:
+          - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
           - "0.71"
