@@ -1,16 +1,11 @@
-import { AppRegistry } from 'react-native'
-import { getCurrentCommand } from './CommandRunner'
-import * as Scenarios from '../scenarios'
-import { REACT_APP_SCENARIO_NAME, REACT_APP_ENDPOINT, REACT_APP_API_KEY } from '@env'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
-import { FileSystem, Dirs } from 'react-native-file-access'
+import { REACT_APP_API_KEY, REACT_APP_ENDPOINT, REACT_APP_SCENARIO_NAME } from '@env'
+import { AppRegistry } from 'react-native'
+import * as Scenarios from '../scenarios'
+import { getCurrentCommand } from './CommandRunner'
+import { clearPersistedState, setDeviceId, setSamplingProbability } from './Persistence'
 
 const isTurboModuleEnabled = () => global.__turboModuleProxy != null
-
-const PERSISTED_STATE_VERSION = 1
-const PERSISTED_STATE_DIRECTORY = `${Dirs.CacheDir}/bugsnag-performance-react-native/v${PERSISTED_STATE_VERSION}`
-const PERSISTED_STATE_PATH = `${PERSISTED_STATE_DIRECTORY}/persisted-state.json`
-
 
 function loadReactNavigationScenario (scenario) {
   if (scenario.load) {
@@ -61,36 +56,9 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
   }
 }
 
-async function writePersistedStateFile (contents) {
-  if (!await FileSystem.exists(PERSISTED_STATE_DIRECTORY)) {
-    console.error(`[BugsnagPerformance] creating persisted state directory: ${PERSISTED_STATE_DIRECTORY}`)
-    await FileSystem.mkdir(PERSISTED_STATE_DIRECTORY)
-  }
-
-  console.error(`[BugsnagPerformance] writing to: ${PERSISTED_STATE_PATH}`)
-
-  await FileSystem.writeFile(
-    PERSISTED_STATE_PATH,
-    JSON.stringify(contents)
-  )
-
-  console.error(`[BugsnagPerformance] finished writing to: ${PERSISTED_STATE_PATH}`)
-}
-
-async function setSamplingProbability (value, time = Date.now()) {
-  await writePersistedStateFile({
-    'sampling-probability': { value, time }
-  })
-}
-
-async function setDeviceId (deviceId) {
-  await writePersistedStateFile({ 'device-id': deviceId })
-}
-
 export async function launchScenario (rootTag, clearPersistedData = true) {
-  if (clearPersistedData && await FileSystem.exists(PERSISTED_STATE_PATH)) {
-    console.error(`[BugsnagPerformance] Clearing persisted data at path: ${PERSISTED_STATE_PATH}`)
-    await FileSystem.unlink(PERSISTED_STATE_PATH)
+  if (clearPersistedData) {
+    await clearPersistedState()
   }
 
   let command
