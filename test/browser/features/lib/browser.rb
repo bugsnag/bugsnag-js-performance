@@ -122,10 +122,12 @@ class Browser
 
   def firefox_supported_vitals
     case @version
+    when (122..)
+      ["fcp", "fid_end", "fid_start", "lcp", "ttfb"]
     when (89..)
-      ["ttfb", "fcp", "fid_start", "fid_end"]
+      ["fcp", "fid_end", "fid_start", "ttfb"]
     when (84..)
-      ["ttfb", "fcp", "cls"]
+      ["fcp", "cls", "ttfb"]
     else
       ["ttfb"]
     end
