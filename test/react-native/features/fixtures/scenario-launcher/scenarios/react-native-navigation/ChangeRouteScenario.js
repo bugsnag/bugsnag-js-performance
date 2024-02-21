@@ -1,6 +1,6 @@
 import { ReactNativeNavigationPlugin } from '@bugsnag/react-native-navigation-performance'
-import React from 'react'
-import { Button, SafeAreaView, Text } from 'react-native'
+import React, { useEffect } from 'react'
+import { SafeAreaView, Text } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 
 export const config = {
@@ -30,18 +30,19 @@ export function load() {
 }
 
 function Screen1(props) {
+    useEffect(() => {
+        setTimeout(() => {
+            Navigation.push(props.componentId, {
+                component: {
+                    name: 'Screen 2'
+                }
+            })
+        }, 50)
+    }, [])
+
     return (
         <SafeAreaView>
             <Text>Screen 1</Text>
-            <Button
-                title='Go to screen 2'
-                onPress={() => { 
-                    Navigation.push(props.componentId, { 
-                        component: { 
-                            name: 'Screen 2' 
-                        } 
-                    }) 
-                }} />
         </SafeAreaView>
     )
 }
