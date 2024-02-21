@@ -4,6 +4,7 @@ Feature: Navigation spans with React Native Navigation
   Scenario: Navigation Spans are automatically instrumented
     When I run 'RNNChangeRouteScenario'
     And I wait to receive a sampling request
+    And I click the element "Go to screen 2"
     And I wait for 1 span
 
     # Check the initial probability request
