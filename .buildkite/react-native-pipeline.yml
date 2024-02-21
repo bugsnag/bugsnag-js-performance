@@ -15,7 +15,7 @@ steps:
           RN_VERSION: "{{matrix}}"
           BUILD_ANDROID: "true"
         artifact_paths:
-          - "test/react-native/features/fixtures/generated/oldarch/**/reactnative.apk"
+          - "test/react-native/features/fixtures/generated/old-arch/**/reactnative.apk"
         commands:
           - bundle install
           - ./bin/generate-react-native-fixture
@@ -40,7 +40,7 @@ steps:
           RCT_NEW_ARCH_ENABLED: "true"
           BUILD_ANDROID: "true"
         artifact_paths:
-          - "test/react-native/features/fixtures/generated/newarch/**/reactnative.apk"
+          - "test/react-native/features/fixtures/generated/new-arch/**/reactnative.apk"
         commands:
           - bundle install
           - ./bin/generate-react-native-fixture
@@ -64,7 +64,7 @@ steps:
           BUILD_IOS: "true"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
         artifact_paths:
-          - "test/react-native/features/fixtures/generated/oldarch/**/output/reactnative.ipa"
+          - "test/react-native/features/fixtures/generated/old-arch/**/output/reactnative.ipa"
         commands:
           - bundle install
           - ./bin/generate-react-native-fixture
@@ -89,7 +89,7 @@ steps:
           BUILD_IOS: "true"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
         artifact_paths:
-          - "test/react-native/features/fixtures/generated/newarch/**/output/reactnative.ipa"
+          - "test/react-native/features/fixtures/generated/new-arch/**/output/reactnative.ipa"
         commands:
           - bundle install
           - ./bin/generate-react-native-fixture
@@ -110,14 +110,14 @@ steps:
         timeout_in_minutes: 60
         plugins:
           artifacts#v1.9.0:
-            download: "test/react-native/features/fixtures/generated/oldarch/{{matrix}}/reactnative.apk"
+            download: "test/react-native/features/fixtures/generated/old-arch/{{matrix}}/reactnative.apk"
             upload: ./test/react-native/maze_output/**/*
           docker-compose#v4.7.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
             service-ports: true
             command:
-              - --app=/app/features/fixtures/generated/oldarch/{{matrix}}/reactnative.apk
+              - --app=/app/features/fixtures/generated/old-arch/{{matrix}}/reactnative.apk
               - --farm=bb
               - --device=ANDROID_12
               - --a11y-locator
@@ -140,14 +140,14 @@ steps:
         timeout_in_minutes: 60
         plugins:
           artifacts#v1.9.0:
-            download: "test/react-native/features/fixtures/generated/newarch/{{matrix}}/reactnative.apk"
+            download: "test/react-native/features/fixtures/generated/new-arch/{{matrix}}/reactnative.apk"
             upload: ./test/react-native/maze_output/**/*
           docker-compose#v4.7.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
             service-ports: true
             command:
-              - --app=/app/features/fixtures/generated/newarch/{{matrix}}/reactnative.apk
+              - --app=/app/features/fixtures/generated/new-arch/{{matrix}}/reactnative.apk
               - --farm=bb
               - --device=ANDROID_12
               - --a11y-locator
@@ -172,14 +172,14 @@ steps:
         timeout_in_minutes: 60
         plugins:
           artifacts#v1.9.0:
-            download: "test/react-native/features/fixtures/generated/oldarch/{{matrix}}/output/reactnative.ipa"
+            download: "test/react-native/features/fixtures/generated/old-arch/{{matrix}}/output/reactnative.ipa"
             upload: ./test/react-native/maze_output/**/*
           docker-compose#v4.12.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
             service-ports: true
             command:
-              - --app=/app/features/fixtures/generated/oldarch/{{matrix}}/output/reactnative.ipa
+              - --app=/app/features/fixtures/generated/old-arch/{{matrix}}/output/reactnative.ipa
               - --farm=bb
               - --device=IOS_14
               - --a11y-locator
@@ -202,14 +202,14 @@ steps:
         timeout_in_minutes: 60
         plugins:
           artifacts#v1.9.0:
-            download: "test/react-native/features/fixtures/generated/newarch/{{matrix}}/output/reactnative.ipa"
+            download: "test/react-native/features/fixtures/generated/new-arch/{{matrix}}/output/reactnative.ipa"
             upload: ./test/react-native/maze_output/**/*
           docker-compose#v4.12.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
             service-ports: true
             command:
-              - --app=/app/features/fixtures/generated/newarch/{{matrix}}/output/reactnative.ipa
+              - --app=/app/features/fixtures/generated/new-arch/{{matrix}}/output/reactnative.ipa
               - --farm=bb
               - --device=IOS_14
               - --a11y-locator
