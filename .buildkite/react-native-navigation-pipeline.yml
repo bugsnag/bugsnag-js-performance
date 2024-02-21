@@ -69,6 +69,7 @@ steps:
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
         commands:
+          - bundle install
           - ./bin/generate-react-native-navigation-fixture
         matrix:
           setup:
@@ -94,6 +95,7 @@ steps:
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
         commands:
+          - bundle install
           - ./bin/generate-react-native-navigation-fixture
         matrix:
           setup:
