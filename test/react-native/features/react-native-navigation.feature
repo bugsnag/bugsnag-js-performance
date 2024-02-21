@@ -1,4 +1,4 @@
-@react_native_navigation_only
+@react_native_navigation
 Feature: Navigation spans with React Native Navigation
 
   Scenario: Navigation Spans are automatically instrumented
