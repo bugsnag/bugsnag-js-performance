@@ -4,7 +4,7 @@ import { SafeAreaView, Text } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 
 export const config = {
-    maximumBatchSize: 1,
+    maximumBatchSize: 2,
     autoInstrumentAppStarts: false,
     appVersion: '1.2.3',
     plugins: [new ReactNativeNavigationPlugin(Navigation)]
