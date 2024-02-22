@@ -7,11 +7,11 @@ import { clearPersistedState, setDeviceId, setSamplingProbability } from './Pers
 
 const isTurboModuleEnabled = () => global.__turboModuleProxy != null
 
-function loadReactNavigationScenario (scenario) {
+async function loadReactNavigationScenario (scenario) {
   if (typeof scenario.registerScreens === 'function') {
     scenario.registerScreens()
   } else {
-    const Navigation = require('react-native-navigation')
+    const Navigation = await import('react-native-navigation')
     Navigation.registerComponent('Scenario', () => scenario.App)
     Navigation.setRoot({
       root: {
