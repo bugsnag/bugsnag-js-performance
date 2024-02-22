@@ -1,5 +1,5 @@
 import { ReactNativeNavigationPlugin } from '@bugsnag/react-native-navigation-performance'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView, Text } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 
@@ -30,19 +30,35 @@ export function registerScreens() {
 }
 
 function Screen1(props) {
+    const [counter, setCounter] = useState(3)
+
     useEffect(() => {
-        setTimeout(() => {
+        function decrementCounter() {
+            if (counter > 0) {
+                setTimeout(() => {
+                    setCounter(c => c - 1)
+                    decrementCounter()
+                }, 1000)
+            }
+        }
+
+        decrementCounter()
+    }, [])
+
+    useEffect(() => {
+        if (counter === 0) {
             Navigation.push(props.componentId, {
                 component: {
                     name: 'Screen 2'
                 }
             })
-        }, 50)
-    }, [])
+        }
+    }, [counter])
 
     return (
         <SafeAreaView>
             <Text>Screen 1</Text>
+            <Text>Navigating in {counter}...</Text>
         </SafeAreaView>
     )
 }
