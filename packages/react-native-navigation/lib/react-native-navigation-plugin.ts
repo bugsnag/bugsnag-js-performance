@@ -3,8 +3,8 @@ import { type ReactNativeConfiguration } from '@bugsnag/react-native-performance
 import { type NavigationDelegate } from 'react-native-navigation/lib/dist/src/NavigationDelegate'
 
 class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
-  navigationSpan?: SpanInternal
-  startTime?: number
+  private navigationSpan?: SpanInternal
+  private startTime?: number
 
   constructor (private Navigation: NavigationDelegate) {}
 
