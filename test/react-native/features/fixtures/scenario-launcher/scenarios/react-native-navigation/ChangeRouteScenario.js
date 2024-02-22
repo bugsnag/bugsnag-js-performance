@@ -10,7 +10,7 @@ export const config = {
     plugins: [new ReactNativeNavigationPlugin(Navigation)]
 }
 
-export function load() {
+export function registerScreens() {
     Navigation.registerComponent('Screen 1', () => Screen1);
     Navigation.registerComponent('Screen 2', () => Screen2);
 
