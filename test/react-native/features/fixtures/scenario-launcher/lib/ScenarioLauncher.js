@@ -8,8 +8,8 @@ import { clearPersistedState, setDeviceId, setSamplingProbability } from './Pers
 const isTurboModuleEnabled = () => global.__turboModuleProxy != null
 
 function loadReactNavigationScenario (scenario) {
-  if (scenario.load) {
-    scenario.load()
+  if (typeof scenario.registerScreens === 'function') {
+    scenario.registerScreens()
   } else {
     const Navigation = require('react-native-navigation')
     Navigation.registerComponent('Scenario', () => scenario.App)
@@ -43,7 +43,7 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
   })
 
   if (process.env.REACT_NATIVE_NAVIGATION) {
-    loadReactNavigationScenario()
+    loadReactNavigationScenario(scenario)
   } else {
     const appParams = { rootTag }
     if (isTurboModuleEnabled()) {
