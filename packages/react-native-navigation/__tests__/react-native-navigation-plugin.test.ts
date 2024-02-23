@@ -43,10 +43,14 @@ describe('ReactNativeNavigationPlugin', () => {
 
     jest.advanceTimersByTime(100)
 
-    expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
-      name: '[Navigation]TestScreen',
-      startTime: 0,
-      endTime: 0
-    }))
+    expect(spanFactory.endSpan).toHaveBeenCalledTimes(1)
+    expect(spanFactory.createdSpans).toHaveLength(1)
+
+    const span = spanFactory.createdSpans[0]
+    expect(span.name).toEqual('[Navigation]TestScreen')
+    expect(span).toHaveAttribute('bugsnag.span.category', 'navigation')
+    expect(span).toHaveAttribute('bugsnag.span.first_class', false)
+    expect(span).toHaveAttribute('bugsnag.navigation.route', 'TestScreen')
+    expect(span).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-native-navigation-performance')
   })
 })

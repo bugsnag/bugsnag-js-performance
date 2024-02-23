@@ -18,6 +18,9 @@ Feature: Navigation spans with React Native Navigation
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.traceId" matches the regex "^[A-Fa-f0-9]{32}$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.startTimeUnixNano" matches the regex "^[0-9]+$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.endTimeUnixNano" matches the regex "^[0-9]+$"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "navigation"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.navigation.route" equals "Screen 1"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.navigation.triggered_by" equals "@bugsnag/react-native-navigation-performance"
 
     # Span 2
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.name" equals "[Navigation]Screen 2"
@@ -26,3 +29,6 @@ Feature: Navigation spans with React Native Navigation
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.traceId" matches the regex "^[A-Fa-f0-9]{32}$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.startTimeUnixNano" matches the regex "^[0-9]+$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.endTimeUnixNano" matches the regex "^[0-9]+$"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" string attribute "bugsnag.span.category" equals "navigation"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" string attribute "bugsnag.navigation.route" equals "Screen 2"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" string attribute "bugsnag.navigation.triggered_by" equals "@bugsnag/react-native-navigation-performance"
