@@ -4,7 +4,7 @@ describe('Request Tracker', () => {
   it('should invoke start callbacks on onStart', () => {
     const requestTracker = new RequestTracker()
     const endCallback = jest.fn()
-    const startCallback = jest.fn(() => endCallback)
+    const startCallback = jest.fn(() => ({ onRequestEnd: endCallback }))
 
     requestTracker.onStart(startCallback)
     expect(startCallback).not.toHaveBeenCalled()
@@ -17,13 +17,13 @@ describe('Request Tracker', () => {
   it('should invoke end callbacks on end', () => {
     const requestTracker = new RequestTracker()
     const endCallback = jest.fn()
-    const startCallback = jest.fn(() => endCallback)
+    const startCallback = jest.fn(() => ({ onRequestEnd: endCallback }))
 
     requestTracker.onStart(startCallback)
     expect(startCallback).not.toHaveBeenCalled()
 
     const startContext = { type: 'fetch', url: '/', method: 'GET', startTime: 1 } as const
-    const onEnd = requestTracker.start(startContext)
+    const { onRequestEnd: onEnd } = requestTracker.start(startContext)
     expect(startCallback).toHaveBeenCalledWith(startContext)
     expect(endCallback).not.toHaveBeenCalled()
 
@@ -35,7 +35,7 @@ describe('Request Tracker', () => {
   it('should handle undefined end callbacks', () => {
     const requestTracker = new RequestTracker()
     const endCallback = jest.fn()
-    const acceptCallback = jest.fn(() => endCallback)
+    const acceptCallback = jest.fn(() => ({ onRequestEnd: endCallback }))
     const rejectCallback = jest.fn()
 
     requestTracker.onStart(acceptCallback)
@@ -44,7 +44,7 @@ describe('Request Tracker', () => {
     expect(rejectCallback).not.toHaveBeenCalled()
 
     const startContext = { type: 'fetch', url: '/', method: 'GET', startTime: 1 } as const
-    const onEnd = requestTracker.start(startContext)
+    const { onRequestEnd: onEnd } = requestTracker.start(startContext)
     expect(acceptCallback).toHaveBeenCalledWith(startContext)
     expect(rejectCallback).toHaveBeenCalledWith(startContext)
 

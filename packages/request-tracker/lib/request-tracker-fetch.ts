@@ -24,7 +24,7 @@ function createFetchRequestTracker (global: GlobalWithFetch, clock: Clock) {
 
   global.fetch = function fetch (input?: unknown, init?: unknown) {
     const startContext = createStartContext(clock.now(), input, init, global.document && global.document.baseURI)
-    const onRequestEnd = requestTracker.start(startContext)
+    const { onRequestEnd } = requestTracker.start(startContext)
 
     return originalFetch.call(this, input as RequestInfo, init as RequestInit).then(response => {
       onRequestEnd({ status: response.status, endTime: clock.now(), state: 'success' })

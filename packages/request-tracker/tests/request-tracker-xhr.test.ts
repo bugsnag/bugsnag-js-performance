@@ -54,7 +54,7 @@ describe('XHR Request Tracker', () => {
   beforeEach(() => {
     clock = new IncrementingClock()
     endCallback = jest.fn()
-    startCallback = jest.fn(context => endCallback)
+    startCallback = jest.fn(context => ({ onRequestEnd: endCallback }))
   })
 
   it('does not require document parameter', () => {

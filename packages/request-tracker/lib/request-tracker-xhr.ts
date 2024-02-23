@@ -1,5 +1,5 @@
 import { type Clock } from '@bugsnag/core-performance'
-import { type RequestEndCallback, type RequestEndContext, RequestTracker } from './request-tracker'
+import { type RequestEndContext, RequestTracker } from './request-tracker'
 import getAbsoluteUrl from './url-helpers'
 
 interface RequestData {
@@ -31,7 +31,7 @@ function createXmlHttpRequestTracker (xhr: typeof XMLHttpRequest, clock: Clock, 
       const existingHandler = requestHandlers.get(this)
       if (existingHandler) this.removeEventListener('readystatechange', existingHandler)
 
-      const onRequestEnd: RequestEndCallback = requestTracker.start({
+      const { onRequestEnd } = requestTracker.start({
         type: 'xmlhttprequest',
         method: requestData.method,
         url: requestData.url,

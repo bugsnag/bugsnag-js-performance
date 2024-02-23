@@ -29,7 +29,7 @@ describe('fetch Request Tracker', () => {
   beforeEach(() => {
     clock = new IncrementingClock()
     endCallback = jest.fn()
-    startCallback = jest.fn(context => endCallback)
+    startCallback = jest.fn(context => ({ onRequestEnd: endCallback }))
   })
 
   it.each([['GET', 200], ['PUT', 200], ['POST', 201], ['DELETE', 204]])('should notify subscribers for a completed %s request', async (method, status) => {

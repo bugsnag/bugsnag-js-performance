@@ -2,7 +2,6 @@ import { type Clock } from '@bugsnag/core-performance'
 import { Settler } from './settler'
 import {
   type RequestStartContext,
-  type RequestEndCallback,
   type RequestEndContext,
   type RequestTracker
 } from '@bugsnag/request-tracker-performance'
@@ -28,7 +27,7 @@ class RequestSettler extends Settler {
     this.urlsToIgnore = urlsToIgnore
   }
 
-  private onRequestStart (startContext: RequestStartContext): RequestEndCallback | undefined {
+  private onRequestStart (startContext: RequestStartContext) {
     // if this is an excluded URL, ignore this request
     if (this.shouldIgnoreUrl(startContext.url)) return
 
@@ -36,14 +35,16 @@ class RequestSettler extends Settler {
     this.settled = false
     ++this.outstandingRequests
 
-    return (endContext: RequestEndContext): void => {
-      if (--this.outstandingRequests === 0) {
-        // we wait 100ms to ensure that requests have actually stopped but don't
-        // want the settled time to reflect that wait, so we record the time
-        // here and use that when settling
-        const settledTime = this.clock.now()
+    return {
+      onRequestEnd: (endContext: RequestEndContext): void => {
+        if (--this.outstandingRequests === 0) {
+          // we wait 100ms to ensure that requests have actually stopped but don't
+          // want the settled time to reflect that wait, so we record the time
+          // here and use that when settling
+          const settledTime = this.clock.now()
 
-        this.timeout = setTimeout(() => { this.settle(settledTime) }, 100)
+          this.timeout = setTimeout(() => { this.settle(settledTime) }, 100)
+        }
       }
     }
   }
