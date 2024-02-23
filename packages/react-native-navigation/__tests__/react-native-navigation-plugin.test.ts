@@ -8,11 +8,18 @@ jest.mock('react-native-navigation', () => {
     Navigation: {
       events: jest.fn().mockReturnValue({
         registerCommandListener: jest.fn(),
-        registerCommandCompletedListener: jest.fn(),
         registerComponentDidAppearListener: jest.fn()
       })
     }
   }
+})
+
+beforeEach(() => {
+  jest.useFakeTimers()
+})
+
+afterEach(() => {
+  jest.useRealTimers()
 })
 
 describe('ReactNativeNavigationPlugin', () => {
@@ -34,16 +41,12 @@ describe('ReactNativeNavigationPlugin', () => {
       componentType: 'Component'
     })
 
-    jest.mocked(Navigation.events().registerCommandCompletedListener).mock.calls[0][0]({
-      commandId: '1',
-      completionTime: 1000,
-      commandName: 'push'
-    })
+    jest.advanceTimersByTime(100)
 
     expect(spanFactory.createdSpans).toContainEqual(expect.objectContaining({
       name: '[Navigation]TestScreen',
-      startTime: expect.any(Number),
-      endTime: 1000
+      startTime: 0,
+      endTime: 0
     }))
   })
 })
