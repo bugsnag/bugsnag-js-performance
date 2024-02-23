@@ -42,7 +42,7 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
 
     // Navigation has occurred
     this.Navigation.events().registerComponentDidAppearListener(event => {
-      if (this.startTime) {
+      if (typeof this.startTime === 'number') {
         const routeName = event.componentName
         this.navigationSpan = spanFactory.startSpan('[Navigation]' + routeName, {
           startTime: this.startTime
