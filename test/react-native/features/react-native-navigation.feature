@@ -9,7 +9,7 @@ Feature: Navigation spans with React Native Navigation
     # Check the initial probability request
     Then the sampling request "Bugsnag-Span-Sampling" header equals "1.0:0"
 
-    And the trace "Bugsnag-Span-Sampling" header equals "1:1"
+    And the trace "Bugsnag-Span-Sampling" header equals "1:2"
 
     # Span 1
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[Navigation]Screen 1"
