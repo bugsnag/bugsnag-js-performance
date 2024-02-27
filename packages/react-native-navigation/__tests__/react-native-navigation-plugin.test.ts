@@ -3,16 +3,7 @@ import { type ReactNativeConfiguration } from '@bugsnag/react-native-performance
 import ReactNativeNavigationPlugin from '../lib/react-native-navigation-plugin'
 import { Navigation } from 'react-native-navigation'
 
-jest.mock('react-native-navigation', () => {
-  return {
-    Navigation: {
-      events: jest.fn().mockReturnValue({
-        registerCommandListener: jest.fn(),
-        registerComponentDidAppearListener: jest.fn()
-      })
-    }
-  }
-})
+jest.mock('react-native-navigation')
 
 beforeEach(() => {
   jest.useFakeTimers()

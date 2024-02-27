@@ -22,11 +22,14 @@
     "peerDependencies": {
         "@bugsnag/core-performance": "^2.2.0",
         "@bugsnag/react-native-performance": "^2.2.0",
-        "react-native-navigation": "7.37.2"
+        "react-native-navigation": "*"
     },
     "devDependencies": {
         "@bugsnag/core-performance": "*",
         "@bugsnag/react-native-performance": "*",
+        "@react-native/babel-preset": "^0.74.0",
+        "@testing-library/jest-native": "^5.4.3",
+        "@testing-library/react-native": "^12.4.1",
         "react-native-navigation": "7.37.2"
     },
     "type": "module",
