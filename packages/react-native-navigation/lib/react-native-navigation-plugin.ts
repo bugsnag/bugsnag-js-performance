@@ -13,6 +13,7 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
   private startTime?: number
   private startTimeout?: NodeJS.Timeout
   private endTimeout?: NodeJS.Timeout
+  private endedBy: Reason = 'immediate'
   private componentsWaiting = 0
   private spanFactory?: SpanFactory<ReactNativeConfiguration>
 
@@ -27,16 +28,19 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
     this.currentNavigationSpan = undefined
   }
 
-  /** Trigger the end of the current navigation span after 100ms */
-  private triggerNavigationEnd = (spanFactory: SpanFactory<ReactNativeConfiguration>, endedBy: Reason, endTime = performance.now()) => {
-    clearTimeout(this.endTimeout)
+  private endActiveSpan (endTime: number) {
+    if (this.componentsWaiting === 0 && this.currentNavigationSpan && this.spanFactory) {
+      this.currentNavigationSpan.setAttribute('bugsnag.navigation.ended_by', this.endedBy)
+      this.spanFactory.endSpan(this.currentNavigationSpan, endTime)
+      this.clearActiveSpan()
+    }
+  }
 
+  /** Trigger the end of the current navigation span after 100ms */
+  private triggerNavigationEnd = (endTime: number) => {
+    clearTimeout(this.endTimeout)
     this.endTimeout = setTimeout(() => {
-      if (this.componentsWaiting === 0 && this.currentNavigationSpan) {
-        this.currentNavigationSpan.setAttribute('bugsnag.navigation.ended_by', endedBy)
-        spanFactory.endSpan(this.currentNavigationSpan, endTime)
-        this.clearActiveSpan()
-      }
+      this.endActiveSpan(endTime)
     }, NAVIGATION_COMPLETE_TIMEOUT)
   }
 
@@ -44,19 +48,20 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
    * Blocks the current navigation by incrementing the count of components waiting
    */
   blockNavigationEnd = () => {
+    clearTimeout(this.endTimeout)
     this.componentsWaiting += 1
   }
 
   /**
    * Unblocks the current navigation by decrementing the count of components waiting and setting the reason
-   */
+  */
   unblockNavigationEnd = (endedBy: Reason) => {
     const renderTime = performance.now()
-
+    this.endedBy = endedBy
     this.componentsWaiting = Math.max(this.componentsWaiting - 1, 0)
 
-    if (this.spanFactory) {
-      this.triggerNavigationEnd(this.spanFactory, endedBy, renderTime)
+    if (this.componentsWaiting === 0 && this.spanFactory) {
+      this.triggerNavigationEnd(renderTime)
     }
   }
 
@@ -75,6 +80,8 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
     // Navigation has occurred
     this.Navigation.events().registerComponentDidAppearListener(event => {
       if (typeof this.startTime === 'number') {
+        clearTimeout(this.startTimeout)
+
         const routeName = event.componentName
         this.currentNavigationSpan = spanFactory.startSpan('[Navigation]' + routeName, {
           startTime: this.startTime,
@@ -86,7 +93,9 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
         this.currentNavigationSpan.setAttribute('bugsnag.navigation.route', routeName)
         this.currentNavigationSpan.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-native-navigation-performance')
 
-        this.triggerNavigationEnd(spanFactory, 'immediate')
+        this.endedBy = 'immediate'
+
+        this.triggerNavigationEnd(performance.now())
       }
     })
   }
