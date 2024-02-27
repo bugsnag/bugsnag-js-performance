@@ -43,7 +43,11 @@ export class RequestTracker {
           result?.onRequestEnd(endContext)
         }
       },
-      extraRequestHeaders: results.map(result => result?.extraRequestHeaders)
+      extraRequestHeaders: results.map(result => result?.extraRequestHeaders).filter(isDefined)
     }
   }
+}
+
+function isDefined<T> (argument: T | undefined): argument is T {
+  return argument !== undefined
 }

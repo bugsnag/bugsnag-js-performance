@@ -52,4 +52,32 @@ describe('Request Tracker', () => {
     onEnd(endContext)
     expect(endCallback).toHaveBeenCalledWith(endContext)
   })
+
+  it('should handle callbacks with extraRequestHeaders', () => {
+    const requestTracker = new RequestTracker()
+    const endCallback1 = jest.fn()
+    const endCallback2 = jest.fn()
+    const startCallback1 = jest.fn(() => ({ onRequestEnd: endCallback1, extraRequestHeaders: { traceparent: 'abc123' } }))
+    const startCallback2 = jest.fn(() => ({ onRequestEnd: endCallback2, extraRequestHeaders: { 'x-foo': 'bar' } }))
+
+    requestTracker.onStart(startCallback1)
+    requestTracker.onStart(startCallback2)
+
+    const startContext = { type: 'fetch', url: '/', method: 'GET', startTime: 1 } as const
+    const { onRequestEnd: onEnd, extraRequestHeaders } = requestTracker.start(startContext)
+
+    expect(startCallback1).toHaveBeenCalledWith(startContext)
+    expect(startCallback2).toHaveBeenCalledWith(startContext)
+
+    expect(extraRequestHeaders).toEqual([
+      { traceparent: 'abc123' },
+      { 'x-foo': 'bar' }
+    ])
+
+    const endContext: RequestEndContext = { status: 200, endTime: 2, state: 'success' }
+    onEnd(endContext)
+
+    expect(endCallback1).toHaveBeenCalledWith(endContext)
+    expect(endCallback2).toHaveBeenCalledWith(endContext)
+  })
 })
