@@ -43,6 +43,8 @@ function createXmlHttpRequestFake (success: boolean = true, responseStatus: numb
     this._listeners[evt] = this._listeners[evt].filter((existing: () => void) => existing !== listener)
   })
 
+  XmlHttpRequestFake.prototype.setRequestHeader = jest.fn(function (name: string, value: string) {})
+
   return XmlHttpRequestFake
 }
 
@@ -143,6 +145,37 @@ describe('XHR Request Tracker', () => {
     expect(startCallback).not.toHaveBeenCalled()
 
     request.send()
+    expect(startCallback).toHaveBeenCalledWith({
+      type: 'xmlhttprequest',
+      url: TEST_URL,
+      method: 'GET',
+      startTime: 1
+    })
+    expect(endCallback).toHaveBeenCalledWith({
+      status: 200,
+      endTime: 2,
+      state: 'success'
+    })
+  })
+
+  it('should set extra request headers if specified by callback handlers', () => {
+    window.XMLHttpRequest = createXmlHttpRequestFake() as unknown as typeof XMLHttpRequest
+    const xhrTracker = createXmlHttpRequestTracker(XMLHttpRequest, clock, document)
+
+    startCallback = jest.fn(context => ({ onRequestEnd: endCallback, extraRequestHeaders: { traceparent: 'abc123' } }))
+    const startCallback2 = jest.fn(context => ({ onRequestEnd: endCallback, extraRequestHeaders: { 'x-test-header': 'test-value' } }))
+
+    xhrTracker.onStart(startCallback)
+    xhrTracker.onStart(startCallback2)
+
+    const request = new window.XMLHttpRequest()
+    request.open('GET', new URL(TEST_URL))
+
+    request.send()
+
+    expect(window.XMLHttpRequest.prototype.setRequestHeader).toHaveBeenCalledWith('traceparent', 'abc123')
+    expect(window.XMLHttpRequest.prototype.setRequestHeader).toHaveBeenCalledWith('x-test-header', 'test-value')
+
     expect(startCallback).toHaveBeenCalledWith({
       type: 'xmlhttprequest',
       url: TEST_URL,
