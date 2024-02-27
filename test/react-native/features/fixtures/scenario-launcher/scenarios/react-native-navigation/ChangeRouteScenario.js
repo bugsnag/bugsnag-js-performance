@@ -1,4 +1,4 @@
-import { ReactNativeNavigationPlugin } from '@bugsnag/react-native-navigation-performance'
+import { CompleteNavigation, ReactNativeNavigationPlugin } from '@bugsnag/react-native-navigation-performance'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView, Text } from 'react-native'
 import { Navigation } from 'react-native-navigation'
@@ -66,7 +66,9 @@ function Screen1(props) {
 function Screen2(props) {
     return (
         <SafeAreaView>
-            <Text>Screen 2</Text>
+            <CompleteNavigation on="mount">
+                <Text>Screen 2</Text>
+            </CompleteNavigation>
         </SafeAreaView>
     )
 }
