@@ -1,7 +1,7 @@
 import { VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 import { fireEvent, render, screen } from '@testing-library/react-native'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Button, View } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 import { CompleteNavigation } from '../lib/CompleteNavigation'
