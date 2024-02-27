@@ -75,7 +75,7 @@ function Screen2(props) {
     return (
         <SafeAreaView>
             <Text>Screen 2</Text>
-            {loaded && <CompleteNavigation on="mount"/>}
+            <CompleteNavigation condition={loaded} />
         </SafeAreaView>
     )
 }
