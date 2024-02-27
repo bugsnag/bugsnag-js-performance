@@ -64,11 +64,18 @@ function Screen1(props) {
 }
 
 function Screen2(props) {
+    const [loaded, setLoaded] = useState(false)
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoaded(true)
+        }, 50)
+    }, [])
+
     return (
         <SafeAreaView>
-            <CompleteNavigation on="mount">
-                <Text>Screen 2</Text>
-            </CompleteNavigation>
+            <Text>Screen 2</Text>
+            {loaded && <CompleteNavigation on="mount"/>}
         </SafeAreaView>
     )
 }
