@@ -1,5 +1,6 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
-import React, { type PropsWithChildren } from 'react'
+import type React from 'react'
+import { useEffect, useRef, type PropsWithChildren } from 'react'
 import ReactNativeNavigationPlugin from './react-native-navigation-plugin'
 
 interface Props extends PropsWithChildren {
@@ -7,51 +8,50 @@ interface Props extends PropsWithChildren {
 }
 
 /** End the current navigation span when the component is mounted, unmounted or the `on` prop is `true` */
-export class CompleteNavigation extends React.Component<Props> {
-  private _plugin?: ReactNativeNavigationPlugin
+export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, on }) => {
+  const pluginRef = useRef<ReactNativeNavigationPlugin>()
 
-  private get plugin () {
-    if (this._plugin) return this._plugin
+  function getPlugin () {
+    if (pluginRef.current) return pluginRef.current
 
     // @ts-expect-error signature does not match
-    this._plugin = BugsnagPerformance.getPlugin(ReactNativeNavigationPlugin)
+    pluginRef.current = BugsnagPerformance.getPlugin(ReactNativeNavigationPlugin)
 
-    return this._plugin
+    return pluginRef.current
   }
 
-  constructor (props: Props) {
-    super(props)
+  useEffect(() => {
+    const plugin = getPlugin()
 
-    if (this.plugin) {
-      this.plugin.blockNavigationEnd()
+    if (plugin) {
+      plugin.blockNavigationEnd()
     }
-  }
 
-  componentDidMount () {
-    if (this.props.on === 'mount') {
+    if (on === 'mount') {
       setTimeout(() => {
-        if (this.plugin) {
-          this.plugin.unblockNavigationEnd('mount')
+        if (plugin) {
+          plugin.unblockNavigationEnd('mount')
         }
       })
     }
-  }
 
-  componentWillUnmount () {
-    if (this.props.on === 'unmount' && this.plugin) {
-      this.plugin.unblockNavigationEnd('unmount')
-    }
-  }
-
-  componentDidUpdate (prevProps: Readonly<Props>) {
-    if (typeof this.props.on === 'boolean') {
-      if (this.props.on && !prevProps.on && this.plugin) {
-        this.plugin.unblockNavigationEnd('condition')
+    return () => {
+      if (plugin && on === 'unmount') {
+        plugin.unblockNavigationEnd('unmount')
       }
     }
-  }
+  }, [])
 
-  render () {
-    return this.props.children
-  }
+  useEffect(() => {
+    if (typeof on === 'boolean') {
+      if (on === true) {
+        const plugin = getPlugin()
+        if (plugin) {
+          plugin.unblockNavigationEnd('condition')
+        }
+      }
+    }
+  }, [on])
+
+  return children
 }
