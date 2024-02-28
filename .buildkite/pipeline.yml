@@ -12,13 +12,13 @@ steps:
   #
   # Upload each basic pipeline
   #
-  # - label: ":pipeline_upload: Basic browser pipeline"
-  #   commands:
-  #     - buildkite-agent pipeline upload .buildkite/browser-pipeline.yml
+  - label: ":pipeline_upload: Basic browser pipeline"
+    commands:
+      - buildkite-agent pipeline upload .buildkite/browser-pipeline.yml
 
-  # - label: ":pipeline_upload: React Native pipeline"
-  #   commands:
-  #     - buildkite-agent pipeline upload .buildkite/react-native-pipeline.yml
+  - label: ":pipeline_upload: React Native pipeline"
+    commands:
+      - buildkite-agent pipeline upload .buildkite/react-native-pipeline.yml
 
   - label: ":pipeline_upload: React Native Navigation pipeline"
     commands:
