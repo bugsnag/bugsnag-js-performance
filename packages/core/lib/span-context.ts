@@ -3,6 +3,7 @@ import { type BackgroundingListenerState, type BackgroundingListener } from './b
 export interface SpanContext {
   readonly id: string // 64 bit random string
   readonly traceId: string // 128 bit random string
+  readonly samplingRate: number
 
   // returns true if this is still considered a valid context
   readonly isValid: () => boolean

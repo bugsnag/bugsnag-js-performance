@@ -244,7 +244,7 @@ describe('Core', () => {
           const spanContextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
           const client = createTestClient({ spanContextStorage })
 
-          const spanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
+          const spanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
           spanContextStorage.push(spanContext)
           expect(client.currentSpanContext).toBe(spanContext)
         })

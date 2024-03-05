@@ -5,7 +5,7 @@ import { type SpanContext } from '@bugsnag/core-performance'
 
 const PAGE_LOAD_ID = 'page load span ID'
 const PAGE_LOAD_TRACE_ID = 'page load span trace ID'
-const fullPageLoadSpan: SpanContext = { id: PAGE_LOAD_ID, traceId: PAGE_LOAD_TRACE_ID, isValid: () => true }
+const fullPageLoadSpan: SpanContext = { id: PAGE_LOAD_ID, traceId: PAGE_LOAD_TRACE_ID, isValid: () => true, samplingRate: 0.1 }
 
 describe('PageLoadPhase Spans', () => {
   it('automatically creates expected spans', () => {

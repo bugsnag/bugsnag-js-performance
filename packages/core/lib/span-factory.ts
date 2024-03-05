@@ -128,6 +128,9 @@ export class SpanFactory <C extends Configuration> {
       get traceId () {
         return span.traceId
       },
+      get samplingRate () {
+        return span.samplingRate
+      },
       isValid: () => span.isValid(),
       end: (endTime) => {
         const safeEndTime = timeToNumber(this.clock, endTime)

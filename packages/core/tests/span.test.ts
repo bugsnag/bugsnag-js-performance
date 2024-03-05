@@ -150,7 +150,8 @@ describe('Span', () => {
         id: expect.any(String),
         traceId: expect.any(String),
         end: expect.any(Function),
-        isValid: expect.any(Function)
+        isValid: expect.any(Function),
+        samplingRate: 290
       })
     })
 
