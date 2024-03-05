@@ -14,7 +14,7 @@ export const DISCARD_END_TIME = -1
 
 export class SpanFactory <C extends Configuration> {
   private processor: Processor
-  private readonly sampler: ReadonlySampler
+  readonly sampler: ReadonlySampler
   private readonly idGenerator: IdGenerator
   private readonly spanAttributesSource: SpanAttributesSource<C>
   private readonly clock: Clock
