@@ -31,6 +31,7 @@ export interface BrowserConfiguration extends Configuration {
   settleIgnoreUrls?: Array<string | RegExp>
   networkRequestCallback?: NetworkRequestCallback<BrowserNetworkRequestInfo>
   sendPageAttributes?: SendPageAttributes
+  tracePropagationUrls?: Array<string | RegExp>
 }
 
 export function createSchema (hostname: string, defaultRoutingProvider: RoutingProvider): BrowserSchema {
@@ -79,6 +80,11 @@ export function createSchema (hostname: string, defaultRoutingProvider: RoutingP
       defaultValue: defaultSendPageAttributes,
       message: 'should be an object',
       validate: isSendPageAttributes
+    },
+    tracePropagationUrls: {
+      defaultValue: [],
+      message: 'should be an array of string|RegExp',
+      validate: isStringOrRegExpArray
     }
   }
 }

@@ -61,7 +61,7 @@ if (typeof window === 'undefined' || typeof document === 'undefined') {
       // ResourceLoadPlugin should always come after FullPageLoad plugin, as it should use that
       // span context as the parent of it's spans
       new ResourceLoadPlugin(spanFactory, spanContextStorage, window.PerformanceObserver),
-      new NetworkRequestPlugin(spanFactory, fetchRequestTracker, xhrRequestTracker),
+      new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchRequestTracker, xhrRequestTracker),
       new RouteChangePlugin(spanFactory, window.location, document)
     ],
     persistence,

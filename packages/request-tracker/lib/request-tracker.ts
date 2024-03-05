@@ -19,7 +19,7 @@ export interface RequestEndContextError {
 
 export type RequestEndContext = RequestEndContextSuccess | RequestEndContextError
 
-export type RequestStartCallback = (context: RequestStartContext) => { onRequestEnd: RequestEndCallback, extraRequestHeaders?: Record<string, string> } | undefined
+export type RequestStartCallback = (context: RequestStartContext) => { onRequestEnd?: RequestEndCallback, extraRequestHeaders?: Record<string, string> } | undefined
 
 export type RequestEndCallback = (context: RequestEndContext) => void
 
@@ -40,7 +40,7 @@ export class RequestTracker {
     return {
       onRequestEnd: (endContext: RequestEndContext) => {
         for (const result of results) {
-          result?.onRequestEnd(endContext)
+          result?.onRequestEnd?.(endContext)
         }
       },
       extraRequestHeaders: results.map(result => result?.extraRequestHeaders).filter(isDefined)
