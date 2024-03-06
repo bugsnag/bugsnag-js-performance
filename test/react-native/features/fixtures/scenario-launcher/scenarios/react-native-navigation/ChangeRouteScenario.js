@@ -1,16 +1,16 @@
 import { ReactNativeNavigationPlugin } from '@bugsnag/react-native-navigation-performance'
-import React from 'react'
-import { Button, SafeAreaView, Text } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { SafeAreaView, Text } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 
 export const config = {
-    maximumBatchSize: 1,
+    maximumBatchSize: 2,
     autoInstrumentAppStarts: false,
     appVersion: '1.2.3',
     plugins: [new ReactNativeNavigationPlugin(Navigation)]
 }
 
-export function load() {
+export function registerScreens() {
     Navigation.registerComponent('Screen 1', () => Screen1);
     Navigation.registerComponent('Screen 2', () => Screen2);
 
@@ -30,18 +30,35 @@ export function load() {
 }
 
 function Screen1(props) {
+    const [counter, setCounter] = useState(3)
+
+    useEffect(() => {
+        function decrementCounter() {
+            if (counter > 0) {
+                setTimeout(() => {
+                    setCounter(c => c - 1)
+                    decrementCounter()
+                }, 1000)
+            }
+        }
+
+        decrementCounter()
+    }, [])
+
+    useEffect(() => {
+        if (counter === 0) {
+            Navigation.push(props.componentId, {
+                component: {
+                    name: 'Screen 2'
+                }
+            })
+        }
+    }, [counter])
+
     return (
         <SafeAreaView>
             <Text>Screen 1</Text>
-            <Button
-                title='Go to screen 2'
-                onPress={() => { 
-                    Navigation.push(props.componentId, { 
-                        component: { 
-                            name: 'Screen 2' 
-                        } 
-                    }) 
-                }} />
+            <Text>Navigating in {counter}...</Text>
         </SafeAreaView>
     )
 }
