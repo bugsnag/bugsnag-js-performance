@@ -1,6 +1,7 @@
-@skip_new_arch
+@react_navigation
 Feature: Navigation spans with React Navigation
 
+  @skip_new_arch
   Scenario: Navigation Spans are automatically instrumented
     When I run 'ReactNavigationScenario'
     And I wait to receive a sampling request

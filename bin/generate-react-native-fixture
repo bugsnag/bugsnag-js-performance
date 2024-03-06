@@ -14,27 +14,29 @@ const ROOT_DIR = resolve(__dirname, '../')
 
 let fixturePath = 'test/react-native/features/fixtures/generated/'
 if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
-  fixturePath += 'newarch/'
+  fixturePath += 'new-arch/'
 } else {
-  fixturePath += 'oldarch/'
+  fixturePath += 'old-arch/'
 }
 
 const fixtureDir = resolve(ROOT_DIR, fixturePath, rnVersion)
 
 const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
+  '@bugsnag/delivery-fetch-performance',
+  '@bugsnag/react-native-navigation-performance',
   '@bugsnag/react-native-performance',
   '@bugsnag/react-navigation-performance',
-  '@bugsnag/delivery-fetch-performance',
   '@bugsnag/request-tracker-performance'
 ]
 
 const PACKAGE_DIRECTORIES = [
   `${ROOT_DIR}/packages/core`,
   `${ROOT_DIR}/packages/delivery-fetch`,
+  `${ROOT_DIR}/packages/platforms/react-native`,
+  `${ROOT_DIR}/packages/react-native-navigation`,
   `${ROOT_DIR}/packages/react-navigation`,
   `${ROOT_DIR}/packages/request-tracker`,
-  `${ROOT_DIR}/packages/platforms/react-native`,
   `${ROOT_DIR}/test/react-native/features/fixtures/scenario-launcher`,
 ]
 
