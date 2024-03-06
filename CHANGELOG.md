@@ -5,6 +5,7 @@
 ### Fixed
 
 - (browser) Prevent throwing an error in edge cases when `performance.getEntriesByType()` returns undefined [#401](https://github.com/bugsnag/bugsnag-js-performance/pull/401)
+- (react-native) Broaden version range allowed for `@react-native-community/netinfo` peer dependency [#413](https://github.com/bugsnag/bugsnag-js-performance/pull/413)
 
 ## v2.2.0 (2024-02-01)
 
