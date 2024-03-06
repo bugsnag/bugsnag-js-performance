@@ -91,9 +91,9 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
     const extraRequestHeaders: Record<string, string> = {}
 
     if (this.tracePropagationUrls.some(regexp => regexp.test(startContext.url))) {
-      if (span && span.parentSpanId) {
+      if (span) {
         const traceId = span.traceId
-        const parentSpanId = span.parentSpanId
+        const parentSpanId = span.id
         const sampled = span.samplingRate <= this.spanFactory.sampler.spanProbability.scaled
 
         extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)

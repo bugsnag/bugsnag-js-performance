@@ -260,7 +260,7 @@ describe('network span plugin', () => {
         const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: 'https://my-api.com/users', startTime: 1 })
 
         expect(res.extraRequestHeaders).toEqual([
-          { traceparent: '00-xyz456-abc123-01' }
+          { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
         ])
       })
 
