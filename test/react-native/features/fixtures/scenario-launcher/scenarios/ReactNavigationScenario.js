@@ -2,10 +2,10 @@ import BugsnagPerformance from '@bugsnag/react-native-performance'
 import { ReactNavigationNativePlugin } from '@bugsnag/react-navigation-performance'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React, { useEffect } from 'react'
-import { Button, SafeAreaView, Text } from 'react-native'
+import { SafeAreaView, Text } from 'react-native'
 
 export const config = {
-    maximumBatchSize: 2,
+    maximumBatchSize: 3,
     autoInstrumentAppStarts: false,
     appVersion: '1.2.3',
     plugins: [new ReactNavigationNativePlugin()]
@@ -23,28 +23,43 @@ export function App() {
 
     return (
         <BugsnagNavigationContainer>
-            <Stack.Navigator initialRouteName='Home'>
-                <Stack.Screen name='Home' component={HomeScreen} />
-                <Stack.Screen name='Details' component={DetailsScreen} />
+            <Stack.Navigator initialRouteName='Screen1'>
+                <Stack.Screen name='Screen1' component={Screen1} />
+                <Stack.Screen name='Screen2' component={Screen2} />
+                <Stack.Screen name='Screen3' component={Screen3} />
             </Stack.Navigator>
         </BugsnagNavigationContainer>
     );
 }
 
-function HomeScreen({ navigation }) {
+function Screen1({ navigation }) {
     useEffect(() => {
         parentSpan = BugsnagPerformance.startSpan('ParentSpan')
-        navigation.navigate('Details')
+        navigation.navigate('Screen2')
     }, [])
 
     return (
         <SafeAreaView>
-            <Text>HomeScreen</Text>
+            <Text>Screen1</Text>
         </SafeAreaView>
     )
 }
 
-function DetailsScreen({ navigation }) {
+function Screen2({ navigation }) {
+    useEffect(() => {
+        setTimeout(() => {
+            navigation.navigate('Screen3')
+        }, 250)
+    }, [])
+
+    return (
+        <SafeAreaView>
+            <Text>Screen2</Text>
+        </SafeAreaView>
+    )
+}
+
+function Screen3({ navigation }) {
     useEffect(() => {
         setTimeout(() => {
             if(parentSpan && typeof parentSpan.end === 'function') {
@@ -55,8 +70,7 @@ function DetailsScreen({ navigation }) {
 
     return (
         <SafeAreaView>
-            <Text>DetailsScreen</Text>
-            <Button title='Go back' onPress={() => { navigation.goBack() }} />
+            <Text>Screen3</Text>
         </SafeAreaView>
     )
 }
