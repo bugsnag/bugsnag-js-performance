@@ -5,12 +5,15 @@ import React, { useEffect } from 'react'
 import { SafeAreaView, Text, Button } from 'react-native'
 
 export const config = {
-    maximumBatchSize: 2,
+    maximumBatchSize: 1,
+    autoInstrumentAppStarts: false,
     appVersion: '1.2.3',
     plugins: [new ReactNavigationNativePlugin()]
 }
 
 const Stack = createNativeStackNavigator()
+
+let parentSpan
 
 export function App() {
 
@@ -31,6 +34,7 @@ export function App() {
 
 function HomeScreen({ navigation }) {
     useEffect(() => {
+        parentSpan = BugsnagPerformance.startSpan('ParentSpan')
         navigation.navigate('Details')
     }, [])
 
@@ -38,29 +42,21 @@ function HomeScreen({ navigation }) {
         <SafeAreaView>
             <Text>HomeScreen</Text>
             <Button title='Go to details screen' onPress={() => { navigation.navigate('Details') }} />
-            <Button title='Go to loading screen' onPress={() => { navigation.navigate('Loading') }} />
-        </SafeAreaView>
-    )
-}
-
-function LoadingScreen({ navigation }) {
-    return (
-        <SafeAreaView>
-            <Text>LoadingScreen</Text>
-            <Button title='Go back' onPress={() => { navigation.goBack() }} />
-            <Button title='Go to home screen' onPress={() => { navigation.navigate('Home') }} />
-            <Button title='Go to details screen' onPress={() => { navigation.navigate('Details') }} />
         </SafeAreaView>
     )
 }
 
 function DetailsScreen({ navigation }) {
+    useEffect(() => {
+        setTimeout(() => {
+            parentSpan.end()
+        }, 250)
+    }, [])
+
     return (
         <SafeAreaView>
             <Text>DetailsScreen</Text>
             <Button title='Go back' onPress={() => { navigation.goBack() }} />
-            <Button title='Go to home screen' onPress={() => { navigation.navigate('Home') }} />
-            <Button title='Go to loading screen' onPress={() => { navigation.navigate('Loading') }} />
         </SafeAreaView>
     )
 }
