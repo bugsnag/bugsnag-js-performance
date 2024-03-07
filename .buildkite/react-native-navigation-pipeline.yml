@@ -1,10 +1,9 @@
-# This pipeline file builds runs the end-to-end tests for 
+# This pipeline file builds runs the end-to-end tests for
 # React Native Navigation on BitBar.
 
 steps:
   - group: "React Native Navigation Tests"
     steps:
-
       # Android Build
       # ------------------------------
       - label: ":building_construction: :android: Build RN {{matrix.rn_version}} (Old Arch) test fixture"
@@ -23,8 +22,7 @@ steps:
         matrix:
           setup:
             rn_version:
-              - "0.71"
-              - "0.72"
+              - "0.73"
         retry:
           automatic:
             - exit_status: "*"
@@ -47,8 +45,7 @@ steps:
         matrix:
           setup:
             rn_version:
-              - "0.71"
-              - "0.72"
+              - "0.73"
         retry:
           automatic:
             - exit_status: "*"
@@ -56,7 +53,7 @@ steps:
 
       # iOS Build
       # ------------------------------
-      - label: ':building_construction: :mac: Build RN {{matrix.rn_version}} (Old Arch) test fixture'
+      - label: ":building_construction: :mac: Build RN {{matrix.rn_version}} (Old Arch) test fixture"
         key: "build-react-native-navigation-ios-fixture-old-arch"
         timeout_in_minutes: 30
         agents:
@@ -74,14 +71,13 @@ steps:
         matrix:
           setup:
             rn_version:
-              - "0.71"
-              - "0.72"
+              - "0.73"
         retry:
           automatic:
             - exit_status: "*"
               limit: 1
 
-      - label: ':building_construction: :mac: Build RN {{matrix.rn_version}} (New Arch) test fixture'
+      - label: ":building_construction: :mac: Build RN {{matrix.rn_version}} (New Arch) test fixture"
         key: "build-react-native-navigation-ios-fixture-new-arch"
         timeout_in_minutes: 30
         agents:
@@ -100,8 +96,7 @@ steps:
         matrix:
           setup:
             rn_version:
-              - "0.71"
-              - "0.72"
+              - "0.73"
         retry:
           automatic:
             - exit_status: "*"
@@ -112,7 +107,7 @@ steps:
       - label: ":bitbar: :android: RN {{matrix.rn_version}} (Old Arch) Android {{matrix.android_version}} react-native-navigation end-to-end tests"
         depends_on: "build-react-native-navigation-android-fixture-old-arch"
         timeout_in_minutes: 60
-        env: 
+        env:
           REACT_NATIVE_NAVIGATION: "true"
         plugins:
           artifacts#v1.9.0:
@@ -142,13 +137,12 @@ steps:
             android_version:
               - "12"
             rn_version:
-              - "0.71"
-              - "0.72"
+              - "0.73"
 
       - label: ":bitbar: :android: RN {{matrix.rn_version}} (New Arch) Android {{matrix.android_version}} react-native-navigation end-to-end tests"
         depends_on: "build-react-native-navigation-android-fixture-new-arch"
         timeout_in_minutes: 60
-        env: 
+        env:
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "true"
         plugins:
@@ -179,15 +173,14 @@ steps:
             android_version:
               - "12"
             rn_version:
-              - "0.71"
-              - "0.72"
+              - "0.73"
 
       # iOS Test
       # ------------------------------
       - label: ":bitbar: :mac: RN {{matrix.rn_version}} (Old Arch) iOS {{matrix.ios_version}} react-native-navigation end-to-end tests"
         depends_on: "build-react-native-navigation-ios-fixture-old-arch"
         timeout_in_minutes: 60
-        env: 
+        env:
           REACT_NATIVE_NAVIGATION: "true"
         plugins:
           artifacts#v1.9.0:
@@ -215,15 +208,14 @@ steps:
         matrix:
           setup:
             ios_version:
-              - "14"
+              - "16"
             rn_version:
-              - "0.71"
-              - "0.72"
+              - "0.73"
 
       - label: ":bitbar: :mac: RN {{matrix.rn_version}} (New Arch) iOS {{matrix.ios_version}} react-native-navigation end-to-end tests"
         depends_on: "build-react-native-navigation-ios-fixture-new-arch"
         timeout_in_minutes: 60
-        env: 
+        env:
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "true"
         plugins:
@@ -252,7 +244,6 @@ steps:
         matrix:
           setup:
             ios_version:
-              - "14"
+              - "16"
             rn_version:
-              - "0.71"
-              - "0.72"
+              - "0.73"
