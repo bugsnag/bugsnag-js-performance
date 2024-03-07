@@ -13,23 +13,7 @@ export const config = {
 
 const Stack = createNativeStackNavigator()
 
-function useParentSpan () {
-    const [span, setSpan] = useState(null)
-
-    function startSpan () {
-        const newSpan = BugsnagPerformance.startSpan('ParentSpan')
-        setSpan(newSpan)
-    }
-
-    function endSpan () {
-        if (span) {
-            span.end()
-            setSpan(null)
-        }
-    }
-
-    return { startSpan, endSpan }
-}
+let parentSpan
 
 export function App() {
 
@@ -41,7 +25,6 @@ export function App() {
         <BugsnagNavigationContainer>
             <Stack.Navigator initialRouteName='Home'>
                 <Stack.Screen name='Home' component={HomeScreen} />
-                <Stack.Screen name='Loading' component={LoadingScreen} />
                 <Stack.Screen name='Details' component={DetailsScreen} />
             </Stack.Navigator>
         </BugsnagNavigationContainer>
@@ -52,10 +35,8 @@ function HomeScreen({ navigation }) {
     const { startSpan } = useParentSpan()
 
     useEffect(() => {
-        startSpan()
-        setTimeout(() => {
-            navigation.navigate('Details')
-        }, 250)
+        parentSpan = startSpan('ParentSpan')
+        navigation.navigate('Details')
     }, [])
 
     return (
@@ -67,11 +48,9 @@ function HomeScreen({ navigation }) {
 }
 
 function DetailsScreen({ navigation }) {
-    const { endSpan } = useParentSpan()
-
     useEffect(() => {
         setTimeout(() => {
-            endSpan()
+            parentSpan.end()
         }, 250)
     }, [])
 
