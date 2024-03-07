@@ -10,7 +10,7 @@ export * as SpanTriggeredByCommandScenario from './SpanTriggeredByCommandScenari
 export * as WrapperComponentProviderScenario from './WrapperComponentProviderScenario'
 
 // React Native Navigation Scenarios
-export * as RNNChangeRouteScenario from './react-native-navigation/ChangeRouteScenario'
+export * as ReactNativeNavigationScenario from './ReactNativeNavigationScenario'
 
 // React Navigation Scenarios
 export * as ReactNavigationScenario from './ReactNavigationScenario'
