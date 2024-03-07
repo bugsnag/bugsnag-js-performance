@@ -2,7 +2,7 @@ import BugsnagPerformance from '@bugsnag/react-native-performance'
 import { ReactNavigationNativePlugin } from '@bugsnag/react-navigation-performance'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React, { useEffect } from 'react'
-import { SafeAreaView, Text, Button } from 'react-native'
+import { Button, SafeAreaView, Text } from 'react-native'
 
 export const config = {
     maximumBatchSize: 1,
@@ -13,7 +13,23 @@ export const config = {
 
 const Stack = createNativeStackNavigator()
 
-let parentSpan
+function useParentSpan () {
+    const [span, setSpan] = useState(null)
+
+    function startSpan () {
+        const newSpan = BugsnagPerformance.startSpan('ParentSpan')
+        setSpan(newSpan)
+    }
+
+    function endSpan () {
+        if (span) {
+            span.end()
+            setSpan(null)
+        }
+    }
+
+    return { startSpan, endSpan }
+}
 
 export function App() {
 
@@ -33,8 +49,10 @@ export function App() {
 }
 
 function HomeScreen({ navigation }) {
+    const { startSpan } = useParentSpan()
+
     useEffect(() => {
-        parentSpan = BugsnagPerformance.startSpan('ParentSpan')
+        startSpan()
         navigation.navigate('Details')
     }, [])
 
@@ -47,9 +65,11 @@ function HomeScreen({ navigation }) {
 }
 
 function DetailsScreen({ navigation }) {
+    const { endSpan } = useParentSpan()
+
     useEffect(() => {
         setTimeout(() => {
-            parentSpan.end()
+            endSpan()
         }, 250)
     }, [])
 
