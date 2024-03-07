@@ -6,3 +6,11 @@ steps:
   - label: ":pipeline_upload: Full browser pipeline"
     commands:
       - buildkite-agent pipeline upload .buildkite/browser-pipeline.full.yml
+
+  - label: ":pipeline_upload: Full react native pipeline"
+    commands:
+      - buildkite-agent pipeline upload .buildkite/react-native-pipeline.full.yml
+
+  - label: ":pipeline_upload: Full react native navigation pipeline"
+    commands:
+      - buildkite-agent pipeline upload .buildkite/react-native-navigation-pipeline.full.yml
