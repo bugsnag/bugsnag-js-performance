@@ -64,6 +64,10 @@ describe('NavigationContextProvider', () => {
     expect(secondRouteSpan.name).toEqual('[Navigation]route-2')
     expect(secondRouteSpan).toHaveAttribute('bugsnag.span.category', 'navigation')
     expect(secondRouteSpan).toHaveAttribute('bugsnag.span.first_class', true)
+    expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.route', 'route-2')
+    expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.previous_route', 'route-1')
+    expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.ended_by', 'condition')
+    expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-navigation-performance')
   })
 
   it('Prevents a navigation span from ending when navigation is blocked', () => {
