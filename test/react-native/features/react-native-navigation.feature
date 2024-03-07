@@ -2,7 +2,7 @@
 Feature: Navigation spans with React Native Navigation
 
   Scenario: Navigation Spans are automatically instrumented
-    When I run 'RNNChangeRouteScenario'
+    When I run 'ReactNativeNavigationScenario'
     And I wait to receive a sampling request
     And I wait for 1 span
 
