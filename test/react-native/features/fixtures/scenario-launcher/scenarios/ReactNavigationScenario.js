@@ -53,7 +53,9 @@ function HomeScreen({ navigation }) {
 
     useEffect(() => {
         startSpan()
-        navigation.navigate('Details')
+        setTimeout(() => {
+            navigation.navigate('Details')
+        }, 250)
     }, [])
 
     return (
