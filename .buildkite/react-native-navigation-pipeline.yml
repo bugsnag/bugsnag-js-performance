@@ -208,7 +208,7 @@ steps:
         matrix:
           setup:
             ios_version:
-              - "16"
+              - "14"
             rn_version:
               - "0.72"
 
@@ -244,6 +244,6 @@ steps:
         matrix:
           setup:
             ios_version:
-              - "16"
+              - "14"
             rn_version:
               - "0.72"
