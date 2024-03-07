@@ -5,8 +5,7 @@ import React, { useEffect } from 'react'
 import { SafeAreaView, Text, Button } from 'react-native'
 
 export const config = {
-    maximumBatchSize: 1,
-    autoInstrumentAppStarts: false,
+    maximumBatchSize: 2,
     appVersion: '1.2.3',
     plugins: [new ReactNavigationNativePlugin()]
 }
