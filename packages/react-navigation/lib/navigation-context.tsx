@@ -82,9 +82,7 @@ export class NavigationContextProvider extends React.Component<Props, State> {
       }
 
       const span = spanFactory.startSpan(`[Navigation]${currentRoute}`, {
-        isFirstClass: false,
-        makeCurrentContext: true,
-        parentContext: null
+        isFirstClass: true
       })
 
       span.setAttribute('bugsnag.span.category', 'navigation')

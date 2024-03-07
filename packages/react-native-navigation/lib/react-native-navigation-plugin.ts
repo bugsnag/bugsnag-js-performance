@@ -85,8 +85,7 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
         const routeName = event.componentName
         this.currentNavigationSpan = spanFactory.startSpan('[Navigation]' + routeName, {
           startTime: this.startTime,
-          isFirstClass: false,
-          parentContext: null
+          isFirstClass: true
         })
 
         this.currentNavigationSpan.setAttribute('bugsnag.span.category', 'navigation')
