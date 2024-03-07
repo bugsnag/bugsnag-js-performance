@@ -32,17 +32,14 @@ export function App() {
 }
 
 function HomeScreen({ navigation }) {
-    const { startSpan } = useParentSpan()
-
     useEffect(() => {
-        parentSpan = startSpan('ParentSpan')
+        parentSpan = BugsnagPerformance.startSpan('ParentSpan')
         navigation.navigate('Details')
     }, [])
 
     return (
         <SafeAreaView>
             <Text>HomeScreen</Text>
-            <Button title='Go to details screen' onPress={() => { navigation.navigate('Details') }} />
         </SafeAreaView>
     )
 }
@@ -50,7 +47,9 @@ function HomeScreen({ navigation }) {
 function DetailsScreen({ navigation }) {
     useEffect(() => {
         setTimeout(() => {
-            parentSpan.end()
+            if(parentSpan && typeof parentSpan.end === 'function') {
+                parentSpan.end()
+            }
         }, 250)
     }, [])
 
