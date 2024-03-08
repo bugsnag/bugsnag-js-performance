@@ -4,8 +4,7 @@ import { SafeAreaView, Text } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 
 export const config = {
-    maximumBatchSize: 2,
-    autoInstrumentAppStarts: false,
+    maximumBatchSize: 3,
     appVersion: '1.2.3',
     plugins: [new ReactNativeNavigationPlugin(Navigation)]
 }
@@ -30,35 +29,19 @@ export function registerScreens() {
 }
 
 function Screen1(props) {
-    const [counter, setCounter] = useState(3)
-
     useEffect(() => {
-        function decrementCounter() {
-            if (counter > 0) {
-                setTimeout(() => {
-                    setCounter(c => c - 1)
-                    decrementCounter()
-                }, 1000)
-            }
-        }
-
-        decrementCounter()
-    }, [])
-
-    useEffect(() => {
-        if (counter === 0) {
+        setTimeout(() => {
             Navigation.push(props.componentId, {
                 component: {
                     name: 'Screen 2'
                 }
             })
-        }
-    }, [counter])
+        }, 250)
+    }, [])
 
     return (
         <SafeAreaView>
             <Text>Screen 1</Text>
-            <Text>Navigating in {counter}...</Text>
         </SafeAreaView>
     )
 }
@@ -75,7 +58,7 @@ function Screen2(props) {
     return (
         <SafeAreaView>
             <Text>Screen 2</Text>
-            {loaded && <CompleteNavigation on="mount"/>}
+            <CompleteNavigation on={loaded} />
         </SafeAreaView>
     )
 }
