@@ -16,7 +16,7 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
   private endedBy: Reason = 'immediate'
   private componentsWaiting = 0
   private spanFactory?: SpanFactory<ReactNativeConfiguration>
-  private lastRouteName?: string
+  private previousRoute?: string
 
   constructor (Navigation: NavigationDelegate) {
     this.Navigation = Navigation
@@ -93,11 +93,11 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
         this.currentNavigationSpan.setAttribute('bugsnag.navigation.route', routeName)
         this.currentNavigationSpan.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-native-navigation-performance')
 
-        if (this.lastRouteName) {
-          this.currentNavigationSpan.setAttribute('bugsnag.navigation.previous_route', this.lastRouteName)
+        if (this.previousRoute) {
+          this.currentNavigationSpan.setAttribute('bugsnag.navigation.previous_route', this.previousRoute)
         }
 
-        this.lastRouteName = routeName
+        this.previousRoute = routeName
 
         this.endedBy = 'immediate'
 
