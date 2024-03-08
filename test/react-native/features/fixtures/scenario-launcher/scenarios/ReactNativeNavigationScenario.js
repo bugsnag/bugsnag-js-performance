@@ -57,8 +57,11 @@ function Screen2(props) {
     useEffect(() => {
         setTimeout(() => {
             setLoaded(true)
-            parentSpan.end()
         }, 50)
+
+        setTimeout(() => {
+            parentSpan.end()
+        }, 250)
     }, [])
 
     return (
