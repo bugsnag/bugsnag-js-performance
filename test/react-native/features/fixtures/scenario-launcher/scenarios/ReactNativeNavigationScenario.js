@@ -1,15 +1,20 @@
 import { CompleteNavigation, ReactNativeNavigationPlugin } from '@bugsnag/react-native-navigation-performance'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView, Text } from 'react-native'
+import BugsnagPerformance from '@bugsnag/react-native-performance'
 import { Navigation } from 'react-native-navigation'
 
 export const config = {
-    maximumBatchSize: 3,
+    maximumBatchSize: 4,
     appVersion: '1.2.3',
     plugins: [new ReactNativeNavigationPlugin(Navigation)]
 }
 
+let parentSpan
+
 export function registerScreens() {
+    parentSpan = BugsnagPerformance.startSpan('ParentSpan')
+
     Navigation.registerComponent('Screen 1', () => Screen1);
     Navigation.registerComponent('Screen 2', () => Screen2);
 
@@ -52,6 +57,7 @@ function Screen2(props) {
     useEffect(() => {
         setTimeout(() => {
             setLoaded(true)
+            parentSpan.end()
         }, 50)
     }, [])
 
