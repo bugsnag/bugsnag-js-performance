@@ -9,7 +9,7 @@ Feature: Navigation spans with React Native Navigation
     # Check the initial probability request
     Then the sampling request "Bugsnag-Span-Sampling" header equals "1.0:0"
 
-    And the trace "Bugsnag-Span-Sampling" header equals "1:2"
+    And the trace "Bugsnag-Span-Sampling" header equals "1:3"
 
     And a span named "[AppStart/ReactNativeInit]" contains the attributes:
       | attribute                       | type        | value                                 |
