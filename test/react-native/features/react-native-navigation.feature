@@ -9,7 +9,7 @@ Feature: Navigation spans with React Native Navigation
     # Check the initial probability request
     Then the sampling request "Bugsnag-Span-Sampling" header equals "1.0:0"
 
-    And the trace "Bugsnag-Span-Sampling" header equals "1:3"
+    And the trace "Bugsnag-Span-Sampling" header equals "1:5"
 
     And a span named "[AppStart/ReactNativeInit]" contains the attributes:
       | attribute                       | type        | value                                 |
@@ -28,5 +28,21 @@ Feature: Navigation spans with React Native Navigation
       | bugsnag.span.category             | stringValue | navigation                                   |
       | bugsnag.navigation.route          | stringValue | Screen 2                                     |
       | bugsnag.navigation.triggered_by   | stringValue | @bugsnag/react-native-navigation-performance |
-      # | bugsnag.navigation.previous_route | stringValue | Screen 1                                     |
-      # | bugsnag.navigation.ended_by       | stringValue | condition                                    |
+      | bugsnag.navigation.previous_route | stringValue | Screen 1                                     |
+      | bugsnag.navigation.ended_by       | stringValue | condition                                    |
+
+    And a span named "[Navigation]Screen 3" contains the attributes:
+      | attribute                         | type        | value                                        |
+      | bugsnag.span.category             | stringValue | navigation                                   |
+      | bugsnag.navigation.route          | stringValue | Screen 3                                     |
+      | bugsnag.navigation.triggered_by   | stringValue | @bugsnag/react-native-navigation-performance |
+      | bugsnag.navigation.previous_route | stringValue | Screen 2                                     |
+      | bugsnag.navigation.ended_by       | stringValue | mount                                        |
+
+    And a span named "[Navigation]Screen 4" contains the attributes:
+      | attribute                         | type        | value                                        |
+      | bugsnag.span.category             | stringValue | navigation                                   |
+      | bugsnag.navigation.route          | stringValue | Screen 4                                     |
+      | bugsnag.navigation.triggered_by   | stringValue | @bugsnag/react-native-navigation-performance |
+      | bugsnag.navigation.previous_route | stringValue | Screen 3                                     |
+      | bugsnag.navigation.ended_by       | stringValue | unmount                                      |

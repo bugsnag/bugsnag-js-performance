@@ -4,7 +4,7 @@ import { SafeAreaView, Text } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 
 export const config = {
-    maximumBatchSize: 3,
+    maximumBatchSize: 5,
     appVersion: '1.2.3',
     plugins: [new ReactNativeNavigationPlugin(Navigation)]
 }
@@ -12,6 +12,8 @@ export const config = {
 export function registerScreens() {
     Navigation.registerComponent('Screen 1', () => Screen1);
     Navigation.registerComponent('Screen 2', () => Screen2);
+    Navigation.registerComponent('Screen 3', () => Screen3);
+    Navigation.registerComponent('Screen 4', () => Screen4);
 
     Navigation.setRoot({
         root: {
@@ -53,12 +55,62 @@ function Screen2(props) {
         setTimeout(() => {
             setLoaded(true)
         }, 50)
+
+        setTimeout(() => {
+            Navigation.push(props.componentId, {
+                component: {
+                    name: 'Screen 3'
+                }
+            })
+        }, 250)
     }, [])
 
     return (
         <SafeAreaView>
             <Text>Screen 2</Text>
             <CompleteNavigation on={loaded} />
+        </SafeAreaView>
+    )
+}
+
+function Screen3(props) {
+    const [loaded, setLoaded] = useState(false)
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoaded(true)
+        }, 50)
+
+        setTimeout(() => {
+            Navigation.push(props.componentId, {
+                component: {
+                    name: 'Screen 4'
+                }
+            })
+        }, 250)
+    }, [])
+
+    return (
+        <SafeAreaView>
+            <Text>Screen 3</Text>
+            {loaded ? <CompleteNavigation on="mount" /> : null}
+        </SafeAreaView>
+    )
+}
+
+function Screen4(props) {
+    const [loaded, setLoaded] = useState(false)
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoaded(true)
+        }, 50)
+    }, [])
+
+    return (
+        <SafeAreaView>
+            <Text>Screen 3</Text>
+            {loaded ? null : <CompleteNavigation on="unmount" />}
         </SafeAreaView>
     )
 }
