@@ -109,7 +109,7 @@ function Screen4(props) {
 
     return (
         <SafeAreaView>
-            <Text>Screen 3</Text>
+            <Text>Screen 4</Text>
             {loaded ? null : <CompleteNavigation on="unmount" />}
         </SafeAreaView>
     )
