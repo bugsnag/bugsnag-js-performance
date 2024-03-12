@@ -44,7 +44,7 @@ function Screen1(props) {
                     name: 'Screen 2'
                 }
             })
-        }, 250)
+        }, 500)
     }, [])
 
     return (
@@ -60,7 +60,7 @@ function Screen2(props) {
     useEffect(() => {
         setTimeout(() => {
             setLoaded(true)
-        }, 50)
+        }, 100)
 
         setTimeout(() => {
             Navigation.push(props.componentId, {
@@ -68,7 +68,7 @@ function Screen2(props) {
                     name: 'Screen 3'
                 }
             })
-        }, 250)
+        }, 500)
     }, [])
 
     return (
@@ -93,7 +93,7 @@ function Screen3(props) {
                     name: 'Screen 4'
                 }
             })
-        }, 250)
+        }, 500)
     }, [])
 
     return (
@@ -110,13 +110,13 @@ function Screen4(props) {
     useEffect(() => {
         setTimeout(() => {
             setLoaded(true)
-        }, 50)
+        }, 100)
 
         setTimeout(() => {
             if (parentSpan && typeof parentSpan.end === 'function') {
                 parentSpan.end()
             }
-        }, 250)
+        }, 500)
     }, [])
 
     return (
