@@ -6,6 +6,7 @@ import { Navigation } from 'react-native-navigation'
 
 export const config = {
     maximumBatchSize: 6,
+    batchInactivityTimeoutMs: 5000,
     appVersion: '1.2.3',
     plugins: [new ReactNativeNavigationPlugin(Navigation)]
 }
