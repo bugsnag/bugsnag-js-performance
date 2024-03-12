@@ -31,6 +31,7 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
 
   private endActiveSpan (endTime: number) {
     if (this.componentsWaiting === 0 && this.currentNavigationSpan && this.spanFactory) {
+      console.error('[Bugsnag] ending active span ' + this.currentNavigationSpan.name)
       this.currentNavigationSpan.setAttribute('bugsnag.navigation.ended_by', this.endedBy)
       this.spanFactory.endSpan(this.currentNavigationSpan, endTime)
       this.clearActiveSpan()
@@ -49,7 +50,7 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
    * Blocks the current navigation by incrementing the count of components waiting
    */
   blockNavigationEnd = () => {
-    console.log('[Bugsnag] blockNavigationEnd called')
+    console.error('[Bugsnag] blockNavigationEnd called')
 
     clearTimeout(this.endTimeout)
     this.componentsWaiting += 1
@@ -59,7 +60,7 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
    * Unblocks the current navigation by decrementing the count of components waiting and setting the reason
   */
   unblockNavigationEnd = (endedBy: Reason) => {
-    console.log('[Bugsnag] unblockNavigationEnd called with reason:' + endedBy)
+    console.error('[Bugsnag] unblockNavigationEnd called with reason:' + endedBy)
 
     const renderTime = performance.now()
     this.endedBy = endedBy
