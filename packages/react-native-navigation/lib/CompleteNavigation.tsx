@@ -31,11 +31,11 @@ export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, o
           plugin.unblockNavigationEnd('mount')
         })
       }
-    }
 
-    return () => {
-      if (plugin && on === 'unmount') {
-        plugin.unblockNavigationEnd('unmount')
+      if (on === 'unmount') {
+        return () => {
+          plugin.unblockNavigationEnd('unmount')
+        }
       }
     }
   }, [])
