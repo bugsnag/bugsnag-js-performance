@@ -5,13 +5,13 @@ Feature: Navigation spans with React Navigation
   Scenario: Navigation Spans are automatically instrumented
     When I run 'ReactNavigationScenario'
     And I wait to receive a sampling request
-    And I wait for 3 spans
+    And I wait for 5 spans
 
     # Check the initial probability request
     Then the sampling request "Bugsnag-Span-Sampling" header equals "1.0:0"
 
     And the trace "Bugsnag-Span-Sampling" header equals "1:5"
-    
+
     And a span named "[Navigation]Screen2" has a parent named "ParentSpan"
     And a span named "[Navigation]Screen2" contains the attributes:
       | attribute                       | type        | value                                 |

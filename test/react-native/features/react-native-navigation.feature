@@ -4,7 +4,7 @@ Feature: Navigation spans with React Native Navigation
   Scenario: Navigation Spans are automatically instrumented
     When I run 'ReactNativeNavigationScenario'
     And I wait to receive a sampling request
-    And I wait for 1 span
+    And I wait for 6 spans
 
     # Check the initial probability request
     Then the sampling request "Bugsnag-Span-Sampling" header equals "1.0:0"
