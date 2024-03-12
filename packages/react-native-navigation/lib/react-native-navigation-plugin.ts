@@ -49,6 +49,8 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
    * Blocks the current navigation by incrementing the count of components waiting
    */
   blockNavigationEnd = () => {
+    console.log('[Bugsnag] blockNavigationEnd called')
+
     clearTimeout(this.endTimeout)
     this.componentsWaiting += 1
   }
@@ -57,6 +59,8 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
    * Unblocks the current navigation by decrementing the count of components waiting and setting the reason
   */
   unblockNavigationEnd = (endedBy: Reason) => {
+    console.log('[Bugsnag] unblockNavigationEnd called with reason:' + endedBy)
+
     const renderTime = performance.now()
     this.endedBy = endedBy
     this.componentsWaiting = Math.max(this.componentsWaiting - 1, 0)

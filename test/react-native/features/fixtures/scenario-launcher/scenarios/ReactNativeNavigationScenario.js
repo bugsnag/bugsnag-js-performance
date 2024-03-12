@@ -1,7 +1,7 @@
 import { CompleteNavigation, ReactNativeNavigationPlugin } from '@bugsnag/react-native-navigation-performance'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 import React, { useEffect, useState } from 'react'
-import { SafeAreaView, Text } from 'react-native'
+import { View, Text } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 
 export const config = {
@@ -48,9 +48,9 @@ function Screen1(props) {
     }, [])
 
     return (
-        <SafeAreaView>
+        <View>
             <Text>Screen 1</Text>
-        </SafeAreaView>
+        </View>
     )
 }
 
@@ -72,10 +72,10 @@ function Screen2(props) {
     }, [])
 
     return (
-        <SafeAreaView>
+        <View>
             <Text>Screen 2</Text>
             <CompleteNavigation on={loaded} />
-        </SafeAreaView>
+        </View>
     )
 }
 
@@ -97,10 +97,10 @@ function Screen3(props) {
     }, [])
 
     return (
-        <SafeAreaView>
+        <View>
             <Text>Screen 3</Text>
             {loaded ? <CompleteNavigation on="mount" /> : null}
-        </SafeAreaView>
+        </View>
     )
 }
 
@@ -120,9 +120,9 @@ function Screen4(props) {
     }, [])
 
     return (
-        <SafeAreaView>
+        <View>
             <Text>Screen 4</Text>
             {loaded ? null : <CompleteNavigation on="unmount" />}
-        </SafeAreaView>
+        </View>
     )
 }
