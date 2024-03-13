@@ -36,6 +36,7 @@ def execute_command(action, scenario_name = '')
   command = {
     action: action,
     scenario_name: scenario_name,
+    payload: scenario_name,
     endpoint: "http://#{address}/traces",
     api_key: $api_key,
   }
