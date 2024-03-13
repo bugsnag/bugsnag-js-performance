@@ -12,7 +12,13 @@ export const config = {
     plugins: [new ReactNativeNavigationPlugin(Navigation)]
 }
 
+const COMMAND_INTERVAL = 500
+
 // let parentSpan
+
+function delay(ms) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+}
 
 function useCommandRunner(componentId) {
     useEffect(() => {
@@ -30,7 +36,9 @@ function useCommandRunner(componentId) {
                     })
                     break
                 default:
-                    throw new Error(`Unknown command: ${JSON.stringify(command)}`)
+                    console.error(`Unknown command: ${JSON.stringify(command)}`)
+                    delay(COMMAND_INTERVAL)
+                    commandRunner()
             }
         }
 
