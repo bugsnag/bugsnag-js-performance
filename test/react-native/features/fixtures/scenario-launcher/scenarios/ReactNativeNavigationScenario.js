@@ -1,17 +1,42 @@
 import { CompleteNavigation, ReactNativeNavigationPlugin } from '@bugsnag/react-native-navigation-performance'
-import BugsnagPerformance from '@bugsnag/react-native-performance'
+// import BugsnagPerformance from '@bugsnag/react-native-performance'
 import React, { useEffect, useState } from 'react'
 import { View, Text } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 
 export const config = {
-    maximumBatchSize: 6,
+    maximumBatchSize: 1,
+    autoInstrumentAppStarts: false,
     batchInactivityTimeoutMs: 5000,
     appVersion: '1.2.3',
     plugins: [new ReactNativeNavigationPlugin(Navigation)]
 }
 
-let parentSpan
+// let parentSpan
+
+function useCommandRunner(componentId) {
+    useEffect(() => {
+        async function commandRunner () {
+            console.error(`[BugsnagPerformance] ReactNativeNavigationScenario waiting for command...`)
+            const command = await getCurrentCommand(Infinity)
+    
+            switch (command.action) {
+                case 'navigate':
+                    console.error(`[BugsnagPerformance] Navigating to route ${command.route}`)
+                    Navigation.push(componentId, {
+                        component: {
+                            name: command.route
+                        }
+                    })
+                    break
+                default:
+                    throw new Error(`Unknown command: ${JSON.stringify(command)}`)
+            }
+        }
+
+        commandRunner()
+    }, [])
+}
 
 export function registerScreens() {
     Navigation.registerComponent('Screen 1', () => Screen1);
@@ -35,18 +60,12 @@ export function registerScreens() {
 }
 
 function Screen1(props) {
-    useEffect(() => {
-        parentSpan = BugsnagPerformance.startSpan('ParentSpan')
+    useCommandRunner(props.componentId)
 
-        setTimeout(() => {
-            console.error('[Bugsnag] Navigating to Screen 2...')
-            Navigation.push(props.componentId, {
-                component: {
-                    name: 'Screen 2'
-                }
-            })
-        }, 500)
-    }, [])
+    // TODO: Handle with command runner
+    // useEffect(() => {
+    //     parentSpan = BugsnagPerformance.startSpan('ParentSpan')
+    // }, [])
 
     return (
         <View>
@@ -56,6 +75,8 @@ function Screen1(props) {
 }
 
 function Screen2(props) {
+    useCommandRunner(props.componentId)
+
     const [loaded, setLoaded] = useState(false)
 
     useEffect(() => {
@@ -63,19 +84,6 @@ function Screen2(props) {
             setLoaded(true)
         }, 50)
     }, [])
-    
-    useEffect(() => {
-        if (loaded) {
-            setTimeout(() => {
-                console.error('[Bugsnag] Navigating to Screen 3...')
-                Navigation.push(props.componentId, {
-                    component: {
-                        name: 'Screen 3'
-                    }
-                })
-            }, 250) // Sufficient time for the navigation span to end
-        }
-    }, [loaded])
 
     return (
         <View>
@@ -86,6 +94,8 @@ function Screen2(props) {
 }
 
 function Screen3(props) {
+    useCommandRunner(props.componentId)
+
     const [loaded, setLoaded] = useState(false)
 
     useEffect(() => {
@@ -93,19 +103,6 @@ function Screen3(props) {
             setLoaded(true)
         }, 50)
     }, [])
-    
-    useEffect(() => {
-        if (loaded) {
-            setTimeout(() => {
-                console.error('[Bugsnag] Navigating to Screen 4...')
-                Navigation.push(props.componentId, {
-                    component: {
-                        name: 'Screen 4'
-                    }
-                })
-            }, 250) // Sufficient time for the navigation span to end
-        }
-    }, [loaded])
 
     return (
         <View>
@@ -116,6 +113,8 @@ function Screen3(props) {
 }
 
 function Screen4(props) {
+    useCommandRunner(props.componentId)
+
     const [loaded, setLoaded] = useState(false)
 
     useEffect(() => {
@@ -123,16 +122,17 @@ function Screen4(props) {
             setLoaded(true)
         }, 50)
     }, [])
-    
-    useEffect(() => {
-        if (loaded) {
-            setTimeout(() => {
-                if (parentSpan && typeof parentSpan.end === 'function') {
-                    parentSpan.end()
-                }
-            }, 250) // Sufficient time for the navigation span to end
-        }
-    }, [loaded])
+
+    // TODO: Handle with command runner
+    // useEffect(() => {
+    //     if (loaded) {
+    //         setTimeout(() => {
+    //             if (parentSpan && typeof parentSpan.end === 'function') {
+    //                 parentSpan.end()
+    //             }
+    //         }, 250)
+    //     }
+    // }, [loaded])
 
     return (
         <View>

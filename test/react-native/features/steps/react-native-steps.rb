@@ -6,6 +6,10 @@ When('I execute the command {string}') do |command|
   execute_command(command)
 end
 
+When('I navigate to {string}') do |screen|
+  execute_command 'navigate', screen
+end
+
 Then('the trace payload field {string} string attribute {string} equals the platform-dependent string:') do |field, attribute, platform_values|
   expected_value = get_expected_platform_value(platform_values)
   if !expected_value.eql?('@skip')
