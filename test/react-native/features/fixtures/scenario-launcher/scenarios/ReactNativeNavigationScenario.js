@@ -29,10 +29,10 @@ function useCommandRunner(componentId) {
     
             switch (command.action) {
                 case 'navigate':
-                    console.error(`[BugsnagPerformance] Navigating to route ${command.route}`)
+                    console.error(`[BugsnagPerformance] Navigating to route ${command.screen}`)
                     Navigation.push(componentId, {
                         component: {
-                            name: command.route
+                            name: command.screen
                         }
                     })
                     break
