@@ -61,17 +61,21 @@ function Screen2(props) {
     useEffect(() => {
         setTimeout(() => {
             setLoaded(true)
-        }, 100)
-
-        setTimeout(() => {
-            console.error('[Bugsnag] Navigating to Screen 3...')
-            Navigation.push(props.componentId, {
-                component: {
-                    name: 'Screen 3'
-                }
-            })
-        }, 500)
+        }, 50)
     }, [])
+    
+    useEffect(() => {
+        if (loaded) {
+            setTimeout(() => {
+                console.error('[Bugsnag] Navigating to Screen 3...')
+                Navigation.push(props.componentId, {
+                    component: {
+                        name: 'Screen 3'
+                    }
+                })
+            }, 250) // Sufficient time for the navigation span to end
+        }
+    }, [loaded])
 
     return (
         <View>
@@ -88,16 +92,20 @@ function Screen3(props) {
         setTimeout(() => {
             setLoaded(true)
         }, 50)
-
-        setTimeout(() => {
-            console.error('[Bugsnag] Navigating to Screen 4...')
-            Navigation.push(props.componentId, {
-                component: {
-                    name: 'Screen 4'
-                }
-            })
-        }, 500)
     }, [])
+    
+    useEffect(() => {
+        if (loaded) {
+            setTimeout(() => {
+                console.error('[Bugsnag] Navigating to Screen 4...')
+                Navigation.push(props.componentId, {
+                    component: {
+                        name: 'Screen 4'
+                    }
+                })
+            }, 250) // Sufficient time for the navigation span to end
+        }
+    }, [loaded])
 
     return (
         <View>
@@ -113,14 +121,18 @@ function Screen4(props) {
     useEffect(() => {
         setTimeout(() => {
             setLoaded(true)
-        }, 100)
-
-        setTimeout(() => {
-            if (parentSpan && typeof parentSpan.end === 'function') {
-                parentSpan.end()
-            }
-        }, 500)
+        }, 50)
     }, [])
+    
+    useEffect(() => {
+        if (loaded) {
+            setTimeout(() => {
+                if (parentSpan && typeof parentSpan.end === 'function') {
+                    parentSpan.end()
+                }
+            }, 250) // Sufficient time for the navigation span to end
+        }
+    }, [loaded])
 
     return (
         <View>
