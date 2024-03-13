@@ -19,6 +19,8 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
 
   constructor (Navigation: NavigationDelegate) {
     this.Navigation = Navigation
+
+    console.error('[Bugsnag] Constructing ReactNativeNavigationPlugin')
   }
 
   private clearActiveSpan () {
@@ -102,6 +104,8 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
         }
 
         this.previousRoute = routeName
+
+        console.error('[Bugsnag] new component appeared! it\'s super effective!')
 
         this.triggerNavigationEnd(performance.now(), 'immediate')
       }

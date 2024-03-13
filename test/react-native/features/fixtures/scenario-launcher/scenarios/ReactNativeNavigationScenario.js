@@ -24,12 +24,12 @@ function delay(ms) {
 function useCommandRunner(componentId) {
     useEffect(() => {
         async function commandRunner () {
-            console.error(`[BugsnagPerformance] ReactNativeNavigationScenario waiting for command...`)
+            console.error(`[Bugsnag] ReactNativeNavigationScenario waiting for command...`)
             const command = await getCurrentCommand(Infinity)
     
             switch (command.action) {
                 case 'navigate':
-                    console.error(`[BugsnagPerformance] Navigating to route ${command.payload}`)
+                    console.error(`[Bugsnag] Navigating to route ${command.payload}`)
                     Navigation.push(componentId, {
                         component: {
                             name: command.payload
