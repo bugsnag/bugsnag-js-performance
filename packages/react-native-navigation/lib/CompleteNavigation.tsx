@@ -8,7 +8,7 @@ interface Props extends PropsWithChildren {
 }
 
 /** End the current navigation span when the component is mounted, unmounted or the `on` prop is `true` */
-export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, on }) => {
+export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, on, ...rest }) => {
   const pluginRef = useRef<ReactNativeNavigationPlugin>()
 
   function getPlugin () {
@@ -21,6 +21,8 @@ export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, o
   }
 
   useEffect(() => {
+    console.error('[Bugsnag] CompleteNavigation props: ', rest)
+
     const plugin = getPlugin()
 
     if (plugin) {
