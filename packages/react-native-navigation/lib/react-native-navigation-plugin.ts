@@ -39,7 +39,7 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
 
   /** Trigger the end of the current navigation span after 100ms */
   private triggerNavigationEnd = (endTime: number, endedBy: Reason) => {
-    console.error('[Bugsnag] triggerNavigationEnd called')
+    console.error('[Bugsnag] triggerNavigationEnd called with reason: ' + endedBy)
     clearTimeout(this.endTimeout)
     this.endTimeout = setTimeout(() => {
       this.endActiveSpan(endTime, endedBy)

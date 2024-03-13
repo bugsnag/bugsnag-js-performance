@@ -11,8 +11,6 @@ interface Props extends PropsWithChildren {
 export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, on }) => {
   const pluginRef = useRef<ReactNativeNavigationPlugin>()
 
-  console.error('[Bugsnag] CompleteNavigation - here I am!')
-
   function getPlugin () {
     if (pluginRef.current) return pluginRef.current
 
@@ -23,7 +21,7 @@ export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, o
   }
 
   useEffect(() => {
-    console.error('[Bugsnag] CompleteNavigation mounted')
+    console.error('[Bugsnag] CompleteNavigation component mounted')
 
     const plugin = getPlugin()
 
