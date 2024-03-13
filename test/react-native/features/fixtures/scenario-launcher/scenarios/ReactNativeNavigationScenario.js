@@ -39,6 +39,7 @@ function Screen1(props) {
         parentSpan = BugsnagPerformance.startSpan('ParentSpan')
 
         setTimeout(() => {
+            console.error('[Bugsnag] Navigating to Screen 2...')
             Navigation.push(props.componentId, {
                 component: {
                     name: 'Screen 2'
@@ -63,6 +64,7 @@ function Screen2(props) {
         }, 100)
 
         setTimeout(() => {
+            console.error('[Bugsnag] Navigating to Screen 3...')
             Navigation.push(props.componentId, {
                 component: {
                     name: 'Screen 3'
@@ -88,6 +90,7 @@ function Screen3(props) {
         }, 50)
 
         setTimeout(() => {
+            console.error('[Bugsnag] Navigating to Screen 4...')
             Navigation.push(props.componentId, {
                 component: {
                     name: 'Screen 4'
