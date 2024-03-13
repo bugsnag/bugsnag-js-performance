@@ -37,6 +37,8 @@ export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, o
           plugin.unblockNavigationEnd('unmount')
         }
       }
+    } else {
+      console.error('[Bugsnag] ReactNativeNavigationPlugin not found')
     }
   }, [])
 
