@@ -10,15 +10,19 @@ steps:
         agents:
           queue: macos-12-arm
         env:
+          JAVA_VERSION: "17"
+          NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
           BUILD_ANDROID: "true"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/oldarch/**/reactnative.apk"
         commands:
+          - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
           - "0.71"
           - "0.72"
+          - "0.73"
         retry:
           automatic:
             - exit_status: "*"
@@ -30,16 +34,20 @@ steps:
         agents:
           queue: macos-12-arm
         env:
+          JAVA_VERSION: "17"
+          NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
           RCT_NEW_ARCH_ENABLED: "true"
           BUILD_ANDROID: "true"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/newarch/**/reactnative.apk"
         commands:
+          - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
           - "0.71"
           - "0.72"
+          - "0.73"
         retry:
           automatic:
             - exit_status: "*"
@@ -51,16 +59,19 @@ steps:
         agents:
           queue: "macos-12-arm"
         env:
+          NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
           BUILD_IOS: "true"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/oldarch/**/output/reactnative.ipa"
         commands:
+          - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
           - "0.71"
           - "0.72"
+          - "0.73"
         retry:
           automatic:
             - exit_status: "*"
@@ -72,6 +83,7 @@ steps:
         agents:
           queue: "macos-12-arm"
         env:
+          NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
           RCT_NEW_ARCH_ENABLED: "1"
           BUILD_IOS: "true"
@@ -79,10 +91,12 @@ steps:
         artifact_paths:
           - "test/react-native/features/fixtures/generated/newarch/**/output/reactnative.ipa"
         commands:
+          - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
           - "0.71"
           - "0.72"
+          - "0.73"
         retry:
           automatic:
             - exit_status: "*"
@@ -119,6 +133,7 @@ steps:
         matrix:
           - "0.71"
           - "0.72"
+          - "0.73"
 
       - label: ":bitbar: :android: RN {{matrix}} Android 12 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-new-arch"
@@ -150,6 +165,7 @@ steps:
         matrix:
           - "0.71"
           - "0.72"
+          - "0.73"
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS 14 (Old Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-old-arch"
@@ -179,6 +195,7 @@ steps:
         matrix:
           - "0.71"
           - "0.72"
+          - "0.73"
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS 14 (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-new-arch"
@@ -210,3 +227,4 @@ steps:
         matrix:
           - "0.71"
           - "0.72"
+          - "0.73"

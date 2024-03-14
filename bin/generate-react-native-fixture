@@ -67,7 +67,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   }
 
   // create the test fixture
-  const RNInitArgs = ['react-native', 'init', 'reactnative', '--package-name', 'com.bugsnag.fixtures.reactnative.performance', '--directory', fixtureDir, '--version', rnVersion, '--npm', '--skip-install']
+  const RNInitArgs = ['react-native@latest', 'init', 'reactnative', '--package-name', 'com.bugsnag.fixtures.reactnative.performance', '--directory', fixtureDir, '--version', rnVersion, '--npm', '--skip-install']
   execFileSync('npx', RNInitArgs, { stdio: 'inherit' })
   
   // replace the App.tsx file with our own App.js file
@@ -113,9 +113,10 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     
     // replace the MainActivity file with our own
     if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
+      const fileExtension = parseFloat(rnVersion) < 0.73 ? 'java' : 'kt'
       fs.copyFileSync(
-        resolve(ROOT_DIR, `test/react-native/features/fixtures/app/android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${process.env.RN_VERSION}.java`),
-        resolve(fixtureDir, 'android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.java')
+        resolve(ROOT_DIR, `test/react-native/features/fixtures/app/android/MainActivity.${rnVersion}.${fileExtension}`),
+        resolve(fixtureDir, `android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${fileExtension}`)
       )
     }
   }
