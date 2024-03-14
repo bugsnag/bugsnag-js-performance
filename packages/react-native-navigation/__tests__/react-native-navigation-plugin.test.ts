@@ -26,7 +26,7 @@ describe('ReactNativeNavigationPlugin', () => {
       componentId: '123'
     })
 
-    jest.mocked(Navigation.events().registerComponentDidAppearListener).mock.calls[0][0]({
+    jest.mocked(Navigation.events().registerComponentWillAppearListener).mock.calls[0][0]({
       componentId: '123',
       componentName: 'TestScreen',
       componentType: 'Component'
@@ -58,7 +58,7 @@ describe('ReactNativeNavigationPlugin', () => {
       componentId: '123'
     })
 
-    jest.mocked(Navigation.events().registerComponentDidAppearListener).mock.calls[1][0]({
+    jest.mocked(Navigation.events().registerComponentWillAppearListener).mock.calls[1][0]({
       componentId: '123',
       componentName: 'TestScreen',
       componentType: 'Component'
@@ -107,7 +107,7 @@ describe('ReactNativeNavigationPlugin', () => {
       componentId: '1'
     })
 
-    jest.mocked(Navigation.events().registerComponentDidAppearListener).mock.calls[2][0]({
+    jest.mocked(Navigation.events().registerComponentWillAppearListener).mock.calls[2][0]({
       componentId: '1',
       componentName: 'FirstScreen',
       componentType: 'Component'
@@ -121,7 +121,7 @@ describe('ReactNativeNavigationPlugin', () => {
       componentId: '2'
     })
 
-    jest.mocked(Navigation.events().registerComponentDidAppearListener).mock.calls[2][0]({
+    jest.mocked(Navigation.events().registerComponentWillAppearListener).mock.calls[2][0]({
       componentId: '2',
       componentName: 'SecondScreen',
       componentType: 'Component'
