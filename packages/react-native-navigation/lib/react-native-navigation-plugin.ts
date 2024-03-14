@@ -86,6 +86,9 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
 
     // Navigation has occurred
     this.Navigation.events().registerComponentDidAppearListener(event => {
+      console.error('[Bugsnag] new component appeared! it\'s super effective!')
+      console.error('[Bugsnag] ' + JSON.stringify({ previousRoute: this.previousRoute, event }))
+
       if (typeof this.startTime === 'number') {
         clearTimeout(this.startTimeout)
 
@@ -104,8 +107,6 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
         }
 
         this.previousRoute = routeName
-
-        console.error('[Bugsnag] new component appeared! it\'s super effective!')
 
         this.triggerNavigationEnd(performance.now(), 'immediate')
       }
