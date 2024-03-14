@@ -85,7 +85,7 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
     })
 
     // Navigation has occurred
-    this.Navigation.events().registerComponentDidAppearListener(event => {
+    this.Navigation.events().registerComponentWillAppearListener(event => {
       console.error('[Bugsnag] new component appeared! it\'s super effective!')
       console.error('[Bugsnag] ' + JSON.stringify({ previousRoute: this.previousRoute, event }))
 
