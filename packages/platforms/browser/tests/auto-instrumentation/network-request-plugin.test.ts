@@ -253,13 +253,20 @@ describe('network span plugin', () => {
           endpoint: ENDPOINT,
           autoInstrumentNetworkRequests: true,
           tracePropagationUrls: [
-            'https://my-api.com'
+            'https://my-api.com',
+            /^\//
           ]
         }))
 
         const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: 'https://my-api.com/users', startTime: 1 })
 
         expect(res.extraRequestHeaders).toEqual([
+          { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
+        ])
+
+        const res2 = fetchTracker.start({ type: 'fetch', method: 'GET', url: '/users', startTime: 1 })
+
+        expect(res2.extraRequestHeaders).toEqual([
           { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
         ])
       })
