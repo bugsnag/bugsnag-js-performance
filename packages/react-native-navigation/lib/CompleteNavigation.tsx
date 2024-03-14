@@ -21,8 +21,6 @@ export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, o
   }
 
   useEffect(() => {
-    console.error('[Bugsnag] CompleteNavigation component mounted')
-
     const plugin = getPlugin()
 
     if (plugin) {
@@ -31,7 +29,7 @@ export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, o
       if (on === 'mount') {
         setTimeout(() => {
           plugin.unblockNavigationEnd('mount')
-        })
+        }, 0)
       }
 
       if (on === 'unmount') {
@@ -39,8 +37,6 @@ export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, o
           plugin.unblockNavigationEnd('unmount')
         }
       }
-    } else {
-      console.error('[Bugsnag] ReactNativeNavigationPlugin not found')
     }
   }, [])
 

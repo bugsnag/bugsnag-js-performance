@@ -19,8 +19,6 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
 
   constructor (Navigation: NavigationDelegate) {
     this.Navigation = Navigation
-
-    console.error('[Bugsnag] Constructing ReactNativeNavigationPlugin')
   }
 
   private clearActiveSpan () {
@@ -32,7 +30,6 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
 
   private endActiveSpan (endTime: number, endedBy: Reason) {
     if (this.componentsWaiting === 0 && this.currentNavigationSpan && this.spanFactory) {
-      console.error('[Bugsnag] ending active span ' + this.currentNavigationSpan.name)
       this.currentNavigationSpan.setAttribute('bugsnag.navigation.ended_by', endedBy)
       this.spanFactory.endSpan(this.currentNavigationSpan, endTime)
       this.clearActiveSpan()
@@ -41,7 +38,6 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
 
   /** Trigger the end of the current navigation span after 100ms */
   private triggerNavigationEnd = (endTime: number, endedBy: Reason) => {
-    console.error('[Bugsnag] triggerNavigationEnd called with reason: ' + endedBy)
     clearTimeout(this.endTimeout)
     this.endTimeout = setTimeout(() => {
       this.endActiveSpan(endTime, endedBy)
@@ -52,8 +48,6 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
    * Blocks the current navigation by incrementing the count of components waiting
    */
   blockNavigationEnd = () => {
-    console.error('[Bugsnag] blockNavigationEnd called')
-
     clearTimeout(this.endTimeout)
     this.componentsWaiting += 1
   }
@@ -62,8 +56,6 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
    * Unblocks the current navigation by decrementing the count of components waiting and setting the reason
   */
   unblockNavigationEnd = (endedBy: Reason) => {
-    console.error('[Bugsnag] unblockNavigationEnd called with reason:' + endedBy)
-
     const renderTime = performance.now()
     this.componentsWaiting = Math.max(this.componentsWaiting - 1, 0)
 
@@ -86,9 +78,6 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
 
     // Navigation has occurred
     this.Navigation.events().registerComponentWillAppearListener(event => {
-      console.error('[Bugsnag] new component appeared! it\'s super effective!')
-      console.error('[Bugsnag] ' + JSON.stringify({ previousRoute: this.previousRoute, event }))
-
       if (typeof this.startTime === 'number') {
         clearTimeout(this.startTimeout)
 
