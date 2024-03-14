@@ -1,5 +1,4 @@
 import { CompleteNavigation, ReactNativeNavigationPlugin } from '@bugsnag/react-native-navigation-performance'
-// import BugsnagPerformance from '@bugsnag/react-native-performance'
 import React, { useEffect, useState } from 'react'
 import { Text, View } from 'react-native'
 import { Navigation } from 'react-native-navigation'
@@ -15,18 +14,14 @@ export const config = {
 
 const COMMAND_INTERVAL = 500
 
-// let parentSpan
-
-function delay(ms) {
-    return new Promise( resolve => setTimeout(resolve, ms) );
-}
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 function useCommandRunner(componentId) {
     useEffect(() => {
-        async function commandRunner () {
+        async function commandRunner() {
             console.error(`[Bugsnag] ReactNativeNavigationScenario waiting for command...`)
             const command = await getCurrentCommand(Infinity)
-    
+
             switch (command.action) {
                 case 'navigate':
                     console.error(`[Bugsnag] Navigating to route ${command.payload}`)
@@ -38,7 +33,7 @@ function useCommandRunner(componentId) {
                     break
                 default:
                     console.error(`Unknown command: ${JSON.stringify(command)}`)
-                    delay(COMMAND_INTERVAL)
+                    await delay(COMMAND_INTERVAL)
                     commandRunner()
             }
         }
@@ -70,11 +65,6 @@ export function registerScreens() {
 
 function Screen1(props) {
     useCommandRunner(props.componentId)
-
-    // TODO: Handle with command runner
-    // useEffect(() => {
-    //     parentSpan = BugsnagPerformance.startSpan('ParentSpan')
-    // }, [])
 
     return (
         <View>
@@ -131,17 +121,6 @@ function Screen4(props) {
             setLoaded(true)
         }, 50)
     }, [])
-
-    // TODO: Handle with command runner
-    // useEffect(() => {
-    //     if (loaded) {
-    //         setTimeout(() => {
-    //             if (parentSpan && typeof parentSpan.end === 'function') {
-    //                 parentSpan.end()
-    //             }
-    //         }, 250)
-    //     }
-    // }, [loaded])
 
     return (
         <View>
