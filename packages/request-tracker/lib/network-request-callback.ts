@@ -1,5 +1,6 @@
 export interface NetworkRequestInfo {
-  url: string
+  url: string | null
+  propagateTraceContext?: boolean
 }
 
 export type NetworkRequestCallback <T extends NetworkRequestInfo> = (networkRequestInfo: T) => T | null

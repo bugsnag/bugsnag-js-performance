@@ -20,7 +20,6 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private configEndpoint: string = ''
   private networkRequestCallback: NetworkRequestCallback<BrowserNetworkRequestInfo> = defaultNetworkRequestCallback
   private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
-  private tracePropagationUrls: RegExp[] = []
 
   constructor (
     private spanFactory: SpanFactory<BrowserConfiguration>,
@@ -31,9 +30,6 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
 
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     this.logger = configuration.logger
-    this.tracePropagationUrls = (configuration.tracePropagationUrls ?? []).map(
-      (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
-    )
 
     if (configuration.autoInstrumentNetworkRequests) {
       this.configEndpoint = configuration.endpoint
@@ -46,15 +42,38 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private trackRequest: RequestStartCallback = (startContext) => {
     if (!this.shouldTrackRequest(startContext)) return
 
-    const networkRequestInfo = this.networkRequestCallback({ url: startContext.url, type: startContext.type })
+    const shouldPropagateTraceContextByDefault = startContext.url.startsWith(window.origin)
 
+    const defaultRequestInfo: BrowserNetworkRequestInfo = {
+      url: startContext.url,
+      type: startContext.type,
+      propagateTraceContext: shouldPropagateTraceContextByDefault
+    }
+
+    const networkRequestInfo = this.networkRequestCallback(defaultRequestInfo)
+
+    // returning null neither creates a span nor propagates trace context
     if (!networkRequestInfo) {
       return {
         onRequestEnd: undefined,
-        extraRequestHeaders: this.getExtraRequestHeaders(startContext)
+        extraRequestHeaders: undefined
       }
     }
 
+    if (networkRequestInfo.propagateTraceContext === undefined) {
+      networkRequestInfo.propagateTraceContext = shouldPropagateTraceContextByDefault
+    }
+
+    // a span is not created if url is null
+    if (!networkRequestInfo.url) {
+      return {
+        onRequestEnd: undefined,
+        // propagate trace context if requested using span context
+        extraRequestHeaders: networkRequestInfo.propagateTraceContext ? this.getExtraRequestHeaders() : undefined
+      }
+    }
+
+    // otherwise, create a span and propagate trace context if requested
     if (typeof networkRequestInfo.url !== 'string') {
       this.logger.warn(`expected url to be a string following network request callback, got ${typeof networkRequestInfo.url}`)
       return
@@ -76,10 +95,10 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
           this.spanFactory.endSpan(span, endContext.endTime)
         }
       },
-      extraRequestHeaders: this.getExtraRequestHeaders(
-        startContext,
-        span
-      )
+      // propagate trace context using network span
+      extraRequestHeaders: networkRequestInfo.propagateTraceContext
+        ? this.getExtraRequestHeaders(span)
+        : undefined
     }
   }
 
@@ -87,25 +106,23 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
     return startContext.url !== this.configEndpoint && permittedPrefixes.some((prefix) => startContext.url.startsWith(prefix))
   }
 
-  private getExtraRequestHeaders (startContext: RequestStartContext, span?: SpanInternal): Record<string, string> {
+  private getExtraRequestHeaders (span?: SpanInternal): Record<string, string> {
     const extraRequestHeaders: Record<string, string> = {}
 
-    if (this.tracePropagationUrls.some(regexp => regexp.test(startContext.url))) {
-      if (span) {
-        const traceId = span.traceId
-        const parentSpanId = span.id
-        const sampled = span.samplingRate <= this.spanFactory.sampler.spanProbability.scaled
+    if (span) {
+      const traceId = span.traceId
+      const parentSpanId = span.id
+      const sampled = span.samplingRate <= this.spanFactory.sampler.spanProbability.scaled
 
-        extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)
-      } else if (this.spanContextStorage.current) {
-        const currentSpanContext = this.spanContextStorage.current
+      extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)
+    } else if (this.spanContextStorage.current) {
+      const currentSpanContext = this.spanContextStorage.current
 
-        const traceId = currentSpanContext.traceId
-        const parentSpanId = currentSpanContext.id
-        const sampled = currentSpanContext.samplingRate <= this.spanFactory.sampler.spanProbability.scaled
+      const traceId = currentSpanContext.traceId
+      const parentSpanId = currentSpanContext.id
+      const sampled = currentSpanContext.samplingRate <= this.spanFactory.sampler.spanProbability.scaled
 
-        extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)
-      }
+      extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)
     }
 
     return extraRequestHeaders

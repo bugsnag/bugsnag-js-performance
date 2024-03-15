@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { DefaultSpanContextStorage, type SpanContextStorage, spanContextEquals } from '@bugsnag/core-performance'
 import { ControllableBackgroundingListener, MockSpanFactory, createConfiguration, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { type BrowserSchema, type BrowserConfiguration } from '../../lib/config'
@@ -240,7 +244,7 @@ describe('network span plugin', () => {
 
   describe('returning traceparent extraRequestHeaders', () => {
     describe('when a network span is being created for the request', () => {
-      it('generates a traceparent extraRequestHeader if the request matches tracePropogationUrls config', () => {
+      it('generates a traceparent extraRequestHeader if propagateTraceContext is set to true', () => {
         spanContextStorage.push({
           id: 'abc123',
           traceId: 'xyz456',
@@ -252,10 +256,10 @@ describe('network span plugin', () => {
         plugin.configure(createConfiguration<BrowserConfiguration>({
           endpoint: ENDPOINT,
           autoInstrumentNetworkRequests: true,
-          tracePropagationUrls: [
-            'https://my-api.com',
-            /^\//
-          ]
+          networkRequestCallback: (requestInfo) => {
+            requestInfo.propagateTraceContext = true
+            return requestInfo
+          }
         }))
 
         const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: 'https://my-api.com/users', startTime: 1 })
@@ -271,7 +275,7 @@ describe('network span plugin', () => {
         ])
       })
 
-      it('does not generate a traceparent extraRequestHeader if the request does not match tracePropogationUrls config', () => {
+      it('does not generate a traceparent extraRequestHeader if propagateTraceContext is set to false', () => {
         spanContextStorage.push({
           id: 'abc123',
           traceId: 'xyz456',
@@ -283,16 +287,15 @@ describe('network span plugin', () => {
         plugin.configure(createConfiguration<BrowserConfiguration>({
           endpoint: ENDPOINT,
           autoInstrumentNetworkRequests: true,
-          tracePropagationUrls: [
-            'https://my-api.com'
-          ]
+          networkRequestCallback: (requestInfo) => {
+            requestInfo.propagateTraceContext = false
+            return requestInfo
+          }
         }))
 
         const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: 'https://not-my-api.com/users', startTime: 1 })
 
-        expect(res.extraRequestHeaders).toEqual([
-          {}
-        ])
+        expect(res.extraRequestHeaders).toEqual([])
       })
     })
 
@@ -309,10 +312,11 @@ describe('network span plugin', () => {
         plugin.configure(createConfiguration<BrowserConfiguration>({
           endpoint: ENDPOINT,
           autoInstrumentNetworkRequests: true,
-          tracePropagationUrls: [
-            'https://my-api.com'
-          ],
-          networkRequestCallback: () => null
+          networkRequestCallback: (requestInfo) => {
+            requestInfo.propagateTraceContext = true
+            requestInfo.url = null
+            return requestInfo
+          }
         }))
 
         const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: 'https://my-api.com/users', startTime: 1 })
