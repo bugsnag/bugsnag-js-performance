@@ -86,7 +86,7 @@ describe('network span plugin', () => {
     expect(span).toHaveAttribute('http.status_code', 200)
   })
 
-  it('does not track requests when autoInstrumentNetworkRequests = false', () => {
+  it('does not track requests or add trace propagation headers when autoInstrumentNetworkRequests = false', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
 
     plugin.configure(createConfiguration<BrowserConfiguration>({
@@ -94,8 +94,10 @@ describe('network span plugin', () => {
       autoInstrumentNetworkRequests: false
     }))
 
-    expect(xhrTracker.onStart).not.toHaveBeenCalled()
-    expect(fetchTracker.onStart).not.toHaveBeenCalled()
+    const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
+
+    expect(spanFactory.startSpan).not.toHaveBeenCalled()
+    expect(res.extraRequestHeaders).toEqual([])
   })
 
   it('does not track requests to the configured traces endpoint', () => {
