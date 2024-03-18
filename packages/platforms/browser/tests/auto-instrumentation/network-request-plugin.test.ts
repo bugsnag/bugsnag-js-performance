@@ -10,6 +10,7 @@ import { NetworkRequestPlugin } from '../../lib/auto-instrumentation/network-req
 
 const ENDPOINT = 'http://traces.endpoint'
 const TEST_URL = 'http://test-url.com/'
+const SAME_ORIGIN_TEST_URL = 'http://localhost/my-api'
 
 class MockRequestTracker extends RequestTracker {
   onStart = jest.fn((startCallback: RequestStartCallback) => {
@@ -31,20 +32,6 @@ describe('network span plugin', () => {
     spanContextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
   })
 
-  it('tracks requests when autoInstrumentNetworkRequests = true', () => {
-    const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-    expect(xhrTracker.onStart).not.toHaveBeenCalled()
-    expect(fetchTracker.onStart).not.toHaveBeenCalled()
-
-    plugin.configure(createConfiguration<BrowserConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: true
-    }))
-
-    expect(xhrTracker.onStart).toHaveBeenCalled()
-    expect(fetchTracker.onStart).toHaveBeenCalled()
-  })
-
   it('starts a span on request start', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
 
@@ -53,11 +40,20 @@ describe('network span plugin', () => {
       autoInstrumentNetworkRequests: true
     }))
 
-    fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
+    const res1 = fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+    expect(res1.extraRequestHeaders).toEqual([])
 
-    xhrTracker.start({ type: 'xmlhttprequest', method: 'POST', url: TEST_URL, startTime: 2 })
+    const res2 = xhrTracker.start({ type: 'xmlhttprequest', method: 'POST', url: TEST_URL, startTime: 2 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/POST', { startTime: 2, makeCurrentContext: false })
+    expect(res2.extraRequestHeaders).toEqual([])
+
+    // traceparent headers are added to same-origin requests by default
+    const res3 = xhrTracker.start({ type: 'xmlhttprequest', method: 'POST', url: SAME_ORIGIN_TEST_URL, startTime: 2 })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/POST', { startTime: 2, makeCurrentContext: false })
+    expect(res3.extraRequestHeaders).toEqual([
+      { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
+    ])
   })
 
   it('ends a span on request end', () => {
@@ -87,17 +83,23 @@ describe('network span plugin', () => {
   })
 
   it('does not track requests or add trace propagation headers when autoInstrumentNetworkRequests = false', () => {
+    const networkRequestCallback = jest.fn().mockReturnValue(() => ({ url: SAME_ORIGIN_TEST_URL, propagateTraceContext: true }))
+
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
 
     plugin.configure(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: false
+      autoInstrumentNetworkRequests: false,
+      networkRequestCallback
     }))
 
-    const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
+    const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: SAME_ORIGIN_TEST_URL, startTime: 1 })
 
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
     expect(res.extraRequestHeaders).toEqual([])
+
+    // networkRequestCallback is called even if autoInstrumentNetworkRequests, but the result is ignored
+    expect(networkRequestCallback).toHaveBeenCalled()
   })
 
   it('does not track requests to the configured traces endpoint', () => {
@@ -214,6 +216,46 @@ describe('network span plugin', () => {
 
     fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+  })
+
+  it('prevents creating a span when networkRequestCallback returns { url: null }', () => {
+    const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true,
+      networkRequestCallback: (networkRequestInfo) => ({ ...networkRequestInfo, url: null })
+    }))
+
+    fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
+    expect(spanFactory.startSpan).not.toHaveBeenCalled()
+  })
+
+  it('prevents adding trace propagation headers when networkRequestCallback returns { propagateTraceContext: null }', () => {
+    const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true,
+      networkRequestCallback: (networkRequestInfo) => ({ ...networkRequestInfo, url: null })
+    }))
+
+    const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: SAME_ORIGIN_TEST_URL, startTime: 1 })
+    expect(spanFactory.startSpan).not.toHaveBeenCalled()
+    expect(res.extraRequestHeaders).toEqual([{}])
+  })
+
+  it('adds trace propagation headers when networkRequestCallback returns { propagateTraceContext: true }', () => {
+    const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true,
+      networkRequestCallback: (networkRequestInfo) => ({ ...networkRequestInfo, propagateTraceContext: true })
+    }))
+
+    const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+    expect(res.extraRequestHeaders).toEqual([
+      { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
+    ])
   })
 
   it('uses a modified url from networkRequestCallback', () => {
