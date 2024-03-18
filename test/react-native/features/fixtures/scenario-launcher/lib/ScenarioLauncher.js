@@ -11,14 +11,15 @@ async function loadReactNavigationScenario (scenario) {
   if (typeof scenario.registerScreens === 'function') {
     scenario.registerScreens()
   } else {
-    const Navigation = await import('react-native-navigation')
-    Navigation.registerComponent('Scenario', () => scenario.App)
-    Navigation.setRoot({
-      root: {
-        component: {
-          name: 'Scenario'
+    import('react-native-navigation').then(({ Navigation }) => {
+      Navigation.registerComponent('Scenario', () => scenario.App)
+      Navigation.setRoot({
+        root: {
+          component: {
+            name: 'Scenario'
+          }
         }
-      }
+      })
     })
   }
 }
