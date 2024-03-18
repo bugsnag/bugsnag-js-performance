@@ -11,6 +11,7 @@ interface ReadonlySampler {
   readonly probability: number
   readonly spanProbability: SpanProbability
   readonly sample: (span: SpanEnded) => boolean
+  readonly shouldSample: (samplingRate: number) => boolean
 }
 
 interface ReadWriteSampler extends ReadonlySampler {
@@ -65,6 +66,10 @@ class Sampler {
 
   sample (span: SpanEnded): boolean {
     return span.samplingRate <= span.samplingProbability.scaled
+  }
+
+  shouldSample (samplingRate: number): boolean {
+    return samplingRate <= this.spanProbability.scaled
   }
 }
 

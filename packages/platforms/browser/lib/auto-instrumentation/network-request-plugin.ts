@@ -114,7 +114,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
     if (span) {
       const traceId = span.traceId
       const parentSpanId = span.id
-      const sampled = span.samplingRate <= this.spanFactory.sampler.spanProbability.scaled
+      const sampled = this.spanFactory.sampler.shouldSample(span.samplingRate)
 
       extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)
     } else if (this.spanContextStorage.current) {
@@ -122,7 +122,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
 
       const traceId = currentSpanContext.traceId
       const parentSpanId = currentSpanContext.id
-      const sampled = currentSpanContext.samplingRate <= this.spanFactory.sampler.spanProbability.scaled
+      const sampled = this.spanFactory.sampler.shouldSample(currentSpanContext.samplingRate)
 
       extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)
     }

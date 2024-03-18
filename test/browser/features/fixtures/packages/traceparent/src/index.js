@@ -11,8 +11,6 @@ BugsnagPerformance.start({
   autoInstrumentFullPageLoads: false,
   autoInstrumentNetworkRequests: true,
   maximumBatchSize: 1,
-  // tracePropagationUrls: [/^\//],
-  tracePropagationUrls: [/.*/]
  })
 
 document.getElementById("xhr").addEventListener("click", () => {
