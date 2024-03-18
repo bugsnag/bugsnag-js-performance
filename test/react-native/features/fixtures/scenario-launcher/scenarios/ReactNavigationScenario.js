@@ -1,11 +1,11 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
-import { ReactNavigationNativePlugin } from '@bugsnag/react-navigation-performance'
+import { CompleteNavigation, ReactNavigationNativePlugin } from '@bugsnag/react-navigation-performance'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView, Text } from 'react-native'
 
 export const config = {
-    maximumBatchSize: 3,
+    maximumBatchSize: 5,
     autoInstrumentAppStarts: false,
     appVersion: '1.2.3',
     plugins: [new ReactNavigationNativePlugin()]
@@ -27,6 +27,8 @@ export function App() {
                 <Stack.Screen name='Screen1' component={Screen1} />
                 <Stack.Screen name='Screen2' component={Screen2} />
                 <Stack.Screen name='Screen3' component={Screen3} />
+                <Stack.Screen name='Screen4' component={Screen4} />
+                <Stack.Screen name='Screen5' component={Screen5} />
             </Stack.Navigator>
         </BugsnagNavigationContainer>
     );
@@ -45,6 +47,7 @@ function Screen1({ navigation }) {
     )
 }
 
+// End navigation immediately
 function Screen2({ navigation }) {
     useEffect(() => {
         setTimeout(() => {
@@ -59,10 +62,61 @@ function Screen2({ navigation }) {
     )
 }
 
+// End navigation with CompleteNavigation component on condition
 function Screen3({ navigation }) {
+    const [loadingComplete, setLoadingComplete] = useState(false)
+
     useEffect(() => {
         setTimeout(() => {
-            if(parentSpan && typeof parentSpan.end === 'function') {
+            setLoadingComplete(true)
+        }, 50)
+
+        setTimeout(() => {
+            navigation.navigate('Screen4')
+        }, 250)
+    }, [])
+
+    return (
+        <SafeAreaView>
+            <Text>Screen3</Text>
+            <CompleteNavigation on={loadingComplete} />
+        </SafeAreaView>
+    )
+}
+
+// End navigation with CompleteNavigation component on mount
+function Screen4({ navigation }) {
+    const [loadingComplete, setLoadingComplete] = useState(false)
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoadingComplete(true)
+        }, 50)
+
+        setTimeout(() => {
+            navigation.navigate('Screen5')
+        }, 250)
+    }, [])
+
+    return (
+        <SafeAreaView>
+            <Text>Screen4</Text>
+            {loadingComplete ? <CompleteNavigation on="mount" /> : null}
+        </SafeAreaView>
+    )
+}
+
+// End navigation with CompleteNavigation component on unmount
+function Screen5() {
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false)
+        }, 50)
+
+        setTimeout(() => {
+            if (parentSpan && typeof parentSpan.end === 'function') {
                 parentSpan.end()
             }
         }, 250)
@@ -70,7 +124,8 @@ function Screen3({ navigation }) {
 
     return (
         <SafeAreaView>
-            <Text>Screen3</Text>
+            <Text>Screen5</Text>
+            {loading ? <CompleteNavigation on="unmount" /> : null}
         </SafeAreaView>
     )
 }

@@ -13,7 +13,6 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
   private startTime?: number
   private startTimeout?: NodeJS.Timeout
   private endTimeout?: NodeJS.Timeout
-  private endedBy: Reason = 'immediate'
   private componentsWaiting = 0
   private spanFactory?: SpanFactory<ReactNativeConfiguration>
   private previousRoute?: string
@@ -29,19 +28,19 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
     this.currentNavigationSpan = undefined
   }
 
-  private endActiveSpan (endTime: number) {
+  private endActiveSpan (endTime: number, endedBy: Reason) {
     if (this.componentsWaiting === 0 && this.currentNavigationSpan && this.spanFactory) {
-      this.currentNavigationSpan.setAttribute('bugsnag.navigation.ended_by', this.endedBy)
+      this.currentNavigationSpan.setAttribute('bugsnag.navigation.ended_by', endedBy)
       this.spanFactory.endSpan(this.currentNavigationSpan, endTime)
       this.clearActiveSpan()
     }
   }
 
   /** Trigger the end of the current navigation span after 100ms */
-  private triggerNavigationEnd = (endTime: number) => {
+  private triggerNavigationEnd = (endTime: number, endedBy: Reason) => {
     clearTimeout(this.endTimeout)
     this.endTimeout = setTimeout(() => {
-      this.endActiveSpan(endTime)
+      this.endActiveSpan(endTime, endedBy)
     }, NAVIGATION_COMPLETE_TIMEOUT)
   }
 
@@ -58,11 +57,10 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
   */
   unblockNavigationEnd = (endedBy: Reason) => {
     const renderTime = performance.now()
-    this.endedBy = endedBy
     this.componentsWaiting = Math.max(this.componentsWaiting - 1, 0)
 
     if (this.componentsWaiting === 0 && this.spanFactory) {
-      this.triggerNavigationEnd(renderTime)
+      this.triggerNavigationEnd(renderTime, endedBy)
     }
   }
 
@@ -79,7 +77,7 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
     })
 
     // Navigation has occurred
-    this.Navigation.events().registerComponentDidAppearListener(event => {
+    this.Navigation.events().registerComponentWillAppearListener(event => {
       if (typeof this.startTime === 'number') {
         clearTimeout(this.startTimeout)
 
@@ -99,9 +97,7 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
 
         this.previousRoute = routeName
 
-        this.endedBy = 'immediate'
-
-        this.triggerNavigationEnd(performance.now())
+        this.triggerNavigationEnd(performance.now(), 'immediate')
       }
     })
   }
