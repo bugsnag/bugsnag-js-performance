@@ -17,7 +17,7 @@ steps:
           REACT_NATIVE_NAVIGATION: "true"
           RN_VERSION: "{{matrix.rn_version}}"
         artifact_paths:
-          - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative-full.apk"
+          - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
           - ./bin/generate-react-native-navigation-fixture
         matrix:
@@ -41,7 +41,7 @@ steps:
           RCT_NEW_ARCH_ENABLED: "true"
           RN_VERSION: "{{matrix.rn_version}}"
         artifact_paths:
-          - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative-full.apk"
+          - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
           - ./bin/generate-react-native-navigation-fixture
         matrix:
@@ -67,7 +67,7 @@ steps:
           RN_VERSION: "{{matrix.rn_version}}"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
         artifact_paths:
-          - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative-full.ipa"
+          - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
         commands:
           - bundle install
           - ./bin/generate-react-native-navigation-fixture
@@ -93,7 +93,7 @@ steps:
           RN_VERSION: "{{matrix.rn_version}}"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
         artifact_paths:
-          - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative-full.ipa"
+          - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
         commands:
           - bundle install
           - ./bin/generate-react-native-navigation-fixture
@@ -116,7 +116,7 @@ steps:
           REACT_NATIVE_NAVIGATION: "true"
         plugins:
           artifacts#v1.9.0:
-            download: "test/react-native/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative-full.apk"
+            download: "test/react-native/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative.apk"
             upload: ./test/react-native/maze_output/**/*
           docker-compose#v4.7.0:
             pull: react-native-maze-runner
@@ -124,7 +124,7 @@ steps:
             service-ports: true
             command:
               - features/react-native-navigation.feature
-              - --app=/app/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative-full.apk
+              - --app=/app/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative.apk
               - --farm=bb
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
@@ -153,7 +153,7 @@ steps:
           RCT_NEW_ARCH_ENABLED: "true"
         plugins:
           artifacts#v1.9.0:
-            download: "test/react-native/features/fixtures/generated/react-native-navigation/new-arch/{{matrix.rn_version}}/reactnative-full.apk"
+            download: "test/react-native/features/fixtures/generated/react-native-navigation/new-arch/{{matrix.rn_version}}/reactnative.apk"
             upload: ./test/react-native/maze_output/**/*
           docker-compose#v4.7.0:
             pull: react-native-maze-runner
@@ -161,7 +161,7 @@ steps:
             service-ports: true
             command:
               - features/react-native-navigation.feature
-              - --app=/app/features/fixtures/generated/react-native-navigation/new-arch/{{matrix.rn_version}}/reactnative-full.apk
+              - --app=/app/features/fixtures/generated/react-native-navigation/new-arch/{{matrix.rn_version}}/reactnative.apk
               - --farm=bb
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
@@ -191,7 +191,7 @@ steps:
           REACT_NATIVE_NAVIGATION: "true"
         plugins:
           artifacts#v1.9.0:
-            download: "test/react-native/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/output/reactnative-full.ipa"
+            download: "test/react-native/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/output/reactnative.ipa"
             upload: ./test/react-native/maze_output/**/*
           docker-compose#v4.12.0:
             pull: react-native-maze-runner
@@ -199,7 +199,7 @@ steps:
             service-ports: true
             command:
               - features/react-native-navigation.feature
-              - --app=/app/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/output/reactnative-full.ipa
+              - --app=/app/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/output/reactnative.ipa
               - --farm=bb
               - --device=IOS_{{matrix.ios_version}}
               - --a11y-locator
@@ -228,7 +228,7 @@ steps:
           RCT_NEW_ARCH_ENABLED: "true"
         plugins:
           artifacts#v1.9.0:
-            download: "test/react-native/features/fixtures/generated/react-native-navigation/new-arch/{{matrix.rn_version}}/output/reactnative-full.ipa"
+            download: "test/react-native/features/fixtures/generated/react-native-navigation/new-arch/{{matrix.rn_version}}/output/reactnative.ipa"
             upload: ./test/react-native/maze_output/**/*
           docker-compose#v4.12.0:
             pull: react-native-maze-runner
@@ -236,7 +236,7 @@ steps:
             service-ports: true
             command:
               - features/react-native-navigation.feature
-              - --app=/app/features/fixtures/generated/react-native-navigation/new-arch/{{matrix.rn_version}}/output/reactnative-full.ipa
+              - --app=/app/features/fixtures/generated/react-native-navigation/new-arch/{{matrix.rn_version}}/output/reactnative.ipa
               - --farm=bb
               - --device=IOS_{{matrix.ios_version}}
               - --a11y-locator
