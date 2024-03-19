@@ -13,11 +13,14 @@ steps:
           queue: macos-12-arm
         env:
           BUILD_ANDROID: "true"
+          JAVA_VERSION: "17"
+          NODE_VERSION: "18"
           REACT_NATIVE_NAVIGATION: "true"
           RN_VERSION: "{{matrix.rn_version}}"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
+          - bundle install
           - ./bin/generate-react-native-navigation-fixture
         matrix:
           setup:
@@ -35,12 +38,15 @@ steps:
           queue: macos-12-arm
         env:
           BUILD_ANDROID: "true"
+          JAVA_VERSION: "17"
+          NODE_VERSION: "18"
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "true"
           RN_VERSION: "{{matrix.rn_version}}"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
+          - bundle install
           - ./bin/generate-react-native-navigation-fixture
         matrix:
           setup:
@@ -60,6 +66,7 @@ steps:
           queue: "macos-12-arm"
         env:
           BUILD_IOS: "true"
+          NODE_VERSION: "18"
           REACT_NATIVE_NAVIGATION: "true"
           RN_VERSION: "{{matrix.rn_version}}"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
@@ -84,6 +91,7 @@ steps:
           queue: "macos-12-arm"
         env:
           BUILD_IOS: "true"
+          NODE_VERSION: "18"
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "true"
           RN_VERSION: "{{matrix.rn_version}}"
