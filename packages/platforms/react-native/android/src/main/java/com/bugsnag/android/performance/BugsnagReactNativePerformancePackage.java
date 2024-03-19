@@ -1,4 +1,4 @@
-package com.bugsnag.android.performance;
+package com.bugsnag.reactnative.performance;
 
 import androidx.annotation.Nullable;
 import com.facebook.react.bridge.NativeModule;
