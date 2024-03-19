@@ -1,5 +1,7 @@
 Feature: Backgrounding listener
 
+  # Skip until PLAT-11769 has been resolved
+  @skip
   Scenario: Spans are discarded when app is in the background
     When I run 'BackgroundSpanScenario'
     And I wait to receive a sampling request
