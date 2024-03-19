@@ -20,7 +20,7 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "peerDependencies": {
-    "@bugsnag/browser-performance": "^2.0.0",
+    "@bugsnag/browser-performance": "*",
     "path-to-regexp": "^1.8.0",
     "vue-router": "^4.2.4"
   },

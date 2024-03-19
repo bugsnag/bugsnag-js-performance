@@ -22,7 +22,7 @@
   "peerDependencies": {
     "@angular/core": "*",
     "@angular/router": "*",
-    "@bugsnag/browser-performance": "^2.0.0"
+    "@bugsnag/browser-performance": "*"
   },
   "type": "module",
   "main": "dist/index.js",
