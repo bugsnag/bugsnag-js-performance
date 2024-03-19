@@ -52,9 +52,25 @@ git push --follow-tags
 
 # publish
 if [ -z "${RETRY_PUBLISH:-}" ]; then
-  npx lerna publish from-git
+  case $VERSION in
+    "prerelease" | "prepatch" | "preminor" | "premajor")
+      npx lerna publish from-git --dist-tag next
+      ;;
+
+    *)
+      npx lerna publish from-git
+      ;;
+  esac
 else
-  npx lerna publish from-package
+  case $VERSION in
+    "prerelease" | "prepatch" | "preminor" | "premajor")
+      npx lerna publish from-package --dist-tag next
+      ;;
+
+    *)
+      npx lerna publish from-package
+      ;;
+  esac
 fi
 
 if [ "$BROWSER_PACKAGE_CHANGED" -eq 1 ] || [  -v FORCE_CDN_UPLOAD ]; then
