@@ -1,4 +1,4 @@
-import React, { type PropsWithChildren } from 'react'
+import React, { useEffect, type PropsWithChildren } from 'react'
 import { NavigationContext } from './navigation-context'
 
 interface Props extends PropsWithChildren {
@@ -6,40 +6,32 @@ interface Props extends PropsWithChildren {
 }
 
 /** End the current navigation span when the component is mounted, unmounted or the `on` prop is `true` */
-export class CompleteNavigation extends React.Component<Props> {
-  static contextType = NavigationContext
+export const CompleteNavigation: React.FC<Props> = ({ on, children }) => {
+  const context = React.useContext(NavigationContext)
 
-  declare context: React.ContextType<typeof NavigationContext>
-
-  constructor (props: Props, context: React.ContextType<typeof NavigationContext>) {
-    super(props)
-
+  useEffect(() => {
     context.blockNavigationEnd()
-  }
 
-  componentDidMount () {
-    if (this.props.on === 'mount') {
+    if (on === 'mount') {
       setTimeout(() => {
-        this.context.unblockNavigationEnd('mount')
+        context.unblockNavigationEnd('mount')
       })
     }
-  }
 
-  componentWillUnmount () {
-    if (this.props.on === 'unmount') {
-      this.context.unblockNavigationEnd('unmount')
-    }
-  }
-
-  componentDidUpdate (prevProps: Readonly<Props>) {
-    if (typeof this.props.on === 'boolean') {
-      if (this.props.on && !prevProps.on) {
-        this.context.unblockNavigationEnd('condition')
+    return () => {
+      if (on === 'unmount') {
+        context.unblockNavigationEnd('unmount')
       }
     }
-  }
+  }, [])
 
-  render () {
-    return this.props.children
-  }
+  useEffect(() => {
+    if (typeof on === 'boolean') {
+      if (on === true) {
+        context.unblockNavigationEnd('condition')
+      }
+    }
+  }, [on])
+
+  return children
 }

@@ -10,16 +10,14 @@ steps:
         agents:
           queue: macos-12-arm
         env:
-          JAVA_VERSION: "17"
-          NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
           BUILD_ANDROID: "true"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/old-arch/**/reactnative.apk"
         commands:
-          - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
+          - "0.71"
           - "0.72"
         retry:
           automatic:
@@ -32,17 +30,15 @@ steps:
         agents:
           queue: macos-12-arm
         env:
-          JAVA_VERSION: "17"
-          NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
           RCT_NEW_ARCH_ENABLED: "true"
           BUILD_ANDROID: "true"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/new-arch/**/reactnative.apk"
         commands:
-          - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
+          - "0.71"
           - "0.72"
         retry:
           automatic:
@@ -55,7 +51,6 @@ steps:
         agents:
           queue: "macos-12-arm"
         env:
-          NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
           BUILD_IOS: "true"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
@@ -65,6 +60,7 @@ steps:
           - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
+          - "0.71"
           - "0.72"
         retry:
           automatic:
@@ -77,7 +73,6 @@ steps:
         agents:
           queue: "macos-12-arm"
         env:
-          NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
           RCT_NEW_ARCH_ENABLED: "1"
           BUILD_IOS: "true"
@@ -88,6 +83,7 @@ steps:
           - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
+          - "0.71"
           - "0.72"
         retry:
           automatic:
@@ -123,6 +119,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
+          - "0.71"
           - "0.72"
 
       - label: ":bitbar: :android: RN {{matrix}} Android 12 (New Arch) end-to-end tests"
@@ -153,6 +150,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
+          - "0.71"
           - "0.72"
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS 14 (Old Arch) end-to-end tests"
@@ -181,6 +179,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
+          - "0.71"
           - "0.72"
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS 14 (New Arch) end-to-end tests"
@@ -211,4 +210,5 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
+          - "0.71"
           - "0.72"
