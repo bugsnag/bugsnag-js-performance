@@ -10,7 +10,9 @@ const paths = {
   '@bugsnag/request-tracker-performance': ['./packages/request-tracker/lib/index.ts'],
   '@bugsnag/react-router-performance': ['./packages/react-router/lib/index.ts'],
   '@bugsnag/vue-router-performance': ['./packages/vue-router/lib/index.ts'],
-  '@bugsnag/angular-performance': ['./packages/angular/lib/index.ts']
+  '@bugsnag/angular-performance': ['./packages/angular/lib/index.ts'],
+  '@bugsnag/react-native-navigation-performance': ['./packages/react-native-navigation/lib/index.ts'],
+  '@bugsnag/react-navigation-performance': ['./packages/react-navigation/lib/index.ts']
 }
 
 // convert the tsconfig "paths" option into Jest's "moduleNameMapper" option
@@ -98,13 +100,15 @@ module.exports = {
         ]
       }
     },
-    '<rootDir>/jest/config/react-navigation.js'
+    '<rootDir>/jest/config/react-navigation.js',
+    '<rootDir>/jest/config/react-native-navigation.js'
   ],
   collectCoverageFrom: [
     '**/packages/*/**/*.ts',
     '!**/packages/*/**/*.d.ts',
     '!**/packages/*/**/*.test.ts',
     '!**/packages/*/**/tests/**/*',
+    '!**/packages/*/**/__tests__/**/*',
     '!<rootDir>/packages/test-utilities/**/*',
     '!<rootDir>/test/**/*'
   ],
