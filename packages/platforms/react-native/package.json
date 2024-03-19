@@ -53,7 +53,7 @@
     "type": "modules",
     "jsSrcsDir": "dist",
     "android": {
-      "javaPackageName": "com.bugsnag.android.performance"
+      "javaPackageName": "com.bugsnag.reactnative.performance"
     }
   }
 }
