@@ -16,7 +16,7 @@ apply plugin: 'com.facebook.react'
 
 android {
   compileSdkVersion safeExtGet('compileSdkVersion', 33)
-  namespace "com.bugsnag.android.performance"
+  namespace "com.bugsnag.reactnative.performance"
 }
 
 repositories {
