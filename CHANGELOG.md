@@ -1,8 +1,12 @@
 # Changelog
 
-## v2.3.0 (2024-03-19)
+## v2.3.0 (2024-03-20)
 
 This release adds support for instrumenting navigation spans when using the [react-native-navigation](https://github.com/wix/react-native-navigation) library
+
+### Added 
+
+- (react-native-navigation) Added `@bugsnag/react-native-navigation-performance` package [#404](https://github.com/bugsnag/bugsnag-js-performance/pull/404)
 
 ### Fixed
 
