@@ -24,7 +24,6 @@ steps:
           setup:
             rn_version:
               - "0.71"
-              - "0.72"
         retry:
           automatic:
             - exit_status: "*"
@@ -48,7 +47,6 @@ steps:
           setup:
             rn_version:
               - "0.71"
-              - "0.72"
         retry:
           automatic:
             - exit_status: "*"
@@ -75,7 +73,6 @@ steps:
           setup:
             rn_version:
               - "0.71"
-              - "0.72"
         retry:
           automatic:
             - exit_status: "*"
@@ -101,7 +98,6 @@ steps:
           setup:
             rn_version:
               - "0.71"
-              - "0.72"
         retry:
           automatic:
             - exit_status: "*"
@@ -143,7 +139,6 @@ steps:
               - "12"
             rn_version:
               - "0.71"
-              - "0.72"
 
       - label: ":bitbar: :android: react-native-navigation end-to-end tests - RN {{matrix.rn_version}} (New Arch) Android {{matrix.android_version}}"
         depends_on: "build-react-native-navigation-android-fixture-new-arch"
@@ -180,7 +175,6 @@ steps:
               - "12"
             rn_version:
               - "0.71"
-              - "0.72"
 
       # iOS Test
       # ------------------------------
@@ -218,7 +212,6 @@ steps:
               - "14"
             rn_version:
               - "0.71"
-              - "0.72"
 
       - label: ":bitbar: :mac: react-native-navigation end-to-end tests - RN {{matrix.rn_version}} (New Arch) iOS {{matrix.ios_version}}"
         depends_on: "build-react-native-navigation-ios-fixture-new-arch"
@@ -255,4 +248,3 @@ steps:
               - "14"
             rn_version:
               - "0.71"
-              - "0.72"
