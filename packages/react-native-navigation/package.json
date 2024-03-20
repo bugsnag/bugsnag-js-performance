@@ -1,6 +1,6 @@
 {
     "name": "@bugsnag/react-native-navigation-performance",
-    "version": "0.0.1",
+    "version": "2.2.0",
     "description": "BugSnag performance monitoring for react-native-navigation",
     "homepage": "https://www.bugsnag.com/",
     "license": "MIT",
