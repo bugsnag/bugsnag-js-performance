@@ -10,6 +10,10 @@ BugsnagPerformance.start({
   endpoint,
   autoInstrumentFullPageLoads: false,
   autoInstrumentNetworkRequests: true,
+  networkRequestCallback: (requestInfo) => {
+    requestInfo.propagateTraceContext = true
+    return requestInfo;
+  },
   maximumBatchSize: 1,
  })
 

@@ -42,7 +42,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private trackRequest: RequestStartCallback = (startContext) => {
     if (!this.shouldTrackRequest(startContext)) return
 
-    const shouldPropagateTraceContextByDefault = startContext.url.startsWith(window.origin)
+    const shouldPropagateTraceContextByDefault = false
 
     const defaultRequestInfo: BrowserNetworkRequestInfo = {
       url: startContext.url,

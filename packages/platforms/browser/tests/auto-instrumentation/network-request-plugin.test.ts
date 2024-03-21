@@ -32,7 +32,7 @@ describe('network span plugin', () => {
     spanContextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
   })
 
-  it('tracks requests and adds trace propagation headers to same-origin requests when autoInstrumentNetworkRequests = true', () => {
+  it('tracks requests when autoInstrumentNetworkRequests = true', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
 
     plugin.configure(createConfiguration<BrowserConfiguration>({
@@ -42,9 +42,7 @@ describe('network span plugin', () => {
 
     const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: SAME_ORIGIN_TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
-    expect(res.extraRequestHeaders).toEqual([
-      { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
-    ])
+    expect(res.extraRequestHeaders).toEqual([])
 
     const res2 = fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 2 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
@@ -67,12 +65,10 @@ describe('network span plugin', () => {
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/POST', { startTime: 2, makeCurrentContext: false })
     expect(res2.extraRequestHeaders).toEqual([])
 
-    // traceparent headers are added to same-origin requests by default
+    // traceparent headers are not added to same-origin requests by default
     const res3 = xhrTracker.start({ type: 'xmlhttprequest', method: 'POST', url: SAME_ORIGIN_TEST_URL, startTime: 2 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/POST', { startTime: 2, makeCurrentContext: false })
-    expect(res3.extraRequestHeaders).toEqual([
-      { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
-    ])
+    expect(res3.extraRequestHeaders).toEqual([])
   })
 
   it('ends a span on request end', () => {
@@ -248,9 +244,7 @@ describe('network span plugin', () => {
 
     const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: SAME_ORIGIN_TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
-    expect(res.extraRequestHeaders).toEqual([
-      { traceparent: '00-xyz456-abc123-01' }
-    ])
+    expect(res.extraRequestHeaders).toEqual([])
   })
 
   it('prevents adding trace propagation headers when networkRequestCallback returns { propagateTraceContext: false }', () => {
