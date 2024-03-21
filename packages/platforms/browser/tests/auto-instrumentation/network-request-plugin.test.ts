@@ -51,31 +51,6 @@ describe('network span plugin', () => {
     expect(res2.extraRequestHeaders).toEqual([])
   })
 
-  it('does not track requests or add trace propagation headers when autoInstrumentNetworkRequests = false', () => {
-    const networkRequestCallback = jest.fn().mockReturnValue(() => ({ url: SAME_ORIGIN_TEST_URL, propagateTraceContext: true }))
-
-    const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-
-    plugin.configure(createConfiguration<BrowserConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: false,
-      networkRequestCallback
-    }))
-
-    // fetch and xhr are still patched regardless of autoInstrumentNetworkRequests being false
-    expect(xhrTracker.onStart).toHaveBeenCalled()
-    expect(fetchTracker.onStart).toHaveBeenCalled()
-
-    const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: SAME_ORIGIN_TEST_URL, startTime: 1 })
-
-    // networkRequestCallback is called even if autoInstrumentNetworkRequests, but the result is ignored
-    expect(networkRequestCallback).toHaveBeenCalled()
-
-    // no span is created or trace propagation headers added
-    expect(spanFactory.startSpan).not.toHaveBeenCalled()
-    expect(res.extraRequestHeaders).toEqual([])
-  })
-
   it('starts a span on request start', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
 
@@ -124,6 +99,18 @@ describe('network span plugin', () => {
     expect(span).toHaveAttribute('http.url', TEST_URL)
     expect(span).toHaveAttribute('http.method', 'GET')
     expect(span).toHaveAttribute('http.status_code', 200)
+  })
+
+  it('does not track requests when autoInstrumentNetworkRequests = false', () => {
+    const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+
+    plugin.configure(createConfiguration<BrowserConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: false
+    }))
+
+    expect(xhrTracker.onStart).not.toHaveBeenCalled()
+    expect(fetchTracker.onStart).not.toHaveBeenCalled()
   })
 
   it('does not track requests to the configured traces endpoint', () => {

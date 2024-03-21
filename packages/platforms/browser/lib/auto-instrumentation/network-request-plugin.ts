@@ -18,7 +18,6 @@ const permittedPrefixes = ['http://', 'https://', '/', './', '../']
 
 export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private configEndpoint: string = ''
-  private autoInstrumentNetworkRequests: boolean = true
   private networkRequestCallback: NetworkRequestCallback<BrowserNetworkRequestInfo> = defaultNetworkRequestCallback
   private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
 
@@ -32,11 +31,12 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
     this.logger = configuration.logger
 
-    this.configEndpoint = configuration.endpoint
-    this.xhrTracker.onStart(this.trackRequest)
-    this.fetchTracker.onStart(this.trackRequest)
-    this.autoInstrumentNetworkRequests = configuration.autoInstrumentNetworkRequests
-    this.networkRequestCallback = configuration.networkRequestCallback
+    if (configuration.autoInstrumentNetworkRequests) {
+      this.configEndpoint = configuration.endpoint
+      this.xhrTracker.onStart(this.trackRequest)
+      this.fetchTracker.onStart(this.trackRequest)
+      this.networkRequestCallback = configuration.networkRequestCallback
+    }
   }
 
   private trackRequest: RequestStartCallback = (startContext) => {
@@ -53,9 +53,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
     const networkRequestInfo = this.networkRequestCallback(defaultRequestInfo)
 
     // returning null neither creates a span nor propagates trace context
-    // if autoInstrumentNetworkRequests not true, don't create a span
-    // regardless of the result of networkRequestCallback
-    if (!networkRequestInfo || !this.autoInstrumentNetworkRequests) {
+    if (!networkRequestInfo) {
       return {
         onRequestEnd: undefined,
         extraRequestHeaders: undefined
