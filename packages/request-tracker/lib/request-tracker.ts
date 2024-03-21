@@ -40,10 +40,17 @@ export class RequestTracker {
     return {
       onRequestEnd: (endContext: RequestEndContext) => {
         for (const result of results) {
-          result?.onRequestEnd?.(endContext)
+          if (result && result.onRequestEnd) {
+            result.onRequestEnd(endContext)
+          }
         }
       },
-      extraRequestHeaders: results.map(result => result?.extraRequestHeaders).filter(isDefined)
+      extraRequestHeaders: results.map((result) => {
+        if (result && result.extraRequestHeaders) {
+          return result.extraRequestHeaders
+        }
+        return undefined
+      }).filter(isDefined)
     }
   }
 }
