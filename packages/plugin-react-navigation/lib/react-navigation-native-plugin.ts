@@ -1,19 +1,19 @@
 import type { Plugin, SpanFactory } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
-import { createNavigationContainer } from './create-navigation-container'
 import { NavigationContainer } from '@react-navigation/native'
+import { createNavigationContainer } from './create-navigation-container'
 
-class ReactNavigationNativePlugin implements Plugin<ReactNativeConfiguration> {
+class BugsnagPluginReactNavigationNativePerformance implements Plugin<ReactNativeConfiguration> {
   private spanFactory?: SpanFactory<ReactNativeConfiguration>
 
   configure (_configuration: ReactNativeConfiguration, spanFactory: SpanFactory<ReactNativeConfiguration>) {
     this.spanFactory = spanFactory
   }
 
-  createNavigationContainer = () => {
-    if (!this.spanFactory) throw new Error('Bugsnag: ReactNavigationNativePlugin not configured')
-    return createNavigationContainer(NavigationContainer, this.spanFactory)
+  createNavigationContainer = (Container = NavigationContainer) => {
+    if (!this.spanFactory) throw new Error('Bugsnag: BugsnagPluginReactNavigationNativePerformance not configured')
+    return createNavigationContainer(Container, this.spanFactory) as typeof Container
   }
 }
 
-export default ReactNavigationNativePlugin
+export default BugsnagPluginReactNavigationNativePerformance
