@@ -1,5 +1,5 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
-import BugsnagPluginReactNavigationPerformance, { CompleteNavigation } from '@bugsnag/react-navigation-performance'
+import BugsnagPluginReactNavigationPerformance, { CompleteNavigation } from '@bugsnag/plugin-react-navigation-performance'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView, Text } from 'react-native'
