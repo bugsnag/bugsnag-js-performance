@@ -1,5 +1,9 @@
 export interface NetworkRequestInfo {
-  url: string
+  url: string | null
+  /**
+   * Experimental. Whether to propagate trace context by adding a `traceparent` header to the request.
+   */
+  propagateTraceContext?: boolean
 }
 
 export type NetworkRequestCallback <T extends NetworkRequestInfo> = (networkRequestInfo: T) => T | null

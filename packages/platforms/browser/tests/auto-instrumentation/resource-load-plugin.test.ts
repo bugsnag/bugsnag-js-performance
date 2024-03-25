@@ -213,7 +213,7 @@ describe('ResourceLoadPlugin', () => {
       ]
     })
 
-    client.start({ apiKey: VALID_API_KEY, networkRequestCallback: (info) => info.url.includes('personally-identifiable-information') ? null : info })
+    client.start({ apiKey: VALID_API_KEY, networkRequestCallback: (info) => info.url?.includes('personally-identifiable-information') ? null : info })
 
     const span = client.startSpan('custom-span')
 
@@ -257,7 +257,7 @@ describe('ResourceLoadPlugin', () => {
       ]
     })
 
-    client.start({ apiKey: VALID_API_KEY, networkRequestCallback: (info) => info.url.includes('personally-identifiable-information') ? { ...info, url: 'https://bugsnag.com/redacted-url.jpg' } : info })
+    client.start({ apiKey: VALID_API_KEY, networkRequestCallback: (info) => info.url?.includes('personally-identifiable-information') ? { ...info, url: 'https://bugsnag.com/redacted-url.jpg' } : info })
 
     const span = client.startSpan('custom-span')
 

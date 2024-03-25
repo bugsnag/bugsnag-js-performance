@@ -16,11 +16,3 @@ end
 Before('@skip_new_arch') do |scenario|
   skip_this_scenario("Skipping scenario: Not supported with new architecture") if ENV["RCT_NEW_ARCH_ENABLED"]
 end
-
-Before('@react_native_navigation') do |scenario|
-  skip_this_scenario("Skipping scenario: Not running react-native-navigation fixture") unless ENV["REACT_NATIVE_NAVIGATION"]
-end
-
-Before('@skip_react_native_navigation') do |scenario|
-  skip_this_scenario("Skipping scenario") if ENV["REACT_NATIVE_NAVIGATION"]
-end

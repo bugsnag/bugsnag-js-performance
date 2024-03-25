@@ -6,9 +6,9 @@ import {
 } from '@bugsnag/core-performance'
 import {
   defaultNetworkRequestCallback,
+  type RequestStartCallback,
   type NetworkRequestCallback,
   type NetworkRequestInfo,
-  type RequestEndCallback,
   type RequestEndContext,
   type RequestStartContext,
   type RequestTracker
@@ -45,7 +45,7 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
     }
   }
 
-  private trackRequest = (startContext: RequestStartContext): RequestEndCallback | undefined => {
+  private trackRequest: RequestStartCallback = (startContext) => {
     if (!this.shouldTrackRequest(startContext)) return
 
     const networkRequestInfo = this.networkRequestCallback({ url: startContext.url, type: 'xmlhttprequest' })
@@ -66,10 +66,12 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
     span.setAttribute('http.method', startContext.method)
     span.setAttribute('http.url', networkRequestInfo.url)
 
-    return (endContext: RequestEndContext) => {
-      if (endContext.state === 'success') {
-        span.setAttribute('http.status_code', endContext.status)
-        this.spanFactory.endSpan(span, endContext.endTime)
+    return {
+      onRequestEnd: (endContext: RequestEndContext) => {
+        if (endContext.state === 'success') {
+          span.setAttribute('http.status_code', endContext.status)
+          this.spanFactory.endSpan(span, endContext.endTime)
+        }
       }
     }
   }

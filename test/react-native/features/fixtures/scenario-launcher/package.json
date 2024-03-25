@@ -8,10 +8,9 @@
   },
   "author": "",
   "license": "MIT",
-  "optionalDependencies": {
-    "react-native-navigation": "*"
-  },
   "peerDependencies": {
+    "@bugsnag/react-native-performance": "*",
+    "@bugsnag/react-navigation-performance": "*",
     "@react-navigation/native": "*",
     "@react-navigation/native-stack": "*",
     "react": "*",

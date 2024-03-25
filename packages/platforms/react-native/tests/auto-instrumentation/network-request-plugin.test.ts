@@ -54,7 +54,7 @@ describe('network span plugin', () => {
       autoInstrumentNetworkRequests: true
     }))
 
-    const endRequest = xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
+    const { onRequestEnd: endRequest } = xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
 
@@ -161,7 +161,7 @@ describe('network span plugin', () => {
       autoInstrumentNetworkRequests: true
     }))
 
-    const endRequest = xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
+    const { onRequestEnd: endRequest } = xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
 
     endRequest({ endTime: 2, state: 'error' })
@@ -176,7 +176,7 @@ describe('network span plugin', () => {
       autoInstrumentNetworkRequests: true
     }))
 
-    const endRequest = xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
+    const { onRequestEnd: endRequest } = xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
 
     endRequest({ state: 'error', error: new Error('woopsy'), endTime: 2 })
@@ -218,7 +218,7 @@ describe('network span plugin', () => {
       })
     }))
 
-    const endRequest = xhrTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
+    const { onRequestEnd: endRequest } = xhrTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
 
     endRequest({ status: 200, endTime: 2, state: 'success' })

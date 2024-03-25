@@ -20,10 +20,6 @@ steps:
     commands:
       - buildkite-agent pipeline upload .buildkite/react-native-pipeline.yml
 
-  - label: ":pipeline_upload: React Native Navigation pipeline"
-    commands:
-      - buildkite-agent pipeline upload .buildkite/react-native-navigation-pipeline.yml
-
   #
   # Conditionally trigger full pipeline
   #

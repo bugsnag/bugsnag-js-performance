@@ -59,7 +59,7 @@ describe('RequestSettler', () => {
     const tracker = new RequestTracker()
     const settler = new RequestSettler(createClock(performance, new ControllableBackgroundingListener()), tracker)
 
-    const end = tracker.start(START_CONTEXT)
+    const { onRequestEnd: end } = tracker.start(START_CONTEXT)
 
     settler.subscribe(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
@@ -84,7 +84,7 @@ describe('RequestSettler', () => {
     const settleCallback = jest.fn()
     const tracker = new RequestTracker()
 
-    const end = tracker.start(START_CONTEXT)
+    const { onRequestEnd: end } = tracker.start(START_CONTEXT)
 
     const settler = new RequestSettler(new IncrementingClock(), tracker)
 
@@ -106,11 +106,11 @@ describe('RequestSettler', () => {
     const tracker = new RequestTracker()
     const settler = new RequestSettler(createClock(performance, new ControllableBackgroundingListener()), tracker)
 
-    const endRequest1 = tracker.start(START_CONTEXT)
+    const { onRequestEnd: endRequest1 } = tracker.start(START_CONTEXT)
 
     settler.subscribe(settleCallback)
 
-    const endRequest2 = tracker.start(START_CONTEXT)
+    const { onRequestEnd: endRequest2 } = tracker.start(START_CONTEXT)
 
     endRequest1(END_CONTEXT)
 
@@ -132,7 +132,7 @@ describe('RequestSettler', () => {
     const tracker = new RequestTracker()
     const settler = new RequestSettler(new IncrementingClock(), tracker)
 
-    const end = tracker.start(START_CONTEXT)
+    const { onRequestEnd: end } = tracker.start(START_CONTEXT)
 
     expect(settler.isSettled()).toBe(false)
 
@@ -164,7 +164,7 @@ describe('RequestSettler', () => {
     const tracker = new RequestTracker()
     const settler = new RequestSettler(new IncrementingClock(), tracker)
 
-    const end = tracker.start(START_CONTEXT)
+    const { onRequestEnd: end } = tracker.start(START_CONTEXT)
 
     settler.subscribe(settleCallback1)
     settler.subscribe(settleCallback2)
@@ -195,7 +195,7 @@ describe('RequestSettler', () => {
       /http:\/\/www\.bugsnag\.com/
     ])
 
-    const endIgnoredRequest1 = tracker.start({
+    const { onRequestEnd: endIgnoredRequest1 } = tracker.start({
       ...START_CONTEXT,
       // matches the first URL to ignore
       url: 'https://www.bugsnag.com'
@@ -207,7 +207,7 @@ describe('RequestSettler', () => {
 
     endIgnoredRequest1(END_CONTEXT)
 
-    const endIgnoredRequest2 = tracker.start({
+    const { onRequestEnd: endIgnoredRequest2 } = tracker.start({
       ...START_CONTEXT,
       // matches the second URL to ignore
       url: 'http://example.com/a/b/c?x=http://www.bugsnag.com'
@@ -219,7 +219,7 @@ describe('RequestSettler', () => {
 
     endIgnoredRequest2(END_CONTEXT)
 
-    const end = tracker.start({
+    const { onRequestEnd: end } = tracker.start({
       ...START_CONTEXT,
       // does not match the URLs to ignore
       url: 'http://example.com'

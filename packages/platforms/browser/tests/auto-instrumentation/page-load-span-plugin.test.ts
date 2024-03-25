@@ -456,7 +456,7 @@ describe('FullPageLoadPlugin', () => {
     expect(testClient.currentSpanContext).not.toBeUndefined()
 
     // we're using the incrementing ID generator so the page load span should have an ID and trace ID of 1
-    const pageLoadSpanContext = { id: 'span ID 1', traceId: 'trace ID 1', isValid: () => true }
+    const pageLoadSpanContext = { id: 'span ID 1', traceId: 'trace ID 1', isValid: () => true, samplingRate: 0.1 }
     expect(spanContextEquals(pageLoadSpanContext, testClient.currentSpanContext)).toBe(true)
 
     // start and end a new span - this should become a child of the page load span

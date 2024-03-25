@@ -1,4 +1,4 @@
-package com.bugsnag.reactnative.performance;
+package com.bugsnag.android.performance;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -6,7 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.bugsnag.reactnative.performance.NativeBugsnagPerformanceSpec;
+import com.bugsnag.android.performance.NativeBugsnagPerformanceSpec;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;

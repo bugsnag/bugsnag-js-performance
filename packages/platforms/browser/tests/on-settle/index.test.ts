@@ -190,7 +190,7 @@ describe('onSettle', () => {
     onSettle(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
 
-    const end = fetchRequestTracker.start(START_CONTEXT)
+    const { onRequestEnd: end } = fetchRequestTracker.start(START_CONTEXT)
 
     await jest.advanceTimersByTimeAsync(100)
     expect(settleCallback).not.toHaveBeenCalled()
@@ -221,7 +221,7 @@ describe('onSettle', () => {
     onSettle(settleCallback)
     expect(settleCallback).not.toHaveBeenCalled()
 
-    const end = xhrRequestTracker.start(START_CONTEXT)
+    const { onRequestEnd: end } = xhrRequestTracker.start(START_CONTEXT)
 
     await jest.advanceTimersByTimeAsync(100)
     expect(settleCallback).not.toHaveBeenCalled()

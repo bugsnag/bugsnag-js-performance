@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/vue-router-performance",
-  "version": "2.2.0",
+  "version": "2.3.0-alpha.0",
   "description": "BugSnag performance monitoring for vue-router",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "peerDependencies": {
-    "@bugsnag/browser-performance": "^2.0.0",
+    "@bugsnag/browser-performance": "*",
     "path-to-regexp": "^1.8.0",
     "vue-router": "^4.2.4"
   },
