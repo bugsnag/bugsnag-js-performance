@@ -16,6 +16,14 @@
     - Rename package import from `@bugsnag/react-native-navigation-performance` to `@bugsnag/plugin-react-native-navigation-performance`
     - Rename plugin type from `ReactNativeNavigationPlugin` to `BugsnagPluginReactNativeNavigationPerformance`
 
+### Added
+
+- (plugin-react-native-navigation) Added `@bugsnag/plugin-react-native-navigation-performance` package
+
+### Deprecated
+
+- (react-native-navigation) Deprecated `@bugsnag/react-native-navigation-performance` package
+
 ## v2.3.0 (2024-03-20)
 
 This release adds support for instrumenting navigation spans when using the [react-native-navigation](https://github.com/wix/react-native-navigation) library
