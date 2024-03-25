@@ -12,7 +12,7 @@ const paths = {
   '@bugsnag/vue-router-performance': ['./packages/vue-router/lib/index.ts'],
   '@bugsnag/angular-performance': ['./packages/angular/lib/index.ts'],
   '@bugsnag/plugin-react-native-navigation-performance': ['./packages/plugin-react-native-navigation/lib/index.ts'],
-  '@bugsnag/react-navigation-performance': ['./packages/react-navigation/lib/index.ts']
+  '@bugsnag/plugin-react-navigation-performance': ['./packages/plugin-react-navigation/lib/index.ts']
 }
 
 // convert the tsconfig "paths" option into Jest's "moduleNameMapper" option

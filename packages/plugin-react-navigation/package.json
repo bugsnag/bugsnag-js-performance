@@ -1,5 +1,5 @@
 {
-    "name": "@bugsnag/react-navigation-performance",
+    "name": "@bugsnag/plugin-react-navigation-performance",
     "version": "2.3.0",
     "description": "BugSnag performance monitoring for @react-navigation/native",
     "homepage": "https://www.bugsnag.com/",

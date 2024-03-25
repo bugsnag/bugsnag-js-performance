@@ -1,4 +1,4 @@
-# `@bugsnag/react-navigation-performance`
+# `@bugsnag/plugin-react-navigation-performance`
 
 A react navigation integration for BugSnag performance
 
@@ -6,17 +6,17 @@ A react navigation integration for BugSnag performance
 
 ```typescript
 import BugsnagPerformance from "@bugsnag/react-native-performance"
-import ReactNavigationNativePlugin from "@bugsnag/react-navigation-performance/native"
+import BugsnagPluginReactNavigationNativePerformance from "@bugsnag/plugin-react-navigation-performance/native"
 import { NavigationContainer } from "@react-navigation/native"
 
-const reactNavigationPlugin = new ReactNavigationNativePlugin(NavigationContainer)
+const pluginReactNavigation = new BugsnagPluginReactNavigationNativePerformance(NavigationContainer)
 
 BugsnagPerformance.start({
   apiKey: "my-api-key",
-  plugins: [reactNavigationPlugin]
+  plugins: [pluginReactNavigation]
 })
 
-const BugsnagNavigationContainer = reactNavigationPlugin.createNavigationContainer()
+const BugsnagNavigationContainer = pluginReactNavigation.createNavigationContainer()
 
 function App () {
   return (
