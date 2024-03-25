@@ -42,10 +42,12 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
 
     const AppStartWrapper = ({ children }: WrapperProps) => {
       useEffect(() => {
-        this.spanFactory.endSpan(appStartSpan, this.clock.now())
+        if (appStartSpan.isValid()) {
+          this.spanFactory.endSpan(appStartSpan, this.clock.now())
+        }
       }, [])
 
-      return <>{children}</>
+      return children
     }
 
     const instrumentedComponentProvider: WrapperComponentProvider = (appParams) => ({ children }) => {
