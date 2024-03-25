@@ -19,10 +19,12 @@
 ### Added
 
 - (plugin-react-native-navigation) Added `@bugsnag/plugin-react-native-navigation-performance` package
+- (plugin-react-navigation) Added `@bugsnag/plugin-react-navigation-performance` package
 
 ### Deprecated
 
 - (react-native-navigation) Deprecated `@bugsnag/react-native-navigation-performance` package
+- (react-navigation) Deprecated `@bugsnag/react-navigation-performance` package
 
 ## v2.3.0 (2024-03-20)
 
