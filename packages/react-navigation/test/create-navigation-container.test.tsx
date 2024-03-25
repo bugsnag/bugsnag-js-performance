@@ -22,14 +22,14 @@ describe('createNavigationContainer', () => {
     expect(screen.getByText('Route 2')).toBeOnTheScreen()
 
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(1)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 2', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 2', { isFirstClass: false, makeCurrentContext: true, parentContext: null })
 
     fireEvent.press(screen.getByText('Go back'))
 
     expect(screen.getByText('Route 1')).toBeOnTheScreen()
 
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(2)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 1', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 1', { isFirstClass: false, makeCurrentContext: true, parentContext: null })
   })
 })
 

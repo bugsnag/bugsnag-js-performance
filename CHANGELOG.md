@@ -4,20 +4,10 @@
 
 This release adds experimental trace propagation support. When enabled, by setting `propagateTraceContext` to `true` in the `networkRequestCallback` handler, a `traceparent` header will be added to the outgoing network request.
 
-## v2.3.0 (2024-03-20)
-
-This release adds support for instrumenting navigation spans when using the [react-native-navigation](https://github.com/wix/react-native-navigation) library
-
-### Added 
-
-- (react-native-navigation) Added `@bugsnag/react-native-navigation-performance` package [#404](https://github.com/bugsnag/bugsnag-js-performance/pull/404)
-
 ### Fixed
 
 - (browser) Prevent throwing an error in edge cases when `performance.getEntriesByType()` returns undefined [#401](https://github.com/bugsnag/bugsnag-js-performance/pull/401)
 - (react-native) Broaden version range allowed for `@react-native-community/netinfo` peer dependency [#413](https://github.com/bugsnag/bugsnag-js-performance/pull/413)
-- (react-navigation) Refactor `CompleteNavigation` as a functional component [#418](https://github.com/bugsnag/bugsnag-js-performance/pull/418)
-- (react-native) Update the android namepsace to `com.bugsnag.reactnative.performance` to prevent overlap with the native android package [#426]https://github.com/bugsnag/bugsnag-js-performance/pull/426
 
 ## v2.2.0 (2024-02-01)
 

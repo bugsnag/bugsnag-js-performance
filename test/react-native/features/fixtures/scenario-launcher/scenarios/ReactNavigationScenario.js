@@ -1,19 +1,17 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
-import { CompleteNavigation, ReactNavigationNativePlugin } from '@bugsnag/react-navigation-performance'
+import { ReactNavigationNativePlugin } from '@bugsnag/react-navigation-performance'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import React, { useEffect, useState } from 'react'
-import { SafeAreaView, Text } from 'react-native'
+import React, { useEffect } from 'react'
+import { SafeAreaView, Text, Button } from 'react-native'
 
 export const config = {
-    maximumBatchSize: 5,
+    maximumBatchSize: 1,
     autoInstrumentAppStarts: false,
     appVersion: '1.2.3',
     plugins: [new ReactNavigationNativePlugin()]
 }
 
 const Stack = createNativeStackNavigator()
-
-let parentSpan
 
 export function App() {
 
@@ -23,109 +21,47 @@ export function App() {
 
     return (
         <BugsnagNavigationContainer>
-            <Stack.Navigator initialRouteName='Screen1'>
-                <Stack.Screen name='Screen1' component={Screen1} />
-                <Stack.Screen name='Screen2' component={Screen2} />
-                <Stack.Screen name='Screen3' component={Screen3} />
-                <Stack.Screen name='Screen4' component={Screen4} />
-                <Stack.Screen name='Screen5' component={Screen5} />
+            <Stack.Navigator initialRouteName='Home'>
+                <Stack.Screen name='Home' component={HomeScreen} />
+                <Stack.Screen name='Loading' component={LoadingScreen} />
+                <Stack.Screen name='Details' component={DetailsScreen} />
             </Stack.Navigator>
         </BugsnagNavigationContainer>
     );
 }
 
-function Screen1({ navigation }) {
+function HomeScreen({ navigation }) {
     useEffect(() => {
-        parentSpan = BugsnagPerformance.startSpan('ParentSpan')
-        navigation.navigate('Screen2')
+        navigation.navigate('Details')
     }, [])
 
     return (
         <SafeAreaView>
-            <Text>Screen1</Text>
+            <Text>HomeScreen</Text>
+            <Button title='Go to details screen' onPress={() => { navigation.navigate('Details') }} />
+            <Button title='Go to loading screen' onPress={() => { navigation.navigate('Loading') }} />
         </SafeAreaView>
     )
 }
 
-// End navigation immediately
-function Screen2({ navigation }) {
-    useEffect(() => {
-        setTimeout(() => {
-            navigation.navigate('Screen3')
-        }, 250)
-    }, [])
-
+function LoadingScreen({ navigation }) {
     return (
         <SafeAreaView>
-            <Text>Screen2</Text>
+            <Text>LoadingScreen</Text>
+            <Button title='Go back' onPress={() => { navigation.goBack() }} />
+            <Button title='Go to home screen' onPress={() => { navigation.navigate('Home') }} />
+            <Button title='Go to details screen' onPress={() => { navigation.navigate('Details') }} />
         </SafeAreaView>
     )
 }
 
-// End navigation with CompleteNavigation component on condition
-function Screen3({ navigation }) {
-    const [loadingComplete, setLoadingComplete] = useState(false)
-
-    useEffect(() => {
-        setTimeout(() => {
-            setLoadingComplete(true)
-        }, 50)
-
-        setTimeout(() => {
-            navigation.navigate('Screen4')
-        }, 250)
-    }, [])
-
+function DetailsScreen({ navigation }) {
     return (
         <SafeAreaView>
-            <Text>Screen3</Text>
-            <CompleteNavigation on={loadingComplete} />
-        </SafeAreaView>
-    )
-}
-
-// End navigation with CompleteNavigation component on mount
-function Screen4({ navigation }) {
-    const [loadingComplete, setLoadingComplete] = useState(false)
-
-    useEffect(() => {
-        setTimeout(() => {
-            setLoadingComplete(true)
-        }, 50)
-
-        setTimeout(() => {
-            navigation.navigate('Screen5')
-        }, 250)
-    }, [])
-
-    return (
-        <SafeAreaView>
-            <Text>Screen4</Text>
-            {loadingComplete ? <CompleteNavigation on="mount" /> : null}
-        </SafeAreaView>
-    )
-}
-
-// End navigation with CompleteNavigation component on unmount
-function Screen5() {
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        setTimeout(() => {
-            setLoading(false)
-        }, 50)
-
-        setTimeout(() => {
-            if (parentSpan && typeof parentSpan.end === 'function') {
-                parentSpan.end()
-            }
-        }, 250)
-    }, [])
-
-    return (
-        <SafeAreaView>
-            <Text>Screen5</Text>
-            {loading ? <CompleteNavigation on="unmount" /> : null}
+            <Text>DetailsScreen</Text>
+            <Button title='Go back' onPress={() => { navigation.goBack() }} />
+            <Button title='Go to home screen' onPress={() => { navigation.navigate('Home') }} />
+            <Button title='Go to loading screen' onPress={() => { navigation.navigate('Loading') }} />
         </SafeAreaView>
     )
 }

@@ -8,6 +8,8 @@ import { NavigationContext, NavigationContextProvider } from '../lib/navigation-
 
 jest.useFakeTimers()
 
+const navigationSpanOptions = { isFirstClass: false, makeCurrentContext: true, parentContext: null }
+
 describe('NavigationContextProvider', () => {
   it('Creates a navigation span when the currentRoute changes', () => {
     const spanFactory = new MockSpanFactory()
@@ -18,7 +20,7 @@ describe('NavigationContextProvider', () => {
 
     // Route change should create a navigation span
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', navigationSpanOptions)
 
     // Await the navigation span to end
     jest.advanceTimersByTime(100)
@@ -28,7 +30,7 @@ describe('NavigationContextProvider', () => {
     const span = spanFactory.createdSpans[0]
     expect(span.name).toEqual('[Navigation]route-1')
     expect(span).toHaveAttribute('bugsnag.span.category', 'navigation')
-    expect(span).toHaveAttribute('bugsnag.span.first_class', true)
+    expect(span).toHaveAttribute('bugsnag.span.first_class', false)
     expect(span).toHaveAttribute('bugsnag.navigation.route', 'route-1')
     expect(span).toHaveAttribute('bugsnag.navigation.ended_by', 'immediate')
     expect(span).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-navigation-performance')
@@ -42,7 +44,7 @@ describe('NavigationContextProvider', () => {
     fireEvent.press(screen.getByText('Change to route 1'))
     fireEvent.press(screen.getByText('Block Navigation'))
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(1)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', navigationSpanOptions)
 
     // Navigation span should not end after timeout
     jest.advanceTimersByTime(100)
@@ -51,7 +53,7 @@ describe('NavigationContextProvider', () => {
     // Change to a second route while the first navigation span is still open
     fireEvent.press(screen.getByText('Change to route 2'))
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(2)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-2', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-2', navigationSpanOptions)
 
     // End the navigation
     fireEvent.press(screen.getByText('Unblock Navigation'))
@@ -63,11 +65,7 @@ describe('NavigationContextProvider', () => {
     const secondRouteSpan = spanFactory.createdSpans[0]
     expect(secondRouteSpan.name).toEqual('[Navigation]route-2')
     expect(secondRouteSpan).toHaveAttribute('bugsnag.span.category', 'navigation')
-    expect(secondRouteSpan).toHaveAttribute('bugsnag.span.first_class', true)
-    expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.route', 'route-2')
-    expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.previous_route', 'route-1')
-    expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.ended_by', 'condition')
-    expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-navigation-performance')
+    expect(secondRouteSpan).toHaveAttribute('bugsnag.span.first_class', false)
   })
 
   it('Prevents a navigation span from ending when navigation is blocked', () => {
@@ -76,7 +74,7 @@ describe('NavigationContextProvider', () => {
 
     // Start a navigation
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', navigationSpanOptions)
 
     // Prevent navigation from ending
     fireEvent.press(screen.getByText('Block Navigation'))
@@ -94,7 +92,7 @@ describe('NavigationContextProvider', () => {
     expect(spanFactory.createdSpans).toHaveLength(1)
     expect(secondRouteSpan.name).toEqual('[Navigation]route-1')
     expect(secondRouteSpan).toHaveAttribute('bugsnag.span.category', 'navigation')
-    expect(secondRouteSpan).toHaveAttribute('bugsnag.span.first_class', true)
+    expect(secondRouteSpan).toHaveAttribute('bugsnag.span.first_class', false)
   })
 
   it('Does not end a navigation span while multiple components are blocking', () => {
@@ -103,7 +101,7 @@ describe('NavigationContextProvider', () => {
 
     // Start a navigation
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', navigationSpanOptions)
 
     // Block navigation from completing
     fireEvent.press(screen.getByText('Block Navigation'))
