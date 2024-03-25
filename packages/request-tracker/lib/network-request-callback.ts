@@ -1,5 +1,8 @@
 export interface NetworkRequestInfo {
   url: string | null
+  /**
+   * Experimental. Whether to propagate trace context by adding a `traceparent` header to the request.
+   */
   propagateTraceContext?: boolean
 }
 
