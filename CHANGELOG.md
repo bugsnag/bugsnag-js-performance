@@ -4,6 +4,14 @@
 
 This release adds experimental trace propagation support. When enabled, by setting `propagateTraceContext` to `true` in the `networkRequestCallback` handler, a `traceparent` header will be added to the outgoing network request.
 
+### Added
+
+- (plugin-react-native-navigation) Added `@bugsnag/plugin-react-native-navigation-performance` package
+
+### Deprecated
+
+- (react-native-navigation) Deprecated `@bugsnag/react-native-navigation-performance` package
+
 ## v2.3.0 (2024-03-20)
 
 This release adds support for instrumenting navigation spans when using the [react-native-navigation](https://github.com/wix/react-native-navigation) library

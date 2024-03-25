@@ -42,7 +42,7 @@ describe('ReactNativeNavigationPlugin', () => {
     expect(span).toHaveAttribute('bugsnag.span.category', 'navigation')
     expect(span).toHaveAttribute('bugsnag.span.first_class', true)
     expect(span).toHaveAttribute('bugsnag.navigation.route', 'TestScreen')
-    expect(span).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-native-navigation-performance')
+    expect(span).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-native-navigation-performance')
     expect(span).toHaveAttribute('bugsnag.navigation.ended_by', 'immediate')
   })
 
@@ -91,7 +91,7 @@ describe('ReactNativeNavigationPlugin', () => {
     expect(span).toHaveAttribute('bugsnag.span.category', 'navigation')
     expect(span).toHaveAttribute('bugsnag.span.first_class', true)
     expect(span).toHaveAttribute('bugsnag.navigation.route', 'TestScreen')
-    expect(span).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-native-navigation-performance')
+    expect(span).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-native-navigation-performance')
     expect(span).toHaveAttribute('bugsnag.navigation.ended_by', 'condition')
   })
 
@@ -139,7 +139,7 @@ describe('ReactNativeNavigationPlugin', () => {
     expect(span).toHaveAttribute('bugsnag.span.first_class', true)
     expect(span).toHaveAttribute('bugsnag.navigation.route', 'SecondScreen')
     expect(span).toHaveAttribute('bugsnag.navigation.previous_route', 'FirstScreen')
-    expect(span).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-native-navigation-performance')
+    expect(span).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-native-navigation-performance')
     expect(span).toHaveAttribute('bugsnag.navigation.ended_by', 'immediate')
   })
 })

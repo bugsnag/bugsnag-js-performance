@@ -34,7 +34,7 @@ const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
   '@bugsnag/delivery-fetch-performance',
   '@bugsnag/react-native-performance',
-  '@bugsnag/react-native-navigation-performance',
+  '@bugsnag/plugin-react-native-navigation-performance',
   '@bugsnag/react-navigation-performance',
   '@bugsnag/request-tracker-performance'
 ]
@@ -42,7 +42,7 @@ const PACKAGE_NAMES = [
 const PACKAGE_DIRECTORIES = [
   `${ROOT_DIR}/packages/core`,
   `${ROOT_DIR}/packages/delivery-fetch`,
-  `${ROOT_DIR}/packages/react-native-navigation`,
+  `${ROOT_DIR}/packages/plugin-react-native-navigation`,
   `${ROOT_DIR}/packages/react-navigation`,
   `${ROOT_DIR}/packages/request-tracker`,
   `${ROOT_DIR}/packages/platforms/react-native`,

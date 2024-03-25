@@ -11,7 +11,7 @@ const paths = {
   '@bugsnag/react-router-performance': ['./packages/react-router/lib/index.ts'],
   '@bugsnag/vue-router-performance': ['./packages/vue-router/lib/index.ts'],
   '@bugsnag/angular-performance': ['./packages/angular/lib/index.ts'],
-  '@bugsnag/react-native-navigation-performance': ['./packages/react-native-navigation/lib/index.ts'],
+  '@bugsnag/plugin-react-native-navigation-performance': ['./packages/plugin-react-native-navigation/lib/index.ts'],
   '@bugsnag/react-navigation-performance': ['./packages/react-navigation/lib/index.ts']
 }
 
