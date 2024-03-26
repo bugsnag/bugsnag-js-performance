@@ -1,3 +1,4 @@
+@skip_react_native_navigation
 Feature: Backgrounding listener
 
   # Skip until PLAT-11769 has been resolved
