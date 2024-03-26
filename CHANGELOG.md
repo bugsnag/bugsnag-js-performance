@@ -2,12 +2,19 @@
 
 ## Unreleased
 
-This release adds experimental trace propagation support. When enabled, by setting `propagateTraceContext` to `true` in the `networkRequestCallback` handler, a `traceparent` header will be added to the outgoing network request.
+### Added
 
-### Changed
+- (browser) This release adds experimental trace propagation support. When enabled, by setting `propagateTraceContext` to `true` in the `networkRequestCallback` handler, a `traceparent` header will be added to the outgoing network request.
 
-- Renamed `@bugsnag/react-navigation-performance` to `@bugsnag/plugin-react-navigation-performance` [#429](https://github.com/bugsnag/bugsnag-js-performance/pull/429)
-- Renamed `@bugsnag/react-native-navigation-performance` to `@bugsnag/plugin-react-native-navigation-performance` [#429](https://github.com/bugsnag/bugsnag-js-performance/pull/429)
+### Deprecated
+
+- (react-native) For improved consistency with our error SDK, this release renames the existing navigation plugins and their exported types. The old packages are now marked as deprecated in NPM, but can be used until the next major version of this library. However we recommend renaming any existing references to the new packages straightaway:
+  - React Navigation:
+    - Rename package import from `@bugsnag/react-navigation-performance` to `@bugsnag/plugin-react-navigation-performance`
+    - Rename plugin type from `ReactNavigationNativePlugin` to `BugsnagPluginReactNavigationPerformance`
+  - React Native Navigation:
+    - Rename package import from `@bugsnag/react-native-navigation-performance` to `@bugsnag/plugin-react-native-navigation-performance`
+    - Rename plugin type from `ReactNativeNavigationPlugin` to `BugsnagPluginReactNativeNavigationPerformance`
 
 ## v2.3.0 (2024-03-20)
 
