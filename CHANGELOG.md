@@ -4,15 +4,10 @@
 
 This release adds experimental trace propagation support. When enabled, by setting `propagateTraceContext` to `true` in the `networkRequestCallback` handler, a `traceparent` header will be added to the outgoing network request.
 
-### Added
+### Changed
 
-- (plugin-react-native-navigation) Added `@bugsnag/plugin-react-native-navigation-performance` package
-- (plugin-react-navigation) Added `@bugsnag/plugin-react-navigation-performance` package
-
-### Deprecated
-
-- (react-native-navigation) Deprecated `@bugsnag/react-native-navigation-performance` package
-- (react-navigation) Deprecated `@bugsnag/react-navigation-performance` package
+- Renamed `@bugsnag/react-navigation-performance` to `@bugsnag/plugin-react-navigation-performance` [#429](https://github.com/bugsnag/bugsnag-js-performance/pull/429)
+- Renamed `@bugsnag/react-native-navigation-performance` to `@bugsnag/plugin-react-native-navigation-performance` [#429](https://github.com/bugsnag/bugsnag-js-performance/pull/429)
 
 ## v2.3.0 (2024-03-20)
 
