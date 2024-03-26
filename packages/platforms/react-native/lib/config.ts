@@ -21,12 +21,12 @@ export interface ReactNativeSchema extends CoreSchema {
 }
 
 export interface ReactNativeConfiguration extends Configuration {
+  autoInstrumentAppStarts?: boolean
+  autoInstrumentNetworkRequests?: boolean
   codeBundleId?: string
   generateAnonymousId?: boolean
-  autoInstrumentAppStarts?: boolean
-  wrapperComponentProvider?: WrapperComponentProvider | null
-  autoInstrumentNetworkRequests?: boolean
   networkRequestCallback?: NetworkRequestCallback<ReactNativeNetworkRequestInfo>
+  wrapperComponentProvider?: WrapperComponentProvider | null
 }
 
 function createSchema (): ReactNativeSchema {

@@ -1,7 +1,7 @@
 {
-    "name": "@bugsnag/react-navigation-performance",
+    "name": "@bugsnag/react-native-navigation-performance",
     "version": "2.3.0",
-    "description": "BugSnag performance monitoring for @react-navigation/native",
+    "description": "BugSnag performance monitoring for react-native-navigation",
     "homepage": "https://www.bugsnag.com/",
     "license": "MIT",
     "repository": {
@@ -18,22 +18,18 @@
     "bugs": {
         "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
     },
-    "devDependencies": {
+    "peerDependencies": {
         "@bugsnag/core-performance": "^2.3.0-alpha.0",
         "@bugsnag/react-native-performance": "^2.3.0",
+        "react-native-navigation": "*"
+    },
+    "devDependencies": {
+        "@bugsnag/core-performance": "*",
+        "@bugsnag/react-native-performance": "^2.3.0",
         "@react-native/babel-preset": "^0.74.0",
-        "@react-navigation/native": "^6.1.9",
-        "@react-navigation/native-stack": "^6.9.17",
         "@testing-library/jest-native": "^5.4.3",
         "@testing-library/react-native": "^12.4.1",
-        "identity-obj-proxy": "^3.0.0",
-        "react": "^18.2.0"
-    },
-    "peerDependencies": {
-        "@bugsnag/core-performance": "*",
-        "@bugsnag/react-native-performance": "*",
-        "@react-navigation/native": "*",
-        "react": "*"
+        "react-native-navigation": "7.37.2"
     },
     "type": "module",
     "main": "dist/index.js",
