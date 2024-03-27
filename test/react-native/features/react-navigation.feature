@@ -14,35 +14,35 @@ Feature: Navigation spans with React Navigation
 
     And a span named "[Navigation]Screen2" has a parent named "ParentSpan"
     And a span named "[Navigation]Screen2" contains the attributes:
-      | attribute                       | type        | value                                 |
-      | bugsnag.span.category           | stringValue | navigation                            |
-      | bugsnag.navigation.route        | stringValue | Screen2                               |
-      | bugsnag.navigation.triggered_by | stringValue | @bugsnag/react-navigation-performance |
-      | bugsnag.navigation.ended_by     | stringValue | immediate                             |
+      | attribute                       | type        | value                                        |
+      | bugsnag.span.category           | stringValue | navigation                                   |
+      | bugsnag.navigation.route        | stringValue | Screen2                                      |
+      | bugsnag.navigation.triggered_by | stringValue | @bugsnag/plugin-react-navigation-performance |
+      | bugsnag.navigation.ended_by     | stringValue | immediate                                    |
 
     And a span named "[Navigation]Screen3" has a parent named "ParentSpan"
     And a span named "[Navigation]Screen3" contains the attributes:
-      | attribute                         | type        | value                                 |
-      | bugsnag.span.category             | stringValue | navigation                            |
-      | bugsnag.navigation.route          | stringValue | Screen3                               |
-      | bugsnag.navigation.previous_route | stringValue | Screen2                               |
-      | bugsnag.navigation.triggered_by   | stringValue | @bugsnag/react-navigation-performance |
-      | bugsnag.navigation.ended_by       | stringValue | condition                             |
+      | attribute                         | type        | value                                        |
+      | bugsnag.span.category             | stringValue | navigation                                   |
+      | bugsnag.navigation.route          | stringValue | Screen3                                      |
+      | bugsnag.navigation.previous_route | stringValue | Screen2                                      |
+      | bugsnag.navigation.triggered_by   | stringValue | @bugsnag/plugin-react-navigation-performance |
+      | bugsnag.navigation.ended_by       | stringValue | condition                                    |
 
     And a span named "[Navigation]Screen4" has a parent named "ParentSpan"
     And a span named "[Navigation]Screen4" contains the attributes:
-      | attribute                         | type        | value                                 |
-      | bugsnag.span.category             | stringValue | navigation                            |
-      | bugsnag.navigation.route          | stringValue | Screen4                               |
-      | bugsnag.navigation.previous_route | stringValue | Screen3                               |
-      | bugsnag.navigation.triggered_by   | stringValue | @bugsnag/react-navigation-performance |
-      | bugsnag.navigation.ended_by       | stringValue | mount                                 |
+      | attribute                         | type        | value                                        |
+      | bugsnag.span.category             | stringValue | navigation                                   |
+      | bugsnag.navigation.route          | stringValue | Screen4                                      |
+      | bugsnag.navigation.previous_route | stringValue | Screen3                                      |
+      | bugsnag.navigation.triggered_by   | stringValue | @bugsnag/plugin-react-navigation-performance |
+      | bugsnag.navigation.ended_by       | stringValue | mount                                        |
 
     And a span named "[Navigation]Screen5" has a parent named "ParentSpan"
     And a span named "[Navigation]Screen5" contains the attributes:
-      | attribute                         | type        | value                                 |
-      | bugsnag.span.category             | stringValue | navigation                            |
-      | bugsnag.navigation.route          | stringValue | Screen5                               |
-      | bugsnag.navigation.previous_route | stringValue | Screen4                               |
-      | bugsnag.navigation.triggered_by   | stringValue | @bugsnag/react-navigation-performance |
-      | bugsnag.navigation.ended_by       | stringValue | unmount                               |
+      | attribute                         | type        | value                                        |
+      | bugsnag.span.category             | stringValue | navigation                                   |
+      | bugsnag.navigation.route          | stringValue | Screen5                                      |
+      | bugsnag.navigation.previous_route | stringValue | Screen4                                      |
+      | bugsnag.navigation.triggered_by   | stringValue | @bugsnag/plugin-react-navigation-performance |
+      | bugsnag.navigation.ended_by       | stringValue | unmount                                      |

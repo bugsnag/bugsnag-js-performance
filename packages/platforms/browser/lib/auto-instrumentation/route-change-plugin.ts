@@ -52,6 +52,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
           return {
             id: '',
             traceId: '',
+            samplingRate: 0,
             isValid: () => false,
             end: () => {}
           }
@@ -88,6 +89,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
         id: span.id,
         traceId: span.traceId,
         isValid: span.isValid,
+        samplingRate: span.samplingRate,
         end: (endTimeOrOptions?: Time | RouteChangeSpanEndOptions): void => {
           const options: RouteChangeSpanEndOptions = isObject(endTimeOrOptions) ? endTimeOrOptions : { endTime: endTimeOrOptions }
 

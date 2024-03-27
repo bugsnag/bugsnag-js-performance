@@ -14,7 +14,7 @@ export const DISCARD_END_TIME = -1
 
 export class SpanFactory <C extends Configuration> {
   private processor: Processor
-  private readonly sampler: ReadonlySampler
+  readonly sampler: ReadonlySampler
   private readonly idGenerator: IdGenerator
   private readonly spanAttributesSource: SpanAttributesSource<C>
   private readonly clock: Clock
@@ -127,6 +127,9 @@ export class SpanFactory <C extends Configuration> {
       },
       get traceId () {
         return span.traceId
+      },
+      get samplingRate () {
+        return span.samplingRate
       },
       isValid: () => span.isValid(),
       end: (endTime) => {

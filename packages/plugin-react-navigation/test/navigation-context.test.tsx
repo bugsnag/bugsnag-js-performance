@@ -31,7 +31,7 @@ describe('NavigationContextProvider', () => {
     expect(span).toHaveAttribute('bugsnag.span.first_class', true)
     expect(span).toHaveAttribute('bugsnag.navigation.route', 'route-1')
     expect(span).toHaveAttribute('bugsnag.navigation.ended_by', 'immediate')
-    expect(span).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-navigation-performance')
+    expect(span).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-navigation-performance')
   })
 
   it('Discards the active navigation span when the route changes', () => {
@@ -67,7 +67,7 @@ describe('NavigationContextProvider', () => {
     expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.route', 'route-2')
     expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.previous_route', 'route-1')
     expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.ended_by', 'condition')
-    expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-navigation-performance')
+    expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-navigation-performance')
   })
 
   it('Prevents a navigation span from ending when navigation is blocked', () => {

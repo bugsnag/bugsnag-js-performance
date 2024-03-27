@@ -21,7 +21,7 @@ const internalModuleMap = Object.fromEntries(
 )
 
 module.exports = {
-  rootDir: '../../packages/react-navigation',
+  rootDir: '../../packages/plugin-react-navigation',
   preset: 'react-native',
   displayName: 'react-navigation',
   testMatch: [

@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/core-performance",
-  "version": "2.2.0",
+  "version": "2.3.0-alpha.0",
   "description": "Core performance client",
   "keywords": [
     "bugsnag",

@@ -31,8 +31,8 @@ describe('DefaultSpanContextStorage', () => {
     it('pushes valid contexts onto the stack', () => {
       const contextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
 
-      const spanContext1 = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
-      const spanContext2 = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
+      const spanContext1 = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
+      const spanContext2 = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
 
       contextStorage.push(spanContext1)
       expect(contextStorage.current).toBe(spanContext1)
@@ -44,8 +44,8 @@ describe('DefaultSpanContextStorage', () => {
     it('does not push invalid contexts onto the stack', () => {
       const contextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
 
-      const validSpanContext: SpanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
-      const invalidSpanContext: SpanContext = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => false }
+      const validSpanContext: SpanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
+      const invalidSpanContext: SpanContext = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => false, samplingRate: 0.1 }
 
       contextStorage.push(validSpanContext)
       contextStorage.push(invalidSpanContext)
@@ -57,8 +57,8 @@ describe('DefaultSpanContextStorage', () => {
     it('only pops the supplied context if it is the current context', () => {
       const contextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
 
-      const spanContext1 = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
-      const spanContext2 = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
+      const spanContext1 = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
+      const spanContext2 = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
 
       contextStorage.push(spanContext1)
       contextStorage.push(spanContext2)
@@ -82,10 +82,10 @@ describe('DefaultSpanContextStorage', () => {
     it('removes invalid contexts from the stack when popped', () => {
       const contextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
 
-      const spanContext1 = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
-      const spanContext2 = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
-      const spanContext3 = { id: 'abcdef0123456789', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
-      const spanContext4 = { id: 'fedcba0123456789', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
+      const spanContext1 = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
+      const spanContext2 = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
+      const spanContext3 = { id: 'abcdef0123456789', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
+      const spanContext4 = { id: 'fedcba0123456789', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
 
       contextStorage.push(spanContext1)
       contextStorage.push(spanContext2)
@@ -109,9 +109,9 @@ describe('DefaultSpanContextStorage', () => {
     it('removes invalid contexts from the stack when current is called', () => {
       const contextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
 
-      const spanContext1 = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
-      const spanContext2 = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
-      const spanContext3 = { id: 'abcdef0123456789', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
+      const spanContext1 = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
+      const spanContext2 = { id: 'abcdef9876543210', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
+      const spanContext3 = { id: 'abcdef0123456789', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
 
       contextStorage.push(spanContext1)
       contextStorage.push(spanContext2)
@@ -137,7 +137,7 @@ describe('DefaultSpanContextStorage', () => {
 
       // push some contexts onto the stack
       for (let i = 0; i < 10; i++) {
-        const spanContext = { id: `${i}123456789abcdef`, traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
+        const spanContext = { id: `${i}123456789abcdef`, traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
         spanContexts.push(spanContext)
         contextStorage.push(spanContext)
       }
@@ -160,7 +160,7 @@ describe('DefaultSpanContextStorage', () => {
       const backgroundingListener = new ControllableBackgroundingListener()
       const contextStorage = new DefaultSpanContextStorage(backgroundingListener)
 
-      const spanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
+      const spanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
       contextStorage.push(spanContext)
       expect(contextStorage.current).toBe(spanContext)
 
@@ -173,7 +173,7 @@ describe('DefaultSpanContextStorage', () => {
       const contextStorage = new DefaultSpanContextStorage(backgroundingListener)
 
       backgroundingListener.sendToBackground()
-      const spanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true }
+      const spanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
       contextStorage.push(spanContext)
       expect(contextStorage.current).toBeUndefined()
 
@@ -192,33 +192,33 @@ describe('spanContextEquals()', () => {
       expected: true
     },
     {
-      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 },
       span2: undefined,
       expected: false
     },
     {
       span1: undefined,
-      span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+      span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 },
       expected: false
     },
     {
-      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
-      span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 },
+      span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 },
       expected: true
     },
     {
-      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
-      span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => false },
+      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 },
+      span2: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => false, samplingRate: 0.1 },
       expected: true
     },
     {
-      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
-      span2: { id: '0123456789abcdef', traceId: 'a0b1c2d3e4f5a0b1c2d3e4f5a0b1c2d3', isValid: () => true },
+      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 },
+      span2: { id: '0123456789abcdef', traceId: 'a0b1c2d3e4f5a0b1c2d3e4f5a0b1c2d3', isValid: () => true, samplingRate: 0.1 },
       expected: false
     },
     {
-      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
-      span2: { id: '9876543210fedcba', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true },
+      span1: { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 },
+      span2: { id: '9876543210fedcba', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 },
       expected: false
     }
   ])('returns $expected given inputs $span1 and $span2', ({ span1, span2, expected }) => {

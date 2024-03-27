@@ -1,5 +1,5 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
-import { CompleteNavigation, ReactNavigationNativePlugin } from '@bugsnag/react-navigation-performance'
+import BugsnagPluginReactNavigationPerformance, { CompleteNavigation } from '@bugsnag/plugin-react-navigation-performance'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView, Text } from 'react-native'
@@ -8,7 +8,7 @@ export const config = {
     maximumBatchSize: 5,
     autoInstrumentAppStarts: false,
     appVersion: '1.2.3',
-    plugins: [new ReactNavigationNativePlugin()]
+    plugins: [new BugsnagPluginReactNavigationPerformance()]
 }
 
 const Stack = createNativeStackNavigator()
@@ -18,7 +18,7 @@ let parentSpan
 export function App() {
 
     // These methods must be called after Bugsnag has been started
-    const plugin = BugsnagPerformance.getPlugin(ReactNavigationNativePlugin)
+    const plugin = BugsnagPerformance.getPlugin(BugsnagPluginReactNavigationPerformance)
     const BugsnagNavigationContainer = plugin.createNavigationContainer()
 
     return (

@@ -64,9 +64,9 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
 export class SpanInternal implements SpanContext {
   readonly id: string
   readonly traceId: string
-  private readonly parentSpanId?: string
+  readonly parentSpanId?: string
+  readonly samplingRate: number
   private readonly startTime: number
-  private readonly samplingRate: number
   private readonly kind = Kind.Client // TODO: How do we define the initial Kind?
   private readonly events = new SpanEvents()
   private readonly attributes: SpanAttributes

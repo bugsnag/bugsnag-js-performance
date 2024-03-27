@@ -29,17 +29,21 @@ describe('fetch Request Tracker', () => {
   beforeEach(() => {
     clock = new IncrementingClock()
     endCallback = jest.fn()
-    startCallback = jest.fn(context => endCallback)
+    startCallback = jest.fn(context => ({ onRequestEnd: endCallback }))
   })
 
   it.each([['GET', 200], ['PUT', 200], ['POST', 201], ['DELETE', 204]])('should notify subscribers for a completed %s request', async (method, status) => {
-    window.fetch = createFetchFake(false, status)
+    const originalFetch = jest.fn().mockImplementation(createFetchFake(false, status))
+    window.fetch = originalFetch
     const fetchTracker = createFetchRequestTracker(window, clock)
 
     fetchTracker.onStart(startCallback)
     expect(startCallback).not.toHaveBeenCalled()
 
     const response = await window.fetch(TEST_URL, { method })
+
+    expect(originalFetch).toHaveBeenCalledWith('http://test-url.com/', { headers: { }, method })
+
     expect(response.status).toEqual(status)
 
     expect(startCallback).toHaveBeenCalledWith({
@@ -249,6 +253,35 @@ describe('fetch Request Tracker', () => {
 
     const response = await window.fetch(TEST_URL, {})
     expect(response.status).toEqual(200)
+
+    expect(startCallback).toHaveBeenCalledWith({
+      type: 'fetch',
+      url: TEST_URL,
+      method: 'GET',
+      startTime: 1
+    })
+    expect(endCallback).toHaveBeenCalledWith({
+      status: 200,
+      endTime: 2,
+      state: 'success'
+    })
+  })
+
+  it('should set extra request headers if specified by callback handlers', async () => {
+    const originalFetch = jest.fn().mockImplementation(createFetchFake())
+    window.fetch = originalFetch
+
+    const fetchTracker = createFetchRequestTracker(global, clock)
+
+    startCallback = jest.fn(context => ({ onRequestEnd: endCallback, extraRequestHeaders: { traceparent: 'abc123' } }))
+    const startCallback2 = jest.fn(context => ({ onRequestEnd: endCallback, extraRequestHeaders: { 'x-test-header': 'test-value', 'x-foo': 'bar' } }))
+
+    fetchTracker.onStart(startCallback)
+    fetchTracker.onStart(startCallback2)
+
+    await window.fetch(TEST_URL, { headers: { 'x-foo': 'overridden' } })
+
+    expect(originalFetch).toHaveBeenCalledWith('http://test-url.com/', { headers: { traceparent: 'abc123', 'x-foo': 'overridden', 'x-test-header': 'test-value' } })
 
     expect(startCallback).toHaveBeenCalledWith({
       type: 'fetch',
