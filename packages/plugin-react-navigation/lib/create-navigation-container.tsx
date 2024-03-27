@@ -14,12 +14,11 @@ export const createNavigationContainer: CreateNavigationContainer = (NavigationC
   return forwardRef<NavigationContainerRef, NavigationContainerProps>((props, _ref) => {
     const { onStateChange, ...rest } = props
 
-    const navigationContainerRef = _ref || useNavigationContainerRef()
+    const navigationContainerRef = _ref as NavigationContainerRef || useNavigationContainerRef()
     const [routeName, setRouteName] = React.useState<string>()
     const routeNameRef = useRef<string>()
 
     const wrappedOnStateChange: typeof onStateChange = (...args) => {
-      // @ts-expect-error getCurrentRoute doesn't exist on type
       const currentRoute = navigationContainerRef ? navigationContainerRef.getCurrentRoute() : null
 
       if (currentRoute) {
