@@ -1,4 +1,4 @@
-import { CompleteNavigation, ReactNativeNavigationPlugin } from '@bugsnag/react-native-navigation-performance'
+import BugsnagPluginReactNativeNavigationPerformance, { CompleteNavigation } from '@bugsnag/plugin-react-native-navigation-performance'
 import React, { useEffect, useState } from 'react'
 import { Text, View } from 'react-native'
 import { Navigation } from 'react-native-navigation'
@@ -9,7 +9,7 @@ export const config = {
     autoInstrumentAppStarts: false,
     batchInactivityTimeoutMs: 5000,
     appVersion: '1.2.3',
-    plugins: [new ReactNativeNavigationPlugin(Navigation)]
+    plugins: [new BugsnagPluginReactNativeNavigationPerformance(Navigation)]
 }
 
 const COMMAND_INTERVAL = 500

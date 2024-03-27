@@ -7,7 +7,7 @@ type Reason = 'immediate' | 'mount' | 'unmount' | 'condition'
 const NAVIGATION_START_TIMEOUT = 1000
 const NAVIGATION_COMPLETE_TIMEOUT = 100
 
-class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
+class BugsnagPluginReactNativeNavigationPerformance implements Plugin<ReactNativeConfiguration> {
   private Navigation: NavigationDelegate
   private currentNavigationSpan?: SpanInternal
   private startTime?: number
@@ -89,7 +89,7 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
 
         this.currentNavigationSpan.setAttribute('bugsnag.span.category', 'navigation')
         this.currentNavigationSpan.setAttribute('bugsnag.navigation.route', routeName)
-        this.currentNavigationSpan.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-native-navigation-performance')
+        this.currentNavigationSpan.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-native-navigation-performance')
 
         if (this.previousRoute) {
           this.currentNavigationSpan.setAttribute('bugsnag.navigation.previous_route', this.previousRoute)
@@ -103,4 +103,4 @@ class ReactNativeNavigationPlugin implements Plugin<ReactNativeConfiguration> {
   }
 }
 
-export default ReactNativeNavigationPlugin
+export default BugsnagPluginReactNativeNavigationPerformance

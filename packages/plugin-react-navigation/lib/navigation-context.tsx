@@ -87,7 +87,7 @@ export class NavigationContextProvider extends React.Component<Props, State> {
 
       span.setAttribute('bugsnag.span.category', 'navigation')
       span.setAttribute('bugsnag.navigation.route', currentRoute)
-      span.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/react-navigation-performance')
+      span.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-navigation-performance')
 
       if (this.state.previousRoute) {
         span.setAttribute('bugsnag.navigation.previous_route', this.state.previousRoute)

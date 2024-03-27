@@ -1,7 +1,7 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 import type React from 'react'
 import { useEffect, useRef, type PropsWithChildren } from 'react'
-import ReactNativeNavigationPlugin from './react-native-navigation-plugin'
+import BugsnagPluginReactNativeNavigationPerformance from './react-native-navigation-plugin'
 
 interface Props extends PropsWithChildren {
   on: 'mount' | 'unmount' | boolean
@@ -9,13 +9,13 @@ interface Props extends PropsWithChildren {
 
 /** End the current navigation span when the component is mounted, unmounted or the `on` prop is `true` */
 export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, on }) => {
-  const pluginRef = useRef<ReactNativeNavigationPlugin>()
+  const pluginRef = useRef<BugsnagPluginReactNativeNavigationPerformance>()
 
   function getPlugin () {
     if (pluginRef.current) return pluginRef.current
 
     // @ts-expect-error signature does not match
-    pluginRef.current = BugsnagPerformance.getPlugin(ReactNativeNavigationPlugin)
+    pluginRef.current = BugsnagPerformance.getPlugin(BugsnagPluginReactNativeNavigationPerformance)
 
     return pluginRef.current
   }
