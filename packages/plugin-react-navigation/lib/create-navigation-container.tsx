@@ -1,44 +1,45 @@
 import { type SpanFactory } from '@bugsnag/core-performance'
 import { type ReactNativeConfiguration } from '@bugsnag/react-native-performance'
-import { NavigationContainer, useNavigationContainerRef, type NavigationContainerProps } from '@react-navigation/native'
+import { NavigationContainer, useNavigationContainerRef, type NavigationContainerProps, type NavigationContainerRefWithCurrent } from '@react-navigation/native'
 import React, { forwardRef, useRef } from 'react'
 import { NavigationContextProvider } from './navigation-context'
 
 // Prevent rollup plugin from tree shaking NavigationContextProvider
 const Provider = NavigationContextProvider
 
-export const createNavigationContainer = (Container = NavigationContainer, spanFactory: SpanFactory<ReactNativeConfiguration>) =>
-  forwardRef<typeof Container, NavigationContainerProps>(
-    (props, _ref) => {
-      const { onStateChange, ...rest } = props
+type CreateNavigationContainer = (NavigationContainerComponent: typeof NavigationContainer, spanFactory: SpanFactory<ReactNativeConfiguration>) => typeof NavigationContainer
+type NavigationContainerRef = NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>
 
-      const navigationContainerRef = useNavigationContainerRef()
-      const [routeName, setRouteName] = React.useState<string>()
-      const routeNameRef = useRef<string>()
+export const createNavigationContainer: CreateNavigationContainer = (NavigationContainerComponent = NavigationContainer, spanFactory: SpanFactory<ReactNativeConfiguration>) => {
+  return forwardRef<NavigationContainerRef, NavigationContainerProps>((props, _ref) => {
+    const { onStateChange, ...rest } = props
 
-      const wrappedOnStateChange: typeof onStateChange = (...args) => {
-        const currentRoute = navigationContainerRef.current
-          ? navigationContainerRef.current.getCurrentRoute()
-          : null
+    const navigationContainerRef = _ref || useNavigationContainerRef()
+    const [routeName, setRouteName] = React.useState<string>()
+    const routeNameRef = useRef<string>()
 
-        if (currentRoute) {
-          routeNameRef.current = currentRoute.name
-          setRouteName(currentRoute.name)
-        }
+    const wrappedOnStateChange: typeof onStateChange = (...args) => {
+      // @ts-expect-error getCurrentRoute doesn't exist on type
+      const currentRoute = navigationContainerRef ? navigationContainerRef.getCurrentRoute() : null
 
-        if (typeof onStateChange === 'function') {
-          onStateChange.apply(this, args)
-        }
+      if (currentRoute) {
+        routeNameRef.current = currentRoute.name
+        setRouteName(currentRoute.name)
       }
 
-      return (
-        <Provider spanFactory={spanFactory} currentRoute={routeName}>
-          <Container
-            {...rest}
-            onStateChange={wrappedOnStateChange}
-            ref={navigationContainerRef}
-          />
-        </Provider>
-      )
+      if (typeof onStateChange === 'function') {
+        onStateChange.apply(this, args)
+      }
     }
-  )
+
+    return (
+      <Provider spanFactory={spanFactory} currentRoute={routeName}>
+        <NavigationContainerComponent
+          {...rest}
+          onStateChange={wrappedOnStateChange}
+          ref={navigationContainerRef}
+        />
+      </Provider>
+    )
+  }) as typeof NavigationContainerComponent
+}
