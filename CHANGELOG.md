@@ -16,6 +16,10 @@
     - Rename package import from `@bugsnag/react-native-navigation-performance` to `@bugsnag/plugin-react-native-navigation-performance`
     - Rename plugin type from `ReactNativeNavigationPlugin` to `BugsnagPluginReactNativeNavigationPerformance`
 
+### Fixed
+
+- (plugin-react-navigation) Fix an issue where refs are not forwarded to the NavigationContainer [#431](https://github.com/bugsnag/bugsnag-js-performance/pull/431)
+
 ## v2.3.0 (2024-03-20)
 
 This release adds support for instrumenting navigation spans when using the [react-native-navigation](https://github.com/wix/react-native-navigation) library
