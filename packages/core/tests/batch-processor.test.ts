@@ -14,6 +14,8 @@ import {
 
 jest.useFakeTimers()
 
+const minimalProbabilityManager = { setProbability () { return Promise.resolve() }, fetchingInitialProbability: undefined }
+
 describe('BatchProcessor', () => {
   it('delivers after reaching the specified span limit', async () => {
     const delivery = new InMemoryDelivery()
@@ -23,7 +25,7 @@ describe('BatchProcessor', () => {
       createConfiguration(),
       { add: jest.fn(), flush: jest.fn() },
       new Sampler(1.0),
-      { setProbability () { return Promise.resolve() } },
+      minimalProbabilityManager,
       new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
@@ -49,7 +51,7 @@ describe('BatchProcessor', () => {
       createConfiguration(),
       { add: jest.fn(), flush: jest.fn() },
       new Sampler(1.0),
-      { setProbability () { return Promise.resolve() } },
+      minimalProbabilityManager,
       new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
@@ -70,7 +72,7 @@ describe('BatchProcessor', () => {
       createConfiguration(),
       { add: jest.fn(), flush: jest.fn() },
       new Sampler(1.0),
-      { setProbability () { return Promise.resolve() } },
+      minimalProbabilityManager,
       new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
@@ -97,7 +99,7 @@ describe('BatchProcessor', () => {
       configuration,
       { add: jest.fn(), flush: jest.fn() },
       new Sampler(1.0),
-      { setProbability () { return Promise.resolve() } },
+      minimalProbabilityManager,
       new TracePayloadEncoder(clock, configuration, resourceAttributesSource)
     )
 
@@ -119,7 +121,7 @@ describe('BatchProcessor', () => {
       createConfiguration({ logger }),
       retryQueue,
       new Sampler(1.0),
-      { setProbability () { return Promise.resolve() } },
+      minimalProbabilityManager,
       new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
@@ -146,7 +148,7 @@ describe('BatchProcessor', () => {
       createConfiguration({ logger }),
       retryQueue,
       new Sampler(1.0),
-      { setProbability () { return Promise.resolve() } },
+      minimalProbabilityManager,
       new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
@@ -173,7 +175,7 @@ describe('BatchProcessor', () => {
       createConfiguration({ logger }),
       retryQueue,
       new Sampler(1.0),
-      { setProbability () { return Promise.resolve() } },
+      minimalProbabilityManager,
       new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
     )
 
