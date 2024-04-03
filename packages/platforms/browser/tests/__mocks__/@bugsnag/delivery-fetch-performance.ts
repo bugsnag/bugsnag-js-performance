@@ -12,18 +12,14 @@ export const requests: DeliveryPayload[] = []
 
 type Fetch = typeof fetch
 
-// manually mock response
-const response = {
-  status: 200,
-  headers: new Headers({ 'Bugsnag-Sampling-Probability': '1.0' })
-}
-
-export const setNextSamplingProbability = (probability: number) => {
-  const newProbability = probability.toString()
-  response.headers.set('Bugsnag-Sampling-Probability', newProbability)
-}
-
-export const mockFetch = jest.fn((endpoint: string, options) => Promise.resolve(response))
+export const mockFetch = jest.fn().mockImplementation((endpoint: string, options: any) => new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve({
+      status: 200,
+      headers: new Headers({ 'Bugsnag-Sampling-Probability': '1.0' })
+    })
+  }, 100)
+}))
 
 function samplingProbabilityFromHeaders (headers: Headers): number | undefined {
   const value = headers.get('Bugsnag-Sampling-Probability')
@@ -49,8 +45,6 @@ function createFetchDeliveryFactory (
   return function fetchDeliveryFactory (endpoint: string): Delivery {
     return {
       async send (payload: TracePayload) {
-        requests.push({ resourceSpans: payload.body.resourceSpans })
-
         const body = JSON.stringify(payload.body)
 
         payload.headers['Bugsnag-Sent-At'] = clock.date().toISOString()
@@ -62,6 +56,8 @@ function createFetchDeliveryFactory (
             body,
             headers: payload.headers
           })
+
+          requests.push({ resourceSpans: payload.body.resourceSpans })
 
           return {
             state: responseStateFromStatusCode(response.status),

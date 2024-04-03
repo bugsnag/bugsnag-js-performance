@@ -6,7 +6,7 @@ import { type RetryQueue } from './retry-queue'
 import { type ReadonlySampler } from './sampler'
 import { type SpanEnded } from './span'
 
-type MinimalProbabilityManager = Pick<ProbabilityManager, 'setProbability'>
+type MinimalProbabilityManager = Pick<ProbabilityManager, 'setProbability' | 'fetchingInitialProbability'>
 
 export class BatchProcessor<C extends Configuration> implements Processor {
   private readonly delivery: Delivery
@@ -66,6 +66,11 @@ export class BatchProcessor<C extends Configuration> implements Processor {
 
   async flush () {
     this.stop()
+
+    // we're still waiting for the initial probability value to be fetched
+    if (this.probabilityManager.fetchingInitialProbability) {
+      await this.probabilityManager.fetchingInitialProbability
+    }
 
     const batch = this.prepareBatch()
 

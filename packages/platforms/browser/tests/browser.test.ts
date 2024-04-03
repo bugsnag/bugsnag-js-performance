@@ -7,14 +7,20 @@ import { VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 import BugsnagPerformance from '../lib/browser'
 
 // eslint-disable-next-line jest/no-mocks-import
-import { mockFetch, requests, setNextSamplingProbability } from './__mocks__/@bugsnag/delivery-fetch-performance'
+import { mockFetch, requests } from './__mocks__/@bugsnag/delivery-fetch-performance'
 
 jest.useFakeTimers()
 
 describe('Browser client integration tests', () => {
-  describe('Sampling', () => {
-    it('(potential flake) uses the sampling header from the response for the next batch', async () => {
-      setNextSamplingProbability(0.999999)
+  describe('Batching', () => {
+    it('waits for the initial sampling request to complete before sending the first batch', async () => {
+      // Fill a batch before starting bugsnag
+      for (let i = 0; i < 100; i++) {
+        const span = BugsnagPerformance.startSpan(`span ${i}`)
+        span.end()
+      }
+
+      expect(mockFetch).toHaveBeenCalledTimes(0)
 
       BugsnagPerformance.start({
         apiKey: VALID_API_KEY,
@@ -24,25 +30,20 @@ describe('Browser client integration tests', () => {
 
       // Advance to next tick
       await jest.advanceTimersByTimeAsync(1)
-
-      // Check for initial sampling request
       expect(mockFetch).toHaveBeenCalledTimes(1)
-      expect(mockFetch).toHaveBeenCalledWith('/test', expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({
-          resourceSpans: []
-        })
-      }))
 
-      // Create and end span and await batch timeout
-      BugsnagPerformance.startSpan('test span').end()
+      // Await the initial sampling request
+      await jest.advanceTimersByTimeAsync(100)
 
-      await jest.advanceTimersByTimeAsync(30000)
+      // First request should be the empty sampling request
+      expect(requests[0].resourceSpans).toHaveLength(0)
 
+      // wait for the full batch to be sent
+      await jest.advanceTimersByTimeAsync(100)
       expect(mockFetch).toHaveBeenCalledTimes(2)
 
-      const deliveredSpan = requests[1].resourceSpans[0].scopeSpans[0].spans[0]
-      expect(deliveredSpan.attributes).toContainEqual({ key: 'bugsnag.sampling.p', value: { doubleValue: 0.999999 } })
+      // Second request should be the full batch
+      expect(requests[1].resourceSpans[0].scopeSpans[0].spans).toHaveLength(100)
     })
   })
 })
