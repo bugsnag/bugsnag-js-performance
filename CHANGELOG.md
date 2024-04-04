@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- (browser) Delay span batching while inital sampling request is in flight [#433](https://github.com/bugsnag/bugsnag-js-performance/pull/433)
+
 ## v2.4.0 (2024-03-27)
 
 ### Added
