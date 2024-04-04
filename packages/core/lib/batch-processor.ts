@@ -67,7 +67,6 @@ export class BatchProcessor<C extends Configuration> implements Processor {
   async flush () {
     this.stop()
 
-    // we're still waiting for the initial probability value to be fetched
     if (this.probabilityManager.fetchingInitialProbability) {
       await this.probabilityManager.fetchingInitialProbability
     }
