@@ -117,6 +117,7 @@ class ProbabilityManager {
         if (milliseconds === 0 && this.resolveInitialProbability) {
           this.resolveInitialProbability()
           this.resolveInitialProbability = undefined
+          this.fetchingInitialProbability = undefined
         }
       },
       milliseconds
