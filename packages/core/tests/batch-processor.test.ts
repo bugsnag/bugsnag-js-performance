@@ -193,6 +193,9 @@ describe('BatchProcessor', () => {
     const delivery = new InMemoryDelivery()
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const sampler = new Sampler(1.0)
+    const persistence = new InMemoryPersistence()
+
+    persistence.save('bugsnag-sampling-probability', { value: 1.0, time: Date.now() })
 
     const batchProcessor = new BatchProcessor(
       delivery,
@@ -200,7 +203,7 @@ describe('BatchProcessor', () => {
       { add: jest.fn(), flush: jest.fn() },
       sampler,
       await ProbabilityManager.create(
-        new InMemoryPersistence(),
+        persistence,
         sampler,
         new ProbabilityFetcher(delivery, 'api key')
       ),
