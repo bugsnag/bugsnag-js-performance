@@ -15,7 +15,6 @@ export interface Configuration {
   logger?: Logger
   appVersion?: string
   enabledReleaseStages?: string[] | null
-  samplingProbability?: number
   plugins?: Array<Plugin<Configuration>>
 }
 
@@ -42,7 +41,6 @@ export interface CoreSchema extends Schema {
   logger: ConfigOption<Logger>
   appVersion: ConfigOption<string>
   enabledReleaseStages: ConfigOption<string[] | null>
-  samplingProbability: ConfigOption<number>
   plugins: ConfigOption<Array<Plugin<Configuration>>>
 }
 
@@ -81,11 +79,6 @@ export const schema: CoreSchema = {
     defaultValue: null,
     message: 'should be an array of strings',
     validate: (value: unknown): value is string[] | null => value === null || isStringArray(value)
-  },
-  samplingProbability: {
-    defaultValue: 1.0,
-    message: 'should be a number between 0 and 1',
-    validate: (value: unknown): value is number => isNumber(value) && value >= 0 && value <= 1
   },
   plugins: {
     defaultValue: [],
