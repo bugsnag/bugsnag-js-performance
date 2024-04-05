@@ -114,7 +114,7 @@ class ProbabilityManager {
         }
 
         // Initial sampling request has been made, and we can unblock batching
-        if (milliseconds === 0 && this.resolveInitialProbability) {
+        if (this.resolveInitialProbability) {
           this.resolveInitialProbability()
           this.resolveInitialProbability = undefined
           this.fetchingInitialProbability = undefined
