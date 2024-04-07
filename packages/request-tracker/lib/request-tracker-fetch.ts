@@ -25,10 +25,10 @@ function createFetchRequestTracker (global: GlobalWithFetch, clock: Clock) {
   global.fetch = function fetch (input?: unknown, init?: unknown) {
     const startContext = createStartContext(clock.now(), input, init, global.document && global.document.baseURI)
 
-    const { onRequestEnd, extraRequestHeaders } = requestTracker.start(startContext)
+    const { onRequestEnd } = requestTracker.start(startContext)
 
     // Add the headers to the `init` received from the caller
-    const patchedInit = mergeRequestHeaders(init as RequestInit, extraRequestHeaders)
+    const patchedInit = mergeRequestHeaders(init as RequestInit, input.headers)
 
     return originalFetch.call(this, input as RequestInfo, patchedInit).then(response => {
       onRequestEnd({ status: response.status, endTime: clock.now(), state: 'success' })
@@ -46,10 +46,8 @@ function mergeRequestHeaders (init: RequestInit, extraRequestHeaders?: Array<Rec
   if (!extraRequestHeaders) return init
 
   const extraHeaders: Record<string, string> = {}
-  for (const h of extraRequestHeaders) {
-    for (const [name, value] of Object.entries(h)) {
-      extraHeaders[name] = value
-    }
+  for (const [name, value] of extraRequestHeaders) {
+    extraHeaders[name] = value
   }
 
   return { ...init, headers: { ...extraHeaders, ...init?.headers } }
