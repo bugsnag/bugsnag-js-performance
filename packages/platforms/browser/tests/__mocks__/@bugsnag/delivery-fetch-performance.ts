@@ -12,14 +12,26 @@ export const requests: DeliveryPayload[] = []
 
 type Fetch = typeof fetch
 
-export const mockFetch = jest.fn().mockImplementation((endpoint: string, options: any) => new Promise((resolve, reject) => {
+const response = {
+  status: 200,
+  headers: new Headers({ 'Bugsnag-Sampling-Probability': '1.0' })
+}
+
+export const mockFetch = jest.fn().mockImplementation(() => new Promise((resolve) => {
   setTimeout(() => {
-    resolve({
-      status: 200,
-      headers: new Headers({ 'Bugsnag-Sampling-Probability': '1.0' })
-    })
+    resolve(response)
   }, 100)
 }))
+
+export const setNextSamplingProbability = (probability: number) => {
+  response.headers.set('Bugsnag-Sampling-Probability', probability.toString())
+}
+
+export const reset = () => {
+  requests.length = 0
+  mockFetch.mockClear()
+  setNextSamplingProbability(1.0)
+}
 
 function samplingProbabilityFromHeaders (headers: Headers): number | undefined {
   const value = headers.get('Bugsnag-Sampling-Probability')
