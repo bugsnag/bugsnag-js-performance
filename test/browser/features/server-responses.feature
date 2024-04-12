@@ -58,4 +58,4 @@ Feature: Server responses
     And I wait to receive 1 trace
     Then the trace "Bugsnag-Span-Sampling" header equals "0.999999:1"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "Span 2"
-    And the trace payload field "resourceSpans.0.resource" double attribute "bugsnag.sampling.p" equals 0.999999
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" double attribute "bugsnag.sampling.p" equals 0.999999
