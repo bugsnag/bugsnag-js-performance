@@ -37,7 +37,7 @@ const BugsnagPerformance = createClient({
   persistence,
   plugins: (spanFactory, spanContextStorage) => [
     new AppStartPlugin(appStartTime, spanFactory, clock, AppRegistry),
-    new NetworkRequestPlugin(spanFactory, xhrRequestTracker)
+    new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrRequestTracker)
   ],
   resourceAttributesSource,
   schema: createSchema(),
