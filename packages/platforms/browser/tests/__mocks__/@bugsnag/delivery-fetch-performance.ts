@@ -4,11 +4,8 @@ import {
   type Clock,
   type Delivery,
   type DeliveryFactory,
-  type DeliveryPayload,
   type TracePayload
 } from '@bugsnag/core-performance'
-
-export const requests: DeliveryPayload[] = []
 
 type Fetch = typeof fetch
 
@@ -25,12 +22,6 @@ export const mockFetch = jest.fn().mockImplementation(() => new Promise((resolve
 
 export const setNextSamplingProbability = (probability: number) => {
   response.headers.set('Bugsnag-Sampling-Probability', probability.toString())
-}
-
-export const reset = () => {
-  requests.length = 0
-  mockFetch.mockClear()
-  setNextSamplingProbability(1.0)
 }
 
 function samplingProbabilityFromHeaders (headers: Headers): number | undefined {
@@ -68,8 +59,6 @@ function createFetchDeliveryFactory (
             body,
             headers: payload.headers
           })
-
-          requests.push({ resourceSpans: payload.body.resourceSpans })
 
           return {
             state: responseStateFromStatusCode(response.status),
