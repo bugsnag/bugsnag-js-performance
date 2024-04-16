@@ -18,6 +18,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
 
   private batch: SpanEnded[] = []
   private timeout: ReturnType<typeof setTimeout> | null = null
+  private flushing = false
 
   constructor (
     delivery: Delivery,
@@ -65,6 +66,12 @@ export class BatchProcessor<C extends Configuration> implements Processor {
   }
 
   async flush () {
+    if (this.flushing) {
+      return
+    }
+
+    this.flushing = true
+
     this.stop()
 
     if (this.probabilityManager.fetchingInitialProbability) {
@@ -75,6 +82,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
 
     // we either had nothing in the batch originally or all spans were discarded
     if (!batch) {
+      this.flushing = false
       return
     }
 
@@ -104,6 +112,8 @@ export class BatchProcessor<C extends Configuration> implements Processor {
       }
     } catch (err) {
       this.configuration.logger.warn('delivery failed')
+    } finally {
+      this.flushing = false
     }
   }
 
