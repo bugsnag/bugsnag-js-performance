@@ -4,7 +4,7 @@ const parameters = new URLSearchParams(window.location.search)
 const apiKey = parameters.get('api_key')
 const endpoint = parameters.get('endpoint')
 
-BugsnagPerformance.start({ apiKey, endpoint, retryQueueMaxSize: 3, maximumBatchSize: 1, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false })
+BugsnagPerformance.start({ apiKey, endpoint, retryQueueMaxSize: 3, maximumBatchSize: 1, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false, appVersion: '1.2.3' })
 
 document.getElementById("send-first-span").addEventListener("click", () => {
   BugsnagPerformance.startSpan("Custom/Span to discard").end()
