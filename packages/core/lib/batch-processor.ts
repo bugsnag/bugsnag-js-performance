@@ -18,7 +18,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
 
   private batch: SpanEnded[] = []
   private timeout: ReturnType<typeof setTimeout> | null = null
-  private flushing = false
+  private flushQueue: Promise<void> = Promise.resolve()
 
   constructor (
     delivery: Delivery,
@@ -66,55 +66,50 @@ export class BatchProcessor<C extends Configuration> implements Processor {
   }
 
   async flush () {
-    if (this.flushing) {
-      return
-    }
-
-    this.flushing = true
-
     this.stop()
-
-    if (this.probabilityManager.fetchingInitialProbability) {
-      await this.probabilityManager.fetchingInitialProbability
-    }
 
     const batch = this.prepareBatch()
 
     // we either had nothing in the batch originally or all spans were discarded
     if (!batch) {
-      this.flushing = false
       return
     }
 
-    const payload = await this.encoder.encode(batch)
-    const batchTime = Date.now()
-
-    try {
-      const response = await this.delivery.send(payload)
-
-      if (response.samplingProbability !== undefined) {
-        this.probabilityManager.setProbability(response.samplingProbability)
+    this.flushQueue = this.flushQueue.then(async () => {
+      if (this.probabilityManager.fetchingInitialProbability) {
+        await this.probabilityManager.fetchingInitialProbability
       }
 
-      switch (response.state) {
-        case 'success':
-          this.retryQueue.flush()
-          break
-        case 'failure-discard':
-          this.configuration.logger.warn('delivery failed')
-          break
-        case 'failure-retryable':
-          this.configuration.logger.info('delivery failed, adding to retry queue')
-          this.retryQueue.add(payload, batchTime)
-          break
-        default:
+      const payload = await this.encoder.encode(batch)
+      const batchTime = Date.now()
+
+      try {
+        const response = await this.delivery.send(payload)
+
+        if (response.samplingProbability !== undefined) {
+          this.probabilityManager.setProbability(response.samplingProbability)
+        }
+
+        switch (response.state) {
+          case 'success':
+            this.retryQueue.flush()
+            break
+          case 'failure-discard':
+            this.configuration.logger.warn('delivery failed')
+            break
+          case 'failure-retryable':
+            this.configuration.logger.info('delivery failed, adding to retry queue')
+            this.retryQueue.add(payload, batchTime)
+            break
+          default:
           response.state satisfies never
+        }
+      } catch (err) {
+        this.configuration.logger.warn('delivery failed')
       }
-    } catch (err) {
-      this.configuration.logger.warn('delivery failed')
-    } finally {
-      this.flushing = false
-    }
+    })
+
+    await this.flushQueue
   }
 
   private prepareBatch (): SpanEnded[] | undefined {
