@@ -16,7 +16,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
   private readonly probabilityManager: MinimalProbabilityManager
   private readonly encoder: TracePayloadEncoder<C>
 
-  private batch: SpanEnded[] = []
+  private spans: SpanEnded[] = []
   private timeout: ReturnType<typeof setTimeout> | null = null
   private flushQueue: Promise<void> = Promise.resolve()
 
@@ -56,9 +56,9 @@ export class BatchProcessor<C extends Configuration> implements Processor {
       return
     }
 
-    this.batch.push(span)
+    this.spans.push(span)
 
-    if (this.batch.length >= this.configuration.maximumBatchSize) {
+    if (this.spans.length >= this.configuration.maximumBatchSize) {
       this.flush()
     } else {
       this.start()
@@ -68,16 +68,16 @@ export class BatchProcessor<C extends Configuration> implements Processor {
   async flush () {
     this.stop()
 
-    const batch = this.prepareBatch()
-
-    // we either had nothing in the batch originally or all spans were discarded
-    if (!batch) {
-      return
-    }
-
     this.flushQueue = this.flushQueue.then(async () => {
       if (this.probabilityManager.fetchingInitialProbability) {
         await this.probabilityManager.fetchingInitialProbability
+      }
+
+      const batch = this.prepareBatch()
+
+      // we either had nothing in the batch originally or all spans were discarded
+      if (!batch) {
+        return
       }
 
       const payload = await this.encoder.encode(batch)
@@ -113,7 +113,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
   }
 
   private prepareBatch (): SpanEnded[] | undefined {
-    if (this.batch.length === 0) {
+    if (this.spans.length === 0) {
       return
     }
 
@@ -121,7 +121,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
     const batch: SpanEnded[] = []
     const probability = this.sampler.spanProbability
 
-    for (const span of this.batch) {
+    for (const span of this.spans) {
       if (span.samplingProbability.raw > probability.raw) {
         span.samplingProbability = probability
       }
@@ -132,7 +132,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
     }
 
     // clear out the current batch so we're ready to start a new one
-    this.batch = []
+    this.spans = []
 
     // if every span was discarded there's nothing to send
     if (batch.length === 0) {

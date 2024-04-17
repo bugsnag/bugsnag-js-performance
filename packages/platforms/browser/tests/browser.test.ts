@@ -67,7 +67,7 @@ describe('Browser client integration tests', () => {
       setNextSamplingProbability(0.999999)
 
       // Fill a batch before starting bugsnag
-      createSpans(50)
+      createSpans(100)
 
       client.start({
         apiKey: VALID_API_KEY,
@@ -81,24 +81,21 @@ describe('Browser client integration tests', () => {
       expect(mockFetch).toHaveBeenCalledTimes(1)
       expect(mockFetch).toHaveBeenCalledWith('/test', emptySamplingRequest)
 
-      createSpans(40)
-
       // Initial sampling request will complete here
       await jest.advanceTimersByTimeAsync(RESPONSE_TIME)
-
-      // Await batch timeout
-      await jest.advanceTimersByTimeAsync(30000)
       expect(mockFetch).toHaveBeenCalledTimes(2)
 
       // Second request delivered
       await jest.advanceTimersByTimeAsync(RESPONSE_TIME)
       const fullBatch = JSON.parse(mockFetch.mock.calls[1][1].body)
-      expect(fullBatch.resourceSpans[0].scopeSpans[0].spans).toHaveLength(90)
+      expect(fullBatch.resourceSpans[0].scopeSpans[0].spans).toHaveLength(100)
+
+      console.log(mockFetch.mock.calls[1][1].headers)
 
       // Header should be updated
       expect(mockFetch).toHaveBeenLastCalledWith('/test', expect.objectContaining({
         headers: expect.objectContaining({
-          'Bugsnag-Span-Sampling': '0.999999:90'
+          'Bugsnag-Span-Sampling': '0.999999:100'
         })
       }))
 
@@ -128,14 +125,17 @@ describe('Browser client integration tests', () => {
 
       setNextSamplingProbability(0.999999)
 
-      // Create one full batch and one almost complete batch
-      createSpans(199)
+      // Create one full batch
+      createSpans(100)
 
       await jest.advanceTimersByTimeAsync(1)
       expect(mockFetch).toHaveBeenCalledTimes(2)
       expect(mockFetch.mock.calls[1][1]).toEqual(expect.objectContaining({
         headers: expect.objectContaining({ 'Bugsnag-Span-Sampling': '1:100' })
       }))
+
+      // Create a second almost complete batch
+      createSpans(99)
 
       // Await delivery response and subsequent probability update
       await jest.advanceTimersByTimeAsync(RESPONSE_TIME)
