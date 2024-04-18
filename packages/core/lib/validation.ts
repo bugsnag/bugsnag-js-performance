@@ -45,13 +45,6 @@ export function isTime (value: unknown): value is Time {
   return isNumber(value) || value instanceof Date
 }
 
-// NOTE: this should be kept in sync with the notifier
-// https://github.com/bugsnag/bugsnag-js/blob/next/packages/plugin-browser-device/device.js
-export function isDeviceId (value: unknown): value is string {
-  // make sure the persisted value looks like a valid cuid
-  return typeof value === 'string' && /^c[a-z0-9]{20,32}$/.test(value)
-}
-
 export function isPlugin (value: unknown): value is Plugin<unknown extends Configuration ? unknown : Configuration> {
   return isObject(value) && typeof value.configure === 'function'
 }

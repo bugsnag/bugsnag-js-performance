@@ -21,6 +21,19 @@ function createFetchFake (fail: boolean = false, status: number = 200) {
   }
 }
 
+// mock (fetch) Request
+class RequestFake {
+  url: string
+  method: string
+  headers: Headers
+
+  constructor (url: string, opts?: { method?: string, headers?: Record<string, string> }) {
+    this.url = url
+    this.method = (opts?.method) || 'GET'
+    this.headers = new Headers(opts?.headers)
+  }
+}
+
 describe('fetch Request Tracker', () => {
   let clock: Clock
   let startCallback: jest.MockedFunction<RequestStartCallback>
@@ -267,32 +280,140 @@ describe('fetch Request Tracker', () => {
     })
   })
 
-  it('should set extra request headers if specified by callback handlers', async () => {
-    const originalFetch = jest.fn().mockImplementation(createFetchFake())
-    window.fetch = originalFetch
+  describe('extra request headers', () => {
+    it('should set extra request headers if specified (existing headers as object literal in fetch options)', async () => {
+      const originalFetch = jest.fn().mockImplementation(createFetchFake())
+      window.fetch = originalFetch
 
-    const fetchTracker = createFetchRequestTracker(global, clock)
+      const fetchTracker = createFetchRequestTracker(global, clock)
 
-    startCallback = jest.fn(context => ({ onRequestEnd: endCallback, extraRequestHeaders: { traceparent: 'abc123' } }))
-    const startCallback2 = jest.fn(context => ({ onRequestEnd: endCallback, extraRequestHeaders: { 'x-test-header': 'test-value', 'x-foo': 'bar' } }))
+      startCallback = jest.fn(context => ({ onRequestEnd: endCallback, extraRequestHeaders: { traceparent: 'abc123' } }))
+      const startCallback2 = jest.fn(context => ({ onRequestEnd: endCallback, extraRequestHeaders: { 'x-test-header': 'test-value', 'x-foo': 'bar' } }))
 
-    fetchTracker.onStart(startCallback)
-    fetchTracker.onStart(startCallback2)
+      fetchTracker.onStart(startCallback)
+      fetchTracker.onStart(startCallback2)
 
-    await window.fetch(TEST_URL, { headers: { 'x-foo': 'overridden' } })
+      await window.fetch(TEST_URL, { headers: { 'x-foo': 'overridden' } })
 
-    expect(originalFetch).toHaveBeenCalledWith('http://test-url.com/', { headers: { traceparent: 'abc123', 'x-foo': 'overridden', 'x-test-header': 'test-value' } })
+      expect(originalFetch).toHaveBeenCalledWith('http://test-url.com/', { headers: { traceparent: 'abc123', 'x-foo': 'overridden', 'x-test-header': 'test-value' } })
 
-    expect(startCallback).toHaveBeenCalledWith({
-      type: 'fetch',
-      url: TEST_URL,
-      method: 'GET',
-      startTime: 1
+      expect(startCallback).toHaveBeenCalledWith({
+        type: 'fetch',
+        url: TEST_URL,
+        method: 'GET',
+        startTime: 1
+      })
+      expect(endCallback).toHaveBeenCalledWith({
+        status: 200,
+        endTime: 2,
+        state: 'success'
+      })
     })
-    expect(endCallback).toHaveBeenCalledWith({
-      status: 200,
-      endTime: 2,
-      state: 'success'
+
+    it('should set extra request headers if specified (existing headers as Headers object in fetch options)', async () => {
+      const originalFetch = jest.fn().mockImplementation(createFetchFake())
+      window.fetch = originalFetch
+
+      const fetchTracker = createFetchRequestTracker(global, clock)
+
+      startCallback = jest.fn(context => ({ onRequestEnd: endCallback, extraRequestHeaders: { traceparent: 'abc123' } }))
+      const startCallback2 = jest.fn(context => ({ onRequestEnd: endCallback, extraRequestHeaders: { 'x-test-header': 'test-value', 'x-foo': 'bar' } }))
+
+      fetchTracker.onStart(startCallback)
+      fetchTracker.onStart(startCallback2)
+
+      await window.fetch(TEST_URL, { headers: new Headers({ 'x-foo': 'overridden' }) })
+
+      const fetchArguments = originalFetch.mock.calls[0]
+      expect(fetchArguments[0]).toEqual('http://test-url.com/')
+      expect(fetchArguments[1].headers).toBeInstanceOf(Headers)
+      expect(fetchArguments[1].headers.get('traceparent')).toEqual('abc123')
+      expect(fetchArguments[1].headers.get('x-test-header')).toEqual('test-value')
+      expect(fetchArguments[1].headers.get('x-foo')).toEqual('overridden')
+
+      expect(startCallback).toHaveBeenCalledWith({
+        type: 'fetch',
+        url: TEST_URL,
+        method: 'GET',
+        startTime: 1
+      })
+      expect(endCallback).toHaveBeenCalledWith({
+        status: 200,
+        endTime: 2,
+        state: 'success'
+      })
+    })
+
+    it('should set extra request headers if specified (existing headers in Request object)', async () => {
+      const originalFetch = jest.fn().mockImplementation(createFetchFake())
+      window.fetch = originalFetch
+
+      const fetchTracker = createFetchRequestTracker(global, clock)
+
+      startCallback = jest.fn(context => ({ onRequestEnd: endCallback, extraRequestHeaders: { traceparent: 'abc123' } }))
+      const startCallback2 = jest.fn(context => ({ onRequestEnd: endCallback, extraRequestHeaders: { 'x-test-header': 'test-value', 'x-foo': 'bar' } }))
+
+      fetchTracker.onStart(startCallback)
+      fetchTracker.onStart(startCallback2)
+
+      const request = new RequestFake(TEST_URL, { headers: { 'x-foo': 'overridden' } }) as Parameters<typeof fetch>[0]
+      await window.fetch(request)
+
+      const fetchArguments = originalFetch.mock.calls[0]
+      expect(fetchArguments[0]).toBeInstanceOf(RequestFake)
+      expect(fetchArguments[1]).toBeUndefined()
+
+      expect(fetchArguments[0].headers.get('traceparent')).toEqual('abc123')
+      expect(fetchArguments[0].headers.get('x-test-header')).toEqual('test-value')
+      expect(fetchArguments[0].headers.get('x-foo')).toEqual('overridden')
+
+      expect(startCallback).toHaveBeenCalledWith({
+        type: 'fetch',
+        url: TEST_URL,
+        method: 'GET',
+        startTime: 1
+      })
+      expect(endCallback).toHaveBeenCalledWith({
+        status: 200,
+        endTime: 2,
+        state: 'success'
+      })
+    })
+
+    it('should set extra request headers if specified (prefers headers set in options over Request object)', async () => {
+      const originalFetch = jest.fn().mockImplementation(createFetchFake())
+      window.fetch = originalFetch
+
+      const fetchTracker = createFetchRequestTracker(global, clock)
+
+      startCallback = jest.fn(context => ({ onRequestEnd: endCallback, extraRequestHeaders: { traceparent: 'abc123' } }))
+      const startCallback2 = jest.fn(context => ({ onRequestEnd: endCallback, extraRequestHeaders: { 'x-test-header': 'test-value', 'x-foo': 'bar' } }))
+
+      fetchTracker.onStart(startCallback)
+      fetchTracker.onStart(startCallback2)
+
+      const request = new RequestFake(TEST_URL, { headers: { 'x-request-header': 'ignored' } }) as Parameters<typeof fetch>[0]
+      await window.fetch(request, { headers: { 'x-foo': 'overridden' } })
+
+      const fetchArguments = originalFetch.mock.calls[0]
+      expect(fetchArguments[0]).toBeInstanceOf(RequestFake)
+      expect(fetchArguments[0].headers.get('x-request-header')).toEqual('ignored')
+
+      expect(fetchArguments[1].headers).toStrictEqual(
+        { traceparent: 'abc123', 'x-test-header': 'test-value', 'x-foo': 'overridden' }
+      )
+
+      expect(startCallback).toHaveBeenCalledWith({
+        type: 'fetch',
+        url: TEST_URL,
+        method: 'GET',
+        startTime: 1
+      })
+      expect(endCallback).toHaveBeenCalledWith({
+        status: 200,
+        endTime: 2,
+        state: 'success'
+      })
     })
   })
 })

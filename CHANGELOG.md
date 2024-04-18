@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.4.1 (2024-04-18)
+
+### Fixed
+
+- (core) Delay span batching while inital sampling request is in flight [#433](https://github.com/bugsnag/bugsnag-js-performance/pull/433)
+- (core) Refactor span batching to ensure correct sampling values for subsequent spans [#435](https://github.com/bugsnag/bugsnag-js-performance/pull/435)
+- (request-tracker) Ensure existing headers are preserved for fetch requests [#436](https://github.com/bugsnag/bugsnag-js-performance/pull/436)
+
 ## v2.4.0 (2024-03-27)
 
 ### Added

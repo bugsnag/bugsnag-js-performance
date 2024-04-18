@@ -1,5 +1,4 @@
 import {
-  isDeviceId,
   isPersistedProbability,
   type Persistence,
   type PersistenceKey,
@@ -8,6 +7,7 @@ import {
 } from '@bugsnag/core-performance'
 import { type ReadWriteFile, type ReadableFile } from './file'
 import { Platform } from 'react-native'
+import { isCuid } from '@bugsnag/cuid'
 
 // this is intentionally very loose as the persisted file could contain anything
 type PersistedData = Record<string, unknown>
@@ -48,7 +48,7 @@ export default class FileBasedPersistence implements Persistence {
 
     switch (key) {
       case 'bugsnag-anonymous-id':
-        return isDeviceId(existing['device-id'])
+        return isCuid(existing['device-id'])
           ? existing['device-id'] as PersistencePayloadMap[K]
           : undefined
 
@@ -69,7 +69,7 @@ export default class FileBasedPersistence implements Persistence {
       // validate the existing data (if there is any) to try to keep the file as
       // clean as possible
       // this also ensures no extra keys end up in the file
-      if (isDeviceId(existing['device-id'])) {
+      if (isCuid(existing['device-id'])) {
         dataToBePersisted['device-id'] = existing['device-id']
       }
 
