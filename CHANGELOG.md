@@ -9,6 +9,7 @@
 ### Changed
 
 - (browser) Delay span batching while inital sampling request is in flight [#433](https://github.com/bugsnag/bugsnag-js-performance/pull/433)
+- (core) Refactor batching to ensure correct sampling values for following spans [#435](https://github.com/bugsnag/bugsnag-js-performance/pull/435)
 
 ## v2.4.0 (2024-03-27)
 
