@@ -1,4 +1,5 @@
-import { isDeviceId, isPersistedProbability } from './validation'
+import { isCuid } from '@bugsnag/cuid'
+import { isPersistedProbability } from './validation'
 
 export interface PersistedProbability {
   value: number
@@ -45,7 +46,7 @@ export function toPersistedPayload<K extends PersistenceKey> (
     }
 
     case 'bugsnag-anonymous-id':
-      return isDeviceId(raw)
+      return isCuid(raw)
         ? raw as PersistencePayloadMap[K]
         : undefined
   }
