@@ -2,7 +2,9 @@ import {
   type InternalConfiguration,
   type Logger,
   type Plugin,
-  type SpanFactory
+  type SpanContextStorage,
+  type SpanFactory,
+  type SpanInternal
 } from '@bugsnag/core-performance'
 import {
   defaultNetworkRequestCallback,
@@ -32,6 +34,7 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
 
   constructor (
     private spanFactory: SpanFactory<ReactNativeConfiguration>,
+    private readonly spanContextStorage: SpanContextStorage,
     private xhrTracker: RequestTracker
   ) {}
 
@@ -48,10 +51,38 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
   private trackRequest: RequestStartCallback = (startContext) => {
     if (!this.shouldTrackRequest(startContext)) return
 
-    const networkRequestInfo = this.networkRequestCallback({ url: startContext.url, type: 'xmlhttprequest' })
+    const shouldPropagateTraceContextByDefault = false
 
-    if (!networkRequestInfo) return
+    const defaultRequestInfo: ReactNativeNetworkRequestInfo = {
+      url: startContext.url,
+      type: 'xmlhttprequest',
+      propagateTraceContext: shouldPropagateTraceContextByDefault
+    }
 
+    const networkRequestInfo = this.networkRequestCallback(defaultRequestInfo)
+
+    // returning null neither creates a span nor propagates trace context
+    if (!networkRequestInfo) {
+      return {
+        onRequestEnd: undefined,
+        extraRequestHeaders: undefined
+      }
+    }
+
+    if (networkRequestInfo.propagateTraceContext === undefined) {
+      networkRequestInfo.propagateTraceContext = shouldPropagateTraceContextByDefault
+    }
+
+    // a span is not created if url is null
+    if (!networkRequestInfo.url) {
+      return {
+        onRequestEnd: undefined,
+        // propagate trace context if requested using span context
+        extraRequestHeaders: networkRequestInfo.propagateTraceContext ? this.getExtraRequestHeaders() : undefined
+      }
+    }
+
+    // otherwise, create a span and propagate trace context if requested
     if (typeof networkRequestInfo.url !== 'string') {
       this.logger.warn(`expected url to be a string following network request callback, got ${typeof networkRequestInfo.url}`)
       return
@@ -72,11 +103,41 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
           span.setAttribute('http.status_code', endContext.status)
           this.spanFactory.endSpan(span, endContext.endTime)
         }
-      }
+      },
+      // propagate trace context using network span
+      extraRequestHeaders: networkRequestInfo.propagateTraceContext
+        ? this.getExtraRequestHeaders(span)
+        : undefined
     }
   }
 
   private shouldTrackRequest (startContext: RequestStartContext): boolean {
     return !this.ignoredUrls.some(url => startContext.url.startsWith(url)) && permittedPrefixes.some((prefix) => startContext.url.startsWith(prefix))
   }
+
+  private getExtraRequestHeaders (span?: SpanInternal): Record<string, string> {
+    const extraRequestHeaders: Record<string, string> = {}
+
+    if (span) {
+      const traceId = span.traceId
+      const parentSpanId = span.id
+      const sampled = this.spanFactory.sampler.shouldSample(span.samplingRate)
+
+      extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)
+    } else if (this.spanContextStorage.current) {
+      const currentSpanContext = this.spanContextStorage.current
+
+      const traceId = currentSpanContext.traceId
+      const parentSpanId = currentSpanContext.id
+      const sampled = this.spanFactory.sampler.shouldSample(currentSpanContext.samplingRate)
+
+      extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)
+    }
+
+    return extraRequestHeaders
+  }
+}
+
+function buildTraceparentHeader (traceId: string, parentSpanId: string, sampled: boolean): string {
+  return `00-${traceId}-${parentSpanId}-${sampled ? '01' : '00'}`
 }
