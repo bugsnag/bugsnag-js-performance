@@ -1,5 +1,11 @@
 # Changelog
 
+## TBD
+
+### Added
+
+- (react-native) Add trace propagation headers for React Native [#437](https://github.com/bugsnag/bugsnag-js-performance/pull/437) [#444](https://github.com/bugsnag/bugsnag-js-performance/pull/444)
+
 ## v2.4.1 (2024-04-18)
 
 ### Fixed
