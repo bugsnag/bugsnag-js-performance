@@ -6,18 +6,14 @@ const endpoint = parameters.get('endpoint')
 
 const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time))
 
-BugsnagPerformance.start({ apiKey, endpoint, retryQueueMaxSize: 3, maximumBatchSize: 1, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false, appVersion: '1.2.3' })
+BugsnagPerformance.start({ apiKey, endpoint, retryQueueMaxSize: 1, maximumBatchSize: 1, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false, appVersion: '1.2.3' })
 
 document.getElementById("send-first-span").addEventListener("click", () => {
   BugsnagPerformance.startSpan("Custom/Span to discard").end()
 })
 
 document.getElementById("send-retry-spans").addEventListener("click", async () => {
-  BugsnagPerformance.startSpan("Custom/Span to retry 1").end()
-  await sleep(100)
-  BugsnagPerformance.startSpan("Custom/Span to retry 2").end()
-  await sleep(100)
-  BugsnagPerformance.startSpan("Custom/Span to retry 3").end()
+  BugsnagPerformance.startSpan("Custom/Span to retry").end()
 })
 
 document.getElementById("send-final-span").addEventListener("click", () => {

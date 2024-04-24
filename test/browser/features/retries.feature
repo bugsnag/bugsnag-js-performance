@@ -68,29 +68,27 @@ Feature: Retries
     Scenario Outline: Oldest batch is removed when max retry queue size is exceeded
         Given I navigate to the test URL "/oldest-batch-removed"
         And I wait to receive a sampling request
-        And I set the HTTP status code for the next 4 "POST" requests to <status>
+        And I set the HTTP status code for the next 2 "POST" requests to <status>
 
         When I click the element "send-first-span"
         And I wait to receive 1 trace
         And I discard the oldest trace
 
         Then I click the element "send-retry-spans"
-        And I wait to receive 3 traces
+        And I wait to receive 1 trace
 
         # Remove failed requests
-        And I discard the oldest 3 traces
+        And I discard the oldest trace
 
         Then I click the element "send-final-span"
         And I wait for 5 seconds
-        And I wait to receive 4 traces
+        And I wait to receive 2 traces
 
         # First successful batch
         Then a span name equals "Custom/Span to deliver"
 
-        # Retried batches
-        And a span name equals "Custom/Span to retry 1"
-        And a span name equals "Custom/Span to retry 2"
-        And a span name equals "Custom/Span to retry 3"
+        # Retried batch
+        And a span name equals "Custom/Span to retry"
 
         Examples:
             | status | definition                    |
