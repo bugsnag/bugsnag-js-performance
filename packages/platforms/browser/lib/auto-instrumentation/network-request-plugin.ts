@@ -12,6 +12,11 @@ import { type BrowserConfiguration } from '../config'
 
 export interface BrowserNetworkRequestInfo extends NetworkRequestInfo {
   readonly type: PerformanceResourceTiming['initiatorType']
+
+  /**
+   * Experimental. Whether to propagate trace context by adding a `traceparent` header to the request.
+   */
+  propagateTraceContext?: boolean
 }
 
 const permittedPrefixes = ['http://', 'https://', '/', './', '../']
