@@ -29,6 +29,7 @@ export interface ReactNativeNetworkRequestInfo extends NetworkRequestInfo {
 
 export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
   private ignoredUrls: string[] = [NET_INFO_REACHABILITY_URL]
+  private tracePropagationUrls: RegExp[] = []
   private networkRequestCallback: NetworkRequestCallback<ReactNativeNetworkRequestInfo> = defaultNetworkRequestCallback
   private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
 
@@ -45,18 +46,18 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
       this.ignoredUrls.push(configuration.endpoint)
       this.xhrTracker.onStart(this.trackRequest)
       this.networkRequestCallback = configuration.networkRequestCallback
+      this.tracePropagationUrls = configuration.tracePropagationUrls.map(
+        (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
+      )
     }
   }
 
   private trackRequest: RequestStartCallback = (startContext) => {
     if (!this.shouldTrackRequest(startContext)) return
 
-    const shouldPropagateTraceContextByDefault = false
-
     const defaultRequestInfo: ReactNativeNetworkRequestInfo = {
       url: startContext.url,
-      type: 'xmlhttprequest',
-      propagateTraceContext: shouldPropagateTraceContextByDefault
+      type: 'xmlhttprequest'
     }
 
     const networkRequestInfo = this.networkRequestCallback(defaultRequestInfo)
@@ -69,16 +70,14 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
       }
     }
 
-    if (networkRequestInfo.propagateTraceContext === undefined) {
-      networkRequestInfo.propagateTraceContext = shouldPropagateTraceContextByDefault
-    }
+    const propagateTraceContext = this.shouldPropagateTraceContext(startContext.url)
 
     // a span is not created if url is null
     if (!networkRequestInfo.url) {
       return {
         onRequestEnd: undefined,
         // propagate trace context if requested using span context
-        extraRequestHeaders: networkRequestInfo.propagateTraceContext ? this.getExtraRequestHeaders() : undefined
+        extraRequestHeaders: propagateTraceContext ? this.getExtraRequestHeaders() : undefined
       }
     }
 
@@ -105,7 +104,7 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
         }
       },
       // propagate trace context using network span
-      extraRequestHeaders: networkRequestInfo.propagateTraceContext
+      extraRequestHeaders: propagateTraceContext
         ? this.getExtraRequestHeaders(span)
         : undefined
     }
@@ -113,6 +112,10 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
 
   private shouldTrackRequest (startContext: RequestStartContext): boolean {
     return !this.ignoredUrls.some(url => startContext.url.startsWith(url)) && permittedPrefixes.some((prefix) => startContext.url.startsWith(prefix))
+  }
+
+  private shouldPropagateTraceContext (url: string): boolean {
+    return this.tracePropagationUrls.some(regexp => regexp.test(url))
   }
 
   private getExtraRequestHeaders (span?: SpanInternal): Record<string, string> {

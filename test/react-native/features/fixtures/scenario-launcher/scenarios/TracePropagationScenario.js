@@ -5,12 +5,11 @@ import { ScenarioContext } from '../lib/ScenarioContext'
 export const config = {
   maximumBatchSize: 5,
   autoInstrumentAppStarts: false,
+  tracePropagationUrls: [/^http:\/\/.+:\d{4}\/reflect$/],
   networkRequestCallback: (requestInfo) => {
     if (requestInfo.url.endsWith('/command')) return null
-
-    requestInfo.propagateTraceContext = true
-    return requestInfo;
-  },
+    return requestInfo
+  }
 }
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))

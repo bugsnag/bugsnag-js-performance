@@ -1,5 +1,6 @@
 import {
   isBoolean,
+  isStringOrRegExpArray,
   isStringWithLength,
   schema,
   type ConfigOption,
@@ -18,6 +19,7 @@ export interface ReactNativeSchema extends CoreSchema {
   wrapperComponentProvider: ConfigOption<WrapperComponentProvider | null>
   autoInstrumentNetworkRequests: ConfigOption<boolean>
   networkRequestCallback: ConfigOption<NetworkRequestCallback<ReactNativeNetworkRequestInfo>>
+  tracePropagationUrls: ConfigOption<Array<string | RegExp>>
 }
 
 export interface ReactNativeConfiguration extends Configuration {
@@ -27,6 +29,7 @@ export interface ReactNativeConfiguration extends Configuration {
   generateAnonymousId?: boolean
   networkRequestCallback?: NetworkRequestCallback<ReactNativeNetworkRequestInfo>
   wrapperComponentProvider?: WrapperComponentProvider | null
+  tracePropagationUrls?: Array<string | RegExp>
 }
 
 function createSchema (): ReactNativeSchema {
@@ -61,6 +64,11 @@ function createSchema (): ReactNativeSchema {
       defaultValue: defaultNetworkRequestCallback,
       message: 'should be a function',
       validate: isNetworkRequestCallback
+    },
+    tracePropagationUrls: {
+      defaultValue: [],
+      message: 'should be an array of string|RegExp',
+      validate: isStringOrRegExpArray
     }
   }
 }

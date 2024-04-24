@@ -90,8 +90,6 @@ describe('Browser client integration tests', () => {
       const fullBatch = JSON.parse(mockFetch.mock.calls[1][1].body)
       expect(fullBatch.resourceSpans[0].scopeSpans[0].spans).toHaveLength(100)
 
-      console.log(mockFetch.mock.calls[1][1].headers)
-
       // Header should be updated
       expect(mockFetch).toHaveBeenLastCalledWith('/test', expect.objectContaining({
         headers: expect.objectContaining({
