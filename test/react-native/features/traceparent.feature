@@ -4,46 +4,34 @@ Feature: Trace propagation headers
         When I run 'TracePropagationScenario'
 
         And I wait to receive 5 reflections
-        And I wait to receive 5 traces
+        
+        And I wait for 5 spans
+        Then every span string attribute "http.url" matches the regex "^http:\/\/.+:\d{4}\/reflect$"
 
-        Then the reflection request method equals "GET"
+        And the reflection request method equals "GET"
         And the reflection "X-Test-Header" header equals "test"
         And the reflection "traceparent" header matches the regex "^00-[A-Fa-f0-9]{32}-[A-Fa-f0-9]{16}-01"
-
-        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
 
         And I discard the oldest reflection
-        And I discard the oldest trace
 
         Then the reflection request method equals "GET"
         And the reflection "X-Test-Header" header equals "test"
         And the reflection "traceparent" header matches the regex "^00-[A-Fa-f0-9]{32}-[A-Fa-f0-9]{16}-01"
-
-        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
 
         And I discard the oldest reflection
-        And I discard the oldest trace
 
         Then the reflection request method equals "GET"
         And the reflection "X-Test-Header" header equals "test"
         And the reflection "traceparent" header matches the regex "^00-[A-Fa-f0-9]{32}-[A-Fa-f0-9]{16}-01"
-
-        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
 
         And I discard the oldest reflection
-        And I discard the oldest trace
 
         Then the reflection request method equals "GET"
         And the reflection "X-Test-Header" header equals "test"
         And the reflection "traceparent" header matches the regex "^00-[A-Fa-f0-9]{32}-[A-Fa-f0-9]{16}-01"
-
-        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
 
         And I discard the oldest reflection
-        And I discard the oldest trace
 
         Then the reflection request method equals "GET"
         And the reflection "X-Test-Header" header equals "test"
         And the reflection "traceparent" header matches the regex "^00-[A-Fa-f0-9]{32}-[A-Fa-f0-9]{16}-01"
-
-        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"

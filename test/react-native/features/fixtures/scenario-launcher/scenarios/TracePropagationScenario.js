@@ -3,7 +3,7 @@ import React, { useContext, useEffect } from 'react'
 import { ScenarioContext } from '../lib/ScenarioContext'
 
 export const config = {
-  maximumBatchSize: 1,
+  maximumBatchSize: 5,
   autoInstrumentAppStarts: false,
   networkRequestCallback: (requestInfo) => {
     if (requestInfo.url.endsWith('/command')) return null
