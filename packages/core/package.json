@@ -33,6 +33,6 @@
     "dist"
   ],
   "dependencies": {
-    "@bugsnag/cuid": "^3.1.0"
+    "@bugsnag/cuid": "^3.1.1"
   }
 }
