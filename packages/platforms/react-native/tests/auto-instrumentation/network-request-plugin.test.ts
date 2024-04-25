@@ -14,6 +14,15 @@ class MockRequestTracker extends RequestTracker {
   })
 }
 
+const createConfig = (overrides: Partial<ReactNativeConfiguration> = {}) => {
+  return createConfiguration<ReactNativeConfiguration>({
+    endpoint: ENDPOINT,
+    autoInstrumentNetworkRequests: true,
+    tracePropagationUrls: [],
+    ...overrides
+  })
+}
+
 describe('network span plugin', () => {
   let xhrTracker: MockRequestTracker
   let spanFactory: MockSpanFactory<ReactNativeConfiguration>
@@ -29,10 +38,7 @@ describe('network span plugin', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
     expect(xhrTracker.onStart).not.toHaveBeenCalled()
 
-    plugin.configure(createConfiguration<ReactNativeConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: true
-    }))
+    plugin.configure(createConfig())
 
     expect(xhrTracker.onStart).toHaveBeenCalled()
   })
@@ -40,16 +46,13 @@ describe('network span plugin', () => {
   it('starts a span on request start', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
 
-    plugin.configure(createConfiguration<ReactNativeConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: true
-    }))
+    plugin.configure(createConfig())
 
     const res = xhrTracker.start({ type: 'xmlhttprequest', method: 'POST', url: TEST_URL, startTime: 2 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/POST', { startTime: 2, makeCurrentContext: false })
     expect(res.extraRequestHeaders).toEqual([])
 
-    // traceparent headers are not added to same-origin requests by default
+    // currently traceparent headers are not added to any requests by default
     const res2 = xhrTracker.start({ type: 'xmlhttprequest', method: 'POST', url: SAME_ORIGIN_TEST_URL, startTime: 2 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/POST', { startTime: 2, makeCurrentContext: false })
     expect(res2.extraRequestHeaders).toEqual([])
@@ -58,10 +61,7 @@ describe('network span plugin', () => {
   it('ends a span on request end', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
 
-    plugin.configure(createConfiguration<ReactNativeConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: true
-    }))
+    plugin.configure(createConfig())
 
     const { onRequestEnd: endRequest } = xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
@@ -84,10 +84,7 @@ describe('network span plugin', () => {
   it('does not track requests when autoInstrumentNetworkRequests = false', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
 
-    plugin.configure(createConfiguration<ReactNativeConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: false
-    }))
+    plugin.configure(createConfig({ autoInstrumentNetworkRequests: false }))
 
     expect(xhrTracker.onStart).not.toHaveBeenCalled()
   })
@@ -95,10 +92,7 @@ describe('network span plugin', () => {
   it('does not track requests to the configured traces endpoint', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
 
-    plugin.configure(createConfiguration<ReactNativeConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: true
-    }))
+    plugin.configure(createConfig())
 
     xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: `${ENDPOINT}`, startTime: 1 })
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
@@ -108,10 +102,7 @@ describe('network span plugin', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
     const NET_INFO_REACHABILITY_URL = 'https://clients3.google.com/generate_204?_=1701691583660'
 
-    plugin.configure(createConfiguration<ReactNativeConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: true
-    }))
+    plugin.configure(createConfig())
 
     xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: NET_INFO_REACHABILITY_URL, startTime: 1 })
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
@@ -129,10 +120,7 @@ describe('network span plugin', () => {
   it.each(expectedProtocols)('tracks requests over all expected protocols', (url) => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
 
-    plugin.configure(createConfiguration<ReactNativeConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: true
-    }))
+    plugin.configure(createConfig())
 
     xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalled()
@@ -153,10 +141,7 @@ describe('network span plugin', () => {
   it.each(unexpectedProtocols)('does not track requests over unexpected protocols', (url) => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
 
-    plugin.configure(createConfiguration<ReactNativeConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: true
-    }))
+    plugin.configure(createConfig())
 
     xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url, startTime: 1 })
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
@@ -165,10 +150,7 @@ describe('network span plugin', () => {
   it('discards the span if the status is 0', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
 
-    plugin.configure(createConfiguration<ReactNativeConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: true
-    }))
+    plugin.configure(createConfig())
 
     const { onRequestEnd: endRequest } = xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
@@ -180,10 +162,7 @@ describe('network span plugin', () => {
   it('discards the span if there is an error', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
 
-    plugin.configure(createConfiguration<ReactNativeConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: true
-    }))
+    plugin.configure(createConfig())
 
     const { onRequestEnd: endRequest } = xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
@@ -205,9 +184,7 @@ describe('network span plugin', () => {
 
   it('prevents creating a span when networkRequestCallback returns null', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
-    plugin.configure(createConfiguration<ReactNativeConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: true,
+    plugin.configure(createConfig({
       networkRequestCallback: (networkRequestInfo) => networkRequestInfo.url === 'no-delivery' ? null : networkRequestInfo
     }))
 
@@ -220,9 +197,7 @@ describe('network span plugin', () => {
 
   it('uses a modified url from networkRequestCallback', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
-    plugin.configure(createConfiguration<ReactNativeConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: true,
+    plugin.configure(createConfig({
       networkRequestCallback: (networkRequestInfo) => ({
         type: networkRequestInfo.type,
         url: 'modified-url'
@@ -246,32 +221,54 @@ describe('network span plugin', () => {
     expect(span).toHaveAttribute('http.status_code', 200)
   })
 
-  it('prevents adding trace propagation headers when networkRequestCallback returns { propagateTraceContext: false }', () => {
+  it('adds trace propagation headers when url matches tracePropagationUrls (string)', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
-    plugin.configure(createConfiguration<ReactNativeConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: true,
-      networkRequestCallback: (networkRequestInfo) => ({ ...networkRequestInfo, propagateTraceContext: false })
+    plugin.configure(createConfig({
+      tracePropagationUrls: [TEST_URL]
     }))
+
+    const res = xhrTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+    expect(res.extraRequestHeaders).toEqual([
+      { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
+    ])
+  })
+
+  it('adds trace propagation headers when url matches tracePropagationUrls (RegExp)', () => {
+    const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
+    plugin.configure(createConfig({
+      tracePropagationUrls: [
+        /^(http(s)?(:\/\/))?(www\.)?test-url\.com(\/.*)?$/
+      ]
+    }))
+
+    const res = xhrTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+    expect(res.extraRequestHeaders).toEqual([
+      { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
+    ])
+  })
+
+  it('does not add trace propagation headers when tracePropagationUrls is empty', () => {
+    const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
+    plugin.configure(createConfig())
 
     const res = xhrTracker.start({ type: 'fetch', method: 'GET', url: SAME_ORIGIN_TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
     expect(res.extraRequestHeaders).toEqual([])
   })
 
-  it('adds trace propagation headers when networkRequestCallback returns { propagateTraceContext: true }', () => {
+  it('does not add trace propagation headers when url does not match tracePropagationUrls', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrTracker)
-    plugin.configure(createConfiguration<ReactNativeConfiguration>({
-      endpoint: ENDPOINT,
-      autoInstrumentNetworkRequests: true,
-      networkRequestCallback: (networkRequestInfo) => ({ ...networkRequestInfo, propagateTraceContext: true })
+    plugin.configure(createConfig({
+      tracePropagationUrls: [
+        'http://noheader.com/',
+        /^(http(s)?(:\/\/))?(www\.)?noheader\.com(\/.*)?$/
+      ]
     }))
 
-    // by default when the origin is different trace propagation headers are not added, unless the networkRequestCallback returns { propagateTraceContext: true }
-    const res = xhrTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
+    const res = xhrTracker.start({ type: 'fetch', method: 'GET', url: SAME_ORIGIN_TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
-    expect(res.extraRequestHeaders).toEqual([
-      { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
-    ])
+    expect(res.extraRequestHeaders).toEqual([])
   })
 })
