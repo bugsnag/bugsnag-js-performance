@@ -123,10 +123,15 @@ export class SpanInternal implements SpanContext {
   }
 }
 
+export interface ParentContext {
+  readonly id: string // 64 bit random string
+  readonly traceId: string // 128 bit random string
+}
+
 export interface SpanOptions {
   startTime?: Time
   makeCurrentContext?: boolean
-  parentContext?: SpanContext | null
+  parentContext?: ParentContext | null
   isFirstClass?: boolean
 }
 
