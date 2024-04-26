@@ -6,11 +6,16 @@
 
 - (react-native) Add trace propagation headers for React Native [#437](https://github.com/bugsnag/bugsnag-js-performance/pull/437) [#444](https://github.com/bugsnag/bugsnag-js-performance/pull/444)
 
+
+### Fixed
+
+- (core) Fix import of `@bugsnag/cuid` not working in node ESM environment [#445](https://github.com/bugsnag/bugsnag-js-performance/pull/445)
+
 ## v2.4.1 (2024-04-18)
 
 ### Fixed
 
-- (core) Delay span batching while inital sampling request is in flight [#433](https://github.com/bugsnag/bugsnag-js-performance/pull/433)
+- (core) Delay span batching while initial sampling request is in flight [#433](https://github.com/bugsnag/bugsnag-js-performance/pull/433)
 - (core) Refactor span batching to ensure correct sampling values for subsequent spans [#435](https://github.com/bugsnag/bugsnag-js-performance/pull/435)
 - (request-tracker) Ensure existing headers are preserved for fetch requests [#436](https://github.com/bugsnag/bugsnag-js-performance/pull/436)
 

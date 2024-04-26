@@ -7,7 +7,9 @@ import {
 } from '@bugsnag/core-performance'
 import { type ReadWriteFile, type ReadableFile } from './file'
 import { Platform } from 'react-native'
-import { isCuid } from '@bugsnag/cuid'
+import cuid from '@bugsnag/cuid'
+
+const { isCuid } = cuid
 
 // this is intentionally very loose as the persisted file could contain anything
 type PersistedData = Record<string, unknown>
