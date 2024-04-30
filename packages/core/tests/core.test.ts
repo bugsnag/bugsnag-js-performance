@@ -1,12 +1,12 @@
-import { createNoopClient } from '../lib/core'
-import { type BackgroundingListener } from '../lib/backgrounding-listener'
-import { DefaultSpanContextStorage } from '../lib/span-context'
 import {
   ControllableBackgroundingListener,
-  createTestClient,
   InMemoryDelivery,
-  VALID_API_KEY
+  VALID_API_KEY,
+  createTestClient
 } from '@bugsnag/js-performance-test-utilities'
+import { type BackgroundingListener } from '../lib/backgrounding-listener'
+import { createNoopClient } from '../lib/core'
+import { DefaultSpanContextStorage } from '../lib/span-context'
 
 jest.useFakeTimers()
 
@@ -18,6 +18,7 @@ describe('Core', () => {
       expect(client).toStrictEqual({
         start: expect.any(Function),
         startSpan: expect.any(Function),
+        startNetworkSpan: expect.any(Function),
         currentSpanContext: undefined,
         getPlugin: expect.any(Function)
       })
