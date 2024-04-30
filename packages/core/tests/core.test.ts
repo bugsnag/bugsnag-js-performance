@@ -296,6 +296,44 @@ describe('Core', () => {
           expect(plugin).toBeUndefined()
         })
       })
+
+      describe('startNetworkSpan', () => {
+        it('creates a network span', async () => {
+          const delivery = new InMemoryDelivery()
+          const client = createTestClient({ deliveryFactory: () => delivery })
+
+          client.start(VALID_API_KEY)
+
+          const span = client.startNetworkSpan({
+            method: 'GET',
+            url: 'https://example.com',
+            title: 'Example',
+            referrer: 'https://referrer.com'
+          })
+
+          span.end({ status: 200 })
+
+          await jest.runOnlyPendingTimersAsync()
+
+          expect(delivery).toHaveSentSpan(expect.objectContaining({
+            name: '[HTTP]GET',
+            kind: 3,
+            events: [],
+            spanId: 'a random 64 bit string',
+            traceId: 'a random 128 bit string',
+            startTimeUnixNano: expect.any(String),
+            endTimeUnixNano: expect.any(String)
+          }))
+
+          const deliveredSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+          expect(deliveredSpan).toHaveAttribute('bugsnag.span.category', 'network')
+          expect(deliveredSpan).toHaveAttribute('bugsnag.browser.page.title', 'Example')
+          expect(deliveredSpan).toHaveAttribute('bugsnag.browser.page.referrer', 'https://referrer.com')
+          expect(deliveredSpan).toHaveAttribute('http.method', 'GET')
+          expect(deliveredSpan).toHaveAttribute('http.url', 'https://example.com')
+          expect(deliveredSpan).toHaveAttribute('http.status_code', 200)
+        })
+      })
     })
 
     it('creates and configures a given plugin', () => {
