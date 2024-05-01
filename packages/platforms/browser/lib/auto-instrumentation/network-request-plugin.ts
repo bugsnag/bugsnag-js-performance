@@ -1,10 +1,10 @@
-import type { SpanInternal, InternalConfiguration, Logger, Plugin, SpanFactory, SpanContextStorage } from '@bugsnag/core-performance'
+import type { InternalConfiguration, Logger, Plugin, SpanContextStorage, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
 import {
   defaultNetworkRequestCallback,
-  type RequestStartCallback,
   type NetworkRequestCallback,
   type NetworkRequestInfo,
   type RequestEndContext,
+  type RequestStartCallback,
   type RequestStartContext,
   type RequestTracker
 } from '@bugsnag/request-tracker-performance'
@@ -84,20 +84,16 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
       return
     }
 
-    const span = this.spanFactory.startSpan(
-      `[HTTP]/${startContext.method.toUpperCase()}`,
-      { startTime: startContext.startTime, makeCurrentContext: false }
-    )
-
-    span.setAttribute('bugsnag.span.category', 'network')
-    span.setAttribute('http.method', startContext.method)
-    span.setAttribute('http.url', networkRequestInfo.url)
+    const span = this.spanFactory.startNetworkSpan({
+      method: startContext.method,
+      startTime: startContext.startTime,
+      url: networkRequestInfo.url
+    })
 
     return {
       onRequestEnd: (endContext: RequestEndContext) => {
         if (endContext.state === 'success') {
-          span.setAttribute('http.status_code', endContext.status)
-          this.spanFactory.endSpan(span, endContext.endTime)
+          this.spanFactory.endSpan(span, endContext.endTime, { 'http.status_code': endContext.status })
         }
       },
       // propagate trace context using network span
