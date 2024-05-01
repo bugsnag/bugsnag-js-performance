@@ -1,12 +1,11 @@
 # Changelog
 
-## TBD
+## [Unreleased]
 
 ### Added
 
 - (react-native) Add trace propagation headers for React Native [#437](https://github.com/bugsnag/bugsnag-js-performance/pull/437) [#444](https://github.com/bugsnag/bugsnag-js-performance/pull/444)
 - Add new `startNetworkSpan` method to `BugsnagPerformance` [#448](https://github.com/bugsnag/bugsnag-js-performance/pull/448)
-
 
 ### Fixed
 

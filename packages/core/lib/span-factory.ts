@@ -89,9 +89,9 @@ export class SpanFactory <C extends Configuration> {
   }
 
   startNetworkSpan (options: NetworkSpanOptions) {
-    // Use method as the span name, prefixed with [HTTP]
-    const cleanOptions = this.validateSpanOptions<NetworkSpanOptions>(options.method, options)
-    const spanInternal = this.startSpan(`[HTTP]${cleanOptions.name.toUpperCase()}`, { ...cleanOptions.options, makeCurrentContext: false })
+    const spanName = `[HTTP]/${options.method.toUpperCase()}`
+    const cleanOptions = this.validateSpanOptions<NetworkSpanOptions>(spanName, options)
+    const spanInternal = this.startSpan(cleanOptions.name, { ...cleanOptions.options, makeCurrentContext: false })
 
     spanInternal.setAttribute('bugsnag.span.category', 'network')
     spanInternal.setAttribute('http.method', options.method)

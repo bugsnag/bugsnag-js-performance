@@ -8,10 +8,10 @@ import {
 } from '@bugsnag/core-performance'
 import {
   defaultNetworkRequestCallback,
-  type RequestStartCallback,
   type NetworkRequestCallback,
   type NetworkRequestInfo,
   type RequestEndContext,
+  type RequestStartCallback,
   type RequestStartContext,
   type RequestTracker
 } from '@bugsnag/request-tracker-performance'
@@ -87,18 +87,16 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
       return
     }
 
-    const span = this.spanFactory.startSpan(
-      `[HTTP]/${startContext.method.toUpperCase()}`,
-      { startTime: startContext.startTime, makeCurrentContext: false }
-    )
-
-    span.setAttribute('bugsnag.span.category', 'network')
-    span.setAttribute('http.method', startContext.method)
-    span.setAttribute('http.url', networkRequestInfo.url)
+    const span = this.spanFactory.startNetworkSpan({
+      method: startContext.method,
+      startTime: startContext.startTime,
+      url: networkRequestInfo.url
+    })
 
     return {
       onRequestEnd: (endContext: RequestEndContext) => {
         if (endContext.state === 'success') {
+          // TODO: set http.status_code as part of ending a network span
           span.setAttribute('http.status_code', endContext.status)
           this.spanFactory.endSpan(span, endContext.endTime)
         }

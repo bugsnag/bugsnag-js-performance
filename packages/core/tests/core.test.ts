@@ -314,7 +314,7 @@ describe('Core', () => {
           await jest.runOnlyPendingTimersAsync()
 
           expect(delivery).toHaveSentSpan(expect.objectContaining({
-            name: '[HTTP]GET',
+            name: '[HTTP]/GET',
             kind: 3,
             events: [],
             spanId: 'a random 64 bit string',
