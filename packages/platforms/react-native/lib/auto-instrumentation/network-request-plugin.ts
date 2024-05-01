@@ -96,9 +96,7 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
     return {
       onRequestEnd: (endContext: RequestEndContext) => {
         if (endContext.state === 'success') {
-          // TODO: set http.status_code as part of ending a network span
-          span.setAttribute('http.status_code', endContext.status)
-          this.spanFactory.endSpan(span, endContext.endTime)
+          this.spanFactory.endSpan(span, endContext.endTime, { 'http.status_code': endContext.status })
         }
       },
       // propagate trace context using network span

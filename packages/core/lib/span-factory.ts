@@ -1,4 +1,4 @@
-import { SpanAttributes, type SpanAttributesSource } from './attributes'
+import { type SpanAttribute, SpanAttributes, type SpanAttributesSource } from './attributes'
 import { type BackgroundingListener, type BackgroundingListenerState } from './backgrounding-listener'
 import { type Clock } from './clock'
 import { type Configuration, type Logger } from './config'
@@ -97,7 +97,6 @@ export class SpanFactory <C extends Configuration> {
     spanInternal.setAttribute('http.method', options.method)
     spanInternal.setAttribute('http.url', options.url)
 
-    // TODO: Set http.status_code attribute on span.end
     return spanInternal
   }
 
@@ -108,7 +107,8 @@ export class SpanFactory <C extends Configuration> {
 
   endSpan (
     span: SpanInternal,
-    endTime: number
+    endTime: number,
+    additionalAttributes?: Record<string, SpanAttribute>
   ) {
     // if the span doesn't exist here it shouldn't be processed
     if (!this.openSpans.delete(span)) {
@@ -123,6 +123,11 @@ export class SpanFactory <C extends Configuration> {
 
     // Discard marked spans
     if (endTime === DISCARD_END_TIME) return
+
+    // Set any additional attributes
+    for (const [key, value] of Object.entries(additionalAttributes || {})) {
+      span.setAttribute(key, value)
+    }
 
     this.spanAttributesSource.requestAttributes(span)
 
