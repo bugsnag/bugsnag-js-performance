@@ -1,6 +1,7 @@
 import {
   DefaultSpanContextStorage,
   Sampler,
+  type SpanAttribute,
   SpanFactory,
   type Configuration,
   type SpanEnded,
@@ -45,8 +46,8 @@ class MockSpanFactory <C extends Configuration> extends SpanFactory<C> {
     return super.startSpan(name, options)
   })
 
-  endSpan = jest.fn((span: SpanInternal, endTime: number) => {
-    super.endSpan(span, endTime)
+  endSpan = jest.fn((span: SpanInternal, endTime: number, additionalAttributes?: Record<string, SpanAttribute>) => {
+    super.endSpan(span, endTime, additionalAttributes)
   })
 }
 
