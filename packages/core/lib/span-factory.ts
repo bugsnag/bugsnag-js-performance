@@ -89,7 +89,7 @@ export class SpanFactory <C extends Configuration> {
   }
 
   startNetworkSpan (options: NetworkSpanOptions) {
-    const spanName = `[HTTP]/${options.method.toUpperCase()}`
+    const spanName = `[HTTP/${options.method.toUpperCase()}]`
     const cleanOptions = this.validateSpanOptions<NetworkSpanOptions>(spanName, options)
     const spanInternal = this.startSpan(cleanOptions.name, { ...cleanOptions.options, makeCurrentContext: false })
 

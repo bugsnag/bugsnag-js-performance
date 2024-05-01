@@ -11,7 +11,7 @@ Feature: Trace propagation headers
 
         And I wait to receive 1 trace
 
-        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
+        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP/GET]"
 
     Scenario: traceparent header is added to fetch requests (simple headers in fetch options)
         Given I navigate to the test URL "/traceparent"
@@ -24,7 +24,7 @@ Feature: Trace propagation headers
 
         And I wait to receive 1 trace
 
-        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
+        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP/GET]"
 
     Scenario: traceparent header is added to fetch requests (Headers class in fetch options)   
         Given I navigate to the test URL "/traceparent"
@@ -37,7 +37,7 @@ Feature: Trace propagation headers
 
         And I wait to receive 1 trace
 
-        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
+        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP/GET]"
 
     Scenario: traceparent header is added to fetch requests (simple headers in Request object)   
         Given I navigate to the test URL "/traceparent"
@@ -50,7 +50,7 @@ Feature: Trace propagation headers
 
         And I wait to receive 1 trace
 
-        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
+        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP/GET]"
 
     Scenario: traceparent header is added to fetch requests (Headers class in Request object)
         Given I navigate to the test URL "/traceparent"
@@ -63,7 +63,7 @@ Feature: Trace propagation headers
 
         And I wait to receive 1 trace
 
-        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
+        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP/GET]"
 
     Scenario: traceparent header is added to fetch requests (headers in both request and options)
         Given I navigate to the test URL "/traceparent"
@@ -76,4 +76,4 @@ Feature: Trace propagation headers
 
         And I wait to receive 1 trace
         
-        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP]/GET"
+        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[HTTP/GET]"

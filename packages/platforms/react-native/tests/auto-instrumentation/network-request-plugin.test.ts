@@ -49,12 +49,12 @@ describe('network span plugin', () => {
     plugin.configure(createConfig())
 
     const res = xhrTracker.start({ type: 'xmlhttprequest', method: 'POST', url: TEST_URL, startTime: 2 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/POST', { startTime: 2, makeCurrentContext: false })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/POST]', { startTime: 2, makeCurrentContext: false })
     expect(res.extraRequestHeaders).toEqual([])
 
     // currently traceparent headers are not added to any requests by default
     const res2 = xhrTracker.start({ type: 'xmlhttprequest', method: 'POST', url: SAME_ORIGIN_TEST_URL, startTime: 2 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/POST', { startTime: 2, makeCurrentContext: false })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/POST]', { startTime: 2, makeCurrentContext: false })
     expect(res2.extraRequestHeaders).toEqual([])
   })
 
@@ -64,7 +64,7 @@ describe('network span plugin', () => {
     plugin.configure(createConfig())
 
     const { onRequestEnd: endRequest } = xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
 
     endRequest({ status: 200, endTime: 2, state: 'success' })
@@ -72,7 +72,7 @@ describe('network span plugin', () => {
     expect(spanFactory.createdSpans.length).toEqual(1)
 
     const span = spanFactory.createdSpans[0]
-    expect(span.name).toEqual('[HTTP]/GET')
+    expect(span.name).toEqual('[HTTP/GET]')
     expect(span.startTime).toEqual(1)
     expect(span.endTime).toEqual(2)
     expect(span).toHaveAttribute('bugsnag.span.category', 'network')
@@ -153,7 +153,7 @@ describe('network span plugin', () => {
     plugin.configure(createConfig())
 
     const { onRequestEnd: endRequest } = xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
 
     endRequest({ endTime: 2, state: 'error' })
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
@@ -165,7 +165,7 @@ describe('network span plugin', () => {
     plugin.configure(createConfig())
 
     const { onRequestEnd: endRequest } = xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
 
     endRequest({ state: 'error', error: new Error('woopsy'), endTime: 2 })
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
@@ -192,7 +192,7 @@ describe('network span plugin', () => {
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
 
     xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
   })
 
   it('uses a modified url from networkRequestCallback', () => {
@@ -205,14 +205,14 @@ describe('network span plugin', () => {
     }))
 
     const { onRequestEnd: endRequest } = xhrTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
 
     endRequest({ status: 200, endTime: 2, state: 'success' })
     expect(spanFactory.endSpan).toHaveBeenCalled()
     expect(spanFactory.createdSpans.length).toEqual(1)
 
     const span = spanFactory.createdSpans[0]
-    expect(span.name).toEqual('[HTTP]/GET')
+    expect(span.name).toEqual('[HTTP/GET]')
     expect(span.startTime).toEqual(1)
     expect(span.endTime).toEqual(2)
     expect(span).toHaveAttribute('bugsnag.span.category', 'network')
@@ -228,7 +228,7 @@ describe('network span plugin', () => {
     }))
 
     const res = xhrTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
     expect(res.extraRequestHeaders).toEqual([
       { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
     ])
@@ -243,7 +243,7 @@ describe('network span plugin', () => {
     }))
 
     const res = xhrTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
     expect(res.extraRequestHeaders).toEqual([
       { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
     ])
@@ -254,7 +254,7 @@ describe('network span plugin', () => {
     plugin.configure(createConfig())
 
     const res = xhrTracker.start({ type: 'fetch', method: 'GET', url: SAME_ORIGIN_TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
     expect(res.extraRequestHeaders).toEqual([])
   })
 
@@ -268,7 +268,7 @@ describe('network span plugin', () => {
     }))
 
     const res = xhrTracker.start({ type: 'fetch', method: 'GET', url: SAME_ORIGIN_TEST_URL, startTime: 1 })
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP]/GET', { startTime: 1, makeCurrentContext: false })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
     expect(res.extraRequestHeaders).toEqual([])
   })
 })
