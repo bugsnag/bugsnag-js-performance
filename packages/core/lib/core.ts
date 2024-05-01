@@ -124,15 +124,6 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       spanInternal.setAttribute('http.method', cleanOptions.options.method)
       spanInternal.setAttribute('http.url', cleanOptions.options.url)
 
-      // Optinal attributes
-      if (cleanOptions.options.title) {
-        spanInternal.setAttribute('bugsnag.browser.page.title', cleanOptions.options.title)
-      }
-
-      if (cleanOptions.options.referrer) {
-        spanInternal.setAttribute('bugsnag.browser.page.referrer', cleanOptions.options.referrer)
-      }
-
       const span = spanFactory.toPublicApi(spanInternal)
 
       // Overwrite end method to set status code attribute

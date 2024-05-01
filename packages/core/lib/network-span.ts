@@ -5,8 +5,6 @@ import { isStringWithLength } from './validation'
 export interface NetworkSpanOptions extends Omit<SpanOptions, 'makeCurrentContext'> {
   method: string
   url: string
-  title?: string
-  referrer?: string
 }
 
 export interface NetworkSpanEndOptions {
@@ -31,16 +29,6 @@ export const networkSpanOptionsSchema: SpanOptionSchema = {
     validate: isStringWithLength
   },
   url: {
-    message: 'should be a string',
-    getDefaultValue: () => undefined,
-    validate: isStringWithLength
-  },
-  title: {
-    message: 'should be a string',
-    getDefaultValue: () => undefined,
-    validate: isStringWithLength
-  },
-  referrer: {
     message: 'should be a string',
     getDefaultValue: () => undefined,
     validate: isStringWithLength

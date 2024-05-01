@@ -306,9 +306,7 @@ describe('Core', () => {
 
           const span = client.startNetworkSpan({
             method: 'GET',
-            url: 'https://example.com',
-            title: 'Example',
-            referrer: 'https://referrer.com'
+            url: 'https://example.com'
           })
 
           span.end({ status: 200 })
@@ -327,8 +325,6 @@ describe('Core', () => {
 
           const deliveredSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
           expect(deliveredSpan).toHaveAttribute('bugsnag.span.category', 'network')
-          expect(deliveredSpan).toHaveAttribute('bugsnag.browser.page.title', 'Example')
-          expect(deliveredSpan).toHaveAttribute('bugsnag.browser.page.referrer', 'https://referrer.com')
           expect(deliveredSpan).toHaveAttribute('http.method', 'GET')
           expect(deliveredSpan).toHaveAttribute('http.url', 'https://example.com')
           expect(deliveredSpan).toHaveAttribute('http.status_code', 200)
