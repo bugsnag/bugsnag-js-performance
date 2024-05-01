@@ -6,7 +6,7 @@ import { type Clock } from './clock'
 import { validateConfig, type Configuration, type CoreSchema } from './config'
 import { TracePayloadEncoder, type DeliveryFactory } from './delivery'
 import { type IdGenerator } from './id-generator'
-import { networkSpanOptionsSchema, type NetworkSpan, type NetworkSpanEndOptions, type NetworkSpanOptions } from './network-span'
+import { type NetworkSpan, type NetworkSpanEndOptions, type NetworkSpanOptions } from './network-span'
 import { type Persistence } from './persistence'
 import { type Plugin } from './plugin'
 import ProbabilityFetcher from './probability-fetcher'
@@ -117,24 +117,20 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       return spanFactory.toPublicApi(span)
     },
     startNetworkSpan: (networkSpanOptions: NetworkSpanOptions) => {
-      const cleanOptions = spanFactory.validateSpanOptions<NetworkSpanOptions>(`[HTTP]${networkSpanOptions.method.toUpperCase()}`, networkSpanOptions, networkSpanOptionsSchema)
-      const spanInternal = spanFactory.startSpan(cleanOptions.name, { ...cleanOptions.options, makeCurrentContext: false })
-
-      spanInternal.setAttribute('bugsnag.span.category', 'network')
-      spanInternal.setAttribute('http.method', cleanOptions.options.method)
-      spanInternal.setAttribute('http.url', cleanOptions.options.url)
-
+      const spanInternal = spanFactory.startNetworkSpan(networkSpanOptions)
       const span = spanFactory.toPublicApi(spanInternal)
 
       // Overwrite end method to set status code attribute
       // once we release the setAttribute API we can simply return the span
-      return {
+      const networkSpan: NetworkSpan = {
         ...span,
         end: (endOptions: NetworkSpanEndOptions) => {
           spanInternal.setAttribute('http.status_code', endOptions.status)
           span.end(endOptions.endTime)
         }
       }
+
+      return networkSpan
     },
     getPlugin: (Constructor) => {
       for (const plugin of plugins) {

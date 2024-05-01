@@ -3,9 +3,10 @@ import { type BackgroundingListener, type BackgroundingListenerState } from './b
 import { type Clock } from './clock'
 import { type Configuration, type Logger } from './config'
 import { type IdGenerator } from './id-generator'
+import { type NetworkSpanOptions } from './network-span'
 import { type Processor } from './processor'
 import { type ReadonlySampler } from './sampler'
-import { SpanInternal, type Span, type SpanOptions, type SpanOptionSchema, type InternalSpanOptions, coreSpanOptionSchema } from './span'
+import { SpanInternal, coreSpanOptionSchema, type InternalSpanOptions, type Span, type SpanOptionSchema, type SpanOptions } from './span'
 import { type SpanContextStorage } from './span-context'
 import { timeToNumber } from './time'
 import { isObject, isSpanContext } from './validation'
@@ -85,6 +86,19 @@ export class SpanFactory <C extends Configuration> {
     }
 
     return span
+  }
+
+  startNetworkSpan (options: NetworkSpanOptions) {
+    // Use method as the span name, prefixed with [HTTP]
+    const cleanOptions = this.validateSpanOptions<NetworkSpanOptions>(options.method, options)
+    const spanInternal = this.startSpan(`[HTTP]${cleanOptions.name.toUpperCase()}`, { ...cleanOptions.options, makeCurrentContext: false })
+
+    spanInternal.setAttribute('bugsnag.span.category', 'network')
+    spanInternal.setAttribute('http.method', options.method)
+    spanInternal.setAttribute('http.url', options.url)
+
+    // TODO: Set http.status_code attribute on span.end
+    return spanInternal
   }
 
   configure (processor: Processor, logger: Logger) {
