@@ -17,6 +17,7 @@ import Sampler from './sampler'
 import { type Span, type SpanOptions } from './span'
 import { DefaultSpanContextStorage, type SpanContext, type SpanContextStorage } from './span-context'
 import { SpanFactory } from './span-factory'
+import { timeToNumber } from './time'
 
 interface Constructor<T> { new(): T, prototype: T }
 
@@ -125,8 +126,11 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       const networkSpan: NetworkSpan = {
         ...span,
         end: (endOptions: NetworkSpanEndOptions) => {
-          spanInternal.setAttribute('http.status_code', endOptions.status)
-          span.end(endOptions.endTime)
+          spanFactory.endSpan(
+            spanInternal,
+            timeToNumber(options.clock, endOptions.endTime),
+            { 'http.status_code': endOptions.status }
+          )
         }
       }
 
