@@ -1,5 +1,7 @@
-import { isCuid } from '@bugsnag/cuid'
+import cuid from '@bugsnag/cuid'
 import { isPersistedProbability } from './validation'
+
+const { isCuid } = cuid
 
 export interface PersistedProbability {
   value: number

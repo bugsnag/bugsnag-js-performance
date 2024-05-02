@@ -1,12 +1,12 @@
-import { createNoopClient } from '../lib/core'
-import { type BackgroundingListener } from '../lib/backgrounding-listener'
-import { DefaultSpanContextStorage } from '../lib/span-context'
 import {
   ControllableBackgroundingListener,
-  createTestClient,
   InMemoryDelivery,
-  VALID_API_KEY
+  VALID_API_KEY,
+  createTestClient
 } from '@bugsnag/js-performance-test-utilities'
+import { type BackgroundingListener } from '../lib/backgrounding-listener'
+import { createNoopClient } from '../lib/core'
+import { DefaultSpanContextStorage } from '../lib/span-context'
 
 jest.useFakeTimers()
 
@@ -18,6 +18,7 @@ describe('Core', () => {
       expect(client).toStrictEqual({
         start: expect.any(Function),
         startSpan: expect.any(Function),
+        startNetworkSpan: expect.any(Function),
         currentSpanContext: undefined,
         getPlugin: expect.any(Function)
       })
@@ -293,6 +294,40 @@ describe('Core', () => {
           const plugin = client.getPlugin(AnotherPlugin)
 
           expect(plugin).toBeUndefined()
+        })
+      })
+
+      describe('startNetworkSpan', () => {
+        it('creates a network span', async () => {
+          const delivery = new InMemoryDelivery()
+          const client = createTestClient({ deliveryFactory: () => delivery })
+
+          client.start(VALID_API_KEY)
+
+          const span = client.startNetworkSpan({
+            method: 'GET',
+            url: 'https://example.com'
+          })
+
+          span.end({ status: 200 })
+
+          await jest.runOnlyPendingTimersAsync()
+
+          expect(delivery).toHaveSentSpan(expect.objectContaining({
+            name: '[HTTP/GET]',
+            kind: 3,
+            events: [],
+            spanId: 'a random 64 bit string',
+            traceId: 'a random 128 bit string',
+            startTimeUnixNano: expect.any(String),
+            endTimeUnixNano: expect.any(String)
+          }))
+
+          const deliveredSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+          expect(deliveredSpan).toHaveAttribute('bugsnag.span.category', 'network')
+          expect(deliveredSpan).toHaveAttribute('http.method', 'GET')
+          expect(deliveredSpan).toHaveAttribute('http.url', 'https://example.com')
+          expect(deliveredSpan).toHaveAttribute('http.status_code', 200)
         })
       })
     })

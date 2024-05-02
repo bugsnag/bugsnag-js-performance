@@ -4,6 +4,7 @@ import { AppRegistry } from 'react-native'
 import * as Scenarios from '../scenarios'
 import { getCurrentCommand } from './CommandRunner'
 import { clearPersistedState, setDeviceId, setSamplingProbability } from './Persistence'
+import { ScenarioContext } from './ScenarioContext' 
 
 const isTurboModuleEnabled = () => global.__turboModuleProxy != null
 
@@ -51,8 +52,17 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
       appParams.fabric = true
       appParams.initialProps = { concurrentRoot: true }
     }
+
+    const reflectEndpoint = endpoint.replace('traces', 'reflect')
+
+    console.error(`[BugsnagPerformance] Reflect endpoint: ${reflectEndpoint}`)
+
+    const Scenario = () => 
+    <ScenarioContext.Provider value={{ reflectEndpoint }}>
+      <scenario.App />
+    </ScenarioContext.Provider>
   
-    AppRegistry.registerComponent(scenarioName, () => scenario.App)
+    AppRegistry.registerComponent(scenarioName, () => Scenario)
     AppRegistry.runApplication(scenarioName, appParams)
   }
 }
