@@ -760,10 +760,10 @@ describe('FullPageLoadPlugin', () => {
 
   describe('when the page contains a traceparent html meta tag', () => {
     it('sets the parent context based on the values parsed from the traceparent', async () => {
-      const meta = document.createElement('meta');
-      meta.name = 'traceparent';
-      meta.content = '00-d2b0a64e3730b6ca065236508b85e069-6647406222c42487-01';
-      document.head.append(meta);
+      const meta = document.createElement('meta')
+      meta.name = 'traceparent'
+      meta.content = '00-d2b0a64e3730b6ca065236508b85e069-6647406222c42487-01'
+      document.head.append(meta)
 
       const clock = new IncrementingClock()
       const delivery = new InMemoryDelivery()

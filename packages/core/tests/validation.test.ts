@@ -221,7 +221,7 @@ describe('validation', () => {
     it('passes with valid ParentContext type', () => {
       const parentContext = {
         id: '1234',
-        traceId: '5678',
+        traceId: '5678'
       }
 
       expect(validation.isParentContext(parentContext)).toBe(true)
