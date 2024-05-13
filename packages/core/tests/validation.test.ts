@@ -203,6 +203,31 @@ describe('validation', () => {
     })
   })
 
+  describe('isParentContext', () => {
+    it.each(nonObjects)('fails validation with $type', ({ value }) => {
+      expect(validation.isParentContext(value)).toBe(false)
+    })
+
+    const invalidParentContexts: any[] = [
+      { id: 1234, traceId: '5678' },
+      { id: '1234', traceId: 5678 },
+      { id: 1234, traceId: 5678 }
+    ]
+
+    it.each(invalidParentContexts)('fails validation with %s', (value) => {
+      expect(validation.isParentContext(value)).toBe(false)
+    })
+
+    it('passes with valid ParentContext type', () => {
+      const parentContext = {
+        id: '1234',
+        traceId: '5678',
+      }
+
+      expect(validation.isParentContext(parentContext)).toBe(true)
+    })
+  })
+
   describe('isTime', () => {
     it.each([-1, 0, 1, 10000, new Date().getTime(), performance.now(), new Date()])('passes validation with %s', (value) => {
       expect(validation.isTime(value)).toBe(true)
