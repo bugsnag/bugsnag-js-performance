@@ -805,7 +805,6 @@ describe('FullPageLoadPlugin', () => {
       }
 
       expect(spanContextEquals(pageLoadSpanContext, testClient.currentSpanContext)).toBe(true)
-      // expect( testClient.currentSpanContext.parentSpanId).toBe('6647406222c42487')
 
       // trigger the onsettle to end the page load span
       await jest.runOnlyPendingTimersAsync()
