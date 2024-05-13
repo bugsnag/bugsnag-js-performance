@@ -818,5 +818,65 @@ describe('FullPageLoadPlugin', () => {
 
       meta.remove()
     })
+
+    it('ignores malformed traceparent values', async () => {
+      const meta = document.createElement('meta')
+      meta.name = 'traceparent'
+      meta.content = 'not a valid traceparent value'
+      document.head.append(meta)
+
+      const clock = new IncrementingClock()
+      const delivery = new InMemoryDelivery()
+      const onSettle: OnSettle = (onSettleCallback) => {
+        Promise.resolve().then(() => { onSettleCallback(1234) })
+      }
+      const performance = new PerformanceFake()
+      const manager = new PerformanceObserverManager()
+      const Observer = manager.createPerformanceObserverFakeClass()
+      const webVitals = new WebVitals(performance, clock, Observer)
+      const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
+        idGenerator: new IncrementingIdGenerator(),
+        schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+        deliveryFactory: () => delivery,
+        plugins: (spanFactory) => [
+          new FullPageLoadPlugin(
+            document,
+            window.location,
+            spanFactory,
+            webVitals,
+            onSettle,
+            new ControllableBackgroundingListener(),
+            performance
+          )
+        ]
+      })
+
+      // the page load span should be started when we call start
+      testClient.start({ apiKey: VALID_API_KEY })
+      expect(testClient.currentSpanContext).not.toBeUndefined()
+
+      // we're using the incrementing ID generator so the page load span should have an ID and trace ID of 1
+      const pageLoadSpanContext = {
+        id: 'span ID 1',
+        traceId: 'trace ID 1',
+        parentSpanId: undefined,
+        isValid: () => true,
+        samplingRate: 0.1
+      }
+
+      expect(spanContextEquals(pageLoadSpanContext, testClient.currentSpanContext)).toBe(true)
+
+      // trigger the onsettle to end the page load span
+      await jest.runOnlyPendingTimersAsync()
+
+      expect(delivery).toHaveSentSpan(expect.objectContaining({
+        name: '[FullPageLoad]/initial-route',
+        spanId: 'span ID 1',
+        traceId: 'trace ID 1',
+        parentSpanId: undefined
+      }))
+
+      meta.remove()
+    })
   })
 })
