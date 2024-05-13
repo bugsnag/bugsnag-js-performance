@@ -4,8 +4,9 @@ import { type BackgroundingListener } from './backgrounding-listener'
 import { BatchProcessor } from './batch-processor'
 import { type Clock } from './clock'
 import { validateConfig, type Configuration, type CoreSchema } from './config'
-import { type DeliveryFactory, TracePayloadEncoder } from './delivery'
+import { TracePayloadEncoder, type DeliveryFactory } from './delivery'
 import { type IdGenerator } from './id-generator'
+import { type NetworkSpan, type NetworkSpanEndOptions, type NetworkSpanOptions } from './network-span'
 import { type Persistence } from './persistence'
 import { type Plugin } from './plugin'
 import ProbabilityFetcher from './probability-fetcher'
@@ -16,12 +17,14 @@ import Sampler from './sampler'
 import { type Span, type SpanOptions } from './span'
 import { DefaultSpanContextStorage, type SpanContext, type SpanContextStorage } from './span-context'
 import { SpanFactory } from './span-factory'
+import { timeToNumber } from './time'
 
 interface Constructor<T> { new(): T, prototype: T }
 
 export interface Client<C extends Configuration> {
   start: (config: C | string) => void
   startSpan: (name: string, options?: SpanOptions) => Span
+  startNetworkSpan: (options: NetworkSpanOptions) => NetworkSpan
   readonly currentSpanContext: SpanContext | undefined
   getPlugin: <T extends Plugin<C>> (Constructor: Constructor<T>) => T | undefined
 }
@@ -113,6 +116,25 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       const span = spanFactory.startSpan(cleanOptions.name, cleanOptions.options)
       span.setAttribute('bugsnag.span.category', 'custom')
       return spanFactory.toPublicApi(span)
+    },
+    startNetworkSpan: (networkSpanOptions: NetworkSpanOptions) => {
+      const spanInternal = spanFactory.startNetworkSpan(networkSpanOptions)
+      const span = spanFactory.toPublicApi(spanInternal)
+
+      // Overwrite end method to set status code attribute
+      // once we release the setAttribute API we can simply return the span
+      const networkSpan: NetworkSpan = {
+        ...span,
+        end: (endOptions: NetworkSpanEndOptions) => {
+          spanFactory.endSpan(
+            spanInternal,
+            timeToNumber(options.clock, endOptions.endTime),
+            { 'http.status_code': endOptions.status }
+          )
+        }
+      }
+
+      return networkSpan
     },
     getPlugin: (Constructor) => {
       for (const plugin of plugins) {
