@@ -112,5 +112,7 @@ Feature: Page Load spans
         Given I navigate to the test URL "/traceparent-meta"
         And I wait to receive 1 trace
 
-        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.11.parentSpanId" equals "6647406222c42487"
-        Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.11.traceId" equals "d2b0a64e3730b6ca065236508b85e069"
+        Then a span named "[FullPageLoad]/traceparent-meta/" has the following properties:
+            | property          | value                            |
+            | parentSpanId      | 6647406222c42487                 |
+            | traceId           | d2b0a64e3730b6ca065236508b85e069 |
