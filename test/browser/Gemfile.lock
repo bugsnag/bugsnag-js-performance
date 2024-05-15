@@ -10,7 +10,7 @@ GEM
       selenium-webdriver (~> 4.2, < 4.6)
     bugsnag (6.26.3)
       concurrent-ruby (~> 1.0)
-    bugsnag-maze-runner (9.3.0)
+    bugsnag-maze-runner (9.9.0)
       appium_lib (~> 12.0.0)
       appium_lib_core (~> 5.4.0)
       bugsnag (~> 6.24)

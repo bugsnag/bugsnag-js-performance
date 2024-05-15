@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- (browser) Set parent span context for full page load spans based on traceparent meta tag, if present [#446](https://github.com/bugsnag/bugsnag-js-performance/pull/446)
+
 ## [v2.5.0] (2024-05-02)
 
 ### Added

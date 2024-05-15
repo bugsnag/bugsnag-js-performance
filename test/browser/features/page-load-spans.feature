@@ -107,3 +107,12 @@ Feature: Page Load spans
         Then a span named "[FullPageLoad]/network-span-control/" does not contain the attribute "bugsnag.browser.page.title"
         And a span named "[FullPageLoad]/network-span-control/" does not contain the attribute "bugsnag.browser.page.url"
         And a span named "[FullPageLoad]/network-span-control/" does not contain the attribute "bugsnag.browser.page.referrer"
+
+    Scenario: Page load spans inherit parent context from traceparent meta tag if present
+        Given I navigate to the test URL "/traceparent-meta"
+        And I wait to receive 1 trace
+
+        Then a span named "[FullPageLoad]/traceparent-meta/" has the following properties:
+            | property          | value                            |
+            | parentSpanId      | 6647406222c42487                 |
+            | traceId           | d2b0a64e3730b6ca065236508b85e069 |
