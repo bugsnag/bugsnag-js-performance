@@ -1,6 +1,6 @@
 FROM node:18-alpine as license-finder
 
-RUN apk update && apk add ruby
+RUN apk update && apk add ruby ruby-dev
 
 RUN gem install license_finder
 
