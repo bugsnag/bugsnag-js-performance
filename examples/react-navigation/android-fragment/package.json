@@ -8,8 +8,8 @@
         "postinstall": "patch-package"
     },
     "dependencies": {
-        "@bugsnag/react-native-performance": "^2.5.0",
-        "@bugsnag/plugin-react-navigation-performance": "^2.5.0",
+        "@bugsnag/react-native-performance": "file:../../../packages/platforms/react-native",
+        "@bugsnag/plugin-react-navigation-performance": "file:../../../packages/plugin-react-navigation",
         "@react-native-community/netinfo": "^11.3.1",
         "@react-navigation/native": "^6.1.17",
         "@react-navigation/native-stack": "^6.9.26",
