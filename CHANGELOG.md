@@ -1,10 +1,14 @@
 # Changelog
 
-## Unreleased
+## [Unreleased]
 
 ### Added
 
 - (browser) Set parent span context for full page load spans based on traceparent meta tag, if present [#446](https://github.com/bugsnag/bugsnag-js-performance/pull/446)
+
+### Fixed
+
+- (plugin-react-navigation) Fix an issue where a navigation span could inherit the end time of the last span [#457](https://github.com/bugsnag/bugsnag-js-performance/pull/457)
 
 ## [v2.5.0] (2024-05-02)
 
