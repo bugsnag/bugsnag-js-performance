@@ -1,6 +1,16 @@
 import { type Plugin } from './plugin'
 import { isLogger, isNumber, isObject, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
 
+interface BugsnagErrorEvent {
+  addMetadata: (tabName: string, data: Record<string, any>) => void
+}
+
+type BugsnagErrorCallback = (event: BugsnagErrorEvent) => void
+
+interface BugsnagErrorStatic {
+  addOnError: (fn: BugsnagErrorCallback) => void
+}
+
 export interface Logger {
   debug: (message: string) => void
   info: (message: string) => void
@@ -16,6 +26,7 @@ export interface Configuration {
   appVersion?: string
   enabledReleaseStages?: string[] | null
   plugins?: Array<Plugin<Configuration>>
+  bugsnag?: BugsnagErrorStatic
 }
 
 export interface TestConfiguration {
@@ -42,6 +53,7 @@ export interface CoreSchema extends Schema {
   appVersion: ConfigOption<string>
   enabledReleaseStages: ConfigOption<string[] | null>
   plugins: ConfigOption<Array<Plugin<Configuration>>>
+  bugsnag: ConfigOption<BugsnagErrorStatic | undefined>
 }
 
 export const schema: CoreSchema = {
@@ -84,6 +96,11 @@ export const schema: CoreSchema = {
     defaultValue: [],
     message: 'should be an array of plugin objects',
     validate: isPluginArray
+  },
+  bugsnag: {
+    defaultValue: undefined,
+    message: 'should be an instance of Bugsnag',
+    validate: (value: unknown): value is BugsnagErrorStatic => isObject(value) && typeof value.addOnError === 'function'
   }
 }
 
