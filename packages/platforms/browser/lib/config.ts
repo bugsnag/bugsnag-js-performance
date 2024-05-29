@@ -6,8 +6,8 @@ import {
   type Configuration,
   type CoreSchema
 } from '@bugsnag/core-performance'
-import { type NetworkRequestCallback, defaultNetworkRequestCallback, isNetworkRequestCallback } from '@bugsnag/request-tracker-performance'
-import { type BrowserNetworkRequestInfo } from './auto-instrumentation'
+import { defaultNetworkRequestCallback, isNetworkRequestCallback, type NetworkRequestCallback } from '@bugsnag/request-tracker-performance'
+import type { BrowserNetworkRequestInfo } from './auto-instrumentation'
 import { isRoutingProvider, type RoutingProvider } from './routing-provider'
 import { defaultSendPageAttributes, isSendPageAttributes, type SendPageAttributes } from './send-page-attributes'
 
