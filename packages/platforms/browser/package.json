@@ -26,6 +26,9 @@
     "@bugsnag/delivery-fetch-performance": "^2.6.0",
     "@bugsnag/request-tracker-performance": "^2.6.0"
   },
+  "devDependencies": {
+    "@bugsnag/browser": "^7.0.0"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
