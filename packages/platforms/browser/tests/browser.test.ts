@@ -6,6 +6,7 @@
 import { VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 import { type BrowserConfiguration } from '../lib/config'
 import { type Client } from '@bugsnag/core-performance'
+import Bugsnag from '@bugsnag/browser'
 
 const emptySamplingRequest = {
   body: '{"resourceSpans":[]}',
@@ -145,6 +146,58 @@ describe('Browser client integration tests', () => {
       expect(mockFetch.mock.calls[2][1]).toEqual(expect.objectContaining({
         headers: expect.objectContaining({ 'Bugsnag-Span-Sampling': '0.999999:100' })
       }))
+    })
+  })
+
+  describe('Error Correlation', () => {
+    it('adds correlation metadata to error reports', async () => {
+      jest.spyOn(console, 'debug').mockImplementation(() => {})
+
+      const errorClient = Bugsnag.start({
+        apiKey: VALID_API_KEY,
+        autoTrackSessions: false,
+        endpoints: {
+          notify: '/test',
+          sessions: '/test'
+        }
+      })
+
+      const sendEvent = jest.fn()
+
+      // @ts-expect-error _delivery api is hidden from the public API
+      errorClient._delivery = {
+        sendSession: jest.fn(),
+        sendEvent
+      }
+
+      client.start({
+        apiKey: VALID_API_KEY,
+        endpoint: '/test',
+        autoInstrumentFullPageLoads: false,
+        autoInstrumentNetworkRequests: false,
+        autoInstrumentRouteChanges: false,
+        bugsnag: Bugsnag
+      })
+
+      await jest.runOnlyPendingTimersAsync()
+      expect(mockFetch).toHaveBeenCalledTimes(1)
+      expect(mockFetch).toHaveBeenCalledWith('/test', emptySamplingRequest)
+
+      const span = client.startSpan('test span')
+
+      Bugsnag.notify(new Error('test error'))
+
+      expect(sendEvent).toHaveBeenCalledTimes(1)
+      expect(sendEvent.mock.calls[0][0].events[0]._metadata).toEqual({
+        correlation: {
+          traceid: span.traceId,
+          spanid: span.id
+        }
+      })
+
+      span.end()
+
+      await jest.runOnlyPendingTimersAsync()
     })
   })
 })
