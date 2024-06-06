@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/request-tracker-performance",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "description": "BugSnag performance request tracker for monitoring XHR and fetch requests",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "dependencies": {
-    "@bugsnag/core-performance": "^2.5.0"
+    "@bugsnag/core-performance": "^2.6.0"
   },
   "type": "module",
   "main": "dist/index.js",
