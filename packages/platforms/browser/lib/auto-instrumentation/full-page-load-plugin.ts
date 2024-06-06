@@ -1,4 +1,5 @@
 import {
+  type ParentContext,
   type BackgroundingListener,
   type InternalConfiguration,
   type Plugin,
@@ -54,7 +55,21 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
       return
     }
 
-    const span = this.spanFactory.startSpan('[FullPageLoad]', { startTime: 0, parentContext: null })
+    let parentContext: ParentContext | null = null
+
+    const traceparentMetaTag = document.querySelector('meta[name="traceparent"]')
+    if (traceparentMetaTag !== null && traceparentMetaTag.getAttribute('content')) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const traceparent = traceparentMetaTag.getAttribute('content')!
+      const [, traceId, parentSpanId] = traceparent.split('-')
+
+      parentContext = {
+        traceId,
+        id: parentSpanId
+      }
+    }
+
+    const span = this.spanFactory.startSpan('[FullPageLoad]', { startTime: 0, parentContext })
     const permittedAttributes = getPermittedAttributes(configuration.sendPageAttributes)
     const url = new URL(this.location.href)
 

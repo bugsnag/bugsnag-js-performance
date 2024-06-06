@@ -9,7 +9,7 @@ import { type ReadonlySampler } from './sampler'
 import { SpanInternal, coreSpanOptionSchema, type InternalSpanOptions, type Span, type SpanOptionSchema, type SpanOptions } from './span'
 import { type SpanContextStorage } from './span-context'
 import { timeToNumber } from './time'
-import { isObject, isSpanContext } from './validation'
+import { isObject, isParentContext } from './validation'
 
 export const DISCARD_END_TIME = -1
 
@@ -61,7 +61,7 @@ export class SpanFactory <C extends Configuration> {
     // if the parentContext option is not set use the current context
     // if parentContext is explicitly null, or there is no current context,
     // we are starting a new root span
-    const parentContext = isSpanContext(options.parentContext) || options.parentContext === null
+    const parentContext = isParentContext(options.parentContext) || options.parentContext === null
       ? options.parentContext
       : this.spanContextStorage.current
 

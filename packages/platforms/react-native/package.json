@@ -23,7 +23,6 @@
   "devDependencies": {
     "@react-native-community/netinfo": "^9.4.1",
     "@types/react": "^18.2.24",
-    "babel-preset-react-native": "^4.0.1",
     "metro-react-native-babel-preset": "^0.77.0",
     "react-native-file-access": "^3.0.4"
   },

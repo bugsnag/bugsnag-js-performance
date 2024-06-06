@@ -13,46 +13,31 @@ interface Props extends PropsWithChildren {
   spanFactory: SpanFactory<ReactNativeConfiguration>
 }
 
-interface State {
-  componentsLoading: number
-  previousRoute?: string
-  lastRenderTime: number
-}
-
 type EndCondition = 'condition' | 'mount' | 'unmount' | 'immediate'
 
 const DISCARDED = -1
 
-export class NavigationContextProvider extends React.Component<Props, State> {
+export class NavigationContextProvider extends React.Component<Props> {
   private currentSpan?: SpanInternal
   private timerRef?: NodeJS.Timeout
   private endCondition: EndCondition = 'immediate'
-
-  state = {
-    previousRoute: undefined,
-    componentsLoading: 0,
-    lastRenderTime: 0
-  }
+  private previousRoute?: string
+  private lastRenderTime = 0
+  private componentsLoading = 0
 
   blockNavigationEnd = () => {
-    this.setState(prevState => ({
-      ...prevState,
-      componentsLoading: prevState.componentsLoading + 1,
-      lastRenderTime: 0
-    }))
+    this.lastRenderTime = 0
+    this.componentsLoading = this.componentsLoading + 1
   }
 
-  unblockNavigationEnd = (condition: EndCondition) => {
-    this.setState(prevState => ({
-      ...prevState,
-      componentsLoading: Math.max(prevState.componentsLoading - 1, 0),
-      lastRenderTime: performance.now()
-    }), () => {
-      if (this.state.componentsLoading === 0) {
-        this.endCondition = condition
-        this.triggerNavigationEnd()
-      }
-    })
+  unblockNavigationEnd = (endCondition: EndCondition) => {
+    this.lastRenderTime = performance.now()
+    this.componentsLoading = Math.max(this.componentsLoading - 1, 0)
+
+    if (this.componentsLoading === 0) {
+      this.endCondition = endCondition
+      this.triggerNavigationEnd()
+    }
   }
 
   triggerNavigationEnd = () => {
@@ -62,16 +47,20 @@ export class NavigationContextProvider extends React.Component<Props, State> {
     const triggerNavigationEndTime = performance.now()
 
     this.timerRef = setTimeout(() => {
-      if (this.state.componentsLoading === 0 && this.currentSpan) {
+      if (this.componentsLoading === 0 && this.currentSpan) {
         this.currentSpan.setAttribute('bugsnag.navigation.ended_by', this.endCondition)
-        const endTime = this.state.lastRenderTime === 0 ? triggerNavigationEndTime : this.state.lastRenderTime
+        const endTime = Math.max(this.lastRenderTime, triggerNavigationEndTime)
         this.props.spanFactory.endSpan(this.currentSpan, endTime)
+
         this.currentSpan = undefined
+        this.lastRenderTime = 0
       }
     }, 100)
   }
 
   componentDidUpdate (prevProps: Props) {
+    const updateTime = performance.now()
+
     const { currentRoute, spanFactory } = this.props
 
     if (currentRoute && currentRoute !== prevProps.currentRoute) {
@@ -82,24 +71,21 @@ export class NavigationContextProvider extends React.Component<Props, State> {
       }
 
       const span = spanFactory.startSpan(`[Navigation]${currentRoute}`, {
-        isFirstClass: true
+        isFirstClass: true,
+        startTime: updateTime
       })
 
       span.setAttribute('bugsnag.span.category', 'navigation')
       span.setAttribute('bugsnag.navigation.route', currentRoute)
       span.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-navigation-performance')
 
-      if (this.state.previousRoute) {
-        span.setAttribute('bugsnag.navigation.previous_route', this.state.previousRoute)
+      if (this.previousRoute) {
+        span.setAttribute('bugsnag.navigation.previous_route', this.previousRoute)
       }
 
       this.currentSpan = span
       this.endCondition = 'immediate'
-
-      this.setState(prevState => ({
-        ...prevState,
-        previousRoute: currentRoute
-      }))
+      this.previousRoute = currentRoute
 
       setTimeout(() => {
         this.triggerNavigationEnd()

@@ -6,7 +6,13 @@ import React, { useContext } from 'react'
 import { Button, View } from 'react-native'
 import { NavigationContext, NavigationContextProvider } from '../lib/navigation-context'
 
-jest.useFakeTimers()
+beforeEach(() => {
+  jest.useFakeTimers()
+})
+
+afterEach(() => {
+  jest.useRealTimers()
+})
 
 describe('NavigationContextProvider', () => {
   it('Creates a navigation span when the currentRoute changes', () => {
@@ -18,7 +24,7 @@ describe('NavigationContextProvider', () => {
 
     // Route change should create a navigation span
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
 
     // Await the navigation span to end
     jest.advanceTimersByTime(100)
@@ -27,6 +33,8 @@ describe('NavigationContextProvider', () => {
     // Navigation span has expected attributes
     const span = spanFactory.createdSpans[0]
     expect(span.name).toEqual('[Navigation]route-1')
+    expect(span.startTime).toEqual(0)
+    expect(span.endTime).toEqual(0)
     expect(span).toHaveAttribute('bugsnag.span.category', 'navigation')
     expect(span).toHaveAttribute('bugsnag.span.first_class', true)
     expect(span).toHaveAttribute('bugsnag.navigation.route', 'route-1')
@@ -42,7 +50,7 @@ describe('NavigationContextProvider', () => {
     fireEvent.press(screen.getByText('Change to route 1'))
     fireEvent.press(screen.getByText('Block Navigation'))
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(1)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
 
     // Navigation span should not end after timeout
     jest.advanceTimersByTime(100)
@@ -51,7 +59,7 @@ describe('NavigationContextProvider', () => {
     // Change to a second route while the first navigation span is still open
     fireEvent.press(screen.getByText('Change to route 2'))
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(2)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-2', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-2', { isFirstClass: true, startTime: 100 })
 
     // End the navigation
     fireEvent.press(screen.getByText('Unblock Navigation'))
@@ -76,7 +84,7 @@ describe('NavigationContextProvider', () => {
 
     // Start a navigation
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
 
     // Prevent navigation from ending
     fireEvent.press(screen.getByText('Block Navigation'))
@@ -103,7 +111,7 @@ describe('NavigationContextProvider', () => {
 
     // Start a navigation
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
 
     // Block navigation from completing
     fireEvent.press(screen.getByText('Block Navigation'))
@@ -120,6 +128,44 @@ describe('NavigationContextProvider', () => {
     fireEvent.press(screen.getByText('Unblock Navigation'))
     jest.advanceTimersByTime(100)
     expect(spanFactory.endSpan).toHaveBeenCalled()
+  })
+
+  it('resets the lastRenderTime when a navigation span ends', () => {
+    jest.useFakeTimers()
+
+    const spanFactory = new MockSpanFactory()
+    render(<App spanFactory={spanFactory} />)
+
+    // start navigation
+    fireEvent.press(screen.getByText('Change to route 1'))
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
+
+    // lastRenderTime should be set to 2
+
+    // block navigation to prevent current span ending
+    fireEvent.press(screen.getByText('Block Navigation'))
+    jest.advanceTimersByTime(100)
+
+    // unblock navigation to end current span with specific end time and condition
+    fireEvent.press(screen.getByText('Unblock Navigation'))
+    jest.advanceTimersByTime(100)
+
+    // check delivered span
+    expect(spanFactory.endSpan).toHaveBeenCalled()
+    expect(spanFactory.createdSpans[0].startTime).toEqual(0)
+    expect(spanFactory.createdSpans[0].endTime).toEqual(100)
+    expect(spanFactory.createdSpans[0]).toHaveAttribute('bugsnag.navigation.ended_by', 'condition')
+
+    // start second navigation
+    fireEvent.press(screen.getByText('Change to route 2'))
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-2', { isFirstClass: true, startTime: 200 })
+    jest.advanceTimersByTime(100)
+
+    // check delivered span
+    expect(spanFactory.endSpan).toHaveBeenCalledTimes(2)
+    expect(spanFactory.createdSpans[1].startTime).toEqual(200)
+    expect(spanFactory.createdSpans[1].endTime).toEqual(200) // Why isn't this 201?
+    expect(spanFactory.createdSpans[1]).toHaveAttribute('bugsnag.navigation.ended_by', 'immediate')
   })
 })
 
