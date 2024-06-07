@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">React Navigation Android Fragment</string>
+    <string name="title_home">Android</string>
+    <string name="title_react_native">React Native</string>
+</resources>
