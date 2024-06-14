@@ -188,11 +188,9 @@ describe('Browser client integration tests', () => {
       Bugsnag.notify(new Error('test error'))
 
       expect(sendEvent).toHaveBeenCalledTimes(1)
-      expect(sendEvent.mock.calls[0][0].events[0]._metadata).toEqual({
-        correlation: {
-          traceid: span.traceId,
-          spanid: span.id
-        }
+      expect(sendEvent.mock.calls[0][0].events[0]._correlation).toEqual({
+        traceId: span.traceId,
+        spanId: span.id
       })
 
       span.end()

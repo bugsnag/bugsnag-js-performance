@@ -72,11 +72,8 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         configuration.bugsnag.addOnError((event) => {
           const currentSpanContext = spanContextStorage.current
 
-          if (currentSpanContext) {
-            event.addMetadata('correlation', {
-              traceid: currentSpanContext.traceId,
-              spanid: currentSpanContext.id
-            })
+          if (currentSpanContext && event.setTraceCorrelation) {
+            event.setTraceCorrelation(currentSpanContext.traceId, currentSpanContext.id)
           }
         })
       }

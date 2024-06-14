@@ -2,7 +2,7 @@ import { type Plugin } from './plugin'
 import { isLogger, isNumber, isObject, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
 
 interface BugsnagErrorEvent {
-  addMetadata: (tabName: string, data: Record<string, any>) => void
+  setTraceCorrelation: (traceId: string, spanId: string) => void
 }
 
 type BugsnagErrorCallback = (event: BugsnagErrorEvent) => void
