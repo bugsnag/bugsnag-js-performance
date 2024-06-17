@@ -2,7 +2,7 @@ import { type Plugin } from './plugin'
 import { isLogger, isNumber, isObject, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
 
 interface BugsnagErrorEvent {
-  setTraceCorrelation: (traceId: string, spanId: string) => void
+  setTraceCorrelation?: (traceId: string, spanId: string) => void
 }
 
 type BugsnagErrorCallback = (event: BugsnagErrorEvent) => void
