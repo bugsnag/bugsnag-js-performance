@@ -32,7 +32,7 @@ export const createNavigationContainer: CreateNavigationContainer = (NavigationC
       }
 
       if (typeof onStateChange === 'function') {
-        onStateChange.apply(undefined, args)
+        onStateChange.apply(this, args)
       }
     }
 
