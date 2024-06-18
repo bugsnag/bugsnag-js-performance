@@ -18,6 +18,7 @@ BugsnagPerformance.start({
 })
 
 let span
+let nestedSpan
 
 document.getElementById('start-span').onclick = () => {
   span = BugsnagPerformance.startSpan("Custom/ErrorCorrelationScenario")
@@ -25,6 +26,14 @@ document.getElementById('start-span').onclick = () => {
 
 document.getElementById('end-span').onclick = () => {
   span.end()
+}
+
+document.getElementById('start-nested-span').onclick = () => {
+  nestedSpan = BugsnagPerformance.startSpan("Custom/ChildSpan", { makeCurrentContext: false })
+}
+
+document.getElementById('end-nested-span').onclick = () => {
+  nestedSpan.end()
 }
 
 document.getElementById('send-error').onclick = () => {
