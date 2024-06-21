@@ -13,6 +13,7 @@
   },
   "peerDependencies": {
     "@bugsnag/react-native": "^7.25.0-alpha.0",
+    "@bugsnag/react-native-cli": "^7.23.0",
     "@react-navigation/native": "*",
     "@react-navigation/native-stack": "*",
     "react": "*",

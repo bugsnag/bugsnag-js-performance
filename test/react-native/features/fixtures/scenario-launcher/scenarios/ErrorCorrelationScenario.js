@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react'
 import { Text, View } from 'react-native'
 import { getCurrentCommand } from '../lib/CommandRunner'
 
+Bugsnag.start()
+
 export const config = {
   appVersion: '1.2.3',
   maximumBatchSize: 1,
