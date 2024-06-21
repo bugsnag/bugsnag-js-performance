@@ -8,6 +8,7 @@ Bugsnag.start()
 
 export const config = {
   appVersion: '1.2.3',
+  bugsnag: Bugsnag,
   maximumBatchSize: 1,
   autoInstrumentAppStarts: false
 }
