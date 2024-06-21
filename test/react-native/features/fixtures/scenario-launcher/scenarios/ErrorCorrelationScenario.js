@@ -1,6 +1,6 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 import Bugsnag from '@bugsnag/react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Text, View } from 'react-native'
 import { getCurrentCommand } from '../lib/CommandRunner'
 
