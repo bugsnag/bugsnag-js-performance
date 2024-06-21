@@ -180,7 +180,7 @@ if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
     
   // Install Bugsnag using CLI script
   fs.copyFileSync(resolve(ROOT_DIR, 'bin', 'rn-cli-init-ios.sh'), resolve(fixtureDir, 'rn-cli-init-ios.sh'))
-  execFileSync(`rn-cli-init-ios`, [fixtureDir, rnVersion], { cwd: fixtureDir, stdio: 'inherit' })
+  execFileSync(`./rn-cli-init-ios.sh`, [fixtureDir, rnVersion], { cwd: fixtureDir, stdio: 'inherit' })
 
   // install pods
   execFileSync('pod', ['install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
