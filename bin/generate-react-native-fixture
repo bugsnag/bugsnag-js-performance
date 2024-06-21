@@ -158,13 +158,29 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 }
 
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
+  if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
+    // If we're building with the new architecture, replace the gradle.properties file
+    fs.copyFileSync( 
+      resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/newarch.gradle.properties'),
+      resolve(fixtureDir, 'android/gradle.properties')
+    )
+  }
+
+  // Install Bugsnag using CLI script
+  fs.copyFileSync(resolve(ROOT_DIR, 'bin', 'rn-cli-init-android.sh'), resolve(fixtureDir, 'rn-cli-init-android.sh'))
+  execFileSync(`./rn-cli-init-android.sh`, [fixtureDir, rnVersion], { cwd: fixtureDir, stdio: 'inherit' })
+  
   // build the android app
   execFileSync('./gradlew', ['assembleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
   fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
-}
-
-if(process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
+} 
+  
+if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
   fs.rmSync(`${fixtureDir}/reactnative.xcarchive`, { recursive: true, force: true })
+    
+  // Install Bugsnag using CLI script
+  fs.copyFileSync(resolve(ROOT_DIR, 'bin', 'rn-cli-init-ios.sh'), resolve(fixtureDir, 'rn-cli-init-ios.sh'))
+  execFileSync(`rn-cli-init-ios`, [fixtureDir, rnVersion], { cwd: fixtureDir, stdio: 'inherit' })
 
   // install pods
   execFileSync('pod', ['install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
