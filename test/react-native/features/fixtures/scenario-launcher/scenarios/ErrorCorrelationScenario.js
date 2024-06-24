@@ -36,7 +36,9 @@ export function App () {
             setId(id => id + 1)
             break
         case 'send-error':
+            console.log("[BugsnagPerformance] ErrorCorrelationScenario sending error")
             Bugsnag.notify(new Error(`ErrorCorrelationScenario`))
+            setId(id => id + 1)
             break
         default:
             throw new Error(`Unknown command: ${JSON.stringify(command)}`)
