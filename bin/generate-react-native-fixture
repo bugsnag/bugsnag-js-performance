@@ -3,6 +3,7 @@
 const { execFileSync, execSync } = require('child_process')
 const { resolve } = require('path')
 const fs = require('fs')
+const { removeAndroid } = require('./remove-bugsnag-start')
 
 if (!process.env.RN_VERSION) {
   console.error('Please provide a React Native version')
@@ -97,6 +98,12 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     resolve(fixtureDir, 'android/app/src/main/AndroidManifest.xml')
   )
 
+  // copy the bugsnag notifier config reader
+  fs.copyFileSync(
+    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/ConfigFileReader.kt'),
+    resolve(fixtureDir, 'android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/ConfigFileReader.kt')
+  )
+
   // replace the Info.plist file with our own
   fs.copyFileSync(
     resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/Info.plist'),
@@ -169,6 +176,9 @@ if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
   // Install Bugsnag using CLI script
   fs.copyFileSync(resolve(ROOT_DIR, 'bin', 'rn-cli-init-android.sh'), resolve(fixtureDir, 'rn-cli-init-android.sh'))
   execFileSync(`./rn-cli-init-android.sh`, [fixtureDir, rnVersion], { cwd: fixtureDir, stdio: 'inherit' })
+
+  // Remove the bugnsnag start code added by react-native-cli
+  removeAndroid(fixtureDir)
   
   // build the android app
   execFileSync('./gradlew', ['assembleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
