@@ -43,7 +43,6 @@ const PACKAGE_DIRECTORIES = [
 
 const DEPENDENCIES = [
   '@react-native-community/netinfo',
-  'glob',
   'react-native-dotenv',
   'react-native-file-access@3.0.4' // Why this version specifically?
 ]
