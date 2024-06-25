@@ -3,7 +3,7 @@
 const { execFileSync, execSync } = require('child_process')
 const { resolve } = require('path')
 const fs = require('fs')
-const { removeAndroid } = require('./remove-bugsnag-start')
+const { removeAndroid } = require('./rn-modify-source')
 
 if (!process.env.RN_VERSION) {
   console.error('Please provide a React Native version')
