@@ -1,11 +1,7 @@
 #!/usr/bin/env node
 
-const { promises: fs } = require('fs')
-const glob = require('glob')
+const { promises: fs } = require('node:fs')
 const path = require('path')
-const { promisify } = require('util')
-
-const asyncGlob = promisify(glob)
 
 const BUGSNAG_COCOA_IMPORT = '#import <Bugsnag/Bugsnag.h>'
 const BUGSNAG_COCOA_INIT = '[Bugsnag start];'
@@ -87,11 +83,11 @@ async function removeAndroid(projectRoot) {
   let mainApplicationPath
   try {
     const javaDir = path.join(projectRoot, 'android', 'app', 'src', 'main', 'java')
-    const relativeMainApplicationPathJava = (await asyncGlob('**/*/MainApplication.java', {
+    const relativeMainApplicationPathJava = (await fs.glob('**/*/MainApplication.java', {
       cwd: javaDir
     }))[0]
 
-    const relativeMainApplicationPathKotlin = (await asyncGlob('**/*/MainApplication.kt', {
+    const relativeMainApplicationPathKotlin = (await fs.glob('**/*/MainApplication.kt', {
       cwd: javaDir
     }))[0]
 
