@@ -1,0 +1,128 @@
+const { promises: fs } = require('fs')
+const glob = require('glob')
+const path = require('path')
+const { promisify } = require('util')
+
+const asyncGlob = promisify(glob)
+
+const BUGSNAG_COCOA_IMPORT = '#import <Bugsnag/Bugsnag.h>'
+const BUGSNAG_COCOA_INIT = '[Bugsnag start];'
+const COCOA_APP_LAUNCH_REGEX = /(-\s*\(BOOL\)\s*application:\s*\(UIApplication\s\*\)\s*application\s+didFinishLaunchingWithOptions:\s*\(NSDictionary\s*\*\)launchOptions\s*\{\s*)\S/
+
+const BUGSNAG_JAVA_IMPORT = 'import com.bugsnag.android.Bugsnag;'
+const BUGSNAG_JAVA_INIT = 'Bugsnag.start(this);'
+
+const BUGSNAG_KOTLIN_IMPORT = 'import com.bugsnag.android.Bugsnag'
+const BUGSNAG_KOTLIN_INIT = 'Bugsnag.start(this)'
+
+const DOCS_LINK = 'https://docs.bugsnag.com/platforms/react-native/react-native/#basic-configuration'
+const FAIL_MSG = (filename) =>
+  `Failed to update "${filename}" automatically. The file may not exist or it may be in an unexpected format or location.
+
+Bugsnag must be imported manually. See ${DOCS_LINK} for more information.`
+
+async function removeIos(projectRoot, console) {
+  console.info('Adding Bugsnag to the iOS layer')
+
+  const iosDir = path.join(projectRoot, 'ios')
+  let appDelegatePath
+
+  try {
+    const xcodeprojDir = (await fs.readdir(iosDir)).find(p => p.endsWith('.xcodeproj'))
+
+    if (!xcodeprojDir) {
+      console.warn(FAIL_MSG('AppDelegate'))
+      return
+    }
+
+    const appDelegateDirectory = path.join(iosDir, xcodeprojDir.replace(/\.xcodeproj$/, ''))
+
+    // handle both AppDelegate.m and AppDelegate.mm (RN 0.68+)
+    const appDelegateFile = (await fs.readdir(appDelegateDirectory)).find(p => p.startsWith('AppDelegate.m'))
+
+    if (!appDelegateFile) {
+      console.warn(FAIL_MSG('AppDelegate'))
+      return
+    }
+
+    appDelegatePath = path.join(iosDir, xcodeprojDir.replace(/\.xcodeproj$/, ''), appDelegateFile)
+  } catch (e) {
+    console.error(FAIL_MSG('AppDelegate'))
+    return
+  }
+
+  try {
+    const appDelegate = await fs.readFile(appDelegatePath, 'utf8')
+
+    if (appDelegate.includes(BUGSNAG_COCOA_IMPORT) || appDelegate.includes(BUGSNAG_COCOA_INIT)) {
+      console.warn('Bugsnag is already included, skipping')
+      return
+    }
+
+    const appDelegateWithImport = `${BUGSNAG_COCOA_IMPORT}\n${appDelegate}`
+    const appLaunchRes = COCOA_APP_LAUNCH_REGEX.exec(appDelegateWithImport)
+
+    if (!appLaunchRes) {
+      console.warn(FAIL_MSG(path.basename(appDelegatePath)))
+      return
+    }
+
+    await fs.writeFile(
+      appDelegatePath,
+      appDelegateWithImport.replace(appLaunchRes[1], `${appLaunchRes[1]}  ${BUGSNAG_COCOA_INIT}\n\n`),
+      'utf8'
+    )
+
+    console.log('Done')
+  } catch (e) {
+    console.error(FAIL_MSG(path.basename(appDelegatePath)))
+  }
+}
+
+async function removeAndroid(projectRoot) {
+  console.info('Removing Bugsnag startup code from the Android layer')
+
+  let mainApplicationPath
+  try {
+    const javaDir = path.join(projectRoot, 'android', 'app', 'src', 'main', 'java')
+    const relativeMainApplicationPathJava = (await asyncGlob('**/*/MainApplication.java', {
+      cwd: javaDir
+    }))[0]
+
+    const relativeMainApplicationPathKotlin = (await asyncGlob('**/*/MainApplication.kt', {
+      cwd: javaDir
+    }))[0]
+
+    const relativeMainApplicationPath = relativeMainApplicationPathJava || relativeMainApplicationPathKotlin
+
+    if (!relativeMainApplicationPath) {
+      return console.warn(FAIL_MSG('MainApplication'))
+    }
+    mainApplicationPath = path.join(javaDir, relativeMainApplicationPath)
+  } catch (e) {
+    return console.warn(FAIL_MSG('MainApplication'))
+  }
+
+  try {
+    const isKotlin = path.extname(mainApplicationPath) === '.kt'
+    const bugsnagImport = isKotlin ? BUGSNAG_KOTLIN_IMPORT : BUGSNAG_JAVA_IMPORT
+    const bugsnagInit = isKotlin ? BUGSNAG_KOTLIN_INIT : BUGSNAG_JAVA_INIT
+
+    const mainApplication = await fs.readFile(mainApplicationPath, 'utf8')
+    if (mainApplication.includes(bugsnagImport) || mainApplication.includes(bugsnagInit)) {
+      const mainApplicationAdjusted = mainApplication.replace(bugsnagImport, '')
+      await fs.writeFile(mainApplicationPath, mainApplicationAdjusted.replace(bugsnagInit, ''), 'utf8')
+      console.log('Done')
+      return
+    }
+
+    console.warn('Bugsnag has already been removed, skipping')
+    return
+  } catch (e) {
+    console.error(e)
+    console.error(FAIL_MSG('MainApplication'))
+  }
+}
+
+module.exports.removeIos = removeIos
+module.exports.removeAndroid = removeAndroid
