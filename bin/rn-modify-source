@@ -9,6 +9,7 @@ const COCOA_APP_LAUNCH_REGEX = /(-\s*\(BOOL\)\s*application:\s*\(UIApplication\s
 
 const BUGSNAG_JAVA_IMPORT = 'import com.bugsnag.android.Bugsnag;'
 const BUGSNAG_JAVA_INIT = 'Bugsnag.start(this);'
+const BUGSNAG_DISABLE_BAGP = 'bugsnag.enabled = false'
 
 const BUGSNAG_KOTLIN_IMPORT = 'import com.bugsnag.android.Bugsnag'
 const BUGSNAG_KOTLIN_INIT = 'Bugsnag.start(this)'
@@ -20,7 +21,7 @@ const FAIL_MSG = (filename) =>
 Bugsnag must be imported manually. See ${DOCS_LINK} for more information.`
 
 async function removeIos(projectRoot, console) {
-  console.info('Adding Bugsnag to the iOS layer')
+  console.info('Removing Bugsnag startup code from the iOS layer')
 
   const iosDir = path.join(projectRoot, 'ios')
   let appDelegatePath
@@ -52,22 +53,14 @@ async function removeIos(projectRoot, console) {
   try {
     const appDelegate = await fs.readFile(appDelegatePath, 'utf8')
 
-    if (appDelegate.includes(BUGSNAG_COCOA_IMPORT) || appDelegate.includes(BUGSNAG_COCOA_INIT)) {
-      console.warn('Bugsnag is already included, skipping')
-      return
-    }
-
-    const appDelegateWithImport = `${BUGSNAG_COCOA_IMPORT}\n${appDelegate}`
-    const appLaunchRes = COCOA_APP_LAUNCH_REGEX.exec(appDelegateWithImport)
-
-    if (!appLaunchRes) {
-      console.warn(FAIL_MSG(path.basename(appDelegatePath)))
+    if (!appDelegate.includes(BUGSNAG_COCOA_IMPORT) || !appDelegate.includes(BUGSNAG_COCOA_INIT)) {
+      console.warn('react-native-cli initialisation not present, skipping')
       return
     }
 
     await fs.writeFile(
       appDelegatePath,
-      appDelegateWithImport.replace(appLaunchRes[1], `${appLaunchRes[1]}  ${BUGSNAG_COCOA_INIT}\n\n`),
+      appDelegate.replace(BUGSNAG_COCOA_INIT, '').replace(BUGSNAG_COCOA_IMPORT, ''),
       'utf8'
     )
 
@@ -77,7 +70,7 @@ async function removeIos(projectRoot, console) {
   }
 }
 
-async function removeAndroid(projectRoot) {
+async function removeAndroid (projectRoot) {
   console.info('Removing Bugsnag startup code from the Android layer')
 
   let mainApplicationPath
@@ -117,10 +110,31 @@ async function removeAndroid(projectRoot) {
     console.warn('Bugsnag has already been removed, skipping')
     return
   } catch (e) {
-    console.error(e)
     console.error(FAIL_MSG('MainApplication'))
   }
 }
 
+async function disableGradlePlugin (projectRoot) {
+  console.info('Disabling Bugsnag android plugin in the Android layer')
+
+  const gradlePath = path.join(projectRoot, 'android', 'app', 'build.gradle')
+  const gradleFile = await fs.readFile(gradlePath, 'utf8')
+
+  if (gradleFile.includes(BUGSNAG_DISABLE_BAGP)) {
+    return console.warn('Bugsnag android gradle plugin has already been disabled in the build.gradle file, skipping')
+  }
+
+  try {
+    await fs.writeFile(gradlePath, `${gradleFile}\n${BUGSNAG_DISABLE_BAGP}`, 'utf8')
+  } catch (e) {
+    console.error(FAIL_MSG('build.gradle'))
+  }
+}
+
+async function modifyAndroidSource (projectRoot) {
+  await removeAndroid(projectRoot)
+  await disableGradlePlugin(projectRoot)
+}
+
 module.exports.removeIos = removeIos
-module.exports.removeAndroid = removeAndroid
+module.exports.removeAndroid = modifyAndroidSource
