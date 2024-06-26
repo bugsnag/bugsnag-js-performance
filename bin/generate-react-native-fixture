@@ -178,12 +178,13 @@ if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
   fs.copyFileSync(resolve(ROOT_DIR, 'bin', 'rn-cli-init-android.sh'), resolve(fixtureDir, 'rn-cli-init-android.sh'))
   execFileSync(`./rn-cli-init-android.sh`, [fixtureDir, rnVersion], { cwd: fixtureDir, stdio: 'inherit' })
 
+  // TODO: Await this promise instead of using .then
   // Remove the bugnsnag start code added by react-native-cli
-  removeAndroid(fixtureDir)
-  
-  // build the android app
-  execFileSync('./gradlew', ['assembleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
-  fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
+  removeAndroid(fixtureDir).then(() => {  
+    // build the android app
+    execFileSync('./gradlew', ['assembleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
+    fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
+  })
 } 
   
 if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
