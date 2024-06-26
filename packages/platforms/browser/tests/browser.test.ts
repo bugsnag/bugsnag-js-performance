@@ -6,6 +6,7 @@
 import { VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 import { type BrowserConfiguration } from '../lib/config'
 import { type Client } from '@bugsnag/core-performance'
+import type { BrowserBugsnagStatic } from '@bugsnag/browser'
 
 const emptySamplingRequest = {
   body: '{"resourceSpans":[]}',
@@ -27,6 +28,7 @@ const createSpans = (count: number) => {
 }
 
 let client: Client<BrowserConfiguration>
+let bugsnag: BrowserBugsnagStatic
 
 const response = {
   status: 200,
@@ -58,6 +60,8 @@ beforeEach(() => {
 
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     client = require('../lib/browser').default
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    bugsnag = require('@bugsnag/browser').default
   })
 })
 
@@ -145,6 +149,154 @@ describe('Browser client integration tests', () => {
       expect(mockFetch.mock.calls[2][1]).toEqual(expect.objectContaining({
         headers: expect.objectContaining({ 'Bugsnag-Span-Sampling': '0.999999:100' })
       }))
+    })
+  })
+
+  describe('Error Correlation', () => {
+    it('adds correlation metadata to error reports', async () => {
+      jest.spyOn(console, 'debug').mockImplementation(() => {})
+
+      const errorClient = bugsnag.start({
+        apiKey: VALID_API_KEY,
+        autoTrackSessions: false,
+        endpoints: {
+          notify: '/test',
+          sessions: '/test'
+        }
+      })
+
+      const sendEvent = jest.fn()
+
+      // @ts-expect-error _delivery api is hidden from the public API
+      errorClient._delivery = {
+        sendSession: jest.fn(),
+        sendEvent
+      }
+
+      client.start({
+        apiKey: VALID_API_KEY,
+        endpoint: '/test',
+        autoInstrumentFullPageLoads: false,
+        autoInstrumentNetworkRequests: false,
+        autoInstrumentRouteChanges: false,
+        bugsnag
+      })
+
+      await jest.runOnlyPendingTimersAsync()
+      expect(mockFetch).toHaveBeenCalledTimes(1)
+      expect(mockFetch).toHaveBeenCalledWith('/test', emptySamplingRequest)
+
+      const span = client.startSpan('test span')
+
+      bugsnag.notify(new Error('test error'))
+
+      expect(sendEvent).toHaveBeenCalledTimes(1)
+      expect(sendEvent.mock.calls[0][0].events[0]._correlation).toEqual({
+        traceId: span.traceId,
+        spanId: span.id
+      })
+
+      span.end()
+
+      await jest.runOnlyPendingTimersAsync()
+    })
+
+    it('does not add correlation metadata to error reports when no span is active', async () => {
+      jest.spyOn(console, 'debug').mockImplementation(() => {})
+
+      const errorClient = bugsnag.start({
+        apiKey: VALID_API_KEY,
+        autoTrackSessions: false,
+        endpoints: {
+          notify: '/test',
+          sessions: '/test'
+        }
+      })
+
+      const sendEvent = jest.fn()
+
+      // @ts-expect-error _delivery api is hidden from the public API
+      errorClient._delivery = {
+        sendSession: jest.fn(),
+        sendEvent
+      }
+
+      client.start({
+        apiKey: VALID_API_KEY,
+        endpoint: '/test',
+        autoInstrumentFullPageLoads: false,
+        autoInstrumentNetworkRequests: false,
+        autoInstrumentRouteChanges: false,
+        bugsnag
+      })
+
+      await jest.runOnlyPendingTimersAsync()
+      expect(mockFetch).toHaveBeenCalledTimes(1)
+      expect(mockFetch).toHaveBeenCalledWith('/test', emptySamplingRequest)
+
+      const span = client.startSpan('test span')
+
+      span.end()
+
+      bugsnag.notify(new Error('test error'))
+
+      expect(sendEvent).toHaveBeenCalledTimes(1)
+      expect(sendEvent.mock.calls[0][0].events[0]._correlation).toBeUndefined()
+
+      await jest.runOnlyPendingTimersAsync()
+    })
+
+    it('adds the span and trace id from the parent span', async () => {
+      jest.spyOn(console, 'debug').mockImplementation(() => {})
+
+      const errorClient = bugsnag.start({
+        apiKey: VALID_API_KEY,
+        autoTrackSessions: false,
+        endpoints: {
+          notify: '/test',
+          sessions: '/test'
+        }
+      })
+
+      const sendEvent = jest.fn()
+
+      // @ts-expect-error _delivery api is hidden from the public API
+      errorClient._delivery = {
+        sendSession: jest.fn(),
+        sendEvent
+      }
+
+      client.start({
+        apiKey: VALID_API_KEY,
+        endpoint: '/test',
+        autoInstrumentFullPageLoads: false,
+        autoInstrumentNetworkRequests: false,
+        autoInstrumentRouteChanges: false,
+        bugsnag
+      })
+
+      await jest.runOnlyPendingTimersAsync()
+      expect(mockFetch).toHaveBeenCalledTimes(1)
+      expect(mockFetch).toHaveBeenCalledWith('/test', emptySamplingRequest)
+
+      const parentSpan = client.startSpan('parent span')
+
+      await jest.advanceTimersByTimeAsync(500)
+
+      const childSpan = client.startSpan('child span', { makeCurrentContext: false })
+
+      bugsnag.notify(new Error('test error'))
+
+      expect(sendEvent).toHaveBeenCalledTimes(1)
+      expect(sendEvent.mock.calls[0][0].events[0]._correlation).toEqual({
+        traceId: parentSpan.traceId,
+        spanId: parentSpan.id
+      })
+
+      parentSpan.end()
+      childSpan.end()
+
+      await jest.runOnlyPendingTimersAsync()
     })
   })
 })
