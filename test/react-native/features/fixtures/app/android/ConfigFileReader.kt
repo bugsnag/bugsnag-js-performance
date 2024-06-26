@@ -50,7 +50,7 @@ class ConfigFileReader {
 fun Context.startBugsnag() {
     val reader = ConfigFileReader()
     val mazeRunnerAddress = reader.getMazeRunnerAddress(this)
-    Bugsnag.start(Configuration.load(this).apply {
+    Bugsnag.start(this, Configuration.load(this).apply {
         endpoints = EndpointConfiguration(
             "http://$mazeRunnerAddress/notify",
             "http://$mazeRunnerAddress/sessions",
