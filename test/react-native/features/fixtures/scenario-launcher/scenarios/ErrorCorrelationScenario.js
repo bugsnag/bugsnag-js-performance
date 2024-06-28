@@ -4,7 +4,10 @@ import React, { useEffect, useState, useRef } from 'react'
 import { Text, View } from 'react-native'
 import { getCurrentCommand } from '../lib/CommandRunner'
 
-Bugsnag.start()
+
+export function onStart () {
+  Bugsnag.start()
+}
 
 export const config = {
   appVersion: '1.2.3',
