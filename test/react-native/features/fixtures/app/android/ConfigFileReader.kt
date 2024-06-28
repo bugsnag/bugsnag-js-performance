@@ -55,5 +55,38 @@ fun Context.startBugsnag() {
             "http://$mazeRunnerAddress/notify",
             "http://$mazeRunnerAddress/sessions",
         )
+        logger = object : com.bugsnag.android.Logger {
+            override fun e(msg: String) {
+                android.util.Log.e("Bugsnag", msg)
+            }
+
+            override fun e(msg: String, throwable: Throwable) {
+                android.util.Log.e("Bugsnag", msg, throwable)
+            }
+
+            override fun w(msg: String) {
+                android.util.Log.w("Bugsnag", msg)
+            }
+
+            override fun w(msg: String, throwable: Throwable) {
+                android.util.Log.w("Bugsnag", msg, throwable)
+            }
+
+            override fun i(msg: String) {
+                android.util.Log.i("Bugsnag", msg)
+            }
+
+            override fun i(msg: String, throwable: Throwable) {
+                android.util.Log.i("Bugsnag", msg, throwable)
+            }
+
+            override fun d(msg: String) {
+                android.util.Log.d("Bugsnag", msg)
+            }
+
+            override fun d(msg: String, throwable: Throwable) {
+                android.util.Log.d("Bugsnag", msg, throwable)
+            }
+        }
     })
 }
