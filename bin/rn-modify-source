@@ -1,9 +1,8 @@
 #!/usr/bin/env node
 
-const { promises: fs } = require('node:fs')
-const { glob } = require('glob');
+const { promises: fs, existsSync } = require('node:fs')
 const path = require('path')
-
+  
 const BUGSNAG_COCOA_IMPORT = '#import <Bugsnag/Bugsnag.h>'
 const BUGSNAG_COCOA_INIT = '[Bugsnag start];'
 const COCOA_APP_LAUNCH_REGEX = /(-\s*\(BOOL\)\s*application:\s*\(UIApplication\s\*\)\s*application\s+didFinishLaunchingWithOptions:\s*\(NSDictionary\s*\*\)launchOptions\s*\{\s*)\S/
@@ -76,22 +75,16 @@ async function removeAndroid (projectRoot) {
 
   let mainApplicationPath
   try {
-    const javaDir = path.join(projectRoot, 'android', 'app', 'src', 'main', 'java')
-    const relativeMainApplicationPathJava = (await glob('**/*/MainApplication.java', {
-      cwd: javaDir
-    }))[0]
+    const javaDir = path.join(projectRoot, 'android', 'app', 'src', 'main', 'java', 'com', 'bugsnag', 'fixtures', 'reactnative', 'performance')
+    const javaPath = path.join(javaDir, 'MainApplication.java')
+    const kotlinPath = path.join(javaDir, 'MainApplication.kt')
 
-    const relativeMainApplicationPathKotlin = (await glob('**/*/MainApplication.kt', {
-      cwd: javaDir
-    }))[0]
-
-    const relativeMainApplicationPath = relativeMainApplicationPathJava || relativeMainApplicationPathKotlin
-
-    if (!relativeMainApplicationPath) {
+    if (!existsSync(javaPath) && !existsSync(kotlinPath)) {
       console.error('MainApplication.java or MainApplication.kt not found in the Android source directory')
       return console.warn(FAIL_MSG('MainApplication'))
     }
-    mainApplicationPath = path.join(javaDir, relativeMainApplicationPath)
+
+    mainApplicationPath = kotlinExists ? kotlinPath : javaExists
   } catch (e) {
     console.error(e)
     return console.warn(FAIL_MSG('MainApplication'))
@@ -119,7 +112,7 @@ async function removeAndroid (projectRoot) {
 }
 
 async function disableGradlePlugin (projectRoot) {
-  console.info('Disabling Bugsnag android plugin in the Android layer')
+  console.info('Disabling Bugsnag android gradle plugin')
 
   const gradlePath = path.join(projectRoot, 'android', 'app', 'build.gradle')
   const gradleFile = await fs.readFile(gradlePath, 'utf8')
