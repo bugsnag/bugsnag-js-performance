@@ -84,7 +84,7 @@ async function removeAndroid (projectRoot) {
       return console.warn(FAIL_MSG('MainApplication'))
     }
 
-    mainApplicationPath = kotlinExists ? kotlinPath : javaExists
+    mainApplicationPath = existsSync(kotlinPath) ? kotlinPath : javaExists
   } catch (e) {
     console.error(e)
     return console.warn(FAIL_MSG('MainApplication'))
