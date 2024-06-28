@@ -28,6 +28,7 @@ async function loadReactNavigationScenario (scenario) {
 async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
   console.error(`[BugsnagPerformance] Launching scenario: ${scenarioName}`)
   const scenario = Scenarios[scenarioName]
+  scenario.onStart?.()
 
   BugsnagPerformance.start({
     apiKey,
