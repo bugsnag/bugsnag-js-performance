@@ -12,7 +12,7 @@ const createClock = (performance: Performance): Clock => {
   const startWallTime = Date.now()
 
   return {
-    now: performance.now,
+    now: () => performance.now(),
     date: () => new Date(performance.now() - startPerfTime + startWallTime),
     convert: (date: Date) => date.getTime() - startWallTime + startPerfTime,
     // convert milliseconds since timeOrigin to full timestamp
