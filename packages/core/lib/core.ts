@@ -69,10 +69,13 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       const configuration = validateConfig<S, C>(config, options.schema)
 
       if (configuration.bugsnag) {
+        logger.debug('[BugsnagPerformance] Setting up addOnError callback')
         configuration.bugsnag.addOnError((event) => {
+          logger.debug('[BugsnagPerformance] onError callback called')
           const currentSpanContext = spanContextStorage.current
 
           if (currentSpanContext && event.setTraceCorrelation) {
+            logger.debug('[BugsnagPerformance] setting trace correlation property')
             event.setTraceCorrelation(currentSpanContext.traceId, currentSpanContext.id)
           }
         })

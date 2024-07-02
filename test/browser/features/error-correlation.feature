@@ -12,6 +12,7 @@ Feature: Error Correlation
     Given I navigate to the test URL "/error-correlation"
     And I wait to receive a sampling request
     Then I click the element "start-span"
+    And I wait for 1 second
     And I click the element "send-error"
 
     # Wait for the error
@@ -27,6 +28,7 @@ Feature: Error Correlation
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.traceId" is stored as the value "traceId"
 
     # Check span id is included in the error
+    And the error payload field "events.0.correlation" is not null
     And the error payload field "events.0.correlation.spanId" equals the stored value "spanId"
     And the error payload field "events.0.correlation.traceId" equals the stored value "traceId"
 
