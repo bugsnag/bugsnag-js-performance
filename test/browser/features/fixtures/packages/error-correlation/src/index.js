@@ -7,18 +7,19 @@ const endpoint = parameters.get('endpoint')
 const sessions = parameters.get('sessions')
 const notify = parameters.get('notify')
 
+let span
+let nestedSpan
+
 Bugsnag.start({ apiKey, endpoints: { notify, sessions } })
 BugsnagPerformance.start({ 
   apiKey, 
+  bugsnag: Bugsnag,
   endpoint, 
   maximumBatchSize: 1, 
   autoInstrumentFullPageLoads: false, 
   autoInstrumentNetworkRequests: false, 
   autoInstrumentRouteChanges: false 
 })
-
-let span
-let nestedSpan
 
 document.getElementById('start-span').onclick = () => {
   span = BugsnagPerformance.startSpan("Custom/ErrorCorrelationScenario")
