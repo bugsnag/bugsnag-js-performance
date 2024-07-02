@@ -62,6 +62,7 @@ Feature: Error Correlation
     Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.spanId" is stored as the value "childSpanId"
 
     # Check span id is included in the error
+    And the error payload field "events.0.correlation" is not null
     And the error payload field "events.0.correlation.spanId" equals the stored value "spanId"
     And the error payload field "events.0.correlation.spanId" does not equal the stored value "childSpanId"
     And the error payload field "events.0.correlation.traceId" equals the stored value "traceId"
