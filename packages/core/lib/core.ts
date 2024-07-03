@@ -68,6 +68,16 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     start: (config: C | string) => {
       const configuration = validateConfig<S, C>(config, options.schema)
 
+      if (configuration.bugsnag) {
+        configuration.bugsnag.addOnError((event) => {
+          const currentSpanContext = spanContextStorage.current
+
+          if (currentSpanContext && event.setTraceCorrelation) {
+            event.setTraceCorrelation(currentSpanContext.traceId, currentSpanContext.id)
+          }
+        })
+      }
+
       const delivery = options.deliveryFactory(configuration.endpoint)
 
       options.spanAttributesSource.configure(configuration)

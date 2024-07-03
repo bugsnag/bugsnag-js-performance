@@ -113,14 +113,19 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   if (!process.env.RCT_NEW_ARCH_ENABLED) {
     DEPENDENCIES.push(...REACT_NAVIGATION_DEPENDENCIES)
     
-    // replace the MainActivity file with our own
-    if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
-      const fileExtension = parseFloat(rnVersion) < 0.73 ? 'java' : 'kt'
+    const fileExtension = parseFloat(rnVersion) < 0.73 ? 'java' : 'kt'
       fs.copyFileSync(
         resolve(ROOT_DIR, `test/react-native/features/fixtures/app/android/MainActivity.${rnVersion}.${fileExtension}`),
         resolve(fixtureDir, `android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${fileExtension}`)
       )
-    }
+  }
+ 
+  // enable new architecture for android
+  if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
+    fs.copyFileSync(
+      resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/newarch.gradle.properties'),
+      resolve(fixtureDir, 'android/gradle.properties')
+    )
   }
 
   // pack the required packages into the fixture directory
@@ -136,14 +141,6 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 }
 
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
-  if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
-    // If we're building with the new architecture, replace the gradle.properties file
-    fs.copyFileSync(
-      resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/newarch.gradle.properties'),
-      resolve(fixtureDir, 'android/gradle.properties')
-    )
-  }
-
   // build the android app
   execFileSync('./gradlew', ['assembleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
   fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
