@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- (plugin-react-navigation) Fix a crash when navigation ref is created using useRef [#469](https://github.com/bugsnag/bugsnag-js-performance/pull/469)
+
 ### Added
 
 - (react-native) Support remote debugging in Chrome [#468](https://github.com/bugsnag/bugsnag-js-performance/pull/468)
