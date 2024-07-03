@@ -19,9 +19,11 @@ export const createNavigationContainer: CreateNavigationContainer = (NavigationC
     const routeNameRef = useRef<string>()
 
     const wrappedOnStateChange: typeof onStateChange = (...args) => {
-      const currentRoute = navigationContainerRef ? navigationContainerRef.current
-        ? navigationContainerRef.current.getCurrentRoute()
-        : navigationContainerRef.getCurrentRoute() : null
+      const currentRoute = navigationContainerRef
+        ? navigationContainerRef.current
+          ? navigationContainerRef.current.getCurrentRoute()
+          : navigationContainerRef.getCurrentRoute()
+        : null
 
       if (currentRoute) {
         routeNameRef.current = currentRoute.name
