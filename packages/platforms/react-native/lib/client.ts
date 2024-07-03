@@ -15,11 +15,19 @@ import createRetryQueueFactory from './retry-queue'
 import { createSpanAttributesSource } from './span-attributes-source'
 import createBrowserBackgroundingListener from './backgrounding-listener'
 
+// this is how some internal react native code detects whether the app is running
+// in the remote debugger:
+// https://github.com/facebook/react-native/blob/e320ab47cf855f2e5de74ea448ec292cf0bbb29a/packages/react-native/Libraries/Utilities/DebugEnvironment.js#L15
+// there's no public api for this so we use the same approach
+
+// @ts-expect-error Element implicitly has an 'any' type because type 'typeof globalThis' has no index signature.
+const isDebuggingRemotely = !global.nativeCallSyncHook && !global.RN$Bridgeless
+
 const clock = createClock(performance)
 const appStartTime = clock.now()
 const deliveryFactory = createFetchDeliveryFactory(fetch, clock)
 const spanAttributesSource = createSpanAttributesSource()
-const deviceInfo = NativeBugsnagPerformance ? NativeBugsnagPerformance.getDeviceInfo() : undefined
+const deviceInfo = NativeBugsnagPerformance && !isDebuggingRemotely ? NativeBugsnagPerformance.getDeviceInfo() : undefined
 const persistence = persistenceFactory(FileSystem, deviceInfo)
 const resourceAttributesSource = resourceAttributesSourceFactory(persistence, deviceInfo)
 const backgroundingListener = createBrowserBackgroundingListener(AppState)
@@ -27,7 +35,7 @@ const backgroundingListener = createBrowserBackgroundingListener(AppState)
 // React Native's fetch polyfill uses xhr under the hood, so we only track xhr requests
 const xhrRequestTracker = createXmlHttpRequestTracker(XMLHttpRequest, clock)
 
-const idGenerator = createIdGenerator(NativeBugsnagPerformance)
+const idGenerator = createIdGenerator(NativeBugsnagPerformance, isDebuggingRemotely)
 
 const BugsnagPerformance = createClient({
   backgroundingListener,

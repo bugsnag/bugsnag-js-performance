@@ -104,5 +104,12 @@ describe('React Native ID generator', () => {
       const id = idGenerator.generate(64)
       expect(id).toMatch(/^[a-f0-9]{16}$/)
     })
+
+    it('falls back to JS entropy source if remote debugging is enabled', () => {
+      const idGenerator = createIdGenerator(NativeBugsnagPerformance, true)
+      expect(requestEntropy).not.toHaveBeenCalled()
+      const id = idGenerator.generate(64)
+      expect(id).toMatch(/^[a-f0-9]{16}$/)
+    })
   })
 })
