@@ -1,0 +1,11 @@
+{
+    "name": "error-correlation",
+    "private": true,
+    "scripts": {
+        "build": "rollup --config ../rollup.config.mjs",
+        "clean": "rm -rf dist"
+    },
+    "dependencies": {
+        "@bugsnag/browser": "^7.25.0-alpha.0"
+    }
+}
