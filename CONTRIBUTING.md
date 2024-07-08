@@ -13,7 +13,7 @@ If you have spotted a problem with this module, feel free to open a [new issue](
 
 * Are you using the latest version of BugSnag? If not, does updating to the latest version fix your issue?
 * Has somebody else [already reported](https://github.com/bugsnag/bugsnag-js-performance/issues?utf8=%E2%9C%93&q=is%3Aissue%20is%3Aopen) your issue? Feel free to add additional context to or check-in on an existing issue that matches your own.
-* Is your issue caused by this module? Only things related to `@bugsnag/browser-performance` should be reported here. For anything else, please [contact us directly](mailto:support@bugsnag.com) and we'd be happy to help you out.
+* Is your issue caused by this module? Only things related to `@bugsnag/browser-performance`, `@bugsnag/react-native-performance`, and performance related plugins (such as `@bugsnag/plugin-react-navigation-performance`) should be reported here. For anything else, please [contact us directly](mailto:support@bugsnag.com) and we'd be happy to help you out.
 
 ### Fixing issues
 
