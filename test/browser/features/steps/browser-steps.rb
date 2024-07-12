@@ -233,3 +233,7 @@ def get_attribute_value_from_span(span, attribute, attr_type)
   value = attribute&.dig 'value', attr_type
   attr_type == 'intValue' && value.is_a?(String) ? value.to_i : value
 end
+
+Then('the trace payload field {string} double attribute {string} equals {float}') do |field, attribute, expected|
+  check_attribute_equal field, attribute, 'doubleValue', expected
+end
