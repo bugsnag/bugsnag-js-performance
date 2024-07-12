@@ -1,5 +1,6 @@
-import { type Clock } from '@bugsnag/core-performance'
-import { type RequestStartContext, RequestTracker } from './request-tracker'
+import type { Clock } from '@bugsnag/core-performance'
+import type { RequestStartContext } from './request-tracker'
+import { RequestTracker } from './request-tracker'
 import getAbsoluteUrl from './url-helpers'
 
 interface GlobalWithFetch {

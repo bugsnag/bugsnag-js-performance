@@ -1,10 +1,10 @@
-import { type Configuration, type InternalConfiguration } from './config'
-import { type Delivery, type TracePayloadEncoder } from './delivery'
-import { type Processor } from './processor'
+import type { Configuration, InternalConfiguration } from './config'
+import type { Delivery, TracePayloadEncoder } from './delivery'
 import type ProbabilityManager from './probability-manager'
-import { type RetryQueue } from './retry-queue'
-import { type ReadonlySampler } from './sampler'
-import { type SpanEnded } from './span'
+import type { Processor } from './processor'
+import type { RetryQueue } from './retry-queue'
+import type { ReadonlySampler } from './sampler'
+import type { SpanEnded } from './span'
 
 type MinimalProbabilityManager = Pick<ProbabilityManager, 'setProbability' | 'fetchingInitialProbability'>
 

@@ -1,6 +1,6 @@
-import { type Persistence } from './persistence'
+import type { Persistence } from './persistence'
 import type ProbabilityFetcher from './probability-fetcher'
-import { type ReadWriteSampler } from './sampler'
+import type { ReadWriteSampler } from './sampler'
 
 // the time between requests to fetch a new probability value from the server
 const PROBABILITY_REFRESH_MILLISECONDS = 24 * 60 * 60 * 1000 // 24 hours

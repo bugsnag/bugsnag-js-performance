@@ -4,7 +4,7 @@ import {
   VALID_API_KEY,
   createTestClient
 } from '@bugsnag/js-performance-test-utilities'
-import { type BackgroundingListener } from '../lib/backgrounding-listener'
+import type { BackgroundingListener } from '../lib/backgrounding-listener'
 import { createNoopClient } from '../lib/core'
 import { DefaultSpanContextStorage } from '../lib/span-context'
 

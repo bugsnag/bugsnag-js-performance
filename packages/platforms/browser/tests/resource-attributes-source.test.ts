@@ -4,7 +4,7 @@
 
 import { InMemoryPersistence } from '@bugsnag/core-performance'
 import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
-import { type BrowserConfiguration } from '../lib/config'
+import type { BrowserConfiguration } from '../lib/config'
 import createResourceAttributesSource from '../lib/resource-attributes-source'
 
 describe('resourceAttributesSource', () => {

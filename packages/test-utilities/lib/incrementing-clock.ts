@@ -1,4 +1,4 @@
-import { type Clock } from '@bugsnag/core-performance'
+import type { Clock } from '@bugsnag/core-performance'
 
 interface ClockOptions {
   startDate?: string

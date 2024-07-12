@@ -1,6 +1,6 @@
 import { SpanAttributes, SpanInternal } from '@bugsnag/core-performance'
 import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
-import { type BrowserConfiguration } from '../lib'
+import type { BrowserConfiguration } from '../lib'
 import createSpanAttributesSource from '../lib/span-attributes-source'
 
 const mockDocument = {

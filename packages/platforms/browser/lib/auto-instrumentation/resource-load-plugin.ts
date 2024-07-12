@@ -1,5 +1,5 @@
-import { type SpanContextStorage, type InternalConfiguration, type Plugin, type SpanFactory } from '@bugsnag/core-performance'
-import { type BrowserConfiguration } from '../config'
+import type { SpanContextStorage, InternalConfiguration, Plugin, SpanFactory } from '@bugsnag/core-performance'
+import type { BrowserConfiguration } from '../config'
 
 interface ResourceTiming extends PerformanceResourceTiming {
   responseStatus?: number // https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming/responseStatus

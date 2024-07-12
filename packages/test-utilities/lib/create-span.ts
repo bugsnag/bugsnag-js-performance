@@ -1,11 +1,10 @@
 import {
   SpanAttributes,
   SpanEvents,
-  traceIdToSamplingRate,
-  type ScaledProbability,
-  type SpanEnded,
-  type SpanProbability
+  traceIdToSamplingRate
+
 } from '@bugsnag/core-performance'
+import type { ScaledProbability, SpanEnded, SpanProbability } from '@bugsnag/core-performance'
 import { randomBytes } from 'crypto'
 
 export function createSamplingProbability (rawProbability: number): SpanProbability {

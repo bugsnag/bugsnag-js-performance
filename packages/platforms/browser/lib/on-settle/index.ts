@@ -1,10 +1,11 @@
 import DomMutationSettler from './dom-mutation-settler'
-import LoadEventEndSettler, { type PerformanceWithTiming } from './load-event-end-settler'
+import LoadEventEndSettler from './load-event-end-settler'
+import type { PerformanceWithTiming } from './load-event-end-settler'
 import RequestSettler from './request-settler'
 import SettlerAggregate from './settler-aggregate'
-import { type BrowserConfiguration } from '../config'
-import { type RequestTracker } from '@bugsnag/request-tracker-performance'
-import { type Clock, type InternalConfiguration, type Plugin } from '@bugsnag/core-performance'
+import type { BrowserConfiguration } from '../config'
+import type { RequestTracker } from '@bugsnag/request-tracker-performance'
+import type { Clock, InternalConfiguration, Plugin } from '@bugsnag/core-performance'
 
 export type OnSettle = (callback: OnSettleCallback) => void
 export type OnSettleCallback = (settledTime: number) => void

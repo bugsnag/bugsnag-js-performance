@@ -1,8 +1,9 @@
-import { type Configuration, type InternalConfiguration } from './config'
-import { type Clock } from './clock'
-import { type JsonAttribute, type ResourceAttributeSource } from './attributes'
-import { type JsonEvent } from './events'
-import { type Kind, type SpanEnded, spanToJson } from './span'
+import type { JsonAttribute, ResourceAttributeSource } from './attributes'
+import type { Clock } from './clock'
+import type { Configuration, InternalConfiguration } from './config'
+import type { JsonEvent } from './events'
+import type { Kind, SpanEnded } from './span'
+import { spanToJson } from './span'
 
 export type DeliveryFactory = (endpoint: string) => Delivery
 

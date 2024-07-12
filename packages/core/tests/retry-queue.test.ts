@@ -1,12 +1,9 @@
 import { randomUUID } from 'crypto'
 import {
-  type Delivery,
-  type DeliverySpan,
-  type DeliveryPayload,
-  type ResponseState,
-  type TracePayload,
+
   InMemoryQueue
 } from '../lib'
+import type { Delivery, DeliverySpan, DeliveryPayload, ResponseState, TracePayload } from '../lib'
 import { InMemoryDelivery } from '@bugsnag/js-performance-test-utilities'
 
 describe('RetryQueue', () => {

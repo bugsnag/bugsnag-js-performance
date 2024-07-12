@@ -1,7 +1,4 @@
-import {
-  type PerformanceEntryFake,
-  type PerformanceEntryType
-} from './performance-entry'
+import type { PerformanceEntryFake, PerformanceEntryType } from './performance-entry'
 import PerformanceObserverEntryListFake from './performance-observer-entry-list'
 
 // options valid when observing a single PerformanceEntryType

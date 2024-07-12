@@ -1,6 +1,6 @@
-import { type SpanFactory } from '@bugsnag/core-performance'
+import type { SpanFactory } from '@bugsnag/core-performance'
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
-import { type ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import React, { useContext } from 'react'
 import { Button, View } from 'react-native'

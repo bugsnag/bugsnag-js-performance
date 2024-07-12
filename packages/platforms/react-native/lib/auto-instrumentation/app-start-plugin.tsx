@@ -1,12 +1,13 @@
-import {
-  type InternalConfiguration,
-  type Plugin,
-  type SpanFactory,
-  type Clock
+import type {
+  Clock,
+  InternalConfiguration,
+  Plugin,
+  SpanFactory
 } from '@bugsnag/core-performance'
-import { type ReactNativeConfiguration } from '../config'
-import { type ReactNode, useEffect } from 'react'
-import { type WrapperComponentProvider, type AppRegistry } from 'react-native'
+import type { ReactNode } from 'react'
+import { useEffect } from 'react'
+import type { AppRegistry, WrapperComponentProvider } from 'react-native'
+import type { ReactNativeConfiguration } from '../config'
 
 interface WrapperProps {
   children: ReactNode

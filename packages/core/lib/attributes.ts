@@ -1,5 +1,5 @@
-import { type Configuration, type InternalConfiguration } from './config'
-import { type SpanInternal } from './span'
+import type { Configuration, InternalConfiguration } from './config'
+import type { SpanInternal } from './span'
 import { isNumber } from './validation'
 
 export type SpanAttribute = string | number | boolean

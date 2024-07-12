@@ -4,8 +4,8 @@
 */
 
 import { VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
-import { type BrowserConfiguration } from '../lib/config'
-import { type Client } from '@bugsnag/core-performance'
+import type { BrowserConfiguration } from '../lib/config'
+import type { Client } from '@bugsnag/core-performance'
 import type { BrowserBugsnagStatic } from '@bugsnag/browser'
 
 const emptySamplingRequest = {

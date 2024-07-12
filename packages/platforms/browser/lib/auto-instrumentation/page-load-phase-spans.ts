@@ -1,6 +1,6 @@
 import type { SpanContext, SpanFactory } from '@bugsnag/core-performance'
-import { type BrowserConfiguration } from '../config'
-import { type PerformanceWithTiming } from '../on-settle/load-event-end-settler'
+import type { BrowserConfiguration } from '../config'
+import type { PerformanceWithTiming } from '../on-settle/load-event-end-settler'
 
 type PageLoadPhase = 'Unload'
 | 'Redirect'

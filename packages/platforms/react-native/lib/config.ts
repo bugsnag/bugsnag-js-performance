@@ -1,15 +1,9 @@
-import {
-  isBoolean,
-  isStringOrRegExpArray,
-  isStringWithLength,
-  schema,
-  type ConfigOption,
-  type Configuration,
-  type CoreSchema
-} from '@bugsnag/core-performance'
-import { defaultNetworkRequestCallback, isNetworkRequestCallback, type NetworkRequestCallback } from '@bugsnag/request-tracker-performance'
-import { type WrapperComponentProvider } from 'react-native'
-import { type ReactNativeNetworkRequestInfo } from './auto-instrumentation'
+import type { ConfigOption, Configuration, CoreSchema } from '@bugsnag/core-performance'
+import { isBoolean, isStringOrRegExpArray, isStringWithLength, schema } from '@bugsnag/core-performance'
+import type { NetworkRequestCallback } from '@bugsnag/request-tracker-performance'
+import { defaultNetworkRequestCallback, isNetworkRequestCallback } from '@bugsnag/request-tracker-performance'
+import type { WrapperComponentProvider } from 'react-native'
+import type { ReactNativeNetworkRequestInfo } from './auto-instrumentation'
 import { isWrapperComponentProvider } from './auto-instrumentation/app-start-plugin'
 
 export interface ReactNativeSchema extends CoreSchema {

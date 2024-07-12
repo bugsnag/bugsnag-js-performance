@@ -3,9 +3,9 @@
  */
 
 import createFetchRequestTracker from '../lib/request-tracker-fetch'
-import { type RequestEndCallback, type RequestStartCallback } from '../lib/request-tracker'
+import type { RequestEndCallback, RequestStartCallback } from '../lib/request-tracker'
 import { IncrementingClock } from '@bugsnag/js-performance-test-utilities'
-import { type Clock } from '@bugsnag/core-performance'
+import type { Clock } from '@bugsnag/core-performance'
 
 const TEST_URL = 'http://test-url.com/'
 

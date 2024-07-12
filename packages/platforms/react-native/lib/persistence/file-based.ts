@@ -1,13 +1,13 @@
-import {
-  isPersistedProbability,
-  type Persistence,
-  type PersistenceKey,
-  type PersistedProbability,
-  type PersistencePayloadMap
+import type {
+  PersistedProbability,
+  Persistence,
+  PersistenceKey,
+  PersistencePayloadMap
 } from '@bugsnag/core-performance'
-import { type ReadWriteFile, type ReadableFile } from './file'
-import { Platform } from 'react-native'
+import { isPersistedProbability } from '@bugsnag/core-performance'
 import cuid from '@bugsnag/cuid'
+import { Platform } from 'react-native'
+import type { ReadWriteFile, ReadableFile } from './file'
 
 const { isCuid } = cuid
 

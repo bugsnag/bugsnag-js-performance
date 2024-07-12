@@ -1,9 +1,9 @@
-import {
-  type Delivery,
-  type DeliveryPayload,
-  type DeliverySpan,
-  type RetryQueue,
-  type TracePayload
+import type {
+  Delivery,
+  DeliveryPayload,
+  DeliverySpan,
+  RetryQueue,
+  TracePayload
 } from '@bugsnag/core-performance'
 import type Directory from './directory'
 import timestampFromFilename from './timestamp-from-filename'

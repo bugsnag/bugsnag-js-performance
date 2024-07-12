@@ -1,6 +1,7 @@
-import { coreSpanOptionSchema, isString, type InternalConfiguration, type Plugin, type SpanFactory, type SpanOptionSchema, type Time, isObject } from '@bugsnag/core-performance'
-import { type BrowserConfiguration } from '../config'
-import { type RouteChangeSpanEndOptions, type RouteChangeSpanOptions } from '../routing-provider'
+import { coreSpanOptionSchema, isString, isObject } from '@bugsnag/core-performance'
+import type { InternalConfiguration, Plugin, SpanFactory, SpanOptionSchema, Time } from '@bugsnag/core-performance'
+import type { BrowserConfiguration } from '../config'
+import type { RouteChangeSpanEndOptions, RouteChangeSpanOptions } from '../routing-provider'
 import { getPermittedAttributes } from '../send-page-attributes'
 import { defaultRouteResolver } from '../default-routing-provider'
 

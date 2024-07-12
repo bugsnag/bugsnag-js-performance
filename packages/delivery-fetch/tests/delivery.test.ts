@@ -2,8 +2,8 @@
  * @jest-environment jsdom
  */
 
-import { type TracePayload } from '@bugsnag/core-performance'
-import { type JsonEvent } from '@bugsnag/core-performance/lib'
+import type { TracePayload } from '@bugsnag/core-performance'
+import type { JsonEvent } from '@bugsnag/core-performance/lib'
 import {
   ControllableBackgroundingListener,
   IncrementingClock

@@ -1,5 +1,6 @@
 import { isObject } from '@bugsnag/core-performance'
-import { Util, type FileSystem } from 'react-native-file-access'
+import type { FileSystem } from 'react-native-file-access'
+import { Util } from 'react-native-file-access'
 
 export interface ReadableFile {
   read: () => Promise<string>

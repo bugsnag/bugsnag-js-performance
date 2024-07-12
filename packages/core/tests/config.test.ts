@@ -1,4 +1,5 @@
-import { schema as coreSchema, validateConfig, type CoreSchema } from '../lib/config'
+import { schema as coreSchema, validateConfig } from '../lib/config'
+import type { CoreSchema } from '../lib/config'
 import { VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 
 describe('Schema validation', () => {

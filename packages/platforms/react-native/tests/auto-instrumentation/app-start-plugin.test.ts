@@ -1,9 +1,9 @@
 import { MockSpanFactory, createConfiguration } from '@bugsnag/js-performance-test-utilities'
-import { type Clock } from '@bugsnag/core-performance'
+import type { Clock } from '@bugsnag/core-performance'
 import createClock from '../../lib/clock'
 import { AppStartPlugin } from '../../lib/auto-instrumentation/app-start-plugin'
-import { type ReactNativeConfiguration } from '../../lib/config'
-import { type AppRegistry } from 'react-native'
+import type { ReactNativeConfiguration } from '../../lib/config'
+import type { AppRegistry } from 'react-native'
 
 describe('app start plugin', () => {
   let spanFactory: MockSpanFactory<ReactNativeConfiguration>

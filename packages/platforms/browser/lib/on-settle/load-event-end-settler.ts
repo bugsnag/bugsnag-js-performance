@@ -1,4 +1,4 @@
-import { type Clock } from '@bugsnag/core-performance'
+import type { Clock } from '@bugsnag/core-performance'
 import { Settler } from './settler'
 
 type AddEventListener = (event: string, callback: () => void) => void
