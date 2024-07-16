@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/vue-router-performance",
-  "version": "2.4.0",
+  "version": "2.7.1",
   "description": "BugSnag performance monitoring for vue-router",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
