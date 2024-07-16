@@ -1,5 +1,6 @@
 import createBrowserBackgroundingListener from '../lib/backgrounding-listener'
-import { AppState, type AppStateStatus } from 'react-native'
+import { AppState } from 'react-native'
+import type { AppStateStatus } from 'react-native'
 
 describe('React Native BackgroundingListener', () => {
   const setAppState = (status: AppStateStatus) => {

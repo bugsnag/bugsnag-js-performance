@@ -1,14 +1,13 @@
-import {
-  type Delivery,
-  type RetryQueue,
-  type RetryQueueFactory
-} from '@bugsnag/core-performance'
-import NetInfo, { type NetInfoState } from '@react-native-community/netinfo'
-import { AppState, Platform, type AppStateStatus } from 'react-native'
+import type { Delivery, RetryQueue, RetryQueueFactory } from '@bugsnag/core-performance'
+import type { NetInfoState } from '@react-native-community/netinfo'
+import NetInfo from '@react-native-community/netinfo'
+import { AppState, Platform } from 'react-native'
+import type { AppStateStatus } from 'react-native'
 
-import RetryQueueDirectory, { type MinimalFileSystem } from './directory'
-import FileBasedRetryQueue from './file-based'
 import { PERSISTENCE_DIRECTORY } from '../persistence'
+import type { MinimalFileSystem } from './directory'
+import RetryQueueDirectory from './directory'
+import FileBasedRetryQueue from './file-based'
 
 export default function createRetryQueueFactory (fileSystem: MinimalFileSystem): RetryQueueFactory {
   return function fileBasedQueueFactory (delivery: Delivery, _retryQueueMaxSize: number): RetryQueue {

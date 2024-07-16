@@ -1,8 +1,4 @@
-import {
-  type BackgroundingListener,
-  type BackgroundingListenerCallback,
-  type BackgroundingListenerState
-} from '@bugsnag/core-performance'
+import type { BackgroundingListener, BackgroundingListenerCallback, BackgroundingListenerState } from '@bugsnag/core-performance'
 
 interface DocumentForVisibilityState {
   addEventListener: (event: string, callback: () => void) => void

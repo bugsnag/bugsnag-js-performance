@@ -1,6 +1,7 @@
 import type { SpanFactory, SpanInternal } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
-import React, { type PropsWithChildren } from 'react'
+import React from 'react'
+import type { PropsWithChildren } from 'react'
 
 export const NavigationContext = React.createContext({
   blockNavigationEnd: () => {},

@@ -2,10 +2,12 @@
  * @jest-environment jsdom
  */
 
-import { DefaultSpanContextStorage, type SpanContextStorage, spanContextEquals } from '@bugsnag/core-performance'
+import { DefaultSpanContextStorage, spanContextEquals } from '@bugsnag/core-performance'
+import type { SpanContextStorage } from '@bugsnag/core-performance'
 import { ControllableBackgroundingListener, MockSpanFactory, createConfiguration, createTestClient } from '@bugsnag/js-performance-test-utilities'
-import { type BrowserSchema, type BrowserConfiguration } from '../../lib/config'
-import { RequestTracker, type RequestStartCallback } from '@bugsnag/request-tracker-performance'
+import type { BrowserSchema, BrowserConfiguration } from '../../lib/config'
+import { RequestTracker } from '@bugsnag/request-tracker-performance'
+import type { RequestStartCallback } from '@bugsnag/request-tracker-performance'
 import { NetworkRequestPlugin } from '../../lib/auto-instrumentation/network-request-plugin'
 
 const ENDPOINT = 'http://traces.endpoint'

@@ -1,4 +1,4 @@
-import { type Plugin } from './plugin'
+import type { Plugin } from './plugin'
 import { isLogger, isNumber, isObject, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
 
 interface BugsnagErrorEvent {

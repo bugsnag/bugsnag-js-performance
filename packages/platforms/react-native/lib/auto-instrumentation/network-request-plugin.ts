@@ -1,21 +1,21 @@
-import {
-  type InternalConfiguration,
-  type Logger,
-  type Plugin,
-  type SpanContextStorage,
-  type SpanFactory,
-  type SpanInternal
+import type {
+  InternalConfiguration,
+  Logger,
+  Plugin,
+  SpanContextStorage,
+  SpanFactory,
+  SpanInternal
 } from '@bugsnag/core-performance'
-import {
-  defaultNetworkRequestCallback,
-  type NetworkRequestCallback,
-  type NetworkRequestInfo,
-  type RequestEndContext,
-  type RequestStartCallback,
-  type RequestStartContext,
-  type RequestTracker
+import type {
+  NetworkRequestCallback,
+  NetworkRequestInfo,
+  RequestEndContext,
+  RequestStartCallback,
+  RequestStartContext,
+  RequestTracker
 } from '@bugsnag/request-tracker-performance'
-import { type ReactNativeConfiguration } from '../config'
+import { defaultNetworkRequestCallback } from '@bugsnag/request-tracker-performance'
+import type { ReactNativeConfiguration } from '../config'
 
 const permittedPrefixes = ['http://', 'https://', '/', './', '../']
 

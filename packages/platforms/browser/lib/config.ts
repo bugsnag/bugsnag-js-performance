@@ -1,15 +1,17 @@
 import {
   isBoolean,
   isStringOrRegExpArray,
-  schema,
-  type ConfigOption,
-  type Configuration,
-  type CoreSchema
+  schema
+
 } from '@bugsnag/core-performance'
-import { defaultNetworkRequestCallback, isNetworkRequestCallback, type NetworkRequestCallback } from '@bugsnag/request-tracker-performance'
+import type { ConfigOption, Configuration, CoreSchema } from '@bugsnag/core-performance'
+import { defaultNetworkRequestCallback, isNetworkRequestCallback } from '@bugsnag/request-tracker-performance'
+import type { NetworkRequestCallback } from '@bugsnag/request-tracker-performance'
 import type { BrowserNetworkRequestInfo } from './auto-instrumentation'
-import { isRoutingProvider, type RoutingProvider } from './routing-provider'
-import { defaultSendPageAttributes, isSendPageAttributes, type SendPageAttributes } from './send-page-attributes'
+import { isRoutingProvider } from './routing-provider'
+import type { RoutingProvider } from './routing-provider'
+import { defaultSendPageAttributes, isSendPageAttributes } from './send-page-attributes'
+import type { SendPageAttributes } from './send-page-attributes'
 
 export interface BrowserSchema extends CoreSchema {
   autoInstrumentFullPageLoads: ConfigOption<boolean>

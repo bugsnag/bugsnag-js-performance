@@ -13,8 +13,9 @@ import {
   createTestClient
 } from '@bugsnag/js-performance-test-utilities'
 import { FullPageLoadPlugin } from '../../lib/auto-instrumentation/full-page-load-plugin'
-import { createSchema, type BrowserConfiguration, type BrowserSchema } from '../../lib/config'
-import { type OnSettle } from '../../lib/on-settle'
+import { createSchema } from '../../lib/config'
+import type { BrowserConfiguration, BrowserSchema } from '../../lib/config'
+import type { OnSettle } from '../../lib/on-settle'
 import { WebVitals } from '../../lib/web-vitals'
 import {
   PerformanceFake,

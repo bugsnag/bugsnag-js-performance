@@ -1,5 +1,5 @@
-import { type Clock } from '@bugsnag/core-performance'
-import { type OnSettleCallback } from '.'
+import type { Clock } from '@bugsnag/core-performance'
+import type { OnSettleCallback } from '.'
 
 export abstract class Settler {
   protected clock: Clock

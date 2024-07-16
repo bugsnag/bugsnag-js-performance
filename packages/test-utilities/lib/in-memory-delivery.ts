@@ -1,9 +1,4 @@
-import {
-  type DeliveryPayload,
-  type Delivery,
-  type ResponseState,
-  type TracePayload
-} from '@bugsnag/core-performance'
+import type { DeliveryPayload, Delivery, ResponseState, TracePayload } from '@bugsnag/core-performance'
 
 class InMemoryDelivery implements Delivery {
   public requests: DeliveryPayload[] = []

@@ -2,10 +2,10 @@
  * @jest-environment jsdom
  */
 
-import { type Router } from 'vue-router'
+import type { Router } from 'vue-router'
 import { VueRouterRoutingProvider } from '../lib/vue-router-routing-provider'
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
-import { type RouteChangeSpan, type StartRouteChangeCallback } from '@bugsnag/browser-performance'
+import type { RouteChangeSpan, StartRouteChangeCallback } from '@bugsnag/browser-performance'
 
 jest.useFakeTimers()
 

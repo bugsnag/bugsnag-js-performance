@@ -1,5 +1,5 @@
-import { type ReactNativeConfiguration } from '@bugsnag/react-native-performance'
-import { type Plugin, type Configuration } from '@bugsnag/core-performance'
+import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import type { Plugin, Configuration } from '@bugsnag/core-performance'
 
 const plugins: Array<Plugin<Configuration>> = []
 

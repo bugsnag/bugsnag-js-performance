@@ -1,5 +1,11 @@
 # Changelog
 
+## [v2.7.1] (2024-07-16)
+
+### Changed
+
+- Update type imports to ensure TypeScript backwards compatibility [#471](https://github.com/bugsnag/bugsnag-js-performance/pull/471)
+
 ## [v2.7.0] (2024-07-03)
 
 ### Added

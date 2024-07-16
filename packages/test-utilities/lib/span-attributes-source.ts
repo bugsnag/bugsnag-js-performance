@@ -1,4 +1,4 @@
-import { type Configuration, type SpanAttributesSource } from '@bugsnag/core-performance'
+import type { Configuration, SpanAttributesSource } from '@bugsnag/core-performance'
 
 const spanAttributesSource: SpanAttributesSource<Configuration> = {
   configure () {

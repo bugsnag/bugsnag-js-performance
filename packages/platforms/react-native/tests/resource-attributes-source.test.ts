@@ -1,7 +1,7 @@
 import { InMemoryPersistence } from '@bugsnag/core-performance'
 import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
 import { Platform } from 'react-native'
-import { type ReactNativeConfiguration } from '../lib/config'
+import type { ReactNativeConfiguration } from '../lib/config'
 import resourceAttributesSourceFactory from '../lib/resource-attributes-source'
 import NativeBugsnagPerformance from '../lib/NativeBugsnagPerformance'
 

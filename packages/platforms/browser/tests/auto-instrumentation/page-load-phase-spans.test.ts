@@ -1,7 +1,7 @@
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
 import { instrumentPageLoadPhaseSpans } from '../../lib/auto-instrumentation/page-load-phase-spans'
 import { PerformanceFake, createPerformanceNavigationTimingFake } from '../utilities'
-import { type SpanContext } from '@bugsnag/core-performance'
+import type { SpanContext } from '@bugsnag/core-performance'
 
 const PAGE_LOAD_ID = 'page load span ID'
 const PAGE_LOAD_TRACE_ID = 'page load span trace ID'

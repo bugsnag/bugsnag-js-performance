@@ -1,4 +1,5 @@
-import React, { useEffect, type PropsWithChildren } from 'react'
+import React, { useEffect } from 'react'
+import type { PropsWithChildren } from 'react'
 import { NavigationContext } from './navigation-context'
 
 interface Props extends PropsWithChildren {

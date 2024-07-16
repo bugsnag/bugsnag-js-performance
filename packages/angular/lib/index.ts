@@ -1,11 +1,10 @@
 import { APP_INITIALIZER } from '@angular/core'
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from '@angular/router'
 import {
-  onSettle,
-  type RouteChangeSpan,
-  type RoutingProvider,
-  type StartRouteChangeCallback
+  onSettle
+
 } from '@bugsnag/browser-performance'
+import type { RouteChangeSpan, RoutingProvider, StartRouteChangeCallback } from '@bugsnag/browser-performance'
 
 let globalRouterRef: Router | undefined
 

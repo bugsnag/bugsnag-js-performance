@@ -1,13 +1,11 @@
 import {
   DefaultSpanContextStorage,
   Sampler,
-  type SpanAttribute,
-  SpanFactory,
-  type Configuration,
-  type SpanEnded,
-  type SpanInternal,
-  type SpanOptions
+
+  SpanFactory
+
 } from '@bugsnag/core-performance'
+import type { SpanAttribute, Configuration, SpanEnded, SpanInternal, SpanOptions } from '@bugsnag/core-performance'
 import ControllableBackgroundingListener from './controllable-backgrounding-listener'
 import InMemoryProcessor from './in-memory-processor'
 import IncrementingClock from './incrementing-clock'

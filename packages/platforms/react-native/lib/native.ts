@@ -1,5 +1,5 @@
 import { TurboModuleRegistry } from 'react-native'
-import { type Spec } from './NativeBugsnagPerformance'
+import type { Spec } from './NativeBugsnagPerformance'
 
 const NativeBugsnagPerformance = TurboModuleRegistry.get('BugsnagReactNativePerformance')
 

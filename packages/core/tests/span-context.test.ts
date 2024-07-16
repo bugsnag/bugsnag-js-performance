@@ -1,4 +1,5 @@
-import { type SpanContext, DefaultSpanContextStorage, spanContextEquals } from '../lib'
+import { DefaultSpanContextStorage, spanContextEquals } from '../lib'
+import type { SpanContext } from '../lib'
 import {
   ControllableBackgroundingListener,
   InMemoryDelivery,

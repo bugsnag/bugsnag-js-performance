@@ -1,10 +1,9 @@
 import {
   InMemoryPersistence,
-  toPersistedPayload,
-  type Persistence,
-  type PersistenceKey,
-  type PersistencePayloadMap
+  toPersistedPayload
+
 } from '@bugsnag/core-performance'
+import type { Persistence, PersistenceKey, PersistencePayloadMap } from '@bugsnag/core-performance'
 
 interface LocalStorage {
   setItem: (key: string, value: string) => void

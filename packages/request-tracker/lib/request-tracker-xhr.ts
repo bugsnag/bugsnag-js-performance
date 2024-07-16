@@ -1,5 +1,6 @@
-import { type Clock } from '@bugsnag/core-performance'
-import { type RequestEndContext, RequestTracker } from './request-tracker'
+import type { Clock } from '@bugsnag/core-performance'
+import type { RequestEndContext } from './request-tracker'
+import { RequestTracker } from './request-tracker'
 import getAbsoluteUrl from './url-helpers'
 
 interface RequestData {

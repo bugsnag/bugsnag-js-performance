@@ -4,10 +4,10 @@
 
 import RequestSettler from '../../lib/on-settle/request-settler'
 import {
-  type RequestStartContext,
-  type RequestEndContext,
+
   RequestTracker
 } from '@bugsnag/request-tracker-performance'
+import type { RequestStartContext, RequestEndContext } from '@bugsnag/request-tracker-performance'
 import createClock from '../../lib/clock'
 import { ControllableBackgroundingListener, IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 

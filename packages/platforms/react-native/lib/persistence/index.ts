@@ -1,6 +1,7 @@
 import { Platform } from 'react-native'
-import { Dirs, type FileSystem } from 'react-native-file-access'
-import { type DeviceInfo } from '../NativeBugsnagPerformance'
+import type { FileSystem } from 'react-native-file-access'
+import { Dirs } from 'react-native-file-access'
+import type { DeviceInfo } from '../NativeBugsnagPerformance'
 import { File, NullFile, ReadOnlyFile } from './file'
 import FileBasedPersistence from './file-based'
 
