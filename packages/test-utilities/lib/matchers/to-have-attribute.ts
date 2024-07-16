@@ -1,12 +1,10 @@
 import { expect } from '@jest/globals'
-import { type MatcherFunction } from 'expect'
+import type { MatcherFunction } from 'expect'
 import {
-  type DeliverySpan,
-  type SpanInternal,
-  type SpanEnded,
-  type JsonAttribute,
+
   SpanAttributes
 } from '@bugsnag/core-performance'
+import type { DeliverySpan, SpanInternal, SpanEnded, JsonAttribute } from '@bugsnag/core-performance'
 
 function getValueObjectFor (value: unknown) {
   switch (typeof value) {

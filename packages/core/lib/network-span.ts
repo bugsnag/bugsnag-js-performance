@@ -1,6 +1,7 @@
-import { coreSpanOptionSchema, type SpanOptionSchema, type SpanOptions } from './span'
-import { type SpanContext } from './span-context'
-import { type Time } from './time'
+import type { SpanOptionSchema, SpanOptions } from './span'
+import { coreSpanOptionSchema } from './span'
+import type { SpanContext } from './span-context'
+import type { Time } from './time'
 import { isStringWithLength } from './validation'
 
 export interface NetworkSpanOptions extends Omit<SpanOptions, 'makeCurrentContext'> {

@@ -16,10 +16,10 @@ import {
   SpanFactory,
   SpanInternal,
   spanToJson,
-  spanContextEquals,
-  type SpanAttribute,
-  type SpanEnded
+  spanContextEquals
+
 } from '../lib'
+import type { SpanAttribute, SpanEnded } from '../lib'
 import Sampler from '../lib/sampler'
 
 jest.useFakeTimers()

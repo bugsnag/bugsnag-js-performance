@@ -1,5 +1,5 @@
-import { type InternalConfiguration, type Configuration } from './config'
-import { type SpanEnded } from './span'
+import type { InternalConfiguration, Configuration } from './config'
+import type { SpanEnded } from './span'
 
 // processor.add is called by a Span when 'Span.end' is called
 // it can then add to a queue or send immediately

@@ -1,4 +1,4 @@
-import { type Delivery, type TracePayload } from './delivery'
+import type { Delivery, TracePayload } from './delivery'
 
 export interface RetryQueue {
   add: (payload: TracePayload, time: number) => void

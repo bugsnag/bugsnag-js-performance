@@ -1,4 +1,4 @@
-import { type PerformanceEntryFake } from './performance-entry'
+import type { PerformanceEntryFake } from './performance-entry'
 import PerformanceEntryListFake from './performance-entry-list'
 
 // NOTE: this is intentionally a subset of the real Performance APIs because

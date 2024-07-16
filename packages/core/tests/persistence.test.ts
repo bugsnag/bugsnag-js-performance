@@ -1,8 +1,8 @@
 import {
-  type PersistenceKey,
-  type PersistencePayload,
+
   InMemoryPersistence
 } from '../lib/persistence'
+import type { PersistenceKey, PersistencePayload } from '../lib/persistence'
 
 describe('InMemoryPersistence', () => {
   const payloads: Array<{ key: PersistenceKey, value: PersistencePayload }> = [

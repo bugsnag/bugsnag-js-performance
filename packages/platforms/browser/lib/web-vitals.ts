@@ -1,4 +1,4 @@
-import { type Clock, type SpanInternal } from '@bugsnag/core-performance'
+import type { Clock, SpanInternal } from '@bugsnag/core-performance'
 
 interface PerformanceWithNavigationTiming {
   getEntriesByName: typeof performance.getEntriesByName

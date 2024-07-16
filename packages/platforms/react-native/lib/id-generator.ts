@@ -1,5 +1,5 @@
 import type { BitLength, IdGenerator } from '@bugsnag/core-performance'
-import { type Spec as NativeBugsnag } from './NativeBugsnagPerformance'
+import type { Spec as NativeBugsnag } from './NativeBugsnagPerformance'
 
 const POOL_SIZE = 1024
 

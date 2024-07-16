@@ -1,14 +1,10 @@
 import type { InternalConfiguration, Logger, Plugin, SpanContextStorage, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
 import {
-  defaultNetworkRequestCallback,
-  type NetworkRequestCallback,
-  type NetworkRequestInfo,
-  type RequestEndContext,
-  type RequestStartCallback,
-  type RequestStartContext,
-  type RequestTracker
+  defaultNetworkRequestCallback
+
 } from '@bugsnag/request-tracker-performance'
-import { type BrowserConfiguration } from '../config'
+import type { NetworkRequestCallback, NetworkRequestInfo, RequestEndContext, RequestStartCallback, RequestStartContext, RequestTracker } from '@bugsnag/request-tracker-performance'
+import type { BrowserConfiguration } from '../config'
 
 export interface BrowserNetworkRequestInfo extends NetworkRequestInfo {
   readonly type: PerformanceResourceTiming['initiatorType']

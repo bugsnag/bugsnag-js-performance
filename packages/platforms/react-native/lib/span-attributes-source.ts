@@ -1,7 +1,8 @@
-import { type SpanAttributesSource } from '@bugsnag/core-performance'
+import type { SpanAttributesSource } from '@bugsnag/core-performance'
 import NetInfo from '@react-native-community/netinfo'
-import { type ReactNativeConfiguration } from './config'
-import getNetworkConnectionType, { type CellularGeneration, type NetworkConnectionType } from './get-network-connection-type'
+import type { ReactNativeConfiguration } from './config'
+import type { CellularGeneration, NetworkConnectionType } from './get-network-connection-type'
+import getNetworkConnectionType from './get-network-connection-type'
 
 export function createSpanAttributesSource () {
   let connectionType: NetworkConnectionType = 'unknown'

@@ -1,4 +1,4 @@
-import { type SpanEnded, type Processor } from '@bugsnag/core-performance'
+import type { SpanEnded, Processor } from '@bugsnag/core-performance'
 
 class InMemoryProcessor implements Processor {
   public readonly spans: SpanEnded[] = []

@@ -2,7 +2,8 @@
  * @jest-environment jsdom
  */
 
-import { NavigationEnd, NavigationStart, type Router } from '@angular/router'
+import { NavigationEnd, NavigationStart } from '@angular/router'
+import type { Router } from '@angular/router'
 import { bugsnagBootstrapper, AngularRoutingProvider } from '../lib'
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
 

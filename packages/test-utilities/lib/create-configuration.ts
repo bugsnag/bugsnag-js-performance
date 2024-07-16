@@ -1,4 +1,4 @@
-import { type Configuration, type InternalConfiguration } from '@bugsnag/core-performance'
+import type { Configuration, InternalConfiguration } from '@bugsnag/core-performance'
 
 function createConfiguration<C extends Configuration> (overrides: Partial<C> = {}): InternalConfiguration<C> {
   return {

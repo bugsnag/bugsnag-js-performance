@@ -1,4 +1,4 @@
-import { type DeliverySpan, type TracePayload } from '@bugsnag/core-performance'
+import type { DeliverySpan, TracePayload } from '@bugsnag/core-performance'
 
 type PayloadCreator = (...spans: Array<Partial<DeliverySpan>>) => TracePayload
 

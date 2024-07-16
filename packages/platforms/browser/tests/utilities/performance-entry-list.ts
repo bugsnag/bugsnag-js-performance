@@ -1,4 +1,4 @@
-import { type PerformanceEntryFake, type PerformanceEntryType } from './performance-entry'
+import type { PerformanceEntryFake, PerformanceEntryType } from './performance-entry'
 
 export default abstract class PerformanceEntryListFake {
   protected readonly entries: PerformanceEntryFake[]

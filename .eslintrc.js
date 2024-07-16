@@ -31,7 +31,11 @@ const tsRuleOverrides = {
   '@typescript-eslint/no-for-in-array': 'off',
 
   // Optional chaining compiles to a lot more code
-  '@typescript-eslint/prefer-optional-chain': 'off'
+  '@typescript-eslint/prefer-optional-chain': 'off',
+
+  // Support TypeScript 3.8 by disallowing import { type Module } from 'module'
+  // TODO: Find the export equivalent
+  'import/consistent-type-specifier-style': ['warn', 'prefer-top-level']
 }
 
 const jestRuleOverrides = {

@@ -1,11 +1,10 @@
 import {
-  onSettle,
-  type RouteResolver,
-  type RoutingProvider,
-  type StartRouteChangeCallback
+  onSettle
+
 } from '@bugsnag/browser-performance'
+import type { RouteResolver, RoutingProvider, StartRouteChangeCallback } from '@bugsnag/browser-performance'
 import pathToRegexp from 'path-to-regexp'
-import { type RouteRecordRaw, type Router } from 'vue-router'
+import type { RouteRecordRaw, Router } from 'vue-router'
 
 function flattenRoutes (routes: RouteRecordRaw[], _prefix: string = ''): string[] {
   const prefix = `${!_prefix || _prefix === '/' ? _prefix : `${_prefix}/`}`

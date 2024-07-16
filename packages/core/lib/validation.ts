@@ -1,9 +1,9 @@
-import { type Configuration, type Logger } from './config'
-import { type PersistedProbability } from './persistence'
-import { type Plugin } from './plugin'
-import { type ParentContext } from './span'
-import { type SpanContext } from './span-context'
-import { type Time } from './time'
+import type { Configuration, Logger } from './config'
+import type { PersistedProbability } from './persistence'
+import type { Plugin } from './plugin'
+import type { ParentContext } from './span'
+import type { SpanContext } from './span-context'
+import type { Time } from './time'
 
 export const isBoolean = (value: unknown): value is boolean =>
   value === true || value === false

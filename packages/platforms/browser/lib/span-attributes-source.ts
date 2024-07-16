@@ -1,5 +1,5 @@
 import type { InternalConfiguration, SpanAttributesSource, SpanInternal } from '@bugsnag/core-performance'
-import { type BrowserConfiguration } from './config'
+import type { BrowserConfiguration } from './config'
 
 export const createSpanAttributesSource = (document: Document): SpanAttributesSource<BrowserConfiguration> => {
   const defaultAttributes = {

@@ -4,7 +4,8 @@
 
 import { InMemoryDelivery, IncrementingClock, IncrementingIdGenerator, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import { ResourceLoadPlugin } from '../../lib/auto-instrumentation/resource-load-plugin'
-import { createSchema, type BrowserConfiguration, type BrowserSchema } from '../../lib/config'
+import { createSchema } from '../../lib/config'
+import type { BrowserConfiguration, BrowserSchema } from '../../lib/config'
 import { createDefaultRoutingProvider } from '../../lib/default-routing-provider'
 import createOnSettle from '../../lib/on-settle'
 import { RequestTracker } from '@bugsnag/request-tracker-performance'

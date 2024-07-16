@@ -1,5 +1,5 @@
-import { type SpanContextStorage, type SpanFactory, type SpanOptions } from '@bugsnag/core-performance'
-import { type ReactNativeConfiguration } from './config'
+import type { SpanContextStorage, SpanFactory, SpanOptions } from '@bugsnag/core-performance'
+import type { ReactNativeConfiguration } from './config'
 
 type NavigationSpanOptions = Omit<SpanOptions, 'isFirstClass'>
 

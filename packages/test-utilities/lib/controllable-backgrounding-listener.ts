@@ -1,8 +1,4 @@
-import {
-  type BackgroundingListenerState,
-  type BackgroundingListener,
-  type BackgroundingListenerCallback
-} from '@bugsnag/core-performance'
+import type { BackgroundingListenerState, BackgroundingListener, BackgroundingListenerCallback } from '@bugsnag/core-performance'
 
 class ControllableBackgroundingListener implements BackgroundingListener {
   private state: BackgroundingListenerState = 'in-foreground'
