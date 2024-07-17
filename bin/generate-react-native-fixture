@@ -157,7 +157,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   // install test fixture dependencies and local packages
   const dependencies = [...DEPENDENCIES, ...fs.readdirSync(fixtureDir)].filter((package) => package.endsWith('.tgz'))
   dependencies.forEach(package => {
-    execSync(`npm install --save ${package}`, {cwd: fixtureDir, stdio: 'inherit'})
+    execSync(`npm install --verbose --save ${package}`, {cwd: fixtureDir, stdio: 'inherit'})
   })
   
   // apply additional modifications required for RN 0.64
