@@ -12,8 +12,8 @@
     "react-native-navigation": "*"
   },
   "peerDependencies": {
-    "@bugsnag/react-native": "^7.25.0",
-    "@bugsnag/react-native-cli": "^7.23.0",
+    "@bugsnag/react-native": "*",
+    "@bugsnag/react-native-cli": "*",
     "@react-navigation/native": "*",
     "@react-navigation/native-stack": "*",
     "react": "*",
