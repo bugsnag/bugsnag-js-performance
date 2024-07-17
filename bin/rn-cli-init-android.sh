@@ -1,7 +1,8 @@
 #!/usr/bin/expect -f
 
 set timeout -1
-set notifierVersion "^8.0.0-alpha.10";
+set notifierVersion "8.0.0-alpha.10";
+set notifierApiKey "1234567890abcdef1234567890abcdef"
 set fixtureDirectory [lindex $argv 0];
 set rnVersion [lindex $argv 1];
 set rnVersionInt ""
@@ -49,7 +50,7 @@ expect "Enter version of the Bugsnag Android Gradle plugin you want to use"
 send -- \r
 
 expect "What is your Bugsnag project API key?"
-send -- "1234567890abcdef1234567890abcdef\r"
+send -- $notifierApiKey\r
 
 expect "Do you want to install the BugSnag CLI to allow you to upload JavaScript source maps?"
 send -- y
