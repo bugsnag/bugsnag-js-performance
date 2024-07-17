@@ -27,7 +27,7 @@
     "@bugsnag/request-tracker-performance": "^2.7.1"
   },
   "devDependencies": {
-    "@bugsnag/browser": "^8.0.0-alpha.10"
+    "@bugsnag/browser": "^7.25.0"
   },
   "type": "module",
   "main": "dist/index.js",
