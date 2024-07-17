@@ -63,8 +63,6 @@ const REACT_NAVIGATION_DEPENDENCIES = [
   `react-native-safe-area-context@${reactNativeSafeAreaContextVersion}`
 ]
 
-execSync('npm cache clean --force', { cwd: ROOT_DIR, stdio: 'inherit' })
-
 if (!process.env.SKIP_BUILD_PACKAGES) {
   // run npm install in the root directory
   execFileSync('npm', ['install'], { cwd: ROOT_DIR, stdio: 'inherit' })
@@ -156,11 +154,12 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
   }
 
-  const fixtureDependencyArgs = DEPENDENCIES.join(' ')
-
   // install test fixture dependencies and local packages
-  execSync(`npm install --save --save-exact ${fixtureDependencyArgs} *.tgz`, { cwd: fixtureDir, stdio: 'inherit' })
-
+  const dependencies = [...DEPENDENCIES, ...fs.readdirSync(fixtureDir)].filter((package) => package.endsWith('.tgz'))
+  dependencies.forEach(package => {
+    execSync(`npm install --save ${package}`, {cwd: fixtureDir, stdio: 'inherit'})
+  })
+  
   // apply additional modifications required for RN 0.64
   if (parseFloat(rnVersion) === 0.64) {
     configureRN064Fixture(fixtureDir)
