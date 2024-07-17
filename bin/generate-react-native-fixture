@@ -26,8 +26,8 @@ const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
   '@bugsnag/delivery-fetch-performance',
   '@bugsnag/plugin-react-native-navigation-performance',
-  '@bugsnag/react-native-performance',
   '@bugsnag/plugin-react-navigation-performance',
+  '@bugsnag/react-native-performance',
   '@bugsnag/request-tracker-performance'
 ]
 
