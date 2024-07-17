@@ -12,7 +12,9 @@
     "react-native-navigation": "*"
   },
   "peerDependencies": {
-    "@bugsnag/react-native": "8.0.0-alpha.10",
+    "@bugsnag/core": ">=8.0.0-alpha.10",
+    "@bugsnag/delivery-react-native": ">=8.0.0-alpha.10",
+    "@bugsnag/react-native": ">=8.0.0-alpha.10",
     "@bugsnag/react-native-cli": "*",
     "@react-navigation/native": "*",
     "@react-navigation/native-stack": "*",
