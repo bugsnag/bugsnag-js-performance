@@ -18,9 +18,5 @@
     "react": "*",
     "react-native": "*",
     "react-native-file-access": "*"
-  },
-  "overrides": {
-    "@bugsnag/core": "8.0.0-alpha.10",
-    "@bugsnag/delivery-react-native": "8.0.0-alpha.10"
   }
 }
