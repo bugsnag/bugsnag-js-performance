@@ -6,6 +6,6 @@
         "clean": "rm -rf dist"
     },
     "dependencies": {
-        "@bugsnag/browser": "^7.25.0-alpha.0"
+        "@bugsnag/browser": "^8.0.0-alpha.10"
     }
 }

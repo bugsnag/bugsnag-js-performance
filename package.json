@@ -19,6 +19,7 @@
     "@aws-sdk/client-cloudfront": "^3.360.0",
     "@aws-sdk/client-s3": "^3.360.0",
     "@babel/plugin-transform-private-methods": "^7.24.7",
+    "@bugsnag/browser": "^8.0.0-alpha.10",
     "@rollup/plugin-commonjs": "^25.0.2",
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-replace": "^5.0.2",
