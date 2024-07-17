@@ -44,13 +44,13 @@ expect "What is your Bugsnag build endpoint?"
 send -- http://localhost:9339/builds\r
 
 expect "If you want the latest version of @bugsnag/react-native hit enter, otherwise type the version you want"
-send -- $notifierVersion\r
+send -- "$notifierVersion\r"
 
 expect "Enter version of the Bugsnag Android Gradle plugin you want to use"
 send -- \r
 
 expect "What is your Bugsnag project API key?"
-send -- $notifierApiKey\r
+send -- "$notifierApiKey\r"
 
 expect "Do you want to install the BugSnag CLI to allow you to upload JavaScript source maps?"
 send -- y
