@@ -154,12 +154,11 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
   }
 
-  // install test fixture dependencies and local packages
-  const dependencies = [...DEPENDENCIES, ...fs.readdirSync(fixtureDir)].filter((package) => package.endsWith('.tgz'))
-  dependencies.forEach(package => {
-    execSync(`npm install --save ${package}`, {cwd: fixtureDir, stdio: 'inherit'})
-  })
+  const fixtureDependencyArgs = DEPENDENCIES.join(' ')
   
+  // install test fixture dependencies and local packages
+  execSync(`npm install --save ${fixtureDependencyArgs} *.tgz`, { cwd: fixtureDir, stdio: 'inherit' })
+
   // apply additional modifications required for RN 0.64
   if (parseFloat(rnVersion) === 0.64) {
     configureRN064Fixture(fixtureDir)
