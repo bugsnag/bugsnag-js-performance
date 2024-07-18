@@ -141,11 +141,10 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
   }
 
+  const fixtureDependencyArgs = DEPENDENCIES.join(' ')
+  
   // install test fixture dependencies and local packages
-  const dependencies = [...DEPENDENCIES, ...fs.readdirSync(fixtureDir)].filter((package) => package.endsWith('.tgz'))
-  dependencies.forEach(package => {
-    execSync(`npm install --save ${package}`, {cwd: fixtureDir, stdio: 'inherit'})
-  })
+  execSync(`npm install --save ${fixtureDependencyArgs} *.tgz`, { cwd: fixtureDir, stdio: 'inherit' })
 }
 
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
