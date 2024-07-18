@@ -10,7 +10,7 @@ import com.bugsnag.android.Bugsnag
 import com.bugsnag.android.Configuration
 import com.bugsnag.android.EndpointConfiguration
 
-const val CONFIG_FILE_TIMEOUT = 5000
+const val CONFIG_FILE_TIMEOUT = 15000
 
 class ConfigFileReader {
 
