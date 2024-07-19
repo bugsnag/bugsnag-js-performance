@@ -25,9 +25,6 @@ export function App() {
       console.error(`[BugsnagPerformance] ErrorCorrelationScenario has id: ${id}`)
 
       switch (command.action) {
-        case 'start-bugsnag-notifier':
-          Bugsnag.start()
-          break;
         case 'start-span':
           span.current = BugsnagPerformance.startSpan(`ErrorCorrelationScenario ${id}`)
           setId(id => id + 1)
@@ -51,9 +48,6 @@ export function App() {
     <View>
       <Text>ErrorCorrelationScenario</Text>
       <Text>Current Command ID: {id}</Text>
-      <Button title="Start Bugsnag" onPress={() => {
-        Bugsnag.start()
-      }} />
     </View>
   )
 }
