@@ -3,8 +3,6 @@ Feature: Error correlation
   Scenario: Reported errors include the current trace and span id
     When I run 'ErrorCorrelationScenario'
     And I wait to receive a sampling request
-    And I execute the command "start-bugsnag-notifier"
-    And I wait to receive a session
     And I execute the command "start-span"
     And I execute the command "send-error"
 
