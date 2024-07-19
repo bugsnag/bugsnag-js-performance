@@ -1,13 +1,8 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 import Bugsnag from '@bugsnag/react-native'
 import React, { useEffect, useState, useRef } from 'react'
-import { Text, View } from 'react-native'
+import { Button, Text, View } from 'react-native'
 import { getCurrentCommand } from '../lib/CommandRunner'
-
-
-export function onStart () {
-  Bugsnag.start()
-}
 
 export const config = {
   appVersion: '1.2.3',
@@ -16,7 +11,7 @@ export const config = {
   autoInstrumentAppStarts: false
 }
 
-export function App () {
+export function App() {
   const [id, setId] = useState(1)
   const span = useRef()
 
@@ -30,21 +25,24 @@ export function App () {
       console.error(`[BugsnagPerformance] ErrorCorrelationScenario has id: ${id}`)
 
       switch (command.action) {
+        case 'start-bugsnag-notifier':
+          Bugsnag.start()
+          break;
         case 'start-span':
-            span.current = BugsnagPerformance.startSpan(`ErrorCorrelationScenario ${id}`)
-            setId(id => id + 1)
-            break
+          span.current = BugsnagPerformance.startSpan(`ErrorCorrelationScenario ${id}`)
+          setId(id => id + 1)
+          break
         case 'end-span':
-            span.current?.end()
-            setId(id => id + 1)
-            break
+          span.current?.end()
+          setId(id => id + 1)
+          break
         case 'send-error':
-            console.log("[BugsnagPerformance] ErrorCorrelationScenario sending error")
-            Bugsnag.notify(new Error(`ErrorCorrelationScenario`))
-            setId(id => id + 1)
-            break
+          console.log("[BugsnagPerformance] ErrorCorrelationScenario sending error")
+          Bugsnag.notify(new Error(`ErrorCorrelationScenario`))
+          setId(id => id + 1)
+          break
         default:
-            throw new Error(`Unknown command: ${JSON.stringify(command)}`)
+          throw new Error(`Unknown command: ${JSON.stringify(command)}`)
       }
     })()
   }, [id])
@@ -52,7 +50,10 @@ export function App () {
   return (
     <View>
       <Text>ErrorCorrelationScenario</Text>
-      <Text>ID: {id}</Text>
+      <Text>Current Command ID: {id}</Text>
+      <Button title="Start Bugsnag" onPress={() => {
+        Bugsnag.start()
+      }} />
     </View>
   )
 }
