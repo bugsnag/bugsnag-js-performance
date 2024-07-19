@@ -51,6 +51,8 @@ fun Context.startBugsnag() {
     val reader = ConfigFileReader()
     val mazeRunnerAddress = reader.getMazeRunnerAddress(this)
     Bugsnag.start(this, Configuration.load(this).apply {
+        android.util.Log.e("Bugsnag", "Starting Bugsnag with Maze Runner address: $mazeRunnerAddress")
+
         endpoints = EndpointConfiguration(
             "http://$mazeRunnerAddress/notify",
             "http://$mazeRunnerAddress/sessions",
