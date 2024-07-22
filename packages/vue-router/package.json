@@ -21,7 +21,6 @@
   },
   "peerDependencies": {
     "@bugsnag/browser-performance": "*",
-    "path-to-regexp": "^1.8.0",
     "vue-router": "^4.2.4"
   },
   "type": "module",
