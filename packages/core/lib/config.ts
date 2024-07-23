@@ -1,14 +1,24 @@
 import type { Plugin } from './plugin'
 import { isLogger, isNumber, isObject, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
 
+type SetTraceCorrelation = (traceId: string, spanId: string) => void
+
 interface BugsnagErrorEvent {
-  setTraceCorrelation?: (traceId: string, spanId: string) => void
+  setTraceCorrelation?: SetTraceCorrelation
 }
 
 type BugsnagErrorCallback = (event: BugsnagErrorEvent) => void
 
 interface BugsnagErrorStatic {
   addOnError: (fn: BugsnagErrorCallback) => void
+  Event: {
+    prototype: {
+      setTraceCorrelation?: SetTraceCorrelation
+    }
+  }
+  _client?: {
+    _notify: (event: BugsnagErrorEvent) => void
+  }
 }
 
 export interface Logger {

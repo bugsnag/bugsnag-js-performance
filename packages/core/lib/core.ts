@@ -72,14 +72,17 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     start: (config: C | string) => {
       const configuration = validateConfig<S, C>(config, options.schema)
 
-      if (configuration.bugsnag) {
-        configuration.bugsnag.addOnError((event) => {
+      // Correlate errors with span by monkey patching _notify on the error client
+      // and utilizing the setTraceCorrelation method on the event
+      if (configuration.bugsnag && typeof configuration.bugsnag.Event.prototype.setTraceCorrelation === 'function' && configuration.bugsnag._client) {
+        const originalNotify = configuration.bugsnag._client._notify
+        configuration.bugsnag._client._notify = function (...args) {
           const currentSpanContext = spanContextStorage.current
-
-          if (currentSpanContext && event.setTraceCorrelation) {
-            event.setTraceCorrelation(currentSpanContext.traceId, currentSpanContext.id)
+          if (currentSpanContext && typeof args[0].setTraceCorrelation === 'function') {
+            args[0].setTraceCorrelation(currentSpanContext.traceId, currentSpanContext.id)
           }
-        })
+          originalNotify.apply(this, args)
+        }
       }
 
       const delivery = options.deliveryFactory(configuration.endpoint)
