@@ -120,6 +120,7 @@ steps:
               - --device=ANDROID_12
               - --a11y-locator
               - --fail-fast
+              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
         retry:
@@ -150,6 +151,7 @@ steps:
               - --device=ANDROID_12
               - --a11y-locator
               - --fail-fast
+              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
         env:
@@ -182,6 +184,7 @@ steps:
               - --device=IOS_14
               - --a11y-locator
               - --fail-fast
+              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
         retry:
@@ -212,6 +215,7 @@ steps:
               - --device=IOS_14
               - --a11y-locator
               - --fail-fast
+              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
         env:
