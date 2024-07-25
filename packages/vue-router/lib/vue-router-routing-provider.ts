@@ -13,7 +13,7 @@ export class VueRouterRoutingProvider implements RoutingProvider {
 
     function resolveRoute (url: URL): string {
       const location = router.resolve({ path: url.pathname.replace(normalizedBasename ?? '', '') })
-      return location.matched.length > 0 ? location.matched[location.matched.length - 1].path : 'no-route-found'
+      return location.matched.pop()?.path || 'no-route-found'
     }
     this.resolveRoute = resolveRoute
   }
