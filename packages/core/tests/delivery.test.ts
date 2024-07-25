@@ -56,6 +56,7 @@ describe('TracePayloadEncoder', () => {
                 { key: 'deployment.environment', value: { stringValue: 'test' } },
                 { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.core' } },
                 { key: 'telemetry.sdk.version', value: { stringValue: '1.2.3' } },
+                { key: 'service.name', value: { stringValue: 'unknown_service' } },
                 { key: 'service.version', value: { stringValue: '3.4.5' } }
               ]
             },
