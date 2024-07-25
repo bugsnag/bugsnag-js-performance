@@ -1,8 +1,8 @@
 import {
   isBoolean,
+  isStringWithLength,
   isStringOrRegExpArray,
   schema
-
 } from '@bugsnag/core-performance'
 import type { ConfigOption, Configuration, CoreSchema } from '@bugsnag/core-performance'
 import { defaultNetworkRequestCallback, isNetworkRequestCallback } from '@bugsnag/request-tracker-performance'
@@ -22,6 +22,7 @@ export interface BrowserSchema extends CoreSchema {
   settleIgnoreUrls: ConfigOption<Array<string | RegExp>>
   networkRequestCallback: ConfigOption<NetworkRequestCallback<BrowserNetworkRequestInfo>>
   sendPageAttributes: ConfigOption<SendPageAttributes>
+  serviceName: ConfigOption<string>
 }
 
 export interface BrowserConfiguration extends Configuration {
@@ -33,6 +34,7 @@ export interface BrowserConfiguration extends Configuration {
   settleIgnoreUrls?: Array<string | RegExp>
   networkRequestCallback?: NetworkRequestCallback<BrowserNetworkRequestInfo>
   sendPageAttributes?: SendPageAttributes
+  serviceName?: string
 }
 
 export function createSchema (hostname: string, defaultRoutingProvider: RoutingProvider): BrowserSchema {
@@ -81,6 +83,11 @@ export function createSchema (hostname: string, defaultRoutingProvider: RoutingP
       defaultValue: defaultSendPageAttributes,
       message: 'should be an object',
       validate: isSendPageAttributes
+    },
+    serviceName: {
+      defaultValue: 'unknown_service',
+      message: 'should be a string',
+      validate: isStringWithLength
     }
   }
 }
