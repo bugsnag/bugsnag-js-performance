@@ -13,6 +13,7 @@ export default function resourceAttributesSourceFactory (persistence: Persistenc
     const attributes = new ResourceAttributes(
       config.releaseStage,
       config.appVersion,
+      deviceInfo?.bundleIdentifier || 'unknown_service',
       'bugsnag.performance.reactnative',
       '__VERSION__'
     )
@@ -43,10 +44,6 @@ export default function resourceAttributesSourceFactory (persistence: Persistenc
 
       if (deviceInfo.model) {
         attributes.set('device.model.identifier', deviceInfo.model)
-      }
-
-      if (deviceInfo.bundleIdentifier) {
-        attributes.set('service.name', deviceInfo.bundleIdentifier)
       }
     }
 

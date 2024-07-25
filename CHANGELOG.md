@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+(browser) - Add serviceName config option for browser and ensure service.name attribute is always set [#477](https://github.com/bugsnag/bugsnag-js-performance/pull/477)
+
 ## [v2.7.1] (2024-07-16)
 
 ### Changed

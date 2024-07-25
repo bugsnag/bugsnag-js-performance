@@ -5,7 +5,15 @@ const apiKey = parameters.get('api_key')
 const endpoint = parameters.get('endpoint')
 const reflectEndpoint = '/reflect?status=200&delay_ms=0'
 
-BugsnagPerformance.start({ apiKey, endpoint, maximumBatchSize: 1, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false, autoInstrumentRouteChanges: false })
+BugsnagPerformance.start({
+  apiKey,
+  endpoint,
+  maximumBatchSize: 1,
+  autoInstrumentFullPageLoads: false,
+  autoInstrumentNetworkRequests: false,
+  autoInstrumentRouteChanges: false,
+  serviceName: 'manual-span'
+})
 
 document.getElementById('send-span').onclick = () => {
   const spanOptions = {}
