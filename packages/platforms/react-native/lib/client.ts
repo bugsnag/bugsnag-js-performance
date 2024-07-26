@@ -50,7 +50,7 @@ const BugsnagPerformance = createClient({
   resourceAttributesSource,
   schema: createSchema(),
   spanAttributesSource,
-  retryQueueFactory: createRetryQueueFactory(FileSystem),
+  retryQueueFactory: createRetryQueueFactory(),
   platformExtensions
 })
 
