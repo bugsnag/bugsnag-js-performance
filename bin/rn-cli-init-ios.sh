@@ -1,10 +1,10 @@
 #!/usr/bin/expect -f
 
 set timeout -1
-set notifierVersion "next";
+set notifierVersion "8.0.0-alpha.11"
 set notifierApiKey "1234567890abcdef1234567890abcdef"
-set fixtureDirectory [lindex $argv 0];
-set rnVersion [lindex $argv 1];
+set fixtureDirectory [lindex $argv 0]
+set rnVersion [lindex $argv 1]
 set rnVersionInt ""
 set substringToTrim ".expo.ejected"
 
