@@ -1,21 +1,13 @@
-import type { Delivery, RetryQueue, RetryQueueFactory } from '@bugsnag/core-performance'
+import type { Delivery, RetryQueueFactory } from '@bugsnag/core-performance'
+import { InMemoryQueue } from '@bugsnag/core-performance'
 import type { NetInfoState } from '@react-native-community/netinfo'
 import NetInfo from '@react-native-community/netinfo'
 import { AppState, Platform } from 'react-native'
 import type { AppStateStatus } from 'react-native'
 
-import { PERSISTENCE_DIRECTORY } from '../persistence'
-import type { MinimalFileSystem } from './directory'
-import RetryQueueDirectory from './directory'
-import FileBasedRetryQueue from './file-based'
-
-export default function createRetryQueueFactory (fileSystem: MinimalFileSystem): RetryQueueFactory {
-  return function fileBasedQueueFactory (delivery: Delivery, _retryQueueMaxSize: number): RetryQueue {
-    const directory = new RetryQueueDirectory(fileSystem, `${PERSISTENCE_DIRECTORY}/retry-queue`)
-    const retryQueue = new FileBasedRetryQueue(delivery, directory)
-
-    // send any currently stored payloads from previous launches
-    retryQueue.flush()
+const createRetryQueueFactory: () => RetryQueueFactory = () => {
+  return (delivery: Delivery, _retryQueueMaxSize: number) => {
+    const retryQueue = new InMemoryQueue(delivery, _retryQueueMaxSize)
 
     // store the last known network state value so we can see if it has changed
     let lastNetworkState: NetInfoState | undefined
@@ -56,3 +48,5 @@ export default function createRetryQueueFactory (fileSystem: MinimalFileSystem):
     return retryQueue
   }
 }
+
+export default createRetryQueueFactory
