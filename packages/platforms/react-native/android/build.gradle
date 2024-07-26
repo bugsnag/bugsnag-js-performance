@@ -1,3 +1,7 @@
+def isNewArchitectureEnabled() {
+    return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
+}
+
 buildscript {
   ext.safeExtGet = {prop, fallback ->
     rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
@@ -17,6 +21,16 @@ apply plugin: 'com.facebook.react'
 android {
   compileSdkVersion safeExtGet('compileSdkVersion', 33)
   namespace "com.bugsnag.reactnative.performance"
+
+  sourceSets {
+        main {
+            if (isNewArchitectureEnabled()) {
+                java.srcDirs += ['src/newarch/java']
+            } else {
+                java.srcDirs += ['src/oldarch/java']
+            }
+        }
+    }
 }
 
 repositories {

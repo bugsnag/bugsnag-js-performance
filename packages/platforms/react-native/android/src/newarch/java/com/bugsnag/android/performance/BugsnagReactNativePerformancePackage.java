@@ -16,8 +16,8 @@ public class BugsnagReactNativePerformancePackage extends TurboReactPackage {
   @Nullable
   @Override
   public NativeModule getModule(String name, ReactApplicationContext reactContext) {
-    if(name.equals(NativeBugsnagPerformanceImpl.NAME)) {
-      return new NativeBugsnagPerformanceImpl(reactContext);
+    if(name.equals(NativeBugsnagPerformanceImpl.MODULE_NAME)) {
+      return new BugsnagReactNativePerformance(reactContext);
     } else {
       return null;
     }
@@ -28,10 +28,10 @@ public class BugsnagReactNativePerformancePackage extends TurboReactPackage {
     return new ReactModuleInfoProvider() {
       public Map<String, ReactModuleInfo> getReactModuleInfos() {
         return Collections.singletonMap(
-          NativeBugsnagPerformanceImpl.NAME,
+          NativeBugsnagPerformanceImpl.MODULE_NAME,
           new ReactModuleInfo(
-            NativeBugsnagPerformanceImpl.NAME,
-            NativeBugsnagPerformanceImpl.NAME,
+            NativeBugsnagPerformanceImpl.MODULE_NAME,
+            NativeBugsnagPerformanceImpl.MODULE_NAME,
             false, // canOverrideExistingModule
             true,  // needsEagerInit
             false, // hasConstants
