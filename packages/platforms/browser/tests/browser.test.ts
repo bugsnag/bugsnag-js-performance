@@ -6,7 +6,7 @@
 import { VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 import type { BrowserConfiguration } from '../lib/config'
 import type { Client } from '@bugsnag/core-performance'
-import type { BrowserBugsnagStatic } from '@bugsnag/browser'
+import type Bugsnag from '@bugsnag/browser'
 
 const emptySamplingRequest = {
   body: '{"resourceSpans":[]}',
@@ -28,7 +28,7 @@ const createSpans = (count: number) => {
 }
 
 let client: Client<BrowserConfiguration>
-let bugsnag: BrowserBugsnagStatic
+let bugsnag: typeof Bugsnag
 
 const response = {
   status: 200,
