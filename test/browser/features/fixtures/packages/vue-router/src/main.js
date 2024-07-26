@@ -20,9 +20,16 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/contacts/:contactId',
+      path: '/contacts/:contactId()',
       name: 'contact',
-      component: () => import('./views/ContactView.vue')
+      component: () => import('./views/ContactView.vue'),
+      children: [
+        {
+          path: 'profile',
+          name: 'profile', 
+          component: () => import('./views/ContactProfile.vue')
+        }
+      ]
     }
   ]
 })
@@ -31,7 +38,7 @@ const router = createRouter({
 BugsnagPerformance.start({
     apiKey,
     endpoint,
-    maximumBatchSize: 13,
+    maximumBatchSize: 14,
     batchInactivityTimeoutMs: 5000,
     autoInstrumentNetworkRequests: false,
     routingProvider: new VueRouterRoutingProvider(router, base)

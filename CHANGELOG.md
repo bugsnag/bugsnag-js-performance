@@ -6,6 +6,10 @@
 
 (browser) - Add serviceName config option for browser and ensure service.name attribute is always set [#477](https://github.com/bugsnag/bugsnag-js-performance/pull/477)
 
+### Changed
+
+(vue-router) - Use vue router to resolve routes [#476](https://github.com/bugsnag/bugsnag-js-performance/pull/476)
+
 ## [v2.7.1] (2024-07-16)
 
 ### Changed

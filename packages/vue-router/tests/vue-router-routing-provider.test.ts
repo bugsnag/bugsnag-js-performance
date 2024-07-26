@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import type { Router } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import { VueRouterRoutingProvider } from '../lib/vue-router-routing-provider'
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
 import type { RouteChangeSpan, StartRouteChangeCallback } from '@bugsnag/browser-performance'
@@ -15,15 +15,15 @@ describe('VueRouterRoutingProvider', () => {
   const routes = [
     {
       path: '/',
-      element: '<Root />',
+      component: { template: '<Root />' },
       children: [
         {
           path: 'contacts/:contactId',
-          element: '<Contact />',
+          component: { template: '<Contact />' },
           children: [
             {
               path: 'edit',
-              element: '<EditContact />'
+              component: { template: '<EditContact />' }
             }
           ]
         }
@@ -31,12 +31,14 @@ describe('VueRouterRoutingProvider', () => {
     }
   ]
 
-  const router = {
-    getRoutes () {
-      return routes
-    },
-    beforeResolve: jest.fn()
-  } as unknown as Router
+  const router = createRouter({
+    history: createWebHistory(),
+    routes
+  })
+
+  beforeEach(() => {
+    router.beforeResolve = jest.fn()
+  })
 
   describe('listenForRouteChanges', () => {
     it('attaches a handler to the beforeResolve event and calls startRouteChangeSpan when fired', () => {
@@ -128,7 +130,7 @@ describe('VueRouterRoutingProvider', () => {
   })
 
   describe('resolveRoute', () => {
-    it('uses the provided routes when resolving routes', () => {
+    it('resolves a URL to the expected route', () => {
       const routingProvider = new VueRouterRoutingProvider(router)
 
       expect(routingProvider.resolveRoute(new URL('/contacts/2', window.origin))).toBe('/contacts/:contactId')
