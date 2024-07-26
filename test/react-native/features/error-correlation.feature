@@ -8,7 +8,10 @@ Feature: Error correlation
 
     # Wait for the error
     And I wait to receive an error
-    Then the error is a valid browser payload for the error reporting API
+    Then the exception "errorClass" equals "Error"
+    And the exception "message" equals "ErrorCorrelationScenario"
+    And the exception "type" equals "reactnativejs"
+    And the event "unhandled" is false
 
     # End the span
     And I execute the command "end-span"
