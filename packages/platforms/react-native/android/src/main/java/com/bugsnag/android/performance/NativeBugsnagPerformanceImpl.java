@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.bugsnag.reactnative.performance.NativeBugsnagPerformanceSpec;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -14,30 +13,24 @@ import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import java.security.SecureRandom;
 
-public class NativeBugsnagPerformanceImpl extends NativeBugsnagPerformanceSpec {
+class NativeBugsnagPerformanceImpl {
   
-  static final String NAME = "BugsnagReactNativePerformance";
+  static final String MODULE_NAME = "BugsnagReactNativePerformance";
   
+  private final ReactApplicationContext reactContext;
+
   private final SecureRandom random = new SecureRandom();
 
   public NativeBugsnagPerformanceImpl(ReactApplicationContext reactContext) {
-    super(reactContext);
+    this.reactContext = reactContext;
   }
 
-  @NonNull
-  @Override
-  public String getName() {
-    return NAME;
-  }
-
-  @Override
   public WritableMap getDeviceInfo() {
     WritableMap map = Arguments.createMap();
     try {
-      ReactApplicationContext reactContext = getReactApplicationContext();
-      String bundleIdentifier = reactContext.getPackageName();
+      String bundleIdentifier = this.reactContext.getPackageName();
       map.putString("bundleIdentifier", bundleIdentifier);
-      PackageInfo packageInfo = reactContext.getPackageManager().getPackageInfo(bundleIdentifier, 0);
+      PackageInfo packageInfo = this.reactContext.getPackageManager().getPackageInfo(bundleIdentifier, 0);
       map.putString("versionCode", Integer.toString(packageInfo.versionCode));
     } catch (Exception e) {
       // ignore
@@ -62,7 +55,6 @@ public class NativeBugsnagPerformanceImpl extends NativeBugsnagPerformanceSpec {
     return map;
   }
 
-  @Override
   public String requestEntropy() {
     byte[] bytes = new byte[1024];
     random.nextBytes(bytes);
@@ -78,7 +70,6 @@ public class NativeBugsnagPerformanceImpl extends NativeBugsnagPerformanceSpec {
     return hex.toString();
   }
 
-  @Override
   public void requestEntropyAsync(Promise promise) {
     promise.resolve(requestEntropy());
   }
