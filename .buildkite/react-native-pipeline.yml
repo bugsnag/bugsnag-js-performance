@@ -21,6 +21,7 @@ steps:
           - ./bin/generate-react-native-fixture
         matrix:
           - "0.74"
+          - "0.64"
         retry:
           automatic:
             - exit_status: "*"
@@ -66,6 +67,7 @@ steps:
           - ./bin/generate-react-native-fixture
         matrix:
           - "0.74"
+          - "0.64"
         retry:
           automatic:
             - exit_status: "*"
@@ -125,6 +127,7 @@ steps:
         concurrency_method: eager
         matrix:
           - "0.74"
+          - "0.64"
 
       - label: ":bitbar: :android: RN {{matrix}} Android 12 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-new-arch"
@@ -185,6 +188,7 @@ steps:
         concurrency_method: eager
         matrix:
           - "0.74"
+          - "0.64"
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS 14 (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-new-arch"
