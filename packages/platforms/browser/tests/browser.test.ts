@@ -3,6 +3,8 @@
  * @jest-environment-options { "url": "https://bugsnag.com/browser-integration-tests" }
 */
 
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 import { VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 import type { BrowserConfiguration } from '../lib/config'
 import type { Client } from '@bugsnag/core-performance'
@@ -58,9 +60,7 @@ beforeEach(() => {
     mockFetch = createMockFetch()
     window.fetch = mockFetch
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     client = require('../lib/browser').default
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     bugsnag = require('@bugsnag/browser').default
   })
 })
@@ -179,7 +179,7 @@ describe('Browser client integration tests', () => {
         autoInstrumentFullPageLoads: false,
         autoInstrumentNetworkRequests: false,
         autoInstrumentRouteChanges: false,
-        bugsnag
+        bugsnag: errorClient
       })
 
       await jest.runOnlyPendingTimersAsync()
@@ -191,6 +191,7 @@ describe('Browser client integration tests', () => {
       bugsnag.notify(new Error('test error'))
 
       expect(sendEvent).toHaveBeenCalledTimes(1)
+      // console.log(sendEvent.mock.calls[0][0].events[0])
       expect(sendEvent.mock.calls[0][0].events[0]._correlation).toEqual({
         traceId: span.traceId,
         spanId: span.id
@@ -227,7 +228,7 @@ describe('Browser client integration tests', () => {
         autoInstrumentFullPageLoads: false,
         autoInstrumentNetworkRequests: false,
         autoInstrumentRouteChanges: false,
-        bugsnag
+        bugsnag: errorClient
       })
 
       await jest.runOnlyPendingTimersAsync()
@@ -272,7 +273,7 @@ describe('Browser client integration tests', () => {
         autoInstrumentFullPageLoads: false,
         autoInstrumentNetworkRequests: false,
         autoInstrumentRouteChanges: false,
-        bugsnag
+        bugsnag: errorClient
       })
 
       await jest.runOnlyPendingTimersAsync()
