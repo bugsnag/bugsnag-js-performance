@@ -9,11 +9,15 @@ Pod::Spec.new do |s|
   s.description     = package["description"]
   s.homepage        = package["homepage"]
   s.license         = package["license"]
-  s.platforms       = { :ios => "11.0" }
+  s.platforms       = { :ios => "10.0" }
   s.author          = { "Bugsnag" => "platforms@bugsnag.com" }
   s.source          = { :git => "https://github.com/bugsnag/bugsnag-js-performance.git", :tag => "v#{s.version}" }
 
   s.source_files    = "ios/**/*.{h,m,mm,swift}"
 
-  install_modules_dependencies(s)
+  if ENV["RCT_NEW_ARCH_ENABLED"] == "1"
+    install_modules_dependencies(s)
+  else
+    s.dependency "React-Core"
+  end
 end
