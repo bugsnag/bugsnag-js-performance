@@ -48,6 +48,7 @@ class ProbabilityManager {
   private readonly probabilityFetcher: ProbabilityFetcher
 
   private lastProbabilityTime: number
+  private outstandingFreshnessCheck: Promise<void> | undefined = undefined
 
   private constructor (
     persistence: Persistence,
@@ -72,6 +73,35 @@ class ProbabilityManager {
       value: newProbability,
       time: this.lastProbabilityTime
     })
+  }
+
+  /**
+   * Ensure that the current probability value is fresh, i.e. it is less than 24
+   * hours old
+   *
+   * If the probability value is stale then this method will fetch a fresh one
+   *
+   * This method is idempotent; calling it while there is already an outstanding
+   * probability request will not create a second request
+   */
+  ensureFreshProbability (): Promise<void> {
+    // we're already fetching a new probability
+    if (this.outstandingFreshnessCheck) {
+      return this.outstandingFreshnessCheck
+    }
+
+    // if the probability value is >= 24 hours old, fetch a new one
+    if (Date.now() - this.lastProbabilityTime >= PROBABILITY_REFRESH_MILLISECONDS) {
+      this.outstandingFreshnessCheck = this.probabilityFetcher.getNewProbability()
+        .then(probability => {
+          this.setProbability(probability)
+          this.outstandingFreshnessCheck = undefined
+        })
+
+      return this.outstandingFreshnessCheck
+    }
+
+    return Promise.resolve()
   }
 }
 
