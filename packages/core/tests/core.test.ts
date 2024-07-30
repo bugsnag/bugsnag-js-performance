@@ -238,6 +238,28 @@ describe('Core', () => {
 
           expect(delivery.requests).toHaveLength(0)
         })
+
+        it('makes a probability freshness check when the app is foregrounded', async () => {
+          const delivery = new InMemoryDelivery()
+          const backgroundingListener = new ControllableBackgroundingListener()
+
+          const client = createTestClient({ backgroundingListener, deliveryFactory: () => delivery })
+          client.start(VALID_API_KEY)
+
+          await jest.runOnlyPendingTimersAsync()
+
+          expect(delivery.samplingRequests).toHaveLength(0)
+
+          backgroundingListener.sendToBackground()
+          await jest.runOnlyPendingTimersAsync()
+
+          expect(delivery.samplingRequests).toHaveLength(0)
+
+          backgroundingListener.sendToForeground()
+          await jest.runOnlyPendingTimersAsync()
+
+          expect(delivery.samplingRequests).toHaveLength(1)
+        })
       })
 
       describe('currentSpanContext', () => {
