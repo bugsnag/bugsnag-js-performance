@@ -6,7 +6,7 @@ import type { RetryQueue } from './retry-queue'
 import type { ReadonlySampler } from './sampler'
 import type { SpanEnded } from './span'
 
-type MinimalProbabilityManager = Pick<ProbabilityManager, 'setProbability' | 'fetchingInitialProbability'>
+type MinimalProbabilityManager = Pick<ProbabilityManager, 'setProbability'>
 
 export class BatchProcessor<C extends Configuration> implements Processor {
   private readonly delivery: Delivery
@@ -69,10 +69,6 @@ export class BatchProcessor<C extends Configuration> implements Processor {
     this.stop()
 
     this.flushQueue = this.flushQueue.then(async () => {
-      if (this.probabilityManager.fetchingInitialProbability) {
-        await this.probabilityManager.fetchingInitialProbability
-      }
-
       const batch = this.prepareBatch()
 
       // we either had nothing in the batch originally or all spans were discarded
