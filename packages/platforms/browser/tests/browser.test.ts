@@ -203,6 +203,8 @@ describe('Browser client integration tests', () => {
       })
 
       await jest.runOnlyPendingTimersAsync()
+      expect(mockFetch).toHaveBeenCalledTimes(1)
+      expect(mockFetch).toHaveBeenCalledWith('/test', emptySamplingRequest)
 
       const span = client.startSpan('test span')
 
@@ -249,6 +251,8 @@ describe('Browser client integration tests', () => {
       })
 
       await jest.runOnlyPendingTimersAsync()
+      expect(mockFetch).toHaveBeenCalledTimes(1)
+      expect(mockFetch).toHaveBeenCalledWith('/test', emptySamplingRequest)
 
       const span = client.startSpan('test span')
 
@@ -292,6 +296,8 @@ describe('Browser client integration tests', () => {
       })
 
       await jest.runOnlyPendingTimersAsync()
+      expect(mockFetch).toHaveBeenCalledTimes(1)
+      expect(mockFetch).toHaveBeenCalledWith('/test', emptySamplingRequest)
 
       const parentSpan = client.startSpan('parent span')
 
