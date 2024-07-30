@@ -95,6 +95,9 @@ export async function launchScenario (rootTag, clearPersistedData = true) {
         command.endpoint
       )
 
+    case 'clear-all-persistent-data':
+      return await launchScenario(rootTag, true)
+
     case 'set-sampling-probability-to-0':
       await setSamplingProbability(0)
 
