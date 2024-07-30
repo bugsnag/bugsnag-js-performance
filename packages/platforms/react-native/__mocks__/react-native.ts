@@ -163,6 +163,11 @@ export const AppState = new class {
     return this.#status
   }
 
+  reset (): void {
+    this.#status = 'active'
+    this.#eventListeners.length = 0
+  }
+
   bugsnagChangeAppStateStatus (status: AppStateStatus): void {
     this.#status = status
 
