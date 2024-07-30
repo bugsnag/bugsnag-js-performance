@@ -6,6 +6,10 @@ When('I execute the command {string}') do |command|
   execute_command(command)
 end
 
+When('I clear all persistent data') do
+  execute_command 'clear-all-persistent-data'
+end
+
 When('I navigate to {string}') do |screen|
   execute_command 'navigate', screen
 end
