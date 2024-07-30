@@ -60,6 +60,8 @@ class ProbabilityManager {
     this.sampler = sampler
     this.probabilityFetcher = probabilityFetcher
     this.lastProbabilityTime = initialProbabilityTime
+
+    this.ensureFreshProbability()
   }
 
   setProbability (newProbability: number): Promise<void> {

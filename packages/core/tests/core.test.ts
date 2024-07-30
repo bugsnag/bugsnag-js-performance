@@ -7,6 +7,7 @@ import {
 import type { BackgroundingListener } from '../lib/backgrounding-listener'
 import { createNoopClient } from '../lib/core'
 import { DefaultSpanContextStorage } from '../lib/span-context'
+import { InMemoryPersistence } from '../lib/persistence'
 
 jest.useFakeTimers()
 
@@ -242,22 +243,34 @@ describe('Core', () => {
         it('makes a probability freshness check when the app is foregrounded', async () => {
           const delivery = new InMemoryDelivery()
           const backgroundingListener = new ControllableBackgroundingListener()
+          const persistence = new InMemoryPersistence()
+          await persistence.save('bugsnag-sampling-probability', {
+            value: 0.25,
+            time: Date.now() - 24 * 60 * 60 * 1000 + 1 // 23 hours 59 minutes & 59 seconds ago
+          })
 
-          const client = createTestClient({ backgroundingListener, deliveryFactory: () => delivery })
+          const client = createTestClient({
+            backgroundingListener,
+            deliveryFactory: () => delivery,
+            persistence
+          })
+
           client.start(VALID_API_KEY)
 
+          // a request shouldn't be made during 'start'
           await jest.runOnlyPendingTimersAsync()
-
           expect(delivery.samplingRequests).toHaveLength(0)
 
+          await jest.advanceTimersByTimeAsync(1)
+
+          // backgrounding should not kick off a freshness check
           backgroundingListener.sendToBackground()
           await jest.runOnlyPendingTimersAsync()
-
           expect(delivery.samplingRequests).toHaveLength(0)
 
+          // returning to the foreground should kick off a freshness check
           backgroundingListener.sendToForeground()
           await jest.runOnlyPendingTimersAsync()
-
           expect(delivery.samplingRequests).toHaveLength(1)
         })
       })
