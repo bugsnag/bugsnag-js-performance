@@ -107,4 +107,114 @@ describe('ProbabilityManager', () => {
     await jest.runOnlyPendingTimersAsync()
     expect(delivery.samplingRequests).toHaveLength(0)
   })
+
+  describe('ensureFreshProbability', () => {
+    it('does nothing if the probability has just been set', async () => {
+      const persistence = new InMemoryPersistence()
+      const delivery = new InMemoryDelivery()
+      delivery.setNextSamplingProbability(0.5)
+
+      const sampler = new Sampler(0.75)
+      const fetcher = new ProbabilityFetcher(delivery, 'api key')
+
+      const manager = await ProbabilityManager.create(
+        persistence,
+        sampler,
+        fetcher
+      )
+
+      await manager.setProbability(0.25)
+      await manager.ensureFreshProbability()
+
+      // we've just set a probability value so shouldn't make a sampling request
+      await jest.runOnlyPendingTimersAsync()
+      expect(delivery.samplingRequests).toHaveLength(0)
+    })
+
+    it('does nothing if the probability is less than 24 hours old', async () => {
+      const persistence = new InMemoryPersistence()
+      persistence.save('bugsnag-sampling-probability', {
+        value: 0.25,
+        time: Date.now() - 24 * 60 * 60 * 1000 + 1 // 23 hours 59 minutes & 59 seconds ago
+      })
+
+      const delivery = new InMemoryDelivery()
+      delivery.setNextSamplingProbability(0.5)
+
+      const sampler = new Sampler(0.75)
+      const fetcher = new ProbabilityFetcher(delivery, 'api key')
+
+      const manager = await ProbabilityManager.create(
+        persistence,
+        sampler,
+        fetcher
+      )
+
+      await manager.ensureFreshProbability()
+
+      // the persisted probability value is fresh enough so we shouldn't make a
+      // sampling request
+      await jest.runOnlyPendingTimersAsync()
+      expect(delivery.samplingRequests).toHaveLength(0)
+    })
+
+    it('fetches a new probability if the probability is stale', async () => {
+      const persistence = new InMemoryPersistence()
+      persistence.save('bugsnag-sampling-probability', {
+        value: 0.25,
+        time: Date.now() - 25 * 60 * 60 * 1000 // 25 hours ago
+      })
+
+      const delivery = new InMemoryDelivery()
+      delivery.setNextSamplingProbability(0.5)
+
+      const sampler = new Sampler(0.75)
+      const fetcher = new ProbabilityFetcher(delivery, 'api key')
+
+      const manager = await ProbabilityManager.create(
+        persistence,
+        sampler,
+        fetcher
+      )
+
+      expect(delivery.samplingRequests).toHaveLength(0)
+
+      await manager.ensureFreshProbability()
+
+      // the persisted probability value is stale so we should make a request
+      expect(delivery.samplingRequests).toHaveLength(1)
+    })
+
+    it('does not make a second request if one is already underway', async () => {
+      const persistence = new InMemoryPersistence()
+      persistence.save('bugsnag-sampling-probability', {
+        value: 0.25,
+        time: Date.now() - 25 * 60 * 60 * 1000 // 25 hours ago
+      })
+
+      const delivery = new InMemoryDelivery()
+      delivery.setNextSamplingProbability(0.5)
+
+      const sampler = new Sampler(0.75)
+      const fetcher = new ProbabilityFetcher(delivery, 'api key')
+
+      const manager = await ProbabilityManager.create(
+        persistence,
+        sampler,
+        fetcher
+      )
+
+      expect(delivery.samplingRequests).toHaveLength(0)
+
+      await Promise.all([
+        manager.ensureFreshProbability(),
+        manager.ensureFreshProbability(),
+        manager.ensureFreshProbability(),
+        manager.ensureFreshProbability()
+      ])
+
+      // the persisted probability value is stale so we should make a request
+      expect(delivery.samplingRequests).toHaveLength(1)
+    })
+  })
 })
