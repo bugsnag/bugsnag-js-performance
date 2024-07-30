@@ -6,7 +6,7 @@ import type { RetryQueue } from './retry-queue'
 import type { ReadonlySampler } from './sampler'
 import type { SpanEnded } from './span'
 
-type MinimalProbabilityManager = Pick<ProbabilityManager, 'setProbability'>
+type MinimalProbabilityManager = Pick<ProbabilityManager, 'setProbability' | 'ensureFreshProbability'>
 
 export class BatchProcessor<C extends Configuration> implements Processor {
   private readonly delivery: Delivery
@@ -69,7 +69,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
     this.stop()
 
     this.flushQueue = this.flushQueue.then(async () => {
-      const batch = this.prepareBatch()
+      const batch = await this.prepareBatch()
 
       // we either had nothing in the batch originally or all spans were discarded
       if (!batch) {
@@ -108,10 +108,13 @@ export class BatchProcessor<C extends Configuration> implements Processor {
     await this.flushQueue
   }
 
-  private prepareBatch (): SpanEnded[] | undefined {
+  private async prepareBatch (): Promise<SpanEnded[] | undefined> {
     if (this.spans.length === 0) {
       return
     }
+
+    // ensure we have a fresh probability value before building the batch
+    await this.probabilityManager.ensureFreshProbability()
 
     // update sampling values if necessary and re-sample
     const batch: SpanEnded[] = []
