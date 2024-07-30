@@ -52,8 +52,6 @@ let mockFetch: ReturnType<typeof createMockFetch>
 jest.useFakeTimers({ doNotFake: ['performance'] })
 
 beforeEach(() => {
-  setNextSamplingProbability(1.0)
-
   jest.isolateModules(() => {
     mockFetch = createMockFetch()
     window.fetch = mockFetch
@@ -63,12 +61,14 @@ beforeEach(() => {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     bugsnag = require('@bugsnag/browser').default
   })
+
+  localStorage.removeItem('bugsnag-sampling-probability')
 })
 
 describe('Browser client integration tests', () => {
   describe('Batching', () => {
-    xit('waits for the initial sampling request to complete before sending the first batch', async () => {
-      setNextSamplingProbability(0.999999)
+    it('waits for the initial sampling request to complete before sending the first batch', async () => {
+      setNextSamplingProbability(0.1234)
 
       // Fill a batch before starting bugsnag
       createSpans(100)
@@ -92,24 +92,34 @@ describe('Browser client integration tests', () => {
       // Second request delivered
       await jest.advanceTimersByTimeAsync(RESPONSE_TIME)
       const fullBatch = JSON.parse(mockFetch.mock.calls[1][1].body)
-      expect(fullBatch.resourceSpans[0].scopeSpans[0].spans).toHaveLength(100)
 
       // Header should be updated
       expect(mockFetch).toHaveBeenLastCalledWith('/test', expect.objectContaining({
         headers: expect.objectContaining({
-          'Bugsnag-Span-Sampling': '0.999999:100'
+          'Bugsnag-Span-Sampling': expect.stringMatching(/^0\.1234:\d+$/)
         })
       }))
 
+      const samplingHeaderParser = /^(?<probability>0\.\d+):(?<numberOfSpans>\d+)$/
+      const samplingHeader = mockFetch.mock.calls[1][1].headers['Bugsnag-Span-Sampling']
+      const matches = samplingHeaderParser.exec(samplingHeader)
+      expect(matches?.groups?.probability).toEqual('0.1234')
+
+      const numberOfSpans = Number.parseInt(matches?.groups?.numberOfSpans || '0')
+      expect(numberOfSpans).toBeGreaterThan(0)
+      expect(numberOfSpans).toBeLessThanOrEqual(100)
+
+      expect(fullBatch.resourceSpans[0].scopeSpans[0].spans).toHaveLength(numberOfSpans)
+
       // Every span should have the sampling probability returned by the initial sampling request
       for (const span of fullBatch.resourceSpans[0].scopeSpans[0].spans) {
-        expect(span.attributes).toContainEqual({ key: 'bugsnag.sampling.p', value: { doubleValue: 0.999999 } })
+        expect(span.attributes).toContainEqual({ key: 'bugsnag.sampling.p', value: { doubleValue: 0.1234 } })
       }
     })
   })
 
   describe('Resampling', () => {
-    xit('uses the incoming sampling probability for the next batch', async () => {
+    it('uses the incoming sampling probability for the next batch', async () => {
       client.start({
         apiKey: VALID_API_KEY,
         endpoint: '/test',
@@ -118,37 +128,47 @@ describe('Browser client integration tests', () => {
         autoInstrumentRouteChanges: false
       })
 
-      await jest.runOnlyPendingTimersAsync()
-      expect(mockFetch).toHaveBeenCalledTimes(1)
-      expect(mockFetch).toHaveBeenCalledWith('/test', emptySamplingRequest)
-
-      // Initial sampling probability has been updated
-      await jest.advanceTimersByTimeAsync(RESPONSE_TIME)
-
-      setNextSamplingProbability(0.999999)
+      setNextSamplingProbability(0.2)
 
       // Create one full batch
       createSpans(100)
 
-      await jest.advanceTimersByTimeAsync(1)
+      await jest.runOnlyPendingTimersAsync()
+
       expect(mockFetch).toHaveBeenCalledTimes(2)
       expect(mockFetch.mock.calls[1][1]).toEqual(expect.objectContaining({
-        headers: expect.objectContaining({ 'Bugsnag-Span-Sampling': '1:100' })
+        headers: expect.objectContaining({ 'Bugsnag-Span-Sampling': expect.stringMatching(/^0\.2:\d+$/) })
       }))
 
-      // Create a second almost complete batch
-      createSpans(99)
+      const samplingHeaderParser = /^(?<probability>0\.\d+):(?<numberOfSpans>\d+)$/
+      const samplingHeader1 = mockFetch.mock.calls[1][1].headers['Bugsnag-Span-Sampling']
+      const matches1 = samplingHeaderParser.exec(samplingHeader1)
+      expect(matches1?.groups?.probability).toEqual('0.2')
 
-      // Await delivery response and subsequent probability update
-      await jest.advanceTimersByTimeAsync(RESPONSE_TIME)
+      const numberOfSpans1 = Number.parseInt(matches1?.groups?.numberOfSpans || '0')
+      expect(numberOfSpans1).toBeGreaterThan(0)
+      expect(numberOfSpans1).toBeLessThanOrEqual(100)
 
-      // Complete second batch
-      createSpans(1)
-      await jest.advanceTimersByTimeAsync(1)
+      // make a second batch with a different probability value
+      setNextSamplingProbability(0.5)
+      await jest.runOnlyPendingTimersAsync()
+      createSpans(100)
+      await jest.runOnlyPendingTimersAsync()
+
       expect(mockFetch).toHaveBeenCalledTimes(3)
       expect(mockFetch.mock.calls[2][1]).toEqual(expect.objectContaining({
-        headers: expect.objectContaining({ 'Bugsnag-Span-Sampling': '0.999999:100' })
+        headers: expect.objectContaining({ 'Bugsnag-Span-Sampling': expect.stringMatching(/^0\.5:\d+$/) })
       }))
+
+      const samplingHeader2 = mockFetch.mock.calls[2][1].headers['Bugsnag-Span-Sampling']
+      const matches2 = samplingHeaderParser.exec(samplingHeader2)
+      expect(matches2?.groups?.probability).toEqual('0.5')
+
+      const numberOfSpans2 = Number.parseInt(matches2?.groups?.numberOfSpans || '0')
+      expect(numberOfSpans2).toBeGreaterThan(0)
+      expect(numberOfSpans2).toBeLessThanOrEqual(100)
+
+      await jest.runOnlyPendingTimersAsync()
     })
   })
 

@@ -14,7 +14,10 @@ import {
 
 jest.useFakeTimers()
 
-const minimalProbabilityManager = { setProbability () { return Promise.resolve() } }
+const minimalProbabilityManager = {
+  setProbability: () => Promise.resolve(),
+  ensureFreshProbability: () => Promise.resolve()
+}
 
 describe('BatchProcessor', () => {
   it('delivers after reaching the specified span limit', async () => {
