@@ -1,7 +1,7 @@
 #!/usr/bin/expect -f
 
 set timeout -1
-set notifierVersion "8.0.0-alpha.11"
+set notifierVersion "8.0.0-alpha.12"
 set notifierApiKey "1234567890abcdef1234567890abcdef"
 set fixtureDirectory [lindex $argv 0]
 set rnVersion [lindex $argv 1]
