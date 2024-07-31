@@ -19,7 +19,7 @@
         "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
     },
     "peerDependencies": {
-        "@bugsnag/core-performance": "^2.3.0-alpha.0",
+        "@bugsnag/core-performance": "^2.3.0",
         "@bugsnag/react-native-performance": "^2.3.0",
         "react-native-navigation": "*"
     },

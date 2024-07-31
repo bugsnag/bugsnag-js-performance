@@ -1,5 +1,8 @@
 Feature: Persistent state
 
+Background:
+  Given I clear all persistent data
+
 Scenario: Sampling value of 0 is read on app launch
   Given I execute the command "set-sampling-probability-to-0"
   When I run "SpanTriggeredByCommandScenario"

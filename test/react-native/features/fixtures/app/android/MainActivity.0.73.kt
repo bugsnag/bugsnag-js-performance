@@ -13,6 +13,7 @@ class MainActivity : ReactActivity() {
    * https://reactnavigation.org/docs/getting-started/#installing-dependencies-into-a-bare-react-native-project
    */
   override fun onCreate(savedInstanceState: Bundle?) {
+    startBugsnag()
     super.onCreate(null)
   }
 

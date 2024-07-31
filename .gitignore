@@ -124,3 +124,6 @@ test/react-native/features/fixtures/generated/
 
 # React Native Android gradle files
 .gradle/
+
+# MacOS system files
+.DS_Store

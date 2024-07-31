@@ -16,8 +16,10 @@ interface BugsnagErrorStatic {
       setTraceCorrelation?: SetTraceCorrelation
     }
   }
-  _client?: {
-    _notify: (event: BugsnagErrorEvent) => void
+  Client?: {
+    prototype: {
+      _notify: (event: BugsnagErrorEvent) => void
+    }
   }
 }
 
