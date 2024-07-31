@@ -114,6 +114,12 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         // from configuration
         options.backgroundingListener.onStateChange(state => {
           (processor as BatchProcessor<C>).flush()
+
+          // ensure we have a fresh probability value when returning to the
+          // foreground
+          if (state === 'in-foreground') {
+            manager.ensureFreshProbability()
+          }
         })
 
         logger = configuration.logger
