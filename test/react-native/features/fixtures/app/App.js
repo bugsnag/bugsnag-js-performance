@@ -1,11 +1,11 @@
 import React, { useContext, useEffect } from 'react'
-import { SafeAreaView, StyleSheet, View, Text, RootTagContext } from 'react-native'
+import { SafeAreaView, StyleSheet, View, Text, RootTagContext, unstable_RootTagContext } from 'react-native'
 import { launchScenario } from '@bugsnag/react-native-performance-scenarios'
 
 console.reportErrorsAsExceptions = false
 
 const App = () => {
-  const rootTag = useContext(RootTagContext)
+  const rootTag = useContext(RootTagContext || unstable_RootTagContext)
 
   useEffect(() => {
     launchScenario(rootTag)
