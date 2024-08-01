@@ -1,5 +1,6 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 import { REACT_APP_API_KEY, REACT_APP_ENDPOINT, REACT_APP_SCENARIO_NAME } from '@env'
+import React from 'react'
 import { AppRegistry } from 'react-native'
 import * as Scenarios from '../scenarios'
 import { getCurrentCommand } from './CommandRunner'
