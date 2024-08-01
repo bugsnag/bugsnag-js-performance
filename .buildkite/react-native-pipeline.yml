@@ -94,6 +94,46 @@ steps:
             - exit_status: "*"
               limit: 1
 
+      - label: ':android: Build RN 0.64 test fixture APK'
+        key: "build-react-native-android-fixture-064"
+        timeout_in_minutes: 30
+        agents:
+          queue: macos-14
+        env:
+          JAVA_VERSION: "11"
+          NODE_VERSION: "18"
+          RN_VERSION: "0.64"
+          BUILD_ANDROID: "true"
+        artifact_paths:
+          - "test/react-native/features/fixtures/generated/old-arch/**/reactnative.apk"
+        commands:
+          - bundle install
+          - ./bin/generate-react-native-fixture
+        retry:
+          automatic:
+            - exit_status: "*"
+              limit: 1
+
+      - label: ':mac: Build RN 0.64 test fixture ipa'
+        key: "build-react-native-ios-fixture-064"
+        timeout_in_minutes: 30
+        agents:
+          queue: "macos-14"
+        env:
+          NODE_VERSION: "18"
+          RN_VERSION: "0.64"
+          BUILD_IOS: "true"
+          XCODE_VERSION: "15.3.0"
+        artifact_paths:
+          - "test/react-native/features/fixtures/generated/old-arch/**/output/reactnative.ipa"
+        commands:
+          - bundle install
+          - ./bin/generate-react-native-fixture
+        retry:
+          automatic:
+            - exit_status: "*"
+              limit: 1
+
         #
         # End-to-end tests
         #
@@ -216,3 +256,55 @@ steps:
         concurrency_method: eager
         matrix:
           - "0.74"
+
+      - label: ":bitbar: :android: RN 0.64 Android 12 end-to-end tests"
+        depends_on: "build-react-native-android-fixture-064"
+        timeout_in_minutes: 60
+        plugins:
+          artifacts#v1.9.0:
+            download: "test/react-native/features/fixtures/generated/old-arch/0.64/reactnative.apk"
+            upload: ./test/react-native/maze_output/**/*
+          docker-compose#v4.7.0:
+            pull: react-native-maze-runner
+            run: react-native-maze-runner
+            service-ports: true
+            command:
+              - --app=/app/features/fixtures/generated/old-arch/0.64/reactnative.apk
+              - --farm=bb
+              - --device=ANDROID_12
+              - --a11y-locator
+              - --appium-version=1.22
+              - --no-tunnel
+              - --aws-public-ip
+        retry:
+          manual:
+            permit_on_passed: true
+        concurrency: 25
+        concurrency_group: "bitbar"
+        concurrency_method: eager
+
+      - label: ":bitbar: :mac: RN 0.64 iOS 14 (Old Arch) end-to-end tests"
+        depends_on: "build-react-native-ios-fixture-064"
+        timeout_in_minutes: 60
+        plugins:
+          artifacts#v1.9.0:
+            download: "test/react-native/features/fixtures/generated/old-arch/0.64/output/reactnative.ipa"
+            upload: ./test/react-native/maze_output/**/*
+          docker-compose#v4.12.0:
+            pull: react-native-maze-runner
+            run: react-native-maze-runner
+            service-ports: true
+            command:
+              - --app=/app/features/fixtures/generated/old-arch/0.64/output/reactnative.ipa
+              - --farm=bb
+              - --device=IOS_14
+              - --a11y-locator
+              - --appium-version=1.22
+              - --no-tunnel
+              - --aws-public-ip
+        retry:
+          manual:
+            permit_on_passed: true
+        concurrency: 25
+        concurrency_group: "bitbar"
+        concurrency_method: eager
