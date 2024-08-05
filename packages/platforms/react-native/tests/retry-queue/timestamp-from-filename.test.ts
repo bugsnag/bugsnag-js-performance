@@ -9,12 +9,9 @@ describe('timestampFromFilename', () => {
     ['retry-00000000000-a.json', '0'],
     ['retry-999999999999999999999999999999999999-a.json', '999999999999999999999999999999999999']
   ])('parses %s into the timestamp %s', (input, expected) => {
-    // ideally we'd want to do something like this:
-    // expect(timestampFromFilename(input)).toBe(BigInt(expected))
-    // but Jest can't serialise BigInts yet so we have to use strings for now
     const actual = timestampFromFilename(input)
-
-    expect(actual?.toString()).toBe(expected)
+    expect(actual).toBe(Number(expected))
+    expect(Number.isNaN(actual)).toBe(false)
   })
 
   it.each([
