@@ -37,6 +37,7 @@ export interface Configuration {
   enabledReleaseStages?: string[] | null
   plugins?: Array<Plugin<Configuration>>
   bugsnag?: BugsnagErrorStatic
+  samplingProbability?: number
 }
 
 export interface TestConfiguration {
@@ -64,6 +65,7 @@ export interface CoreSchema extends Schema {
   enabledReleaseStages: ConfigOption<string[] | null>
   plugins: ConfigOption<Array<Plugin<Configuration>>>
   bugsnag: ConfigOption<BugsnagErrorStatic | undefined>
+  samplingProbability: ConfigOption<number | undefined>
 }
 
 export const schema: CoreSchema = {
@@ -111,6 +113,11 @@ export const schema: CoreSchema = {
     defaultValue: undefined,
     message: 'should be an instance of Bugsnag',
     validate: (value: unknown): value is BugsnagErrorStatic => isObject(value) && typeof value.addOnError === 'function'
+  },
+  samplingProbability: {
+    defaultValue: undefined,
+    message: 'should be a number',
+    validate: (value: unknown): value is number | undefined => value === undefined || isNumber(value)
   }
 }
 
