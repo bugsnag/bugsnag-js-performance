@@ -9,17 +9,15 @@ import type Directory from './directory'
 import timestampFromFilename from './timestamp-from-filename'
 
 function getLastSpan (body: DeliveryPayload): DeliverySpan | undefined {
-  let lastSpan: DeliverySpan | undefined
-
-  for (const resourceSpan of body.resourceSpans) {
-    for (const scopeSpan of resourceSpan.scopeSpans) {
-      for (const span of scopeSpan.spans) {
-        lastSpan = span
+  for (let i = body.resourceSpans.length - 1; i >= 0; i--) {
+    const resourceSpan = body.resourceSpans[i]
+    for (let j = resourceSpan.scopeSpans.length - 1; j >= 0; j--) {
+      const scopeSpan = resourceSpan.scopeSpans[j]
+      if (scopeSpan.spans.length > 0) {
+        return scopeSpan.spans[scopeSpan.spans.length - 1]
       }
     }
   }
-
-  return lastSpan
 }
 
 function isValidFilename (filename: string): boolean {
