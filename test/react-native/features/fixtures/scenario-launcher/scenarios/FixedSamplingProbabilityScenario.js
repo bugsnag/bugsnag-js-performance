@@ -5,7 +5,8 @@ import BugsnagPerformance from '@bugsnag/react-native-performance'
 export const config = {
   maximumBatchSize: 1,
   autoInstrumentAppStarts: false,
-  appVersion: '1.2.3'
+  appVersion: '1.2.3',
+  samplingProbability: 1
 }
 
 export const App = () => {
