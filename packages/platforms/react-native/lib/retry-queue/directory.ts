@@ -21,12 +21,18 @@ function filenameSorter (a: string, b: string): number {
     return -1
   }
 
-  if (aTimestamp > bTimestamp) {
-    return -1
+  const delta = bTimestamp - aTimestamp
+  if (delta !== 0) {
+    return delta
   }
 
-  if (aTimestamp < bTimestamp) {
+  // if timestamps are equal fall back to default string sorting
+  if (a > b) {
     return 1
+  }
+
+  if (a < b) {
+    return -1
   }
 
   return 0
