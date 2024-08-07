@@ -1,6 +1,6 @@
 import { isObject } from '@bugsnag/core-performance'
 import type { FileSystem } from 'react-native-file-access'
-import { Util } from 'react-native-file-access'
+import { Util } from '../persistence'
 import timestampFromFilename from './timestamp-from-filename'
 
 export type MinimalFileSystem = Pick<typeof FileSystem, 'ls' | 'exists' | 'isDir' | 'readFile' | 'writeFile' | 'mkdir' | 'unlink'>
