@@ -34,5 +34,5 @@ export const CompleteNavigation: React.FC<Props> = ({ on, children }) => {
     }
   }, [on])
 
-  return children
+  return <>{children}</>
 }
