@@ -9,6 +9,7 @@ export * as NetworkRequestScenario from './NetworkRequestScenario'
 export * as SpanTriggeredByCommandScenario from './SpanTriggeredByCommandScenario'
 export * as WrapperComponentProviderScenario from './WrapperComponentProviderScenario'
 export * as TracePropagationScenario from './TracePropagationScenario'
+export * as FixedSamplingProbabilityScenario from './FixedSamplingProbabilityScenario'
 
 // React Native Navigation Scenarios
 export * as ReactNativeNavigationScenario from './ReactNativeNavigationScenario'
