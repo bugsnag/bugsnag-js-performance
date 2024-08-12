@@ -1,6 +1,6 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 import { REACT_APP_API_KEY, REACT_APP_ENDPOINT, REACT_APP_SCENARIO_NAME } from '@env'
-import { AppRegistry } from 'react-native'
+import { AppRegistry, SafeAreaView } from 'react-native'
 import * as Scenarios from '../scenarios'
 import { getCurrentCommand } from './CommandRunner'
 import { clearPersistedState, setDeviceId, setSamplingProbability } from './Persistence'
@@ -28,6 +28,10 @@ async function loadReactNavigationScenario (scenario) {
 async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
   console.error(`[BugsnagPerformance] Launching scenario: ${scenarioName}`)
   const scenario = Scenarios[scenarioName]
+
+  if (typeof scenario.init == 'function') {
+    scenario.init()
+  }
 
   BugsnagPerformance.start({
     apiKey,
@@ -58,9 +62,11 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
     console.error(`[BugsnagPerformance] Reflect endpoint: ${reflectEndpoint}`)
 
     const Scenario = () => 
-    <ScenarioContext.Provider value={{ reflectEndpoint }}>
-      <scenario.App />
-    </ScenarioContext.Provider>
+      <ScenarioContext.Provider value={{ reflectEndpoint }}>
+        <SafeAreaView>
+          <scenario.App />
+        </SafeAreaView>
+      </ScenarioContext.Provider>
   
     AppRegistry.registerComponent(scenarioName, () => Scenario)
     AppRegistry.runApplication(scenarioName, appParams)
