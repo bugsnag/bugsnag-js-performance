@@ -3,7 +3,7 @@
 const { execFileSync, execSync } = require('child_process')
 const { resolve } = require('path')
 const fs = require('fs')
-const { removeAndroid } = require('./rn-modify-source')
+const { modifyAndroidSource, modifyIosSource } = require('./rn-modify-source')
 
 if (!process.env.RN_VERSION) {
   console.error('Please provide a React Native version')
@@ -122,7 +122,7 @@ if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
 
   // Remove the bugnsnag start code added by react-native-cli
   // TODO: Await this promise instead of using .then
-  removeAndroid(fixtureDir).then(() => {
+  modifyAndroidSource(fixtureDir).then(() => {
     // build the android app
     execFileSync('./gradlew', ['assembleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
     fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
@@ -140,37 +140,39 @@ if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
   // install pods
   execFileSync('pod', ['install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
 
-  // build the ios app
-  const archiveArgs = [
-    'xcodebuild',
-    'DEVELOPMENT_TEAM=7W9PZ27Y5F',
-    '-workspace',
-    'reactnative.xcworkspace',
-    '-scheme',
-    'reactnative',
-    '-configuration',
-    'Release',
-    '-archivePath',
-    `${fixtureDir}/reactnative.xcarchive`,
-    '-allowProvisioningUpdates',
-    'archive',
-  ]
-
-  execFileSync('xcrun', archiveArgs, { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
-
-  // export the archive
-  const exportArgs = [
-    'xcodebuild',
-    '-exportArchive',
-    '-archivePath',
-    'reactnative.xcarchive',
-    '-exportPath',
-    'output/',
-    '-exportOptionsPlist',
-    'exportOptions.plist',
-  ]
-
-  execFileSync('xcrun', exportArgs, { cwd: fixtureDir, stdio: 'inherit' })
+  modifyIosSource(fixtureDir).then(() => {
+    // build the iOS app
+    const archiveArgs = [
+      'xcodebuild',
+      'DEVELOPMENT_TEAM=7W9PZ27Y5F',
+      '-workspace',
+      'reactnative.xcworkspace',
+      '-scheme',
+      'reactnative',
+      '-configuration',
+      'Release',
+      '-archivePath',
+      `${fixtureDir}/reactnative.xcarchive`,
+      '-allowProvisioningUpdates',
+      'archive',
+    ]
+  
+    execFileSync('xcrun', archiveArgs, { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
+  
+    // export the archive
+    const exportArgs = [
+      'xcodebuild',
+      '-exportArchive',
+      '-archivePath',
+      'reactnative.xcarchive',
+      '-exportPath',
+      'output/',
+      '-exportOptionsPlist',
+      'exportOptions.plist',
+    ]
+  
+    execFileSync('xcrun', exportArgs, { cwd: fixtureDir, stdio: 'inherit' })
+  })
 }
 
 function configureRN064Fixture(fixtureDir) {
@@ -241,6 +243,26 @@ function replaceNativeFiles() {
     resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/ConfigFileReader.kt'),
     resolve(fixtureDir, 'android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/ConfigFileReader.kt')
   )
+
+  // fs.copyFileSync(
+  //   resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/ConfigFileReader.swift'),
+  //   resolve(fixtureDir, 'ios/reactnative/ConfigFileReader.swift')
+  // )
+
+  // fs.copyFileSync(
+  //   resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/Fixture.swift'),
+  //   resolve(fixtureDir, 'ios/reactnative/Fixture.swift')
+  // )
+
+  // fs.copyFileSync(
+  //   resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/Fixture.m'),
+  //   resolve(fixtureDir, 'ios/reactnative/Fixture.m')
+  // )
+
+  // fs.copyFileSync(
+  //   resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/Fixture-Bridging-Header.h'),
+  //   resolve(fixtureDir, 'ios/reactnative/Fixture-Bridging-Header.h')
+  // )
 
   fs.copyFileSync(
     resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/Info.plist'),

@@ -20,7 +20,7 @@ const FAIL_MSG = (filename) =>
 
 Bugsnag must be imported manually. See ${DOCS_LINK} for more information.`
 
-async function removeIos(projectRoot, console) {
+async function removeIos(projectRoot) {
   console.info('Removing Bugsnag startup code from the iOS layer')
 
   const iosDir = path.join(projectRoot, 'ios')
@@ -134,5 +134,12 @@ async function modifyAndroidSource (projectRoot) {
   await disableGradlePlugin(projectRoot)
 }
 
-module.exports.removeIos = removeIos
+async function modifyIosSource (projectRoot) {
+  await removeIos(projectRoot)
+  // await addBugsnagStartupCodeIos(projectRoot)
+}
+
+module.exports.modifyAndroidSource = modifyAndroidSource
+module.exports.modifyIosSource = modifyIosSource
 module.exports.removeAndroid = modifyAndroidSource
+module.exports.removeIos = modifyIosSource
