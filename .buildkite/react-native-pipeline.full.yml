@@ -4,24 +4,32 @@ steps:
       #
       # Test fixtures
       #
-      - label: ':android: Build RN {{matrix}} test fixture APK (Old Arch)'
+      - label: ':android: Build RN {{matrix.reactnative}} test fixture APK (Old Arch)'
         key: "build-react-native-android-fixture-old-arch-full"
         timeout_in_minutes: 30
         agents:
           queue: macos-14
         env:
-          JAVA_VERSION: "17"
+          JAVA_VERSION: "{{matrix.java}}"
           NODE_VERSION: "18"
-          RN_VERSION: "{{matrix}}"
+          RN_VERSION: "{{matrix.reactnative}}"
           BUILD_ANDROID: "true"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/old-arch/**/reactnative.apk"
         commands:
           - ./bin/generate-react-native-fixture
         matrix:
-          - "0.71"
-          - "0.72"
-          - "0.73"
+          setup:
+            reactnative:
+              - "0.71"
+              - "0.72"
+              - "0.73"
+            java:
+              - "17"
+          adjustments:
+            - with:
+                reactnative: "0.64"
+                java: "11"
         retry:
           automatic:
             - exit_status: "*"
@@ -67,6 +75,7 @@ steps:
           - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
+          - "0.64"
           - "0.71"
           - "0.72"
           - "0.73"
@@ -130,6 +139,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
+          - "0.64"
           - "0.71"
           - "0.72"
           - "0.73"
@@ -194,6 +204,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
+          - "0.64"
           - "0.71"
           - "0.72"
           - "0.73"

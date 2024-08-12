@@ -5,7 +5,7 @@ import type {
   SpanFactory
 } from '@bugsnag/core-performance'
 import type { ReactNode } from 'react'
-import { useEffect } from 'react'
+import React from 'react'
 import type { AppRegistry, WrapperComponentProvider } from 'react-native'
 import type { ReactNativeConfiguration } from '../config'
 
@@ -42,7 +42,7 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
     appStartSpan.setAttribute('bugsnag.app_start.type', 'ReactNativeInit')
 
     const AppStartWrapper = ({ children }: WrapperProps) => {
-      useEffect(() => {
+      React.useEffect(() => {
         if (appStartSpan.isValid()) {
           this.spanFactory.endSpan(appStartSpan, this.clock.now())
         }
