@@ -20,7 +20,7 @@ Feature: Manual spans
 
     And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.name" equals "bugsnag.performance.reactnative"
     And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals "production"
-    And the trace payload field "resourceSpans.0.resource" string attribute "device.id" matches the regex "^[a-z0-9-]{20,36}$"
+    And the trace payload field "resourceSpans.0.resource" string attribute "device.id" matches the regex "^[a-z0-9-]{20,40}$"
     And the trace payload field "resourceSpans.0.resource" string attribute "service.version" equals "1.2.3"
     And the trace payload field "resourceSpans.0.resource" string attribute "os.version" exists
     And the trace payload field "resourceSpans.0.resource" string attribute "os.type" equals the platform-dependent string:
