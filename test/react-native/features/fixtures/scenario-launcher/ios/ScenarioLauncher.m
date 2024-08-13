@@ -14,8 +14,8 @@ RCT_EXPORT_METHOD(startBugsnag) {
   NSString *notifyEndpoint;
   NSString *sessionsEndpoint;
 
-  notifyEndpoint = [NSString stringWithFormat:@"http://%@/notify", mazeRunnerAddress];
-  sessionsEndpoint = [NSString stringWithFormat:@"http://%@/sessions", mazeRunnerAddress];
+  notifyEndpoint = [NSString stringWithFormat:@"%@/notify", mazeRunnerAddress];
+  sessionsEndpoint = [NSString stringWithFormat:@"%@/sessions", mazeRunnerAddress];
 
   NSLog(@"Notify endpoint set to: %@\n", notifyEndpoint);
   NSLog(@"Sessions endpoint set to: %@\n", sessionsEndpoint);
