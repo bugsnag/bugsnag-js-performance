@@ -1,17 +1,8 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 import Bugsnag from '@bugsnag/react-native'
 import React, { useEffect, useState, useRef } from 'react'
-import { Button, Text, View, NativeModules } from 'react-native'
+import { Button, Text, View } from 'react-native'
 import { getCurrentCommand } from '../lib/CommandRunner'
-
-const { ScenarioLauncher } = NativeModules;
-
-export function init () {
-  console.log({ ScenarioLauncher, NativeModules })
-  if (ScenarioLauncher) {
-    ScenarioLauncher.startBugsnag()
-  }
-}
 
 export const config = {
   appVersion: '1.2.3',

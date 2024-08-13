@@ -30,10 +30,6 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
   console.error(`[BugsnagPerformance] Launching scenario: ${scenarioName}`)
   const scenario = Scenarios[scenarioName]
 
-  if (typeof scenario.init == 'function') {
-    scenario.init()
-  }
-
   BugsnagPerformance.start({
     apiKey,
     endpoint,
