@@ -27,4 +27,14 @@ RCT_EXPORT_METHOD(startBugsnag) {
 
 RCT_EXPORT_MODULE();
 
+// Start Bugsnag when the module is initialized
+- (instancetype)init
+{
+  self = [super init];
+
+  [self startBugsnag];
+
+  return self;
+}
+
 @end
