@@ -4,7 +4,7 @@
 
 #import <React/RCTBridgeModule.h>
 
-@interface ScenarioLauncher : NSObject
+@interface ScenarioLauncher : NSObject<RCTBridgeModule>
 
 @end
 
