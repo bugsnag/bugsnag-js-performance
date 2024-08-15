@@ -7,6 +7,7 @@ import type { Configuration, CoreSchema } from './config'
 import { validateConfig } from './config'
 import type { DeliveryFactory } from './delivery'
 import { TracePayloadEncoder } from './delivery'
+import FixedProbabilityManager from './fixed-probability-manager'
 import type { IdGenerator } from './id-generator'
 import type { NetworkSpan, NetworkSpanEndOptions, NetworkSpanOptions } from './network-span'
 import type { Persistence } from './persistence'
@@ -89,11 +90,15 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
 
       options.spanAttributesSource.configure(configuration)
 
-      ProbabilityManager.create(
-        options.persistence,
-        sampler,
-        new ProbabilityFetcher(delivery, configuration.apiKey)
-      ).then((manager: ProbabilityManager) => {
+      const probabilityManagerPromise = configuration.samplingProbability === undefined
+        ? ProbabilityManager.create(
+          options.persistence,
+          sampler,
+          new ProbabilityFetcher(delivery, configuration.apiKey)
+        )
+        : FixedProbabilityManager.create(sampler, configuration.samplingProbability)
+
+      probabilityManagerPromise.then((manager: ProbabilityManager | FixedProbabilityManager) => {
         processor = new BatchProcessor(
           delivery,
           configuration,

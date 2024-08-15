@@ -52,7 +52,8 @@ export interface TracePayload {
   headers: {
     'Bugsnag-Api-Key': string
     'Content-Type': 'application/json'
-    'Bugsnag-Span-Sampling': string
+    // It may be unset if the SDK is being used with a fixed samplingProbability
+    'Bugsnag-Span-Sampling'?: string
     // we don't add 'Bugsnag-Sent-At' in the TracePayloadEncoder so that retried
     // payloads get a new value each time delivery is attempted
     // therefore it's 'undefined' when passed to delivery, which adds a value
@@ -98,7 +99,8 @@ export class TracePayloadEncoder<C extends Configuration> {
       headers: {
         'Bugsnag-Api-Key': this.configuration.apiKey,
         'Content-Type': 'application/json',
-        'Bugsnag-Span-Sampling': this.generateSamplingHeader(spans)
+        // Do not set 'Bugsnag-Span-Sampling' if the SDK is configured with samplingProbability
+        ...(this.configuration.samplingProbability !== undefined ? {} : { 'Bugsnag-Span-Sampling': this.generateSamplingHeader(spans) })
       }
     }
   }

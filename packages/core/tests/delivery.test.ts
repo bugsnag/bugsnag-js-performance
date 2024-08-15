@@ -139,5 +139,21 @@ describe('TracePayloadEncoder', () => {
 
       expect(payload.headers['Bugsnag-Span-Sampling']).toBe(expected)
     })
+
+    it('omits the header if the configuration has a samplingProbability defined', async () => {
+      const encoder = new TracePayloadEncoder(
+        new IncrementingClock(),
+        createConfiguration({ samplingProbability: 0.5 }),
+        resourceAttributesSource
+      )
+
+      const spans = [createEndedSpan({
+        samplingProbability: createSamplingProbability(0.5)
+      })]
+
+      const payload = await encoder.encode(spans)
+
+      expect(payload.headers['Bugsnag-Span-Sampling']).toBeUndefined()
+    })
   })
 })
