@@ -116,8 +116,8 @@ export const schema: CoreSchema = {
   },
   samplingProbability: {
     defaultValue: undefined,
-    message: 'should be a number',
-    validate: (value: unknown): value is number | undefined => value === undefined || isNumber(value)
+    message: 'should be a number between 0 and 1',
+    validate: (value: unknown): value is number | undefined => value === undefined || (isNumber(value) && value >= 0 && value <= 1)
   }
 }
 

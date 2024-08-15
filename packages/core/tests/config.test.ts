@@ -148,6 +148,18 @@ describe('Schema validation', () => {
         const validConfig = validateConfig(config, coreSchema)
         expect(validConfig.samplingProbability).toBe(undefined)
       })
+
+      it('uses the default if the value is out of range', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
+        const config = {
+          apiKey: VALID_API_KEY,
+          samplingProbability: 2
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.samplingProbability).toBe(undefined)
+      })
     })
   })
 })
