@@ -12,12 +12,12 @@ describe('React Native BackgroundingListener', () => {
     setAppState('active')
   })
 
-  it.each<AppStateStatus>(['background', 'inactive'])('calls the registered callback immediately when app state status is "%s" on registration', (status: AppStateStatus) => {
+  it('calls the registered callback immediately when app state status is "background" on registration', () => {
     const onStateChangeCallback = jest.fn()
 
     const listener = createBrowserBackgroundingListener(AppState)
 
-    setAppState(status)
+    setAppState('background')
 
     expect(onStateChangeCallback).not.toHaveBeenCalled()
 
@@ -27,7 +27,7 @@ describe('React Native BackgroundingListener', () => {
     expect(onStateChangeCallback).toHaveBeenCalledTimes(1)
   })
 
-  it.each<AppStateStatus>(['active', 'unknown'])('does not call the registered callback immediately when app state status is "%s" on registration', (status: AppStateStatus) => {
+  it.each<AppStateStatus>(['active', 'inactive', 'unknown'])('does not call the registered callback immediately when app state status is "%s" on registration', (status: AppStateStatus) => {
     setAppState(status)
 
     const onStateChangeCallback = jest.fn()
@@ -43,10 +43,12 @@ describe('React Native BackgroundingListener', () => {
   it.each<AppStateStatus>(['background', 'inactive'])('calls the registered callback with "in-foreground" when app state status changes from "%s" to "active"', (status: AppStateStatus) => {
     const onStateChangeCallback = jest.fn()
 
-    setAppState(status)
-
     const listener = createBrowserBackgroundingListener(AppState)
     listener.onStateChange(onStateChangeCallback)
+
+    expect(onStateChangeCallback).not.toHaveBeenCalled()
+
+    setAppState(status)
 
     expect(onStateChangeCallback).toHaveBeenCalledWith('in-background')
     expect(onStateChangeCallback).toHaveBeenCalledTimes(1)

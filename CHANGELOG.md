@@ -12,6 +12,10 @@
 - Update error correlation implementation to monkey patch the error notifier [#474](https://github.com/bugsnag/bugsnag-js-performance/pull/474)
 - (react-native) Ensure native module is fully backwards compatible [#478](https://github.com/bugsnag/bugsnag-js-performance/pull/478)
 
+### Fixed
+
+- (react-native) Set initial background state to foreground if initial app state is 'inactive' [#491](https://github.com/bugsnag/bugsnag-js-performance/pull/491)
+
 ## [v2.7.1] (2024-07-16)
 
 ### Changed
