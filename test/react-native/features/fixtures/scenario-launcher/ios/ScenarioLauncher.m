@@ -25,6 +25,21 @@ RCT_EXPORT_METHOD(startBugsnag) {
   [Bugsnag startWithConfiguration:config];
 }
 
+RCT_EXPORT_METHOD(clearPersistentData) {
+  NSString *topLevelDir = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
+  NSString *dirPath = [topLevelDir stringByAppendingFormat:@"/bugsnag-shared-%@", [[NSBundle mainBundle] bundleIdentifier]];
+  NSString *filePath = [dirPath stringByAppendingPathComponent:@"device-id.json"];
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  NSError *error;
+  BOOL success = [fileManager removeItemAtPath:filePath error:&error];
+
+  if (success) {
+    NSLog(@"Deleted device-id.json");
+  } else {
+    NSLog(@"Could not delete device-id.json -:%@ ", [error localizedDescription]);
+  }
+}
+
 RCT_EXPORT_MODULE();
 
 // Start Bugsnag when the module is initialized
@@ -33,6 +48,7 @@ RCT_EXPORT_MODULE();
   self = [super init];
 
   [self startBugsnag];
+  [self clearPersistentData];
 
   return self;
 }
