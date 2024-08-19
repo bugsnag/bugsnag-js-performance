@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { type RouteChangeSpan } from '@bugsnag/browser-performance'
+import type { RouteChangeSpan } from '@bugsnag/browser-performance'
 import { ReactRouterRoutingProvider } from '../lib/react-router-routing-provider'
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
 

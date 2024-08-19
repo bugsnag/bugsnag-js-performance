@@ -1,4 +1,4 @@
-import { type SpanEnded, type ScaledProbability, type SpanProbability } from './span'
+import type { SpanEnded, ScaledProbability, SpanProbability } from './span'
 
 // sampling rates are stored as a number between 0 and 2^32 - 1 (i.e. they are
 // u32s) so we need to scale the probability value to match this range as they
@@ -74,4 +74,4 @@ class Sampler {
 }
 
 export default Sampler
-export { type ReadonlySampler, type ReadWriteSampler }
+export type { ReadonlySampler, ReadWriteSampler }

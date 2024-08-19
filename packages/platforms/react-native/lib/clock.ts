@@ -1,4 +1,5 @@
-import { millisecondsToNanoseconds, type Clock } from '@bugsnag/core-performance'
+import type { Clock } from '@bugsnag/core-performance'
+import { millisecondsToNanoseconds } from '@bugsnag/core-performance'
 
 interface Performance {
   now: () => number
@@ -12,7 +13,7 @@ const createClock = (performance: Performance): Clock => {
   const startWallTime = Date.now()
 
   return {
-    now: performance.now,
+    now: () => performance.now(),
     date: () => new Date(performance.now() - startPerfTime + startWallTime),
     convert: (date: Date) => date.getTime() - startWallTime + startPerfTime,
     // convert milliseconds since timeOrigin to full timestamp

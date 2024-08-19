@@ -18,6 +18,7 @@
   "devDependencies": {
     "@aws-sdk/client-cloudfront": "^3.360.0",
     "@aws-sdk/client-s3": "^3.360.0",
+    "@babel/plugin-transform-private-methods": "^7.24.7",
     "@rollup/plugin-commonjs": "^25.0.2",
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-replace": "^5.0.2",
@@ -40,9 +41,16 @@
     "jest-environment-jsdom": "^29.5.0",
     "jest-preset-angular": "^13.1.4",
     "lerna": "^6.4.0",
+    "metro-react-native-babel-preset": "^0.77.0",
     "rollup": "^3.23.0",
     "semver": "^7.5.3",
     "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
+  },
+  "overrides": {
+    "@angular-devkit/build-angular": {
+      "vite": "^4.5.3"
+    },
+    "webpack-dev-middleware": "^7.1.0"
   }
 }

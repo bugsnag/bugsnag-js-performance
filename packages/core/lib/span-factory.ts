@@ -1,14 +1,17 @@
-import { SpanAttributes, type SpanAttributesSource } from './attributes'
-import { type BackgroundingListener, type BackgroundingListenerState } from './backgrounding-listener'
-import { type Clock } from './clock'
-import { type Configuration, type Logger } from './config'
-import { type IdGenerator } from './id-generator'
-import { type Processor } from './processor'
-import { type ReadonlySampler } from './sampler'
-import { SpanInternal, type Span, type SpanOptions, type SpanOptionSchema, type InternalSpanOptions, coreSpanOptionSchema } from './span'
-import { type SpanContextStorage } from './span-context'
+import { SpanAttributes } from './attributes'
+import type { SpanAttribute, SpanAttributesSource } from './attributes'
+import type { BackgroundingListener, BackgroundingListenerState } from './backgrounding-listener'
+import type { Clock } from './clock'
+import type { Configuration, Logger } from './config'
+import type { IdGenerator } from './id-generator'
+import type { NetworkSpanOptions } from './network-span'
+import type { Processor } from './processor'
+import type { ReadonlySampler } from './sampler'
+import { SpanInternal, coreSpanOptionSchema } from './span'
+import type { InternalSpanOptions, Span, SpanOptionSchema, SpanOptions } from './span'
+import type { SpanContextStorage } from './span-context'
 import { timeToNumber } from './time'
-import { isObject, isSpanContext } from './validation'
+import { isObject, isParentContext } from './validation'
 
 export const DISCARD_END_TIME = -1
 
@@ -60,7 +63,7 @@ export class SpanFactory <C extends Configuration> {
     // if the parentContext option is not set use the current context
     // if parentContext is explicitly null, or there is no current context,
     // we are starting a new root span
-    const parentContext = isSpanContext(options.parentContext) || options.parentContext === null
+    const parentContext = isParentContext(options.parentContext) || options.parentContext === null
       ? options.parentContext
       : this.spanContextStorage.current
 
@@ -87,6 +90,18 @@ export class SpanFactory <C extends Configuration> {
     return span
   }
 
+  startNetworkSpan (options: NetworkSpanOptions) {
+    const spanName = `[HTTP/${options.method.toUpperCase()}]`
+    const cleanOptions = this.validateSpanOptions<NetworkSpanOptions>(spanName, options)
+    const spanInternal = this.startSpan(cleanOptions.name, { ...cleanOptions.options, makeCurrentContext: false })
+
+    spanInternal.setAttribute('bugsnag.span.category', 'network')
+    spanInternal.setAttribute('http.method', options.method)
+    spanInternal.setAttribute('http.url', options.url)
+
+    return spanInternal
+  }
+
   configure (processor: Processor, logger: Logger) {
     this.processor = processor
     this.logger = logger
@@ -94,7 +109,8 @@ export class SpanFactory <C extends Configuration> {
 
   endSpan (
     span: SpanInternal,
-    endTime: number
+    endTime: number,
+    additionalAttributes?: Record<string, SpanAttribute>
   ) {
     // if the span doesn't exist here it shouldn't be processed
     if (!this.openSpans.delete(span)) {
@@ -109,6 +125,11 @@ export class SpanFactory <C extends Configuration> {
 
     // Discard marked spans
     if (endTime === DISCARD_END_TIME) return
+
+    // Set any additional attributes
+    for (const [key, value] of Object.entries(additionalAttributes || {})) {
+      span.setAttribute(key, value)
+    }
 
     this.spanAttributesSource.requestAttributes(span)
 

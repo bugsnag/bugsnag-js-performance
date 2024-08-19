@@ -1,6 +1,7 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 import type React from 'react'
-import { useEffect, useRef, type PropsWithChildren } from 'react'
+import { useEffect, useRef } from 'react'
+import type { PropsWithChildren } from 'react'
 import BugsnagPluginReactNativeNavigationPerformance from './react-native-navigation-plugin'
 
 interface Props extends PropsWithChildren {

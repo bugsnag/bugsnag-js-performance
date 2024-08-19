@@ -1,11 +1,50 @@
 # Changelog
 
-## TBD
+## [Unreleased]
+
+### Added
+
+- (browser) Add serviceName config option for browser and ensure service.name attribute is always set [#477](https://github.com/bugsnag/bugsnag-js-performance/pull/477)
+
+### Changed
+
+- (vue-router) Use vue router to resolve routes [#476](https://github.com/bugsnag/bugsnag-js-performance/pull/476)
+- Update error correlation implementation to monkey patch the error notifier [#474](https://github.com/bugsnag/bugsnag-js-performance/pull/474)
+- (react-native) Ensure native module is fully backwards compatible [#478](https://github.com/bugsnag/bugsnag-js-performance/pull/478)
+
+## [v2.7.1] (2024-07-16)
+
+### Changed
+
+- Update type imports to ensure TypeScript backwards compatibility [#471](https://github.com/bugsnag/bugsnag-js-performance/pull/471)
+
+## [v2.7.0] (2024-07-03)
+
+### Added
+
+- (react-native) Support remote debugging in Chrome [#468](https://github.com/bugsnag/bugsnag-js-performance/pull/468)
+
+### Fixed
+
+- (plugin-react-navigation) Fix a crash when navigation ref is created using useRef [#469](https://github.com/bugsnag/bugsnag-js-performance/pull/469)
+
+## [v2.6.0] (2024-06-06)
+
+### Added
+
+- (browser) Set parent span context for full page load spans based on traceparent meta tag, if present [#446](https://github.com/bugsnag/bugsnag-js-performance/pull/446)
+
+### Fixed
+
+- (plugin-react-navigation) Fix an issue where a navigation span could inherit the end time of the last span [#457](https://github.com/bugsnag/bugsnag-js-performance/pull/457)
+
+## [v2.5.0] (2024-05-02)
 
 ### Added
 
 - (react-native) Add trace propagation headers for React Native [#437](https://github.com/bugsnag/bugsnag-js-performance/pull/437) [#444](https://github.com/bugsnag/bugsnag-js-performance/pull/444)
-
+- Add new `startNetworkSpan` method to `BugsnagPerformance` [#448](https://github.com/bugsnag/bugsnag-js-performance/pull/448)
+- Change network span naming convention to `[HTTP/VERB]` [#448](https://github.com/bugsnag/bugsnag-js-performance/pull/448)
 
 ### Fixed
 

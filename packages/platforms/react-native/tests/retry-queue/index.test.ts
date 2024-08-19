@@ -33,11 +33,12 @@ describe('File based retry queue factory', () => {
 
     const validEndTime = BigInt(Date.now()) * BigInt(1_000_000)
     const payload = createPayload({ spanId: 'abcd', endTimeUnixNano: validEndTime.toString() })
-    queue.add(payload, 0)
+    const batchTime = Date.now()
+    queue.add(payload, batchTime)
 
     await flushPromises()
 
-    const file = await fileSystem.readFile(`${EXPECTED_PATH}/retry-${validEndTime}-abcd.json`)
+    const file = await fileSystem.readFile(`${EXPECTED_PATH}/retry-${batchTime}-abcd.json`)
     expect(JSON.parse(file)).toStrictEqual(payload)
 
     await queue.flush()
@@ -56,7 +57,7 @@ describe('File based retry queue factory', () => {
     const payload = createPayload({ spanId: 'xyz', endTimeUnixNano: validEndTime.toString() })
 
     await fileSystem.mkdir(EXPECTED_PATH)
-    await fileSystem.writeFile(`${EXPECTED_PATH}/retry-${validEndTime}-xyz.json`, JSON.stringify(payload))
+    await fileSystem.writeFile(`${EXPECTED_PATH}/retry-${Date.now()}-xyz.json`, JSON.stringify(payload))
 
     expect(delivery.requests).toHaveLength(0)
 
@@ -78,7 +79,7 @@ describe('File based retry queue factory', () => {
 
     const validEndTime = BigInt(Date.now()) * BigInt(1_000_000)
     const payload = createPayload({ spanId: 'abcd', endTimeUnixNano: validEndTime.toString() })
-    queue.add(payload, 0)
+    queue.add(payload, Date.now())
 
     expect(delivery.requests).toHaveLength(0)
 
@@ -100,7 +101,7 @@ describe('File based retry queue factory', () => {
 
     const validEndTime = BigInt(Date.now()) * BigInt(1_000_000)
     const payload = createPayload({ spanId: 'abcd', endTimeUnixNano: validEndTime.toString() })
-    queue.add(payload, 0)
+    queue.add(payload, Date.now())
 
     expect(delivery.requests).toHaveLength(0)
 

@@ -1,15 +1,17 @@
 import {
   isBoolean,
+  isStringWithLength,
   isStringOrRegExpArray,
-  schema,
-  type ConfigOption,
-  type Configuration,
-  type CoreSchema
+  schema
 } from '@bugsnag/core-performance'
-import { type NetworkRequestCallback, defaultNetworkRequestCallback, isNetworkRequestCallback } from '@bugsnag/request-tracker-performance'
-import { type BrowserNetworkRequestInfo } from './auto-instrumentation'
-import { isRoutingProvider, type RoutingProvider } from './routing-provider'
-import { defaultSendPageAttributes, isSendPageAttributes, type SendPageAttributes } from './send-page-attributes'
+import type { ConfigOption, Configuration, CoreSchema } from '@bugsnag/core-performance'
+import { defaultNetworkRequestCallback, isNetworkRequestCallback } from '@bugsnag/request-tracker-performance'
+import type { NetworkRequestCallback } from '@bugsnag/request-tracker-performance'
+import type { BrowserNetworkRequestInfo } from './auto-instrumentation'
+import { isRoutingProvider } from './routing-provider'
+import type { RoutingProvider } from './routing-provider'
+import { defaultSendPageAttributes, isSendPageAttributes } from './send-page-attributes'
+import type { SendPageAttributes } from './send-page-attributes'
 
 export interface BrowserSchema extends CoreSchema {
   autoInstrumentFullPageLoads: ConfigOption<boolean>
@@ -20,6 +22,7 @@ export interface BrowserSchema extends CoreSchema {
   settleIgnoreUrls: ConfigOption<Array<string | RegExp>>
   networkRequestCallback: ConfigOption<NetworkRequestCallback<BrowserNetworkRequestInfo>>
   sendPageAttributes: ConfigOption<SendPageAttributes>
+  serviceName: ConfigOption<string>
 }
 
 export interface BrowserConfiguration extends Configuration {
@@ -31,6 +34,7 @@ export interface BrowserConfiguration extends Configuration {
   settleIgnoreUrls?: Array<string | RegExp>
   networkRequestCallback?: NetworkRequestCallback<BrowserNetworkRequestInfo>
   sendPageAttributes?: SendPageAttributes
+  serviceName?: string
 }
 
 export function createSchema (hostname: string, defaultRoutingProvider: RoutingProvider): BrowserSchema {
@@ -79,6 +83,11 @@ export function createSchema (hostname: string, defaultRoutingProvider: RoutingP
       defaultValue: defaultSendPageAttributes,
       message: 'should be an object',
       validate: isSendPageAttributes
+    },
+    serviceName: {
+      defaultValue: 'unknown_service',
+      message: 'should be a string',
+      validate: isStringWithLength
     }
   }
 }

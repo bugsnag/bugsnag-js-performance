@@ -9,13 +9,14 @@ import {
   createConfiguration,
   MockSpanFactory
 } from '@bugsnag/js-performance-test-utilities'
-import { type BrowserConfiguration, type BrowserSchema, createSchema } from '../../lib/config'
+import { createSchema } from '../../lib/config'
+import type { BrowserConfiguration, BrowserSchema } from '../../lib/config'
 import createOnSettle, { createNoopOnSettle } from '../../lib/on-settle'
 import {
-  RequestTracker,
-  type RequestEndContext,
-  type RequestStartContext
+  RequestTracker
+
 } from '@bugsnag/request-tracker-performance'
+import type { RequestEndContext, RequestStartContext } from '@bugsnag/request-tracker-performance'
 import {
   PerformanceFake,
   createPerformanceNavigationTimingFake

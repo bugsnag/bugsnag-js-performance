@@ -50,4 +50,11 @@ describe('createSchema', () => {
       expect(validate(value)).toBe(expected)
     })
   })
+
+  describe('serviceName', () => {
+    it('defaults to unknown_service', () => {
+      const schema = createSchema('', new MockRoutingProvider())
+      expect(schema.serviceName.defaultValue).toBe('unknown_service')
+    })
+  })
 })

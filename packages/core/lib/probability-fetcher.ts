@@ -1,4 +1,4 @@
-import { type Delivery, type TracePayload } from './delivery'
+import type { Delivery, TracePayload } from './delivery'
 
 // the time to wait before retrying a failed request
 const RETRY_MILLISECONDS = 30 * 1000

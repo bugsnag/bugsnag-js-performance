@@ -1,11 +1,8 @@
 import {
-  type BackgroundingListener,
-  type Clock,
-  type Delivery,
-  type DeliveryFactory,
-  type TracePayload,
+
   responseStateFromStatusCode
 } from '@bugsnag/core-performance'
+import type { BackgroundingListener, Clock, Delivery, DeliveryFactory, TracePayload } from '@bugsnag/core-performance'
 
 export type Fetch = typeof fetch
 

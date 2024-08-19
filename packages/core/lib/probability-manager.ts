@@ -1,6 +1,6 @@
-import { type Persistence } from './persistence'
+import type { Persistence } from './persistence'
 import type ProbabilityFetcher from './probability-fetcher'
-import { type ReadWriteSampler } from './sampler'
+import type { ReadWriteSampler } from './sampler'
 
 // the time between requests to fetch a new probability value from the server
 const PROBABILITY_REFRESH_MILLISECONDS = 24 * 60 * 60 * 1000 // 24 hours
@@ -14,39 +14,31 @@ class ProbabilityManager {
     const persistedProbability = await persistence.load('bugsnag-sampling-probability')
 
     let initialProbabilityTime: number
-    let initialTimeoutDuration: number
 
     if (persistedProbability === undefined) {
       // If there is no stored probability:
       // - Set the initial probability value to the default
+      // - Immediately fetch a new probability value
       sampler.probability = 1.0
       initialProbabilityTime = 0
-
-      // - Immediately fetch a new probability value
-      initialTimeoutDuration = 0
     } else if (persistedProbability.time < Date.now() - PROBABILITY_REFRESH_MILLISECONDS) {
       // If it is >= 24 hours old:
       // - Set the initial probability value to the stored value
+      // - Immediately fetch a new probability value
       sampler.probability = persistedProbability.value
       initialProbabilityTime = persistedProbability.time
-
-      // - Immediately fetch a new probability value
-      initialTimeoutDuration = 0
     } else {
       // If it is < 24 hours old:
       // - Use the stored probability
+      // - Fetch a new probability when this value would be 24 hours old
       sampler.probability = persistedProbability.value
       initialProbabilityTime = persistedProbability.time
-
-      // - Fetch a new probability when this value would be 24 hours old
-      initialTimeoutDuration = PROBABILITY_REFRESH_MILLISECONDS - (Date.now() - initialProbabilityTime)
     }
 
     return new ProbabilityManager(
       persistence,
       sampler,
       probabilityFetcher,
-      initialTimeoutDuration,
       initialProbabilityTime
     )
   }
@@ -56,17 +48,12 @@ class ProbabilityManager {
   private readonly probabilityFetcher: ProbabilityFetcher
 
   private lastProbabilityTime: number
-  private timeout: ReturnType<typeof setTimeout> | undefined = undefined
-
-  // This promise is resolved when the initial sampling request has been made
-  public fetchingInitialProbability
-  private resolveInitialProbability?: (value?: unknown) => void
+  private outstandingFreshnessCheck: Promise<void> | undefined = undefined
 
   private constructor (
     persistence: Persistence,
     sampler: ReadWriteSampler,
     probabilityFetcher: ProbabilityFetcher,
-    initialTimeoutDuration: number,
     initialProbabilityTime: number
   ) {
     this.persistence = persistence
@@ -74,20 +61,12 @@ class ProbabilityManager {
     this.probabilityFetcher = probabilityFetcher
     this.lastProbabilityTime = initialProbabilityTime
 
-    if (initialTimeoutDuration === 0) {
-      this.fetchingInitialProbability = new Promise((resolve) => {
-        this.resolveInitialProbability = resolve
-      })
-    }
-
-    this.fetchNewProbabilityIn(initialTimeoutDuration)
+    this.ensureFreshProbability()
   }
 
   setProbability (newProbability: number): Promise<void> {
     this.lastProbabilityTime = Date.now()
     this.sampler.probability = newProbability
-
-    this.fetchNewProbabilityIn(PROBABILITY_REFRESH_MILLISECONDS)
 
     // return this promise for convience in unit tests as it allows us to wait
     // for persistence to finish; in real code we won't ever wait for this but
@@ -98,30 +77,33 @@ class ProbabilityManager {
     })
   }
 
-  private fetchNewProbabilityIn (milliseconds: number): void {
-    clearTimeout(this.timeout)
+  /**
+   * Ensure that the current probability value is fresh, i.e. it is less than 24
+   * hours old
+   *
+   * If the probability value is stale then this method will fetch a fresh one
+   *
+   * This method is idempotent; calling it while there is already an outstanding
+   * probability request will not create a second request
+   */
+  ensureFreshProbability (): Promise<void> {
+    // we're already fetching a new probability
+    if (this.outstandingFreshnessCheck) {
+      return this.outstandingFreshnessCheck
+    }
 
-    const lastProbabilityTimeBeforeTimeout = this.lastProbabilityTime
-
-    this.timeout = setTimeout(
-      async () => {
-        const probability = await this.probabilityFetcher.getNewProbability()
-
-        // only apply the new probability if we haven't received another value
-        // in the meantime, e.g. from a trace request's response
-        if (lastProbabilityTimeBeforeTimeout === this.lastProbabilityTime) {
+    // if the probability value is >= 24 hours old, fetch a new one
+    if (Date.now() - this.lastProbabilityTime >= PROBABILITY_REFRESH_MILLISECONDS) {
+      this.outstandingFreshnessCheck = this.probabilityFetcher.getNewProbability()
+        .then(probability => {
           this.setProbability(probability)
-        }
+          this.outstandingFreshnessCheck = undefined
+        })
 
-        // Initial sampling request has been made, and we can unblock batching
-        if (this.resolveInitialProbability) {
-          this.resolveInitialProbability()
-          this.resolveInitialProbability = undefined
-          this.fetchingInitialProbability = undefined
-        }
-      },
-      milliseconds
-    )
+      return this.outstandingFreshnessCheck
+    }
+
+    return Promise.resolve()
   }
 }
 

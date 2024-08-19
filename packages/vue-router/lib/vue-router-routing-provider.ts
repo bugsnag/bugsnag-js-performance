@@ -1,22 +1,6 @@
-import {
-  onSettle,
-  type RouteResolver,
-  type RoutingProvider,
-  type StartRouteChangeCallback
-} from '@bugsnag/browser-performance'
-import pathToRegexp from 'path-to-regexp'
-import { type RouteRecordRaw, type Router } from 'vue-router'
-
-function flattenRoutes (routes: RouteRecordRaw[], _prefix: string = ''): string[] {
-  const prefix = `${!_prefix || _prefix === '/' ? _prefix : `${_prefix}/`}`
-  return [
-    ...routes.map(route => `${prefix}${route.path || ''}`),
-    ...routes.reduce<string[]>(
-      (accum, route) => [...accum, ...(route.children ? flattenRoutes(route.children, `${prefix}${route.path}`) : [])],
-      []
-    )
-  ]
-}
+import { onSettle } from '@bugsnag/browser-performance'
+import type { RouteResolver, RoutingProvider, StartRouteChangeCallback } from '@bugsnag/browser-performance'
+import type { Router } from 'vue-router'
 
 export class VueRouterRoutingProvider implements RoutingProvider {
   router: Router
@@ -28,7 +12,8 @@ export class VueRouterRoutingProvider implements RoutingProvider {
     const normalizedBasename = !basename || basename === '/' ? '' : basename
 
     function resolveRoute (url: URL): string {
-      return flattenRoutes(router.getRoutes()).find((fullRoutePath) => url.pathname.replace(normalizedBasename ?? '', '').match(pathToRegexp(fullRoutePath))) || 'no-route-found'
+      const location = router.resolve({ path: url.pathname.replace(normalizedBasename ?? '', '') })
+      return location.matched.pop()?.path || 'no-route-found'
     }
     this.resolveRoute = resolveRoute
   }

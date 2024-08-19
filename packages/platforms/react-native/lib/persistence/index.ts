@@ -1,8 +1,11 @@
 import { Platform } from 'react-native'
-import { Dirs, type FileSystem } from 'react-native-file-access'
-import { type DeviceInfo } from '../NativeBugsnagPerformance'
+import type { FileSystem } from 'react-native-file-access'
+import { Dirs } from 'react-native-file-access'
+import type { DeviceInfo } from '../NativeBugsnagPerformance'
 import { File, NullFile, ReadOnlyFile } from './file'
 import FileBasedPersistence from './file-based'
+
+export { Util } from './file-utils'
 
 const PERSISTENCE_VERSION = 1
 export const PERSISTENCE_DIRECTORY = `${Dirs.CacheDir}/bugsnag-performance-react-native/v${PERSISTENCE_VERSION}`

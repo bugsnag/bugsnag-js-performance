@@ -1,12 +1,11 @@
 import {
   DefaultSpanContextStorage,
   Sampler,
-  SpanFactory,
-  type Configuration,
-  type SpanEnded,
-  type SpanInternal,
-  type SpanOptions
+
+  SpanFactory
+
 } from '@bugsnag/core-performance'
+import type { SpanAttribute, Configuration, SpanEnded, SpanInternal, SpanOptions } from '@bugsnag/core-performance'
 import ControllableBackgroundingListener from './controllable-backgrounding-listener'
 import InMemoryProcessor from './in-memory-processor'
 import IncrementingClock from './incrementing-clock'
@@ -45,8 +44,8 @@ class MockSpanFactory <C extends Configuration> extends SpanFactory<C> {
     return super.startSpan(name, options)
   })
 
-  endSpan = jest.fn((span: SpanInternal, endTime: number) => {
-    super.endSpan(span, endTime)
+  endSpan = jest.fn((span: SpanInternal, endTime: number, additionalAttributes?: Record<string, SpanAttribute>) => {
+    super.endSpan(span, endTime, additionalAttributes)
   })
 }
 

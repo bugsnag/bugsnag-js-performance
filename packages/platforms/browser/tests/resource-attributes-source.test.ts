@@ -4,7 +4,7 @@
 
 import { InMemoryPersistence } from '@bugsnag/core-performance'
 import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
-import { type BrowserConfiguration } from '../lib/config'
+import type { BrowserConfiguration } from '../lib/config'
 import createResourceAttributesSource from '../lib/resource-attributes-source'
 
 describe('resourceAttributesSource', () => {
@@ -21,7 +21,7 @@ describe('resourceAttributesSource', () => {
 
     const resourceAttributesSource = createResourceAttributesSource(navigator, persistence)
     const resourceAttributes = await resourceAttributesSource(
-      createConfiguration<BrowserConfiguration>({ releaseStage: 'test', appVersion: '1.0.0' })
+      createConfiguration<BrowserConfiguration>({ releaseStage: 'test', appVersion: '1.0.0', serviceName: 'test' })
     )
 
     // ensure the anyonmous ID hasn't changed
@@ -31,6 +31,7 @@ describe('resourceAttributesSource', () => {
       { key: 'deployment.environment', value: { stringValue: 'test' } },
       { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.browser' } },
       { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
+      { key: 'service.name', value: { stringValue: 'test' } },
       { key: 'service.version', value: { stringValue: '1.0.0' } },
       { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } },
       { key: 'device.id', value: { stringValue: 'c1234567890abcdefghijklmnop' } }
@@ -51,6 +52,7 @@ describe('resourceAttributesSource', () => {
       { key: 'deployment.environment', value: { stringValue: 'production' } },
       { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.browser' } },
       { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
+      { key: 'service.name', value: { stringValue: 'unknown_service' } },
       { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } },
       { key: 'device.id', value: { stringValue: expect.stringMatching(/^c[0-9a-z]{20,32}$/) } }
     ])
@@ -73,6 +75,7 @@ describe('resourceAttributesSource', () => {
       { key: 'deployment.environment', value: { stringValue: 'production' } },
       { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.browser' } },
       { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
+      { key: 'service.name', value: { stringValue: 'unknown_service' } },
       { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } },
       { key: 'browser.platform', value: { stringValue: 'macOS' } },
       { key: 'browser.mobile', value: { boolValue: false } },
@@ -100,6 +103,7 @@ describe('resourceAttributesSource', () => {
       { key: 'deployment.environment', value: { stringValue: 'production' } },
       { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.browser' } },
       { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
+      { key: 'service.name', value: { stringValue: 'unknown_service' } },
       { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } },
       { key: 'device.id', value: { stringValue: deviceId } }
     ])
@@ -139,6 +143,7 @@ describe('resourceAttributesSource', () => {
       { key: 'deployment.environment', value: { stringValue: 'production' } },
       { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.browser' } },
       { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
+      { key: 'service.name', value: { stringValue: 'unknown_service' } },
       { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } },
       { key: 'device.id', value: { stringValue: deviceId } }
     ])
@@ -179,6 +184,7 @@ describe('resourceAttributesSource', () => {
       { key: 'deployment.environment', value: { stringValue: 'production' } },
       { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.browser' } },
       { key: 'telemetry.sdk.version', value: { stringValue: '__VERSION__' } },
+      { key: 'service.name', value: { stringValue: 'unknown_service' } },
       { key: 'browser.user_agent', value: { stringValue: navigator.userAgent } }
       // the device.id attribute should not exist
     ])

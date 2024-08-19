@@ -1,32 +1,23 @@
-import {
-  type Delivery,
-  type DeliveryPayload,
-  type DeliverySpan,
-  type RetryQueue,
-  type TracePayload
+import type {
+  Delivery,
+  DeliveryPayload,
+  DeliverySpan,
+  RetryQueue,
+  TracePayload
 } from '@bugsnag/core-performance'
 import type Directory from './directory'
 import timestampFromFilename from './timestamp-from-filename'
 
-function getLatestSpan (body: DeliveryPayload): DeliverySpan | undefined {
-  let latestSpan: DeliverySpan | undefined
-  let biggestTimestamp: bigint | undefined
-
-  for (const resourceSpan of body.resourceSpans) {
-    for (const scopeSpan of resourceSpan.scopeSpans) {
-      for (const span of scopeSpan.spans) {
-        if (biggestTimestamp === undefined || BigInt(span.endTimeUnixNano) > biggestTimestamp) {
-          latestSpan = span
-
-          // store the biggest timestamp separately as a bigint so we don't need
-          // to parse it on every iteration
-          biggestTimestamp = BigInt(latestSpan.endTimeUnixNano)
-        }
+function getLastSpan (body: DeliveryPayload): DeliverySpan | undefined {
+  for (let i = body.resourceSpans.length - 1; i >= 0; i--) {
+    const resourceSpan = body.resourceSpans[i]
+    for (let j = resourceSpan.scopeSpans.length - 1; j >= 0; j--) {
+      const scopeSpan = resourceSpan.scopeSpans[j]
+      if (scopeSpan.spans.length > 0) {
+        return scopeSpan.spans[scopeSpan.spans.length - 1]
       }
     }
   }
-
-  return latestSpan
 }
 
 function isValidFilename (filename: string): boolean {
@@ -42,18 +33,18 @@ function isValidFilename (filename: string): boolean {
     return false
   }
 
-  const nowInNanoseconds = BigInt(Date.now()) * NANOSECONDS_IN_MILLISECONDS
+  const now = Date.now()
 
   // files that are older than 24 hours are not valid as the data may not be
   // relevant anymore
-  if (timestamp < nowInNanoseconds - NANOSECONDS_IN_DAY) {
+  if (timestamp < now - MILLISECONDS_IN_DAY) {
     return false
   }
 
   // files that have a timestamp more than 24 hours in the future are not
   // valid as something may have gone wrong with the clock and this is
   // unlikely to be a timezone issue
-  if (timestamp > nowInNanoseconds + NANOSECONDS_IN_DAY) {
+  if (timestamp > now + MILLISECONDS_IN_DAY) {
     return false
   }
 
@@ -63,8 +54,7 @@ function isValidFilename (filename: string): boolean {
 // the minimum possible length of a payload filename (i.e. a 1 character
 // timestamp and span ID)
 const MININUM_FILENAME_LENGTH = 'retry-0-0.json'.length
-const NANOSECONDS_IN_MILLISECONDS = BigInt(1_000_000)
-const NANOSECONDS_IN_DAY = BigInt(24 * 60 * 60_000) * NANOSECONDS_IN_MILLISECONDS
+const MILLISECONDS_IN_DAY = 24 * 60 * 60_000
 
 // the outcome of flushing a single file — either delete it (e.g. success or
 // permanent failure) or leave it alone for the next flush (retryable failure)
@@ -80,18 +70,17 @@ export default class FileBasedRetryQueue implements RetryQueue {
     this.directory = directory
   }
 
-  async add (payload: TracePayload, _time: number): Promise<void> {
-    const span = getLatestSpan(payload.body)
+  async add (payload: TracePayload, time: number): Promise<void> {
+    const span = getLastSpan(payload.body)
 
     if (!span) {
       return
     }
 
-    // we use the latest span's timestamp in the filename so we can decide
-    // whether to keep or discard the span without parsing the payload
-    // as we can't be sure of nanosecond precision in JS environments, we also
-    // append the span ID so file names are unique across batches
-    const filename = `retry-${span.endTimeUnixNano}-${span.spanId}.json`
+    // we use the batch time in the filename so we can decide
+    // whether to keep or discard the file without parsing the payload,
+    // along with the last span's ID so file names are unique across batches
+    const filename = `retry-${time}-${span.spanId}.json`
 
     try {
       const json = JSON.stringify(payload)

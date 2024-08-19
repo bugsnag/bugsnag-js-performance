@@ -56,6 +56,7 @@ describe('TracePayloadEncoder', () => {
                 { key: 'deployment.environment', value: { stringValue: 'test' } },
                 { key: 'telemetry.sdk.name', value: { stringValue: 'bugsnag.performance.core' } },
                 { key: 'telemetry.sdk.version', value: { stringValue: '1.2.3' } },
+                { key: 'service.name', value: { stringValue: 'unknown_service' } },
                 { key: 'service.version', value: { stringValue: '3.4.5' } }
               ]
             },
@@ -137,6 +138,22 @@ describe('TracePayloadEncoder', () => {
       const payload = await encoder.encode(spans)
 
       expect(payload.headers['Bugsnag-Span-Sampling']).toBe(expected)
+    })
+
+    it('omits the header if the configuration has a samplingProbability defined', async () => {
+      const encoder = new TracePayloadEncoder(
+        new IncrementingClock(),
+        createConfiguration({ samplingProbability: 0.5 }),
+        resourceAttributesSource
+      )
+
+      const spans = [createEndedSpan({
+        samplingProbability: createSamplingProbability(0.5)
+      })]
+
+      const payload = await encoder.encode(spans)
+
+      expect(payload.headers['Bugsnag-Span-Sampling']).toBeUndefined()
     })
   })
 })

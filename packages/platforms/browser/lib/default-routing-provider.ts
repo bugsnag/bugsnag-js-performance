@@ -1,6 +1,6 @@
-import { type OnSettle } from './on-settle'
+import type { OnSettle } from './on-settle'
 import { getAbsoluteUrl } from '@bugsnag/request-tracker-performance'
-import { type RouteResolver, type RoutingProvider, type StartRouteChangeCallback } from './routing-provider'
+import type { RouteResolver, RoutingProvider, StartRouteChangeCallback } from './routing-provider'
 
 export const defaultRouteResolver: RouteResolver = (url: URL) => url.pathname || '/'
 

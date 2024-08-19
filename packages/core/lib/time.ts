@@ -1,4 +1,4 @@
-import { type Clock } from './clock'
+import type { Clock } from './clock'
 import { isNumber } from './validation'
 
 export type Time = Date | number

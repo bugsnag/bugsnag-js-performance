@@ -1,10 +1,6 @@
-import { type Clock } from '@bugsnag/core-performance'
+import type { Clock } from '@bugsnag/core-performance'
 import { Settler } from './settler'
-import {
-  type RequestStartContext,
-  type RequestEndContext,
-  type RequestTracker
-} from '@bugsnag/request-tracker-performance'
+import type { RequestStartContext, RequestEndContext, RequestTracker } from '@bugsnag/request-tracker-performance'
 
 class RequestSettler extends Settler {
   private timeout: ReturnType<typeof setTimeout> | undefined = undefined

@@ -1,13 +1,9 @@
-import {
-  ResourceAttributes,
-  type InternalConfiguration,
-  type Persistence,
-  type ResourceAttributeSource
-} from '@bugsnag/core-performance'
+import type { InternalConfiguration, Persistence, ResourceAttributeSource } from '@bugsnag/core-performance'
+import { ResourceAttributes } from '@bugsnag/core-performance'
 import cuid from '@bugsnag/cuid'
 import { Platform } from 'react-native'
-import { type DeviceInfo } from './NativeBugsnagPerformance'
-import { type ReactNativeConfiguration } from './config'
+import type { DeviceInfo } from './NativeBugsnagPerformance'
+import type { ReactNativeConfiguration } from './config'
 
 export default function resourceAttributesSourceFactory (persistence: Persistence, deviceInfo?: DeviceInfo): ResourceAttributeSource<ReactNativeConfiguration> {
   return function resourceAttributesSource (config: InternalConfiguration<ReactNativeConfiguration>): Promise<ResourceAttributes> {
@@ -17,6 +13,7 @@ export default function resourceAttributesSourceFactory (persistence: Persistenc
     const attributes = new ResourceAttributes(
       config.releaseStage,
       config.appVersion,
+      deviceInfo?.bundleIdentifier || 'unknown_service',
       'bugsnag.performance.reactnative',
       '__VERSION__'
     )
@@ -47,10 +44,6 @@ export default function resourceAttributesSourceFactory (persistence: Persistenc
 
       if (deviceInfo.model) {
         attributes.set('device.model.identifier', deviceInfo.model)
-      }
-
-      if (deviceInfo.bundleIdentifier) {
-        attributes.set('service.name', deviceInfo.bundleIdentifier)
       }
     }
 

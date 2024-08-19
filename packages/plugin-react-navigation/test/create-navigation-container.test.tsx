@@ -1,12 +1,21 @@
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
-import { type ReactNativeConfiguration } from '@bugsnag/react-native-performance'
-import { NavigationContainer, createNavigationContainerRef, type ParamListBase } from '@react-navigation/native'
+import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native'
+import type { ParamListBase } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import '@testing-library/jest-native/extend-expect'
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import React from 'react'
 import { Button, Text, View } from 'react-native'
 import { createNavigationContainer } from '../lib/create-navigation-container'
+
+beforeEach(() => {
+  jest.useFakeTimers()
+})
+
+afterEach(() => {
+  jest.useRealTimers()
+})
 
 describe('createNavigationContainer', () => {
   it('creates a navigation span when the route changes', () => {
@@ -23,13 +32,13 @@ describe('createNavigationContainer', () => {
     expect(screen.getByText('Route 2')).toBeOnTheScreen()
 
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(1)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 2', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 2', { isFirstClass: true, startTime: 0 })
 
     fireEvent.press(screen.getByText('Go back'))
     expect(screen.getByText('Route 1')).toBeOnTheScreen()
 
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(2)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 1', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 1', { isFirstClass: true, startTime: 0 })
   })
 
   it('forwards the provided ref to the NavigationContainer', () => {
@@ -49,7 +58,7 @@ describe('createNavigationContainer', () => {
     })
 
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(1)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 2', { isFirstClass: true })
+    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 2', { isFirstClass: true, startTime: 0 })
   })
 })
 

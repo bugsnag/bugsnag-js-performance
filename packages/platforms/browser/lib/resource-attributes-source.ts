@@ -1,6 +1,7 @@
 import cuid from '@bugsnag/cuid'
-import { ResourceAttributes, type Persistence, type ResourceAttributeSource } from '@bugsnag/core-performance'
-import { type BrowserConfiguration } from './config'
+import { ResourceAttributes } from '@bugsnag/core-performance'
+import type { Persistence, ResourceAttributeSource } from '@bugsnag/core-performance'
+import type { BrowserConfiguration } from './config'
 
 function createResourceAttributesSource (
   navigator: Navigator,
@@ -13,6 +14,7 @@ function createResourceAttributesSource (
     const attributes = new ResourceAttributes(
       config.releaseStage,
       config.appVersion,
+      config.serviceName,
       'bugsnag.performance.browser',
       '__VERSION__'
     )

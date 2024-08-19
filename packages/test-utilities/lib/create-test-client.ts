@@ -11,13 +11,10 @@ import {
   createClient,
   schema,
   InMemoryPersistence,
-  InMemoryQueue,
-  type BugsnagPerformance,
-  type ClientOptions,
-  type Configuration,
-  type CoreSchema,
-  type Delivery
+  InMemoryQueue
+
 } from '@bugsnag/core-performance'
+import type { BugsnagPerformance, ClientOptions, Configuration, CoreSchema, Delivery } from '@bugsnag/core-performance'
 
 const defaultOptions = () => ({
   backgroundingListener: new ControllableBackgroundingListener(),

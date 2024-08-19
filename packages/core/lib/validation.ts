@@ -1,8 +1,9 @@
-import { type Configuration, type Logger } from './config'
-import { type PersistedProbability } from './persistence'
-import { type Plugin } from './plugin'
-import { type SpanContext } from './span-context'
-import { type Time } from './time'
+import type { Configuration, Logger } from './config'
+import type { PersistedProbability } from './persistence'
+import type { Plugin } from './plugin'
+import type { ParentContext } from './span'
+import type { SpanContext } from './span-context'
+import type { Time } from './time'
 
 export const isBoolean = (value: unknown): value is boolean =>
   value === true || value === false
@@ -40,6 +41,11 @@ export const isSpanContext = (value: unknown): value is SpanContext =>
     typeof value.id === 'string' &&
     typeof value.traceId === 'string' &&
     typeof value.isValid === 'function'
+
+export const isParentContext = (value: unknown): value is ParentContext =>
+  isObject(value) &&
+    typeof value.id === 'string' &&
+    typeof value.traceId === 'string'
 
 export function isTime (value: unknown): value is Time {
   return isNumber(value) || value instanceof Date

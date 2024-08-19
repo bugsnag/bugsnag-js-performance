@@ -1,5 +1,5 @@
 import type { BitLength, IdGenerator } from '@bugsnag/core-performance'
-import { type Spec as NativeBugsnag } from './NativeBugsnagPerformance'
+import type { Spec as NativeBugsnag } from './NativeBugsnagPerformance'
 
 const POOL_SIZE = 1024
 
@@ -32,9 +32,11 @@ export function createRandomString (): string {
   return random
 }
 
-function createIdGenerator (NativeBugsnagPerformance: NativeBugsnag | null): IdGenerator {
-  // If the native module is not available for any reason, fall back to a JS implementation
-  const requestEntropy = isNativeModuleEnabled(NativeBugsnagPerformance) ? NativeBugsnagPerformance.requestEntropy : createRandomString
+function createIdGenerator (NativeBugsnagPerformance: NativeBugsnag | null, isDebuggingRemotely = false): IdGenerator {
+  // If the native module is not available or remote debugging is enabled, fall back to a JS implementation
+  const requestEntropy = isNativeModuleEnabled(NativeBugsnagPerformance) && !isDebuggingRemotely
+    ? NativeBugsnagPerformance.requestEntropy
+    : createRandomString
   const requestEntropyAsync = isNativeModuleEnabled(NativeBugsnagPerformance) ? NativeBugsnagPerformance.requestEntropyAsync : async () => createRandomString()
 
   // initialise the pool synchronously

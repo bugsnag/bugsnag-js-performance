@@ -1,4 +1,4 @@
-import { type NetInfoStateType } from '@react-native-community/netinfo'
+import type { NetInfoStateType } from '@react-native-community/netinfo'
 
 export type NetworkConnectionType = 'wifi' | 'wired' | 'cell' | 'unavailable' | 'unknown'
 

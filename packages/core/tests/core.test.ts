@@ -1,12 +1,13 @@
-import { createNoopClient } from '../lib/core'
-import { type BackgroundingListener } from '../lib/backgrounding-listener'
-import { DefaultSpanContextStorage } from '../lib/span-context'
 import {
   ControllableBackgroundingListener,
-  createTestClient,
   InMemoryDelivery,
-  VALID_API_KEY
+  VALID_API_KEY,
+  createTestClient
 } from '@bugsnag/js-performance-test-utilities'
+import type { BackgroundingListener } from '../lib/backgrounding-listener'
+import { createNoopClient } from '../lib/core'
+import { DefaultSpanContextStorage } from '../lib/span-context'
+import { InMemoryPersistence } from '../lib/persistence'
 
 jest.useFakeTimers()
 
@@ -18,6 +19,7 @@ describe('Core', () => {
       expect(client).toStrictEqual({
         start: expect.any(Function),
         startSpan: expect.any(Function),
+        startNetworkSpan: expect.any(Function),
         currentSpanContext: undefined,
         getPlugin: expect.any(Function)
       })
@@ -237,6 +239,97 @@ describe('Core', () => {
 
           expect(delivery.requests).toHaveLength(0)
         })
+
+        it('makes a probability freshness check when the app is foregrounded', async () => {
+          const delivery = new InMemoryDelivery()
+          const backgroundingListener = new ControllableBackgroundingListener()
+          const persistence = new InMemoryPersistence()
+          await persistence.save('bugsnag-sampling-probability', {
+            value: 0.25,
+            time: Date.now() - 24 * 60 * 60 * 1000 + 1 // 23 hours 59 minutes & 59 seconds ago
+          })
+
+          const client = createTestClient({
+            backgroundingListener,
+            deliveryFactory: () => delivery,
+            persistence
+          })
+
+          client.start(VALID_API_KEY)
+
+          // a request shouldn't be made during 'start'
+          await jest.runOnlyPendingTimersAsync()
+          expect(delivery.samplingRequests).toHaveLength(0)
+
+          await jest.advanceTimersByTimeAsync(1)
+
+          // backgrounding should not kick off a freshness check
+          backgroundingListener.sendToBackground()
+          await jest.runOnlyPendingTimersAsync()
+          expect(delivery.samplingRequests).toHaveLength(0)
+
+          // returning to the foreground should kick off a freshness check
+          backgroundingListener.sendToForeground()
+          await jest.runOnlyPendingTimersAsync()
+          expect(delivery.samplingRequests).toHaveLength(1)
+        })
+
+        it('immediately fetches probability if the persisted value is 24 hours old', async () => {
+          const delivery = new InMemoryDelivery()
+          const backgroundingListener = new ControllableBackgroundingListener()
+          const persistence = new InMemoryPersistence()
+
+          await persistence.save('bugsnag-sampling-probability', {
+            value: 0.25,
+            time: Date.now() - 24 * 60 * 60 * 1000 // 24 hours ago
+          })
+
+          const client = createTestClient({
+            backgroundingListener,
+            deliveryFactory: () => delivery,
+            persistence
+          })
+
+          client.start({ apiKey: VALID_API_KEY, samplingProbability: undefined })
+
+          // a request shouldn't be made during 'start'
+          await jest.runOnlyPendingTimersAsync()
+          expect(delivery.samplingRequests).toHaveLength(1)
+        })
+
+        describe('when the samplingProbability configuration option is defined', () => {
+          it('does not fetch probability', async () => {
+            const delivery = new InMemoryDelivery()
+            const backgroundingListener = new ControllableBackgroundingListener()
+            const persistence = new InMemoryPersistence()
+
+            // this would cause an immediate fetch if ProbabilityManager was being used internally rather than FixedProbabilityManager
+            await persistence.save('bugsnag-sampling-probability', {
+              value: 0.25,
+              time: Date.now() - 24 * 60 * 60 * 1000 // 24 hours ago
+            })
+
+            const client = createTestClient({
+              backgroundingListener,
+              deliveryFactory: () => delivery,
+              persistence
+            })
+
+            client.start({ apiKey: VALID_API_KEY, samplingProbability: 0.9 })
+
+            // a request shouldn't be made during 'start'
+            await jest.runOnlyPendingTimersAsync()
+            expect(delivery.samplingRequests).toHaveLength(0)
+
+            client.startSpan('Span 1').end()
+
+            await jest.runOnlyPendingTimersAsync()
+            expect(delivery.requests).toHaveLength(1)
+
+            const span = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+            expect(span).toHaveAttribute('bugsnag.sampling.p', 0.9)
+          })
+        })
       })
 
       describe('currentSpanContext', () => {
@@ -293,6 +386,40 @@ describe('Core', () => {
           const plugin = client.getPlugin(AnotherPlugin)
 
           expect(plugin).toBeUndefined()
+        })
+      })
+
+      describe('startNetworkSpan', () => {
+        it('creates a network span', async () => {
+          const delivery = new InMemoryDelivery()
+          const client = createTestClient({ deliveryFactory: () => delivery })
+
+          client.start(VALID_API_KEY)
+
+          const span = client.startNetworkSpan({
+            method: 'GET',
+            url: 'https://example.com'
+          })
+
+          span.end({ status: 200 })
+
+          await jest.runOnlyPendingTimersAsync()
+
+          expect(delivery).toHaveSentSpan(expect.objectContaining({
+            name: '[HTTP/GET]',
+            kind: 3,
+            events: [],
+            spanId: 'a random 64 bit string',
+            traceId: 'a random 128 bit string',
+            startTimeUnixNano: expect.any(String),
+            endTimeUnixNano: expect.any(String)
+          }))
+
+          const deliveredSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+          expect(deliveredSpan).toHaveAttribute('bugsnag.span.category', 'network')
+          expect(deliveredSpan).toHaveAttribute('http.method', 'GET')
+          expect(deliveredSpan).toHaveAttribute('http.url', 'https://example.com')
+          expect(deliveredSpan).toHaveAttribute('http.status_code', 200)
         })
       })
     })

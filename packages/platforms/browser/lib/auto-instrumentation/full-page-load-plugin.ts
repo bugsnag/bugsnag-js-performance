@@ -1,14 +1,9 @@
-import {
-  type BackgroundingListener,
-  type InternalConfiguration,
-  type Plugin,
-  type SpanFactory
-} from '@bugsnag/core-performance'
-import { type BrowserConfiguration } from '../config'
-import { type OnSettle } from '../on-settle'
-import { type PerformanceWithTiming } from '../on-settle/load-event-end-settler'
+import type { ParentContext, BackgroundingListener, InternalConfiguration, Plugin, SpanFactory } from '@bugsnag/core-performance'
+import type { BrowserConfiguration } from '../config'
+import type { OnSettle } from '../on-settle'
+import type { PerformanceWithTiming } from '../on-settle/load-event-end-settler'
 import { getPermittedAttributes } from '../send-page-attributes'
-import { type WebVitals } from '../web-vitals'
+import type { WebVitals } from '../web-vitals'
 import { instrumentPageLoadPhaseSpans } from './page-load-phase-spans'
 import { defaultRouteResolver } from '../default-routing-provider'
 
@@ -54,7 +49,21 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
       return
     }
 
-    const span = this.spanFactory.startSpan('[FullPageLoad]', { startTime: 0, parentContext: null })
+    let parentContext: ParentContext | null = null
+
+    const traceparentMetaTag = document.querySelector('meta[name="traceparent"]')
+    if (traceparentMetaTag !== null && traceparentMetaTag.getAttribute('content')) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const traceparent = traceparentMetaTag.getAttribute('content')!
+      const [, traceId, parentSpanId] = traceparent.split('-')
+
+      parentContext = {
+        traceId,
+        id: parentSpanId
+      }
+    }
+
+    const span = this.spanFactory.startSpan('[FullPageLoad]', { startTime: 0, parentContext })
     const permittedAttributes = getPermittedAttributes(configuration.sendPageAttributes)
     const url = new URL(this.location.href)
 

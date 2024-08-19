@@ -11,15 +11,17 @@ describe('RetryQueueDirectory', () => {
 
       await Promise.all([
         fileSystem.writeFile('/a/b/c/retry-1-d.json', ''),
+        fileSystem.writeFile('/a/b/c/retry-3-b.json', ''),
         fileSystem.writeFile('/a/b/c/retry-4-z.json', ''),
-        fileSystem.writeFile('/a/b/c/retry-3-a.json', ''),
+        fileSystem.writeFile('/a/b/c/retry-1-a.json', ''),
         fileSystem.writeFile('/a/b/c/retry-2-x.json', '')
       ])
 
       expect(await directory.files()).toStrictEqual([
         'retry-4-z.json',
-        'retry-3-a.json',
+        'retry-3-b.json',
         'retry-2-x.json',
+        'retry-1-a.json',
         'retry-1-d.json'
       ])
     })

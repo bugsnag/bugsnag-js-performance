@@ -3,6 +3,7 @@ import { Dirs, FileSystem } from 'react-native-file-access'
 const PERSISTED_STATE_VERSION = 1
 const PERSISTED_STATE_DIRECTORY = `${Dirs.CacheDir}/bugsnag-performance-react-native/v${PERSISTED_STATE_VERSION}`
 const PERSISTED_STATE_PATH = `${PERSISTED_STATE_DIRECTORY}/persisted-state.json`
+const RETRY_QUEUE_DIRECTORY = `${PERSISTED_STATE_DIRECTORY}/retry-queue`
 
 async function writePersistedStateFile(contents) {
     if (!await FileSystem.exists(PERSISTED_STATE_DIRECTORY)) {
@@ -34,5 +35,12 @@ export async function clearPersistedState() {
     if (await FileSystem.exists(PERSISTED_STATE_PATH)) {
         console.error(`[BugsnagPerformance] Clearing persisted data at path: ${PERSISTED_STATE_PATH}`)
         await FileSystem.unlink(PERSISTED_STATE_PATH)
+    }
+    if (await FileSystem.exists(RETRY_QUEUE_DIRECTORY)) {
+        console.error(`[BugsnagPerformance] Clearing persisted data at path: ${RETRY_QUEUE_DIRECTORY}`)
+        const files = await FileSystem.ls(RETRY_QUEUE_DIRECTORY)
+        for (const file of files) {
+            await FileSystem.unlink(`${RETRY_QUEUE_DIRECTORY}/${file}`)
+        }
     }
 }

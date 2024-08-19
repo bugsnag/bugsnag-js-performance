@@ -1,4 +1,5 @@
-import { type BackgroundingListener, type Clock, millisecondsToNanoseconds } from '@bugsnag/core-performance'
+import { millisecondsToNanoseconds } from '@bugsnag/core-performance'
+import type { BackgroundingListener, Clock } from '@bugsnag/core-performance'
 
 // a cut-down PerformanceTiming interface, since we don't care about most of
 // its properties

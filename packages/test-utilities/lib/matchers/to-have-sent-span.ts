@@ -1,6 +1,6 @@
 import { expect } from '@jest/globals'
-import { type MatcherFunction } from 'expect'
-import { type DeliverySpan } from '@bugsnag/core-performance'
+import type { MatcherFunction } from 'expect'
+import type { DeliverySpan } from '@bugsnag/core-performance'
 import { InMemoryDelivery } from '..'
 
 const toHaveSentSpan: MatcherFunction<[expectedSpan: unknown]> = function (delivery, expectedSpan) {

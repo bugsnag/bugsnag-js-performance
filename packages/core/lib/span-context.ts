@@ -1,4 +1,4 @@
-import { type BackgroundingListenerState, type BackgroundingListener } from './backgrounding-listener'
+import type { BackgroundingListenerState, BackgroundingListener } from './backgrounding-listener'
 
 export interface SpanContext {
   readonly id: string // 64 bit random string

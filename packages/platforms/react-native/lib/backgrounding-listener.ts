@@ -1,9 +1,9 @@
-import {
-  type BackgroundingListener,
-  type BackgroundingListenerCallback,
-  type BackgroundingListenerState
+import type {
+  BackgroundingListener,
+  BackgroundingListenerCallback,
+  BackgroundingListenerState
 } from '@bugsnag/core-performance'
-import { type AppStateStatic, type AppStateStatus } from 'react-native'
+import type { AppStateStatic, AppStateStatus } from 'react-native'
 
 export default function createBrowserBackgroundingListener (appState: AppStateStatic) {
   const callbacks: BackgroundingListenerCallback[] = []

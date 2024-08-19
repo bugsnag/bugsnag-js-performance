@@ -1,5 +1,5 @@
 import { MockSpanFactory, createConfiguration } from '@bugsnag/js-performance-test-utilities'
-import { type ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import { Navigation } from 'react-native-navigation'
 import ReactNativeNavigationPlugin from '../lib/react-native-navigation-plugin'
 

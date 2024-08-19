@@ -1,4 +1,4 @@
-import { type Configuration, type InternalConfiguration } from '@bugsnag/core-performance'
+import type { Configuration, InternalConfiguration } from '@bugsnag/core-performance'
 
 function createConfiguration<C extends Configuration> (overrides: Partial<C> = {}): InternalConfiguration<C> {
   return {
@@ -20,6 +20,8 @@ function createConfiguration<C extends Configuration> (overrides: Partial<C> = {
     },
     appVersion: '',
     networkRequestCallback: (networkRequestInfo: unknown) => networkRequestInfo,
+    serviceName: 'unknown_service',
+    samplingProbability: undefined,
     ...overrides
   } as unknown as InternalConfiguration<C>
 }

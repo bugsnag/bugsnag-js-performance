@@ -1,4 +1,5 @@
-import { schema as coreSchema, validateConfig, type CoreSchema } from '../lib/config'
+import { schema as coreSchema, validateConfig } from '../lib/config'
+import type { CoreSchema } from '../lib/config'
 import { VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 
 describe('Schema validation', () => {
@@ -122,6 +123,42 @@ describe('Schema validation', () => {
 
         const validConfig = validateConfig(config, coreSchema)
         expect(validConfig.appVersion).toBe('')
+      })
+    })
+
+    describe('samplingProbability', () => {
+      it('accepts a valid value', () => {
+        const config = {
+          apiKey: VALID_API_KEY,
+          samplingProbability: 0.95
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.samplingProbability).toBe(0.95)
+      })
+
+      it('replaces an invalid value with the default', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
+        const config = {
+          apiKey: VALID_API_KEY,
+          samplingProbability: 'abc'
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.samplingProbability).toBe(undefined)
+      })
+
+      it('uses the default if the value is out of range', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
+        const config = {
+          apiKey: VALID_API_KEY,
+          samplingProbability: 2
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.samplingProbability).toBe(undefined)
       })
     })
   })

@@ -5,13 +5,13 @@ Feature: Network spans
         And I wait to receive a sampling request
         And I wait for 2 spans
 
-        Then a span named "[HTTP]/GET" contains the attributes:
+        Then a span named "[HTTP/GET]" contains the attributes:
             | attribute             | type        | value                             |
             | bugsnag.span.category | stringValue | network                           |
             | http.method           | stringValue | GET                               |
             | http.url              | stringValue | https://bugsnag.com?fetch=true    |
             | http.status_code      | intValue    | 200                               |
-        And a span named "[HTTP]/GET" contains the attributes:
+        And a span named "[HTTP/GET]" contains the attributes:
             | attribute             | type        | value                           |
             | bugsnag.span.category | stringValue | network                         |
             | http.method           | stringValue | GET                             |
@@ -28,7 +28,7 @@ Feature: Network spans
         And I wait to receive a sampling request
         And I wait to receive 1 span
 
-        Then a span named "[HTTP]/GET" contains the attributes:
+        Then a span named "[HTTP/GET]" contains the attributes:
             | attribute             | type        | value                                                       |
             | bugsnag.span.category | stringValue | network                                                     |
             | http.method           | stringValue | GET                                                         |

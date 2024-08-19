@@ -1,5 +1,5 @@
-import { type Configuration, type InternalConfiguration } from './config'
-import { type SpanInternal } from './span'
+import type { Configuration, InternalConfiguration } from './config'
+import type { SpanInternal } from './span'
 import { isNumber } from './validation'
 
 export type SpanAttribute = string | number | boolean
@@ -32,11 +32,12 @@ export class SpanAttributes {
 }
 
 export class ResourceAttributes extends SpanAttributes {
-  constructor (releaseStage: string, appVersion: string, sdkName: string, sdkVersion: string) {
+  constructor (releaseStage: string, appVersion: string, serviceName: string, sdkName: string, sdkVersion: string) {
     const initialValues = new Map([
       ['deployment.environment', releaseStage],
       ['telemetry.sdk.name', sdkName],
-      ['telemetry.sdk.version', sdkVersion]
+      ['telemetry.sdk.version', sdkVersion],
+      ['service.name', serviceName]
     ])
 
     if (appVersion.length > 0) {
