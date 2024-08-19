@@ -14,6 +14,17 @@ const val CONFIG_FILE_TIMEOUT = 15000
 
 class ConfigFileReader {
 
+    fun clearPersistentData (context: Context) {
+        val deviceIdfile = File(context.filesDir, "device-id")
+        if (deviceIdfile.exists()) {
+            try {
+                deviceIdfile.delete()
+            } catch (e: IOException) {
+                Log.e("Bugsnag", "Failed to delete device id file", e)
+            }
+        }
+    }
+
     fun getMazeRunnerAddress(context: Context): String {
         val configFile = File("/data/local/tmp/fixture_config.json")
         var mazeAddress: String? = null
@@ -91,4 +102,5 @@ fun Context.startBugsnag() {
             }
         }
     })
+    reader.clearPersistentData(this)
 }
