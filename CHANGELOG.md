@@ -1,16 +1,21 @@
 # Changelog
 
-## [Unreleased]
+## [v2.8.0] (2024-08-20)
 
 ### Added
 
 - (browser) Add serviceName config option for browser and ensure service.name attribute is always set [#477](https://github.com/bugsnag/bugsnag-js-performance/pull/477)
+- Add a fixed sampling probability configuration option [#487](https://github.com/bugsnag/bugsnag-js-performance/pull/487)
+- (react-native) Support react-native-file-access v1.x [#488](https://github.com/bugsnag/bugsnag-js-performance/pull/488)
+- (react-native) Support React Native 0.64 [#489](https://github.com/bugsnag/bugsnag-js-performance/pull/489)
 
 ### Changed
 
 - (vue-router) Use vue router to resolve routes [#476](https://github.com/bugsnag/bugsnag-js-performance/pull/476)
 - Update error correlation implementation to monkey patch the error notifier [#474](https://github.com/bugsnag/bugsnag-js-performance/pull/474)
 - (react-native) Ensure native module is fully backwards compatible [#478](https://github.com/bugsnag/bugsnag-js-performance/pull/478)
+- (react-native) Use batch time for filenames in retry queue [#486](https://github.com/bugsnag/bugsnag-js-performance/pull/486)
+- (core) Avoid long running timers when ensuring probability freshness [#481](https://github.com/bugsnag/bugsnag-js-performance/pull/481)
 
 ### Fixed
 
