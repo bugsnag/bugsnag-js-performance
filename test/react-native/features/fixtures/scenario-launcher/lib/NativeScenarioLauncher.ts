@@ -1,14 +1,9 @@
 import { TurboModule, TurboModuleRegistry } from "react-native";
-
-export type BugsnagConfiguration = {
-    apiKey: string;
-    notifyEndpoint: string;
-    sessionsEndpoint: string;
-}
+import type { UnsafeObject } from 'react-native/Libraries/Types/CodegenTypes'
 
 export interface Spec extends TurboModule {
-  startBugsnag(configuration: BugsnagConfiguration): Promise<void>;
-  clearPersistentData(): Promise<void>;
+  startBugsnag(configuration: UnsafeObject): Promise<void>;
+  clearPersistentData(): void;
 }
 
 export default TurboModuleRegistry.get<Spec>("ScenarioLauncher") as Spec | null;
