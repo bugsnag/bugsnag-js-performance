@@ -1,20 +1,15 @@
 #import <Foundation/Foundation.h>
 #import "Bugsnag.h"
 #import "ScenarioLauncher.h"
-#import "ConfigFileReader.h"
 
 @implementation ScenarioLauncher
 
-- (void) startBugsnag {
-  NSLog(@"Called startBugsnag, fetching configuration from ConfigFileReader");
-  NSString *mazeRunnerAddress = [[ConfigFileReader new] loadMazeRunnerAddress];
+RCT_EXPORT_MODULE()
 
-  BugsnagConfiguration *config = [[BugsnagConfiguration alloc] initWithApiKey:@"1234567890abcdef1234567890abcdef"];
-  NSString *notifyEndpoint;
-  NSString *sessionsEndpoint;
-
-  notifyEndpoint = [NSString stringWithFormat:@"%@/notify", mazeRunnerAddress];
-  sessionsEndpoint = [NSString stringWithFormat:@"%@/sessions", mazeRunnerAddress];
+RCT_EXPORT_METHOD(startBugsnag:(NSDictionary *)configuration) {
+  BugsnagConfiguration *config = [[BugsnagConfiguration alloc] initWithApiKey:configuration[@"apiKey"]];
+  NSString *notifyEndpoint = configuration[@"notifyEndpoint"];
+  NSString *sessionsEndpoint = configuration[@"sessionsEndpoint"];
 
   NSLog(@"Notify endpoint set to: %@\n", notifyEndpoint);
   NSLog(@"Sessions endpoint set to: %@\n", sessionsEndpoint);
@@ -24,7 +19,7 @@
   [Bugsnag startWithConfiguration:config];
 }
 
-- (void) clearPersistentData {
+RCT_EXPORT_METHOD(clearPersistentData) {
   NSString *topLevelDir = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
   NSString *dirPath = [topLevelDir stringByAppendingFormat:@"/bugsnag-shared-%@", [[NSBundle mainBundle] bundleIdentifier]];
   NSString *filePath = [dirPath stringByAppendingPathComponent:@"device-id.json"];
@@ -39,14 +34,12 @@
   }
 }
 
-// Start Bugsnag when the module is initialized
-- (instancetype) init {
-  self = [super init];
-
-  [self startBugsnag];
-  [self clearPersistentData];
-
-  return self;
+#ifdef RCT_NEW_ARCH_ENABLED
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+  (const facebook::react::ObjCTurboModule::InitParams &)params
+{
+  return std::make_shared<facebook::react::NativeScenarioLauncherSpecJSI>(params);
 }
+#endif
 
 @end

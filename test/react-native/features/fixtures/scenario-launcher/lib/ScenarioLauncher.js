@@ -5,7 +5,8 @@ import { AppRegistry, SafeAreaView } from 'react-native'
 import * as Scenarios from '../scenarios'
 import { getCurrentCommand } from './CommandRunner'
 import { clearPersistedState, setDeviceId, setSamplingProbability } from './Persistence'
-import { ScenarioContext } from './ScenarioContext' 
+import { ScenarioContext } from './ScenarioContext'
+import { NativeScenarioLauncher } from './native'
 
 const isTurboModuleEnabled = () => global.__turboModuleProxy != null
 
@@ -29,6 +30,16 @@ async function loadReactNavigationScenario (scenario) {
 async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
   console.error(`[BugsnagPerformance] Launching scenario: ${scenarioName}`)
   const scenario = Scenarios[scenarioName]
+
+  if (scenario.loadBugsnagNotifier) {
+    const notifyEndpoint = endpoint.replace('traces', 'notify')
+    const sessionsEndpoint = endpoint.replace('traces', 'sessions')
+    await NativeScenarioLauncher.startBugsnag({ apiKey, notifyEndpoint, sessionsEndpoint })
+
+    if (scenario.clearBugsnagPersistentData) {
+      await NativeScenarioLauncher.clearPersistentData()
+    }
+  }
 
   BugsnagPerformance.start({
     apiKey,

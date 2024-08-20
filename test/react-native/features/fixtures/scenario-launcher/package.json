@@ -18,5 +18,13 @@
     "react": "*",
     "react-native": "*",
     "react-native-file-access": "*"
+  },
+  "codegenConfig": {
+    "name": "ScenarioLauncherSpec",
+    "type": "modules",
+    "jsSrcsDir": "lib",
+    "android": {
+      "javaPackageName": "com.scenariolauncher.reactnative"
+    }
   }
 }

@@ -11,6 +11,9 @@ export const config = {
   autoInstrumentAppStarts: false
 }
 
+export const loadBugsnagNotifier = true
+export const clearBugsnagPersistentData = true
+
 export function App() {
   const [id, setId] = useState(1)
   const span = useRef()

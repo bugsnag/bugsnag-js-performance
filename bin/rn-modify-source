@@ -14,6 +14,9 @@ const BUGSNAG_DISABLE_BAGP = 'bugsnag.enabled = false'
 const BUGSNAG_KOTLIN_IMPORT = 'import com.bugsnag.android.Bugsnag'
 const BUGSNAG_KOTLIN_INIT = 'Bugsnag.start(this)'
 
+const BUGSNAG_JS_IMPORT = 'import Bugsnag from "@bugsnag/react-native";'
+const BUGSNAG_JS_INIT = 'Bugsnag.start();'
+
 const DOCS_LINK = 'https://docs.bugsnag.com/platforms/react-native/react-native/#basic-configuration'
 const FAIL_MSG = (filename) =>
   `Failed to update "${filename}" automatically. The file may not exist or it may be in an unexpected format or location.
@@ -136,10 +139,25 @@ async function modifyAndroidSource (projectRoot) {
 
 async function modifyIosSource (projectRoot) {
   await removeIos(projectRoot)
-  // await addBugsnagStartupCodeIos(projectRoot)
+}
+
+async function modifyJsSource (projectRoot) {
+  console.info('Removing Bugsnag startup code from the JS layer')
+
+  const jsPath = path.join(projectRoot, 'index.js')
+  const jsFile = await fs.readFile(jsPath, 'utf8')
+
+  if (jsFile.includes(BUGSNAG_JS_IMPORT) || jsFile.includes(BUGSNAG_JS_INIT)) {
+    await fs.writeFile(jsPath, jsFile.replace(BUGSNAG_JS_IMPORT, '').replace(BUGSNAG_JS_INIT, ''), 'utf8')
+    console.log('Done')
+    return
+  }
+
+  console.warn('Bugsnag has already been removed, skipping')
 }
 
 module.exports.modifyAndroidSource = modifyAndroidSource
 module.exports.modifyIosSource = modifyIosSource
+module.exports.modifyJsSource = modifyJsSource
 module.exports.removeAndroid = modifyAndroidSource
 module.exports.removeIos = modifyIosSource
