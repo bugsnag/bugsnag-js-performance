@@ -135,13 +135,15 @@ async function disableGradlePlugin (projectRoot) {
 async function modifyAndroidSource (projectRoot) {
   await removeAndroid(projectRoot)
   await disableGradlePlugin(projectRoot)
+  await removeJsStartup(projectRoot)
 }
 
 async function modifyIosSource (projectRoot) {
   await removeIos(projectRoot)
+  await removeJsStartup(projectRoot)
 }
 
-async function modifyJsSource (projectRoot) {
+async function removeJsStartup (projectRoot) {
   console.info('Removing Bugsnag startup code from the JS layer')
 
   const jsPath = path.join(projectRoot, 'index.js')
@@ -158,6 +160,3 @@ async function modifyJsSource (projectRoot) {
 
 module.exports.modifyAndroidSource = modifyAndroidSource
 module.exports.modifyIosSource = modifyIosSource
-module.exports.modifyJsSource = modifyJsSource
-module.exports.removeAndroid = modifyAndroidSource
-module.exports.removeIos = modifyIosSource
