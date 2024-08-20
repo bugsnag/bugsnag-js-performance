@@ -1,4 +1,5 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
+import Bugsnag from '@bugsnag/react-native'
 import { REACT_APP_API_KEY, REACT_APP_ENDPOINT, REACT_APP_SCENARIO_NAME } from '@env'
 import React from 'react'
 import { AppRegistry, SafeAreaView } from 'react-native'
@@ -35,6 +36,7 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
     const notifyEndpoint = endpoint.replace('traces', 'notify')
     const sessionsEndpoint = endpoint.replace('traces', 'sessions')
     await NativeScenarioLauncher.startBugsnag({ apiKey, notifyEndpoint, sessionsEndpoint })
+    Bugsnag.start();
 
     if (scenario.clearBugsnagPersistentData) {
       await NativeScenarioLauncher.clearPersistentData()
