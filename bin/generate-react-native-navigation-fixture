@@ -175,11 +175,6 @@ function replaceNativeFiles() {
   )
 
   fs.copyFileSync(
-    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/ConfigFileReader.kt'),
-    resolve(fixtureDir, 'android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/ConfigFileReader.kt')
-  )
-
-  fs.copyFileSync(
     resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/Info.plist'),
     resolve(fixtureDir, 'ios/reactnative/Info.plist')
   )

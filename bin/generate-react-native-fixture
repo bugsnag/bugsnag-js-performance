@@ -96,12 +96,12 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   replaceNativeFiles()
 
+  installPeerDependencies()
+
   // apply additional modifications required for RN 0.64
   if (parseFloat(reactNativeVersion) === 0.64) {
     configureRN064Fixture(fixtureDir)
   }
-
-  installPeerDependencies()
 }
 
 // Generate Android Fixture
