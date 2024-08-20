@@ -1,14 +1,24 @@
 import type { Plugin } from './plugin'
 import { isLogger, isNumber, isObject, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
 
+type SetTraceCorrelation = (traceId: string, spanId: string) => void
+
 interface BugsnagErrorEvent {
-  setTraceCorrelation?: (traceId: string, spanId: string) => void
+  setTraceCorrelation?: SetTraceCorrelation
 }
 
 type BugsnagErrorCallback = (event: BugsnagErrorEvent) => void
 
 interface BugsnagErrorStatic {
   addOnError: (fn: BugsnagErrorCallback) => void
+  Event: {
+    prototype: {
+      setTraceCorrelation?: SetTraceCorrelation
+    }
+  }
+  _client?: {
+    _notify: (event: BugsnagErrorEvent) => void
+  }
 }
 
 export interface Logger {
@@ -27,6 +37,7 @@ export interface Configuration {
   enabledReleaseStages?: string[] | null
   plugins?: Array<Plugin<Configuration>>
   bugsnag?: BugsnagErrorStatic
+  samplingProbability?: number
 }
 
 export interface TestConfiguration {
@@ -54,6 +65,7 @@ export interface CoreSchema extends Schema {
   enabledReleaseStages: ConfigOption<string[] | null>
   plugins: ConfigOption<Array<Plugin<Configuration>>>
   bugsnag: ConfigOption<BugsnagErrorStatic | undefined>
+  samplingProbability: ConfigOption<number | undefined>
 }
 
 export const schema: CoreSchema = {
@@ -101,6 +113,11 @@ export const schema: CoreSchema = {
     defaultValue: undefined,
     message: 'should be an instance of Bugsnag',
     validate: (value: unknown): value is BugsnagErrorStatic => isObject(value) && typeof value.addOnError === 'function'
+  },
+  samplingProbability: {
+    defaultValue: undefined,
+    message: 'should be a number between 0 and 1',
+    validate: (value: unknown): value is number | undefined => value === undefined || (isNumber(value) && value >= 0 && value <= 1)
   }
 }
 

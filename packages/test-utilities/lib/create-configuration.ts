@@ -20,6 +20,8 @@ function createConfiguration<C extends Configuration> (overrides: Partial<C> = {
     },
     appVersion: '',
     networkRequestCallback: (networkRequestInfo: unknown) => networkRequestInfo,
+    serviceName: 'unknown_service',
+    samplingProbability: undefined,
     ...overrides
   } as unknown as InternalConfiguration<C>
 }

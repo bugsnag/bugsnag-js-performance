@@ -7,6 +7,7 @@ import type { Configuration, CoreSchema } from './config'
 import { validateConfig } from './config'
 import type { DeliveryFactory } from './delivery'
 import { TracePayloadEncoder } from './delivery'
+import FixedProbabilityManager from './fixed-probability-manager'
 import type { IdGenerator } from './id-generator'
 import type { NetworkSpan, NetworkSpanEndOptions, NetworkSpanOptions } from './network-span'
 import type { Persistence } from './persistence'
@@ -72,25 +73,32 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     start: (config: C | string) => {
       const configuration = validateConfig<S, C>(config, options.schema)
 
-      if (configuration.bugsnag) {
-        configuration.bugsnag.addOnError((event) => {
+      // Correlate errors with span by monkey patching _notify on the error client
+      // and utilizing the setTraceCorrelation method on the event
+      if (configuration.bugsnag && typeof configuration.bugsnag.Event.prototype.setTraceCorrelation === 'function' && configuration.bugsnag._client) {
+        const originalNotify = configuration.bugsnag._client._notify
+        configuration.bugsnag._client._notify = function (...args) {
           const currentSpanContext = spanContextStorage.current
-
-          if (currentSpanContext && event.setTraceCorrelation) {
-            event.setTraceCorrelation(currentSpanContext.traceId, currentSpanContext.id)
+          if (currentSpanContext && typeof args[0].setTraceCorrelation === 'function') {
+            args[0].setTraceCorrelation(currentSpanContext.traceId, currentSpanContext.id)
           }
-        })
+          originalNotify.apply(this, args)
+        }
       }
 
       const delivery = options.deliveryFactory(configuration.endpoint)
 
       options.spanAttributesSource.configure(configuration)
 
-      ProbabilityManager.create(
-        options.persistence,
-        sampler,
-        new ProbabilityFetcher(delivery, configuration.apiKey)
-      ).then((manager: ProbabilityManager) => {
+      const probabilityManagerPromise = configuration.samplingProbability === undefined
+        ? ProbabilityManager.create(
+          options.persistence,
+          sampler,
+          new ProbabilityFetcher(delivery, configuration.apiKey)
+        )
+        : FixedProbabilityManager.create(sampler, configuration.samplingProbability)
+
+      probabilityManagerPromise.then((manager: ProbabilityManager | FixedProbabilityManager) => {
         processor = new BatchProcessor(
           delivery,
           configuration,
@@ -111,6 +119,12 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         // from configuration
         options.backgroundingListener.onStateChange(state => {
           (processor as BatchProcessor<C>).flush()
+
+          // ensure we have a fresh probability value when returning to the
+          // foreground
+          if (state === 'in-foreground') {
+            manager.ensureFreshProbability()
+          }
         })
 
         logger = configuration.logger

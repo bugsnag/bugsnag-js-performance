@@ -14,6 +14,7 @@ function createResourceAttributesSource (
     const attributes = new ResourceAttributes(
       config.releaseStage,
       config.appVersion,
+      config.serviceName,
       'bugsnag.performance.browser',
       '__VERSION__'
     )

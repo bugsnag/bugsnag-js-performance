@@ -132,6 +132,7 @@ steps:
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
               - --fail-fast
+              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
         retry:
@@ -168,6 +169,7 @@ steps:
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
               - --fail-fast
+              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
         retry:
@@ -205,6 +207,7 @@ steps:
               - --device=IOS_{{matrix.ios_version}}
               - --a11y-locator
               - --fail-fast
+              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
         retry:
@@ -241,6 +244,7 @@ steps:
               - --device=IOS_{{matrix.ios_version}}
               - --a11y-locator
               - --fail-fast
+              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
         retry:
