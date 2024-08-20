@@ -6,7 +6,9 @@
 
 RCT_EXPORT_MODULE()
 
-RCT_EXPORT_METHOD(startBugsnag:(NSDictionary *)configuration) {
+RCT_EXPORT_METHOD(startBugsnag:(NSDictionary *)configuration resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  NSLog(@"Starting Bugsnag with configuration: %@\n", configuration);
+
   BugsnagConfiguration *config = [[BugsnagConfiguration alloc] initWithApiKey:configuration[@"apiKey"]];
   NSString *notifyEndpoint = configuration[@"notifyEndpoint"];
   NSString *sessionsEndpoint = configuration[@"sessionsEndpoint"];
@@ -17,9 +19,11 @@ RCT_EXPORT_METHOD(startBugsnag:(NSDictionary *)configuration) {
 
   [config setEndpoints:endpoints];
   [Bugsnag startWithConfiguration:config];
+
+  resolve(nil);
 }
 
-RCT_EXPORT_METHOD(clearPersistentData) {
+RCT_EXPORT_METHOD(clearPersistentData:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   NSString *topLevelDir = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
   NSString *dirPath = [topLevelDir stringByAppendingFormat:@"/bugsnag-shared-%@", [[NSBundle mainBundle] bundleIdentifier]];
   NSString *filePath = [dirPath stringByAppendingPathComponent:@"device-id.json"];
@@ -29,8 +33,10 @@ RCT_EXPORT_METHOD(clearPersistentData) {
 
   if (success) {
     NSLog(@"Deleted device-id.json");
+    resolve(nil);
   } else {
     NSLog(@"Could not delete device-id.json -:%@ ", [error localizedDescription]);
+    resolve(nil);
   }
 }
 

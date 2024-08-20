@@ -8,8 +8,8 @@
 #endif
 
 @interface ScenarioLauncher : NSObject<RCTBridgeModule>
-    - (void) startBugsnag:(NSDictionary *)configuration;
-    - (void) clearPersistentData;
+    - (void) startBugsnag:(NSDictionary *)configuration resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject;
+    - (void) clearPersistentData:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject;
 @end
 
 #ifdef RCT_NEW_ARCH_ENABLED
