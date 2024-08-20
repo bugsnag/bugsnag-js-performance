@@ -1,12 +1,11 @@
 #import <Foundation/Foundation.h>
-#import <React/RCTBridgeModule.h>
 #import "Bugsnag.h"
 #import "ScenarioLauncher.h"
 #import "ConfigFileReader.h"
 
 @implementation ScenarioLauncher
 
-RCT_EXPORT_METHOD(startBugsnag) {
+- (void) startBugsnag {
   NSLog(@"Called startBugsnag, fetching configuration from ConfigFileReader");
   NSString *mazeRunnerAddress = [[ConfigFileReader new] loadMazeRunnerAddress];
 
@@ -25,7 +24,7 @@ RCT_EXPORT_METHOD(startBugsnag) {
   [Bugsnag startWithConfiguration:config];
 }
 
-RCT_EXPORT_METHOD(clearPersistentData) {
+- (void) clearPersistentData {
   NSString *topLevelDir = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES).firstObject;
   NSString *dirPath = [topLevelDir stringByAppendingFormat:@"/bugsnag-shared-%@", [[NSBundle mainBundle] bundleIdentifier]];
   NSString *filePath = [dirPath stringByAppendingPathComponent:@"device-id.json"];
@@ -40,11 +39,8 @@ RCT_EXPORT_METHOD(clearPersistentData) {
   }
 }
 
-RCT_EXPORT_MODULE();
-
 // Start Bugsnag when the module is initialized
-- (instancetype)init
-{
+- (instancetype) init {
   self = [super init];
 
   [self startBugsnag];
