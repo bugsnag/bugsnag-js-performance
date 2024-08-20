@@ -8,10 +8,7 @@ import type { AppStateStatic, AppStateStatus } from 'react-native'
 export default function createBrowserBackgroundingListener (appState: AppStateStatic) {
   const callbacks: BackgroundingListenerCallback[] = []
   let state: BackgroundingListenerState =
-  // on iOS the app state may be 'unknown' on launch, so we treat this as 'in-foreground'
-    appState.currentState === 'active' || appState.currentState === 'unknown'
-      ? 'in-foreground'
-      : 'in-background'
+    appState.currentState === 'background' ? 'in-background' : 'in-foreground'
 
   const backgroundingListener: BackgroundingListener = {
     onStateChange (backgroundingListenerCallback: BackgroundingListenerCallback): void {
