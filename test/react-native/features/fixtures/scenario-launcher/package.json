@@ -24,7 +24,7 @@
     "type": "modules",
     "jsSrcsDir": "lib",
     "android": {
-      "javaPackageName": "com.scenariolauncher.reactnative"
+      "javaPackageName": "com.bugsnag.reactnative.scenariolauncher"
     }
   }
 }
