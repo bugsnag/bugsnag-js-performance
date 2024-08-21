@@ -170,10 +170,10 @@ if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
 
 function configureRN064Fixture(fixtureDir) {
   // Android
-  // Update build.gradle file - enable hermes and set --openssl-legacy-provider node option
   const moduleGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
   let moduleGradle = fs.readFileSync(moduleGradlePath, 'utf8')
 
+  // enable hermes and set --openssl-legacy-provider node option
   const currentReactConfig = `project.ext.react = [
     enableHermes: false,  // clean and rebuild if changing
 ]`
@@ -183,7 +183,22 @@ function configureRN064Fixture(fixtureDir) {
     nodeExecutableAndArgs: ["node", "--openssl-legacy-provider"]
   ]`
 
-  moduleGradle = moduleGradle.replace(currentReactConfig, updatedReactConfig)
+  // remove flipper dependencies
+  const flipperDependencies = `debugImplementation("com.facebook.flipper:flipper:\${FLIPPER_VERSION}") {
+    exclude group:'com.facebook.fbjni'
+  }
+
+  debugImplementation("com.facebook.flipper:flipper-network-plugin:\${FLIPPER_VERSION}") {
+      exclude group:'com.facebook.flipper'
+      exclude group:'com.squareup.okhttp3', module:'okhttp'
+  }
+
+  debugImplementation("com.facebook.flipper:flipper-fresco-plugin:\${FLIPPER_VERSION}") {
+      exclude group:'com.facebook.flipper'
+  }
+`
+
+  moduleGradle = moduleGradle.replace(currentReactConfig, updatedReactConfig).replace(flipperDependencies, '')
   fs.writeFileSync(moduleGradlePath, moduleGradle)
 
   // iOS
