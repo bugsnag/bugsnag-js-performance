@@ -113,10 +113,6 @@ if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
 if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
   fs.rmSync(`${fixtureDir}/reactnative.xcarchive`, { recursive: true, force: true })
 
-  // Install Bugsnag using CLI script
-  fs.copyFileSync(resolve(ROOT_DIR, 'bin', 'rn-cli-init-ios.sh'), resolve(fixtureDir, 'rn-cli-init-ios.sh'))
-  execFileSync(`./rn-cli-init-ios.sh`, [fixtureDir, reactNativeVersion], { cwd: fixtureDir, stdio: 'inherit' })
-
   // install pods
   execFileSync('pod', ['install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
 
