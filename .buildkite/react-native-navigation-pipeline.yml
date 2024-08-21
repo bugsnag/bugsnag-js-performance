@@ -17,6 +17,7 @@ steps:
           NODE_VERSION: "18"
           REACT_NATIVE_NAVIGATION: "true"
           RN_VERSION: "{{matrix.rn_version}}"
+          NOTIFIER_VERSION: '8.0.0-alpha.13'
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
@@ -43,6 +44,7 @@ steps:
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "true"
           RN_VERSION: "{{matrix.rn_version}}"
+          NOTIFIER_VERSION: '8.0.0-alpha.13'
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
@@ -70,6 +72,7 @@ steps:
           REACT_NATIVE_NAVIGATION: "true"
           RN_VERSION: "{{matrix.rn_version}}"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
+          NOTIFIER_VERSION: '8.0.0-alpha.13'
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
         commands:
@@ -96,6 +99,7 @@ steps:
           RCT_NEW_ARCH_ENABLED: "true"
           RN_VERSION: "{{matrix.rn_version}}"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
+          NOTIFIER_VERSION: '8.0.0-alpha.13'
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
         commands:
