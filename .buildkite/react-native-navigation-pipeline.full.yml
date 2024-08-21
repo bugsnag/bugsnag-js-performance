@@ -23,7 +23,7 @@ steps:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
           - bundle install
-          - ./bin/generate-react-native-navigation-fixture
+          - ./bin/generate-react-native-fixture
         matrix:
           setup:
             rn_version:
@@ -50,7 +50,7 @@ steps:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
           - bundle install
-          - ./bin/generate-react-native-navigation-fixture
+          - ./bin/generate-react-native-fixture
         matrix:
           setup:
             rn_version:
@@ -78,7 +78,7 @@ steps:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
         commands:
           - bundle install
-          - ./bin/generate-react-native-navigation-fixture
+          - ./bin/generate-react-native-fixture
         matrix:
           setup:
             rn_version:
@@ -105,7 +105,7 @@ steps:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
         commands:
           - bundle install
-          - ./bin/generate-react-native-navigation-fixture
+          - ./bin/generate-react-native-fixture
         matrix:
           setup:
             rn_version:

@@ -18,6 +18,9 @@ const reactNativeVersion = process.env.RN_VERSION
 const ROOT_DIR = resolve(__dirname, '../')
 
 let fixturePath = 'test/react-native/features/fixtures/generated/'
+if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
+  fixturePath += 'react-native-navigation/'
+}
 if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
   fixturePath += 'new-arch/'
 } else {
@@ -50,8 +53,8 @@ const reactNativeFileAccessVersion = parseFloat(reactNativeVersion) <= 0.64 ? '1
 const netinfoVersion = parseFloat(reactNativeVersion) <= 0.64 ? '10.0.0' : '11.3.2'
 const DEPENDENCIES = [
   `@bugsnag/react-native@${process.env.NOTIFIER_VERSION}`,
-  'react-native-dotenv',
   `@react-native-community/netinfo@${netinfoVersion}`,
+  `react-native-dotenv`,
   `react-native-file-access@${reactNativeFileAccessVersion}`
 ]
 
@@ -66,22 +69,16 @@ const REACT_NAVIGATION_DEPENDENCIES = [
   `react-native-safe-area-context@${reactNativeSafeAreaContextVersion}`
 ]
 
-/** Install peer dependencies from this repo */
-function installPeerDependencies() {
-  // pack the required packages into the fixture directory
-  for (const package of PACKAGE_DIRECTORIES) {
-    const libraryPackArgs = ['pack', package, '--pack-destination', fixtureDir]
-    execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
-  }
+const REACT_NATIVE_NAVIGATION_DEPENDENCIES = [
+  `react-native-navigation@7.37.2` // INVESTIGATE: higher than 7.37.2 causes a build error
+]
 
-  if (!process.env.RCT_NEW_ARCH_ENABLED) {
-    DEPENDENCIES.push(...REACT_NAVIGATION_DEPENDENCIES)
-  }
-
-  const fixtureDependencyArgs = DEPENDENCIES.join(' ')
-
-  // install test fixture dependencies and local packages
-  execSync(`npm install --save ${fixtureDependencyArgs} *.tgz`, { cwd: fixtureDir, stdio: 'inherit' })
+// add dependencies for react-native-navigation (wix)
+if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
+  DEPENDENCIES.push(...REACT_NATIVE_NAVIGATION_DEPENDENCIES)
+} else if (!process.env.RCT_NEW_ARCH_ENABLED) {
+  // add dependencies for @react-navigation
+  DEPENDENCIES.push(...REACT_NAVIGATION_DEPENDENCIES)
 }
 
 if (!process.env.SKIP_BUILD_PACKAGES) {
@@ -103,32 +100,28 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   const RNInitArgs = ['@react-native-community/cli@latest', 'init', 'reactnative', '--package-name', 'com.bugsnag.fixtures.reactnative.performance', '--directory', fixtureDir, '--version', reactNativeVersion, '--npm', '--skip-install']
   execFileSync('npx', RNInitArgs, { stdio: 'inherit' })
 
-  replaceNativeFiles()
+  replaceGeneratedFixtureFiles()
 
-  installPeerDependencies()
+  installFixtureDependencies()
 
   // apply additional modifications required for RN 0.64
   if (parseFloat(reactNativeVersion) === 0.64) {
     configureRN064Fixture(fixtureDir)
   }
+
+  // link react-native-navigation using rnn-link tool
+  if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
+    execSync('npx rnn-link', { cwd: fixtureDir, stdio: 'inherit' })
+  }
 }
 
-// Generate Android Fixture
+// generate Android Fixture
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
-  if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
-    // If we're building with the new architecture, replace the gradle.properties file
-    fs.copyFileSync(
-      resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/newarch.gradle.properties'),
-      resolve(fixtureDir, 'android/gradle.properties')
-    )
-  }
-
-  // build the android app
   execFileSync('./gradlew', ['assembleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
   fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
 }
 
-// Generate iOS Fixture
+// generate iOS Fixture
 if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
   fs.rmSync(`${fixtureDir}/reactnative.xcarchive`, { recursive: true, force: true })
 
@@ -168,6 +161,7 @@ if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
   execFileSync('xcrun', exportArgs, { cwd: fixtureDir, stdio: 'inherit' })
 }
 
+/** Update fixture configuration to support React Native 0.64 */
 function configureRN064Fixture(fixtureDir) {
   // Android
   const moduleGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
@@ -229,8 +223,22 @@ function configureRN064Fixture(fixtureDir) {
   fs.writeFileSync(yogaCppPath, yogaCpp)
 }
 
+/** Pack and install local packages from this repo */
+function installFixtureDependencies() {
+  // pack the required packages into the fixture directory
+  for (const package of PACKAGE_DIRECTORIES) {
+    const libraryPackArgs = ['pack', package, '--pack-destination', fixtureDir]
+    execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
+  }
+
+  const fixtureDependencyArgs = DEPENDENCIES.join(' ')
+
+  // install test fixture dependencies and local packages
+  execSync(`npm install --save ${fixtureDependencyArgs} *.tgz`, { cwd: fixtureDir, stdio: 'inherit' })
+}
+
 /** Replace native files generated by react-native cli with pre-configured files */
-function replaceNativeFiles() {
+function replaceGeneratedFixtureFiles() {
   // replace the App.tsx/App.js file with our own App.js file
   const appTsFilePath = resolve(fixtureDir, 'App.tsx')
   const appJsFilePath = resolve(fixtureDir, 'App.js')
@@ -241,6 +249,13 @@ function replaceNativeFiles() {
     resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/App.js'),
     resolve(fixtureDir, 'App.js')
   )
+
+  if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
+    fs.copyFileSync(
+      resolve(ROOT_DIR, 'test/react-native/features/fixtures/react-native-navigation/index.js'),
+      resolve(fixtureDir, 'index.js')
+    )
+  }
 
   fs.copyFileSync(
     resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/AndroidManifest.xml'),
@@ -267,7 +282,7 @@ function replaceNativeFiles() {
     resolve(fixtureDir, 'babel.config.js')
   )
 
-  // enable new architecture for android
+  // If we're building with the new architecture, replace the gradle.properties file
   if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
     fs.copyFileSync(
       resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/newarch.gradle.properties'),
