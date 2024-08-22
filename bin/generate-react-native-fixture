@@ -9,24 +9,32 @@ if (!process.env.RN_VERSION) {
   process.exit(1)
 }
 
-const rnVersion = process.env.RN_VERSION
+if (!process.env.NOTIFIER_VERSION) {
+  console.error('Please provide a Notifier version')
+  process.exit(1)
+}
+
+const reactNativeVersion = process.env.RN_VERSION
 const ROOT_DIR = resolve(__dirname, '../')
 
 let fixturePath = 'test/react-native/features/fixtures/generated/'
+if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
+  fixturePath += 'react-native-navigation/'
+}
 if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
   fixturePath += 'new-arch/'
 } else {
   fixturePath += 'old-arch/'
 }
 
-const fixtureDir = resolve(ROOT_DIR, fixturePath, rnVersion)
+const fixtureDir = resolve(ROOT_DIR, fixturePath, reactNativeVersion)
 
 const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
   '@bugsnag/delivery-fetch-performance',
   '@bugsnag/plugin-react-native-navigation-performance',
-  '@bugsnag/react-native-performance',
   '@bugsnag/plugin-react-navigation-performance',
+  '@bugsnag/react-native-performance',
   '@bugsnag/request-tracker-performance'
 ]
 
@@ -37,28 +45,41 @@ const PACKAGE_DIRECTORIES = [
   `${ROOT_DIR}/packages/plugin-react-native-navigation`,
   `${ROOT_DIR}/packages/plugin-react-navigation`,
   `${ROOT_DIR}/packages/request-tracker`,
-  `${ROOT_DIR}/test/react-native/features/fixtures/scenario-launcher`,
+  `${ROOT_DIR}/test/react-native/features/fixtures/scenario-launcher`
 ]
 
 // make sure we install a compatible versions of peer dependencies
-const reactNativeFileAccessVersion = parseFloat(rnVersion) <= 0.64 ? '1.7.1' : '3.1.0'
-const netinfoVersion = parseFloat(rnVersion) <= 0.64 ? '10.0.0' : '11.3.2'
+const reactNativeFileAccessVersion = parseFloat(reactNativeVersion) <= 0.64 ? '1.7.1' : '3.1.0'
+const netinfoVersion = parseFloat(reactNativeVersion) <= 0.64 ? '10.0.0' : '11.3.2'
 const DEPENDENCIES = [
-  'react-native-dotenv',
+  `@bugsnag/react-native@${process.env.NOTIFIER_VERSION}`,
   `@react-native-community/netinfo@${netinfoVersion}`,
+  `react-native-dotenv`,
   `react-native-file-access@${reactNativeFileAccessVersion}`
 ]
 
-const reactNavigationVersion = parseFloat(rnVersion) <= 0.64 ? '6.1.18' : 'latest'
-const reactNavigationNativeStackVersion = parseFloat(rnVersion) <= 0.64 ? '6.11.0' : 'latest'
-const reactNativeScreensVersion = parseFloat(rnVersion) <= 0.64 ? '3.14.0' : 'latest'
-const reactNativeSafeAreaContextVersion = parseFloat(rnVersion) <= 0.64 ? '4.1.0' : 'latest'
+const reactNavigationVersion = parseFloat(reactNativeVersion) <= 0.64 ? '6.1.18' : 'latest'
+const reactNavigationNativeStackVersion = parseFloat(reactNativeVersion) <= 0.64 ? '6.11.0' : 'latest'
+const reactNativeScreensVersion = parseFloat(reactNativeVersion) <= 0.64 ? '3.14.0' : 'latest'
+const reactNativeSafeAreaContextVersion = parseFloat(reactNativeVersion) <= 0.64 ? '4.1.0' : 'latest'
 const REACT_NAVIGATION_DEPENDENCIES = [
   `@react-navigation/native@${reactNavigationVersion}`,
   `@react-navigation/native-stack@${reactNavigationNativeStackVersion}`,
   `react-native-screens@${reactNativeScreensVersion}`,
   `react-native-safe-area-context@${reactNativeSafeAreaContextVersion}`
 ]
+
+const REACT_NATIVE_NAVIGATION_DEPENDENCIES = [
+  `react-native-navigation@7.37.2` // INVESTIGATE: higher than 7.37.2 causes a build error
+]
+
+// add dependencies for react-native-navigation (wix)
+if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
+  DEPENDENCIES.push(...REACT_NATIVE_NAVIGATION_DEPENDENCIES)
+} else if (!process.env.RCT_NEW_ARCH_ENABLED) {
+  // add dependencies for @react-navigation
+  DEPENDENCIES.push(...REACT_NAVIGATION_DEPENDENCIES)
+}
 
 if (!process.env.SKIP_BUILD_PACKAGES) {
   // run npm install in the root directory
@@ -76,99 +97,38 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   }
 
   // create the test fixture
-  const RNInitArgs = ['react-native@latest', 'init', 'reactnative', '--package-name', 'com.bugsnag.fixtures.reactnative.performance', '--directory', fixtureDir, '--version', rnVersion, '--npm', '--skip-install']
+  const RNInitArgs = ['@react-native-community/cli@latest', 'init', 'reactnative', '--package-name', 'com.bugsnag.fixtures.reactnative.performance', '--directory', fixtureDir, '--version', reactNativeVersion, '--npm', '--skip-install']
   execFileSync('npx', RNInitArgs, { stdio: 'inherit' })
-  
-  // replace the App.tsx/App.js file with our own App.js file
-  const appTsFilePath = resolve(fixtureDir, 'App.tsx')
-  const appJsFilePath = resolve(fixtureDir, 'App.js')
-  if (fs.existsSync(appTsFilePath)) fs.unlinkSync(appTsFilePath)
-  if (fs.existsSync(appJsFilePath)) fs.unlinkSync(appJsFilePath)
 
-  fs.copyFileSync(
-    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/App.js'),
-    resolve(fixtureDir, 'App.js')
-  )
+  replaceGeneratedFixtureFiles()
 
-  // replace the AndroidManifest.xml file with our own
-  fs.copyFileSync(
-    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/AndroidManifest.xml'),
-    resolve(fixtureDir, 'android/app/src/main/AndroidManifest.xml')
-  )
-
-  // replace the Info.plist file with our own
-  fs.copyFileSync(
-    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/Info.plist'),
-    resolve(fixtureDir, 'ios/reactnative/Info.plist')
-  )
-
-  // copy the exportOptions.plist file
-  fs.copyFileSync(
-    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/exportOptions.plist'),
-    resolve(fixtureDir, 'exportOptions.plist')
-  )
-
-  // copy the .env file
-  fs.copyFileSync(
-    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/env'),
-    resolve(fixtureDir, '.env')
-  )
-
-  // replace the babel.config.js file
-  fs.copyFileSync(
-    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/babel.config.js'),
-    resolve(fixtureDir, 'babel.config.js')
-  )
-
-  // react navigation setup
-  if (!process.env.RCT_NEW_ARCH_ENABLED) {
-    DEPENDENCIES.push(...REACT_NAVIGATION_DEPENDENCIES)
-    
-    const fileExtension = parseFloat(rnVersion) < 0.73 ? 'java' : 'kt'
-      fs.copyFileSync(
-        resolve(ROOT_DIR, `test/react-native/features/fixtures/app/android/MainActivity.${rnVersion}.${fileExtension}`),
-        resolve(fixtureDir, `android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${fileExtension}`)
-      )
-  }
- 
-  // enable new architecture for android
-  if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
-    fs.copyFileSync(
-      resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/newarch.gradle.properties'),
-      resolve(fixtureDir, 'android/gradle.properties')
-    )
-  }
-
-  // pack the required packages into the fixture directory
-  for (const package of PACKAGE_DIRECTORIES) {
-    const libraryPackArgs = ['pack', package, '--pack-destination', fixtureDir]
-    execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
-  }
-
-  const fixtureDependencyArgs = DEPENDENCIES.join(' ')
-
-  // install test fixture dependencies and local packages
-  execSync(`npm install --save --save-exact ${fixtureDependencyArgs} *.tgz`, { cwd: fixtureDir, stdio: 'inherit' })
+  installFixtureDependencies()
 
   // apply additional modifications required for RN 0.64
-  if (parseFloat(rnVersion) === 0.64) {
+  if (parseFloat(reactNativeVersion) === 0.64) {
     configureRN064Fixture(fixtureDir)
+  }
+
+  // link react-native-navigation using rnn-link tool
+  if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
+    execSync('npx rnn-link', { cwd: fixtureDir, stdio: 'inherit' })
   }
 }
 
+// generate Android Fixture
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
-  // build the android app
   execFileSync('./gradlew', ['assembleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
   fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
 }
 
-if(process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
+// generate iOS Fixture
+if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
   fs.rmSync(`${fixtureDir}/reactnative.xcarchive`, { recursive: true, force: true })
 
   // install pods
   execFileSync('pod', ['install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
 
-  // build the ios app
+  // build the iOS app
   const archiveArgs = [
     'xcodebuild',
     'DEVELOPMENT_TEAM=7W9PZ27Y5F',
@@ -201,12 +161,13 @@ if(process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
   execFileSync('xcrun', exportArgs, { cwd: fixtureDir, stdio: 'inherit' })
 }
 
+/** Update fixture configuration to support React Native 0.64 */
 function configureRN064Fixture(fixtureDir) {
   // Android
-  // Update build.gradle file - enable hermes and set --openssl-legacy-provider node option
   const moduleGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
   let moduleGradle = fs.readFileSync(moduleGradlePath, 'utf8')
 
+  // enable hermes and set --openssl-legacy-provider node option
   const currentReactConfig = `project.ext.react = [
     enableHermes: false,  // clean and rebuild if changing
 ]`
@@ -216,7 +177,22 @@ function configureRN064Fixture(fixtureDir) {
     nodeExecutableAndArgs: ["node", "--openssl-legacy-provider"]
   ]`
 
-  moduleGradle = moduleGradle.replace(currentReactConfig, updatedReactConfig)
+  // remove flipper dependencies
+  const flipperDependencies = `debugImplementation("com.facebook.flipper:flipper:\${FLIPPER_VERSION}") {
+    exclude group:'com.facebook.fbjni'
+  }
+
+  debugImplementation("com.facebook.flipper:flipper-network-plugin:\${FLIPPER_VERSION}") {
+      exclude group:'com.facebook.flipper'
+      exclude group:'com.squareup.okhttp3', module:'okhttp'
+  }
+
+  debugImplementation("com.facebook.flipper:flipper-fresco-plugin:\${FLIPPER_VERSION}") {
+      exclude group:'com.facebook.flipper'
+  }
+`
+
+  moduleGradle = moduleGradle.replace(currentReactConfig, updatedReactConfig).replace(flipperDependencies, '')
   fs.writeFileSync(moduleGradlePath, moduleGradle)
 
   // iOS
@@ -245,4 +221,79 @@ function configureRN064Fixture(fixtureDir) {
   let yogaCpp = fs.readFileSync(yogaCppPath, 'utf8')
   yogaCpp = yogaCpp.replace('node->getLayout().hadOverflow() |', 'node->getLayout().hadOverflow() ||')
   fs.writeFileSync(yogaCppPath, yogaCpp)
+}
+
+/** Pack and install local packages from this repo */
+function installFixtureDependencies() {
+  // pack the required packages into the fixture directory
+  for (const package of PACKAGE_DIRECTORIES) {
+    const libraryPackArgs = ['pack', package, '--pack-destination', fixtureDir]
+    execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
+  }
+
+  const fixtureDependencyArgs = DEPENDENCIES.join(' ')
+
+  // install test fixture dependencies and local packages
+  execSync(`npm install --save ${fixtureDependencyArgs} *.tgz`, { cwd: fixtureDir, stdio: 'inherit' })
+}
+
+/** Replace native files generated by react-native cli with pre-configured files */
+function replaceGeneratedFixtureFiles() {
+  // replace the App.tsx/App.js file with our own App.js file
+  const appTsFilePath = resolve(fixtureDir, 'App.tsx')
+  const appJsFilePath = resolve(fixtureDir, 'App.js')
+  if (fs.existsSync(appTsFilePath)) fs.unlinkSync(appTsFilePath)
+  if (fs.existsSync(appJsFilePath)) fs.unlinkSync(appJsFilePath)
+
+  fs.copyFileSync(
+    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/App.js'),
+    resolve(fixtureDir, 'App.js')
+  )
+
+  if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
+    fs.copyFileSync(
+      resolve(ROOT_DIR, 'test/react-native/features/fixtures/react-native-navigation/index.js'),
+      resolve(fixtureDir, 'index.js')
+    )
+  }
+
+  fs.copyFileSync(
+    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/AndroidManifest.xml'),
+    resolve(fixtureDir, 'android/app/src/main/AndroidManifest.xml')
+  )
+
+  fs.copyFileSync(
+    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/Info.plist'),
+    resolve(fixtureDir, 'ios/reactnative/Info.plist')
+  )
+
+  fs.copyFileSync(
+    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/exportOptions.plist'),
+    resolve(fixtureDir, 'exportOptions.plist')
+  )
+
+  fs.copyFileSync(
+    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/env'),
+    resolve(fixtureDir, '.env')
+  )
+
+  fs.copyFileSync(
+    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/babel.config.js'),
+    resolve(fixtureDir, 'babel.config.js')
+  )
+
+  // If we're building with the new architecture, replace the gradle.properties file
+  if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
+    fs.copyFileSync(
+      resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/newarch.gradle.properties'),
+      resolve(fixtureDir, 'android/gradle.properties')
+    )
+  } else {
+    // react navigation setup
+    const fileExtension = parseFloat(reactNativeVersion) < 0.73 ? 'java' : 'kt'
+    fs.copyFileSync(
+      resolve(ROOT_DIR, `test/react-native/features/fixtures/app/android/MainActivity.${reactNativeVersion}.${fileExtension}`),
+      resolve(fixtureDir, `android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${fileExtension}`)
+    )
+  }
 }

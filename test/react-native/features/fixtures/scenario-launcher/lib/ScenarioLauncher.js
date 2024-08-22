@@ -1,11 +1,13 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
+import Bugsnag from '@bugsnag/react-native'
 import { REACT_APP_API_KEY, REACT_APP_ENDPOINT, REACT_APP_SCENARIO_NAME } from '@env'
 import React from 'react'
-import { AppRegistry } from 'react-native'
+import { AppRegistry, SafeAreaView } from 'react-native'
 import * as Scenarios from '../scenarios'
 import { getCurrentCommand } from './CommandRunner'
 import { clearPersistedState, setDeviceId, setSamplingProbability } from './Persistence'
-import { ScenarioContext } from './ScenarioContext' 
+import { ScenarioContext } from './ScenarioContext'
+import { NativeScenarioLauncher } from './native'
 
 const isTurboModuleEnabled = () => global.__turboModuleProxy != null
 
@@ -29,6 +31,17 @@ async function loadReactNavigationScenario (scenario) {
 async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
   console.error(`[BugsnagPerformance] Launching scenario: ${scenarioName}`)
   const scenario = Scenarios[scenarioName]
+
+  if (scenario.loadBugsnagNotifier) {
+    const notifyEndpoint = endpoint.replace('traces', 'notify')
+    const sessionsEndpoint = endpoint.replace('traces', 'sessions')
+    await NativeScenarioLauncher.startBugsnag({ apiKey, notifyEndpoint, sessionsEndpoint })
+    Bugsnag.start();
+
+    if (scenario.clearBugsnagPersistentData) {
+      await NativeScenarioLauncher.clearPersistentData()
+    }
+  }
 
   BugsnagPerformance.start({
     apiKey,
@@ -59,9 +72,11 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
     console.error(`[BugsnagPerformance] Reflect endpoint: ${reflectEndpoint}`)
 
     const Scenario = () => 
-    <ScenarioContext.Provider value={{ reflectEndpoint }}>
-      <scenario.App />
-    </ScenarioContext.Provider>
+      <ScenarioContext.Provider value={{ reflectEndpoint }}>
+        <SafeAreaView>
+          <scenario.App />
+        </SafeAreaView>
+      </ScenarioContext.Provider>
   
     AppRegistry.registerComponent(scenarioName, () => Scenario)
     AppRegistry.runApplication(scenarioName, appParams)
@@ -94,6 +109,9 @@ export async function launchScenario (rootTag, clearPersistedData = true) {
         command.api_key,
         command.endpoint
       )
+
+    case 'clear-all-persistent-data':
+      return await launchScenario(rootTag, true)
 
     case 'set-sampling-probability-to-0':
       await setSamplingProbability(0)

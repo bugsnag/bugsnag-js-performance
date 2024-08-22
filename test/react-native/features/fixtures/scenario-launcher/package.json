@@ -1,7 +1,7 @@
 {
   "name": "@bugsnag/react-native-performance-scenarios",
   "version": "1.0.0",
-  "description": "",
+  "description": "Performance scenarios for React Native",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,10 +12,19 @@
     "react-native-navigation": "*"
   },
   "peerDependencies": {
+    "@bugsnag/react-native-cli": "*",
     "@react-navigation/native": "*",
     "@react-navigation/native-stack": "*",
     "react": "*",
     "react-native": "*",
     "react-native-file-access": "*"
+  },
+  "codegenConfig": {
+    "name": "ScenarioLauncherSpec",
+    "type": "modules",
+    "jsSrcsDir": "lib",
+    "android": {
+      "javaPackageName": "com.bugsnag.reactnative.scenariolauncher"
+    }
   }
 }

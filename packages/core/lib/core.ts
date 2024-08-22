@@ -75,9 +75,9 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
 
       // Correlate errors with span by monkey patching _notify on the error client
       // and utilizing the setTraceCorrelation method on the event
-      if (configuration.bugsnag && typeof configuration.bugsnag.Event.prototype.setTraceCorrelation === 'function' && configuration.bugsnag._client) {
-        const originalNotify = configuration.bugsnag._client._notify
-        configuration.bugsnag._client._notify = function (...args) {
+      if (configuration.bugsnag && typeof configuration.bugsnag.Event.prototype.setTraceCorrelation === 'function' && configuration.bugsnag.Client) {
+        const originalNotify = configuration.bugsnag.Client.prototype._notify
+        configuration.bugsnag.Client.prototype._notify = function (...args) {
           const currentSpanContext = spanContextStorage.current
           if (currentSpanContext && typeof args[0].setTraceCorrelation === 'function') {
             args[0].setTraceCorrelation(currentSpanContext.traceId, currentSpanContext.id)
