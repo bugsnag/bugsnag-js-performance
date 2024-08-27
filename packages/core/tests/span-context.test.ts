@@ -24,6 +24,17 @@ describe('SpanContext', () => {
       span.end()
       expect(span.isValid()).toEqual(false)
     })
+
+    it('returns false if the span start time is more than one hour in the past', () => {
+      const delivery = new InMemoryDelivery()
+      const clock = new IncrementingClock({ currentTime: Date.now() })
+      const client = createTestClient({ deliveryFactory: () => delivery, clock })
+      client.start({ apiKey: VALID_API_KEY })
+
+      const HOUR_IN_MILLISECONDS = 60 * 60 * 1000
+      const span = client.startSpan('test span', { startTime: Date.now() - HOUR_IN_MILLISECONDS })
+      expect(span.isValid()).toEqual(false)
+    })
   })
 })
 

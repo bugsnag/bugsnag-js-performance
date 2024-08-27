@@ -7,6 +7,8 @@ import type { Time } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
 import { isBoolean, isSpanContext, isTime } from './validation'
 
+const HOUR_IN_MILLISECONDS = 60 * 60 * 1000
+
 export interface Span extends SpanContext {
   end: (endTime?: Time) => void
 }
@@ -70,10 +72,11 @@ export class SpanInternal implements SpanContext {
   private readonly kind = Kind.Client // TODO: How do we define the initial Kind?
   private readonly events = new SpanEvents()
   private readonly attributes: SpanAttributes
+  private readonly clock: Clock
   name: string
   private endTime?: number
 
-  constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes, parentSpanId?: string) {
+  constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes, clock: Clock, parentSpanId?: string) {
     this.id = id
     this.traceId = traceId
     this.parentSpanId = parentSpanId
@@ -81,6 +84,7 @@ export class SpanInternal implements SpanContext {
     this.startTime = startTime
     this.attributes = attributes
     this.samplingRate = traceIdToSamplingRate(this.traceId)
+    this.clock = clock
   }
 
   addEvent (name: string, time: number) {
@@ -119,7 +123,7 @@ export class SpanInternal implements SpanContext {
   }
 
   isValid () {
-    return this.endTime === undefined
+    return this.endTime === undefined && this.startTime > (this.clock.now() - HOUR_IN_MILLISECONDS)
   }
 }
 

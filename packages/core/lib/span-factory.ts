@@ -76,7 +76,7 @@ export class SpanFactory <C extends Configuration> {
       attributes.set('bugsnag.span.first_class', options.isFirstClass)
     }
 
-    const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes, parentSpanId)
+    const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes, this.clock, parentSpanId)
 
     // don't track spans that are started while the app is backgrounded
     if (this.isInForeground) {
@@ -117,7 +117,7 @@ export class SpanFactory <C extends Configuration> {
       // only warn if the span has already been ended explicitly rather than
       // discarded by us
       if (!span.isValid()) {
-        this.logger.warn('Attempted to end a Span which has already ended.')
+        this.logger.warn('Attempted to end a Span which is no longer valid.')
       }
 
       return

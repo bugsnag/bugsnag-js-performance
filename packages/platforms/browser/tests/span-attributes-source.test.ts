@@ -1,5 +1,5 @@
 import { SpanAttributes, SpanInternal } from '@bugsnag/core-performance'
-import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
+import { createConfiguration, IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 import type { BrowserConfiguration } from '../lib'
 import createSpanAttributesSource from '../lib/span-attributes-source'
 
@@ -16,7 +16,8 @@ describe('spanAttributesSource', () => {
   it('adds permitted attributes to a span', () => {
     const browserConfiguration = createConfiguration<BrowserConfiguration>({ sendPageAttributes: { url: true, title: true } })
     const spanAttributes = new SpanAttributes(new Map())
-    const span = new SpanInternal('id', 'traceId', 'test span', 1234, spanAttributes)
+    const clock = new IncrementingClock()
+    const span = new SpanInternal('id', 'traceId', 'test span', 1234, spanAttributes, clock)
 
     spanAttributesSource.requestAttributes(span)
 
