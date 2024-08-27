@@ -109,12 +109,14 @@ describe('SpanInternal', () => {
 
   describe('bugsnag.sampling.p', () => {
     it.each([0.25, 0.5, 0.1, 1, 0, 0.4, 0.3])('is set to the correct value on "end"', (probability) => {
+      const clock = new IncrementingClock()
       const span = new SpanInternal(
         'span id',
         'trace id',
         'name',
         1234,
-        new SpanAttributes(new Map<string, SpanAttribute>())
+        new SpanAttributes(new Map<string, SpanAttribute>()),
+        clock
       )
 
       const endedSpan = span.end(5678, createSamplingProbability(probability))
@@ -124,12 +126,14 @@ describe('SpanInternal', () => {
     })
 
     it.each([0.25, 0.5, 0.1, 1, 0, 0.4, 0.3])('is updated when samplingProbability is changed', (probability) => {
+      const clock = new IncrementingClock()
       const span = new SpanInternal(
         'span id',
         'trace id',
         'name',
         1234,
-        new SpanAttributes(new Map<string, SpanAttribute>())
+        new SpanAttributes(new Map<string, SpanAttribute>()),
+        clock
       )
 
       const endedSpan = span.end(5678, createSamplingProbability(probability))
@@ -386,7 +390,7 @@ describe('Span', () => {
         kind: Kind.Client,
         name: 'test span',
         startTimeUnixNano: '1000000',
-        endTimeUnixNano: '2000000',
+        endTimeUnixNano: '3000000',
         attributes: expect.any(Object),
         events: expect.any(Array)
       })
@@ -656,7 +660,7 @@ describe('Span', () => {
 
       await jest.runOnlyPendingTimersAsync()
 
-      expect(logger.warn).toHaveBeenCalledWith('Attempted to end a Span which has already ended.')
+      expect(logger.warn).toHaveBeenCalledWith('Attempted to end a Span which is no longer valid.')
       expect(delivery.requests).toHaveLength(1)
     })
 
