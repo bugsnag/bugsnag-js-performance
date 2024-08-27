@@ -274,7 +274,10 @@ describe('network span plugin', () => {
     const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
     expect(res.extraRequestHeaders).toEqual([
-      { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
+      {
+        traceparent: '00-a random 128 bit string-a random 64 bit string-01',
+        tracestate: 'sb=v:1;r:290'
+      }
     ])
   })
 
@@ -306,9 +309,9 @@ describe('network span plugin', () => {
     expect(span).toHaveAttribute('http.status_code', 200)
   })
 
-  describe('generating traceparent extraRequestHeaders', () => {
+  describe('generating trace propagation extraRequestHeaders', () => {
     describe('when a network span is being created for the request', () => {
-      it('generates a traceparent extraRequestHeader if propagateTraceContext is set to true', () => {
+      it('generates a trace propagation extraRequestHeader if propagateTraceContext is set to true', () => {
         spanContextStorage.push({
           id: 'abc123',
           traceId: 'xyz456',
@@ -329,17 +332,24 @@ describe('network span plugin', () => {
         const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: 'https://my-api.com/users', startTime: 1 })
 
         expect(res.extraRequestHeaders).toEqual([
-          { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
+          {
+            traceparent: '00-a random 128 bit string-a random 64 bit string-01',
+            tracestate: 'sb=v:1;r:290'
+          }
         ])
 
         const res2 = fetchTracker.start({ type: 'fetch', method: 'GET', url: '/users', startTime: 1 })
 
         expect(res2.extraRequestHeaders).toEqual([
-          { traceparent: '00-a random 128 bit string-a random 64 bit string-01' }
+          {
+            traceparent: '00-a random 128 bit string-a random 64 bit string-01',
+            tracestate: 'sb=v:1;r:290'
+
+          }
         ])
       })
 
-      it('does not generate a traceparent extraRequestHeader if propagateTraceContext is set to false', () => {
+      it('does not generate trace propagation extraRequestHeader if propagateTraceContext is set to false', () => {
         spanContextStorage.push({
           id: 'abc123',
           traceId: 'xyz456',
@@ -386,7 +396,10 @@ describe('network span plugin', () => {
         const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: 'https://my-api.com/users', startTime: 1 })
 
         expect(res.extraRequestHeaders).toEqual([
-          { traceparent: '00-xyz456-abc123-01' }
+          {
+            traceparent: '00-xyz456-abc123-01',
+            tracestate: 'sb=v:1;r:0'
+          }
         ])
       })
     })

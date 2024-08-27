@@ -1,3 +1,4 @@
+import { traceIdToSamplingRate } from '@bugsnag/core-performance'
 import type { InternalConfiguration, Logger, Plugin, SpanContextStorage, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
 import {
   defaultNetworkRequestCallback
@@ -112,6 +113,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
       const sampled = this.spanFactory.sampler.shouldSample(span.samplingRate)
 
       extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)
+      extraRequestHeaders.tracestate = buildTracestateHeader(traceId)
     } else if (this.spanContextStorage.current) {
       const currentSpanContext = this.spanContextStorage.current
 
@@ -120,6 +122,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
       const sampled = this.spanFactory.sampler.shouldSample(currentSpanContext.samplingRate)
 
       extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)
+      extraRequestHeaders.tracestate = buildTracestateHeader(traceId)
     }
 
     return extraRequestHeaders
@@ -128,4 +131,8 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
 
 function buildTraceparentHeader (traceId: string, parentSpanId: string, sampled: boolean): string {
   return `00-${traceId}-${parentSpanId}-${sampled ? '01' : '00'}`
+}
+
+function buildTracestateHeader (traceId: string): string {
+  return `sb=v:1;r:${traceIdToSamplingRate(traceId)}`
 }
