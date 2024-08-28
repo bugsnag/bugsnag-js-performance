@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- (core) Discard spans open for more than one hour [#494](https://github.com/bugsnag/bugsnag-js-performance/pull/494)
+
 ## [v2.8.0] (2024-08-20)
 
 ### Added
