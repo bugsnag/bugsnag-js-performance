@@ -16,8 +16,8 @@ import {
   SpanFactory,
   SpanInternal,
   spanToJson,
-  spanContextEquals
-
+  spanContextEquals,
+  DISCARD_END_TIME
 } from '../lib'
 import type { SpanAttribute, SpanEnded } from '../lib'
 import Sampler from '../lib/sampler'
@@ -631,7 +631,7 @@ describe('Span', () => {
       }))
     })
 
-    it('will not end a span that has already been ended', async () => {
+    it('will discard a span that has already been ended', async () => {
       const delivery = new InMemoryDelivery()
       const backgroundingListener = new ControllableBackgroundingListener()
       const logger = { warn: jest.fn(), debug: jest.fn(), error: jest.fn(), info: jest.fn() }
@@ -662,6 +662,46 @@ describe('Span', () => {
 
       expect(logger.warn).toHaveBeenCalledWith('Attempted to end a Span which is no longer valid.')
       expect(delivery.requests).toHaveLength(1)
+    })
+
+    it('will discard a span if the end time equals DISCARD_END_TIME', async () => {
+      const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
+      const delivery = new InMemoryDelivery()
+
+      const client = createTestClient({ deliveryFactory: () => delivery, clock })
+      client.start({ apiKey: VALID_API_KEY })
+
+      const span = client.startSpan('test span')
+      expect(spanContextEquals(span, client.currentSpanContext)).toBe(true)
+      expect(span.isValid()).toBe(true)
+
+      span.end(DISCARD_END_TIME)
+
+      expect(span.isValid()).toBe(false)
+      expect(client.currentSpanContext).toBeUndefined()
+
+      await jest.runOnlyPendingTimersAsync()
+
+      expect(delivery.requests.length).toEqual(0)
+    })
+
+    it('will discard a span if it is invalid (open for one hour or more)', async () => {
+      const clock = new IncrementingClock({ currentTime: Date.now() })
+      const delivery = new InMemoryDelivery()
+
+      const client = createTestClient({ deliveryFactory: () => delivery, clock })
+      client.start({ apiKey: VALID_API_KEY })
+
+      const HOUR_IN_MILLISECONDS = 60 * 60 * 1000
+      const span = client.startSpan('test span', { startTime: Date.now() - HOUR_IN_MILLISECONDS })
+      expect(client.currentSpanContext).toBeUndefined()
+      expect(span.isValid()).toBe(false)
+
+      span.end()
+
+      await jest.runOnlyPendingTimersAsync()
+
+      expect(delivery.requests.length).toEqual(0)
     })
 
     it('will remove the span from the context stack (if it is the current context)', () => {
