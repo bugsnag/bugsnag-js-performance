@@ -186,20 +186,20 @@ function configureRN064Fixture(fixtureDir) {
     nodeExecutableAndArgs: ["node", "--openssl-legacy-provider"]
   ]`
 
-  // remove flipper dependencies
+  // remove flipper and associated dependencies
+  fs.rmdirSync(resolve(fixtureDir, 'android/app/src/debug/java'), { recursive: true, force: true })
   const flipperDependencies = `debugImplementation("com.facebook.flipper:flipper:\${FLIPPER_VERSION}") {
-    exclude group:'com.facebook.fbjni'
-  }
+      exclude group:'com.facebook.fbjni'
+    }
 
-  debugImplementation("com.facebook.flipper:flipper-network-plugin:\${FLIPPER_VERSION}") {
-      exclude group:'com.facebook.flipper'
-      exclude group:'com.squareup.okhttp3', module:'okhttp'
-  }
+    debugImplementation("com.facebook.flipper:flipper-network-plugin:\${FLIPPER_VERSION}") {
+        exclude group:'com.facebook.flipper'
+        exclude group:'com.squareup.okhttp3', module:'okhttp'
+    }
 
-  debugImplementation("com.facebook.flipper:flipper-fresco-plugin:\${FLIPPER_VERSION}") {
-      exclude group:'com.facebook.flipper'
-  }
-`
+    debugImplementation("com.facebook.flipper:flipper-fresco-plugin:\${FLIPPER_VERSION}") {
+        exclude group:'com.facebook.flipper'
+    }`
 
   moduleGradle = moduleGradle.replace(currentReactConfig, updatedReactConfig).replace(flipperDependencies, '')
   fs.writeFileSync(moduleGradlePath, moduleGradle)
