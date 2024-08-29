@@ -6,7 +6,7 @@ jest.useFakeTimers()
 describe('startNavigationSpan', () => {
   it('creates a navigation span', async () => {
     const delivery = new InMemoryDelivery()
-    const testClient = createTestClient({ deliveryFactory: () => delivery, platformExtensions })
+    const testClient = createTestClient({ deliveryFactory: () => delivery, platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(0, spanFactory, spanContextStorage) })
     testClient.start({ apiKey: VALID_API_KEY })
     await jest.runOnlyPendingTimersAsync()
 
