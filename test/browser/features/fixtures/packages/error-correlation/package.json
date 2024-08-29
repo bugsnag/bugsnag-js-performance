@@ -6,6 +6,6 @@
         "clean": "rm -rf dist"
     },
     "peerDependencies": {
-        "@bugsnag/browser": ">= 8.0.0-alpha.13"
+        "@bugsnag/browser": "^8.0.0"
     }
 }
