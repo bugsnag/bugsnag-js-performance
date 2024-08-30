@@ -8,7 +8,7 @@ Feature: Trace propagation headers
         Then the reflection request method equals "GET"
         And the reflection "X-Test-Header" header equals "test"
         And the reflection "traceparent" header matches the regex "^00-[A-Fa-f0-9]{32}-[A-Fa-f0-9]{16}-01"
-        And the reflection "tracestate" header matches the regex "^sb=v:1;r:[0-9]{1,32}"
+        And the reflection "tracestate" header matches the regex "^sb=v:1;r32:[0-9]{1,32}"
 
         And I wait to receive 1 trace
 
@@ -22,7 +22,7 @@ Feature: Trace propagation headers
         Then the reflection request method equals "GET"
         And the reflection "X-Test-Header" header equals "test"
         And the reflection "traceparent" header matches the regex "^00-[A-Fa-f0-9]{32}-[A-Fa-f0-9]{16}-01"
-        And the reflection "tracestate" header matches the regex "^sb=v:1;r:[0-9]{1,32}"
+        And the reflection "tracestate" header matches the regex "^sb=v:1;r32:[0-9]{1,32}"
 
         And I wait to receive 1 trace
 
@@ -36,7 +36,7 @@ Feature: Trace propagation headers
         Then the reflection request method equals "GET"
         And the reflection "X-Test-Header" header equals "test"
         And the reflection "traceparent" header matches the regex "^00-[A-Fa-f0-9]{32}-[A-Fa-f0-9]{16}-01"
-        And the reflection "tracestate" header matches the regex "^sb=v:1;r:[0-9]{1,32}"
+        And the reflection "tracestate" header matches the regex "^sb=v:1;r32:[0-9]{1,32}"
 
         And I wait to receive 1 trace
 
@@ -50,7 +50,7 @@ Feature: Trace propagation headers
         Then the reflection request method equals "GET"
         And the reflection "X-Test-Header" header equals "test"
         And the reflection "traceparent" header matches the regex "^00-[A-Fa-f0-9]{32}-[A-Fa-f0-9]{16}-01"
-        And the reflection "tracestate" header matches the regex "^sb=v:1;r:[0-9]{1,32}"
+        And the reflection "tracestate" header matches the regex "^sb=v:1;r32:[0-9]{1,32}"
 
         And I wait to receive 1 trace
 
@@ -64,7 +64,7 @@ Feature: Trace propagation headers
         Then the reflection request method equals "GET"
         And the reflection "X-Test-Header" header equals "test"
         And the reflection "traceparent" header matches the regex "^00-[A-Fa-f0-9]{32}-[A-Fa-f0-9]{16}-01"
-        And the reflection "tracestate" header matches the regex "^sb=v:1;r:[0-9]{1,32}"
+        And the reflection "tracestate" header matches the regex "^sb=v:1;r32:[0-9]{1,32}"
 
         And I wait to receive 1 trace
 
@@ -78,7 +78,7 @@ Feature: Trace propagation headers
         Then the reflection request method equals "GET"
         And the reflection "X-Test-Header" header equals "test"
         And the reflection "traceparent" header matches the regex "^00-[A-Fa-f0-9]{32}-[A-Fa-f0-9]{16}-01"
-        And the reflection "tracestate" header matches the regex "^sb=v:1;r:[0-9]{1,32}"
+        And the reflection "tracestate" header matches the regex "^sb=v:1;r32:[0-9]{1,32}"
 
         And I wait to receive 1 trace
         
