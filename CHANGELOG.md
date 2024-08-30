@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- (react-native) Add new withInstrumentedAppStarts method to workaround automatically instrumented app start span issues [#497](https://github.com/bugsnag/bugsnag-js-performance/pull/497)
+
 ## [v2.8.0] (2024-08-20)
 
 ### Added
