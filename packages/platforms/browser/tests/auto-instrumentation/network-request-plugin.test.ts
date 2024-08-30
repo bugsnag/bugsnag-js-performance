@@ -276,7 +276,7 @@ describe('network span plugin', () => {
     expect(res.extraRequestHeaders).toEqual([
       {
         traceparent: '00-a random 128 bit string-a random 64 bit string-01',
-        tracestate: 'sb=v:1;r:290'
+        tracestate: 'sb=v:1;r32:290'
       }
     ])
   })
@@ -334,7 +334,7 @@ describe('network span plugin', () => {
         expect(res.extraRequestHeaders).toEqual([
           {
             traceparent: '00-a random 128 bit string-a random 64 bit string-01',
-            tracestate: 'sb=v:1;r:290'
+            tracestate: 'sb=v:1;r32:290'
           }
         ])
 
@@ -343,7 +343,7 @@ describe('network span plugin', () => {
         expect(res2.extraRequestHeaders).toEqual([
           {
             traceparent: '00-a random 128 bit string-a random 64 bit string-01',
-            tracestate: 'sb=v:1;r:290'
+            tracestate: 'sb=v:1;r32:290'
 
           }
         ])
@@ -398,7 +398,7 @@ describe('network span plugin', () => {
         expect(res.extraRequestHeaders).toEqual([
           {
             traceparent: '00-xyz456-abc123-01',
-            tracestate: 'sb=v:1;r:0'
+            tracestate: 'sb=v:1;r32:0'
           }
         ])
       })

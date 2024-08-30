@@ -134,5 +134,5 @@ function buildTraceparentHeader (traceId: string, parentSpanId: string, sampled:
 }
 
 function buildTracestateHeader (traceId: string): string {
-  return `sb=v:1;r:${traceIdToSamplingRate(traceId)}`
+  return `sb=v:1;r32:${traceIdToSamplingRate(traceId)}`
 }
