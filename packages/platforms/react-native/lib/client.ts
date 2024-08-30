@@ -51,7 +51,7 @@ const BugsnagPerformance = createClient({
   schema: createSchema(),
   spanAttributesSource,
   retryQueueFactory: createRetryQueueFactory(FileSystem),
-  platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(appStartTime, spanFactory, spanContextStorage)
+  platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(appStartTime, clock, spanFactory, spanContextStorage)
 })
 
 export default BugsnagPerformance
