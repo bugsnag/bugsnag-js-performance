@@ -7,7 +7,7 @@ export const config = {
   autoInstrumentAppStarts: false
 }
 
-export const App = BugsnagPerformance.wrapApp(() => {
+export const App = BugsnagPerformance.withInstrumentedAppStarts(() => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.scenario}>

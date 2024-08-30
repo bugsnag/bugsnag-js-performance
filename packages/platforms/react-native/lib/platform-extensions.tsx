@@ -1,10 +1,12 @@
-import type { SpanContextStorage, SpanFactory, SpanOptions } from '@bugsnag/core-performance'
+import type { Clock, SpanContextStorage, SpanFactory, SpanOptions } from '@bugsnag/core-performance'
+import React from 'react'
 import type { ReactNativeConfiguration } from './config'
-import React, { useEffect } from 'react'
+import { createAppStartSpan } from './create-app-start-span'
+import { useEndSpanOnMount } from './use-end-span-on-mount'
 
 type NavigationSpanOptions = Omit<SpanOptions, 'isFirstClass'>
 
-export const platformExtensions = (appStartTime: number, spanFactory: SpanFactory<ReactNativeConfiguration>, spanContextStorage: SpanContextStorage) => ({
+export const platformExtensions = (appStartTime: number, clock: Clock, spanFactory: SpanFactory<ReactNativeConfiguration>, spanContextStorage: SpanContextStorage) => ({
   startNavigationSpan: (routeName: string, spanOptions?: NavigationSpanOptions) => {
     const cleanOptions = spanFactory.validateSpanOptions(routeName, spanOptions)
     cleanOptions.options.isFirstClass = true
@@ -14,17 +16,11 @@ export const platformExtensions = (appStartTime: number, spanFactory: SpanFactor
     span.setAttribute('bugsnag.navigation.route', cleanOptions.name)
     return spanFactory.toPublicApi(span)
   },
-  wrapApp: (App: React.FC) => {
-    const appStartSpan = spanFactory.startSpan('[AppStart/ReactNativeInit]', { startTime: appStartTime, parentContext: null })
-    appStartSpan.setAttribute('bugsnag.span.category', 'app_start')
-    appStartSpan.setAttribute('bugsnag.app_start.type', 'ReactNativeInit')
+  withInstrumentedAppStarts: (App: React.FC) => {
+    const appStartSpan = createAppStartSpan(spanFactory, appStartTime)
 
     return () => {
-      useEffect(() => {
-        if (appStartSpan.isValid()) {
-          spanFactory.endSpan(appStartSpan, performance.now())
-        }
-      }, [])
+      useEndSpanOnMount(appStartSpan, spanFactory, clock)
 
       return <App />
     }
