@@ -3,6 +3,7 @@
 const { execFileSync, execSync } = require('child_process')
 const { resolve } = require('path')
 const fs = require('fs')
+const util = require('util')
 
 if (!process.env.RN_VERSION) {
   console.error('Please provide a React Native version')
@@ -286,10 +287,10 @@ function replaceGeneratedFixtureFiles() {
     resolve(fixtureDir, '.env')
   )
 
-  fs.copyFileSync(
-    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/babel.config.js'),
-    resolve(fixtureDir, 'babel.config.js')
-  )
+  const babelConfig = require(resolve(fixtureDir, 'babel.config.js'))
+  if (!babelConfig.plugins) babelConfig.plugins = []
+  babelConfig.plugins.push('@babel/plugin-transform-export-namespace-from', 'module:react-native-dotenv')
+  fs.writeFileSync(resolve(fixtureDir, 'babel.config.js'), `module.exports = ${util.inspect(babelConfig)}`)
 
   // If we're building with the new architecture, replace the gradle.properties file
   if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
