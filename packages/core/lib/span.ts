@@ -11,6 +11,7 @@ const HOUR_IN_MILLISECONDS = 60 * 60 * 1000
 
 export interface Span extends SpanContext {
   end: (endTime?: Time) => void
+  setAttribute: (name: string, value: SpanAttribute) => void
 }
 
 export const enum Kind {

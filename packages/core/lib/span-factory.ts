@@ -159,6 +159,9 @@ export class SpanFactory <C extends Configuration> {
         return span.samplingRate
       },
       isValid: () => span.isValid(),
+      setAttribute: (name, value) => {
+        span.setAttribute(name, value)
+      },
       end: (endTime) => {
         const safeEndTime = timeToNumber(this.clock, endTime)
         this.endSpan(span, safeEndTime)

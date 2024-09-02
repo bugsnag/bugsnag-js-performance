@@ -155,6 +155,7 @@ describe('Span', () => {
         traceId: expect.any(String),
         end: expect.any(Function),
         isValid: expect.any(Function),
+        setAttribute: expect.any(Function),
         samplingRate: 290
       })
     })
@@ -737,6 +738,35 @@ describe('Span', () => {
 
       span1.end()
       expect(client.currentSpanContext).toBeUndefined()
+    })
+  })
+
+  describe('Span.setAttribute()', () => {
+    it('can set an attribute', async () => {
+      const delivery = new InMemoryDelivery()
+      const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
+      const client = createTestClient({ deliveryFactory: () => delivery, clock })
+      client.start({ apiKey: VALID_API_KEY })
+
+      const span = client.startSpan('test span')
+      span.setAttribute('test', 'value')
+
+      span.end(1234)
+
+      await jest.runOnlyPendingTimersAsync()
+
+      expect(delivery).toHaveSentSpan({
+        name: 'test span',
+        spanId: 'a random 64 bit string',
+        traceId: 'a random 128 bit string',
+        events: expect.any(Array),
+        kind: Kind.Client,
+        startTimeUnixNano: '1000000',
+        endTimeUnixNano: '1234000000',
+        attributes: expect.any(Object)
+      })
+
+      expect(delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes).toContainEqual({ key: 'test', value: { stringValue: 'value' } })
     })
   })
 })
