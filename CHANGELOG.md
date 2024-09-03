@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- (core) Add `setAttribute` method to spans to enable setting custom attributes [#499](https://github.com/bugsnag/bugsnag-js-performance/pull/499)
+
 ### Changed
 
 - (core) Discard spans open for more than one hour [#494](https://github.com/bugsnag/bugsnag-js-performance/pull/494)
