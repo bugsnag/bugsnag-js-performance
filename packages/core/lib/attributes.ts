@@ -2,7 +2,7 @@ import type { Configuration, InternalConfiguration } from './config'
 import type { SpanInternal } from './span'
 import { isNumber } from './validation'
 
-export type SpanAttribute = string | number | boolean
+export type SpanAttribute = string | number | boolean | Array<string | number | boolean>
 
 export interface SpanAttributesSource <C extends Configuration> {
   configure: (configuration: InternalConfiguration<C>) => void
@@ -17,7 +17,7 @@ export class SpanAttributes {
   }
 
   set (name: string, value: SpanAttribute) {
-    if (typeof value === 'string' || typeof value === 'boolean' || isNumber(value)) {
+    if (typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value)) {
       this.attributes.set(name, value)
     }
   }
@@ -53,13 +53,44 @@ export type ResourceAttributeSource<C extends Configuration>
 
 export interface JsonAttribute {
   key: string
-  value: { stringValue: string }
-  | { intValue: string }
-  | { doubleValue: number }
-  | { boolValue: boolean }
+  value: { stringValue: string } | { intValue: string } | { doubleValue: number } | { boolValue: boolean }
 }
 
-export function attributeToJson (key: string, attribute: SpanAttribute): JsonAttribute | undefined {
+type AttributeArrayValueValue = Array<{ stringValue: string } | { intValue: string } | { doubleValue: number } | { boolValue: boolean }>
+
+export interface JsonArrayAttribute {
+  key: string
+  value: {
+    arrayValue: {
+      values?: AttributeArrayValueValue
+    }
+  }
+}
+
+function getArrayAttributeValue (value: string | number | boolean) {
+  switch (typeof value) {
+    case 'number':
+      if (Number.isNaN(value) || !Number.isFinite(value)) {
+        return undefined
+      }
+
+      return { doubleValue: value }
+    case 'boolean':
+      return { boolValue: value }
+    case 'string':
+      return { stringValue: value }
+    default:
+      return undefined
+  }
+}
+
+function getArrayValue (attributeArray: Array<string | number | boolean>): AttributeArrayValueValue {
+  return attributeArray
+    .map((value) => getArrayAttributeValue(value))
+    .filter(value => typeof value !== 'undefined')
+}
+
+export function attributeToJson (key: string, attribute: SpanAttribute): JsonAttribute | JsonArrayAttribute | undefined {
   switch (typeof attribute) {
     case 'number':
       if (Number.isNaN(attribute) || !Number.isFinite(attribute)) {
@@ -76,6 +107,12 @@ export function attributeToJson (key: string, attribute: SpanAttribute): JsonAtt
       return { key, value: { boolValue: attribute } }
     case 'string':
       return { key, value: { stringValue: attribute } }
+    case 'object':
+      if (Array.isArray(attribute)) {
+        const arrayValues = getArrayValue(attribute)
+        return { key, value: { arrayValue: arrayValues.length > 0 ? { values: arrayValues } : {} } }
+      }
+      return undefined
     default:
       return undefined
   }

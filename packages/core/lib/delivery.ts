@@ -1,4 +1,4 @@
-import type { JsonAttribute, ResourceAttributeSource } from './attributes'
+import type { JsonArrayAttribute, JsonAttribute, ResourceAttributeSource } from './attributes'
 import type { Clock } from './clock'
 import type { Configuration, InternalConfiguration } from './config'
 import type { JsonEvent } from './events'
@@ -19,7 +19,7 @@ export interface Delivery {
 }
 
 interface Resource {
-  attributes: Array<JsonAttribute | undefined>
+  attributes: Array<JsonAttribute | JsonArrayAttribute | undefined>
 }
 
 interface ScopeSpan {
@@ -43,7 +43,7 @@ export interface DeliverySpan {
   parentSpanId?: string
   startTimeUnixNano: string
   endTimeUnixNano: string
-  attributes: Array<JsonAttribute | undefined>
+  attributes: Array<JsonAttribute | JsonArrayAttribute | undefined>
   events: JsonEvent[]
 }
 

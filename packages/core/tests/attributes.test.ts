@@ -32,6 +32,16 @@ describe('attributeToJson', () => {
     expect(attribute).toStrictEqual({ key: 'test.bool', value: { boolValue: false } })
   })
 
+  it('converts an array into an OTEL compliant value', () => {
+    const attribute = attributeToJson('test.array', ['unit', 'test'])
+    expect(attribute).toStrictEqual({ key: 'test.array', value: { arrayValue: { values: [{ stringValue: 'unit' }, { stringValue: 'test' }] } } })
+  })
+
+  it('converts an empty array into an OTEL compliant value', () => {
+    const attribute = attributeToJson('test.array', [])
+    expect(attribute).toStrictEqual({ key: 'test.array', value: { arrayValue: { } } })
+  })
+
   it('converts an unsupported value (object) into undefined', () => {
     // @ts-expect-error Argument is not assignable
     const attribute = attributeToJson('test.object', { key: 'test.key', value: 'a string' })
