@@ -330,6 +330,36 @@ describe('Core', () => {
             expect(span).toHaveAttribute('bugsnag.sampling.p', 0.9)
           })
         })
+
+        describe('endpoint', () => {
+          describe('when the endpoint is the default value', () => {
+            it('modifies the endpoint to include the API key', async () => {
+              const delivery = new InMemoryDelivery()
+              const deliveryFactory = jest.fn(() => delivery)
+              const client = createTestClient({ deliveryFactory })
+
+              client.start(VALID_API_KEY)
+
+              await jest.runOnlyPendingTimersAsync()
+
+              expect(deliveryFactory).toHaveBeenCalledWith('https://a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6.otlp.bugsnag.com/v1/traces')
+            })
+          })
+
+          describe('when the endpoint is not the default value', () => {
+            it('does not modify the endpoint', async () => {
+              const delivery = new InMemoryDelivery()
+              const deliveryFactory = jest.fn(() => delivery)
+              const client = createTestClient({ deliveryFactory })
+
+              client.start({ apiKey: VALID_API_KEY, endpoint: 'https://my-custom-otel-repeater.com' })
+
+              await jest.runOnlyPendingTimersAsync()
+
+              expect(deliveryFactory).toHaveBeenCalledWith('https://my-custom-otel-repeater.com')
+            })
+          })
+        })
       })
 
       describe('currentSpanContext', () => {
