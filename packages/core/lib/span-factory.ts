@@ -160,7 +160,11 @@ export class SpanFactory <C extends Configuration> {
       },
       isValid: () => span.isValid(),
       setAttribute: (name, value) => {
-        span.setAttribute(name, value)
+        if (typeof name !== 'string') {
+          this.logger.warn(`Invalid attribute name, expected string, got ${typeof name}`)
+        } else {
+          span.setAttribute(name, value)
+        }
       },
       end: (endTime) => {
         const safeEndTime = timeToNumber(this.clock, endTime)

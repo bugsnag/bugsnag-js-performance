@@ -768,5 +768,37 @@ describe('Span', () => {
 
       expect(delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes).toContainEqual({ key: 'test', value: { stringValue: 'value' } })
     })
+
+    const invalidAttributeNames = [
+      { type: 'bigint', name: BigInt(9007199254740991) },
+      { type: 'boolean', name: true },
+      { type: 'function', name: () => {} },
+      { type: 'number', name: 12345 },
+      { type: 'object', name: { property: 'test' } },
+      { type: 'object', name: [] },
+      { type: 'symbol', name: Symbol('test') }
+    ]
+
+    it.each(invalidAttributeNames)('handles invalid attribute name ($type)', async ({ type, name }) => {
+      const delivery = new InMemoryDelivery()
+      const client = createTestClient({ deliveryFactory: () => delivery })
+      client.start({ apiKey: VALID_API_KEY, logger: jestLogger })
+      await jest.runOnlyPendingTimersAsync()
+
+      const span = client.startSpan('test span')
+
+      // @ts-expect-error 'name' is the wrong type
+      span.setAttribute(name, 'value')
+      expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid attribute name, expected string, got ${type}`)
+
+      span.end()
+      await jest.runOnlyPendingTimersAsync()
+
+      // Ensure invalid attribute is not set
+      expect(delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes).toStrictEqual([
+        { key: 'bugsnag.span.category', value: { stringValue: 'custom' } },
+        { key: 'bugsnag.sampling.p', value: { doubleValue: 1 } }
+      ])
+    })
   })
 })
