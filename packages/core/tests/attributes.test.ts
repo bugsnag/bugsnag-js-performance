@@ -37,9 +37,14 @@ describe('attributeToJson', () => {
     expect(attribute).toStrictEqual({ key: 'test.array', value: { arrayValue: { values: [{ stringValue: 'unit' }, { stringValue: 'test' }] } } })
   })
 
+  it('converts a mixed array into an OTEL compliant value', () => {
+    const attribute = attributeToJson('test.mixed.array', ['one', 2, true])
+    expect(attribute).toStrictEqual({ key: 'test.mixed.array', value: { arrayValue: { values: [{ stringValue: 'one' }, { doubleValue: 2 }, { boolValue: true }] } } })
+  })
+
   it('converts an empty array into an OTEL compliant value', () => {
-    const attribute = attributeToJson('test.array', [])
-    expect(attribute).toStrictEqual({ key: 'test.array', value: { arrayValue: { } } })
+    const attribute = attributeToJson('test.empty.array', [])
+    expect(attribute).toStrictEqual({ key: 'test.empty.array', value: { arrayValue: { } } })
   })
 
   it('converts an unsupported value (object) into undefined', () => {
