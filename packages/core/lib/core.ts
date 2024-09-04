@@ -4,7 +4,7 @@ import type { BackgroundingListener } from './backgrounding-listener'
 import { BatchProcessor } from './batch-processor'
 import type { Clock } from './clock'
 import type { Configuration, CoreSchema } from './config'
-import { validateConfig } from './config'
+import { schema, validateConfig } from './config'
 import type { DeliveryFactory } from './delivery'
 import { TracePayloadEncoder } from './delivery'
 import FixedProbabilityManager from './fixed-probability-manager'
@@ -72,6 +72,15 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
   return {
     start: (config: C | string) => {
       const configuration = validateConfig<S, C>(config, options.schema)
+
+      // if using the default endpoint add the API key as a subdomain
+      // e.g. convert URL https://otlp.bugsnag.com/v1/traces to URL https://<project_api_key>.otlp.bugsnag.com/v1/traces
+      if (configuration.endpoint === schema.endpoint.defaultValue) {
+        const endpointWithApiKeyInSubdomain = new URL(configuration.endpoint)
+        endpointWithApiKeyInSubdomain.hostname = `${configuration.apiKey}.${endpointWithApiKeyInSubdomain.hostname}`
+
+        configuration.endpoint = endpointWithApiKeyInSubdomain.toString()
+      }
 
       // Correlate errors with span by monkey patching _notify on the error client
       // and utilizing the setTraceCorrelation method on the event

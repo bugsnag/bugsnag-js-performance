@@ -9,6 +9,7 @@
 ### Changed
 
 - (core) Discard spans open for more than one hour [#494](https://github.com/bugsnag/bugsnag-js-performance/pull/494)
+- (core) use API key subdomain as default endpoint [#500](https://github.com/bugsnag/bugsnag-js-performance/pull/500)
 
 ## [v2.8.0] (2024-08-20)
 
