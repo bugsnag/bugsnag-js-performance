@@ -42,7 +42,7 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
     const appStartSpan = createAppStartSpan(this.spanFactory, this.appStartTime)
 
     const AppStartWrapper = ({ children }: WrapperProps) => {
-      useEndSpanOnMount(appStartSpan, this.spanFactory, this.clock)
+      useEndSpanOnMount(this.spanFactory, this.clock, appStartSpan)
 
       return children
     }

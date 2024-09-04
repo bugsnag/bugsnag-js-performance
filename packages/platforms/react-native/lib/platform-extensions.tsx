@@ -20,7 +20,7 @@ export const platformExtensions = (appStartTime: number, clock: Clock, spanFacto
     const appStartSpan = createAppStartSpan(spanFactory, appStartTime)
 
     return () => {
-      useEndSpanOnMount(appStartSpan, spanFactory, clock)
+      useEndSpanOnMount(spanFactory, clock, appStartSpan)
 
       return <App />
     }
