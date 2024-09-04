@@ -357,7 +357,7 @@ describe('onSettle', () => {
     expect(settleCallback).not.toHaveBeenCalled()
 
     // request should be ignored, so advancing by 100ms will settle
-    fetchRequestTracker.start({ ...START_CONTEXT, url: 'https://otlp.bugsnag.com/v1/traces' })
+    fetchRequestTracker.start({ ...START_CONTEXT, url: `https://${VALID_API_KEY}.otlp.bugsnag.com/v1/traces` })
 
     await jest.advanceTimersByTimeAsync(100)
     expect(settleCallback).toHaveBeenCalled()
