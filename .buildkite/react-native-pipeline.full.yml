@@ -13,7 +13,7 @@ steps:
           JAVA_VERSION: "{{matrix.java}}"
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix.reactnative}}"
-          NOTIFIER_VERSION: '8.0.0-alpha.13'
+          NOTIFIER_VERSION: '8.0.0'
           BUILD_ANDROID: "true"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/old-arch/**/reactnative.apk"
@@ -46,7 +46,7 @@ steps:
           JAVA_VERSION: "17"
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
-          NOTIFIER_VERSION: '8.0.0-alpha.13'
+          NOTIFIER_VERSION: '8.0.0'
           RCT_NEW_ARCH_ENABLED: "true"
           BUILD_ANDROID: "true"
         artifact_paths:
@@ -71,7 +71,7 @@ steps:
         env:
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
-          NOTIFIER_VERSION: '8.0.0-alpha.13'
+          NOTIFIER_VERSION: '8.0.0'
           BUILD_IOS: "true"
           XCODE_VERSION: "15.3.0"
         artifact_paths:
@@ -98,7 +98,7 @@ steps:
         env:
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
-          NOTIFIER_VERSION: '8.0.0-alpha.13'
+          NOTIFIER_VERSION: '8.0.0'
           RCT_NEW_ARCH_ENABLED: "1"
           BUILD_IOS: "true"
           XCODE_VERSION: "15.3.0"
