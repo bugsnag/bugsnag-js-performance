@@ -5,11 +5,8 @@ let appStartSpan: SpanInternal
 
 export function createAppStartSpan (spanFactory: SpanFactory<ReactNativeConfiguration>, appStartTime: number) {
   if (appStartSpan) {
-    console.log('[BugsnagPerformance] App start span already created')
     return appStartSpan
   }
-
-  console.log('[BugsnagPerformance] Creating app start span')
 
   appStartSpan = spanFactory.startSpan('[AppStart/ReactNativeInit]', { startTime: appStartTime, parentContext: null })
 
