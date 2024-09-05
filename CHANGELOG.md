@@ -1,16 +1,15 @@
 # Changelog
 
-## [Unreleased]
+## [v2.9.0] (2024-09-05)
 
 ### Added
 
-- (core) Add `setAttribute` method to spans to enable setting custom attributes [#499](https://github.com/bugsnag/bugsnag-js-performance/pull/499)
+- (react-native) Add new withInstrumentedAppStarts method to workaround automatically instrumented app start span issues [#497](https://github.com/bugsnag/bugsnag-js-performance/pull/497)
 
 ### Changed
 
 - (core) Discard spans open for more than one hour [#494](https://github.com/bugsnag/bugsnag-js-performance/pull/494)
 - (core) use API key subdomain as default endpoint [#500](https://github.com/bugsnag/bugsnag-js-performance/pull/500)
-- (react-native) Add new withInstrumentedAppStarts method to workaround automatically instrumented app start span issues [#497](https://github.com/bugsnag/bugsnag-js-performance/pull/497)
 
 ## [v2.8.0] (2024-08-20)
 
