@@ -17,6 +17,7 @@ export const platformExtensions = (appStartTime: number, clock: Clock, spanFacto
     return spanFactory.toPublicApi(span)
   },
   withInstrumentedAppStarts: (App: React.FC) => {
+    console.log('[BugsnagPerformance] withInstrumentedAppStarts called, creating app start span')
     const appStartSpan = createAppStartSpan(spanFactory, appStartTime)
 
     return () => {

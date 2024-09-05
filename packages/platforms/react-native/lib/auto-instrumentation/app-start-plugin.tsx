@@ -39,6 +39,7 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
   configure (configuration: InternalConfiguration<ReactNativeConfiguration>) {
     if (!configuration.autoInstrumentAppStarts) return
 
+    console.log('[BugsnagPerformance] app start plugin configured, creating app start span')
     const appStartSpan = createAppStartSpan(this.spanFactory, this.appStartTime)
 
     const AppStartWrapper = ({ children }: WrapperProps) => {
