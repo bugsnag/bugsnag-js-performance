@@ -77,8 +77,10 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
           <scenario.App />
         </SafeAreaView>
       </ScenarioContext.Provider>
+
+    const App = scenario.withInstrumentedAppStarts ? BugsnagPerformance.withInstrumentedAppStarts(Scenario) : Scenario
   
-    AppRegistry.registerComponent(scenarioName, () => Scenario)
+    AppRegistry.registerComponent(scenarioName, () => App)
     AppRegistry.runApplication(scenarioName, appParams)
   }
 }

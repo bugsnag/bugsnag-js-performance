@@ -40,8 +40,8 @@ Feature: App Start spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "app_start"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.app_start.type" equals "ReactNativeInit"
 
-  Scenario: App start span is created when using the wrapApp method
-    When I run 'AppStartWrapperScenario'
+  Scenario: App start span is created when using the withInstrumentedAppStarts wrapper
+    When I run 'WithInstrumentedAppStartsScenario'
     And I wait to receive a sampling request
     And I wait for 1 span
 

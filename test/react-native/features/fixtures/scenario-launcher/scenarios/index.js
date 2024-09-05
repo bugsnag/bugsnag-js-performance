@@ -1,5 +1,5 @@
 export * as AppStartScenario from './AppStartScenario'
-export * as AppStartWrapperScenario from './AppStartWrapperScenario'
+export * as WithInstrumentedAppStartsScenario from './WithInstrumentedAppStartsScenario'
 export * as BackgroundSpanScenario from './BackgroundSpanScenario'
 export * as ErrorCorrelationScenario from './ErrorCorrelationScenario'
 export * as ManualSpanScenario from './ManualSpanScenario'
