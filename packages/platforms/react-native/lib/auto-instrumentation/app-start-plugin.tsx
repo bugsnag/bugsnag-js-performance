@@ -9,7 +9,6 @@ import React from 'react'
 import type { AppRegistry, WrapperComponentProvider } from 'react-native'
 import type { ReactNativeConfiguration } from '../config'
 import { createAppStartSpan } from '../create-app-start-span'
-import { useEndSpanOnMount } from '../use-end-span-on-mount'
 
 interface WrapperProps {
   children: ReactNode
@@ -42,7 +41,11 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
     const appStartSpan = createAppStartSpan(this.spanFactory, this.appStartTime)
 
     const AppStartWrapper = ({ children }: WrapperProps) => {
-      useEndSpanOnMount(this.spanFactory, this.clock, appStartSpan)
+      React.useEffect(() => {
+        if (appStartSpan.isValid()) {
+          this.spanFactory.endSpan(appStartSpan, this.clock.now())
+        }
+      }, [])
 
       return children
     }

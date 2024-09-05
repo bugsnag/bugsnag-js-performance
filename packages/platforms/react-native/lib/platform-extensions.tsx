@@ -2,7 +2,6 @@ import type { Clock, SpanContextStorage, SpanFactory, SpanOptions } from '@bugsn
 import React from 'react'
 import type { ReactNativeConfiguration } from './config'
 import { createAppStartSpan } from './create-app-start-span'
-import { useEndSpanOnMount } from './use-end-span-on-mount'
 
 type NavigationSpanOptions = Omit<SpanOptions, 'isFirstClass'>
 
@@ -20,7 +19,11 @@ export const platformExtensions = (appStartTime: number, clock: Clock, spanFacto
     const appStartSpan = createAppStartSpan(spanFactory, appStartTime)
 
     return () => {
-      useEndSpanOnMount(spanFactory, clock, appStartSpan)
+      React.useEffect(() => {
+        if (appStartSpan.isValid()) {
+          spanFactory.endSpan(appStartSpan, clock.now())
+        }
+      }, [])
 
       return <App />
     }
