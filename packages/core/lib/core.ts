@@ -4,7 +4,7 @@ import type { BackgroundingListener } from './backgrounding-listener'
 import { BatchProcessor } from './batch-processor'
 import type { Clock } from './clock'
 import type { Configuration, CoreSchema } from './config'
-import { validateConfig } from './config'
+import { schema, validateConfig } from './config'
 import type { DeliveryFactory } from './delivery'
 import { TracePayloadEncoder } from './delivery'
 import FixedProbabilityManager from './fixed-probability-manager'
@@ -73,11 +73,20 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     start: (config: C | string) => {
       const configuration = validateConfig<S, C>(config, options.schema)
 
+      // if using the default endpoint add the API key as a subdomain
+      // e.g. convert URL https://otlp.bugsnag.com/v1/traces to URL https://<project_api_key>.otlp.bugsnag.com/v1/traces
+      if (configuration.endpoint === schema.endpoint.defaultValue) {
+        const endpointWithApiKeyInSubdomain = new URL(configuration.endpoint)
+        endpointWithApiKeyInSubdomain.hostname = `${configuration.apiKey}.${endpointWithApiKeyInSubdomain.hostname}`
+
+        configuration.endpoint = endpointWithApiKeyInSubdomain.toString()
+      }
+
       // Correlate errors with span by monkey patching _notify on the error client
       // and utilizing the setTraceCorrelation method on the event
-      if (configuration.bugsnag && typeof configuration.bugsnag.Event.prototype.setTraceCorrelation === 'function' && configuration.bugsnag._client) {
-        const originalNotify = configuration.bugsnag._client._notify
-        configuration.bugsnag._client._notify = function (...args) {
+      if (configuration.bugsnag && typeof configuration.bugsnag.Event.prototype.setTraceCorrelation === 'function' && configuration.bugsnag.Client) {
+        const originalNotify = configuration.bugsnag.Client.prototype._notify
+        configuration.bugsnag.Client.prototype._notify = function (...args) {
           const currentSpanContext = spanContextStorage.current
           if (currentSpanContext && typeof args[0].setTraceCorrelation === 'function') {
             args[0].setTraceCorrelation(currentSpanContext.traceId, currentSpanContext.id)

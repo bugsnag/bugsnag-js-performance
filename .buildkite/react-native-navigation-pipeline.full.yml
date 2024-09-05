@@ -18,11 +18,12 @@ steps:
           NODE_VERSION: "18"
           REACT_NATIVE_NAVIGATION: "true"
           RN_VERSION: "{{matrix.rn_version}}"
+          NOTIFIER_VERSION: '8.0.0'
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
           - bundle install
-          - ./bin/generate-react-native-navigation-fixture
+          - ./bin/generate-react-native-fixture
         matrix:
           setup:
             rn_version:
@@ -44,11 +45,12 @@ steps:
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "true"
           RN_VERSION: "{{matrix.rn_version}}"
+          NOTIFIER_VERSION: '8.0.0'
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
           - bundle install
-          - ./bin/generate-react-native-navigation-fixture
+          - ./bin/generate-react-native-fixture
         matrix:
           setup:
             rn_version:
@@ -71,11 +73,12 @@ steps:
           REACT_NATIVE_NAVIGATION: "true"
           RN_VERSION: "{{matrix.rn_version}}"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
+          NOTIFIER_VERSION: '8.0.0'
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
         commands:
           - bundle install
-          - ./bin/generate-react-native-navigation-fixture
+          - ./bin/generate-react-native-fixture
         matrix:
           setup:
             rn_version:
@@ -97,11 +100,12 @@ steps:
           RCT_NEW_ARCH_ENABLED: "true"
           RN_VERSION: "{{matrix.rn_version}}"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
+          NOTIFIER_VERSION: '8.0.0'
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
         commands:
           - bundle install
-          - ./bin/generate-react-native-navigation-fixture
+          - ./bin/generate-react-native-fixture
         matrix:
           setup:
             rn_version:

@@ -16,9 +16,7 @@ export function createSpanAttributesSource () {
   })
 
   const spanAttributesSource: SpanAttributesSource<ReactNativeConfiguration> = {
-    configure (configuration) {
-
-    },
+    configure (configuration) {},
     requestAttributes (span) {
       span.setAttribute('net.host.connection.type', connectionType)
 

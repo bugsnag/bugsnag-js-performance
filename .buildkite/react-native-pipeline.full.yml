@@ -13,6 +13,7 @@ steps:
           JAVA_VERSION: "{{matrix.java}}"
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix.reactnative}}"
+          NOTIFIER_VERSION: '8.0.0'
           BUILD_ANDROID: "true"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/old-arch/**/reactnative.apk"
@@ -24,6 +25,7 @@ steps:
               - "0.71"
               - "0.72"
               - "0.73"
+              - "0.74"
             java:
               - "17"
           adjustments:
@@ -44,6 +46,7 @@ steps:
           JAVA_VERSION: "17"
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
+          NOTIFIER_VERSION: '8.0.0'
           RCT_NEW_ARCH_ENABLED: "true"
           BUILD_ANDROID: "true"
         artifact_paths:
@@ -54,6 +57,7 @@ steps:
           - "0.71"
           - "0.72"
           - "0.73"
+          - "0.74"
         retry:
           automatic:
             - exit_status: "*"
@@ -67,6 +71,7 @@ steps:
         env:
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
+          NOTIFIER_VERSION: '8.0.0'
           BUILD_IOS: "true"
           XCODE_VERSION: "15.3.0"
         artifact_paths:
@@ -79,6 +84,7 @@ steps:
           - "0.71"
           - "0.72"
           - "0.73"
+          - "0.74"
         retry:
           automatic:
             - exit_status: "*"
@@ -92,6 +98,7 @@ steps:
         env:
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
+          NOTIFIER_VERSION: '8.0.0'
           RCT_NEW_ARCH_ENABLED: "1"
           BUILD_IOS: "true"
           XCODE_VERSION: "15.3.0"
@@ -104,6 +111,7 @@ steps:
           - "0.71"
           - "0.72"
           - "0.73"
+          - "0.74"
         retry:
           automatic:
             - exit_status: "*"
@@ -143,6 +151,7 @@ steps:
           - "0.71"
           - "0.72"
           - "0.73"
+          - "0.74"
 
       - label: ":bitbar: :android: RN {{matrix}} Android 12 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-new-arch-full"
@@ -176,6 +185,7 @@ steps:
           - "0.71"
           - "0.72"
           - "0.73"
+          - "0.74"
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS 14 (Old Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-old-arch-full"
@@ -208,6 +218,7 @@ steps:
           - "0.71"
           - "0.72"
           - "0.73"
+          - "0.74"
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS 14 (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-new-arch-full"
@@ -241,3 +252,4 @@ steps:
           - "0.71"
           - "0.72"
           - "0.73"
+          - "0.74"

@@ -102,7 +102,7 @@ describe('RouteChangePlugin', () => {
 
     const secondSpan = expect.objectContaining({
       name: '[RouteChange]/second-route',
-      startTimeUnixNano: '2000000',
+      startTimeUnixNano: '5000000',
       endTimeUnixNano: '32000000'
     })
 

@@ -16,8 +16,8 @@ import {
   SpanFactory,
   SpanInternal,
   spanToJson,
-  spanContextEquals
-
+  spanContextEquals,
+  DISCARD_END_TIME
 } from '../lib'
 import type { SpanAttribute, SpanEnded } from '../lib'
 import Sampler from '../lib/sampler'
@@ -109,12 +109,14 @@ describe('SpanInternal', () => {
 
   describe('bugsnag.sampling.p', () => {
     it.each([0.25, 0.5, 0.1, 1, 0, 0.4, 0.3])('is set to the correct value on "end"', (probability) => {
+      const clock = new IncrementingClock()
       const span = new SpanInternal(
         'span id',
         'trace id',
         'name',
         1234,
-        new SpanAttributes(new Map<string, SpanAttribute>())
+        new SpanAttributes(new Map<string, SpanAttribute>()),
+        clock
       )
 
       const endedSpan = span.end(5678, createSamplingProbability(probability))
@@ -124,12 +126,14 @@ describe('SpanInternal', () => {
     })
 
     it.each([0.25, 0.5, 0.1, 1, 0, 0.4, 0.3])('is updated when samplingProbability is changed', (probability) => {
+      const clock = new IncrementingClock()
       const span = new SpanInternal(
         'span id',
         'trace id',
         'name',
         1234,
-        new SpanAttributes(new Map<string, SpanAttribute>())
+        new SpanAttributes(new Map<string, SpanAttribute>()),
+        clock
       )
 
       const endedSpan = span.end(5678, createSamplingProbability(probability))
@@ -151,6 +155,7 @@ describe('Span', () => {
         traceId: expect.any(String),
         end: expect.any(Function),
         isValid: expect.any(Function),
+        setAttribute: expect.any(Function),
         samplingRate: 290
       })
     })
@@ -386,7 +391,7 @@ describe('Span', () => {
         kind: Kind.Client,
         name: 'test span',
         startTimeUnixNano: '1000000',
-        endTimeUnixNano: '2000000',
+        endTimeUnixNano: '3000000',
         attributes: expect.any(Object),
         events: expect.any(Array)
       })
@@ -627,7 +632,7 @@ describe('Span', () => {
       }))
     })
 
-    it('will not end a span that has already been ended', async () => {
+    it('will discard a span that has already been ended', async () => {
       const delivery = new InMemoryDelivery()
       const backgroundingListener = new ControllableBackgroundingListener()
       const logger = { warn: jest.fn(), debug: jest.fn(), error: jest.fn(), info: jest.fn() }
@@ -656,8 +661,48 @@ describe('Span', () => {
 
       await jest.runOnlyPendingTimersAsync()
 
-      expect(logger.warn).toHaveBeenCalledWith('Attempted to end a Span which has already ended.')
+      expect(logger.warn).toHaveBeenCalledWith('Attempted to end a Span which is no longer valid.')
       expect(delivery.requests).toHaveLength(1)
+    })
+
+    it('will discard a span if the end time equals DISCARD_END_TIME', async () => {
+      const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
+      const delivery = new InMemoryDelivery()
+
+      const client = createTestClient({ deliveryFactory: () => delivery, clock })
+      client.start({ apiKey: VALID_API_KEY })
+
+      const span = client.startSpan('test span')
+      expect(spanContextEquals(span, client.currentSpanContext)).toBe(true)
+      expect(span.isValid()).toBe(true)
+
+      span.end(DISCARD_END_TIME)
+
+      expect(span.isValid()).toBe(false)
+      expect(client.currentSpanContext).toBeUndefined()
+
+      await jest.runOnlyPendingTimersAsync()
+
+      expect(delivery.requests.length).toEqual(0)
+    })
+
+    it('will discard a span if it is invalid (open for one hour or more)', async () => {
+      const clock = new IncrementingClock({ currentTime: Date.now() })
+      const delivery = new InMemoryDelivery()
+
+      const client = createTestClient({ deliveryFactory: () => delivery, clock })
+      client.start({ apiKey: VALID_API_KEY })
+
+      const HOUR_IN_MILLISECONDS = 60 * 60 * 1000
+      const span = client.startSpan('test span', { startTime: Date.now() - HOUR_IN_MILLISECONDS })
+      expect(client.currentSpanContext).toBeUndefined()
+      expect(span.isValid()).toBe(false)
+
+      span.end()
+
+      await jest.runOnlyPendingTimersAsync()
+
+      expect(delivery.requests.length).toEqual(0)
     })
 
     it('will remove the span from the context stack (if it is the current context)', () => {
@@ -693,6 +738,67 @@ describe('Span', () => {
 
       span1.end()
       expect(client.currentSpanContext).toBeUndefined()
+    })
+  })
+
+  describe('Span.setAttribute()', () => {
+    it('can set an attribute', async () => {
+      const delivery = new InMemoryDelivery()
+      const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
+      const client = createTestClient({ deliveryFactory: () => delivery, clock })
+      client.start({ apiKey: VALID_API_KEY })
+
+      const span = client.startSpan('test span')
+      span.setAttribute('test', 'value')
+
+      span.end(1234)
+
+      await jest.runOnlyPendingTimersAsync()
+
+      expect(delivery).toHaveSentSpan({
+        name: 'test span',
+        spanId: 'a random 64 bit string',
+        traceId: 'a random 128 bit string',
+        events: expect.any(Array),
+        kind: Kind.Client,
+        startTimeUnixNano: '1000000',
+        endTimeUnixNano: '1234000000',
+        attributes: expect.any(Object)
+      })
+
+      expect(delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes).toContainEqual({ key: 'test', value: { stringValue: 'value' } })
+    })
+
+    const invalidAttributeNames = [
+      { type: 'bigint', name: BigInt(9007199254740991) },
+      { type: 'boolean', name: true },
+      { type: 'function', name: () => {} },
+      { type: 'number', name: 12345 },
+      { type: 'object', name: { property: 'test' } },
+      { type: 'object', name: [] },
+      { type: 'symbol', name: Symbol('test') }
+    ]
+
+    it.each(invalidAttributeNames)('handles invalid attribute name ($type)', async ({ type, name }) => {
+      const delivery = new InMemoryDelivery()
+      const client = createTestClient({ deliveryFactory: () => delivery })
+      client.start({ apiKey: VALID_API_KEY, logger: jestLogger })
+      await jest.runOnlyPendingTimersAsync()
+
+      const span = client.startSpan('test span')
+
+      // @ts-expect-error 'name' is the wrong type
+      span.setAttribute(name, 'value')
+      expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid attribute name, expected string, got ${type}`)
+
+      span.end()
+      await jest.runOnlyPendingTimersAsync()
+
+      // Ensure invalid attribute is not set
+      expect(delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes).toStrictEqual([
+        { key: 'bugsnag.span.category', value: { stringValue: 'custom' } },
+        { key: 'bugsnag.sampling.p', value: { doubleValue: 1 } }
+      ])
     })
   })
 })

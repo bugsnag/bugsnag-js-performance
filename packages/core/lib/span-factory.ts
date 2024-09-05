@@ -76,7 +76,7 @@ export class SpanFactory <C extends Configuration> {
       attributes.set('bugsnag.span.first_class', options.isFirstClass)
     }
 
-    const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes, parentSpanId)
+    const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes, this.clock, parentSpanId)
 
     // don't track spans that are started while the app is backgrounded
     if (this.isInForeground) {
@@ -112,19 +112,26 @@ export class SpanFactory <C extends Configuration> {
     endTime: number,
     additionalAttributes?: Record<string, SpanAttribute>
   ) {
-    // if the span doesn't exist here it shouldn't be processed
-    if (!this.openSpans.delete(span)) {
-      // only warn if the span has already been ended explicitly rather than
-      // discarded by us
-      if (!span.isValid()) {
-        this.logger.warn('Attempted to end a Span which has already ended.')
-      }
+    // remove the span from the context stack (this will also remove any invalid spans)
+    this.spanContextStorage.pop(span)
 
-      return
+    const untracked = !this.openSpans.delete(span)
+    const isValidSpan = span.isValid()
+
+    // log a warning if the span is already invalid and is not being tracked
+    if (untracked && !isValidSpan) {
+      this.logger.warn('Attempted to end a Span which is no longer valid.')
     }
 
-    // Discard marked spans
-    if (endTime === DISCARD_END_TIME) return
+    // spans should be discarded if:
+    // - they are not tracked (i.e. discarded due to backgrounding)
+    // - they are already invalid
+    // - they have an explicit discard end time
+    if (untracked || !isValidSpan || endTime === DISCARD_END_TIME) {
+      // we still call end on the span so that it is no longer considered valid
+      span.end(endTime, this.sampler.spanProbability)
+      return
+    }
 
     // Set any additional attributes
     for (const [key, value] of Object.entries(additionalAttributes || {})) {
@@ -134,7 +141,6 @@ export class SpanFactory <C extends Configuration> {
     this.spanAttributesSource.requestAttributes(span)
 
     const spanEnded = span.end(endTime, this.sampler.spanProbability)
-    this.spanContextStorage.pop(span)
 
     if (this.sampler.sample(spanEnded)) {
       this.processor.add(spanEnded)
@@ -153,6 +159,13 @@ export class SpanFactory <C extends Configuration> {
         return span.samplingRate
       },
       isValid: () => span.isValid(),
+      setAttribute: (name, value) => {
+        if (typeof name !== 'string') {
+          this.logger.warn(`Invalid attribute name, expected string, got ${typeof name}`)
+        } else {
+          span.setAttribute(name, value)
+        }
+      },
       end: (endTime) => {
         const safeEndTime = timeToNumber(this.clock, endTime)
         this.endSpan(span, safeEndTime)
