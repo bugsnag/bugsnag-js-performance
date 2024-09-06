@@ -19,10 +19,10 @@ Feature: Custom attributes
             | two   |
             | three |
 
-        # And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer array attribute "custom.array.int" equals the array:
-        #     | 1   |
-        #     | 2   |
-        #     | 3   |
+        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer array attribute "custom.array.int" equals the array:
+            | 1   |
+            | 2   |
+            | 3   |
 
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" double array attribute "custom.array.double" equals the array:
             | 1.1   |

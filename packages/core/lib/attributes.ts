@@ -74,6 +74,10 @@ function getArrayAttributeValue (value: string | number | boolean) {
         return undefined
       }
 
+      if (Number.isInteger(value)) {
+        return { intValue: `${value}` }
+      }
+
       return { doubleValue: value }
     case 'boolean':
       return { boolValue: value }
