@@ -32,14 +32,29 @@ describe('attributeToJson', () => {
     expect(attribute).toStrictEqual({ key: 'test.bool', value: { boolValue: false } })
   })
 
-  it('converts an array into an OTEL compliant value', () => {
+  it('converts a string array into an OTEL compliant value', () => {
     const attribute = attributeToJson('test.array', ['unit', 'test'])
     expect(attribute).toStrictEqual({ key: 'test.array', value: { arrayValue: { values: [{ stringValue: 'unit' }, { stringValue: 'test' }] } } })
   })
 
+  it('converts an integer array into an OTEL compliant value', () => {
+    const attribute = attributeToJson('test.array', [1, 2])
+    expect(attribute).toStrictEqual({ key: 'test.array', value: { arrayValue: { values: [{ intValue: '1' }, { intValue: '2' }] } } })
+  })
+
+  it('converts a double array into an OTEL compliant value', () => {
+    const attribute = attributeToJson('test.array', [1.2, 3.4])
+    expect(attribute).toStrictEqual({ key: 'test.array', value: { arrayValue: { values: [{ doubleValue: 1.2 }, { doubleValue: 3.4 }] } } })
+  })
+
+  it('converts a boolean array into an OTEL compliant value', () => {
+    const attribute = attributeToJson('test.array', [true, false])
+    expect(attribute).toStrictEqual({ key: 'test.array', value: { arrayValue: { values: [{ boolValue: true }, { boolValue: false }] } } })
+  })
+
   it('converts a mixed array into an OTEL compliant value', () => {
-    const attribute = attributeToJson('test.mixed.array', ['one', 2, true])
-    expect(attribute).toStrictEqual({ key: 'test.mixed.array', value: { arrayValue: { values: [{ stringValue: 'one' }, { doubleValue: 2 }, { boolValue: true }] } } })
+    const attribute = attributeToJson('test.mixed.array', ['one', 2, 3.4, true])
+    expect(attribute).toStrictEqual({ key: 'test.mixed.array', value: { arrayValue: { values: [{ stringValue: 'one' }, { intValue: '2' }, { doubleValue: 3.4 }, { boolValue: true }] } } })
   })
 
   it('converts an empty array into an OTEL compliant value', () => {
