@@ -24,6 +24,6 @@ span.setAttribute('custom.array.string', ['one', 'two', 'three'])
 span.setAttribute('custom.array.int', [1, 2, 3])
 span.setAttribute('custom.array.bool', [true, false, true])
 span.setAttribute('custom.array.mixed', ['one', 2, true])
-span.setAttribute('custom.array.invalid', ['one', 2, true, {}, [], { a: 1 }, ['test'], () => {}, new Symbol('test')])
+span.setAttribute('custom.array.invalid', ['one', 2, true, {}, [], { a: 1 }, ['test'], () => null])
 
 span.end()  
