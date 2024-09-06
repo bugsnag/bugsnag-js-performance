@@ -8,7 +8,8 @@ Feature: Custom attributes
             | attribute                                 | type         | value                | 
             | bugsnag.span.category                     | stringValue  | custom               |
             | custom.string                             | stringValue  | custom attribute     |
-            | custom.int                                | doubleValue  | 12345                |
+            | custom.int                                | intValue     | 12345                |
+            | custom.double                             | doubleValue  | 123.45                |
             | custom.bool.true                          | boolValue    | true                 |
             | custom.bool.false                         | boolValue    | false                |
             # | custom.array.empty                        | arrayValue   | values               |

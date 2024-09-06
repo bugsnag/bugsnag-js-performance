@@ -17,6 +17,7 @@ BugsnagPerformance.start({
 const span = BugsnagPerformance.startSpan('Custom/CustomAttributesScenario')
 span.setAttribute('custom.string', 'custom attribute')
 span.setAttribute('custom.int', 12345)
+span.setAttribute('custom.double', 123.45)
 span.setAttribute('custom.bool.true', true)
 span.setAttribute('custom.bool.false', false)
 span.setAttribute('custom.array.empty', [])
