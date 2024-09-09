@@ -22,10 +22,9 @@ Here are some helpful suggestions on contributing that help us merge your PR qui
 
 * [Fork](https://help.github.com/articles/fork-a-repo) the
   [library on GitHub](https://github.com/bugsnag/bugsnag-js-performance)
-* Build and test your changes. We have automated tests for many scenarios but its also helpful to use `npm pack` to build the module locally and install it in a real app.
+* Build and test your changes. You can use `npm pack` to build the module locally and install it in a real app.
 * Commit and push until you are happy with your contribution
 * [Make a pull request](https://help.github.com/articles/using-pull-requests)
-* Ensure the automated checks pass (and if it fails, please try to address the cause)
 
 ### Adding features
 
