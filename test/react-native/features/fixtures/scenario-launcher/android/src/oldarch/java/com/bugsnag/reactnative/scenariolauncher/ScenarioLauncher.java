@@ -5,6 +5,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 
 import java.util.Map;
 
@@ -30,5 +31,15 @@ public class ScenarioLauncher extends ReactContextBaseJavaModule {
   @ReactMethod
   public void clearPersistentData() {
     impl.clearPersistentData();
+  }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public void saveStartupConfig(ReadableMap configuration) {
+    impl.saveStartupConfig(configuration);
+  }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public WritableMap readStartupConfig() {
+    return impl.readStartupConfig();
   }
 }

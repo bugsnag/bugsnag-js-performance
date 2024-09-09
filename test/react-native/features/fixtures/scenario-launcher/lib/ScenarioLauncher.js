@@ -32,6 +32,14 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
   console.error(`[BugsnagPerformance] Launching scenario: ${scenarioName}`)
   const scenario = Scenarios[scenarioName]
 
+  if (scenario.startupConfig) {
+    const config = { ...scenario.startupConfig, apiKey, endpoint }
+    console.error(`[BugsnagPerformance] Saving startup config for scenario ${scenarioName}: ${JSON.stringify(config)}`)
+    NativeScenarioLauncher.saveStartupConfig(config)
+    console.error(`[BugsnagPerformance] Saved startup config for scenario ${scenarioName}`)
+    return
+  }
+
   if (scenario.loadBugsnagNotifier) {
     const notifyEndpoint = endpoint.replace('traces', 'notify')
     const sessionsEndpoint = endpoint.replace('traces', 'sessions')

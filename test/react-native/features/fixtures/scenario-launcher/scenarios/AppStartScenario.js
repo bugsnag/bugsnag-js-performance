@@ -2,7 +2,15 @@ import React from 'react'
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 
 export const config = {
-  maximumBatchSize: 1
+  maximumBatchSize: 1,
+  autoInstrumentAppStarts: false,
+  autoInstrumentNetworkRequests: false
+}
+
+export const startupConfig = {
+  maximumBatchSize: 1,
+  autoInstrumentAppStarts: true,
+  autoInstrumentNetworkRequests: false
 }
 
 export const App = () => {

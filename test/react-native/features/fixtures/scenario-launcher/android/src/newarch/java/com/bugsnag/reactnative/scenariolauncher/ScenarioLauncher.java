@@ -5,6 +5,7 @@ import com.bugsnag.reactnative.scenariolauncher.NativeScenarioLauncherSpec;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.WritableMap;
 
 public class ScenarioLauncher extends NativeScenarioLauncherSpec {
   private final ScenarioLauncherImpl impl;
@@ -28,6 +29,16 @@ public class ScenarioLauncher extends NativeScenarioLauncherSpec {
   @Override
   public void clearPersistentData() {
     impl.clearPersistentData();
+  }
+
+  @Override
+  public void saveStartupConfig(ReadableMap configuration) {
+    impl.saveStartupConfig(configuration);
+  }
+
+  @Override
+  public WritableMap readStartupConfig() {
+    return impl.readStartupConfig();
   }
 }
 

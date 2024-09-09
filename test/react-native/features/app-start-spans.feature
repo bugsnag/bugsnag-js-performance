@@ -3,6 +3,7 @@ Feature: App Start spans
 
   Scenario: App starts are automatically instrumented
     When I run 'AppStartScenario'
+    And I close and relaunch the app
     And I wait to receive a sampling request
     And I wait for 1 span
 

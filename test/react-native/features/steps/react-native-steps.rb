@@ -21,6 +21,11 @@ Then('the trace payload field {string} string attribute {string} equals the plat
   end
 end
 
+When('I close and relaunch the app') do
+  Maze.driver.close_app
+  Maze.driver.launch_app
+end
+
 def execute_command(action, scenario_name = '')
   address = if Maze.config.farm == :bb
               if Maze.config.aws_public_ip
