@@ -2,7 +2,7 @@ import type { Configuration, InternalConfiguration } from './config'
 import type { SpanInternal } from './span'
 import { isNumber } from './validation'
 
-export type SpanAttribute = string | number | boolean | Array<string | number | boolean>
+export type SpanAttribute = string | number | boolean | string[] | number[] | boolean[]
 
 export interface SpanAttributesSource <C extends Configuration> {
   configure: (configuration: InternalConfiguration<C>) => void
@@ -94,6 +94,12 @@ function getArrayValue (attributeArray: Array<string | number | boolean>): Attri
     .filter(value => typeof value !== 'undefined')
 }
 
+/**
+ * Converts a span attribute into an OTEL compliant value i.e. { stringValue: 'value' }
+ * @param key the name of the span attribute
+ * @param attribute the value of the attribute. Can be of type string | number | boolean | string[] | number[] | boolean[]. Invalid types will be removed from array attributes.
+ * @returns
+ */
 export function attributeToJson (key: string, attribute: SpanAttribute): JsonAttribute | JsonArrayAttribute | undefined {
   switch (typeof attribute) {
     case 'number':

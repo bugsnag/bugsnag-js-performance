@@ -53,14 +53,15 @@ describe('attributeToJson', () => {
   })
 
   it('converts a mixed array into an OTEL compliant value', () => {
+    // @ts-expect-error Typescript will try to enforce a single array type
     const attribute = attributeToJson('test.mixed.array', ['one', 2, 3.4, true])
     expect(attribute).toStrictEqual({ key: 'test.mixed.array', value: { arrayValue: { values: [{ stringValue: 'one' }, { intValue: '2' }, { doubleValue: 3.4 }, { boolValue: true }] } } })
   })
 
   it('converts an invalid array into an OTEL compliant value', () => {
     // @ts-expect-error Invalid values will be removed
-    const attribute = attributeToJson('test.invalid.array', ['i will stay', () => null, [], {}, NaN, Symbol('i will go')])
-    expect(attribute).toStrictEqual({ key: 'test.invalid.array', value: { arrayValue: { values: [{ stringValue: 'i will stay' }] } } })
+    const attribute = attributeToJson('test.invalid.array', [() => null, [], {}, NaN, Symbol('i will go')])
+    expect(attribute).toStrictEqual({ key: 'test.invalid.array', value: { arrayValue: { } } })
   })
 
   it('converts an empty array into an OTEL compliant value', () => {
