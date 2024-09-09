@@ -114,6 +114,8 @@ class ScenarioLauncherImpl {
     }
 
     editor.commit();
+
+    System.exit(0);
   }
 
   public WritableMap readStartupConfig() {

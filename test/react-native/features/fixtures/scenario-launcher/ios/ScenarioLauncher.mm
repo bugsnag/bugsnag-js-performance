@@ -65,6 +65,10 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(saveStartupConfig:(NSDictionary *)config)
 
   [defaults synchronize];
 
+  dispatch_async(dispatch_get_main_queue(), ^{
+        exit(0);
+  });
+
   return nil;
 }
 
