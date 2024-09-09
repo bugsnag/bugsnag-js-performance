@@ -57,6 +57,12 @@ describe('attributeToJson', () => {
     expect(attribute).toStrictEqual({ key: 'test.mixed.array', value: { arrayValue: { values: [{ stringValue: 'one' }, { intValue: '2' }, { doubleValue: 3.4 }, { boolValue: true }] } } })
   })
 
+  it('converts an invalid array into an OTEL compliant value', () => {
+    // @ts-expect-error Invalid values will be removed
+    const attribute = attributeToJson('test.invalid.array', ['i will stay', () => null, [], {}, NaN, Symbol('i will go')])
+    expect(attribute).toStrictEqual({ key: 'test.invalid.array', value: { arrayValue: { values: [{ stringValue: 'i will stay' }] } } })
+  })
+
   it('converts an empty array into an OTEL compliant value', () => {
     const attribute = attributeToJson('test.empty.array', [])
     expect(attribute).toStrictEqual({ key: 'test.empty.array', value: { arrayValue: { } } })
