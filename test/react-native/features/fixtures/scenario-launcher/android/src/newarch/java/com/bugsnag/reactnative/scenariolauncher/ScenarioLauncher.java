@@ -40,5 +40,10 @@ public class ScenarioLauncher extends NativeScenarioLauncherSpec {
   public WritableMap readStartupConfig() {
     return impl.readStartupConfig();
   }
+
+  @Override
+  public void exitApp() {
+    impl.exitApp();
+  }
 }
 

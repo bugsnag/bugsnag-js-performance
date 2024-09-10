@@ -65,10 +65,6 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(saveStartupConfig:(NSDictionary *)config)
 
   [defaults synchronize];
 
-  dispatch_async(dispatch_get_main_queue(), ^{
-        exit(0);
-  });
-
   return nil;
 }
 
@@ -80,17 +76,12 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(readStartupConfig) {
     return nil;
   }
 
-  // NSString *apiKey = [defaults objectForKey:@"apiKey"] ? [defaults stringForKey:@"apiKey"] : @"";
-  // NSString *endpoint = [defaults stringForKey:@"endpoint"];
-  // BOOL autoInstrumentAppStarts = [defaults boolForKey:@"autoInstrumentAppStarts"];
-  // BOOL autoInstrumentNetworkRequests = [defaults boolForKey:@"autoInstrumentNetworkRequests"];
-  
   NSMutableDictionary *config = [NSMutableDictionary new];
   config[@"apiKey"] = [defaults objectForKey:@"apiKey"] ? [defaults stringForKey:@"apiKey"] : @"";
   config[@"endpoint"] = [defaults objectForKey:@"apiKey"] ? [defaults stringForKey:@"endpoint"] : @"";
-  config[@"autoInstrumentAppStarts"] = [defaults objectForKey:@"autoInstrumentAppStarts"] ? [NSNumber numberWithBool:[defaults boolForKey:@"autoInstrumentAppStarts"]] : [NSNumber numberWithBool:YES];
-  config[@"autoInstrumentNetworkRequests"] = [defaults objectForKey:@"autoInstrumentNetworkRequests"] ? [NSNumber numberWithBool:[defaults boolForKey:@"autoInstrumentNetworkRequests"]] : [NSNumber numberWithBool:YES];
-  config[@"maximumBatchSize"] = [defaults objectForKey:@"maximumBatchSize"] ? [NSNumber numberWithInteger:[defaults integerForKey:@"maximumBatchSize"]] : [NSNumber numberWithInteger: 100];
+  config[@"autoInstrumentAppStarts"] = [NSNumber numberWithBool:[defaults boolForKey:@"autoInstrumentAppStarts"]];
+  config[@"autoInstrumentNetworkRequests"] = [NSNumber numberWithBool:[defaults boolForKey:@"autoInstrumentNetworkRequests"]];
+  config[@"maximumBatchSize"] = [NSNumber numberWithInteger:[defaults integerForKey:@"maximumBatchSize"]];
 
   // make sure we don't leave this config around for the next startup
   [defaults setBool:NO forKey:@"configured"];
@@ -100,7 +91,17 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(readStartupConfig) {
   [defaults removeObjectForKey:@"autoInstrumentNetworkRequests"];
   [defaults removeObjectForKey:@"maximumBatchSize"];
 
+  [defaults synchronize];
+
   return config;
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(exitApp) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+        exit(0);
+  });
+
+  return nil;
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED

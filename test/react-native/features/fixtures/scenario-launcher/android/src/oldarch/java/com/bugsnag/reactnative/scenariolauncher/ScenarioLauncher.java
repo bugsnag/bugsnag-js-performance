@@ -42,4 +42,9 @@ public class ScenarioLauncher extends ReactContextBaseJavaModule {
   public WritableMap readStartupConfig() {
     return impl.readStartupConfig();
   }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public void exitApp() {
+    impl.exitApp();
+  }
 }

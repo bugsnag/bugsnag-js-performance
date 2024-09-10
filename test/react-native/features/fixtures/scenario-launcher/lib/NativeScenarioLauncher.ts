@@ -6,6 +6,7 @@ export interface Spec extends TurboModule {
   clearPersistentData(): void;
   saveStartupConfig(config: UnsafeObject): void;
   readStartupConfig(): UnsafeObject | null | undefined;
+  exitApp(): void;
 }
 
 export default TurboModuleRegistry.get<Spec>("ScenarioLauncher") as Spec | null;

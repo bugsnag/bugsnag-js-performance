@@ -3,11 +3,16 @@ import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 import { NativeScenarioLauncher } from '../lib/native'
 
 export const initialise = async (config) => {
-  config.autoInstrumentAppStarts = true
-  config.maximumBatchSize = 1
+  const startupConfig = {
+    apiKey: config.apiKey,
+    endpoint: config.endpoint,
+    autoInstrumentAppStarts: true,
+    autoInstrumentNetworkRequests: false,
+    maximumBatchSize: 1
+  }
 
-  NativeScenarioLauncher.saveStartupConfig(config)
-  // NativeScenarioLauncher.exitApp()
+  NativeScenarioLauncher.saveStartupConfig(startupConfig)
+  NativeScenarioLauncher.exitApp()
 }
 
 export const App = () => {

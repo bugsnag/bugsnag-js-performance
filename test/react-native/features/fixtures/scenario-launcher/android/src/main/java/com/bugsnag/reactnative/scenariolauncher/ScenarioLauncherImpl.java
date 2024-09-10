@@ -114,8 +114,6 @@ class ScenarioLauncherImpl {
     }
 
     editor.commit();
-
-    System.exit(0);
   }
 
   public WritableMap readStartupConfig() {
@@ -128,8 +126,8 @@ class ScenarioLauncherImpl {
         WritableMap startupConfig = Arguments.createMap();
         startupConfig.putString("apiKey", sharedPreferences.getString("apiKey", ""));
         startupConfig.putString("endpoint", sharedPreferences.getString("endpoint", ""));
-        startupConfig.putBoolean("autoInstrumentAppStarts", sharedPreferences.getBoolean("autoInstrumentAppStarts", true));
-        startupConfig.putBoolean("autoInstrumentNetworkRequests", sharedPreferences.getBoolean("autoInstrumentNetworkRequests", true));
+        startupConfig.putBoolean("autoInstrumentAppStarts", sharedPreferences.getBoolean("autoInstrumentAppStarts", false));
+        startupConfig.putBoolean("autoInstrumentNetworkRequests", sharedPreferences.getBoolean("autoInstrumentNetworkRequests", false));
         startupConfig.putInt("maximumBatchSize", sharedPreferences.getInt("maximumBatchSize", 100));
         return startupConfig;
     }
@@ -144,5 +142,9 @@ class ScenarioLauncherImpl {
             .remove("maximumBatchSize")
             .commit();
     }
+  }
+
+  public void exitApp() {
+    System.exit(0);
   }
 }

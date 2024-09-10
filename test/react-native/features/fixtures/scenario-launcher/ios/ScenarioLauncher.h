@@ -12,6 +12,7 @@
     - (void) clearPersistentData;
     - (id) saveStartupConfig:(NSDictionary *)config;
     - (NSDictionary *) readStartupConfig;
+    - (id) exitApp;
 @end
 
 #ifdef RCT_NEW_ARCH_ENABLED
