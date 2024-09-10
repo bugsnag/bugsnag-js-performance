@@ -32,6 +32,43 @@ describe('attributeToJson', () => {
     expect(attribute).toStrictEqual({ key: 'test.bool', value: { boolValue: false } })
   })
 
+  it('converts a string array into an OTEL compliant value', () => {
+    const attribute = attributeToJson('test.array', ['unit', 'test'])
+    expect(attribute).toStrictEqual({ key: 'test.array', value: { arrayValue: { values: [{ stringValue: 'unit' }, { stringValue: 'test' }] } } })
+  })
+
+  it('converts an integer array into an OTEL compliant value', () => {
+    const attribute = attributeToJson('test.array', [1, 2])
+    expect(attribute).toStrictEqual({ key: 'test.array', value: { arrayValue: { values: [{ intValue: '1' }, { intValue: '2' }] } } })
+  })
+
+  it('converts a double array into an OTEL compliant value', () => {
+    const attribute = attributeToJson('test.array', [1.2, 3.4])
+    expect(attribute).toStrictEqual({ key: 'test.array', value: { arrayValue: { values: [{ doubleValue: 1.2 }, { doubleValue: 3.4 }] } } })
+  })
+
+  it('converts a boolean array into an OTEL compliant value', () => {
+    const attribute = attributeToJson('test.array', [true, false])
+    expect(attribute).toStrictEqual({ key: 'test.array', value: { arrayValue: { values: [{ boolValue: true }, { boolValue: false }] } } })
+  })
+
+  it('converts a mixed array into an OTEL compliant value', () => {
+    // @ts-expect-error Typescript will try to enforce a single array type
+    const attribute = attributeToJson('test.mixed.array', ['one', 2, 3.4, true])
+    expect(attribute).toStrictEqual({ key: 'test.mixed.array', value: { arrayValue: { values: [{ stringValue: 'one' }, { intValue: '2' }, { doubleValue: 3.4 }, { boolValue: true }] } } })
+  })
+
+  it('converts an invalid array into an OTEL compliant value', () => {
+    // @ts-expect-error Invalid values will be removed
+    const attribute = attributeToJson('test.invalid.array', [() => null, [], {}, NaN, Symbol('i will go')])
+    expect(attribute).toStrictEqual({ key: 'test.invalid.array', value: { arrayValue: { } } })
+  })
+
+  it('converts an empty array into an OTEL compliant value', () => {
+    const attribute = attributeToJson('test.empty.array', [])
+    expect(attribute).toStrictEqual({ key: 'test.empty.array', value: { arrayValue: { } } })
+  })
+
   it('converts an unsupported value (object) into undefined', () => {
     // @ts-expect-error Argument is not assignable
     const attribute = attributeToJson('test.object', { key: 'test.key', value: 'a string' })
