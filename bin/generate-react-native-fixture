@@ -265,6 +265,11 @@ function replaceGeneratedFixtureFiles() {
       resolve(ROOT_DIR, 'test/react-native/features/fixtures/react-native-navigation/index.js'),
       resolve(fixtureDir, 'index.js')
     )
+  } else {
+    fs.copyFileSync(
+      resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/index.js'),
+      resolve(fixtureDir, 'index.js')
+    )
   }
 
   fs.copyFileSync(

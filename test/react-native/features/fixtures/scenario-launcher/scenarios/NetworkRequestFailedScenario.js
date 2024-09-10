@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react'
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 
-export const config = {
-  maximumBatchSize: 1,
-  batchInactivityTimeoutMs: 5000,
-  autoInstrumentAppStarts: false,
-  appVersion: '1.2.3'
+export const initialise = async (config) => {
+  config.autoInstrumentNetworkRequests = true
+  config.maximumBatchSize = 1
+  config.batchInactivityTimeoutMs = 5000
 }
 
 const fetchError = async () => {

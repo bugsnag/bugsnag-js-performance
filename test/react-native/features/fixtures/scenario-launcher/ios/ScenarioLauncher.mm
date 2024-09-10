@@ -38,6 +38,72 @@ RCT_EXPORT_METHOD(clearPersistentData) {
   }
 }
 
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(saveStartupConfig:(NSDictionary *)config) {
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+  [defaults setBool:YES forKey:@"configured"];
+
+  if (config[@"apiKey"]) {
+    [defaults setObject:config[@"apiKey"] forKey:@"apiKey"];
+  }
+
+  if (config[@"endpoint"]) {
+    [defaults setObject:config[@"endpoint"] forKey:@"endpoint"];
+  }
+
+  if (config[@"autoInstrumentAppStarts"]) {
+    [defaults setBool:[config[@"autoInstrumentAppStarts"] boolValue] forKey:@"autoInstrumentAppStarts"];
+  }
+
+  if (config[@"autoInstrumentNetworkRequests"]) {
+    [defaults setBool:[config[@"autoInstrumentNetworkRequests"] boolValue] forKey:@"autoInstrumentNetworkRequests"];
+  }
+
+  if (config[@"maximumBatchSize"]) {
+    [defaults setInteger:[config[@"maximumBatchSize"] integerValue] forKey:@"maximumBatchSize"];
+  }
+
+  [defaults synchronize];
+
+  return nil;
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(readStartupConfig) {
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+  BOOL configured = [defaults boolForKey:@"configured"];
+  if (!configured) {
+    return nil;
+  }
+
+  NSMutableDictionary *config = [NSMutableDictionary new];
+  config[@"apiKey"] = [defaults objectForKey:@"apiKey"] ? [defaults stringForKey:@"apiKey"] : @"";
+  config[@"endpoint"] = [defaults objectForKey:@"apiKey"] ? [defaults stringForKey:@"endpoint"] : @"";
+  config[@"autoInstrumentAppStarts"] = [NSNumber numberWithBool:[defaults boolForKey:@"autoInstrumentAppStarts"]];
+  config[@"autoInstrumentNetworkRequests"] = [NSNumber numberWithBool:[defaults boolForKey:@"autoInstrumentNetworkRequests"]];
+  config[@"maximumBatchSize"] = [NSNumber numberWithInteger:[defaults integerForKey:@"maximumBatchSize"]];
+
+  // make sure we don't leave this config around for the next startup
+  [defaults setBool:NO forKey:@"configured"];
+  [defaults removeObjectForKey:@"apiKey"];
+  [defaults removeObjectForKey:@"endpoint"];
+  [defaults removeObjectForKey:@"autoInstrumentAppStarts"];
+  [defaults removeObjectForKey:@"autoInstrumentNetworkRequests"];
+  [defaults removeObjectForKey:@"maximumBatchSize"];
+
+  [defaults synchronize];
+
+  return config;
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(exitApp) {
+  dispatch_async(dispatch_get_main_queue(), ^{
+        exit(0);
+  });
+
+  return nil;
+}
+
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
   (const facebook::react::ObjCTurboModule::InitParams &)params

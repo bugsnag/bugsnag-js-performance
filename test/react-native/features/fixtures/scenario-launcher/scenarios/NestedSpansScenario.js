@@ -2,9 +2,8 @@ import BugsnagPerformance from '@bugsnag/react-native-performance'
 import React, { useEffect } from 'react'
 import { Text, View } from 'react-native'
 
-export const config = {
-    maximumBatchSize: 4,
-    autoInstrumentAppStarts: false,
+export const initialise = async (config) => {
+    config.maximumBatchSize = 4
 }
 
 const createAndEndSpan = (name) => new Promise((resolve) => {

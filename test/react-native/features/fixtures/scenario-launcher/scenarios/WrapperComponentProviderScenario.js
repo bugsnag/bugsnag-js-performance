@@ -12,9 +12,10 @@ const wrapperComponentProvider = () =>  ({ children }) => {
   )
 }
 
-export const config = {
-  maximumBatchSize: 1,
-  wrapperComponentProvider
+export const initialise = async (config) => {
+  config.maximumBatchSize = 1
+  config.wrapperComponentProvider = wrapperComponentProvider
+  config.autoInstrumentAppStarts = true
 }
 
 export const App = () => {
