@@ -7,7 +7,20 @@ interface IntAttributeValue { intValue: string }
 interface DoubleAttributeValue { doubleValue: number }
 interface BoolAttributeValue { boolValue: boolean }
 
-type JsonAttributeValue = StringAttributeValue | IntAttributeValue | DoubleAttributeValue | BoolAttributeValue
+type SingleAttributeValue = StringAttributeValue | IntAttributeValue | DoubleAttributeValue | BoolAttributeValue
+
+interface ArrayAttributeValue {
+  arrayValue: {
+    values?: SingleAttributeValue[]
+  }
+}
+
+type JsonAttributeValue = SingleAttributeValue | ArrayAttributeValue
+
+export interface JsonAttribute {
+  key: string
+  value: JsonAttributeValue
+}
 
 type Attribute = string | number | boolean
 
@@ -63,28 +76,14 @@ export class ResourceAttributes extends SpanAttributes {
 export type ResourceAttributeSource<C extends Configuration>
   = (configuration: InternalConfiguration<C>) => Promise<ResourceAttributes>
 
-export interface JsonAttribute {
-  key: string
-  value: JsonAttributeValue
-}
-
-export interface JsonArrayAttribute {
-  key: string
-  value: {
-    arrayValue: {
-      values?: JsonAttributeValue[]
-    }
-  }
-}
-
-function getJsonAttributeValue (value: Attribute, enforceDouble = false): JsonAttributeValue | undefined {
+function getJsonAttributeValue (value: Attribute): SingleAttributeValue | undefined {
   switch (typeof value) {
     case 'number':
       if (Number.isNaN(value) || !Number.isFinite(value)) {
         return undefined
       }
 
-      if (!enforceDouble && Number.isInteger(value)) {
+      if (Number.isInteger(value)) {
         return { intValue: `${value}` }
       }
 
@@ -99,7 +98,7 @@ function getJsonAttributeValue (value: Attribute, enforceDouble = false): JsonAt
   }
 }
 
-function getJsonArrayAttributeValue (attributeArray: Attribute[]): JsonAttributeValue[] {
+function getJsonArrayAttributeValue (attributeArray: Attribute[]): SingleAttributeValue[] {
   return attributeArray
     .map((value) => getJsonAttributeValue(value))
     .filter(value => typeof value !== 'undefined')
@@ -111,7 +110,7 @@ function getJsonArrayAttributeValue (attributeArray: Attribute[]): JsonAttribute
  * @param attribute the value of the attribute. Can be of type string | number | boolean | string[] | number[] | boolean[]. Invalid types will be removed from array attributes.
  * @returns
  */
-export function attributeToJson (key: string, attribute: SpanAttribute): JsonAttribute | JsonArrayAttribute | undefined {
+export function attributeToJson (key: string, attribute: SpanAttribute): JsonAttribute | undefined {
   switch (typeof attribute) {
     case 'number':
       if (Number.isNaN(attribute) || !Number.isFinite(attribute)) {
