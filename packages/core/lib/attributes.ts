@@ -2,7 +2,19 @@ import type { Configuration, InternalConfiguration } from './config'
 import type { SpanInternal } from './span'
 import { isNumber } from './validation'
 
-export type SpanAttribute = string | number | boolean | string[] | number[] | boolean[]
+interface StringAttributeValue { stringValue: string }
+interface IntAttributeValue { intValue: string }
+interface DoubleAttributeValue { doubleValue: number }
+interface BoolAttributeValue { boolValue: boolean }
+
+type JsonAttributeValue = StringAttributeValue | IntAttributeValue | DoubleAttributeValue | BoolAttributeValue
+
+type Attribute = string | number | boolean
+
+// Array values should always be of the same type, although the trace server will accept mixed types
+type ArrayAttribute = string[] | number[] | boolean[]
+
+export type SpanAttribute = Attribute | ArrayAttribute
 
 export interface SpanAttributesSource <C extends Configuration> {
   configure: (configuration: InternalConfiguration<C>) => void
@@ -53,28 +65,26 @@ export type ResourceAttributeSource<C extends Configuration>
 
 export interface JsonAttribute {
   key: string
-  value: { stringValue: string } | { intValue: string } | { doubleValue: number } | { boolValue: boolean }
+  value: JsonAttributeValue
 }
-
-type AttributeArrayValueValue = Array<{ stringValue: string } | { intValue: string } | { doubleValue: number } | { boolValue: boolean }>
 
 export interface JsonArrayAttribute {
   key: string
   value: {
     arrayValue: {
-      values?: AttributeArrayValueValue
+      values?: JsonAttributeValue[]
     }
   }
 }
 
-function getArrayAttributeValue (value: string | number | boolean) {
+function getJsonAttributeValue (value: Attribute, enforceDouble = false): JsonAttributeValue | undefined {
   switch (typeof value) {
     case 'number':
       if (Number.isNaN(value) || !Number.isFinite(value)) {
         return undefined
       }
 
-      if (Number.isInteger(value)) {
+      if (!enforceDouble && Number.isInteger(value)) {
         return { intValue: `${value}` }
       }
 
@@ -84,13 +94,14 @@ function getArrayAttributeValue (value: string | number | boolean) {
     case 'string':
       return { stringValue: value }
     default:
-      return undefined
+      // Ensure all JsonAttributeValue cases are handled
+      value satisfies never
   }
 }
 
-function getArrayValue (attributeArray: Array<string | number | boolean>): AttributeArrayValueValue {
+function getJsonArrayAttributeValue (attributeArray: Attribute[]): JsonAttributeValue[] {
   return attributeArray
-    .map((value) => getArrayAttributeValue(value))
+    .map((value) => getJsonAttributeValue(value))
     .filter(value => typeof value !== 'undefined')
 }
 
@@ -119,7 +130,7 @@ export function attributeToJson (key: string, attribute: SpanAttribute): JsonAtt
       return { key, value: { stringValue: attribute } }
     case 'object':
       if (Array.isArray(attribute)) {
-        const arrayValues = getArrayValue(attribute)
+        const arrayValues = getJsonArrayAttributeValue(attribute)
         return { key, value: { arrayValue: arrayValues.length > 0 ? { values: arrayValues } : {} } }
       }
       return undefined
