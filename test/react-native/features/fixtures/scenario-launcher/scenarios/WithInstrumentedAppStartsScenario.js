@@ -2,9 +2,9 @@ import React from 'react'
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 
 export const withInstrumentedAppStarts = true
-export const config = {
-  maximumBatchSize: 1,
-  autoInstrumentAppStarts: false
+
+export const initialise = async (config) => {
+  config.maximumBatchSize = 1
 }
 
 export const App = () => {
