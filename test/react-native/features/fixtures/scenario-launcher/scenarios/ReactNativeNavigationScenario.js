@@ -4,12 +4,10 @@ import { Text, View } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 import { getCurrentCommand } from '../lib/CommandRunner'
 
-export const config = {
-    maximumBatchSize: 1,
-    autoInstrumentAppStarts: false,
-    batchInactivityTimeoutMs: 5000,
-    appVersion: '1.2.3',
-    plugins: [new BugsnagPluginReactNativeNavigationPerformance(Navigation)]
+export const initialise = async (config) => {
+    config.maximumBatchSize = 1
+    config.batchInactivityTimeoutMs = 5000
+    config.plugins = [new BugsnagPluginReactNativeNavigationPerformance(Navigation)]
 }
 
 const COMMAND_INTERVAL = 500

@@ -1,15 +1,21 @@
-import { launchScenario } from '@bugsnag/react-native-performance-scenarios'
+import { launchScenario, NativeScenarioLauncher } from '@bugsnag/react-native-performance-scenarios'
 import { useContext, useEffect } from 'react'
 import { RootTagContext, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { Navigation } from 'react-native-navigation'
+import BugsnagPerformance from '@bugsnag/react-native-performance';
 
 console.reportErrorsAsExceptions = false
+
+const startupConfig = NativeScenarioLauncher.readStartupConfig()
+if (startupConfig) {
+  BugsnagPerformance.start(startupConfig)
+}
 
 const App = () => {
     const rootTag = useContext(RootTagContext)
 
     useEffect(() => {
-        launchScenario(rootTag)
+        if (!startupConfig) launchScenario(rootTag)
     }, [rootTag])
 
     return (

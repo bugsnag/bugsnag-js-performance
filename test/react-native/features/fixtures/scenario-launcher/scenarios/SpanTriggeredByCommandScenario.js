@@ -3,9 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { Text, View } from 'react-native'
 import { getCurrentCommand } from '../lib/CommandRunner'
 
-export const config = {
-  maximumBatchSize: 1,
-  autoInstrumentAppStarts: false,
+export const initialise = async (config) => {
+  config.maximumBatchSize = 1
 }
 
 export function App () {

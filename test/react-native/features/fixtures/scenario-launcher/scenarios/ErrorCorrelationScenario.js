@@ -3,16 +3,29 @@ import Bugsnag from '@bugsnag/react-native'
 import React, { useEffect, useState, useRef } from 'react'
 import { Button, Text, View } from 'react-native'
 import { getCurrentCommand } from '../lib/CommandRunner'
+import { NativeScenarioLauncher } from '../lib/native'
 
-export const config = {
-  appVersion: '1.2.3',
-  bugsnag: Bugsnag,
-  maximumBatchSize: 1,
-  autoInstrumentAppStarts: false
+export const initialise = async (config) => {
+  // set the performance config
+  config.bugsnag = Bugsnag
+  config.maximumBatchSize = 1
+
+  // start the native notifier SDK
+  const notifyEndpoint = config.endpoint.replace('traces', 'notify')
+  const sessionsEndpoint = config.endpoint.replace('traces', 'sessions')
+
+  await NativeScenarioLauncher.startBugsnag({
+    apiKey: config.apiKey,
+    notifyEndpoint,
+    sessionsEndpoint
+  })
+
+  // start the JS notifier SDK
+  Bugsnag.start()
+
+  // clear notifier persisted data
+  await NativeScenarioLauncher.clearPersistentData()
 }
-
-export const loadBugsnagNotifier = true
-export const clearBugsnagPersistentData = true
 
 export function App() {
   const [id, setId] = useState(1)
