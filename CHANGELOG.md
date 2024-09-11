@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [v2.9.1] (2024-09-11)
 
 ### Fixed
 
