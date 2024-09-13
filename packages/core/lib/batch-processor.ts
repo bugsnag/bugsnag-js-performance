@@ -7,6 +7,9 @@ import type { ReadonlySampler } from './sampler'
 import type { Span, SpanEnded } from './span'
 import { spanEndedToSpan } from './span-factory'
 
+import { millisecondsToNanoseconds } from './clock'
+import { spanEndedToSpan } from './span'
+
 export type OnSpanEndCallback = (span: Span) => boolean | Promise<boolean>
 export type OnSpanEndCallbacks = OnSpanEndCallback[]
 
@@ -114,6 +117,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
 
   private async runCallbacks (span: Span): Promise<boolean> {
     if (this.configuration.onSpanEnd) {
+      const callbackStartTime = performance.now()
       let continueToBatch = true
       for (const callback of this.configuration.onSpanEnd) {
         try {
@@ -131,6 +135,10 @@ export class BatchProcessor<C extends Configuration> implements Processor {
         } catch (err) {
           this.configuration.logger.error('Error in onSpanEnd callback: ' + err)
         }
+      }
+      if (continueToBatch) {
+        const duration = millisecondsToNanoseconds(performance.now() - callbackStartTime)
+        span.setAttribute('bugsnag.span.callbacks_duration', duration)
       }
       return continueToBatch
     } else {
