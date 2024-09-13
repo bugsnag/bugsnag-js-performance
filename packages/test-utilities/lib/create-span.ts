@@ -17,8 +17,10 @@ export function createSamplingProbability (rawProbability: number): SpanProbabil
 export function createEndedSpan (overrides: Partial<SpanEnded> = {}): SpanEnded {
   const traceId = overrides.traceId || randomBytes(16).toString('hex')
 
+  const defaultAttributes = new SpanAttributes(new Map())
+
   return {
-    attributes: new SpanAttributes(new Map()),
+    attributes: defaultAttributes,
     events: new SpanEvents(),
     id: randomBytes(8).toString('hex'),
     name: 'test span',
@@ -28,6 +30,7 @@ export function createEndedSpan (overrides: Partial<SpanEnded> = {}): SpanEnded 
     samplingRate: traceIdToSamplingRate(traceId),
     endTime: 23456,
     samplingProbability: createSamplingProbability(1),
+    setAttribute: defaultAttributes.set,
     ...overrides
   }
 }

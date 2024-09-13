@@ -1,5 +1,6 @@
+import type { OnSpanEndCallbacks } from './batch-processor'
 import type { Plugin } from './plugin'
-import { isLogger, isNumber, isObject, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
+import { isLogger, isNumber, isObject, isOnSpanEndCallbacks, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
 
 type SetTraceCorrelation = (traceId: string, spanId: string) => void
 
@@ -40,6 +41,7 @@ export interface Configuration {
   plugins?: Array<Plugin<Configuration>>
   bugsnag?: BugsnagErrorStatic
   samplingProbability?: number
+  onSpanEnd?: OnSpanEndCallbacks
 }
 
 export interface TestConfiguration {
@@ -120,6 +122,11 @@ export const schema: CoreSchema = {
     defaultValue: undefined,
     message: 'should be a number between 0 and 1',
     validate: (value: unknown): value is number | undefined => value === undefined || (isNumber(value) && value >= 0 && value <= 1)
+  },
+  onSpanEnd: {
+    defaultValue: undefined,
+    message: 'should be an array of functions',
+    validate: isOnSpanEndCallbacks
   }
 }
 

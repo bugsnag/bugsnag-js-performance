@@ -4,7 +4,10 @@ import type ProbabilityManager from './probability-manager'
 import type { Processor } from './processor'
 import type { RetryQueue } from './retry-queue'
 import type { ReadonlySampler } from './sampler'
-import type { SpanEnded } from './span'
+import type { Span, SpanEnded } from './span'
+
+export type OnSpanEndCallback = (span: Span) => boolean | Promise<boolean>
+export type OnSpanEndCallbacks = OnSpanEndCallback[]
 
 type MinimalProbabilityManager = Pick<ProbabilityManager, 'setProbability' | 'ensureFreshProbability'>
 
@@ -108,6 +111,34 @@ export class BatchProcessor<C extends Configuration> implements Processor {
     await this.flushQueue
   }
 
+  private async runCallbacks (span: SpanEnded): Promise<boolean> {
+    if (this.configuration.onSpanEnd) {
+      let continueToBatch = true
+      for (const callback of this.configuration.onSpanEnd) {
+        try {
+          // Cast to opened Span to allow for setting attributes
+          let result = callback(span as unknown as Span)
+
+          // @ts-expect-error result may or may not be a promise
+          if (typeof result.then === 'function') {
+            // now we await
+            result = await result
+          }
+
+          if (result === false) {
+            continueToBatch = false
+            break
+          }
+        } catch (err) {
+          this.configuration.logger.error('Error in onSpanEnd callback: ' + err)
+        }
+      }
+      return continueToBatch
+    } else {
+      return true
+    }
+  }
+
   private async prepareBatch (): Promise<SpanEnded[] | undefined> {
     if (this.spans.length === 0) {
       return
@@ -126,7 +157,13 @@ export class BatchProcessor<C extends Configuration> implements Processor {
       }
 
       if (this.sampler.sample(span)) {
-        batch.push(span)
+        // Run any callbacks that have been registered before batching
+        // as callbacks could cause the span to be discarded
+        const continueToBatch = await this.runCallbacks(span)
+        if (continueToBatch) {
+          // TODO: span.seal() or something similar
+          batch.push(span)
+        }
       }
     }
 
