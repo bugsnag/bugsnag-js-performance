@@ -4,6 +4,7 @@ import type ProbabilityManager from './probability-manager'
 import type { Processor } from './processor'
 import type { RetryQueue } from './retry-queue'
 import type { ReadonlySampler } from './sampler'
+import { spanEndedToSpan } from './span'
 import type { Span, SpanEnded } from './span'
 
 export type OnSpanEndCallback = (span: Span) => boolean | Promise<boolean>
@@ -111,13 +112,12 @@ export class BatchProcessor<C extends Configuration> implements Processor {
     await this.flushQueue
   }
 
-  private async runCallbacks (span: SpanEnded): Promise<boolean> {
+  private async runCallbacks (span: Span): Promise<boolean> {
     if (this.configuration.onSpanEnd) {
       let continueToBatch = true
       for (const callback of this.configuration.onSpanEnd) {
         try {
-          // Cast to opened Span to allow for setting attributes
-          let result = callback(span as unknown as Span)
+          let result = callback(span)
 
           // @ts-expect-error result may or may not be a promise
           if (typeof result.then === 'function') {
@@ -158,7 +158,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
       if (this.sampler.sample(span)) {
         // Run any callbacks that have been registered before batching
         // as callbacks could cause the span to be discarded
-        const continueToBatch = await this.runCallbacks(span)
+        const continueToBatch = await this.runCallbacks(spanEndedToSpan(span))
         if (continueToBatch) {
           batch.push(span)
         }

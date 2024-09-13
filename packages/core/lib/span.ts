@@ -48,7 +48,17 @@ export interface SpanEnded {
   readonly endTime: number // stored in the format returned from Clock.now (see clock.ts) - written once when 'end' is called
   samplingProbability: SpanProbability
   readonly parentSpanId?: string
-  setAttribute: (name: string, value: SpanAttribute) => void
+}
+
+export function spanEndedToSpan (span: SpanEnded): Span {
+  return {
+    id: span.id,
+    traceId: span.traceId,
+    samplingRate: span.samplingRate,
+    isValid: () => false,
+    end: () => {}, // no-op
+    setAttribute: (...args) => { span.attributes.set(...args) }
+  }
 }
 
 export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
@@ -113,7 +123,6 @@ export class SpanInternal implements SpanContext {
       events: this.events,
       samplingRate: this.samplingRate,
       endTime,
-      setAttribute: this.setAttribute,
       get samplingProbability (): SpanProbability {
         return _samplingProbability
       },
