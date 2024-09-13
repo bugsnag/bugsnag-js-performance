@@ -159,13 +159,7 @@ export class SpanFactory <C extends Configuration> {
         return span.samplingRate
       },
       isValid: () => span.isValid(),
-      setAttribute: (name, value) => {
-        if (typeof name !== 'string') {
-          this.logger.warn(`Invalid attribute name, expected string, got ${typeof name}`)
-        } else {
-          span.setAttribute(name, value)
-        }
-      },
+      setAttribute: (name, value) => { span.setAttribute(name, value) },
       end: (endTime) => {
         const safeEndTime = timeToNumber(this.clock, endTime)
         this.endSpan(span, safeEndTime)
@@ -215,12 +209,6 @@ export function spanEndedToSpan (span: SpanEnded, logger: Logger): Span {
     samplingRate: span.samplingRate,
     isValid: () => false,
     end: () => {}, // no-op
-    setAttribute: (name, value) => {
-      if (typeof name !== 'string') {
-        logger.warn(`Invalid attribute name, expected string, got ${typeof name}`)
-      } else {
-        span.attributes.set(name, value)
-      }
-    }
+    setAttribute: (name, value) => { span.attributes.set(name, value) }
   }
 }
