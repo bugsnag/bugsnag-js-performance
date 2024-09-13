@@ -121,7 +121,6 @@ export class BatchProcessor<C extends Configuration> implements Processor {
 
           // @ts-expect-error result may or may not be a promise
           if (typeof result.then === 'function') {
-            // now we await
             result = await result
           }
 
@@ -161,7 +160,6 @@ export class BatchProcessor<C extends Configuration> implements Processor {
         // as callbacks could cause the span to be discarded
         const continueToBatch = await this.runCallbacks(span)
         if (continueToBatch) {
-          // TODO: span.seal() or something similar
           batch.push(span)
         }
       }
