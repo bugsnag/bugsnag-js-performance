@@ -202,7 +202,7 @@ export class SpanFactory <C extends Configuration> {
   }
 }
 
-export function spanEndedToSpan (span: SpanEnded, logger: Logger): Span {
+export function spanEndedToSpan (span: SpanEnded): Span {
   return {
     id: span.id,
     traceId: span.traceId,

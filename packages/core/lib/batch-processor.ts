@@ -158,10 +158,8 @@ export class BatchProcessor<C extends Configuration> implements Processor {
       if (this.sampler.sample(span)) {
         // Run any callbacks that have been registered before batching
         // as callbacks could cause the span to be discarded
-        const continueToBatch = await this.runCallbacks(spanEndedToSpan(span, this.configuration.logger))
-        if (continueToBatch) {
-          batch.push(span)
-        }
+        const shouldAddToBatch = await this.runCallbacks(spanEndedToSpan(span))
+        if (shouldAddToBatch) batch.push(span)
       }
     }
 
