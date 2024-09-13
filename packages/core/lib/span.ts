@@ -50,17 +50,6 @@ export interface SpanEnded {
   readonly parentSpanId?: string
 }
 
-export function spanEndedToSpan (span: SpanEnded): Span {
-  return {
-    id: span.id,
-    traceId: span.traceId,
-    samplingRate: span.samplingRate,
-    isValid: () => false,
-    end: () => {}, // no-op
-    setAttribute: (...args) => { span.attributes.set(...args) }
-  }
-}
-
 export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
   return {
     name: span.name,
