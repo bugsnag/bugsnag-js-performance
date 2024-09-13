@@ -5,10 +5,9 @@ import type { Processor } from './processor'
 import type { RetryQueue } from './retry-queue'
 import type { ReadonlySampler } from './sampler'
 import type { Span, SpanEnded } from './span'
-import { spanEndedToSpan } from './span-factory'
 
 import { millisecondsToNanoseconds } from './clock'
-import { spanEndedToSpan } from './span'
+import { spanEndedToSpan } from './span-factory'
 
 export type OnSpanEndCallback = (span: Span) => boolean | Promise<boolean>
 export type OnSpanEndCallbacks = OnSpanEndCallback[]
