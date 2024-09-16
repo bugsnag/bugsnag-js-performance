@@ -7,7 +7,7 @@ import type { IdGenerator } from './id-generator'
 import type { NetworkSpanOptions } from './network-span'
 import type { Processor } from './processor'
 import type { ReadonlySampler } from './sampler'
-import type { InternalSpanOptions, Span, SpanEnded, SpanOptionSchema, SpanOptions } from './span'
+import type { InternalSpanOptions, Span, SpanOptionSchema, SpanOptions } from './span'
 import { SpanInternal, coreSpanOptionSchema } from './span'
 import type { SpanContextStorage } from './span-context'
 import { timeToNumber } from './time'
@@ -199,16 +199,5 @@ export class SpanFactory <C extends Configuration> {
     }
 
     return { name, options: cleanOptions } as unknown as InternalSpanOptions<O>
-  }
-}
-
-export function spanEndedToSpan (span: SpanEnded): Span {
-  return {
-    id: span.id,
-    traceId: span.traceId,
-    samplingRate: span.samplingRate,
-    isValid: () => false,
-    end: () => {}, // no-op
-    setAttribute: (name, value) => { span.attributes.set(name, value) }
   }
 }

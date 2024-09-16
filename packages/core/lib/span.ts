@@ -64,6 +64,17 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
   }
 }
 
+export function spanEndedToSpan (span: SpanEnded): Span {
+  return {
+    id: span.id,
+    traceId: span.traceId,
+    samplingRate: span.samplingRate,
+    isValid: () => false,
+    end: () => {}, // no-op
+    setAttribute: (name, value) => { span.attributes.set(name, value) }
+  }
+}
+
 export class SpanInternal implements SpanContext {
   readonly id: string
   readonly traceId: string
