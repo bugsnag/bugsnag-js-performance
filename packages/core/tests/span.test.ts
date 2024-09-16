@@ -779,18 +779,16 @@ describe('Span', () => {
       { type: 'symbol', name: Symbol('test') }
     ]
 
-    it.each(invalidAttributeNames)('handles invalid attribute name ($type)', async ({ type, name }) => {
+    it.each(invalidAttributeNames)('handles invalid attribute name ($type)', async ({ name }) => {
       const delivery = new InMemoryDelivery()
       const client = createTestClient({ deliveryFactory: () => delivery })
-      client.start({ apiKey: VALID_API_KEY, logger: jestLogger })
+      client.start({ apiKey: VALID_API_KEY })
       await jest.runOnlyPendingTimersAsync()
 
       const span = client.startSpan('test span')
 
       // @ts-expect-error 'name' is the wrong type
       span.setAttribute(name, 'value')
-      expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid attribute name, expected string, got ${type}`)
-
       span.end()
       await jest.runOnlyPendingTimersAsync()
 

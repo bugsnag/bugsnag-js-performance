@@ -4,8 +4,6 @@ const parameters = new URLSearchParams(window.location.search)
 const apiKey = parameters.get('api_key')
 const endpoint = parameters.get('endpoint')
 
-const sleep = (time) => new Promise((resolve) => setTimeout(resolve, time))
-
 BugsnagPerformance.start({ apiKey, endpoint, retryQueueMaxSize: 1, maximumBatchSize: 1, autoInstrumentFullPageLoads: false, autoInstrumentNetworkRequests: false, appVersion: '1.2.3' })
 
 document.getElementById("send-first-span").addEventListener("click", () => {

@@ -42,7 +42,7 @@ export class SpanAttributes {
   }
 
   set (name: string, value: SpanAttribute) {
-    if (typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value)) {
+    if (typeof name === 'string' && (typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value))) {
       this.attributes.set(name, value)
     }
   }

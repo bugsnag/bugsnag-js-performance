@@ -1,5 +1,5 @@
-import { SpanAttributes } from './attributes'
 import type { SpanAttribute, SpanAttributesSource } from './attributes'
+import { SpanAttributes } from './attributes'
 import type { BackgroundingListener, BackgroundingListenerState } from './backgrounding-listener'
 import type { Clock } from './clock'
 import type { Configuration, Logger } from './config'
@@ -7,8 +7,8 @@ import type { IdGenerator } from './id-generator'
 import type { NetworkSpanOptions } from './network-span'
 import type { Processor } from './processor'
 import type { ReadonlySampler } from './sampler'
+import type { InternalSpanOptions, Span, SpanEnded, SpanOptionSchema, SpanOptions } from './span'
 import { SpanInternal, coreSpanOptionSchema } from './span'
-import type { InternalSpanOptions, Span, SpanOptionSchema, SpanOptions } from './span'
 import type { SpanContextStorage } from './span-context'
 import { timeToNumber } from './time'
 import { isObject, isParentContext } from './validation'
@@ -159,13 +159,7 @@ export class SpanFactory <C extends Configuration> {
         return span.samplingRate
       },
       isValid: () => span.isValid(),
-      setAttribute: (name, value) => {
-        if (typeof name !== 'string') {
-          this.logger.warn(`Invalid attribute name, expected string, got ${typeof name}`)
-        } else {
-          span.setAttribute(name, value)
-        }
-      },
+      setAttribute: (name, value) => { span.setAttribute(name, value) },
       end: (endTime) => {
         const safeEndTime = timeToNumber(this.clock, endTime)
         this.endSpan(span, safeEndTime)
@@ -205,5 +199,16 @@ export class SpanFactory <C extends Configuration> {
     }
 
     return { name, options: cleanOptions } as unknown as InternalSpanOptions<O>
+  }
+}
+
+export function spanEndedToSpan (span: SpanEnded): Span {
+  return {
+    id: span.id,
+    traceId: span.traceId,
+    samplingRate: span.samplingRate,
+    isValid: () => false,
+    end: () => {}, // no-op
+    setAttribute: (name, value) => { span.attributes.set(name, value) }
   }
 }
