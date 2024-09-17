@@ -1,11 +1,10 @@
+import type { ScaledProbability, SpanEnded, SpanProbability } from '@bugsnag/core-performance'
 import {
-  SpanAttributes,
   SpanEvents,
   traceIdToSamplingRate
-
 } from '@bugsnag/core-performance'
-import type { ScaledProbability, SpanEnded, SpanProbability } from '@bugsnag/core-performance'
 import { randomBytes } from 'crypto'
+import createSpanAttributes from './create-span-attributes'
 
 export function createSamplingProbability (rawProbability: number): SpanProbability {
   return {
@@ -18,7 +17,7 @@ export function createEndedSpan (overrides: Partial<SpanEnded> = {}): SpanEnded 
   const traceId = overrides.traceId || randomBytes(16).toString('hex')
 
   return {
-    attributes: new SpanAttributes(new Map()),
+    attributes: createSpanAttributes(),
     events: new SpanEvents(),
     id: randomBytes(8).toString('hex'),
     name: 'test span',

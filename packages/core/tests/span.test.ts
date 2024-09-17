@@ -7,19 +7,19 @@ import {
   StableIdGenerator,
   VALID_API_KEY,
   createSamplingProbability,
+  createSpanAttributes,
   createTestClient,
   spanAttributesSource
 } from '@bugsnag/js-performance-test-utilities'
+import type { SpanEnded } from '../lib'
 import {
+  DISCARD_END_TIME,
   InMemoryPersistence,
-  SpanAttributes,
   SpanFactory,
   SpanInternal,
-  spanToJson,
   spanContextEquals,
-  DISCARD_END_TIME
+  spanToJson
 } from '../lib'
-import type { SpanAttribute, SpanEnded } from '../lib'
 import Sampler from '../lib/sampler'
 
 jest.useFakeTimers()
@@ -115,7 +115,7 @@ describe('SpanInternal', () => {
         'trace id',
         'name',
         1234,
-        new SpanAttributes(new Map<string, SpanAttribute>()),
+        createSpanAttributes(),
         clock
       )
 
@@ -132,7 +132,7 @@ describe('SpanInternal', () => {
         'trace id',
         'name',
         1234,
-        new SpanAttributes(new Map<string, SpanAttribute>()),
+        createSpanAttributes(),
         clock
       )
 

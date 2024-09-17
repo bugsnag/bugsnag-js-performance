@@ -1,8 +1,9 @@
 import { SpanAttributes, attributeToJson } from '../lib/attributes'
+import { defaultSpanAttributeLimits } from '../lib/custom-attribute-limits'
 
 describe('SpanAttributes', () => {
   it('prevents adding span attributes with invalid values', () => {
-    const attributes = new SpanAttributes(new Map())
+    const attributes = new SpanAttributes(new Map(), defaultSpanAttributeLimits, console)
     attributes.set('test.NaN', NaN)
     attributes.set('test.Infinity', Infinity)
     attributes.set('test.-Infinity', -Infinity)

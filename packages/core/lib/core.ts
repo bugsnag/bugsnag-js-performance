@@ -137,7 +137,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         })
 
         logger = configuration.logger
-        spanFactory.configure(processor, logger)
+        spanFactory.configure(processor, configuration)
       })
 
       for (const plugin of configuration.plugins) {

@@ -1,4 +1,5 @@
-import type { Configuration, InternalConfiguration } from './config'
+import type { Configuration, InternalConfiguration, Logger } from './config'
+import { defaultResourceAttributeLimits } from './custom-attribute-limits'
 import type { SpanInternal } from './span'
 import { isNumber } from './validation'
 
@@ -34,11 +35,21 @@ export interface SpanAttributesSource <C extends Configuration> {
   requestAttributes: (span: SpanInternal) => void
 }
 
+export interface SpanAttributesLimits {
+  attributeStringValueLimit: number
+  attributeArrayLengthLimit: number
+  attributeCountLimit: number
+}
+
 export class SpanAttributes {
   private readonly attributes: Map<string, SpanAttribute>
+  private readonly logger: Logger
+  private readonly spanAttributeLimits: SpanAttributesLimits
 
-  constructor (initialValues: Map<string, SpanAttribute>) {
+  constructor (initialValues: Map<string, SpanAttribute>, spanAttributeLimits: SpanAttributesLimits, logger: Logger) {
     this.attributes = initialValues
+    this.spanAttributeLimits = spanAttributeLimits
+    this.logger = logger
   }
 
   set (name: string, value: SpanAttribute) {
@@ -69,7 +80,7 @@ export class ResourceAttributes extends SpanAttributes {
       initialValues.set('service.version', appVersion)
     }
 
-    super(initialValues)
+    super(initialValues, defaultResourceAttributeLimits, console)
   }
 }
 
