@@ -115,7 +115,7 @@ describe('SpanInternal', () => {
         'trace id',
         'name',
         1234,
-        createSpanAttributes(),
+        createSpanAttributes('name'),
         clock
       )
 
@@ -132,7 +132,7 @@ describe('SpanInternal', () => {
         'trace id',
         'name',
         1234,
-        createSpanAttributes(),
+        createSpanAttributes('name'),
         clock
       )
 

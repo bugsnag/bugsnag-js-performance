@@ -15,12 +15,13 @@ export function createSamplingProbability (rawProbability: number): SpanProbabil
 
 export function createEndedSpan (overrides: Partial<SpanEnded> = {}): SpanEnded {
   const traceId = overrides.traceId || randomBytes(16).toString('hex')
+  const spanName = overrides.name || 'test span'
 
   return {
-    attributes: createSpanAttributes(),
+    attributes: createSpanAttributes(spanName),
     events: new SpanEvents(),
     id: randomBytes(8).toString('hex'),
-    name: 'test span',
+    name: spanName,
     kind: 1,
     startTime: 12345,
     traceId,

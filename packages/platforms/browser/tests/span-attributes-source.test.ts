@@ -15,9 +15,9 @@ const spanAttributesSource = createSpanAttributesSource(mockDocument as Document
 describe('spanAttributesSource', () => {
   it('adds permitted attributes to a span', () => {
     const browserConfiguration = createConfiguration<BrowserConfiguration>({ sendPageAttributes: { url: true, title: true } })
-    const spanAttributes = createSpanAttributes()
+    const spanAttributes = createSpanAttributes('test.span')
     const clock = new IncrementingClock()
-    const span = new SpanInternal('id', 'traceId', 'test span', 1234, spanAttributes, clock)
+    const span = new SpanInternal('id', 'traceId', 'test.span', 1234, spanAttributes, clock)
 
     spanAttributesSource.requestAttributes(span)
 
