@@ -141,17 +141,17 @@ export const schema: CoreSchema = {
   },
   attributeStringValueLimit: {
     defaultValue: ATTRIBUTE_STRING_VALUE_LIMIT_DEFAULT,
-    message: 'should be a number',
+    message: `should be a number between 1 and ${ATTRIBUTE_STRING_VALUE_LIMIT_MAX}`,
     validate: (value: unknown): value is number => isNumber(value) && value > 0 && value <= ATTRIBUTE_STRING_VALUE_LIMIT_MAX
   },
   attributeArrayLengthLimit: {
     defaultValue: ATTRIBUTE_ARRAY_LENGTH_LIMIT_DEFAULT,
-    message: 'should be a number',
+    message: `should be a number between 1 and ${ATTRIBUTE_ARRAY_LENGTH_LIMIT_MAX}`,
     validate: (value: unknown): value is number => isNumber(value) && value > 0 && value <= ATTRIBUTE_ARRAY_LENGTH_LIMIT_MAX
   },
   attributeCountLimit: {
     defaultValue: ATTRIBUTE_COUNT_LIMIT_DEFAULT,
-    message: 'should be a number',
+    message: `should be a number between 1 and ${ATTRIBUTE_COUNT_LIMIT_MAX}` ,
     validate: (value: unknown): value is number => isNumber(value) && value > 0 && value <= ATTRIBUTE_COUNT_LIMIT_MAX
   }
 }
