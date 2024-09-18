@@ -151,7 +151,7 @@ export const schema: CoreSchema = {
   },
   attributeCountLimit: {
     defaultValue: ATTRIBUTE_COUNT_LIMIT_DEFAULT,
-    message: `should be a number between 1 and ${ATTRIBUTE_COUNT_LIMIT_MAX}` ,
+    message: `should be a number between 1 and ${ATTRIBUTE_COUNT_LIMIT_MAX}`,
     validate: (value: unknown): value is number => isNumber(value) && value > 0 && value <= ATTRIBUTE_COUNT_LIMIT_MAX
   }
 }

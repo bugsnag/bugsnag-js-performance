@@ -67,7 +67,6 @@ export class SpanAttributes {
     this.logger = logger
   }
 
-  // Validate after the span has ended and after the sampling
   private validateAttribute (name: string, value: SpanAttribute) {
     if (name.length > ATTRIBUTE_KEY_LENGTH_LIMIT) {
       this.remove(name)
