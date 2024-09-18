@@ -1,5 +1,5 @@
 import type { Configuration, InternalConfiguration, Logger } from './config'
-import { defaultResourceAttributeLimits } from './custom-attribute-limits'
+import { ATTRIBUTE_KEY_LENGTH_LIMIT, defaultResourceAttributeLimits } from './custom-attribute-limits'
 import type { SpanInternal } from './span'
 import { isNumber } from './validation'
 
@@ -41,10 +41,23 @@ export interface SpanAttributesLimits {
   attributeCountLimit: number
 }
 
+function truncateString (value: string, limit: number) {
+  const originalLength = value.length
+  const newString = value.slice(0, limit)
+  const truncatedLength = newString.length
+
+  return `${newString} *** ${originalLength - truncatedLength} CHARS TRUNCATED`
+}
+
 export class SpanAttributes {
   private readonly attributes: Map<string, SpanAttribute>
   private readonly logger: Logger
   private readonly spanAttributeLimits: SpanAttributesLimits
+  private _droppedAttributesCount = 0
+
+  get droppedAttributesCount () {
+    return this._droppedAttributesCount
+  }
 
   constructor (initialValues: Map<string, SpanAttribute>, spanAttributeLimits: SpanAttributesLimits, logger: Logger) {
     this.attributes = initialValues
@@ -52,8 +65,32 @@ export class SpanAttributes {
     this.logger = logger
   }
 
+  // Validate after the span has ended and after the sampling
+  validateAttribute (name: string, value: SpanAttribute) {
+    if (name.length > ATTRIBUTE_KEY_LENGTH_LIMIT) {
+      this.logger.warn('Attribute key limit reached. Discarding attribute.')
+      this._droppedAttributesCount++
+      return
+    }
+
+    if (typeof value === 'string' && value.length > this.spanAttributeLimits.attributeStringValueLimit) {
+      this.attributes.set(name, truncateString(value, this.spanAttributeLimits.attributeStringValueLimit))
+    }
+
+    if (Array.isArray(value) && value.length > this.spanAttributeLimits.attributeArrayLengthLimit) {
+      this.logger.warn('Attribute array length limit reached. Discarding attribute.')
+      this._droppedAttributesCount++
+    }
+  }
+
   set (name: string, value: SpanAttribute) {
     if (typeof name === 'string' && (typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value))) {
+      if (!!this.attributes.has(name) && this.attributes.size >= this.spanAttributeLimits.attributeCountLimit) {
+        this.logger.warn('Attribute count limit reached. Discarding attribute.')
+        this._droppedAttributesCount++
+        return
+      }
+
       this.attributes.set(name, value)
     }
   }

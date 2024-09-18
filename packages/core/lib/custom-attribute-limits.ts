@@ -1,5 +1,7 @@
 import type { SpanAttributesLimits } from './attributes'
 
+export const ATTRIBUTE_KEY_LENGTH_LIMIT = 128
+
 export const ATTRIBUTE_STRING_VALUE_LIMIT_DEFAULT = 1024
 export const ATTRIBUTE_STRING_VALUE_LIMIT_MAX = 10_000
 
