@@ -72,7 +72,7 @@ export class SpanFactory <C extends Configuration> {
     const parentSpanId = parentContext ? parentContext.id : undefined
     const traceId = parentContext ? parentContext.traceId : this.idGenerator.generate(128)
 
-    const attributes = new SpanAttributes(new Map(), this.spanAttributeLimits, this.logger)
+    const attributes = new SpanAttributes(new Map(), this.spanAttributeLimits, name, this.logger)
 
     if (typeof options.isFirstClass === 'boolean') {
       attributes.set('bugsnag.span.first_class', options.isFirstClass)
