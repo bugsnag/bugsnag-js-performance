@@ -66,9 +66,10 @@ export class SpanAttributes {
   }
 
   // Validate after the span has ended and after the sampling
-  validateAttribute (name: string, value: SpanAttribute) {
+  private validateAttribute (name: string, value: SpanAttribute) {
     if (name.length > ATTRIBUTE_KEY_LENGTH_LIMIT) {
       this.logger.warn('Attribute key limit reached. Discarding attribute.')
+      this.remove(name)
       this._droppedAttributesCount++
       return
     }
@@ -78,14 +79,15 @@ export class SpanAttributes {
     }
 
     if (Array.isArray(value) && value.length > this.spanAttributeLimits.attributeArrayLengthLimit) {
-      this.logger.warn('Attribute array length limit reached. Discarding attribute.')
-      this._droppedAttributesCount++
+      const truncatedValue = value.slice(0, this.spanAttributeLimits.attributeArrayLengthLimit)
+      this.logger.warn('Attribute array length limit reached. Discarding excess array items.')
+      this.set(name, truncatedValue)
     }
   }
 
   set (name: string, value: SpanAttribute) {
     if (typeof name === 'string' && (typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value))) {
-      if (!!this.attributes.has(name) && this.attributes.size >= this.spanAttributeLimits.attributeCountLimit) {
+      if (!this.attributes.has(name) && this.attributes.size >= this.spanAttributeLimits.attributeCountLimit) {
         this.logger.warn('Attribute count limit reached. Discarding attribute.')
         this._droppedAttributesCount++
         return
@@ -100,6 +102,7 @@ export class SpanAttributes {
   }
 
   toJson () {
+    Array.from(this.attributes).forEach(([key, value]) => { this.validateAttribute(key, value) })
     return Array.from(this.attributes).map(([key, value]) => attributeToJson(key, value))
   }
 }
