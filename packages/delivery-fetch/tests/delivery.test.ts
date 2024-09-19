@@ -32,6 +32,7 @@ describe('Browser Delivery', () => {
               endTimeUnixNano: '56789',
               startTimeUnixNano: '12345',
               attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+              dropped_attributes_count: 0,
               events: []
             }]
           }]
@@ -78,6 +79,7 @@ describe('Browser Delivery', () => {
               endTimeUnixNano: '56789',
               startTimeUnixNano: '12345',
               attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+              dropped_attributes_count: 0,
               events: []
             }]
           }]
@@ -127,6 +129,7 @@ describe('Browser Delivery', () => {
               endTimeUnixNano: '56789',
               startTimeUnixNano: '12345',
               attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+              dropped_attributes_count: 0,
               events: []
             }]
           }]
@@ -261,6 +264,7 @@ describe('Browser Delivery', () => {
               endTimeUnixNano: '56789',
               startTimeUnixNano: '12345',
               attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+              dropped_attributes_count: 0,
               events
             }]
           }]
