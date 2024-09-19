@@ -68,13 +68,6 @@ export class SpanAttributes {
   }
 
   private validateAttribute (name: string, value: SpanAttribute) {
-    if (name.length > ATTRIBUTE_KEY_LENGTH_LIMIT) {
-      this.remove(name)
-      this._droppedAttributesCount++
-      this.logger.warn(`Span attribute ${name} in span ${this.spanName} was dropped as the key length exceeds the ${ATTRIBUTE_KEY_LENGTH_LIMIT} character fixed limit.`)
-      return
-    }
-
     if (typeof value === 'string' && value.length > this.spanAttributeLimits.attributeStringValueLimit) {
       this.attributes.set(name, truncateString(value, this.spanAttributeLimits.attributeStringValueLimit))
       this.logger.warn(`Span attribute ${name} in span ${this.spanName} was truncated as the string exceeds the ${this.spanAttributeLimits.attributeStringValueLimit} character limit set by attributeStringValueLimit.`)
@@ -92,6 +85,12 @@ export class SpanAttributes {
       if (!this.attributes.has(name) && this.attributes.size >= this.spanAttributeLimits.attributeCountLimit) {
         this._droppedAttributesCount++
         this.logger.warn(`Span attribute ${name} in span ${this.spanName} was dropped as the number of attributes exceeds the ${this.spanAttributeLimits.attributeCountLimit} attribute limit set by attributeCountLimit.`)
+        return
+      }
+
+      if (name.length > ATTRIBUTE_KEY_LENGTH_LIMIT) {
+        this._droppedAttributesCount++
+        this.logger.warn(`Span attribute ${name} in span ${this.spanName} was dropped as the key length exceeds the ${ATTRIBUTE_KEY_LENGTH_LIMIT} character fixed limit.`)
         return
       }
 
