@@ -165,6 +165,9 @@ export class SpanFactory <C extends Configuration> {
       get samplingRate () {
         return span.samplingRate
       },
+      get name () {
+        return span.name
+      },
       isValid: () => span.isValid(),
       setAttribute: (name, value) => { span.setAttribute(name, value) },
       end: (endTime) => {

@@ -10,6 +10,7 @@ import { isBoolean, isSpanContext, isTime } from './validation'
 const HOUR_IN_MILLISECONDS = 60 * 60 * 1000
 
 export interface Span extends SpanContext {
+  readonly name: string
   end: (endTime?: Time) => void
   setAttribute: (name: string, value: SpanAttribute) => void
 }
@@ -74,6 +75,9 @@ export function spanEndedToSpan (span: SpanEnded): Span {
     },
     get samplingRate () {
       return span.samplingRate
+    },
+    get name () {
+      return span.name
     },
     isValid: () => false,
     end: () => {}, // no-op

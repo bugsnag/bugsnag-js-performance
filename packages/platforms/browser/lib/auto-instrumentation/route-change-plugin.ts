@@ -1,5 +1,5 @@
 import { coreSpanOptionSchema, isString, isObject } from '@bugsnag/core-performance'
-import type { InternalConfiguration, Plugin, SpanFactory, SpanOptionSchema, Time } from '@bugsnag/core-performance'
+import type { InternalConfiguration, Plugin, Span, SpanFactory, SpanOptionSchema, Time } from '@bugsnag/core-performance'
 import type { BrowserConfiguration } from '../config'
 import type { RouteChangeSpanEndOptions, RouteChangeSpanOptions } from '../routing-provider'
 import { getPermittedAttributes } from '../send-page-attributes'
@@ -52,12 +52,13 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
 
           return {
             id: '',
+            name: '',
             traceId: '',
             samplingRate: 0,
             isValid: () => false,
             setAttribute: () => {},
             end: () => {}
-          }
+          } satisfies Span
         }
       }
 
@@ -88,10 +89,19 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
       previousRoute = route
 
       return {
-        id: span.id,
-        traceId: span.traceId,
+        get id () {
+          return span.id
+        },
+        get traceId () {
+          return span.traceId
+        },
+        get samplingRate () {
+          return span.samplingRate
+        },
+        get name () {
+          return span.name
+        },
         isValid: span.isValid,
-        samplingRate: span.samplingRate,
         setAttribute: span.setAttribute,
         end: (endTimeOrOptions?: Time | RouteChangeSpanEndOptions): void => {
           const options: RouteChangeSpanEndOptions = isObject(endTimeOrOptions) ? endTimeOrOptions : { endTime: endTimeOrOptions }
@@ -117,7 +127,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
           this.spanFactory.toPublicApi(span).end(options.endTime)
         }
 
-      }
+      } satisfies Span
     })
   }
 }

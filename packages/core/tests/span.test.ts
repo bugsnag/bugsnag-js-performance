@@ -151,6 +151,7 @@ describe('Span', () => {
       const client = createTestClient()
       const span = client.startSpan('test span')
       expect(span).toStrictEqual({
+        name: expect.any(String),
         id: expect.any(String),
         traceId: expect.any(String),
         end: expect.any(Function),
