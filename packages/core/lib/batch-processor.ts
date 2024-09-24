@@ -7,7 +7,7 @@ import type { ReadonlySampler } from './sampler'
 import type { Span, SpanEnded } from './span'
 
 import { millisecondsToNanoseconds } from './clock'
-import { spanEndedToSpan } from './span-factory'
+import { spanEndedToSpan } from './span'
 
 export type OnSpanEndCallback = (span: Span) => boolean | Promise<boolean>
 export type OnSpanEndCallbacks = OnSpanEndCallback[]

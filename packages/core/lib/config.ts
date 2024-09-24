@@ -1,4 +1,12 @@
 import type { OnSpanEndCallbacks } from './batch-processor'
+import {
+  ATTRIBUTE_ARRAY_LENGTH_LIMIT_DEFAULT,
+  ATTRIBUTE_COUNT_LIMIT_DEFAULT,
+  ATTRIBUTE_STRING_VALUE_LIMIT_DEFAULT,
+  ATTRIBUTE_ARRAY_LENGTH_LIMIT_MAX,
+  ATTRIBUTE_COUNT_LIMIT_MAX,
+  ATTRIBUTE_STRING_VALUE_LIMIT_MAX
+} from './custom-attribute-limits'
 import type { Plugin } from './plugin'
 import { isLogger, isNumber, isObject, isOnSpanEndCallbacks, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
 
@@ -42,6 +50,9 @@ export interface Configuration {
   bugsnag?: BugsnagErrorStatic
   samplingProbability?: number
   onSpanEnd?: OnSpanEndCallbacks
+  attributeStringValueLimit?: number
+  attributeArrayLengthLimit?: number
+  attributeCountLimit?: number
 }
 
 export interface TestConfiguration {
@@ -127,6 +138,21 @@ export const schema: CoreSchema = {
     defaultValue: undefined,
     message: 'should be an array of functions',
     validate: isOnSpanEndCallbacks
+  },
+  attributeStringValueLimit: {
+    defaultValue: ATTRIBUTE_STRING_VALUE_LIMIT_DEFAULT,
+    message: `should be a number between 1 and ${ATTRIBUTE_STRING_VALUE_LIMIT_MAX}`,
+    validate: (value: unknown): value is number => isNumber(value) && value > 0 && value <= ATTRIBUTE_STRING_VALUE_LIMIT_MAX
+  },
+  attributeArrayLengthLimit: {
+    defaultValue: ATTRIBUTE_ARRAY_LENGTH_LIMIT_DEFAULT,
+    message: `should be a number between 1 and ${ATTRIBUTE_ARRAY_LENGTH_LIMIT_MAX}`,
+    validate: (value: unknown): value is number => isNumber(value) && value > 0 && value <= ATTRIBUTE_ARRAY_LENGTH_LIMIT_MAX
+  },
+  attributeCountLimit: {
+    defaultValue: ATTRIBUTE_COUNT_LIMIT_DEFAULT,
+    message: `should be a number between 1 and ${ATTRIBUTE_COUNT_LIMIT_MAX}`,
+    validate: (value: unknown): value is number => isNumber(value) && value > 0 && value <= ATTRIBUTE_COUNT_LIMIT_MAX
   }
 }
 

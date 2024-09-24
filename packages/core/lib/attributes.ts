@@ -1,4 +1,5 @@
-import type { Configuration, InternalConfiguration } from './config'
+import type { Configuration, InternalConfiguration, Logger } from './config'
+import { ATTRIBUTE_KEY_LENGTH_LIMIT, defaultResourceAttributeLimits } from './custom-attribute-limits'
 import type { SpanInternal } from './span'
 import { isNumber } from './validation'
 
@@ -34,15 +35,65 @@ export interface SpanAttributesSource <C extends Configuration> {
   requestAttributes: (span: SpanInternal) => void
 }
 
+export interface SpanAttributesLimits {
+  attributeStringValueLimit: number
+  attributeArrayLengthLimit: number
+  attributeCountLimit: number
+}
+
+function truncateString (value: string, limit: number) {
+  const originalLength = value.length
+  const newString = value.slice(0, limit)
+  const truncatedLength = newString.length
+
+  return `${newString} *** ${originalLength - truncatedLength} CHARS TRUNCATED`
+}
+
 export class SpanAttributes {
   private readonly attributes: Map<string, SpanAttribute>
+  private readonly logger: Logger
+  private readonly spanAttributeLimits: SpanAttributesLimits
+  private readonly spanName: string
+  private _droppedAttributesCount = 0
 
-  constructor (initialValues: Map<string, SpanAttribute>) {
+  get droppedAttributesCount () {
+    return this._droppedAttributesCount
+  }
+
+  constructor (initialValues: Map<string, SpanAttribute>, spanAttributeLimits: SpanAttributesLimits, spanName: string, logger: Logger) {
     this.attributes = initialValues
+    this.spanAttributeLimits = spanAttributeLimits
+    this.spanName = spanName
+    this.logger = logger
+  }
+
+  private validateAttribute (name: string, value: SpanAttribute) {
+    if (typeof value === 'string' && value.length > this.spanAttributeLimits.attributeStringValueLimit) {
+      this.attributes.set(name, truncateString(value, this.spanAttributeLimits.attributeStringValueLimit))
+      this.logger.warn(`Span attribute ${name} in span ${this.spanName} was truncated as the string exceeds the ${this.spanAttributeLimits.attributeStringValueLimit} character limit set by attributeStringValueLimit.`)
+    }
+
+    if (Array.isArray(value) && value.length > this.spanAttributeLimits.attributeArrayLengthLimit) {
+      const truncatedValue = value.slice(0, this.spanAttributeLimits.attributeArrayLengthLimit)
+      this.set(name, truncatedValue)
+      this.logger.warn(`Span attribute ${name} in span ${this.spanName} was truncated as the array exceeds the ${this.spanAttributeLimits.attributeArrayLengthLimit} element limit set by attributeArrayLengthLimit.`)
+    }
   }
 
   set (name: string, value: SpanAttribute) {
     if (typeof name === 'string' && (typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value))) {
+      if (!this.attributes.has(name) && this.attributes.size >= this.spanAttributeLimits.attributeCountLimit) {
+        this._droppedAttributesCount++
+        this.logger.warn(`Span attribute ${name} in span ${this.spanName} was dropped as the number of attributes exceeds the ${this.spanAttributeLimits.attributeCountLimit} attribute limit set by attributeCountLimit.`)
+        return
+      }
+
+      if (name.length > ATTRIBUTE_KEY_LENGTH_LIMIT) {
+        this._droppedAttributesCount++
+        this.logger.warn(`Span attribute ${name} in span ${this.spanName} was dropped as the key length exceeds the ${ATTRIBUTE_KEY_LENGTH_LIMIT} character fixed limit.`)
+        return
+      }
+
       this.attributes.set(name, value)
     }
   }
@@ -52,6 +103,7 @@ export class SpanAttributes {
   }
 
   toJson () {
+    Array.from(this.attributes).forEach(([key, value]) => { this.validateAttribute(key, value) })
     return Array.from(this.attributes).map(([key, value]) => attributeToJson(key, value))
   }
 }
@@ -69,7 +121,7 @@ export class ResourceAttributes extends SpanAttributes {
       initialValues.set('service.version', appVersion)
     }
 
-    super(initialValues)
+    super(initialValues, defaultResourceAttributeLimits, 'resource-attributes', console)
   }
 }
 

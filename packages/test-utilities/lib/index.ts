@@ -11,6 +11,7 @@ export { default as IncrementingClock } from './incrementing-clock'
 export { default as IncrementingIdGenerator } from './incrementing-id-generator'
 export { default as MockSpanFactory } from './mock-span-factory'
 export { default as resourceAttributesSource } from './resource-attributes-source'
+export { default as createSpanAttributes } from './create-span-attributes'
 export { default as spanAttributesSource } from './span-attributes-source'
 export { default as StableIdGenerator } from './stable-id-generator'
 
