@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Allow setting custom span attributes [#510](https://github.com/bugsnag/bugsnag-js-performance/pull/510)
+
 ## [v2.9.0] (2024-09-05)
 
 ### Added
