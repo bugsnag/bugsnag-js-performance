@@ -2,11 +2,9 @@ import BugsnagPerformance from '@bugsnag/react-native-performance'
 import React, { useEffect } from 'react'
 import { AppState, Text, View } from 'react-native'
 
-export const config = {
-  maximumBatchSize: 3,
-  batchInactivityTimeoutMs: 5000,
-  autoInstrumentAppStarts: false,
-  appVersion: '1.2.3'
+export const initialise = async (config) => {
+  config.maximumBatchSize = 3
+  config.batchInactivityTimeoutMs = 5000
 }
 
 export const App = () => {

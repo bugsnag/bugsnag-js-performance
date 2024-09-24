@@ -32,21 +32,13 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
   console.error(`[BugsnagPerformance] Launching scenario: ${scenarioName}`)
   const scenario = Scenarios[scenarioName]
 
-  if (scenario.loadBugsnagNotifier) {
-    const notifyEndpoint = endpoint.replace('traces', 'notify')
-    const sessionsEndpoint = endpoint.replace('traces', 'sessions')
-    await NativeScenarioLauncher.startBugsnag({ apiKey, notifyEndpoint, sessionsEndpoint })
-    Bugsnag.start();
-
-    if (scenario.clearBugsnagPersistentData) {
-      await NativeScenarioLauncher.clearPersistentData()
-    }
-  }
-
-  BugsnagPerformance.start({
+  const scenarioConfig = {
     apiKey,
     endpoint,
-    networkRequestCallback (requestInfo) {
+    autoInstrumentAppStarts: false,
+    autoInstrumentNetworkRequests: false,
+    appVersion: '1.2.3',
+    networkRequestCallback: (requestInfo) => {
       // ignore requests to the maze runner command endpoint
       if (requestInfo.url.endsWith('/command')) {
         console.error(`[BugsnagPerformance] ignoring request to ${requestInfo.url}`)
@@ -54,9 +46,12 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
       }
 
       return requestInfo
-    },
-    ...scenario.config
-  })
+    }
+  }
+
+  await scenario.initialise(scenarioConfig)
+
+  BugsnagPerformance.start(scenarioConfig)
 
   if (process.env.REACT_NATIVE_NAVIGATION) {
     loadReactNavigationScenario(scenario)

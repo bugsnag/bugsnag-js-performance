@@ -2,11 +2,9 @@ import React, { useEffect } from 'react'
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 
-export const config = {
-  maximumBatchSize: 1,
-  autoInstrumentAppStarts: false,
-  appVersion: '1.2.3',
-  samplingProbability: 1
+export const initialise = async (config) => {
+  config.samplingProbability = 1
+  config.maximumBatchSize = 1
 }
 
 export const App = () => {

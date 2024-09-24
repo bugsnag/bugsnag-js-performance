@@ -52,6 +52,7 @@ Feature: React native navigation support
 
   Scenario: App starts are automatically instrumented
     When I run 'AppStartScenario'
+    And I relaunch the app after shutdown
     And I wait to receive a sampling request
     And I wait for 1 span
 

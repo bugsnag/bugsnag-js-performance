@@ -2,14 +2,10 @@ import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 import React, { useContext, useEffect } from 'react'
 import { ScenarioContext } from '../lib/ScenarioContext'
 
-export const config = {
-  maximumBatchSize: 5,
-  autoInstrumentAppStarts: false,
-  tracePropagationUrls: [/^http:\/\/.+:\d{4}\/reflect$/],
-  networkRequestCallback: (requestInfo) => {
-    if (requestInfo.url.endsWith('/command')) return null
-    return requestInfo
-  }
+export const initialise = async (config) => {
+  config.maximumBatchSize = 5
+  config.autoInstrumentNetworkRequests = true
+  config.tracePropagationUrls = [/^http:\/\/.+:\d{4}\/reflect$/]
 }
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))

@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react'
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 
-export const config = {
-  maximumBatchSize: 1,
-  batchInactivityTimeoutMs: 5000,
-  autoInstrumentAppStarts: false,
-  appVersion: '1.2.3',
-  networkRequestCallback: (networkRequestInfo) => {
+export const initialise = async (config) => {
+  config.maximumBatchSize = 1
+  config.batchInactivityTimeoutMs = 5000
+  config.autoInstrumentNetworkRequests = true
+  config.networkRequestCallback = (networkRequestInfo) => {
     // don't send the span for the xhr request
     if (networkRequestInfo.url.indexOf('xhr') > -1) {
       return null

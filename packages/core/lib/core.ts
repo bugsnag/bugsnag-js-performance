@@ -76,10 +76,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       // if using the default endpoint add the API key as a subdomain
       // e.g. convert URL https://otlp.bugsnag.com/v1/traces to URL https://<project_api_key>.otlp.bugsnag.com/v1/traces
       if (configuration.endpoint === schema.endpoint.defaultValue) {
-        const endpointWithApiKeyInSubdomain = new URL(configuration.endpoint)
-        endpointWithApiKeyInSubdomain.hostname = `${configuration.apiKey}.${endpointWithApiKeyInSubdomain.hostname}`
-
-        configuration.endpoint = endpointWithApiKeyInSubdomain.toString()
+        configuration.endpoint = configuration.endpoint.replace('https://', `https://${configuration.apiKey}.`)
       }
 
       // Correlate errors with span by monkey patching _notify on the error client

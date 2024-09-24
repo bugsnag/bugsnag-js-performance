@@ -4,11 +4,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView, Text } from 'react-native'
 
-export const config = {
-    maximumBatchSize: 5,
-    autoInstrumentAppStarts: false,
-    appVersion: '1.2.3',
-    plugins: [new BugsnagPluginReactNavigationPerformance()]
+export const initialise = async (config) => {
+    config.maximumBatchSize = 5
+    config.plugins = [new BugsnagPluginReactNavigationPerformance()]
 }
 
 const Stack = createNativeStackNavigator()
