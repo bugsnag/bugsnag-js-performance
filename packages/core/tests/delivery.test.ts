@@ -65,7 +65,6 @@ describe('TracePayloadEncoder', () => {
                 spans: [
                   {
                     attributes: [],
-                    droppedAttributesCount: 0,
                     endTimeUnixNano: '2000000',
                     events: [],
                     kind: 1,
@@ -77,7 +76,6 @@ describe('TracePayloadEncoder', () => {
                   },
                   {
                     attributes: [],
-                    droppedAttributesCount: 0,
                     endTimeUnixNano: '4000000',
                     events: [],
                     kind: 1,
@@ -89,7 +87,6 @@ describe('TracePayloadEncoder', () => {
                   },
                   {
                     attributes: [],
-                    droppedAttributesCount: 0,
                     endTimeUnixNano: '6000000',
                     events: [],
                     kind: 1,
