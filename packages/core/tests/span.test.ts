@@ -393,7 +393,7 @@ describe('Span', () => {
         startTimeUnixNano: '1000000',
         endTimeUnixNano: '3000000',
         attributes: expect.any(Object),
-        dropped_attributes_count: 0,
+        droppedAttributesCount: 0,
         events: expect.any(Array)
       })
     })
@@ -413,7 +413,7 @@ describe('Span', () => {
         spanId: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         attributes: expect.any(Object),
-        dropped_attributes_count: 0,
+        droppedAttributesCount: 0,
         events: expect.any(Array),
         kind: Kind.Client,
         name: 'test span',
@@ -438,7 +438,7 @@ describe('Span', () => {
         spanId: 'a random 64 bit string',
         traceId: 'a random 128 bit string',
         attributes: expect.any(Object),
-        dropped_attributes_count: 0,
+        droppedAttributesCount: 0,
         events: expect.any(Array),
         kind: Kind.Client,
         name: 'test span',
@@ -767,7 +767,7 @@ describe('Span', () => {
         startTimeUnixNano: '1000000',
         endTimeUnixNano: '1234000000',
         attributes: expect.any(Object),
-        dropped_attributes_count: 0
+        droppedAttributesCount: 0
       })
 
       expect(delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0].attributes).toContainEqual({ key: 'test', value: { stringValue: 'value' } })

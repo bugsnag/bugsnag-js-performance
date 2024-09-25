@@ -57,7 +57,7 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
     spanId: span.id,
     traceId: span.traceId,
     parentSpanId: span.parentSpanId,
-    dropped_attributes_count: span.attributes.droppedAttributesCount,
+    droppedAttributesCount: span.attributes.droppedAttributesCount,
     startTimeUnixNano: clock.toUnixTimestampNanoseconds(span.startTime),
     endTimeUnixNano: clock.toUnixTimestampNanoseconds(span.endTime),
     attributes: span.attributes.toJson(),
