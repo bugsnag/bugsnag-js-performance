@@ -7,7 +7,8 @@ const endpoint = parameters.get('endpoint')
 BugsnagPerformance.start({ 
   apiKey, 
   endpoint, 
-  maximumBatchSize: 1, 
+  maximumBatchSize: 1,
+  attributeCountLimit: 10,
   autoInstrumentFullPageLoads: false,
   autoInstrumentNetworkRequests: false,
   autoInstrumentRouteChanges: false,
@@ -25,5 +26,6 @@ span.setAttribute('custom.array.string', ['one', 'two', 'three'])
 span.setAttribute('custom.array.int', [1, 2, 3])
 span.setAttribute('custom.array.double', [1.1, 2.2, 3.3])
 span.setAttribute('custom.array.bool', [true, false, true])
+span.setAttribute('custom.array.dropped', 'too many attributes')
 
 span.end()  

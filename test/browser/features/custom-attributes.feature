@@ -32,3 +32,5 @@ Feature: Custom attributes
             | true   |
             | false  |
             | true   |
+
+        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.droppedAttributesCount" equals "1"
