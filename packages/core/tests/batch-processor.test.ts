@@ -11,6 +11,7 @@ import {
   createConfiguration,
   createEndedSpan
 } from '@bugsnag/js-performance-test-utilities'
+import type { Span } from '../lib/span'
 
 jest.useFakeTimers()
 
@@ -319,5 +320,48 @@ describe('BatchProcessor', () => {
     }))
 
     expect(delivery.requests).toHaveLength(0)
+  })
+
+  it('handles onSpanEnd callbacks before adding to the batch', async () => {
+    const delivery = new InMemoryDelivery()
+    const clock = new IncrementingClock('1970-01-01T00:00:00Z')
+    const retryQueue = { add: jest.fn(), flush: jest.fn() }
+    const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
+
+    const onSpanEnd = [
+      (span: Span) => Promise.resolve(span.id !== 'discard-this-span'),
+      (span: Span) => { span.setAttribute('callback.error', 'this callback threw an error'); throw new Error('please discard me') },
+      (span: Span) => new Promise<boolean>((resolve) => {
+        setTimeout(() => {
+          span.setAttribute('callback.promise.true', 'this callback returned a promise')
+          resolve(true)
+        }, 1)
+      }),
+      (span: Span) => { span.setAttribute('callback.true', 'this callback returned true'); return true }
+    ]
+
+    const batchProcessor = new BatchProcessor(
+      delivery,
+      createConfiguration({ logger, onSpanEnd }),
+      retryQueue,
+      new Sampler(1.0),
+      minimalProbabilityManager,
+      new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
+    )
+
+    batchProcessor.add(createEndedSpan())
+    batchProcessor.add(createEndedSpan({ id: 'discard-this-span' }))
+    batchProcessor.flush()
+
+    await jest.runOnlyPendingTimersAsync()
+
+    expect(delivery.requests).toHaveLength(1)
+    expect(logger.error).toHaveBeenCalledTimes(1) // second span should be discarded before running the second callback, so no error is logged
+
+    const firstSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
+    expect(firstSpan).toHaveAttribute('callback.true', 'this callback returned true')
+    expect(firstSpan).toHaveAttribute('callback.error', 'this callback threw an error')
+    expect(firstSpan).toHaveAttribute('callback.promise.true', 'this callback returned a promise')
+    expect(firstSpan).toHaveAttribute('bugsnag.span.callbacks_duration', 1000000)
   })
 })

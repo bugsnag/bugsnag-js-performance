@@ -23,6 +23,7 @@ export default function makePayloadCreator (): PayloadCreator {
                   startTimeUnixNano: span.startTimeUnixNano || '123',
                   endTimeUnixNano: span.endTimeUnixNano || '456',
                   attributes: span.attributes || [],
+                  ...(span.droppedAttributesCount && span.droppedAttributesCount > 0 ? { droppedAttributesCount: span.droppedAttributesCount } : {}),
                   events: span.events || []
                 }))
               }

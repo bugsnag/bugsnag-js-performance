@@ -10,6 +10,7 @@ import { isBoolean, isSpanContext, isTime } from './validation'
 const HOUR_IN_MILLISECONDS = 60 * 60 * 1000
 
 export interface Span extends SpanContext {
+  readonly name: string
   end: (endTime?: Time) => void
   setAttribute: (name: string, value: SpanAttribute) => void
 }
@@ -57,10 +58,31 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
     spanId: span.id,
     traceId: span.traceId,
     parentSpanId: span.parentSpanId,
+    ...(span.attributes.droppedAttributesCount > 0 ? { droppedAttributesCount: span.attributes.droppedAttributesCount } : {}),
     startTimeUnixNano: clock.toUnixTimestampNanoseconds(span.startTime),
     endTimeUnixNano: clock.toUnixTimestampNanoseconds(span.endTime),
     attributes: span.attributes.toJson(),
     events: span.events.toJson(clock)
+  }
+}
+
+export function spanEndedToSpan (span: SpanEnded): Span {
+  return {
+    get id () {
+      return span.id
+    },
+    get traceId () {
+      return span.traceId
+    },
+    get samplingRate () {
+      return span.samplingRate
+    },
+    get name () {
+      return span.name
+    },
+    isValid: () => false,
+    end: () => {}, // no-op
+    setAttribute: (name, value) => { span.attributes.setCustom(name, value) }
   }
 }
 
@@ -94,6 +116,10 @@ export class SpanInternal implements SpanContext {
 
   setAttribute (name: string, value: SpanAttribute) {
     this.attributes.set(name, value)
+  }
+
+  setCustomAttribute (name: string, value: SpanAttribute) {
+    this.attributes.setCustom(name, value)
   }
 
   end (endTime: number, samplingProbability: SpanProbability): SpanEnded {

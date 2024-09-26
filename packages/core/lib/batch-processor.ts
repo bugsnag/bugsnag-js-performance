@@ -4,7 +4,13 @@ import type ProbabilityManager from './probability-manager'
 import type { Processor } from './processor'
 import type { RetryQueue } from './retry-queue'
 import type { ReadonlySampler } from './sampler'
-import type { SpanEnded } from './span'
+import type { Span, SpanEnded } from './span'
+
+import { millisecondsToNanoseconds } from './clock'
+import { spanEndedToSpan } from './span'
+
+export type OnSpanEndCallback = (span: Span) => boolean | Promise<boolean>
+export type OnSpanEndCallbacks = OnSpanEndCallback[]
 
 type MinimalProbabilityManager = Pick<ProbabilityManager, 'setProbability' | 'ensureFreshProbability'>
 
@@ -108,6 +114,37 @@ export class BatchProcessor<C extends Configuration> implements Processor {
     await this.flushQueue
   }
 
+  private async runCallbacks (span: Span): Promise<boolean> {
+    if (this.configuration.onSpanEnd) {
+      const callbackStartTime = performance.now()
+      let continueToBatch = true
+      for (const callback of this.configuration.onSpanEnd) {
+        try {
+          let result = callback(span)
+
+          // @ts-expect-error result may or may not be a promise
+          if (typeof result.then === 'function') {
+            result = await result
+          }
+
+          if (result === false) {
+            continueToBatch = false
+            break
+          }
+        } catch (err) {
+          this.configuration.logger.error('Error in onSpanEnd callback: ' + err)
+        }
+      }
+      if (continueToBatch) {
+        const duration = millisecondsToNanoseconds(performance.now() - callbackStartTime)
+        span.setAttribute('bugsnag.span.callbacks_duration', duration)
+      }
+      return continueToBatch
+    } else {
+      return true
+    }
+  }
+
   private async prepareBatch (): Promise<SpanEnded[] | undefined> {
     if (this.spans.length === 0) {
       return
@@ -126,7 +163,10 @@ export class BatchProcessor<C extends Configuration> implements Processor {
       }
 
       if (this.sampler.sample(span)) {
-        batch.push(span)
+        // Run any callbacks that have been registered before batching
+        // as callbacks could cause the span to be discarded
+        const shouldAddToBatch = await this.runCallbacks(spanEndedToSpan(span))
+        if (shouldAddToBatch) batch.push(span)
       }
     }
 

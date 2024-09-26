@@ -16,7 +16,8 @@ function createResourceAttributesSource (
       config.appVersion,
       config.serviceName,
       'bugsnag.performance.browser',
-      '__VERSION__'
+      '__VERSION__',
+      config.logger
     )
 
     attributes.set('browser.user_agent', navigator.userAgent)

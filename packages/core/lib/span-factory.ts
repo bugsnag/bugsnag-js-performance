@@ -1,14 +1,15 @@
+import type { SpanAttribute, SpanAttributesLimits, SpanAttributesSource } from './attributes'
 import { SpanAttributes } from './attributes'
-import type { SpanAttribute, SpanAttributesSource } from './attributes'
 import type { BackgroundingListener, BackgroundingListenerState } from './backgrounding-listener'
 import type { Clock } from './clock'
-import type { Configuration, Logger } from './config'
+import type { Configuration, InternalConfiguration, Logger } from './config'
+import { defaultSpanAttributeLimits } from './custom-attribute-limits'
 import type { IdGenerator } from './id-generator'
 import type { NetworkSpanOptions } from './network-span'
 import type { Processor } from './processor'
 import type { ReadonlySampler } from './sampler'
-import { SpanInternal, coreSpanOptionSchema } from './span'
 import type { InternalSpanOptions, Span, SpanOptionSchema, SpanOptions } from './span'
+import { SpanInternal, coreSpanOptionSchema } from './span'
 import type { SpanContextStorage } from './span-context'
 import { timeToNumber } from './time'
 import { isObject, isParentContext } from './validation'
@@ -23,6 +24,7 @@ export class SpanFactory <C extends Configuration> {
   private readonly clock: Clock
   private readonly spanContextStorage: SpanContextStorage
   private logger: Logger
+  private spanAttributeLimits: SpanAttributesLimits = defaultSpanAttributeLimits
 
   private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
   private isInForeground: boolean = true
@@ -70,7 +72,7 @@ export class SpanFactory <C extends Configuration> {
     const parentSpanId = parentContext ? parentContext.id : undefined
     const traceId = parentContext ? parentContext.traceId : this.idGenerator.generate(128)
 
-    const attributes = new SpanAttributes(new Map())
+    const attributes = new SpanAttributes(new Map(), this.spanAttributeLimits, name, this.logger)
 
     if (typeof options.isFirstClass === 'boolean') {
       attributes.set('bugsnag.span.first_class', options.isFirstClass)
@@ -102,9 +104,14 @@ export class SpanFactory <C extends Configuration> {
     return spanInternal
   }
 
-  configure (processor: Processor, logger: Logger) {
+  configure (processor: Processor, configuration: InternalConfiguration<C>) {
     this.processor = processor
-    this.logger = logger
+    this.logger = configuration.logger
+    this.spanAttributeLimits = {
+      attributeArrayLengthLimit: configuration.attributeArrayLengthLimit,
+      attributeCountLimit: configuration.attributeCountLimit,
+      attributeStringValueLimit: configuration.attributeStringValueLimit
+    }
   }
 
   endSpan (
@@ -158,13 +165,12 @@ export class SpanFactory <C extends Configuration> {
       get samplingRate () {
         return span.samplingRate
       },
+      get name () {
+        return span.name
+      },
       isValid: () => span.isValid(),
       setAttribute: (name, value) => {
-        if (typeof name !== 'string') {
-          this.logger.warn(`Invalid attribute name, expected string, got ${typeof name}`)
-        } else {
-          span.setAttribute(name, value)
-        }
+        span.setCustomAttribute(name, value)
       },
       end: (endTime) => {
         const safeEndTime = timeToNumber(this.clock, endTime)
