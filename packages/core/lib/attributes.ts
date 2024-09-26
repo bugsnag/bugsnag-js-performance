@@ -116,7 +116,7 @@ export class SpanAttributes {
 }
 
 export class ResourceAttributes extends SpanAttributes {
-  constructor (releaseStage: string, appVersion: string, serviceName: string, sdkName: string, sdkVersion: string) {
+  constructor (releaseStage: string, appVersion: string, serviceName: string, sdkName: string, sdkVersion: string, logger: Logger) {
     const initialValues = new Map([
       ['deployment.environment', releaseStage],
       ['telemetry.sdk.name', sdkName],
@@ -128,7 +128,9 @@ export class ResourceAttributes extends SpanAttributes {
       initialValues.set('service.version', appVersion)
     }
 
-    super(initialValues, defaultResourceAttributeLimits, 'resource-attributes', console)
+    // TODO: this class should be refactored to use a common base class instead of SpanAttributes
+    // since we don't need a span name and logger for resource attributes - see PLAT-12820
+    super(initialValues, defaultResourceAttributeLimits, 'resource-attributes', logger)
   }
 }
 

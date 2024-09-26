@@ -15,7 +15,8 @@ export default function resourceAttributesSourceFactory (persistence: Persistenc
       config.appVersion,
       deviceInfo?.bundleIdentifier || 'unknown_service',
       'bugsnag.performance.reactnative',
-      '__VERSION__'
+      '__VERSION__',
+      config.logger
     )
 
     attributes.set('os.type', Platform.select({ android: 'linux', ios: 'darwin', default: 'unknown' }))
