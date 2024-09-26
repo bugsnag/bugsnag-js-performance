@@ -58,6 +58,7 @@ export function spanToJson (span: SpanEnded, clock: Clock): DeliverySpan {
     spanId: span.id,
     traceId: span.traceId,
     parentSpanId: span.parentSpanId,
+    ...(span.attributes.droppedAttributesCount > 0 ? { droppedAttributesCount: span.attributes.droppedAttributesCount } : {}),
     startTimeUnixNano: clock.toUnixTimestampNanoseconds(span.startTime),
     endTimeUnixNano: clock.toUnixTimestampNanoseconds(span.endTime),
     attributes: span.attributes.toJson(),
@@ -81,7 +82,7 @@ export function spanEndedToSpan (span: SpanEnded): Span {
     },
     isValid: () => false,
     end: () => {}, // no-op
-    setAttribute: (name, value) => { span.attributes.set(name, value) }
+    setAttribute: (name, value) => { span.attributes.setCustom(name, value) }
   }
 }
 
@@ -115,6 +116,10 @@ export class SpanInternal implements SpanContext {
 
   setAttribute (name: string, value: SpanAttribute) {
     this.attributes.set(name, value)
+  }
+
+  setCustomAttribute (name: string, value: SpanAttribute) {
+    this.attributes.setCustom(name, value)
   }
 
   end (endTime: number, samplingProbability: SpanProbability): SpanEnded {

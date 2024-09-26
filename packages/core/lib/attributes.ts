@@ -75,12 +75,19 @@ export class SpanAttributes {
 
     if (Array.isArray(value) && value.length > this.spanAttributeLimits.attributeArrayLengthLimit) {
       const truncatedValue = value.slice(0, this.spanAttributeLimits.attributeArrayLengthLimit)
-      this.set(name, truncatedValue)
+      this.attributes.set(name, truncatedValue)
       this.logger.warn(`Span attribute ${name} in span ${this.spanName} was truncated as the array exceeds the ${this.spanAttributeLimits.attributeArrayLengthLimit} element limit set by attributeArrayLengthLimit.`)
     }
   }
 
   set (name: string, value: SpanAttribute) {
+    if (typeof name === 'string' && (typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value))) {
+      this.attributes.set(name, value)
+    }
+  }
+
+  // Used by the public API to set custom attributes
+  setCustom (name: string, value: SpanAttribute) {
     if (typeof name === 'string' && (typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value))) {
       if (!this.attributes.has(name) && this.attributes.size >= this.spanAttributeLimits.attributeCountLimit) {
         this._droppedAttributesCount++

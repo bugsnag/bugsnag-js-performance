@@ -32,3 +32,10 @@ Feature: Custom attributes
             | true   |
             | false  |
             | true   |
+
+        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.droppedAttributesCount" equals 1
+
+        # These attributes exceed the limit, but should not be dropped as they are set by us
+        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" double attribute "bugsnag.sampling.p" equals 1.0
+        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.browser.page.title" equals "custom-attributes"
+        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.browser.page.url" equals the stored value "bugsnag.browser.page.url"
