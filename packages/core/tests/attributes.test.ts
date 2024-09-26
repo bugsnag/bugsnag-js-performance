@@ -109,7 +109,7 @@ describe('attribute validation', () => {
 
   it('prevents adding an attribute with a key that exceeds the limit', () => {
     const attributeKey = 'a'.repeat(256)
-    attributes.set(attributeKey, 'value')
+    attributes.setCustom(attributeKey, 'value')
     expect(attributes.toJson()).toStrictEqual([])
     expect(jestLogger.warn).toHaveBeenCalledWith(`Span attribute ${attributeKey} in span test.span was dropped as the key length exceeds the 128 character fixed limit.`)
     expect(attributes.droppedAttributesCount).toBe(1)
@@ -117,14 +117,14 @@ describe('attribute validation', () => {
 
   it('truncates an attribute with a string value that exceeds the limit', () => {
     const attributeValue = 'a'.repeat(256)
-    attributes.set('test.string', attributeValue)
+    attributes.setCustom('test.string', attributeValue)
     expect(attributes.toJson()).toStrictEqual([{ key: 'test.string', value: { stringValue: 'a'.repeat(20) + ' *** 236 CHARS TRUNCATED' } }])
     expect(jestLogger.warn).toHaveBeenCalledWith('Span attribute test.string in span test.span was truncated as the string exceeds the 20 character limit set by attributeStringValueLimit.')
     expect(attributes.droppedAttributesCount).toBe(0)
   })
 
   it('prevents adding an attribute with an array value that exceeds the limit', () => {
-    attributes.set('test.array', Array.from({ length: 10 }, (_, i) => i))
+    attributes.setCustom('test.array', Array.from({ length: 10 }, (_, i) => i))
     expect(attributes.toJson()).toStrictEqual([{
       key: 'test.array',
       value: { arrayValue: { values: Array.from({ length: 5 }, (_, i) => ({ intValue: i.toString() })) } }
@@ -134,14 +134,14 @@ describe('attribute validation', () => {
   })
 
   it('prevents adding an attribute when the count limit is reached', () => {
-    attributes.set('test.1', 'value')
-    attributes.set('test.2', 'value')
-    attributes.set('test.3', 'value')
-    attributes.set('test.4', 'value')
-    attributes.set('test.5', 'value')
+    attributes.setCustom('test.1', 'value')
+    attributes.setCustom('test.2', 'value')
+    attributes.setCustom('test.3', 'value')
+    attributes.setCustom('test.4', 'value')
+    attributes.setCustom('test.5', 'value')
 
     // New attribute should be discarded
-    attributes.set('test.6', 'value')
+    attributes.setCustom('test.6', 'value')
     expect(jestLogger.warn).toHaveBeenCalledWith('Span attribute test.6 in span test.span was dropped as the number of attributes exceeds the 5 attribute limit set by attributeCountLimit.')
     expect(jestLogger.warn).toHaveBeenCalledTimes(1)
     expect(attributes.droppedAttributesCount).toBe(1)
@@ -154,7 +154,7 @@ describe('attribute validation', () => {
     ])
 
     // Existing attribute can be updated when at the attribute limit
-    attributes.set('test.5', 'new-value')
+    attributes.setCustom('test.5', 'new-value')
     expect(jestLogger.warn).toHaveBeenCalledTimes(1)
     expect(jestLogger.warn).not.toHaveBeenCalledWith('Span attribute test.5 in span test.span was dropped as the number of attributes exceeds the 5 attribute limit set by attributeCountLimit.')
     expect(attributes.droppedAttributesCount).toBe(1)
@@ -168,7 +168,7 @@ describe('attribute validation', () => {
 
     // New attributes can be added after removing an existing attribute
     attributes.remove('test.5')
-    attributes.set('test.7', 'value')
+    attributes.setCustom('test.7', 'value')
     expect(jestLogger.warn).toHaveBeenCalledTimes(1)
     expect(attributes.droppedAttributesCount).toBe(1)
     expect(attributes.toJson()).toStrictEqual([

@@ -72,7 +72,7 @@ export function spanEndedToSpan (span: SpanEnded): Span {
     samplingRate: span.samplingRate,
     isValid: () => false,
     end: () => {}, // no-op
-    setAttribute: (name, value) => { span.attributes.set(name, value) }
+    setAttribute: (name, value) => { span.attributes.setCustom(name, value) }
   }
 }
 
@@ -106,6 +106,10 @@ export class SpanInternal implements SpanContext {
 
   setAttribute (name: string, value: SpanAttribute) {
     this.attributes.set(name, value)
+  }
+
+  setCustomAttribute (name: string, value: SpanAttribute) {
+    this.attributes.setCustom(name, value)
   }
 
   end (endTime: number, samplingProbability: SpanProbability): SpanEnded {
