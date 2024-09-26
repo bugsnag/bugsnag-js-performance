@@ -1,6 +1,6 @@
 {
     "name": "@bugsnag/plugin-react-navigation-performance",
-    "version": "2.9.1",
+    "version": "2.10.0",
     "description": "BugSnag performance monitoring for @react-navigation/native",
     "homepage": "https://www.bugsnag.com/",
     "license": "MIT",
@@ -19,8 +19,8 @@
         "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
     },
     "devDependencies": {
-        "@bugsnag/core-performance": "^2.9.1",
-        "@bugsnag/react-native-performance": "^2.9.1",
+        "@bugsnag/core-performance": "^2.10.0",
+        "@bugsnag/react-native-performance": "^2.10.0",
         "@react-native/babel-preset": "^0.74.0",
         "@react-navigation/native": "^6.1.9",
         "@react-navigation/native-stack": "^6.9.17",
