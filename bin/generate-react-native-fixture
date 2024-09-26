@@ -50,7 +50,7 @@ const PACKAGE_DIRECTORIES = [
 ]
 
 // make sure we install a compatible versions of peer dependencies
-const reactNativeFileAccessVersion = parseFloat(reactNativeVersion) <= 0.64 ? '1.7.1' : '3.1.0'
+const reactNativeFileAccessVersion = parseFloat(reactNativeVersion) <= 0.64 ? '1.7.1' : '3.1.1'
 const netinfoVersion = parseFloat(reactNativeVersion) <= 0.64 ? '10.0.0' : '11.3.2'
 const DEPENDENCIES = [
   `@bugsnag/react-native@${process.env.NOTIFIER_VERSION}`,
@@ -108,15 +108,6 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   // apply additional modifications required for RN 0.64
   if (parseFloat(reactNativeVersion) === 0.64) {
     configureRN064Fixture(fixtureDir)
-  }
-
-  // due to a bug in react-native-file-access, static frameworks is required on 0.75+ othwerwise iOS builds will fail.
-  // there is an open PR to fix this upstream: https://github.com/alpha0010/react-native-file-access/pull/88
-  // TODO: remove this when either the upstream PR is released or PLAT-12626 (replace react-native-file-access with our own File I/O) is implemented
-  if (parseFloat(reactNativeVersion) >= 0.75) {
-    let podfileContents = fs.readFileSync(`${fixtureDir}/ios/Podfile`, 'utf8')
-    podfileContents = podfileContents.replace(/target 'reactnative' do/, 'use_frameworks! :linkage => :static\ntarget \'reactnative\' do')
-    fs.writeFileSync(`${fixtureDir}/ios/Podfile`, podfileContents)
   }
 
   // link react-native-navigation using rnn-link tool

@@ -43,6 +43,7 @@ export interface DeliverySpan {
   parentSpanId?: string
   startTimeUnixNano: string
   endTimeUnixNano: string
+  droppedAttributesCount?: number
   attributes: Array<JsonAttribute | undefined>
   events: JsonEvent[]
 }

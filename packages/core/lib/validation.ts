@@ -1,3 +1,4 @@
+import type { OnSpanEndCallback } from './batch-processor'
 import type { Configuration, Logger } from './config'
 import type { PersistedProbability } from './persistence'
 import type { Plugin } from './plugin'
@@ -57,4 +58,8 @@ export function isPlugin (value: unknown): value is Plugin<unknown extends Confi
 
 export function isPluginArray (value: unknown): value is Array<Plugin<unknown extends Configuration ? unknown : Configuration>> {
   return Array.isArray(value) && value.every(plugin => isPlugin(plugin))
+}
+
+export function isOnSpanEndCallbacks (value: unknown): value is OnSpanEndCallback[] {
+  return Array.isArray(value) && value.every(method => typeof method === 'function')
 }

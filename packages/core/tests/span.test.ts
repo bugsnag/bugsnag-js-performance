@@ -7,19 +7,19 @@ import {
   StableIdGenerator,
   VALID_API_KEY,
   createSamplingProbability,
+  createSpanAttributes,
   createTestClient,
   spanAttributesSource
 } from '@bugsnag/js-performance-test-utilities'
+import type { SpanEnded } from '../lib'
 import {
+  DISCARD_END_TIME,
   InMemoryPersistence,
-  SpanAttributes,
   SpanFactory,
   SpanInternal,
-  spanToJson,
   spanContextEquals,
-  DISCARD_END_TIME
+  spanToJson
 } from '../lib'
-import type { SpanAttribute, SpanEnded } from '../lib'
 import Sampler from '../lib/sampler'
 
 jest.useFakeTimers()
@@ -115,7 +115,7 @@ describe('SpanInternal', () => {
         'trace id',
         'name',
         1234,
-        new SpanAttributes(new Map<string, SpanAttribute>()),
+        createSpanAttributes('name'),
         clock
       )
 
@@ -132,7 +132,7 @@ describe('SpanInternal', () => {
         'trace id',
         'name',
         1234,
-        new SpanAttributes(new Map<string, SpanAttribute>()),
+        createSpanAttributes('name'),
         clock
       )
 
@@ -151,6 +151,7 @@ describe('Span', () => {
       const client = createTestClient()
       const span = client.startSpan('test span')
       expect(span).toStrictEqual({
+        name: expect.any(String),
         id: expect.any(String),
         traceId: expect.any(String),
         end: expect.any(Function),
@@ -779,18 +780,16 @@ describe('Span', () => {
       { type: 'symbol', name: Symbol('test') }
     ]
 
-    it.each(invalidAttributeNames)('handles invalid attribute name ($type)', async ({ type, name }) => {
+    it.each(invalidAttributeNames)('handles invalid attribute name ($type)', async ({ name }) => {
       const delivery = new InMemoryDelivery()
       const client = createTestClient({ deliveryFactory: () => delivery })
-      client.start({ apiKey: VALID_API_KEY, logger: jestLogger })
+      client.start({ apiKey: VALID_API_KEY })
       await jest.runOnlyPendingTimersAsync()
 
       const span = client.startSpan('test span')
 
       // @ts-expect-error 'name' is the wrong type
       span.setAttribute(name, 'value')
-      expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid attribute name, expected string, got ${type}`)
-
       span.end()
       await jest.runOnlyPendingTimersAsync()
 
