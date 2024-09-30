@@ -4,6 +4,7 @@ const DEFAULT_RETRY_COUNT = 20
 const INTERVAL = 500
 
 let mazeAddress
+let lastCommandUuid
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -16,7 +17,8 @@ export async function getCurrentCommand (allowedRetries = DEFAULT_RETRY_COUNT) {
     mazeAddress = await getMazeRunnerAddress()
   }
 
-  const url = `http://${mazeAddress}/command`
+  const lastCommand = lastCommandUuid || ""
+  const url = `http://${mazeAddress}/command?after=${lastCommand}`
   console.error(`[BugsnagPerformance] Fetching command from ${url}`)
 
   let retries = 0
@@ -28,6 +30,7 @@ export async function getCurrentCommand (allowedRetries = DEFAULT_RETRY_COUNT) {
       console.error(`[BugsnagPerformance] Response from maze runner: ${text}`)
 
       const command = JSON.parse(text)
+      lastCommandUuid = command.uuid
 
       // keep polling until a scenario command is received
       if (command.action !== 'noop') {
