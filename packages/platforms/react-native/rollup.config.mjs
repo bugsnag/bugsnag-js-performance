@@ -19,6 +19,7 @@ function reactNativeSpecPlugin() {
 
 const config = createRollupConfig({
   external: [
+    '@bugsnag/create-navigation-span',
     '@bugsnag/cuid',
     '@bugsnag/delivery-fetch-performance',
     '@bugsnag/request-tracker-performance',

@@ -59,6 +59,11 @@ module.exports = {
       ...defaultModuleConfig
     },
     {
+      displayName: 'create-navigation-span',
+      testMatch: ['<rootDir>/packages/create-navigation-span/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
+    {
       displayName: 'vue-router',
       testMatch: ['<rootDir>/packages/vue-router/**/*.test.ts'],
       ...defaultModuleConfig

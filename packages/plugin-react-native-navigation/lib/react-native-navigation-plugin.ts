@@ -1,6 +1,7 @@
 import type { Plugin, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import type { NavigationDelegate } from 'react-native-navigation/lib/dist/src/NavigationDelegate'
+import createNavigationSpan from '@bugsnag/create-navigation-span'
 
 type Reason = 'immediate' | 'mount' | 'unmount' | 'condition'
 
@@ -82,13 +83,7 @@ class BugsnagPluginReactNativeNavigationPerformance implements Plugin<ReactNativ
         clearTimeout(this.startTimeout)
 
         const routeName = event.componentName
-        this.currentNavigationSpan = spanFactory.startSpan('[Navigation]' + routeName, {
-          startTime: this.startTime,
-          isFirstClass: true
-        })
-
-        this.currentNavigationSpan.setAttribute('bugsnag.span.category', 'navigation')
-        this.currentNavigationSpan.setAttribute('bugsnag.navigation.route', routeName)
+        this.currentNavigationSpan = createNavigationSpan(spanFactory, routeName, { startTime: this.startTime })
         this.currentNavigationSpan.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-native-navigation-performance')
 
         if (this.previousRoute) {

@@ -4,6 +4,7 @@ import jsx from 'acorn-jsx'
 
 const config = createRollupConfig({
   external: [
+    '@bugsnag/create-navigation-span',
     '@bugsnag/react-native-performance',
     'react-native-navigation',
     'react-native',

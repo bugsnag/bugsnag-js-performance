@@ -1,4 +1,5 @@
 import type { SpanFactory, SpanInternal } from '@bugsnag/core-performance'
+import createNavigationSpan from '@bugsnag/create-navigation-span'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import React from 'react'
 import type { PropsWithChildren } from 'react'
@@ -71,13 +72,7 @@ export class NavigationContextProvider extends React.Component<Props> {
         spanFactory.endSpan(this.currentSpan, DISCARDED)
       }
 
-      const span = spanFactory.startSpan(`[Navigation]${currentRoute}`, {
-        isFirstClass: true,
-        startTime: updateTime
-      })
-
-      span.setAttribute('bugsnag.span.category', 'navigation')
-      span.setAttribute('bugsnag.navigation.route', currentRoute)
+      const span = createNavigationSpan(spanFactory, currentRoute, { startTime: updateTime })
       span.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-navigation-performance')
 
       if (this.previousRoute) {

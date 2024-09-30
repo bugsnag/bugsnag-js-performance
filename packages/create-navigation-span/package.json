@@ -1,0 +1,11 @@
+{
+  "name": "@bugsnag/create-navigation-span",
+  "description": "Create a navigation span, nothing more, nothing less",
+  "private": true,
+  "license": "MIT",
+  "main": "lib/index.ts",
+  "files": [],
+  "dependencies": {
+    "@bugsnag/core-performance": "*"
+  }
+}
