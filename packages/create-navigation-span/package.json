@@ -1,7 +1,6 @@
 {
   "name": "@bugsnag/create-navigation-span",
-  "description": "Create a navigation span, nothing more, nothing less",
-  "private": true,
+  "description": "Shared logic for creating navigation spans in Bugsnag Performance",
   "version": "2.10.0",
   "license": "MIT",
   "type": "module",
