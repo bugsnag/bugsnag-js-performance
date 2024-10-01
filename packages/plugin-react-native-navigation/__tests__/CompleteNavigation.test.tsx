@@ -7,7 +7,6 @@ import { Navigation } from 'react-native-navigation'
 import { CompleteNavigation } from '../lib/CompleteNavigation'
 import ReactNativeNavigationPlugin from '../lib/react-native-navigation-plugin'
 
-jest.mock('@bugsnag/react-native-performance')
 jest.mock('react-native-navigation')
 
 beforeEach(() => {
