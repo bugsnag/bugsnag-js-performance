@@ -1,7 +1,8 @@
 import type { Plugin, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import type { NavigationDelegate } from 'react-native-navigation/lib/dist/src/NavigationDelegate'
-import createNavigationSpan from '@bugsnag/create-navigation-span'
+
+import { createNavigationSpan } from '@bugsnag/react-native-performance'
 
 type Reason = 'immediate' | 'mount' | 'unmount' | 'condition'
 

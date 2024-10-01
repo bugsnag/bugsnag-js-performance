@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@bugsnag/core-performance": "^2.10.0",
-    "@bugsnag/create-navigation-span": "^2.10.0",
     "@bugsnag/cuid": "^3.1.1",
     "@bugsnag/delivery-fetch-performance": "^2.10.0",
     "@bugsnag/request-tracker-performance": "^2.10.0"

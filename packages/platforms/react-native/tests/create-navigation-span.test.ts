@@ -1,5 +1,5 @@
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
-import createNavigationSpan from '../lib'
+import { createNavigationSpan } from '../lib/create-navigation-span'
 
 describe('createNavigationSpan', () => {
   it('sets the span name to the route prefixed with [Navigation]', () => {

@@ -18,9 +18,6 @@
     "bugs": {
         "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
     },
-    "dependencies": {
-        "@bugsnag/create-navigation-span": "^2.10.0"
-    },
     "peerDependencies": {
         "@bugsnag/core-performance": "*",
         "@bugsnag/react-native-performance": "*",

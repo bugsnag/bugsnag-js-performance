@@ -2,7 +2,7 @@ import type { Clock, SpanContextStorage, SpanFactory, SpanOptions } from '@bugsn
 import React from 'react'
 import type { ReactNativeConfiguration } from './config'
 import { createAppStartSpan } from './create-app-start-span'
-import createNavigationSpan from '@bugsnag/create-navigation-span'
+import { createNavigationSpan } from './create-navigation-span'
 
 type NavigationSpanOptions = Omit<SpanOptions, 'isFirstClass'>
 
