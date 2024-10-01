@@ -2,6 +2,7 @@
   "name": "@bugsnag/create-navigation-span",
   "description": "Create a navigation span, nothing more, nothing less",
   "private": true,
+  "version": "2.10.0",
   "license": "MIT",
   "main": "lib/index.ts",
   "files": [],
