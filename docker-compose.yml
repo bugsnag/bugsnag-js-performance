@@ -18,6 +18,7 @@ x-common-environment: &common-environment
   MAZE_ASPECTO_REPEATER_API_KEY:
   MAZE_BUGSNAG_API_KEY:
   MAZE_REPEATER_API_KEY:
+  MAZE_NO_FAIL_FAST:
 
 services:
   license-finder:
@@ -52,6 +53,7 @@ services:
     volumes:
       - ./test/browser/maze_output:/app/test/browser/maze_output
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./reports/:/app/test/browser/reports/
 
   browser-maze-runner-bs:
     build:
@@ -74,6 +76,7 @@ services:
           - maze-runner
     volumes:
       - ./test/browser/maze_output:/app/test/browser/maze_output
+      - ./reports/:/app/test/browser/reports/
 
   browser-maze-runner-legacy:
     build:
@@ -95,6 +98,7 @@ services:
           - maze-runner
     volumes:
       - ./test/browser/maze_output:/app/test/browser/maze_output
+      - ./reports/:/app/test/browser/reports/
 
   react-native-maze-runner:
     image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v9-cli

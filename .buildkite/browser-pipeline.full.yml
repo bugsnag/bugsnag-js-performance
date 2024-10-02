@@ -34,6 +34,11 @@ steps:
       artifacts#v1.5.0:
         upload:
           - "./test/browser/maze_output/failed/**/*"
+      test-collector#v1.10.2:
+        files: "reports/TEST-*.xml"
+        format: "junit"
+        branch: "^main|next$$"
+        api-token-env-name: "BROWSER_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
     concurrency: 2
     concurrency_group: "browserstack"
 
