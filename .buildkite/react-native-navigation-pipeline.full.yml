@@ -140,6 +140,11 @@ steps:
               - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
+          test-collector#v1.10.2:
+            files: "reports/TEST-*.xml"
+            format: "junit"
+            branch: "^main|next$$"
+            api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         retry:
           manual:
             permit_on_passed: true
@@ -177,6 +182,11 @@ steps:
               - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
+          test-collector#v1.10.2:
+            files: "reports/TEST-*.xml"
+            format: "junit"
+            branch: "^main|next$$"
+            api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         retry:
           manual:
             permit_on_passed: true
@@ -215,6 +225,11 @@ steps:
               - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
+          test-collector#v1.10.2:
+            files: "reports/TEST-*.xml"
+            format: "junit"
+            branch: "^main|next$$"
+            api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         retry:
           manual:
             permit_on_passed: true
@@ -252,6 +267,11 @@ steps:
               - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
+          test-collector#v1.10.2:
+            files: "reports/TEST-*.xml"
+            format: "junit"
+            branch: "^main|next$$"
+            api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         retry:
           manual:
             permit_on_passed: true
