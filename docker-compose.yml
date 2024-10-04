@@ -40,8 +40,6 @@ services:
       BITBAR_ACCESS_KEY:
       HOST: "${HOST:-maze-runner}"
       API_HOST: "${API_HOST:-maze-runner}"
-    env_file:
-      - ${DOCKER_ENV_FILE:-test/browser/features/fixtures/null_env}
     networks:
       default:
         aliases:
@@ -66,8 +64,6 @@ services:
       BROWSER_STACK_ACCESS_KEY:
       HOST: "${HOST:-maze-runner}"
       API_HOST: "${API_HOST:-maze-runner}"
-    env_file:
-      - ${DOCKER_ENV_FILE:-test/browser/features/fixtures/null_env}
     networks:
       default:
         aliases:
@@ -87,8 +83,6 @@ services:
       BROWSER_STACK_USERNAME:
       BROWSER_STACK_ACCESS_KEY:
       USE_LEGACY_DRIVER: 1
-    env_file:
-      - ${DOCKER_ENV_FILE:-test/browser/features/fixtures/null_env}
     networks:
       default:
         aliases:
