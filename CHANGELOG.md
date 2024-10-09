@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- (browser) Update Span and Trace ID generator code to allow for modified `Array.from` API [#518](https://github.com/bugsnag/bugsnag-js-performance/pull/518)
+
 ## [v2.10.0] (2024-09-26)
 
 ### Added
