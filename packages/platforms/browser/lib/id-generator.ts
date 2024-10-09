@@ -19,7 +19,7 @@ const idGenerator: IdGenerator = {
     //       how can we pass this in given it needs to be valid before 'start' is called?
     const randomValues = window.crypto.getRandomValues(bytes)
 
-    return Array.from(randomValues, toHex).join('')
+    return Array.from(randomValues).map(toHex).join('')
   }
 }
 
