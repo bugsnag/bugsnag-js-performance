@@ -2,6 +2,10 @@
 #import "Bugsnag.h"
 #import "ScenarioLauncher.h"
 
+#ifdef NATIVE_INTEGRATION
+#import <BugsnagPerformance/BugsnagPerformance.h>
+#endif
+
 @implementation ScenarioLauncher
 
 RCT_EXPORT_MODULE()
@@ -103,6 +107,32 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(exitApp) {
 
   return nil;
 }
+
+#ifdef NATIVE_INTEGRATION
+RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  NSLog(@"Starting Cocoa Performance with configuration: %@\n", configuration);
+
+  NSString *apiKey = configuration[@"apiKey"];
+  NSString *endpoint = configuration[@"endpoint"];
+
+  dispatch_async(dispatch_get_main_queue(), ^{
+    BugsnagPerformanceConfiguration *config = [BugsnagPerformanceConfiguration loadConfig];
+    config.apiKey = apiKey;
+    config.endpoint = [[NSURL alloc] initWithString: endpoint];
+    [BugsnagPerformance startWithConfiguration:config];
+
+    BugsnagPerformanceSpan *span = [BugsnagPerformance startSpanWithName:@"NativeIntegration"];
+    [span end];
+  });
+    
+    resolve(nil);
+}
+#else
+RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  NSLog(@"Native performance is not enabled in this build");
+  resolve(nil);
+}
+#endif
 
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:

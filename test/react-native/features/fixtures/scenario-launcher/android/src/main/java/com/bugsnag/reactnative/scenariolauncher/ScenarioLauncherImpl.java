@@ -3,10 +3,16 @@ package com.bugsnag.reactnative.scenariolauncher;
 import android.util.Log;
 import android.content.Context;
 import android.content.SharedPreferences;
+
 import com.bugsnag.android.Bugsnag;
 import com.bugsnag.android.Configuration;
 import com.bugsnag.android.EndpointConfiguration;
 import com.bugsnag.android.Logger;
+
+import com.bugsnag.android.performance.BugsnagPerformance;
+import com.bugsnag.android.performance.PerformanceConfiguration;
+import com.bugsnag.android.performance.Span;
+
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -146,5 +152,22 @@ class ScenarioLauncherImpl {
 
   public void exitApp() {
     System.exit(0);
+  }
+
+  public void startNativePerformance(ReadableMap configuration, Promise promise) {
+    try {
+        PerformanceConfiguration config = PerformanceConfiguration.load(reactContext);
+        config.setApiKey(configuration.getString("apiKey"));
+        config.setEndpoint(configuration.getString("endpoint"));
+        BugsnagPerformance.start(config);
+        Log.d(MODULE_NAME, "Started Android performance");
+    
+        Span span = BugsnagPerformance.startSpan("NativeIntegration");
+        span.end();
+    } catch (Exception e) {
+        Log.d(MODULE_NAME, "Failed to start Android performance", e);
+    }
+
+    promise.resolve(true);
   }
 }
