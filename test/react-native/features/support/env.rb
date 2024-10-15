@@ -24,3 +24,7 @@ end
 Before('@skip_react_native_navigation') do |scenario|
   skip_this_scenario("Skipping scenario") if ENV["REACT_NATIVE_NAVIGATION"]
 end
+
+Before('@native_integration') do |scenario|
+  skip_this_scenario("Skipping scenario: Not running native integration fixture") unless ENV["NATIVE_INTEGRATION"]
+end

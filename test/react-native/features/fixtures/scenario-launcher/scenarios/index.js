@@ -18,3 +18,6 @@ export * as ReactNativeNavigationScenario from './ReactNativeNavigationScenario'
 
 // React Navigation Scenarios
 export * as ReactNavigationScenario from './ReactNavigationScenario'
+
+// Native Integration Scenarios
+export * as NativeIntegrationScenario from './NativeIntegrationScenario'
