@@ -21,4 +21,8 @@ Pod::Spec.new do |s|
   else
     s.dependency "React-Core"
   end
+
+  if ENV["NATIVE_INTEGRATION"] == "1"
+    s.compiler_flags = "$(inherited)", "-DNATIVE_INTEGRATION=1"
+  end
 end

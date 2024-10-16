@@ -22,6 +22,11 @@ let fixturePath = 'test/react-native/features/fixtures/generated/'
 if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
   fixturePath += 'react-native-navigation/'
 }
+
+if (process.env.NATIVE_INTEGRATION) {
+  fixturePath += 'native-integration/'
+}
+
 if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
   fixturePath += 'new-arch/'
 } else {
@@ -108,6 +113,11 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   // apply additional modifications required for RN 0.64
   if (parseFloat(reactNativeVersion) === 0.64) {
     configureRN064Fixture(fixtureDir)
+  }
+
+  if (process.env.NATIVE_INTEGRATION === '1') {
+    installAndroidPerformance()
+    installCocoaPerformance()
   }
 
   // link react-native-navigation using rnn-link tool
@@ -302,4 +312,28 @@ function replaceGeneratedFixtureFiles() {
       resolve(fixtureDir, `android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${fileExtension}`)
     )
   }
+}
+
+function installAndroidPerformance() {
+  // add 'implementation "com.bugsnag:bugsnag-android-performance:1.+"' to the dependencies section in the app/build.gradle file
+  const appGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
+  let appGradle = fs.readFileSync(appGradlePath, 'utf8')
+
+  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:1.+")'
+  const dependenciesSection = 'dependencies {'
+
+  appGradle = appGradle.replace(dependenciesSection, `${dependenciesSection}\n    ${performanceDependency}`)
+  fs.writeFileSync(appGradlePath, appGradle)
+}
+
+function installCocoaPerformance() {
+  // add 'pod "BugsnagPerformance"' to the Podfile
+  const podfilePath = resolve(fixtureDir, 'ios/Podfile')
+  let podfile = fs.readFileSync(podfilePath, 'utf8')
+
+  const performancePod = `pod 'BugsnagPerformance'`
+  const targetSection = 'target \'reactnative\' do'
+
+  podfile = podfile.replace(targetSection, `${targetSection}\n  ${performancePod}`)
+  fs.writeFileSync(podfilePath, podfile)
 }

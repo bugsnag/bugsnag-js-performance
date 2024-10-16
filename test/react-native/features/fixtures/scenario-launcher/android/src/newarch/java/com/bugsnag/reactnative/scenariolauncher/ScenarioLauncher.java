@@ -45,5 +45,10 @@ public class ScenarioLauncher extends NativeScenarioLauncherSpec {
   public void exitApp() {
     impl.exitApp();
   }
+
+  @Override
+  public void startNativePerformance(ReadableMap configuration, Promise promise) {
+    impl.startNativePerformance(configuration, promise);
+  }
 }
 

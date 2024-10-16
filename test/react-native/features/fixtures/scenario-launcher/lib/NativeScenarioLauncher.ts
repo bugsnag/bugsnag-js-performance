@@ -7,6 +7,7 @@ export interface Spec extends TurboModule {
   saveStartupConfig(config: UnsafeObject): void;
   readStartupConfig(): UnsafeObject | null | undefined;
   exitApp(): void;
+  startNativePerformance(configuration: UnsafeObject): Promise<void>;
 }
 
 export default TurboModuleRegistry.get<Spec>("ScenarioLauncher") as Spec | null;
