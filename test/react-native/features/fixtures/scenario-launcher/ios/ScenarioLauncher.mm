@@ -4,6 +4,7 @@
 
 #ifdef NATIVE_INTEGRATION
 #import <BugsnagPerformance/BugsnagPerformance.h>
+#import <BugsnagPerformance/BugsnagPerformanceConfiguration+Private.h>
 #endif
 
 @implementation ScenarioLauncher
@@ -119,6 +120,11 @@ RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(
     BugsnagPerformanceConfiguration *config = [BugsnagPerformanceConfiguration loadConfig];
     config.apiKey = apiKey;
     config.endpoint = [[NSURL alloc] initWithString: endpoint];
+    config.autoInstrumentAppStarts = NO;
+    config.autoInstrumentViewControllers = NO;
+    config.autoInstrumentNetworkRequests = NO;
+    config.internal.autoTriggerExportOnBatchSize = 1;
+
     [BugsnagPerformance startWithConfiguration:config];
 
     BugsnagPerformanceSpan *span = [BugsnagPerformance startSpanWithName:@"NativeIntegration"];

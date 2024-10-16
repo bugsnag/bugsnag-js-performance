@@ -9,6 +9,7 @@ import com.bugsnag.android.Configuration;
 import com.bugsnag.android.EndpointConfiguration;
 import com.bugsnag.android.Logger;
 
+import com.bugsnag.android.performance.AutoInstrument;
 import com.bugsnag.android.performance.BugsnagPerformance;
 import com.bugsnag.android.performance.PerformanceConfiguration;
 import com.bugsnag.android.performance.Span;
@@ -159,11 +160,18 @@ class ScenarioLauncherImpl {
         PerformanceConfiguration config = PerformanceConfiguration.load(reactContext);
         config.setApiKey(configuration.getString("apiKey"));
         config.setEndpoint(configuration.getString("endpoint"));
+        config.setAutoInstrumentAppStarts(false);
+        config.setAutoInstrumentActivities(AutoInstrument.OFF);
+
         BugsnagPerformance.start(config);
         Log.d(MODULE_NAME, "Started Android performance");
     
         Span span = BugsnagPerformance.startSpan("NativeIntegration");
         span.end();
+
+        // Move the app to the background to force the queue to flush
+        reactContext.getCurrentActivity().moveTaskToBack(true);
+
     } catch (Exception e) {
         Log.d(MODULE_NAME, "Failed to start Android performance", e);
     }

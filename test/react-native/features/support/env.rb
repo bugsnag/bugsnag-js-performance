@@ -3,6 +3,11 @@ BeforeAll do
     Maze.config.android_app_files_directory = '/data/local/tmp'
   end
   Maze.config.enforce_bugsnag_integrity = false
+
+  if ENV["NATIVE_INTEGRATION"]
+    Maze.config.receive_requests_wait = 60
+  end
+
 end
 
 Before('@skip') do
