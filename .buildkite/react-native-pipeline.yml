@@ -18,10 +18,6 @@ steps:
           BUILD_ANDROID: "true"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/old-arch/**/reactnative.apk"
-        plugins:
-          artifacts#v1.9.3:
-            upload: "test/react-native/features/fixtures/generated/old-arch"
-            compressed: rn-projects.zip
         commands:
           - bundle install
           - ./bin/generate-react-native-fixture
