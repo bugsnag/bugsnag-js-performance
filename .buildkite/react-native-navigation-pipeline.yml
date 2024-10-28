@@ -18,6 +18,7 @@ steps:
           REACT_NATIVE_NAVIGATION: "true"
           RN_VERSION: "{{matrix.rn_version}}"
           NOTIFIER_VERSION: '8.0.0'
+          RCT_NEW_ARCH_ENABLED: "0"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
@@ -42,7 +43,7 @@ steps:
           JAVA_VERSION: "17"
           NODE_VERSION: "18"
           REACT_NATIVE_NAVIGATION: "true"
-          RCT_NEW_ARCH_ENABLED: "true"
+          RCT_NEW_ARCH_ENABLED: "1"
           RN_VERSION: "{{matrix.rn_version}}"
           NOTIFIER_VERSION: '8.0.0'
         artifact_paths:
@@ -73,6 +74,7 @@ steps:
           RN_VERSION: "{{matrix.rn_version}}"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
           NOTIFIER_VERSION: '8.0.0'
+          RCT_NEW_ARCH_ENABLED: "0"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
         commands:
@@ -96,7 +98,7 @@ steps:
           BUILD_IOS: "true"
           NODE_VERSION: "18"
           REACT_NATIVE_NAVIGATION: "true"
-          RCT_NEW_ARCH_ENABLED: "true"
+          RCT_NEW_ARCH_ENABLED: "1"
           RN_VERSION: "{{matrix.rn_version}}"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
           NOTIFIER_VERSION: '8.0.0'
@@ -162,7 +164,7 @@ steps:
         timeout_in_minutes: 60
         env:
           REACT_NATIVE_NAVIGATION: "true"
-          RCT_NEW_ARCH_ENABLED: "true"
+          RCT_NEW_ARCH_ENABLED: "1"
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/react-native-navigation/new-arch/{{matrix.rn_version}}/reactnative.apk"
@@ -247,7 +249,7 @@ steps:
         timeout_in_minutes: 60
         env:
           REACT_NATIVE_NAVIGATION: "true"
-          RCT_NEW_ARCH_ENABLED: "true"
+          RCT_NEW_ARCH_ENABLED: "1"
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/react-native-navigation/new-arch/{{matrix.rn_version}}/output/reactnative.ipa"
