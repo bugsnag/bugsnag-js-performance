@@ -133,6 +133,9 @@ const BugsnagReactNativePerformance = {
   }),
   requestEntropyAsync: jest.fn(() => {
     return Promise.resolve(createPool())
+  }),
+  isNativePerformanceAvailable: jest.fn(() => {
+    return false
   })
 }
 

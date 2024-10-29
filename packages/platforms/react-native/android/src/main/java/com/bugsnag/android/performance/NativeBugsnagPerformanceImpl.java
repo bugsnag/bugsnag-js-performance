@@ -21,8 +21,22 @@ class NativeBugsnagPerformanceImpl {
 
   private final SecureRandom random = new SecureRandom();
 
+  private boolean isNativePerformanceAvailable = false;
+
   public NativeBugsnagPerformanceImpl(ReactApplicationContext reactContext) {
     this.reactContext = reactContext;
+
+    try {
+      Class.forName("com.bugsnag.android.performance.BugsnagPerformance");
+      Class.forName("com.bugsnag.android.performance.internal.InstrumentedAppState");
+      isNativePerformanceAvailable = true;
+    }
+    catch (LinkageError e) {
+      // do nothing, class found but is incompatible
+    }
+    catch (ClassNotFoundException e) {
+      // do nothing, Android Performance SDK is not installed
+    }
   }
 
   public WritableMap getDeviceInfo() {
@@ -72,6 +86,10 @@ class NativeBugsnagPerformanceImpl {
 
   public void requestEntropyAsync(Promise promise) {
     promise.resolve(requestEntropy());
+  }
+
+  public boolean isNativePerformanceAvailable() {
+    return isNativePerformanceAvailable;
   }
 
   @Nullable

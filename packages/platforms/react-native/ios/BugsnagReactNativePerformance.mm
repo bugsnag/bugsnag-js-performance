@@ -1,4 +1,5 @@
 #import "BugsnagReactNativePerformance.h"
+#import "BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.h"
 #import <sys/sysctl.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -82,12 +83,17 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(requestEntropy) {
     return hexStr;
 }
 
- RCT_EXPORT_METHOD(requestEntropyAsync:(RCTPromiseResolveBlock)resolve
-                   rejecter:(RCTPromiseRejectBlock)reject)
- {
-     NSString *hexStr = getRandomBytes();
-     resolve(hexStr);
- }
+RCT_EXPORT_METHOD(requestEntropyAsync:(RCTPromiseResolveBlock)resolve
+                rejecter:(RCTPromiseRejectBlock)reject)
+{
+    NSString *hexStr = getRandomBytes();
+    resolve(hexStr);
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(isNativePerformanceAvailable) {
+BOOL isAvailable = BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.sharedInstance != nil;
+return [NSNumber numberWithBool: isAvailable];
+}
 
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
