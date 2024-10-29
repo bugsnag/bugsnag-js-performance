@@ -127,7 +127,8 @@ if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
   fs.rmSync(`${fixtureDir}/reactnative.xcarchive`, { recursive: true, force: true })
 
   // install pods
-  execFileSync('pod', ['install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
+  execFileSync('bundle', ['install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
+  execFileSync('bundle', ['exec', 'pod', 'install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
 
   // build the iOS app
   const archiveArgs = [
@@ -222,6 +223,9 @@ function configureRN064Fixture(fixtureDir) {
   let yogaCpp = fs.readFileSync(yogaCppPath, 'utf8')
   yogaCpp = yogaCpp.replace('node->getLayout().hadOverflow() |', 'node->getLayout().hadOverflow() ||')
   fs.writeFileSync(yogaCppPath, yogaCpp)
+
+  // copy gemfile
+  fs.copyFileSync(resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/Gemfile'), resolve(fixtureDir, 'Gemfile'))
 }
 
 /** Pack and install local packages from this repo */
@@ -312,4 +316,12 @@ function replaceGeneratedFixtureFiles() {
   }
 
   fs.writeFileSync(`${fixtureDir}/ios/Podfile`, podfileContents)
+
+  // pin xcodeproj version to < 1.26.0
+  const gemfilePath = resolve(fixtureDir, 'Gemfile')
+  if (fs.existsSync(gemfilePath)) {
+    let gemfileContents = fs.readFileSync(gemfilePath, 'utf8')
+    gemfileContents += `\ngem 'xcodeproj', '< 1.26.0'`
+    fs.writeFileSync(gemfilePath, gemfileContents)
+  }
 }
