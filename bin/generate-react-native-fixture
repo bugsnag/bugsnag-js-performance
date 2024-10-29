@@ -302,4 +302,14 @@ function replaceGeneratedFixtureFiles() {
       resolve(fixtureDir, `android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${fileExtension}`)
     )
   }
+
+  // disable Flipper
+  let podfileContents = fs.readFileSync(`${fixtureDir}/ios/Podfile`, 'utf8')
+  if (podfileContents.includes('use_flipper!')) {
+    podfileContents = podfileContents.replace(/use_flipper!/, '# use_flipper!')
+  } else if (podfileContents.includes(':flipper_configuration')) {
+    podfileContents = podfileContents.replace(/:flipper_configuration/, '# :flipper_configuration')
+  }
+
+  fs.writeFileSync(`${fixtureDir}/ios/Podfile`, podfileContents)
 }
