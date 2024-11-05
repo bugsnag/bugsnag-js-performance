@@ -34,5 +34,10 @@ public class BugsnagReactNativePerformance extends NativeBugsnagPerformanceSpec 
   public void requestEntropyAsync(Promise promise) {
     impl.requestEntropyAsync(promise);
   }
+
+  @Override
+  public boolean isNativePerformanceAvailable() {
+    return impl.isNativePerformanceAvailable();
+  }
 }
 

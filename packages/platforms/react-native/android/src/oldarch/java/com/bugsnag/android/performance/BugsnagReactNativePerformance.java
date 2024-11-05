@@ -36,4 +36,9 @@ public class BugsnagReactNativePerformance extends ReactContextBaseJavaModule {
   public void requestEntropyAsync(Promise promise) {
     impl.requestEntropyAsync(promise);
   }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public boolean isNativePerformanceAvailable() {
+    return impl.isNativePerformanceAvailable();
+  }
 }

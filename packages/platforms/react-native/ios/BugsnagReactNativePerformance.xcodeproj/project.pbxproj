@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA396E142CCFD327009B37C2 /* BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = DA396E132CCFD327009B37C2 /* BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.m */; };
 		DAE18DD42C58DF2500D52529 /* BugsnagReactNativePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = DAE18DD32C58DF2500D52529 /* BugsnagReactNativePerformance.m */; };
 		DAE18DD72C58E02C00D52529 /* BugsnagReactNativePerformance.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = DAE18DD22C58DF2500D52529 /* BugsnagReactNativePerformance.h */; };
 /* End PBXBuildFile section */
@@ -26,6 +27,9 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libBugsnagReactNativePerformance.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libBugsnagReactNativePerformance.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA396E122CCFD242009B37C2 /* BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.h; sourceTree = "<group>"; };
+		DA396E132CCFD327009B37C2 /* BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.m; sourceTree = "<group>"; };
+		DA396E152CCFD72E009B37C2 /* BugsnagPerformanceConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagPerformanceConfiguration.h; sourceTree = "<group>"; };
 		DAE18DD22C58DF2500D52529 /* BugsnagReactNativePerformance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BugsnagReactNativePerformance.h; sourceTree = "<group>"; };
 		DAE18DD32C58DF2500D52529 /* BugsnagReactNativePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BugsnagReactNativePerformance.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -52,6 +56,9 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				DA396E152CCFD72E009B37C2 /* BugsnagPerformanceConfiguration.h */,
+				DA396E132CCFD327009B37C2 /* BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.m */,
+				DA396E122CCFD242009B37C2 /* BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.h */,
 				DAE18DD22C58DF2500D52529 /* BugsnagReactNativePerformance.h */,
 				DAE18DD32C58DF2500D52529 /* BugsnagReactNativePerformance.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
@@ -115,6 +122,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA396E142CCFD327009B37C2 /* BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.m in Sources */,
 				DAE18DD42C58DF2500D52529 /* BugsnagReactNativePerformance.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

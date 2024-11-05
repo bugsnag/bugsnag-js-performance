@@ -14,6 +14,7 @@ export interface Spec extends TurboModule {
   getDeviceInfo: () => DeviceInfo
   requestEntropy: () => string
   requestEntropyAsync: () => Promise<string>
+  isNativePerformanceAvailable: () => boolean
 }
 
 export default TurboModuleRegistry.get<Spec>(
