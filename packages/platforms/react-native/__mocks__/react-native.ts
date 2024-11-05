@@ -136,6 +136,17 @@ const BugsnagReactNativePerformance = {
   }),
   isNativePerformanceAvailable: jest.fn(() => {
     return false
+  }),
+  getNativeConfiguration: jest.fn(() => {
+    return {
+      apiKey: '1234567890abcdef1234567890abcdef12',
+      endpoint: '/traces',
+      releaseStage: 'production',
+      serviceName: 'unknown_service',
+      attributeCountLimit: 128,
+      attributeStringValueLimit: 1024,
+      attributeArrayLengthLimit: 1000
+    }
   })
 }
 

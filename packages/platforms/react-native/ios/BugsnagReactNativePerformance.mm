@@ -95,6 +95,40 @@ BOOL isAvailable = BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.shar
 return [NSNumber numberWithBool: isAvailable];
 }
 
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getNativeConfiguration) {
+    if (BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.sharedInstance == nil) {
+        return nil;
+    }
+
+    BugsnagPerformanceConfiguration *nativeConfig = [BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.sharedInstance getConfiguration];
+    if (nativeConfig == nil) {
+        return nil;
+    }
+
+    NSMutableDictionary *config = [NSMutableDictionary new];
+    config[@"apiKey"] = nativeConfig.apiKey;
+    config[@"endpoint"] = [nativeConfig.endpoint absoluteString];
+    config[@"releaseStage"] = nativeConfig.releaseStage;
+    config[@"serviceName"] = nativeConfig.serviceName;
+    config[@"attributeCountLimit"] = [NSNumber numberWithUnsignedInteger: nativeConfig.attributeCountLimit];
+    config[@"attributeStringValueLimit"] = [NSNumber numberWithUnsignedInteger: nativeConfig.attributeStringValueLimit];
+    config[@"attributeArrayLengthLimit"] = [NSNumber numberWithUnsignedInteger: nativeConfig.attributeArrayLengthLimit];
+
+    if (nativeConfig.samplingProbability != nil) {
+        config[@"samplingProbability"] = nativeConfig.samplingProbability;
+    }
+
+    if (nativeConfig.appVersion != nil) {
+        config[@"appVersion"] = nativeConfig.appVersion;
+    }
+
+    if (nativeConfig.enabledReleaseStages != nil && nativeConfig.enabledReleaseStages.count > 0) {
+        config[@"enabledReleaseStages"] = [nativeConfig.enabledReleaseStages allObjects];
+    }
+
+    return config;
+}
+
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params
