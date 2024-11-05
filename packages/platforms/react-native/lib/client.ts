@@ -1,11 +1,12 @@
 import { createClient } from '@bugsnag/core-performance'
 import createFetchDeliveryFactory from '@bugsnag/delivery-fetch-performance'
 import { createXmlHttpRequestTracker } from '@bugsnag/request-tracker-performance'
-import { AppRegistry, AppState } from 'react-native'
+import { AppRegistry, AppState, Platform } from 'react-native'
 import { FileSystem } from 'react-native-file-access'
 import { AppStartPlugin, NetworkRequestPlugin } from './auto-instrumentation'
 import createClock from './clock'
 import createSchema from './config'
+import type { ReactNativeConfiguration } from './config'
 import createIdGenerator from './id-generator'
 import NativeBugsnagPerformance from './native'
 import persistenceFactory from './persistence'
@@ -23,6 +24,8 @@ import createBrowserBackgroundingListener from './backgrounding-listener'
 // @ts-expect-error Element implicitly has an 'any' type because type 'typeof globalThis' has no index signature.
 const isDebuggingRemotely = !global.nativeCallSyncHook && !global.RN$Bridgeless
 
+const isNativePerformanceAvailable = NativeBugsnagPerformance !== null && NativeBugsnagPerformance.isNativePerformanceAvailable()
+
 const clock = createClock(performance)
 const appStartTime = clock.now()
 const deliveryFactory = createFetchDeliveryFactory(fetch, clock)
@@ -36,7 +39,7 @@ const backgroundingListener = createBrowserBackgroundingListener(AppState)
 const xhrRequestTracker = createXmlHttpRequestTracker(XMLHttpRequest, clock)
 
 const idGenerator = createIdGenerator(NativeBugsnagPerformance, isDebuggingRemotely)
-
+const schema = createSchema()
 const BugsnagPerformance = createClient({
   backgroundingListener,
   clock,
@@ -48,10 +51,31 @@ const BugsnagPerformance = createClient({
     new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrRequestTracker)
   ],
   resourceAttributesSource,
-  schema: createSchema(),
+  schema,
   spanAttributesSource,
   retryQueueFactory: createRetryQueueFactory(FileSystem),
   platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(appStartTime, clock, spanFactory, spanContextStorage)
 })
+
+BugsnagPerformance.attach = (config) => {
+  const logger = schema.logger.validate(config?.logger) ? config.logger : schema.logger.defaultValue
+  if (!isNativePerformanceAvailable) {
+    logger.warn(`Could not attach to native SDK. No compatible version of Bugsnag ${Platform.OS} performance was found`)
+    return
+  }
+
+  const nativeConfig = NativeBugsnagPerformance?.getNativeConfiguration()
+  if (!nativeConfig) {
+    logger.warn(`Could not attach to native SDK. Bugsnag ${Platform.OS} performance has not been started`)
+    return
+  }
+
+  const finalConfig: ReactNativeConfiguration = {
+    ...config,
+    ...nativeConfig
+  }
+
+  BugsnagPerformance.start(finalConfig)
+}
 
 export default BugsnagPerformance
