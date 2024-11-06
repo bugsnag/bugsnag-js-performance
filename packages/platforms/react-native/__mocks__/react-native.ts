@@ -138,15 +138,7 @@ const BugsnagReactNativePerformance = {
     return false
   }),
   getNativeConfiguration: jest.fn(() => {
-    return {
-      apiKey: '1234567890abcdef1234567890abcdef12',
-      endpoint: '/traces',
-      releaseStage: 'production',
-      serviceName: 'unknown_service',
-      attributeCountLimit: 128,
-      attributeStringValueLimit: 1024,
-      attributeArrayLengthLimit: 1000
-    }
+    return null
   })
 }
 
@@ -160,6 +152,10 @@ export const TurboModuleRegistry = {
         return null
     }
   }
+}
+
+export const NativeModules = {
+  BugsnagReactNativePerformance
 }
 
 export type AppStateStatus = 'active' | 'inactive' | 'background'
@@ -185,3 +181,7 @@ export const AppState = new class {
     }
   }
 }()
+
+export const AppRegistry = {
+  setWrapperComponentProvider: jest.fn()
+}
