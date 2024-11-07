@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- (react-native) Prevent duplicate app start spans from being started [#524](https://github.com/bugsnag/bugsnag-js-performance/pull/524)
+
 ### Changed
 
 - (browser) Update Span and Trace ID generator code to allow for modified `Array.from` API [#518](https://github.com/bugsnag/bugsnag-js-performance/pull/518)
