@@ -26,6 +26,20 @@ export interface ReactNativeConfiguration extends Configuration {
   tracePropagationUrls?: Array<string | RegExp>
 }
 
+// These config options are applied from the native SDKs and are not configurable in JS.
+export type ReactNativeAttachConfiguration = Omit<ReactNativeConfiguration,
+'apiKey' |
+'endpoint' |
+'samplingProbability' |
+'appVersion' |
+'releaseStage' |
+'enabledReleaseStages' |
+'serviceName' |
+'attributeCountLimit' |
+'attributeStringValueLimit' |
+'attributeArrayLengthLimit'
+>
+
 function createSchema (): ReactNativeSchema {
   return {
     ...schema,

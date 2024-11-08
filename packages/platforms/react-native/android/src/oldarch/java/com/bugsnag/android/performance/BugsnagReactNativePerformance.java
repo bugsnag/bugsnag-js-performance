@@ -41,4 +41,9 @@ public class BugsnagReactNativePerformance extends ReactContextBaseJavaModule {
   public boolean isNativePerformanceAvailable() {
     return impl.isNativePerformanceAvailable();
   }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public WritableMap getNativeConfiguration() {
+    return impl.getNativeConfiguration();
+  }
 }

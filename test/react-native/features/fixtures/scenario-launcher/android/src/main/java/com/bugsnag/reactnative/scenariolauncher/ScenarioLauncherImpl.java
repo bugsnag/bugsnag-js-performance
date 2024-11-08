@@ -166,16 +166,11 @@ class ScenarioLauncherImpl {
         BugsnagPerformance.start(config);
         Log.d(MODULE_NAME, "Started Android performance");
     
-        Span span = BugsnagPerformance.startSpan("NativeIntegration");
-        span.end();
-
-        // Move the app to the background to force the queue to flush
-        reactContext.getCurrentActivity().moveTaskToBack(true);
+        promise.resolve(true);
 
     } catch (Exception e) {
         Log.d(MODULE_NAME, "Failed to start Android performance", e);
+        promise.reject(e);
     }
-
-    promise.resolve(true);
   }
 }

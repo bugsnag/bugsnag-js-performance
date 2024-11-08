@@ -12,6 +12,8 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import java.security.SecureRandom;
+import com.bugsnag.android.performance.BugsnagPerformance;
+import com.bugsnag.android.performance.internal.processing.ImmutableConfig;
 
 class NativeBugsnagPerformanceImpl {
   
@@ -91,6 +93,44 @@ class NativeBugsnagPerformanceImpl {
   public boolean isNativePerformanceAvailable() {
     return isNativePerformanceAvailable;
   }
+
+  @Nullable
+  public WritableMap getNativeConfiguration() {
+    if (!isNativePerformanceAvailable) {
+      return null;
+    }
+
+    ImmutableConfig nativeConfig = BugsnagPerformance.INSTANCE.getInstrumentedAppState$internal().getConfig$internal();
+    if (nativeConfig == null) {
+      return null;
+    }
+
+    WritableMap result = Arguments.createMap();
+    result.putString("apiKey", nativeConfig.getApiKey());
+    result.putString("endpoint", nativeConfig.getEndpoint());    
+    result.putString("releaseStage", nativeConfig.getReleaseStage());
+    result.putString("serviceName", nativeConfig.getServiceName());
+    result.putInt("attributeCountLimit", nativeConfig.getAttributeCountLimit());
+    result.putInt("attriubuteStringValueLimit", nativeConfig.getAttributeStringValueLimit());
+    result.putInt("attributeArrayLengthLimit", nativeConfig.getAttributeArrayLengthLimit());
+
+    var appVersion = nativeConfig.getAppVersion();
+    if (appVersion != null) {
+      result.putString("appVersion", nativeConfig.getAppVersion());
+    }
+
+    var samplingProbability = nativeConfig.getSamplingProbability();
+    if (samplingProbability != null) {
+      result.putDouble("samplingProbability", samplingProbability);
+    }
+
+    var enabledReleaseStages = nativeConfig.getEnabledReleaseStages();
+    if (enabledReleaseStages != null) {
+      result.putArray("enabledReleaseStages", Arguments.fromArray(enabledReleaseStages.toArray(new String[0])));
+    }
+
+    return result;
+  } 
 
   @Nullable
   private String abiToArchitecture(@Nullable String abi) {

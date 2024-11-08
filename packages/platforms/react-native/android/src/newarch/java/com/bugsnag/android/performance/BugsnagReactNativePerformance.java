@@ -39,5 +39,10 @@ public class BugsnagReactNativePerformance extends NativeBugsnagPerformanceSpec 
   public boolean isNativePerformanceAvailable() {
     return impl.isNativePerformanceAvailable();
   }
+
+  @Override
+  public WritableMap getNativeConfiguration() {
+    return impl.getNativeConfiguration();
+  }
 }
 

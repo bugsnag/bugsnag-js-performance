@@ -1,6 +1,6 @@
 import type { Clock, SpanContextStorage, SpanFactory, SpanOptions } from '@bugsnag/core-performance'
 import React from 'react'
-import type { ReactNativeConfiguration } from './config'
+import type { ReactNativeConfiguration, ReactNativeAttachConfiguration } from './config'
 import { createAppStartSpan } from './create-app-start-span'
 import { createNavigationSpan } from './create-navigation-span'
 
@@ -25,6 +25,9 @@ export const platformExtensions = (appStartTime: number, clock: Clock, spanFacto
 
       return <App />
     }
+  },
+  attach: (config?: ReactNativeAttachConfiguration) => {
+    // this noop implementation is overridden by the client and is just defined here for correct typing
   }
 })
 

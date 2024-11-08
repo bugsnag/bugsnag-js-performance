@@ -136,6 +136,9 @@ const BugsnagReactNativePerformance = {
   }),
   isNativePerformanceAvailable: jest.fn(() => {
     return false
+  }),
+  getNativeConfiguration: jest.fn(() => {
+    return null
   })
 }
 
@@ -149,6 +152,10 @@ export const TurboModuleRegistry = {
         return null
     }
   }
+}
+
+export const NativeModules = {
+  BugsnagReactNativePerformance
 }
 
 export type AppStateStatus = 'active' | 'inactive' | 'background'
@@ -174,3 +181,7 @@ export const AppState = new class {
     }
   }
 }()
+
+export const AppRegistry = {
+  setWrapperComponentProvider: jest.fn()
+}

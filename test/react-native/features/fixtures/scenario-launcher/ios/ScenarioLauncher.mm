@@ -126,12 +126,8 @@ RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(
     config.internal.autoTriggerExportOnBatchSize = 1;
 
     [BugsnagPerformance startWithConfiguration:config];
-
-    BugsnagPerformanceSpan *span = [BugsnagPerformance startSpanWithName:@"NativeIntegration"];
-    [span end];
-  });
-    
     resolve(nil);
+  });    
 }
 #else
 RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
