@@ -38,8 +38,9 @@ const router = createRouter({
 BugsnagPerformance.start({
     apiKey,
     endpoint,
-    maximumBatchSize: 14,
+    maximumBatchSize: 2,
     batchInactivityTimeoutMs: 5000,
+    autoInstrumentFullPageLoads: false,
     autoInstrumentNetworkRequests: false,
     routingProvider: new VueRouterRoutingProvider(router, base)
 })

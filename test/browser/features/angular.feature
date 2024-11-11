@@ -4,7 +4,7 @@
 @skip_on_cdn_build
 Feature: Angular
 
-    Scenario: Route change spans are automatically instrumented
+    Scenario: Angular route change spans are automatically instrumented
         Given I navigate to the test URL "/angular/dist"
         And the element "customers" is present
         And I click the element "customers"
