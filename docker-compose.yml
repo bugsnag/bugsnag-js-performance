@@ -18,6 +18,7 @@ x-common-environment: &common-environment
   MAZE_ASPECTO_REPEATER_API_KEY:
   MAZE_BUGSNAG_API_KEY:
   MAZE_REPEATER_API_KEY:
+  MAZE_NO_FAIL_FAST:
 
 services:
   license-finder:
@@ -40,8 +41,6 @@ services:
       BITBAR_ACCESS_KEY:
       HOST: "${HOST:-maze-runner}"
       API_HOST: "${API_HOST:-maze-runner}"
-    env_file:
-      - ${DOCKER_ENV_FILE:-test/browser/features/fixtures/null_env}
     networks:
       default:
         aliases:
@@ -52,6 +51,7 @@ services:
     volumes:
       - ./test/browser/maze_output:/app/test/browser/maze_output
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./reports/:/app/test/browser/reports/
 
   browser-maze-runner-bs:
     build:
@@ -62,18 +62,17 @@ services:
         USE_CDN_BUILD:
     environment: &browser-maze-runner-environment
       <<: *common-environment
-      BROWSER_STACK_BROWSERS_USERNAME:
-      BROWSER_STACK_BROWSERS_ACCESS_KEY:
+      BROWSER_STACK_USERNAME:
+      BROWSER_STACK_ACCESS_KEY:
       HOST: "${HOST:-maze-runner}"
       API_HOST: "${API_HOST:-maze-runner}"
-    env_file:
-      - ${DOCKER_ENV_FILE:-test/browser/features/fixtures/null_env}
     networks:
       default:
         aliases:
           - maze-runner
     volumes:
       - ./test/browser/maze_output:/app/test/browser/maze_output
+      - ./reports/:/app/test/browser/reports/
 
   browser-maze-runner-legacy:
     build:
@@ -84,17 +83,16 @@ services:
         USE_CDN_BUILD:
     environment:
       <<: *common-environment
-      BROWSER_STACK_BROWSERS_USERNAME:
-      BROWSER_STACK_BROWSERS_ACCESS_KEY:
+      BROWSER_STACK_USERNAME:
+      BROWSER_STACK_ACCESS_KEY:
       USE_LEGACY_DRIVER: 1
-    env_file:
-      - ${DOCKER_ENV_FILE:-test/browser/features/fixtures/null_env}
     networks:
       default:
         aliases:
           - maze-runner
     volumes:
       - ./test/browser/maze_output:/app/test/browser/maze_output
+      - ./reports/:/app/test/browser/reports/
 
   react-native-maze-runner:
     image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v9-cli
@@ -115,6 +113,7 @@ services:
       - ./test/react-native/features/:/app/features
       - ./test/react-native/maze_output:/app/maze_output
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./reports/:/app/reports
 
   release:
     build:

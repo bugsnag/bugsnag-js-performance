@@ -59,10 +59,10 @@ const DEPENDENCIES = [
   `react-native-file-access@${reactNativeFileAccessVersion}`
 ]
 
-const reactNavigationVersion = parseFloat(reactNativeVersion) <= 0.64 ? '6.1.18' : 'latest'
-const reactNavigationNativeStackVersion = parseFloat(reactNativeVersion) <= 0.64 ? '6.11.0' : 'latest'
-const reactNativeScreensVersion = parseFloat(reactNativeVersion) <= 0.64 ? '3.14.0' : 'latest'
-const reactNativeSafeAreaContextVersion = parseFloat(reactNativeVersion) <= 0.64 ? '4.1.0' : 'latest'
+const reactNavigationVersion = '6.1.18'
+const reactNavigationNativeStackVersion = '6.11.0'
+const reactNativeScreensVersion = parseFloat(reactNativeVersion) <= 0.64 ? '3.14.0' : '3.35.0'
+const reactNativeSafeAreaContextVersion = parseFloat(reactNativeVersion) <= 0.64 ? '4.1.0' : '4.14.0'
 const REACT_NAVIGATION_DEPENDENCIES = [
   `@react-navigation/native@${reactNavigationVersion}`,
   `@react-navigation/native-stack@${reactNavigationNativeStackVersion}`,
@@ -98,7 +98,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   }
 
   // create the test fixture
-  const RNInitArgs = ['@react-native-community/cli@latest', 'init', 'reactnative', '--package-name', 'com.bugsnag.fixtures.reactnative.performance', '--directory', fixtureDir, '--version', reactNativeVersion, '--npm', '--skip-install']
+  const RNInitArgs = ['@react-native-community/cli@latest', 'init', 'reactnative', '--package-name', 'com.bugsnag.fixtures.reactnative.performance', '--directory', fixtureDir, '--version', reactNativeVersion, '--pm', 'npm', '--skip-install']
   execFileSync('npx', RNInitArgs, { stdio: 'inherit' })
 
   replaceGeneratedFixtureFiles()
@@ -127,7 +127,8 @@ if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
   fs.rmSync(`${fixtureDir}/reactnative.xcarchive`, { recursive: true, force: true })
 
   // install pods
-  execFileSync('pod', ['install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
+  execFileSync('bundle', ['install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
+  execFileSync('bundle', ['exec', 'pod', 'install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
 
   // build the iOS app
   const archiveArgs = [
@@ -222,6 +223,9 @@ function configureRN064Fixture(fixtureDir) {
   let yogaCpp = fs.readFileSync(yogaCppPath, 'utf8')
   yogaCpp = yogaCpp.replace('node->getLayout().hadOverflow() |', 'node->getLayout().hadOverflow() ||')
   fs.writeFileSync(yogaCppPath, yogaCpp)
+
+  // copy gemfile
+  fs.copyFileSync(resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/Gemfile'), resolve(fixtureDir, 'Gemfile'))
 }
 
 /** Pack and install local packages from this repo */
@@ -301,5 +305,23 @@ function replaceGeneratedFixtureFiles() {
       resolve(ROOT_DIR, `test/react-native/features/fixtures/app/android/MainActivity.${reactNativeVersion}.${fileExtension}`),
       resolve(fixtureDir, `android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${fileExtension}`)
     )
+  }
+
+  // disable Flipper
+  let podfileContents = fs.readFileSync(`${fixtureDir}/ios/Podfile`, 'utf8')
+  if (podfileContents.includes('use_flipper!')) {
+    podfileContents = podfileContents.replace(/use_flipper!/, '# use_flipper!')
+  } else if (podfileContents.includes(':flipper_configuration')) {
+    podfileContents = podfileContents.replace(/:flipper_configuration/, '# :flipper_configuration')
+  }
+
+  fs.writeFileSync(`${fixtureDir}/ios/Podfile`, podfileContents)
+
+  // pin xcodeproj version to < 1.26.0
+  const gemfilePath = resolve(fixtureDir, 'Gemfile')
+  if (fs.existsSync(gemfilePath)) {
+    let gemfileContents = fs.readFileSync(gemfilePath, 'utf8')
+    gemfileContents += `\ngem 'xcodeproj', '< 1.26.0'`
+    fs.writeFileSync(gemfilePath, gemfileContents)
   }
 }

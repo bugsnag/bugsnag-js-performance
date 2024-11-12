@@ -40,7 +40,7 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
     appVersion: '1.2.3',
     networkRequestCallback: (requestInfo) => {
       // ignore requests to the maze runner command endpoint
-      if (requestInfo.url.endsWith('/command')) {
+      if (requestInfo.url.includes('/command?after=')) {
         console.error(`[BugsnagPerformance] ignoring request to ${requestInfo.url}`)
         return null
       }

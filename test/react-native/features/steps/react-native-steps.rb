@@ -61,11 +61,6 @@ def execute_command(action, scenario_name = '')
 
   $logger.debug("Queuing command: #{command}")
   Maze::Server.commands.add command
-
-  # Ensure fixture has read the command
-  count = 900
-  sleep 0.1 until Maze::Server.commands.remaining.empty? || (count -= 1) < 1
-  raise 'Test fixture did not GET /command' unless Maze::Server.commands.remaining.empty?
 end
 
 def get_expected_platform_value(platform_values)
