@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/react-native-performance",
-  "version": "2.10.0",
+  "version": "2.10.1",
   "description": "BugSnag performance monitoring for React Native",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
