@@ -66,7 +66,7 @@ steps:
             browser: [chrome, firefox]
             version: [latest]
           adjustments:
-            - with: { browser: safari, version: 16 }
+            - with: { browser: safari, version: 18 }
 
       # BrowserStack
       - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser tests${EXTRA_STEP_LABEL}"
