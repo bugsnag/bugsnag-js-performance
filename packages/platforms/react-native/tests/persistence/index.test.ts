@@ -1,6 +1,7 @@
 import persistenceFactory from '../../lib/persistence'
 import FileBasedPersistence from '../../lib/persistence/file-based'
-import { FileSystem } from 'react-native-file-access'
+// eslint-disable-next-line jest/no-mocks-import
+import { FileSystem } from '../../__mocks__/file-native'
 
 const EXPECTED_PATH = '/mock/CacheDir/bugsnag-performance-react-native/v1/persisted-state.json'
 
@@ -8,7 +9,6 @@ describe('persistenceFactory', () => {
   beforeEach(() => {
     // reset the FileSystem mock between tests, otherwise they will interfere
     // with each other
-    // @ts-expect-error this exists on 'FileSystemMock' (see '__mocks__')
     FileSystem.filesystem = new Map<string, string>()
   })
 
