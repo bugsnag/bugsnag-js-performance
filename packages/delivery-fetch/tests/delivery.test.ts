@@ -14,8 +14,8 @@ import createFetchDeliveryFactory from '../lib/delivery'
 const SENT_AT_FORMAT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
 
 describe('Browser Delivery', () => {
-  it('delivers a span', () => {
-    const fetch = jest.fn(() => Promise.resolve({} as unknown as Response))
+  it('delivers a span', async () => {
+    const fetch = jest.fn(() => Promise.resolve({ status: 200, headers: new Headers() } as unknown as Response))
     const backgroundingListener = new ControllableBackgroundingListener()
     const clock = new IncrementingClock('2023-01-02T00:00:00.000Z')
 
@@ -47,7 +47,7 @@ describe('Browser Delivery', () => {
 
     const deliveryFactory = createFetchDeliveryFactory(fetch, clock, backgroundingListener)
     const delivery = deliveryFactory('/test')
-    delivery.send(deliveryPayload)
+    const response = await delivery.send(deliveryPayload)
 
     expect(fetch).toHaveBeenCalledWith('/test', {
       method: 'POST',
@@ -60,10 +60,15 @@ describe('Browser Delivery', () => {
         'Bugsnag-Sent-At': new Date(clock.timeOrigin + 1).toISOString()
       }
     })
+
+    expect(response).toStrictEqual({
+      state: 'success',
+      samplingProbability: undefined
+    })
   })
 
-  it('delivers a span with keepalive = true when the app is backgrounded', () => {
-    const fetch = jest.fn(() => Promise.resolve({} as unknown as Response))
+  it('delivers a span with keepalive = true when the app is backgrounded', async () => {
+    const fetch = jest.fn(() => Promise.resolve({ status: 200, headers: new Headers() } as unknown as Response))
     const backgroundingListener = new ControllableBackgroundingListener()
 
     const deliveryPayload: TracePayload = {
@@ -97,7 +102,7 @@ describe('Browser Delivery', () => {
 
     backgroundingListener.sendToBackground()
 
-    delivery.send(deliveryPayload)
+    const response = await delivery.send(deliveryPayload)
 
     expect(fetch).toHaveBeenCalledWith('/test', {
       method: 'POST',
@@ -110,10 +115,15 @@ describe('Browser Delivery', () => {
         'Bugsnag-Sent-At': expect.stringMatching(SENT_AT_FORMAT)
       }
     })
+
+    expect(response).toStrictEqual({
+      state: 'success',
+      samplingProbability: undefined
+    })
   })
 
-  it('delivers a span with keepalive = false when the app is returned to the foreground', () => {
-    const fetch = jest.fn(() => Promise.resolve({} as unknown as Response))
+  it('delivers a span with keepalive = false when the app is returned to the foreground', async () => {
+    const fetch = jest.fn(() => Promise.resolve({ status: 200, headers: new Headers() } as unknown as Response))
     const backgroundingListener = new ControllableBackgroundingListener()
 
     const deliveryPayload: TracePayload = {
@@ -148,7 +158,7 @@ describe('Browser Delivery', () => {
     backgroundingListener.sendToBackground()
     backgroundingListener.sendToForeground()
 
-    delivery.send(deliveryPayload)
+    const response = await delivery.send(deliveryPayload)
 
     expect(fetch).toHaveBeenCalledWith('/test', {
       method: 'POST',
@@ -160,6 +170,11 @@ describe('Browser Delivery', () => {
         'Content-Type': 'application/json',
         'Bugsnag-Sent-At': expect.stringMatching(SENT_AT_FORMAT)
       }
+    })
+
+    expect(response).toStrictEqual({
+      state: 'success',
+      samplingProbability: undefined
     })
   })
 
