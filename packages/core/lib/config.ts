@@ -8,7 +8,7 @@ import {
 } from './custom-attribute-limits'
 import type { Plugin } from './plugin'
 import type { Span } from './span'
-import { isLogger, isNumber, isObject, isCallbackArray, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
+import { isBoolean, isLogger, isNumber, isObject, isCallbackArray, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
 
 type SetTraceCorrelation = (traceId: string, spanId: string) => void
 
@@ -60,6 +60,7 @@ export interface Configuration {
   attributeStringValueLimit?: number
   attributeArrayLengthLimit?: number
   attributeCountLimit?: number
+  sendPayloadChecksums?: boolean
 }
 
 export interface TestConfiguration {
@@ -88,6 +89,7 @@ export interface CoreSchema extends Schema {
   plugins: ConfigOption<Array<Plugin<Configuration>>>
   bugsnag: ConfigOption<BugsnagErrorStatic | undefined>
   samplingProbability: ConfigOption<number | undefined>
+  sendPayloadChecksums: ConfigOption<boolean>
 }
 
 export const schema: CoreSchema = {
@@ -165,6 +167,11 @@ export const schema: CoreSchema = {
     defaultValue: ATTRIBUTE_COUNT_LIMIT_DEFAULT,
     message: `should be a number between 1 and ${ATTRIBUTE_COUNT_LIMIT_MAX}`,
     validate: (value: unknown): value is number => isNumber(value) && value > 0 && value <= ATTRIBUTE_COUNT_LIMIT_MAX
+  },
+  sendPayloadChecksums: {
+    defaultValue: false,
+    message: 'should be true|false',
+    validate: isBoolean
   }
 }
 

@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 import type { TracePayload } from '@bugsnag/core-performance'
 import type { JsonEvent } from '@bugsnag/core-performance/lib'
 import {
@@ -14,11 +10,15 @@ import createFetchDeliveryFactory from '../lib/delivery'
 const SENT_AT_FORMAT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
 
 describe('Browser Delivery', () => {
-  it('delivers a span', async () => {
-    const fetch = jest.fn(() => Promise.resolve({ status: 200, headers: new Headers() } as unknown as Response))
-    const backgroundingListener = new ControllableBackgroundingListener()
-    const clock = new IncrementingClock('2023-01-02T00:00:00.000Z')
+  beforeAll(() => {
+    window.isSecureContext = true
+  })
 
+  afterAll(() => {
+    window.isSecureContext = false
+  })
+
+  it('delivers a span', async () => {
     const deliveryPayload: TracePayload = {
       body: {
         resourceSpans: [{
@@ -45,8 +45,12 @@ describe('Browser Delivery', () => {
       }
     }
 
+    const fetch = jest.fn(() => Promise.resolve({ status: 200, headers: new Headers() } as unknown as Response))
+    const backgroundingListener = new ControllableBackgroundingListener()
+    const clock = new IncrementingClock('2023-01-02T00:00:00.000Z')
+
     const deliveryFactory = createFetchDeliveryFactory(fetch, clock, backgroundingListener)
-    const delivery = deliveryFactory('/test')
+    const delivery = deliveryFactory('/test', true)
     const response = await delivery.send(deliveryPayload)
 
     expect(fetch).toHaveBeenCalledWith('/test', {
@@ -57,7 +61,8 @@ describe('Browser Delivery', () => {
         'Bugsnag-Api-Key': 'test-api-key',
         'Bugsnag-Span-Sampling': '1:1',
         'Content-Type': 'application/json',
-        'Bugsnag-Sent-At': new Date(clock.timeOrigin + 1).toISOString()
+        'Bugsnag-Sent-At': new Date(clock.timeOrigin + 1).toISOString(),
+        'Bugsnag-Integrity': 'sha1 835f1ff603eb1be3bf91fc9716c0841e1b37ee64'
       }
     })
 
@@ -98,7 +103,7 @@ describe('Browser Delivery', () => {
     }
 
     const deliveryFactory = createFetchDeliveryFactory(fetch, new IncrementingClock(), backgroundingListener)
-    const delivery = deliveryFactory('/test')
+    const delivery = deliveryFactory('/test', false)
 
     backgroundingListener.sendToBackground()
 
@@ -153,7 +158,7 @@ describe('Browser Delivery', () => {
     }
 
     const deliveryFactory = createFetchDeliveryFactory(fetch, new IncrementingClock(), backgroundingListener)
-    const delivery = deliveryFactory('/test')
+    const delivery = deliveryFactory('/test', false)
 
     backgroundingListener.sendToBackground()
     backgroundingListener.sendToForeground()
@@ -200,7 +205,7 @@ describe('Browser Delivery', () => {
     const backgroundingListener = new ControllableBackgroundingListener()
 
     const deliveryFactory = createFetchDeliveryFactory(fetch, new IncrementingClock(), backgroundingListener)
-    const delivery = deliveryFactory('/test')
+    const delivery = deliveryFactory('/test', false)
     const deliveryPayload: TracePayload = {
       body: { resourceSpans: [] },
       headers: {
@@ -238,7 +243,7 @@ describe('Browser Delivery', () => {
     const backgroundingListener = new ControllableBackgroundingListener()
 
     const deliveryFactory = createFetchDeliveryFactory(fetch, new IncrementingClock(), backgroundingListener)
-    const delivery = deliveryFactory('/test')
+    const delivery = deliveryFactory('/test', false)
     const payload: TracePayload = {
       body: { resourceSpans: [] },
       headers: {
@@ -293,10 +298,117 @@ describe('Browser Delivery', () => {
     }
 
     const deliveryFactory = createFetchDeliveryFactory(fetch, clock, backgroundingListener)
-    const delivery = deliveryFactory('/test')
+    const delivery = deliveryFactory('/test', false)
 
     const { state } = await delivery.send(deliveryPayload)
 
     expect(state).toBe('failure-discard')
+  })
+
+  it('omits the bugsnag integrity header when not in a secure context', async () => {
+    const deliveryPayload: TracePayload = {
+      body: {
+        resourceSpans: [{
+          resource: { attributes: [{ key: 'test-key', value: { stringValue: 'test-value' } }] },
+          scopeSpans: [{
+            spans: [{
+              name: 'test-span',
+              kind: 1,
+              spanId: 'test-span-id',
+              traceId: 'test-trace-id',
+              endTimeUnixNano: '56789',
+              startTimeUnixNano: '12345',
+              attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+              droppedAttributesCount: 0,
+              events: []
+            }]
+          }]
+        }]
+      },
+      headers: {
+        'Bugsnag-Api-Key': 'test-api-key',
+        'Content-Type': 'application/json',
+        'Bugsnag-Span-Sampling': '1:1'
+      }
+    }
+
+    window.isSecureContext = false
+    const _fetch = jest.fn(() => Promise.resolve({ status: 200, headers: new Headers() } as unknown as Response))
+    const backgroundingListener = new ControllableBackgroundingListener()
+    const clock = new IncrementingClock('2023-01-02T00:00:00.000Z')
+
+    const deliveryFactory = createFetchDeliveryFactory(_fetch, clock, backgroundingListener)
+    const delivery = deliveryFactory('/test', true)
+    const response = await delivery.send(deliveryPayload)
+
+    expect(_fetch).toHaveBeenCalledWith('/test', {
+      method: 'POST',
+      keepalive: false,
+      body: JSON.stringify(deliveryPayload.body),
+      headers: {
+        'Bugsnag-Api-Key': 'test-api-key',
+        'Bugsnag-Span-Sampling': '1:1',
+        'Content-Type': 'application/json',
+        'Bugsnag-Sent-At': new Date(clock.timeOrigin + 1).toISOString()
+      }
+    })
+
+    expect(response).toStrictEqual({
+      state: 'success',
+      samplingProbability: undefined
+    })
+  })
+
+  it('omits the bugsnag integrity header when sendPayloadChecksums is false', async () => {
+    const deliveryPayload: TracePayload = {
+      body: {
+        resourceSpans: [{
+          resource: { attributes: [{ key: 'test-key', value: { stringValue: 'test-value' } }] },
+          scopeSpans: [{
+            spans: [{
+              name: 'test-span',
+              kind: 1,
+              spanId: 'test-span-id',
+              traceId: 'test-trace-id',
+              endTimeUnixNano: '56789',
+              startTimeUnixNano: '12345',
+              attributes: [{ key: 'test-span', value: { intValue: '12345' } }],
+              droppedAttributesCount: 0,
+              events: []
+            }]
+          }]
+        }]
+      },
+      headers: {
+        'Bugsnag-Api-Key': 'test-api-key',
+        'Content-Type': 'application/json',
+        'Bugsnag-Span-Sampling': '1:1'
+      }
+    }
+
+    const fetch = jest.fn(() => Promise.resolve({ status: 200, headers: new Headers() } as unknown as Response))
+    const backgroundingListener = new ControllableBackgroundingListener()
+    const clock = new IncrementingClock('2023-01-02T00:00:00.000Z')
+
+    const deliveryFactory = createFetchDeliveryFactory(fetch, clock, backgroundingListener)
+    const delivery = deliveryFactory('/test', false)
+    const response = await delivery.send(deliveryPayload)
+
+    expect(fetch).toHaveBeenCalledWith('/test', {
+      method: 'POST',
+      keepalive: false,
+      body: JSON.stringify(deliveryPayload.body),
+      headers: {
+        'Bugsnag-Api-Key': 'test-api-key',
+        'Bugsnag-Span-Sampling': '1:1',
+        'Content-Type': 'application/json',
+        'Bugsnag-Sent-At': new Date(clock.timeOrigin + 1).toISOString()
+      }
+    })
+
+    expect(response).toStrictEqual({
+      state: 'success',
+      samplingProbability: undefined
+    })
   })
 })
