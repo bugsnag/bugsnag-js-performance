@@ -93,7 +93,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       
       // sendPayloadChecksums is false by default unless custom endpoints are not specified
       if (typeof config !== 'string' && !config.endpoint) {
-        config.sendPayloadChecksums = 'sendPayloadChecksums' in config ? config.sendPayloadChecksums : true
+        configuration.sendPayloadChecksums = ('sendPayloadChecksums' in config && config.sendPayloadChecksums) || true
       }
       
       // if using the default endpoint add the API key as a subdomain
