@@ -1,7 +1,7 @@
 Feature: Manual creation of spans
 
   Scenario: Manual spans can be logged
-    Given I navigate to the test URL "/manual-span"
+    Given I navigate to the test URL "/docs/manual-span"
     And I wait to receive a sampling request
     Then I click the element "send-span"
     And I wait for 1 span
@@ -23,7 +23,7 @@ Feature: Manual creation of spans
     And the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "manual-span"
 
   Scenario: isFirstClass span option can be set to false
-    Given I navigate to the test URL "/manual-span?isFirstClass=false"
+    Given I navigate to the test URL "/docs/manual-span?isFirstClass=false"
     And I wait to receive a sampling request
     Then I click the element "send-span"
     And I wait for 1 span
@@ -46,7 +46,7 @@ Feature: Manual creation of spans
 
   @chromium_only @local_only
   Scenario: userAgentData is included in custom span
-    Given I navigate to the test URL "/manual-span"
+    Given I navigate to the test URL "/docs/manual-span"
     And I wait to receive a sampling request
     When I click the element "send-span"
     And I wait for 1 span
@@ -62,7 +62,7 @@ Feature: Manual creation of spans
       | Unknown |
 
   Scenario: Spans can be logged before start
-    Given I navigate to the test URL "/pre-start-spans"
+    Given I navigate to the test URL "/docs/pre-start-spans"
     When I wait to receive at least 1 trace
     Then a span name equals "Custom/Post Start"
     And a span name equals "Custom/Pre Start Span 0"

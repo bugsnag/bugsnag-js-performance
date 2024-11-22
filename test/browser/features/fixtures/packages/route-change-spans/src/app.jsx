@@ -12,10 +12,10 @@ function Navigation() {
     <div>
       <nav>
         <li>
-          <Link to="/route-change-spans">Home</Link>
+          <Link to="home">Home</Link>
         </li>
         <li>
-          <Link to="/new-route" id="change-route">Change Route</Link>
+          <Link to="new-route" id="change-route">Change Route</Link>
         </li>
       </nav>
     </div>
@@ -24,10 +24,10 @@ function Navigation() {
 
 function App() {
   return (
-    <Router>
+    <Router basename="/docs/route-change-spans">
       <Navigation />
       <Switch>
-        <Route path="/route-change-spans">
+        <Route path="/home">
           <Home />
         </Route>
         <Route path="/new-route">

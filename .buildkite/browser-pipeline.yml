@@ -46,6 +46,7 @@ steps:
             use-aliases: true
             service-ports: true
             command:
+              - --https
               - --farm=bb
               - --browser={{ matrix.browser }}_{{ matrix.version }}
               - --appium-version=1.22
@@ -78,6 +79,7 @@ steps:
             run: browser-maze-runner-legacy
             use-aliases: true
             command:
+              - --https
               - --farm=bs
               - --browser={{ matrix.browser }}_{{ matrix.version }}
           artifacts#v1.5.0:
