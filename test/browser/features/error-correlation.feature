@@ -1,7 +1,7 @@
 Feature: Error Correlation
 
   Scenario: Error does not include the correlation property when no spans are open
-    Given I navigate to the test URL "/docs/error-correlation"
+    Given I navigate to the test URL "/error-correlation"
     And I wait to receive a sampling request
     And I click the element "send-error"
     And I wait to receive an error
@@ -9,7 +9,7 @@ Feature: Error Correlation
     And the error payload field "events.0.correlation" is null
 
   Scenario: Reported errors include the current trace and span id
-    Given I navigate to the test URL "/docs/error-correlation"
+    Given I navigate to the test URL "/error-correlation"
     And I wait to receive a sampling request
     Then I click the element "start-span"
     And I wait for 1 second
@@ -33,7 +33,7 @@ Feature: Error Correlation
     And the error payload field "events.0.correlation.traceId" equals the stored value "traceId"
 
   Scenario: Reported errors do not include the trace and span id if the span is not the current context
-    Given I navigate to the test URL "/docs/error-correlation"
+    Given I navigate to the test URL "/error-correlation"
     And I wait to receive a sampling request
     Then I click the element "start-span"
     And I wait for 1 second

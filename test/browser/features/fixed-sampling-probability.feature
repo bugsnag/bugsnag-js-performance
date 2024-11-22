@@ -1,7 +1,7 @@
 Feature: Fixed Sampling Probability
 
   Scenario: Uses configured sampling probability
-    Given I navigate to the test URL "/docs/fixed-sampling-probability"
+    Given I navigate to the test URL "/fixed-sampling-probability"
     And I enter unmanaged traces mode
     When I click the element "send-span"
     And I wait to receive 1 trace

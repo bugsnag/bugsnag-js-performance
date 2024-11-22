@@ -2,7 +2,7 @@
 Feature: Navigation changes
     @skip_span_time_validation
     Scenario: Batch is sent when navigating to a new page by clicking an anchor tag
-        Given I navigate to the test URL "/docs/navigation-changes"
+        Given I navigate to the test URL "/navigation-changes"
         When I click the element "add-span-to-batch"
         And I click the element "add-span-to-batch"
 
@@ -18,7 +18,7 @@ Feature: Navigation changes
 
     @skip_span_time_validation
     Scenario: Batch is sent when navigating to a new page by entering a new URL
-        Given I navigate to the test URL "/docs/navigation-changes"
+        Given I navigate to the test URL "/navigation-changes"
         When I click the element "add-span-to-batch"
         And I click the element "add-span-to-batch"
         And I click the element "add-span-to-batch"
@@ -36,7 +36,7 @@ Feature: Navigation changes
 
     @minimises_window
     Scenario: Batch is sent when the window is minimised
-        Given I navigate to the test URL "/docs/navigation-changes"
+        Given I navigate to the test URL "/navigation-changes"
         When I click the element "add-span-to-batch"
         And I click the element "add-span-to-batch"
         And I click the element "add-span-to-batch"

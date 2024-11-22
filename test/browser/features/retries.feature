@@ -1,7 +1,7 @@
 Feature: Retries
 
     Scenario Outline: Batch is retried with specified status codes
-        Given I navigate to the test URL "/docs/retry-scenario"
+        Given I navigate to the test URL "/retry-scenario"
         And I wait to receive a sampling request
         And I set the HTTP status code for the next "POST" request to <status>
         
@@ -29,7 +29,7 @@ Feature: Retries
             | 500    | Connection Error              |
 
     Scenario: Batch is retried with connection failure
-        Given I navigate to the test URL "/docs/connection-failure"
+        Given I navigate to the test URL "/connection-failure"
 
         When I click the element "send-span"
         And I wait for 10 seconds
@@ -42,7 +42,7 @@ Feature: Retries
         And a span name equals "Custom/Span 2"
 
     Scenario Outline: Batch is not retried with specified status codes
-        Given I navigate to the test URL "/docs/retry-scenario"
+        Given I navigate to the test URL "/retry-scenario"
         And I wait to receive a sampling request
         And I set the HTTP status code for the next "POST" request to <status>
         
@@ -66,7 +66,7 @@ Feature: Retries
     # Status code 408 cannot be tested on certain browsers as it
     # is automatically retried and does not behave as expected
     Scenario Outline: Oldest batch is removed when max retry queue size is exceeded
-        Given I navigate to the test URL "/docs/oldest-batch-removed"
+        Given I navigate to the test URL "/oldest-batch-removed"
         And I wait to receive a sampling request
         And I set the HTTP status code for the next 2 "POST" requests to <status>
 

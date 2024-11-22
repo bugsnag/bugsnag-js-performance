@@ -4,7 +4,7 @@
 Feature: React router
 
     Scenario: React route change spans are automatically instrumented
-        Given I navigate to the test URL "/docs/react-router"
+        Given I navigate to the test URL "/react-router"
         And I click the element "change-route"
         When I wait to receive 1 span
         Then a span named "[RouteChange]/contacts/:contactId" contains the attributes: 
