@@ -5,7 +5,7 @@ class UrlGenerator
   end
 
   def for_path(path)
-    uri = URI.join(@maze_uri, "#{path}")
+    uri = URI.join(@maze_uri, "/docs#{path}")
     config_query_string = "endpoint=#{@maze_uri}/traces&logs=#{@maze_uri}/logs&api_key=#{$api_key}&notify=#{@maze_uri}/notify&sessions=#{@maze_uri}/sessions"
 
     if uri.query
