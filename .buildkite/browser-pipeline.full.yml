@@ -19,8 +19,8 @@ steps:
   - label: ":browserstack: {{ matrix }} Mobile Browser tests"
     matrix:
       - android_13
-      - ios_12
-      - ios_16
+      - ios_13
+      - ios_18
     depends_on: "browser-maze-runner-bs"
     timeout_in_minutes: 30
     plugins:
