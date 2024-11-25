@@ -13,7 +13,7 @@ const parameters = new URLSearchParams(window.location.search)
 const apiKey = parameters.get('api_key')
 const endpoint = parameters.get('endpoint')
 
-const basename = '/react-router'
+const basename = '/docs/react-router'
 
 function Root() {
   return (
