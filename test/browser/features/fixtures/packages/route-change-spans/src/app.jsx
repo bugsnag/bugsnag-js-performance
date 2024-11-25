@@ -24,13 +24,13 @@ function Navigation() {
 
 function App() {
   return (
-    <Router basename="/docs/route-change-spans">
+    <Router basename="/docs/route-change-spans/">
       <Navigation />
       <Switch>
-        <Route path="/home">
+        <Route path="home">
           <Home />
         </Route>
-        <Route path="/new-route">
+        <Route path="new-route">
           <About />
         </Route>
       </Switch>
