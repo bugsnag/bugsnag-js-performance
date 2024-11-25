@@ -1,7 +1,7 @@
 Feature: Route change spans
 
     Scenario: Route change spans are automatically instrumented
-        Given I navigate to the test URL "/route-change-spans"
+        Given I navigate to the test URL "/docs/route-change-spans"
         And I click the element "change-route"
         When I wait to receive 1 trace
 
@@ -15,7 +15,7 @@ Feature: Route change spans
             | bugsnag.browser.page.route_change.trigger | stringValue  | pushState                                    |
 
     Scenario: Hyperlinks within a page
-        Given I navigate to the test URL "/route-change-spans"
+        Given I navigate to the test URL "/docs/route-change-spans"
         And I click the element "go-to-anchor"
         When I wait to receive 1 trace
 

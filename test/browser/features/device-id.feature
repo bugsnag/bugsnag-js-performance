@@ -2,7 +2,7 @@ Feature: Device ID persistence
 
   Scenario: persisted device ID is used if present
     # load the page and persist an ID
-    Given I navigate to the test URL "/retry-scenario"
+    Given I navigate to the test URL "/docs/retry-scenario"
     And I wait to receive a sampling request
     And I store the device ID "c1234567890abcdefghijklmnop"
 

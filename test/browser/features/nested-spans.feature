@@ -1,7 +1,7 @@
 Feature: Nested spans
 
   Scenario: Spans are nested under the correct parent context
-    Given I navigate to the test URL "/nested-spans"
+    Given I navigate to the test URL "/docs/nested-spans"
     And I wait for 5 spans
 
     # Root span should have no parent

@@ -1,7 +1,7 @@
 @requires_performance_navigation_timing
 Feature: Page Load spans
     Scenario: Page load spans are automatically instrumented
-        Given I navigate to the test URL "/page-load-spans"
+        Given I navigate to the test URL "/docs/page-load-spans"
         # click a button to record a first input delay metric
         And I click the element "stop-clock"
         And I wait to receive 1 trace
@@ -100,7 +100,7 @@ Feature: Page Load spans
             | bugsnag.phase                             | stringValue  | TLS                   |
 
     Scenario: Page load spans can have attributes dropped by sendPageAttributes config
-        Given I navigate to the test URL "/network-span-control"
+        Given I navigate to the test URL "/docs/network-span-control"
         When I click the element "page-load-no-attributes"
         And I wait to receive 1 trace
 
@@ -109,7 +109,7 @@ Feature: Page Load spans
         And a span named "[FullPageLoad]/docs/network-span-control/" does not contain the attribute "bugsnag.browser.page.referrer"
 
     Scenario: Page load spans inherit parent context from traceparent meta tag if present
-        Given I navigate to the test URL "/traceparent-meta"
+        Given I navigate to the test URL "/docs/traceparent-meta"
         And I wait to receive 1 trace
 
         Then a span named "[FullPageLoad]/docs/traceparent-meta/" has the following properties:
