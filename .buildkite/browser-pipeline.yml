@@ -102,7 +102,7 @@ steps:
             - with: { browser: edge, version: latest }
 
       # BrowserStack non-https
-      - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser tests${EXTRA_STEP_LABEL}"
+      - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser non-https tests${EXTRA_STEP_LABEL}"
         depends_on: "browser-maze-runner-legacy-${USE_CDN_BUILD}"
         timeout_in_minutes: 30
         plugins:

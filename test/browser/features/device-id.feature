@@ -8,7 +8,7 @@ Feature: Device ID persistence
 
     # reload the page to prove the ID was persisted and not just available in
     # memory somehow
-    When I navigate to the test URL "/retry-scenario"
+    When I navigate to the test URL "/docs/retry-scenario"
     And I wait to receive a sampling request
     And I click the element "send-first-span"
     And I wait for 1 span

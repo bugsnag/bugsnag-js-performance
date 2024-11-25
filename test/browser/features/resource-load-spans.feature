@@ -3,7 +3,7 @@ Feature: Resource Load Spans
   @requires_resource_load_spans
   Scenario: Resource load spans are automatically instrumented (NPM build)
     Given I set the sampling probability to "0.999999"
-    And I navigate to the test URL "/resource-load-spans"
+    And I navigate to the test URL "/docs/resource-load-spans"
     And I wait to receive a sampling request
 
     When I click the element "end-span"
@@ -33,7 +33,7 @@ Feature: Resource Load Spans
   @requires_resource_load_spans
   Scenario: Resource load spans are automatically instrumented (CDN build)
     Given I set the sampling probability to "0.999999"
-    And I navigate to the test URL "/resource-load-spans"
+    And I navigate to the test URL "/docs/resource-load-spans"
     And I wait to receive a sampling request
 
     When I click the element "end-span"
