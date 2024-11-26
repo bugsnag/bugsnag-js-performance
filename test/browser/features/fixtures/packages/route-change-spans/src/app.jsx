@@ -12,7 +12,7 @@ function Navigation() {
     <div>
       <nav>
         <li>
-          <Link to="/route-change-spans">Home</Link>
+          <Link to="/docs/route-change-spans">Home</Link>
         </li>
         <li>
           <Link to="/new-route" id="change-route">Change Route</Link>
@@ -27,7 +27,7 @@ function App() {
     <Router>
       <Navigation />
       <Switch>
-        <Route path="/route-change-spans">
+        <Route path="/docs/route-change-spans">
           <Home />
         </Route>
         <Route path="/new-route">

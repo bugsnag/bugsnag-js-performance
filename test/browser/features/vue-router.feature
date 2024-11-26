@@ -1,7 +1,7 @@
 Feature: Vue router
 
     Scenario: Vue route change spans are automatically instrumented
-        Given I navigate to the test URL "/vue-router"
+        Given I navigate to the test URL "/docs/vue-router"
         And I click the element "contact"
         And I click the element "profile"
         When I wait to receive 2 spans

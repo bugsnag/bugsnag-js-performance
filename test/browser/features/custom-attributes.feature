@@ -1,7 +1,7 @@
 Feature: Custom attributes
 
     Scenario: Custom attributes can be added to spans
-        Given I navigate to the test URL "/custom-attributes"
+        Given I navigate to the test URL "/docs/custom-attributes"
         And I wait for 1 span
 
         Then a span named "Custom/CustomAttributesScenario" contains the attributes: 
