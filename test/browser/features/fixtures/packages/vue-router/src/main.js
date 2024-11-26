@@ -9,7 +9,7 @@ const parameters = new URLSearchParams(window.location.search)
 const apiKey = parameters.get('api_key')
 const endpoint = parameters.get('endpoint')
 
-const base = '/vue-router'
+const base = '/docs/vue-router'
 
 const router = createRouter({
   history: createWebHistory(base),

@@ -6,7 +6,7 @@ Feature: Trace propagation headers
         And I wait to receive 5 reflections
         
         And I wait for 5 spans
-        Then every span string attribute "http.url" matches the regex "^http:\/\/.+:\d{4}\/reflect$"
+        Then every span string attribute "http.url" matches the regex "^http(s)?:\/\/.+:\d{4}\/reflect$"
 
         And the reflection request method equals "GET"
         And the reflection "X-Test-Header" header equals "test"
