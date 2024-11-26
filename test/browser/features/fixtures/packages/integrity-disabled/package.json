@@ -1,5 +1,5 @@
 {
-    "name": "integrity",
+    "name": "integrity-disabled",
     "private": true,
     "scripts": {
         "build": "rollup --config ../rollup.config.mjs",
