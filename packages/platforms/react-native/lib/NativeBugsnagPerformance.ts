@@ -1,8 +1,6 @@
 import type { TurboModule } from 'react-native/Libraries/TurboModule/RCTExport'
 import { TurboModuleRegistry } from 'react-native'
 
-export type Encoding = 'utf8' | 'base64'
-
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type DeviceInfo = {
   arch?: string
@@ -27,9 +25,9 @@ export interface Spec extends TurboModule {
   isDir: (path: string) => Promise<boolean>
   ls: (path: string) => Promise<string[]>
   mkdir: (path: string) => Promise<string>
-  readFile: (path: string, encoding: Encoding) => Promise<string>
+  readFile: (path: string, encoding: string) => Promise<string>
   unlink: (path: string) => Promise<void>
-  writeFile: (path: string, data: string, encoding: Encoding) => Promise<void>
+  writeFile: (path: string, data: string, encoding: string) => Promise<void>
 }
 
 export default TurboModuleRegistry.get<Spec>(
