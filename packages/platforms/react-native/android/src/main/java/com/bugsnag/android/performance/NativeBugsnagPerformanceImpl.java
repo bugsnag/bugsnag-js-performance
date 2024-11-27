@@ -12,6 +12,13 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import java.security.SecureRandom;
+import java.io.File;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 class NativeBugsnagPerformanceImpl {
   
@@ -72,6 +79,101 @@ class NativeBugsnagPerformanceImpl {
 
   public void requestEntropyAsync(Promise promise) {
     promise.resolve(requestEntropy());
+  }
+
+  public WritableMap getNativeConstants() {
+    WritableMap map = Arguments.createMap();
+    map.putString("CacheDir", this.reactContext.getCacheDir().getAbsolutePath());
+    map.putString("DocumentDir", this.reactContext.getFilesDir().getAbsolutePath());
+
+    return map;
+  }
+
+  public void exists(String path, Promise promise) {
+    try {
+      boolean result = new File(path).exists();
+      if (result) {
+        promise.resolve(result);
+      } else {
+        promise.reject(new Exception("File does not exist"));
+      }
+    } catch(Exception e) {
+      promise.reject(e);
+    }
+  }
+
+  public void isDir(String path, Promise promise) {
+    try {
+      boolean result = new File(path).isDirectory();
+      if (result) {
+        promise.resolve(result);
+      } else {
+        promise.reject(new Exception("Path is not a directory"));
+      }
+    } catch(Exception e) {
+      promise.reject(e);
+    }
+  }
+
+  public void ls(String path, Promise promise) {
+    try {
+      promise.resolve(new File(path).list());
+    } catch(Exception e) {
+      promise.reject(e);
+    }
+  }
+
+  public void mkdir(String path, Promise promise) {
+    try {
+      boolean result = new File(path).mkdir();
+      if (result) {
+        promise.resolve(path);
+      } else {
+        promise.reject(new Exception("Failed to create directory"));
+      }
+    } catch(Exception e) {
+      promise.reject(e);
+    }
+  }
+
+  public void readFile(String path, String encoding, Promise promise) {
+    try {
+      StringBuilder fileContent = new StringBuilder();
+      InputStreamReader isr = new InputStreamReader(new FileInputStream(path), encoding);
+      BufferedReader fileReader = new BufferedReader(isr);
+      String dataLine = "";
+      while ((dataLine = fileReader.readLine()) != null) {
+        fileContent.append(dataLine);
+      }
+      fileReader.close();
+      promise.resolve(fileContent.toString());
+    } catch (Exception e) {
+      promise.reject(e);
+    }
+  }
+
+  public void unlink(String path, Promise promise) {
+    try {
+      boolean result = new File(path).delete();
+      if (result) {
+        promise.resolve(null);
+      } else {
+        promise.reject(new Exception("Failed to delete file/directory"));
+      }
+    } catch(Exception e) {
+      promise.reject(e);
+    }
+  }
+
+  public void writeFile(String path, String data, String encoding, Promise promise){
+    try {
+      Writer w = new OutputStreamWriter(new FileOutputStream(path), encoding);
+      w.write(data);
+      w.close();
+      promise.resolve(null);
+    } catch (Exception e) {
+      promise.reject(e);
+    }
   }
 
   @Nullable
