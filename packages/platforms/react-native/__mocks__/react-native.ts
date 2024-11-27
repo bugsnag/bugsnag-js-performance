@@ -1,3 +1,5 @@
+import type { NativeDirs } from '../lib/NativeBugsnagPerformance'
+
 type Os = 'android' | 'ios' | 'other'
 interface SelectOptions<T> { android: T, ios: T, default: T }
 type PlatformConstants
@@ -133,7 +135,20 @@ const BugsnagReactNativePerformance = {
   }),
   requestEntropyAsync: jest.fn(() => {
     return Promise.resolve(createPool())
-  })
+  }),
+  getNativeConstants (): NativeDirs {
+    return {
+      CacheDir: '/mock/CacheDir',
+      DocumentDir: '/mock/DocumentDir'
+    }
+  },
+  exists: jest.fn(),
+  isDir: jest.fn(),
+  ls: jest.fn(),
+  mkdir: jest.fn(),
+  readFile: jest.fn(),
+  unlink: jest.fn(),
+  writeFile: jest.fn()
 }
 
 export const TurboModuleRegistry = {
@@ -146,6 +161,10 @@ export const TurboModuleRegistry = {
         return null
     }
   }
+}
+
+export const NativeModules = {
+  BugsnagReactNativePerformance
 }
 
 export type AppStateStatus = 'active' | 'inactive' | 'background'
