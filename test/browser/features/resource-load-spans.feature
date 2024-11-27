@@ -52,7 +52,7 @@ Feature: Resource Load Spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" double attribute "bugsnag.sampling.p" equals 0.999999
 
     # CDN bundle
-    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.name" matches the regex "^\[ResourceLoad\]https:\/\/.*:[0-9]{4}\/bugsnag-performance(?:\.min)?\.js$"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.name" matches the regex "^\[ResourceLoad\]https:\/\/.*:[0-9]{4}\/docs\/bugsnag-performance(?:\.min)?\.js$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.parentSpanId" equals the stored value "parent_span_id"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" string attribute "bugsnag.span.category" equals "resource_load"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" double attribute "bugsnag.sampling.p" equals 0.999999

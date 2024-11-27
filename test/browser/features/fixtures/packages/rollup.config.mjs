@@ -10,8 +10,8 @@ export const isCdnBuild = process.env.USE_CDN_BUILD === "1" || process.env.USE_C
 const cdnOutputOptions = {
   // import BugsnagPerformance from the CDN build
   banner: process.env.DEBUG
-    ? 'import BugsnagPerformance from "/bugsnag-performance.js"\n'
-    : 'import BugsnagPerformance from "/bugsnag-performance.min.js"\n',
+    ? 'import BugsnagPerformance from "/docs/bugsnag-performance.js"\n'
+    : 'import BugsnagPerformance from "/docs/bugsnag-performance.min.js"\n',
   globals: {
     '@bugsnag/browser-performance': 'BugsnagPerformance',
     '@bugsnag/react-router-performance': 'BugsnagReactRouterPerformance',
