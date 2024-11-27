@@ -1,3 +1,4 @@
+@skip_safari_11
 Feature: Integrity header
 
 Scenario: Integrity headers are set when setPayloadChecksums is true
