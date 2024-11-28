@@ -29,7 +29,6 @@ steps:
         run: browser-maze-runner-bs
         use-aliases: true
         command:
-          - --https
           - --farm=bs
           - --browser={{ matrix }}
       artifacts#v1.5.0:
