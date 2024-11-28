@@ -9,10 +9,20 @@ import androidx.annotation.Nullable;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import java.security.SecureRandom;
+import java.util.UUID;
+import java.util.concurrent.Callable;
+
 import com.bugsnag.android.performance.BugsnagPerformance;
+import com.bugsnag.android.performance.SpanContext;
+import com.bugsnag.android.performance.SpanOptions;
+
+import com.bugsnag.android.performance.internal.BugsnagClock;
+import com.bugsnag.android.performance.internal.EncodingUtils;
+import com.bugsnag.android.performance.internal.SpanFactory;
+import com.bugsnag.android.performance.internal.SpanImpl;
 import com.bugsnag.android.performance.internal.processing.ImmutableConfig;
 
 class NativeBugsnagPerformanceImpl {
@@ -111,7 +121,7 @@ class NativeBugsnagPerformanceImpl {
     result.putString("releaseStage", nativeConfig.getReleaseStage());
     result.putString("serviceName", nativeConfig.getServiceName());
     result.putInt("attributeCountLimit", nativeConfig.getAttributeCountLimit());
-    result.putInt("attriubuteStringValueLimit", nativeConfig.getAttributeStringValueLimit());
+    result.putInt("attributeStringValueLimit", nativeConfig.getAttributeStringValueLimit());
     result.putInt("attributeArrayLengthLimit", nativeConfig.getAttributeArrayLengthLimit());
 
     var appVersion = nativeConfig.getAppVersion();
@@ -130,9 +140,98 @@ class NativeBugsnagPerformanceImpl {
     }
 
     return result;
-  } 
-
+  }
+  
   @Nullable
+  public WritableMap startNativeSpan(String name, ReadableMap options) {
+    if (!isNativePerformanceAvailable) {
+      return null;
+    }
+
+    SpanOptions spanOptions = jsSpanOptionsToNativeSpanOptions(options);
+    SpanFactory spanFactory = BugsnagPerformance.INSTANCE.getInstrumentedAppState$internal().getSpanFactory();
+    SpanImpl nativeSpan = spanFactory.createCustomSpan(name, spanOptions);
+
+    nativeSpan.getAttributes().getEntries$internal().clear();
+
+    WritableMap span = nativeSpanToJsSpan(nativeSpan);
+    return span;
+  }
+
+  private WritableMap nativeSpanToJsSpan(SpanImpl nativeSpan) {
+    WritableMap span = Arguments.createMap();
+    span.putString("name", nativeSpan.getName());
+    span.putString("id", EncodingUtils.toHexString(nativeSpan.getSpanId()));
+    span.putString("traceId", EncodingUtils.toHexString(nativeSpan.getTraceId()));
+
+    long unixNanoStartTime = BugsnagClock.INSTANCE.elapsedNanosToUnixTime(nativeSpan.getStartTime$internal());
+    span.putDouble("startTime", (double)unixNanoStartTime);
+
+    Long parentSpanId = nativeSpan.getParentSpanId();
+    if (parentSpanId > 0L) {
+      span.putString("parentSpanId", EncodingUtils.toHexString(parentSpanId));
+    }
+
+    return span;
+  }
+
+  private SpanOptions jsSpanOptionsToNativeSpanOptions(ReadableMap options) {
+    SpanOptions spanOptions = SpanOptions.DEFAULTS
+      .setFirstClass(true)
+      .makeCurrentContext(false)
+      .within(null);
+
+    if (options.hasKey("startTime")) {
+      double startTime = options.getDouble("startTime");
+      long nativeStartTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)startTime);
+      spanOptions = spanOptions.startTime(nativeStartTime);
+    }
+
+    ReadableMap parentContext = null;
+    if (options.hasKey("parentContext") && (parentContext = options.getMap("parentContext")) != null) {
+      SpanContext nativeParentContext = jsSpanContextToNativeSpanContext(parentContext);
+      spanOptions = spanOptions.within(nativeParentContext);
+    }
+
+    return spanOptions;
+  }
+
+  private SpanContext jsSpanContextToNativeSpanContext(ReadableMap spanContext) {
+    String spanId = spanContext.getString("id");
+    String traceId = spanContext.getString("traceId");
+
+    long nativeSpanId = Long.parseUnsignedLong(spanId, 16);
+    UUID nativeTraceId = new UUID(Long.parseUnsignedLong(traceId.substring(0, 16), 16), Long.parseUnsignedLong(traceId.substring(16), 16));
+
+    SpanContext nativeSpanContext = new SpanContext() {
+        @Override
+        public long getSpanId() {
+            return nativeSpanId;
+        }
+
+        @NonNull
+        @Override
+        public UUID getTraceId() {
+            return nativeTraceId;
+        }
+
+        @NonNull
+        @Override
+        public Runnable wrap(@NonNull Runnable runnable) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public <T> Callable<T> wrap(@NonNull Callable<T> callable) {
+            return null;
+        }
+    };
+
+    return nativeSpanContext;
+  }
+
+    @Nullable
   private String abiToArchitecture(@Nullable String abi) {
     if (abi == null) {
       return null;

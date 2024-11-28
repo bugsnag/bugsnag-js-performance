@@ -4,6 +4,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
 import java.util.Map;
@@ -45,5 +46,10 @@ public class BugsnagReactNativePerformance extends ReactContextBaseJavaModule {
   @ReactMethod(isBlockingSynchronousMethod = true)
   public WritableMap getNativeConfiguration() {
     return impl.getNativeConfiguration();
+  }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public WritableMap startNativeSpan(String name, ReadableMap options) {
+    return impl.startNativeSpan(name, options);
   }
 }
