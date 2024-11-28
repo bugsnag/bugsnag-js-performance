@@ -15,14 +15,14 @@ Feature: Resource Load Spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2" double attribute "bugsnag.sampling.p" equals 0.999999
 
     # App bundle
-    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" matches the regex "^\[ResourceLoad\]https:\/\/.*:[0-9]{4}\/docs\/resource-load-spans\/dist\/bundle\.js$"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" matches the regex "^\[ResourceLoad\]http(s)?:\/\/.*:[0-9]{4}\/docs\/resource-load-spans\/dist\/bundle\.js$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.parentSpanId" equals the stored value "parent_span_id"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "resource_load"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.flavor" equals "1.1"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" double attribute "bugsnag.sampling.p" equals 0.999999
 
     # Image
-    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.name" matches the regex "^\[ResourceLoad\]https:\/\/.*:[0-9]{4}\/docs\/favicon.png$"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.name" matches the regex "^\[ResourceLoad\]http(s)?:\/\/.*:[0-9]{4}\/docs\/favicon.png$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.parentSpanId" equals the stored value "parent_span_id"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" string attribute "bugsnag.span.category" equals "resource_load"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" string attribute "http.url" matches the regex "^http(s)?:\/\/.*:[0-9]{4}\/docs\/favicon\.png\?height=100&width=100$"
@@ -45,20 +45,20 @@ Feature: Resource Load Spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.3" double attribute "bugsnag.sampling.p" equals 0.999999
 
     # App bundle
-    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" matches the regex "^\[ResourceLoad\]https:\/\/.*:[0-9]{4}\/docs\/resource-load-spans\/dist\/bundle\.js$"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" matches the regex "^\[ResourceLoad\]http(s)?:\/\/.*:[0-9]{4}\/docs\/resource-load-spans\/dist\/bundle\.js$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.parentSpanId" equals the stored value "parent_span_id"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "resource_load"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "http.flavor" equals "1.1"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" double attribute "bugsnag.sampling.p" equals 0.999999
 
     # CDN bundle
-    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.name" matches the regex "^\[ResourceLoad\]https:\/\/.*:[0-9]{4}\/docs\/bugsnag-performance(?:\.min)?\.js$"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.name" matches the regex "^\[ResourceLoad\]http(s)?:\/\/.*:[0-9]{4}\/docs\/bugsnag-performance(?:\.min)?\.js$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1.parentSpanId" equals the stored value "parent_span_id"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" string attribute "bugsnag.span.category" equals "resource_load"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" double attribute "bugsnag.sampling.p" equals 0.999999
 
     # Image
-    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2.name" matches the regex "^\[ResourceLoad\]https:\/\/.*:[0-9]{4}\/docs\/favicon.png$"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2.name" matches the regex "^\[ResourceLoad\]http(s)?:\/\/.*:[0-9]{4}\/docs\/favicon.png$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2.parentSpanId" equals the stored value "parent_span_id"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2" string attribute "bugsnag.span.category" equals "resource_load"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2" string attribute "http.url" matches the regex "^http(s)?:\/\/.*:[0-9]{4}\/docs\/favicon\.png\?height=100&width=100$"
