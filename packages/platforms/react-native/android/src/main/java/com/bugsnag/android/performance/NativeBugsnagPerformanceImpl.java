@@ -32,7 +32,7 @@ class NativeBugsnagPerformanceImpl {
     this.reactContext = reactContext;
   }
 
-  public WritableMap getDeviceInfo() {
+  WritableMap getDeviceInfo() {
     WritableMap map = Arguments.createMap();
     try {
       String bundleIdentifier = this.reactContext.getPackageName();
@@ -62,7 +62,7 @@ class NativeBugsnagPerformanceImpl {
     return map;
   }
 
-  public String requestEntropy() {
+  String requestEntropy() {
     byte[] bytes = new byte[1024];
     random.nextBytes(bytes);
 
@@ -77,11 +77,11 @@ class NativeBugsnagPerformanceImpl {
     return hex.toString();
   }
 
-  public void requestEntropyAsync(Promise promise) {
+  void requestEntropyAsync(Promise promise) {
     promise.resolve(requestEntropy());
   }
 
-  public WritableMap getNativeConstants() {
+  WritableMap getNativeConstants() {
     WritableMap map = Arguments.createMap();
     map.putString("CacheDir", this.reactContext.getCacheDir().getAbsolutePath());
     map.putString("DocumentDir", this.reactContext.getFilesDir().getAbsolutePath());
@@ -89,7 +89,7 @@ class NativeBugsnagPerformanceImpl {
     return map;
   }
 
-  public void exists(String path, Promise promise) {
+  void exists(String path, Promise promise) {
     try {
       boolean result = new File(path).exists();
       if (result) {
@@ -102,7 +102,7 @@ class NativeBugsnagPerformanceImpl {
     }
   }
 
-  public void isDir(String path, Promise promise) {
+  void isDir(String path, Promise promise) {
     try {
       boolean result = new File(path).isDirectory();
       if (result) {
@@ -115,7 +115,7 @@ class NativeBugsnagPerformanceImpl {
     }
   }
 
-  public void ls(String path, Promise promise) {
+  void ls(String path, Promise promise) {
     try {
       promise.resolve(new File(path).list());
     } catch(Exception e) {
@@ -123,7 +123,7 @@ class NativeBugsnagPerformanceImpl {
     }
   }
 
-  public void mkdir(String path, Promise promise) {
+  void mkdir(String path, Promise promise) {
     try {
       boolean result = new File(path).mkdir();
       if (result) {
@@ -136,23 +136,25 @@ class NativeBugsnagPerformanceImpl {
     }
   }
 
-  public void readFile(String path, String encoding, Promise promise) {
-    try {
-      StringBuilder fileContent = new StringBuilder();
-      InputStreamReader isr = new InputStreamReader(new FileInputStream(path), encoding);
-      BufferedReader fileReader = new BufferedReader(isr);
-      String dataLine = "";
-      while ((dataLine = fileReader.readLine()) != null) {
-        fileContent.append(dataLine);
+  void readFile(String path, String encoding, Promise promise) {
+    File file = new File(path);
+    StringBuilder fileContent = new StringBuilder((int) file.length());
+    try(
+      FileInputStream fin = new FileInputStream(file);
+      InputStreamReader isr = new InputStreamReader(fin, encoding);
+    ) {
+      char[] buffer = new char[4096];
+      int charsRead = 0;
+      while ((charsRead = isr.read(buffer)) != -1) {
+        fileContent.append(buffer, 0, charsRead);
       }
-      fileReader.close();
       promise.resolve(fileContent.toString());
     } catch (Exception e) {
       promise.reject(e);
     }
   }
 
-  public void unlink(String path, Promise promise) {
+  void unlink(String path, Promise promise) {
     try {
       boolean result = new File(path).delete();
       if (result) {
@@ -165,11 +167,12 @@ class NativeBugsnagPerformanceImpl {
     }
   }
 
-  public void writeFile(String path, String data, String encoding, Promise promise){
-    try {
-      Writer w = new OutputStreamWriter(new FileOutputStream(path), encoding);
+  void writeFile(String path, String data, String encoding, Promise promise){
+    try(
+      FileOutputStream fout = new FileOutputStream(path);
+      Writer w = new OutputStreamWriter(fout, encoding);
+    ) {
       w.write(data);
-      w.close();
       promise.resolve(null);
     } catch (Exception e) {
       promise.reject(e);
