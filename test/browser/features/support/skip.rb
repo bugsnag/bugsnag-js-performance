@@ -2,6 +2,11 @@ Before('@skip') do
   skip_this_scenario("Skipping scenario")
 end
 
+Before('@skip_on_ios_13') do
+  $logger.info "Maze.config.browser is #{Maze.config.browser}"
+  skip_this_scenario("Skipping scenario on iOS 13") if Maze.config.browser == 'ios_13'
+end
+
 Before('@skip_on_device') do
   skip_this_scenario("Skipping scenario: Not suitable for mobile devices") if $browser.mobile?
 end

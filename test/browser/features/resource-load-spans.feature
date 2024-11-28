@@ -1,4 +1,6 @@
 Feature: Resource Load Spans
+  # TODO: Skipped on iOS 13 mobile browser pending PLAT-13253
+  @skip_on_ios_13
   @skip_on_cdn_build
   @requires_resource_load_spans
   Scenario: Resource load spans are automatically instrumented (NPM build)
