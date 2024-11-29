@@ -357,6 +357,8 @@ describe('Browser Delivery', () => {
       state: 'success',
       samplingProbability: undefined
     })
+
+    window.isSecureContext = true
   })
 
   it('omits the bugsnag integrity header when sendPayloadChecksums is false', async () => {
