@@ -76,7 +76,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
   )
   const setAppState = (state: AppState) => {
     appState = state
-  };
+  }
   const plugins = options.plugins(spanFactory, spanContextStorage, setAppState)
 
   return {
