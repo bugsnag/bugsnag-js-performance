@@ -27,6 +27,7 @@ import { timeToNumber } from './time'
 interface Constructor<T> { new(): T, prototype: T }
 
 export interface Client<C extends Configuration> {
+  appState: 'starting' | 'navigating' | 'settling' | 'ready'
   start: (config: C | string) => void
   startSpan: (name: string, options?: SpanOptions) => Span
   startNetworkSpan: (options: NetworkSpanOptions) => NetworkSpan
@@ -56,6 +57,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
   const bufferingProcessor = new BufferingProcessor()
   const spanContextStorage = options.spanContextStorage || new DefaultSpanContextStorage(options.backgroundingListener)
   let logger = options.schema.logger.defaultValue
+  let appState = 'starting'
   const sampler = new Sampler(1.0)
 
   const SpanFactoryClass = options.spanFactory || SpanFactory
@@ -180,6 +182,9 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     },
     get currentSpanContext () {
       return spanContextStorage.current
+    },
+    get appState () {
+      return appState
     },
     ...(options.platformExtensions && options.platformExtensions(spanFactory, spanContextStorage))
   } as BugsnagPerformance<C, T>

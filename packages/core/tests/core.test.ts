@@ -21,8 +21,9 @@ describe('Core', () => {
         startSpan: expect.any(Function),
         startNetworkSpan: expect.any(Function),
         currentSpanContext: undefined,
-        getPlugin: expect.any(Function)
-      })
+        appState: 'starting',
+        getPlugin: expect.any(Function),
+      });
     })
 
     describe('BugsnagPerformance', () => {
