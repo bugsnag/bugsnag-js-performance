@@ -59,7 +59,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
   const bufferingProcessor = new BufferingProcessor()
   const spanContextStorage = options.spanContextStorage || new DefaultSpanContextStorage(options.backgroundingListener)
   let logger = options.schema.logger.defaultValue
-  let appState = 'starting'
+  let appState: AppState = 'starting'
   const sampler = new Sampler(1.0)
 
   const SpanFactoryClass = options.spanFactory || SpanFactory
@@ -75,9 +75,9 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     spanContextStorage
   )
   const setAppState = (state: AppState) => {
-    appState = state;
-  };
-  const plugins = options.plugins(spanFactory, spanContextStorage, setAppState);
+    appState = state
+  }
+  const plugins = options.plugins(spanFactory, spanContextStorage, setAppState)
 
   return {
     start: (config: C | string) => {
