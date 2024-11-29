@@ -26,8 +26,10 @@ import { timeToNumber } from './time'
 
 interface Constructor<T> { new(): T, prototype: T }
 
+export type AppState = 'starting' | 'navigating' | 'settling' | 'ready'
+
 export interface Client<C extends Configuration> {
-  appState: 'starting' | 'navigating' | 'settling' | 'ready'
+  appState: AppState
   start: (config: C | string) => void
   startSpan: (name: string, options?: SpanOptions) => Span
   startNetworkSpan: (options: NetworkSpanOptions) => NetworkSpan
@@ -43,7 +45,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   resourceAttributesSource: ResourceAttributeSource<C>
   spanAttributesSource: SpanAttributesSource<C>
   schema: S
-  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => Array<Plugin<C>>
+  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage, setAppState: (state: AppState) => void) => Array<Plugin<C>>
   persistence: Persistence
   retryQueueFactory: RetryQueueFactory
   spanContextStorage?: SpanContextStorage
@@ -69,7 +71,10 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     logger,
     spanContextStorage
   )
-  const plugins = options.plugins(spanFactory, spanContextStorage)
+  const setAppState = (state: AppState) => {
+    appState = state;
+  };
+  const plugins = options.plugins(spanFactory, spanContextStorage, setAppState);
 
   return {
     start: (config: C | string) => {
