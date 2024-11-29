@@ -45,7 +45,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   resourceAttributesSource: ResourceAttributeSource<C>
   spanAttributesSource: SpanAttributesSource<C>
   schema: S
-  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => Array<Plugin<C>>
+  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage, setAppState: (state: AppState) => void) => Array<Plugin<C>>
   persistence: Persistence
   retryQueueFactory: RetryQueueFactory
   spanContextStorage?: SpanContextStorage
@@ -76,8 +76,8 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
   )
   const setAppState = (state: AppState) => {
     appState = state
-  }
-  const plugins = options.plugins(spanFactory, spanContextStorage)
+  };
+  const plugins = options.plugins(spanFactory, spanContextStorage, setAppState)
 
   return {
     start: (config: C | string) => {
