@@ -25,6 +25,7 @@ const defaultOptions = () => ({
   spanAttributesSource,
   schema,
   plugins: () => [],
+  appState: 'starting',
   persistence: new InMemoryPersistence(),
   retryQueueFactory: (delivery: Delivery, retryQueueMaxSize: number) => new InMemoryQueue(delivery, retryQueueMaxSize)
 })
