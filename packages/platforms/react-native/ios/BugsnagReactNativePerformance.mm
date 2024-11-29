@@ -41,6 +41,15 @@ static NSString *hostArch() noexcept {
 #endif
 }
 
+static uint64_t hexStringToUInt64(NSString *hexString) {
+    uint64_t result = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:hexString];
+    [scanner setScanLocation:0];
+    [scanner scanHexLongLong:&result];
+    
+    return result;
+}
+
 static NSString *getRandomBytes() noexcept {
     const int POOL_SIZE = 1024;
     UInt8 bytes[POOL_SIZE];
@@ -127,6 +136,46 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getNativeConfiguration) {
     }
 
     return config;
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(startNativeSpan:(NSString *)name
+                options:(NSDictionary *)options) {
+
+    BugsnagPerformanceSpanOptions *spanOptions = [BugsnagPerformanceSpanOptions new];
+    spanOptions.makeCurrentContext = NO;
+    spanOptions.firstClass = BSGFirstClassYes;
+    spanOptions.parentContext = nil;
+
+    // Javascript start times are Unix nanosecond timestamps
+    NSNumber *startTime = options[@"startTime"];
+    spanOptions.startTime = [NSDate dateWithTimeIntervalSince1970:([startTime doubleValue] / NSEC_PER_SEC)];
+
+    NSDictionary *parentContext = options[@"parentContext"];
+    if (parentContext != nil) {
+        NSString *parentSpanId = parentContext[@"id"];
+        NSString *parentTraceId = parentContext[@"traceId"];
+
+        uint64_t spanId = hexStringToUInt64(parentSpanId);
+        uint64_t traceIdHi = hexStringToUInt64([parentTraceId substringToIndex:16]);
+        uint64_t traceIdLo = hexStringToUInt64([parentTraceId substringFromIndex:16]);
+
+        spanOptions.parentContext = [[BugsnagPerformanceSpanContext alloc] initWithTraceIdHi:traceIdHi
+            traceIdLo:traceIdLo spanId:spanId];
+    }
+
+    BugsnagPerformanceSpan *nativeSpan = [BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.sharedInstance startSpan:name options:spanOptions];
+    [nativeSpan.attributes removeAllObjects];
+
+    NSMutableDictionary *span = [NSMutableDictionary new];
+    span[@"name"] = nativeSpan.name;
+    span[@"id"] = [NSString stringWithFormat:@"%llx", nativeSpan.spanId];
+    span[@"traceId"] = [NSString stringWithFormat:@"%llx%llx", nativeSpan.traceId.hi, nativeSpan.traceId.lo];
+    span[@"startTime"] = [NSNumber numberWithDouble: [nativeSpan.startTime timeIntervalSince1970] * NSEC_PER_SEC];
+    if (nativeSpan.parentId > 0) {
+        span[@"parentSpanId"] = [NSString stringWithFormat:@"%llx", nativeSpan.parentId];
+    }
+    
+    return span;
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED

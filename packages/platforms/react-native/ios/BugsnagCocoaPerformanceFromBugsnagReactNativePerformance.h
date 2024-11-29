@@ -1,5 +1,7 @@
 #import <Foundation/Foundation.h>
 #import "BugsnagPerformanceConfiguration.h"
+#import "BugsnagPerformanceSpan.h"
+#import "BugsnagPerformanceSpanOptions.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -17,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark Methods that will be bridged to BugsnagPerformance
 
 - (BugsnagPerformanceConfiguration * _Nullable)getConfiguration;
+
+- (BugsnagPerformanceSpan * _Nullable)startSpan:(NSString *)name options:(BugsnagPerformanceSpanOptions *)options;
 
 #pragma mark Shared Instance
 

@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		DA396E142CCFD327009B37C2 /* BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = DA396E132CCFD327009B37C2 /* BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.m */; };
-		DAE18DD42C58DF2500D52529 /* BugsnagReactNativePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = DAE18DD32C58DF2500D52529 /* BugsnagReactNativePerformance.m */; };
+		DAE18DD42C58DF2500D52529 /* BugsnagReactNativePerformance.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAE18DD32C58DF2500D52529 /* BugsnagReactNativePerformance.mm */; };
 		DAE18DD72C58E02C00D52529 /* BugsnagReactNativePerformance.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = DAE18DD22C58DF2500D52529 /* BugsnagReactNativePerformance.h */; };
 /* End PBXBuildFile section */
 
@@ -30,8 +30,11 @@
 		DA396E122CCFD242009B37C2 /* BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.h; sourceTree = "<group>"; };
 		DA396E132CCFD327009B37C2 /* BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.m; sourceTree = "<group>"; };
 		DA396E152CCFD72E009B37C2 /* BugsnagPerformanceConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagPerformanceConfiguration.h; sourceTree = "<group>"; };
+		DAC1DC592CF87E770009C7F9 /* BugsnagPerformanceSpanContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagPerformanceSpanContext.h; sourceTree = "<group>"; };
+		DAC1DC5A2CF87EBA0009C7F9 /* BugsnagPerformanceSpanOptions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagPerformanceSpanOptions.h; sourceTree = "<group>"; };
+		DAC1DC5B2CF8859A0009C7F9 /* BugsnagPerformanceSpan.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagPerformanceSpan.h; sourceTree = "<group>"; };
 		DAE18DD22C58DF2500D52529 /* BugsnagReactNativePerformance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BugsnagReactNativePerformance.h; sourceTree = "<group>"; };
-		DAE18DD32C58DF2500D52529 /* BugsnagReactNativePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BugsnagReactNativePerformance.m; sourceTree = "<group>"; };
+		DAE18DD32C58DF2500D52529 /* BugsnagReactNativePerformance.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BugsnagReactNativePerformance.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,11 +59,14 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				DAC1DC5B2CF8859A0009C7F9 /* BugsnagPerformanceSpan.h */,
+				DAC1DC5A2CF87EBA0009C7F9 /* BugsnagPerformanceSpanOptions.h */,
+				DAC1DC592CF87E770009C7F9 /* BugsnagPerformanceSpanContext.h */,
 				DA396E152CCFD72E009B37C2 /* BugsnagPerformanceConfiguration.h */,
 				DA396E132CCFD327009B37C2 /* BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.m */,
 				DA396E122CCFD242009B37C2 /* BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.h */,
 				DAE18DD22C58DF2500D52529 /* BugsnagReactNativePerformance.h */,
-				DAE18DD32C58DF2500D52529 /* BugsnagReactNativePerformance.m */,
+				DAE18DD32C58DF2500D52529 /* BugsnagReactNativePerformance.mm */,
 				134814211AA4EA7D00B7C361 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -123,7 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA396E142CCFD327009B37C2 /* BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.m in Sources */,
-				DAE18DD42C58DF2500D52529 /* BugsnagReactNativePerformance.m in Sources */,
+				DAE18DD42C58DF2500D52529 /* BugsnagReactNativePerformance.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -28,6 +28,16 @@ static id bugsnagPerformanceCrossTalkAPI = nil;
             }
         }
 
+        if ((err = [cls mapAPINamed:@"startSpanV1"
+                         toSelector:@selector(startSpan:options:)]) != nil) {
+            NSLog(@"Failed to map Bugsnag Performance API startSpanV1: %@", err);
+            NSString *mapped = err.userInfo[BSGUserInfoKeyMapped];
+            if (![mapped isEqualToString:BSGUserInfoValueMappedYes]) {
+                // Must abort because this method is not mapped, so we'd crash if we tried to call it.
+                return;
+            }
+        }
+
         // Our "sharedInstance" will actually be the cross-talk API whose class we loaded.
         bugsnagPerformanceCrossTalkAPI = [cls sharedInstance];
     }
