@@ -6,14 +6,17 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 
 class ReactNativeSpanContext implements SpanContext {
+  private static final int HEX_RADIX = 16;
+  private static final int TRACE_ID_MIDPOINT = 16;
+
   private final long nativeSpanId;
   private final UUID nativeTraceId;
-
-  public ReactNativeSpanContext(String spanId, String traceId) {
-    nativeSpanId = Long.parseUnsignedLong(spanId, 16);
+  
+  ReactNativeSpanContext(String spanId, String traceId) {
+    nativeSpanId = Long.parseUnsignedLong(spanId, HEX_RADIX);
     nativeTraceId = new UUID(
-      Long.parseUnsignedLong(traceId.substring(0, 16), 16),
-      Long.parseUnsignedLong(traceId.substring(16), 16)
+      Long.parseUnsignedLong(traceId.substring(0, TRACE_ID_MIDPOINT), HEX_RADIX),
+      Long.parseUnsignedLong(traceId.substring(TRACE_ID_MIDPOINT), HEX_RADIX)
     );
   }
 
