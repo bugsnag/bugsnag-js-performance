@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import com.bugsnag.reactnative.performance.NativeBugsnagPerformanceSpec;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
 public class BugsnagReactNativePerformance extends NativeBugsnagPerformanceSpec {
@@ -43,6 +44,10 @@ public class BugsnagReactNativePerformance extends NativeBugsnagPerformanceSpec 
   @Override
   public WritableMap getNativeConfiguration() {
     return impl.getNativeConfiguration();
+  }
+
+  @Override public WritableMap startNativeSpan(String name, ReadableMap options) {
+    return impl.startNativeSpan(name, options);
   }
 }
 

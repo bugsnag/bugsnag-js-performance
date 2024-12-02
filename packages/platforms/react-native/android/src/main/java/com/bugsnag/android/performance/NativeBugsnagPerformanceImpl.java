@@ -1,24 +1,29 @@
 package com.bugsnag.reactnative.performance;
 
-import android.content.Context;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Build;
-import androidx.annotation.NonNull;
+
 import androidx.annotation.Nullable;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import java.security.SecureRandom;
+
 import com.bugsnag.android.performance.BugsnagPerformance;
+import com.bugsnag.android.performance.SpanOptions;
+
+import com.bugsnag.android.performance.internal.BugsnagClock;
+import com.bugsnag.android.performance.internal.EncodingUtils;
+import com.bugsnag.android.performance.internal.SpanFactory;
+import com.bugsnag.android.performance.internal.SpanImpl;
 import com.bugsnag.android.performance.internal.processing.ImmutableConfig;
 
 class NativeBugsnagPerformanceImpl {
-  
+
   static final String MODULE_NAME = "BugsnagReactNativePerformance";
-  
+
   private final ReactApplicationContext reactContext;
 
   private final SecureRandom random = new SecureRandom();
@@ -29,15 +34,11 @@ class NativeBugsnagPerformanceImpl {
     this.reactContext = reactContext;
 
     try {
-      Class.forName("com.bugsnag.android.performance.BugsnagPerformance");
-      Class.forName("com.bugsnag.android.performance.internal.InstrumentedAppState");
+      BugsnagPerformance.INSTANCE.getInstrumentedAppState$internal().getConfig$internal();
       isNativePerformanceAvailable = true;
     }
     catch (LinkageError e) {
-      // do nothing, class found but is incompatible
-    }
-    catch (ClassNotFoundException e) {
-      // do nothing, Android Performance SDK is not installed
+      // do nothing, Android Performance SDK is not installed or is incompatible
     }
   }
 
@@ -107,11 +108,11 @@ class NativeBugsnagPerformanceImpl {
 
     WritableMap result = Arguments.createMap();
     result.putString("apiKey", nativeConfig.getApiKey());
-    result.putString("endpoint", nativeConfig.getEndpoint());    
+    result.putString("endpoint", nativeConfig.getEndpoint());
     result.putString("releaseStage", nativeConfig.getReleaseStage());
     result.putString("serviceName", nativeConfig.getServiceName());
     result.putInt("attributeCountLimit", nativeConfig.getAttributeCountLimit());
-    result.putInt("attriubuteStringValueLimit", nativeConfig.getAttributeStringValueLimit());
+    result.putInt("attributeStringValueLimit", nativeConfig.getAttributeStringValueLimit());
     result.putInt("attributeArrayLengthLimit", nativeConfig.getAttributeArrayLengthLimit());
 
     var appVersion = nativeConfig.getAppVersion();
@@ -130,9 +131,67 @@ class NativeBugsnagPerformanceImpl {
     }
 
     return result;
-  } 
+  }
 
   @Nullable
+  public WritableMap startNativeSpan(String name, ReadableMap options) {
+    if (!isNativePerformanceAvailable) {
+      return null;
+    }
+
+    SpanOptions spanOptions = readableMapToSpanOptions(options);
+    SpanFactory spanFactory = BugsnagPerformance.INSTANCE.getInstrumentedAppState$internal().getSpanFactory();
+    SpanImpl nativeSpan = spanFactory.createCustomSpan(name, spanOptions);
+
+    nativeSpan.getAttributes().getEntries$internal().clear();
+
+    WritableMap span = nativeSpanToJsSpan(nativeSpan);
+    return span;
+  }
+
+  private WritableMap nativeSpanToJsSpan(SpanImpl nativeSpan) {
+    WritableMap span = Arguments.createMap();
+    span.putString("name", nativeSpan.getName());
+    span.putString("id", EncodingUtils.toHexString(nativeSpan.getSpanId()));
+    span.putString("traceId", EncodingUtils.toHexString(nativeSpan.getTraceId()));
+
+    long unixNanoStartTime = BugsnagClock.INSTANCE.elapsedNanosToUnixTime(nativeSpan.getStartTime$internal());
+    span.putDouble("startTime", (double)unixNanoStartTime);
+
+    long parentSpanId = nativeSpan.getParentSpanId();
+    if (parentSpanId != 0L) {
+      span.putString("parentSpanId", EncodingUtils.toHexString(parentSpanId));
+    }
+
+    return span;
+  }
+
+  private SpanOptions readableMapToSpanOptions(ReadableMap jsOptions) {
+    SpanOptions spanOptions = SpanOptions.DEFAULTS
+      .setFirstClass(true)
+      .makeCurrentContext(false)
+      .within(null);
+
+    if (jsOptions.hasKey("startTime")) {
+      double startTime = jsOptions.getDouble("startTime");
+      long nativeStartTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)startTime);
+      spanOptions = spanOptions.startTime(nativeStartTime);
+    }
+
+    ReadableMap parentContext = null;
+    if (jsOptions.hasKey("parentContext") && (parentContext = jsOptions.getMap("parentContext")) != null) {
+      ReactNativeSpanContext nativeParentContext = new ReactNativeSpanContext(
+        parentContext.getString("id"),
+        parentContext.getString("traceId")
+      );
+
+      spanOptions = spanOptions.within(nativeParentContext);
+    }
+
+    return spanOptions;
+  }
+
+    @Nullable
   private String abiToArchitecture(@Nullable String abi) {
     if (abi == null) {
       return null;
