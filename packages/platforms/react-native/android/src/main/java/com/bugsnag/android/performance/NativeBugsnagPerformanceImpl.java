@@ -34,15 +34,11 @@ class NativeBugsnagPerformanceImpl {
     this.reactContext = reactContext;
 
     try {
-      Class.forName("com.bugsnag.android.performance.BugsnagPerformance");
-      Class.forName("com.bugsnag.android.performance.internal.InstrumentedAppState");
+      BugsnagPerformance.INSTANCE.getInstrumentedAppState$internal().getConfig$internal();
       isNativePerformanceAvailable = true;
     }
     catch (LinkageError e) {
-      // do nothing, class found but is incompatible
-    }
-    catch (ClassNotFoundException e) {
-      // do nothing, Android Performance SDK is not installed
+      // do nothing, Android Performance SDK is not installed or is incompatible
     }
   }
 
