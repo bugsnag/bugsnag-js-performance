@@ -64,10 +64,10 @@ const DEPENDENCIES = [
   `react-native-file-access@${reactNativeFileAccessVersion}`
 ]
 
-const reactNavigationVersion = parseFloat(reactNativeVersion) <= 0.64 ? '6.1.18' : 'latest'
-const reactNavigationNativeStackVersion = parseFloat(reactNativeVersion) <= 0.64 ? '6.11.0' : 'latest'
-const reactNativeScreensVersion = parseFloat(reactNativeVersion) <= 0.64 ? '3.14.0' : 'latest'
-const reactNativeSafeAreaContextVersion = parseFloat(reactNativeVersion) <= 0.64 ? '4.1.0' : 'latest'
+const reactNavigationVersion = '6.1.18'
+const reactNavigationNativeStackVersion = '6.11.0'
+const reactNativeScreensVersion = parseFloat(reactNativeVersion) <= 0.64 ? '3.14.0' : '3.35.0'
+const reactNativeSafeAreaContextVersion = parseFloat(reactNativeVersion) <= 0.64 ? '4.1.0' : '4.14.0'
 const REACT_NAVIGATION_DEPENDENCIES = [
   `@react-navigation/native@${reactNavigationVersion}`,
   `@react-navigation/native-stack@${reactNavigationNativeStackVersion}`,

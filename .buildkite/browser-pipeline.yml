@@ -46,6 +46,7 @@ steps:
             use-aliases: true
             service-ports: true
             command:
+              - --https
               - --farm=bb
               - --browser={{ matrix.browser }}_{{ matrix.version }}
               - --appium-version=1.22
@@ -66,10 +67,42 @@ steps:
             browser: [chrome, firefox]
             version: [latest]
           adjustments:
-            - with: { browser: safari, version: 16 }
+            - with: { browser: safari, version: 18 }
 
       # BrowserStack
       - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser tests${EXTRA_STEP_LABEL}"
+        depends_on: "browser-maze-runner-legacy-${USE_CDN_BUILD}"
+        timeout_in_minutes: 30
+        plugins:
+          docker-compose#v4.12.0:
+            pull: browser-maze-runner-legacy
+            run: browser-maze-runner-legacy
+            use-aliases: true
+            command:
+              - --https
+              - --farm=bs
+              - --browser={{ matrix.browser }}_{{ matrix.version }}
+          artifacts#v1.5.0:
+            upload:
+              - "./test/browser/maze_output/failed/**/*"
+          test-collector#v1.10.2:
+            files: "reports/TEST-*.xml"
+            format: "junit"
+            branch: "^main|next$$"
+            api-token-env-name: "BROWSER_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
+        concurrency: 2
+        concurrency_group: "browserstack"
+        matrix:
+          setup:
+            browser: [chrome]
+            version: [61]
+          adjustments:
+            - with: { browser: firefox, version: 60 }
+            - with: { browser: edge, version: 80 }
+            - with: { browser: edge, version: latest }
+
+      # BrowserStack non-https
+      - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser non-https tests${EXTRA_STEP_LABEL}"
         depends_on: "browser-maze-runner-legacy-${USE_CDN_BUILD}"
         timeout_in_minutes: 30
         plugins:
@@ -92,10 +125,5 @@ steps:
         concurrency_group: "browserstack"
         matrix:
           setup:
-            browser: [chrome]
-            version: [61]
-          adjustments:
-            - with: { browser: firefox, version: 60 }
-            - with: { browser: edge, version: 80 }
-            - with: { browser: safari, version: 11 }
-            - with: { browser: edge, version: latest }
+            browser: [safari]
+            version: [11]

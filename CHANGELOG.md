@@ -1,6 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [v2.10.1] (2024-11-12)
+
+### Fixed
+
+- (react-native) Prevent duplicate app start spans from being started [#524](https://github.com/bugsnag/bugsnag-js-performance/pull/524)
 
 ### Changed
 
