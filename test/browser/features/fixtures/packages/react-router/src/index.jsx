@@ -13,7 +13,7 @@ const parameters = new URLSearchParams(window.location.search)
 const apiKey = parameters.get('api_key')
 const endpoint = parameters.get('endpoint')
 
-const basename = '/react-router'
+const basename = '/docs/react-router'
 
 function Root() {
   return (
@@ -52,8 +52,9 @@ const router = createBrowserRouter(routes, { basename })
 BugsnagPerformance.start({
     apiKey,
     endpoint,
-    maximumBatchSize: 14,
+    maximumBatchSize: 2,
     batchInactivityTimeoutMs: 5000,
+    autoInstrumentFullPageLoads: false,
     autoInstrumentNetworkRequests: false,
     routingProvider: new ReactRouterRoutingProvider(routes, basename)
 })

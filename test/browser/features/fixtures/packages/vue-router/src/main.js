@@ -9,7 +9,7 @@ const parameters = new URLSearchParams(window.location.search)
 const apiKey = parameters.get('api_key')
 const endpoint = parameters.get('endpoint')
 
-const base = '/vue-router'
+const base = '/docs/vue-router'
 
 const router = createRouter({
   history: createWebHistory(base),
@@ -38,8 +38,9 @@ const router = createRouter({
 BugsnagPerformance.start({
     apiKey,
     endpoint,
-    maximumBatchSize: 14,
+    maximumBatchSize: 2,
     batchInactivityTimeoutMs: 5000,
+    autoInstrumentFullPageLoads: false,
     autoInstrumentNetworkRequests: false,
     routingProvider: new VueRouterRoutingProvider(router, base)
 })
