@@ -8,7 +8,7 @@ import type { BackgroundingListener } from '../lib/backgrounding-listener'
 import { createNoopClient } from '../lib/core'
 import { DefaultSpanContextStorage } from '../lib/span-context'
 import { InMemoryPersistence } from '../lib/persistence'
-import { AppState } from '../dist/types'
+import type { AppState } from '../dist/types'
 
 jest.useFakeTimers()
 
