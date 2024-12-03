@@ -1,5 +1,5 @@
 import type { Configuration, InternalConfiguration } from './config'
-import { AppState } from './core'
+import type { AppState } from './core'
 import type { SpanFactory } from './span-factory'
 
 export interface Plugin<C extends Configuration> {

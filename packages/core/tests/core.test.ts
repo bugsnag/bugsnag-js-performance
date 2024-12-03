@@ -378,16 +378,16 @@ describe('Core', () => {
       describe('appState', () => {
         it('changes the current app state', () => {
           class AppStatePlugin {
-            setAppState;
+            setAppState
 
-            constructor(setAppState: (state: AppState) => void) {
+            constructor (setAppState: (state: AppState) => void) {
               this.setAppState = setAppState
             }
 
-            configure() {}
+            configure () {}
 
-            updateState(appState: AppState) {
-              this.setAppState(appState);
+            updateState (appState: AppState) {
+              this.setAppState(appState)
             }
           }
 
@@ -523,7 +523,3 @@ describe('Core', () => {
     })
   })
 })
-function setAppState(state: AppState): void {
-  throw new Error('Function not implemented.')
-}
-
