@@ -433,9 +433,9 @@ describe('createNoopOnSettle', () => {
     expect(() => {
       const noopOnSettle = createNoopOnSettle()
       const spanFactory = new MockSpanFactory()
-      const setAppState = () => void
+      const setAppState = jest.fn()
       noopOnSettle(() => {})
-      noopOnSettle.configure(createConfiguration(), spanFactory, setAppState);
+      noopOnSettle.configure(createConfiguration(), spanFactory, setAppState)
     }).not.toThrow()
   })
 })
