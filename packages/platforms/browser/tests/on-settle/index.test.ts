@@ -433,8 +433,9 @@ describe('createNoopOnSettle', () => {
     expect(() => {
       const noopOnSettle = createNoopOnSettle()
       const spanFactory = new MockSpanFactory()
+      const setAppState = () => void
       noopOnSettle(() => {})
-      noopOnSettle.configure(createConfiguration(), spanFactory)
+      noopOnSettle.configure(createConfiguration(), spanFactory, setAppState);
     }).not.toThrow()
   })
 })
