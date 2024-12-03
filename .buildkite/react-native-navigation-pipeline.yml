@@ -1,5 +1,7 @@
 # This pipeline file builds runs the end-to-end tests for
 # React Native Navigation on BitBar.
+agents:
+  queue: opensource
 
 steps:
   - group: "React Native Navigation Tests"
@@ -8,7 +10,7 @@ steps:
       # ------------------------------
       - label: ":building_construction: :android: Build react-native-navigation test fixture - RN {{matrix.rn_version}} (Old Arch)"
         key: "build-react-native-navigation-android-fixture-old-arch"
-        timeout_in_minutes: 30
+        timeout_in_minutes: 15
         agents:
           queue: macos-12-arm
         env:
@@ -34,7 +36,7 @@ steps:
 
       - label: ":building_construction: :android: Build react-native-navigation test fixture - RN {{matrix.rn_version}} (New Arch)"
         key: "build-react-native-navigation-android-fixture-new-arch"
-        timeout_in_minutes: 30
+        timeout_in_minutes: 15
         agents:
           queue: macos-12-arm
         env:
@@ -63,7 +65,7 @@ steps:
       # ------------------------------
       - label: ":building_construction: :mac: Build react-native-navigation test fixture - RN {{matrix.rn_version}} (Old Arch)"
         key: "build-react-native-navigation-ios-fixture-old-arch"
-        timeout_in_minutes: 30
+        timeout_in_minutes: 15
         agents:
           queue: "macos-12-arm"
         env:
@@ -89,7 +91,7 @@ steps:
 
       - label: ":building_construction: :mac: Build react-native-navigation test fixture - RN {{matrix.rn_version}} (New Arch)"
         key: "build-react-native-navigation-ios-fixture-new-arch"
-        timeout_in_minutes: 30
+        timeout_in_minutes: 15
         agents:
           queue: "macos-12-arm"
         env:
@@ -118,7 +120,7 @@ steps:
       # ------------------------------
       - label: ":bitbar: :android: react-native-navigation end-to-end tests - RN {{matrix.rn_version}} (Old Arch) / Android {{matrix.android_version}} "
         depends_on: "build-react-native-navigation-android-fixture-old-arch"
-        timeout_in_minutes: 60
+        timeout_in_minutes: 30
         env:
           REACT_NATIVE_NAVIGATION: "true"
         plugins:
@@ -159,7 +161,7 @@ steps:
 
       - label: ":bitbar: :android: react-native-navigation end-to-end tests - RN {{matrix.rn_version}} (New Arch) / Android {{matrix.android_version}}"
         depends_on: "build-react-native-navigation-android-fixture-new-arch"
-        timeout_in_minutes: 60
+        timeout_in_minutes: 30
         env:
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "true"
@@ -203,7 +205,7 @@ steps:
       # ------------------------------
       - label: ":bitbar: :mac: react-native-navigation end-to-end tests - RN {{matrix.rn_version}} (Old Arch) / iOS {{matrix.ios_version}}"
         depends_on: "build-react-native-navigation-ios-fixture-old-arch"
-        timeout_in_minutes: 60
+        timeout_in_minutes: 30
         env:
           REACT_NATIVE_NAVIGATION: "true"
         plugins:
@@ -244,7 +246,7 @@ steps:
 
       - label: ":bitbar: :mac: react-native-navigation end-to-end tests - RN {{matrix.rn_version}} (New Arch) / iOS {{matrix.ios_version}} react-native-navigation end-to-end tests"
         depends_on: "build-react-native-navigation-ios-fixture-new-arch"
-        timeout_in_minutes: 60
+        timeout_in_minutes: 30
         env:
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "true"
