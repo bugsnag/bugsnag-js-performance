@@ -15,6 +15,7 @@ import {
 
 } from '@bugsnag/core-performance'
 import type { BugsnagPerformance, ClientOptions, Configuration, CoreSchema, Delivery } from '@bugsnag/core-performance'
+import { AppState } from '@bugsnag/react-native-performance/__mocks__/react-native'
 
 const defaultOptions = () => ({
   backgroundingListener: new ControllableBackgroundingListener(),
@@ -26,6 +27,7 @@ const defaultOptions = () => ({
   schema,
   plugins: () => [],
   appState: 'starting',
+  setAppState: () => AppState,
   persistence: new InMemoryPersistence(),
   retryQueueFactory: (delivery: Delivery, retryQueueMaxSize: number) => new InMemoryQueue(delivery, retryQueueMaxSize)
 })

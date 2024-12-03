@@ -8,6 +8,7 @@ import type { BackgroundingListener } from '../lib/backgrounding-listener'
 import { createNoopClient } from '../lib/core'
 import { DefaultSpanContextStorage } from '../lib/span-context'
 import { InMemoryPersistence } from '../lib/persistence'
+import { AppState } from '../dist/types'
 
 jest.useFakeTimers()
 
@@ -374,6 +375,36 @@ describe('Core', () => {
         })
       })
 
+      describe('appState', () => {
+        it('changes the current app state', () => {
+          class AppStatePlugin {
+            setAppState;
+
+            constructor(setAppState: (state: AppState) => void) {
+              this.setAppState = setAppState
+            }
+
+            configure() {}
+
+            updateState(appState: AppState) {
+              this.setAppState(appState);
+            }
+          }
+
+          const client = createTestClient({ plugins: (spanFactory, spanContextStorage, setAppState: (state: AppState) => void) => [new AppStatePlugin(setAppState)] })
+
+          client.start(VALID_API_KEY)
+
+          const plugin = client.getPlugin(AppStatePlugin)
+
+          expect(plugin).toBeInstanceOf(AppStatePlugin)
+
+          plugin?.updateState('navigating')
+
+          expect(client.appState).toBe('navigating')
+        })
+      })
+
       describe('getPlugin()', () => {
         it('returns an instance of a plugin', () => {
           const listener = jest.fn()
@@ -492,3 +523,7 @@ describe('Core', () => {
     })
   })
 })
+function setAppState(state: AppState): void {
+  throw new Error('Function not implemented.')
+}
+
