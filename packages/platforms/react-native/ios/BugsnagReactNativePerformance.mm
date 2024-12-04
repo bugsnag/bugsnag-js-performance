@@ -141,28 +141,11 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getNativeConfiguration) {
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(startNativeSpan:(NSString *)name
                 options:(NSDictionary *)options) {
 
-    BugsnagPerformanceSpanOptions *spanOptions = [BugsnagPerformanceSpanOptions new];
-    spanOptions.makeCurrentContext = NO;
-    spanOptions.firstClass = BSGFirstClassYes;
-    spanOptions.parentContext = nil;
-
-    // Javascript start times are Unix nanosecond timestamps
-    NSNumber *startTime = options[@"startTime"];
-    spanOptions.startTime = [NSDate dateWithTimeIntervalSince1970:([startTime doubleValue] / NSEC_PER_SEC)];
-
-    NSDictionary *parentContext = options[@"parentContext"];
-    if (parentContext != nil) {
-        NSString *parentSpanId = parentContext[@"id"];
-        NSString *parentTraceId = parentContext[@"traceId"];
-
-        uint64_t spanId = hexStringToUInt64(parentSpanId);
-        uint64_t traceIdHi = hexStringToUInt64([parentTraceId substringToIndex:16]);
-        uint64_t traceIdLo = hexStringToUInt64([parentTraceId substringFromIndex:16]);
-
-        spanOptions.parentContext = [[BugsnagPerformanceSpanContext alloc] initWithTraceIdHi:traceIdHi
-            traceIdLo:traceIdLo spanId:spanId];
-    }
-
+    // native spans are always first class and should never become the current context
+    NSMutableDictionary *spanOptions = [options mutableCopy];
+    spanOptions[@"makeCurrentContext"] = [NSNumber numberWithBool:NO];
+    spanOptions[@"firstClass"] = [NSNumber numberWithBool:YES];
+    
     BugsnagPerformanceSpan *nativeSpan = [BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.sharedInstance startSpan:name options:spanOptions];
     [nativeSpan.attributes removeAllObjects];
 
