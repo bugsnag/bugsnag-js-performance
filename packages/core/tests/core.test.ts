@@ -5,10 +5,10 @@ import {
   createTestClient
 } from '@bugsnag/js-performance-test-utilities'
 import type { BackgroundingListener } from '../lib/backgrounding-listener'
-import { createNoopClient } from '../lib/core'
-import { DefaultSpanContextStorage } from '../lib/span-context'
-import { InMemoryPersistence } from '../lib/persistence'
 import type { AppState } from '../lib/core'
+import { createNoopClient } from '../lib/core'
+import { InMemoryPersistence } from '../lib/persistence'
+import { DefaultSpanContextStorage } from '../lib/span-context'
 
 jest.useFakeTimers()
 
@@ -376,31 +376,28 @@ describe('Core', () => {
       })
 
       describe('appState', () => {
-        it('changes the current app state', () => {
+        it('updates the current appState', () => {
           class AppStatePlugin {
-            setAppState
+            setAppState?: (appState: AppState) => void
 
-            constructor (setAppState: (state: AppState) => void) {
+            configure (configuration: any, spanFactory: any, setAppState: (appState: AppState) => void) {
               this.setAppState = setAppState
             }
 
-            configure () {}
-
             updateState (appState: AppState) {
-              this.setAppState(appState)
+              if (this.setAppState) {
+                this.setAppState(appState)
+              }
             }
           }
 
-          const client = createTestClient({ plugins: (spanFactory, spanContextStorage, setAppState: (state: AppState) => void) => [new AppStatePlugin(setAppState)] })
+          const plugin = new AppStatePlugin()
+          const client = createTestClient()
 
-          client.start(VALID_API_KEY)
+          client.start({ apiKey: VALID_API_KEY, plugins: [plugin] })
+          expect(client.appState).toBe('starting')
 
-          const plugin = client.getPlugin(AppStatePlugin)
-
-          expect(plugin).toBeInstanceOf(AppStatePlugin)
-
-          plugin?.updateState('navigating')
-
+          plugin.updateState('navigating')
           expect(client.appState).toBe('navigating')
         })
       })
