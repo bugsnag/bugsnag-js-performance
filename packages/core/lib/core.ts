@@ -73,6 +73,11 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     start: (config: C | string) => {
       const configuration = validateConfig<S, C>(config, options.schema)
 
+      // sendPayloadChecksums is false by default unless custom endpoints are not specified
+      if (typeof config !== 'string' && !config.endpoint) {
+        configuration.sendPayloadChecksums = ('sendPayloadChecksums' in config && config.sendPayloadChecksums) || true
+      }
+
       // if using the default endpoint add the API key as a subdomain
       // e.g. convert URL https://otlp.bugsnag.com/v1/traces to URL https://<project_api_key>.otlp.bugsnag.com/v1/traces
       if (configuration.endpoint === schema.endpoint.defaultValue) {
@@ -92,7 +97,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         }
       }
 
-      const delivery = options.deliveryFactory(configuration.endpoint)
+      const delivery = options.deliveryFactory(configuration.endpoint, configuration.sendPayloadChecksums)
 
       options.spanAttributesSource.configure(configuration)
 
