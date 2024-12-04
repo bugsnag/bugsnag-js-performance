@@ -27,7 +27,7 @@ const defaultOptions = () => ({
   schema,
   plugins: () => [],
   appState: 'starting',
-  setAppState: (appState: AppState) => { appState },
+  setAppState: (appState: AppState) => appState,
   persistence: new InMemoryPersistence(),
   retryQueueFactory: (delivery: Delivery, retryQueueMaxSize: number) =>
     new InMemoryQueue(delivery, retryQueueMaxSize)
