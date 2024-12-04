@@ -17,8 +17,6 @@ typedef uint64_t SpanId;
 @property(nonatomic) TraceId traceId;
 @property(nonatomic) SpanId spanId;
 
-- (instancetype) initWithTraceIdHi:(uint64_t)traceIdHi traceIdLo:(uint64_t)traceIdLo spanId:(SpanId)spanId;
-
 @end
 
 NS_ASSUME_NONNULL_END
