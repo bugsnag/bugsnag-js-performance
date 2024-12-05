@@ -52,4 +52,9 @@ public class BugsnagReactNativePerformance extends ReactContextBaseJavaModule {
   public WritableMap startNativeSpan(String name, ReadableMap options) {
     return impl.startNativeSpan(name, options);
   }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public void endNativeSpan(String spanId, double endTime, ReadableMap attributes) {
+    impl.endNativeSpan(spanId, endTime, attributes);
+  }
 }
