@@ -1,15 +1,18 @@
 package com.bugsnag.reactnative.performance;
 
+import android.annotation.SuppressLint;
 import android.content.pm.PackageInfo;
 import android.os.Build;
 
 import androidx.annotation.Nullable;
+
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import java.security.SecureRandom;
+import java.util.HashMap;
 
 import com.bugsnag.android.performance.BugsnagPerformance;
 import com.bugsnag.android.performance.SpanOptions;
@@ -20,6 +23,7 @@ import com.bugsnag.android.performance.internal.SpanFactory;
 import com.bugsnag.android.performance.internal.SpanImpl;
 import com.bugsnag.android.performance.internal.processing.ImmutableConfig;
 
+@SuppressLint("RestrictedApi")
 class NativeBugsnagPerformanceImpl {
 
   static final String MODULE_NAME = "BugsnagReactNativePerformance";
@@ -29,6 +33,8 @@ class NativeBugsnagPerformanceImpl {
   private final SecureRandom random = new SecureRandom();
 
   private boolean isNativePerformanceAvailable = false;
+
+  private final HashMap<String, SpanImpl> openSpans = new HashMap<>();
 
   public NativeBugsnagPerformanceImpl(ReactApplicationContext reactContext) {
     this.reactContext = reactContext;
@@ -144,9 +150,20 @@ class NativeBugsnagPerformanceImpl {
     SpanImpl nativeSpan = spanFactory.createCustomSpan(name, spanOptions);
 
     nativeSpan.getAttributes().getEntries$internal().clear();
+    openSpans.put(EncodingUtils.toHexString(nativeSpan.getSpanId()), nativeSpan);
 
-    WritableMap span = nativeSpanToJsSpan(nativeSpan);
-    return span;
+    return nativeSpanToJsSpan(nativeSpan);
+  }
+
+  public void endNativeSpan(String spanId, double endTime, ReadableMap jsAttributes, Promise promise) {
+    SpanImpl nativeSpan = openSpans.remove(spanId);
+    if (nativeSpan != null) {
+      ReactNativeSpanAttributes.setAttributesFromReadableMap(nativeSpan.getAttributes(), jsAttributes);
+      long nativeEndTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)endTime);
+      nativeSpan.end(nativeEndTime);
+    }
+
+    promise.resolve(null);
   }
 
   private WritableMap nativeSpanToJsSpan(SpanImpl nativeSpan) {
@@ -178,7 +195,7 @@ class NativeBugsnagPerformanceImpl {
       spanOptions = spanOptions.startTime(nativeStartTime);
     }
 
-    ReadableMap parentContext = null;
+    ReadableMap parentContext;
     if (jsOptions.hasKey("parentContext") && (parentContext = jsOptions.getMap("parentContext")) != null) {
       ReactNativeSpanContext nativeParentContext = new ReactNativeSpanContext(
         parentContext.getString("id"),
