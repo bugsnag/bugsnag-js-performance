@@ -82,12 +82,125 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(requestEntropy) {
     return hexStr;
 }
 
- RCT_EXPORT_METHOD(requestEntropyAsync:(RCTPromiseResolveBlock)resolve
-                   rejecter:(RCTPromiseRejectBlock)reject)
- {
-     NSString *hexStr = getRandomBytes();
-     resolve(hexStr);
- }
+RCT_EXPORT_METHOD(requestEntropyAsync:(RCTPromiseResolveBlock)resolve
+                   rejecter:(RCTPromiseRejectBlock)reject) {
+    NSString *hexStr = getRandomBytes();
+    resolve(hexStr);
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getNativeConstants) {
+    NSMutableDictionary *nativeDirs = [NSMutableDictionary new];
+    NSArray<NSString *> *caches = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true);
+    if (caches != nil && [caches count] != 0 ) {
+        nativeDirs[@"CacheDir"] = caches[0];
+    }
+    NSArray<NSString *> *documents = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true);
+    if (documents != nil && [documents count] != 0 ) {
+        nativeDirs[@"DocumentDir"] = documents[0];
+    }
+
+    return nativeDirs;
+}
+
+RCT_EXPORT_METHOD(exists:(NSString *)path
+       resolve:(RCTPromiseResolveBlock)resolve
+        reject:(RCTPromiseRejectBlock)reject) {
+    BOOL exists = [NSFileManager.defaultManager fileExistsAtPath:path];
+    resolve(@(exists));
+}
+
+RCT_EXPORT_METHOD(isDir:(NSString *)path
+      resolve:(RCTPromiseResolveBlock)resolve
+       reject:(RCTPromiseRejectBlock)reject) {
+    BOOL isDir;
+    BOOL exists = [NSFileManager.defaultManager fileExistsAtPath:path isDirectory:&isDir];
+    resolve(@(exists && isDir));
+}
+
+RCT_EXPORT_METHOD(ls:(NSString *)path
+   resolve:(RCTPromiseResolveBlock)resolve
+    reject:(RCTPromiseRejectBlock)reject) {
+    NSError *error;
+    NSArray<NSString *> *contents = [NSFileManager.defaultManager contentsOfDirectoryAtPath:path error:&error];
+    if (error != nil) {
+        reject(@"ENOENT", @"Directory does not exist", error);
+    } else {
+        resolve(contents);
+    }
+}
+
+RCT_EXPORT_METHOD(mkdir:(NSString *)path
+      resolve:(RCTPromiseResolveBlock)resolve
+       reject:(RCTPromiseRejectBlock)reject) {
+    NSError *error;
+    BOOL result = [NSFileManager.defaultManager createDirectoryAtPath:path withIntermediateDirectories:true attributes:nil error:&error];
+    if (error != nil) {
+        reject(@"EIO", @"Failed to create directory", error);
+    } else {
+        resolve(@(result));
+    }
+}
+
+RCT_EXPORT_METHOD(readFile:(NSString *)path
+        encoding:(NSString *)encoding
+         resolve:(RCTPromiseResolveBlock)resolve
+          reject:(RCTPromiseRejectBlock)reject) {
+    NSError *error;
+    if ([encoding isEqualToString:@"utf8"]) {
+        NSString *fileString = [[NSString alloc] initWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&error];
+        if (error != nil) {
+            reject(@"EIO", @"Failed to read file", error);
+        } else {
+            resolve(fileString);
+        }
+    } else if ([encoding isEqualToString:@"base64"]) {
+        NSData *fileData = [[NSData alloc] initWithContentsOfFile:path];
+        if (fileData != nil) {
+            resolve([fileData base64EncodedStringWithOptions:0]);
+        } else {
+            reject(@"ERR", @"Failed to read file, invalid base64", nil);
+        }
+    }
+}
+
+RCT_EXPORT_METHOD(unlink:(NSString *)path
+       resolve:(RCTPromiseResolveBlock)resolve
+        reject:(RCTPromiseRejectBlock)reject) {
+    NSError *error;
+    BOOL result = [NSFileManager.defaultManager removeItemAtPath:path error:&error];
+    if (error != nil) {
+        reject(@"EIO", @"Failed to remove file", error);
+    } else if (result) {
+        resolve(nil);
+    } else {
+        reject(@"ENOENT", @"Failed to delete file/directory", nil);
+    }
+}
+
+RCT_EXPORT_METHOD(writeFile:(NSString *)path
+             data:(NSString *)data
+         encoding:(NSString *)encoding
+          resolve:(RCTPromiseResolveBlock)resolve
+           reject:(RCTPromiseRejectBlock)reject) {
+    if ([encoding isEqualToString:@"utf8"]) {
+        NSError *error;
+        [data writeToFile:path atomically:NO encoding:NSUTF8StringEncoding error:&error];
+        if (error != nil) {
+            reject(@"EIO", @"Failed to write file", error);
+        } else {
+            resolve(nil);
+        }
+    } else if ([encoding isEqualToString:@"base64"]) {
+        NSURL *fileURL = [NSURL fileURLWithPath:path];
+        NSData *nsData = [[NSData alloc] initWithBase64EncodedString:data options:NSDataBase64DecodingIgnoreUnknownCharacters];
+        if (nsData != nil) {
+            [nsData writeToURL:fileURL atomically:NO];
+            resolve(nil);
+        } else {
+            reject(@"ERR", @"Failed to write to '\(path)', invalid base64.", nil);
+        }
+    }
+}
 
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
