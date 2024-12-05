@@ -26,7 +26,10 @@ import { timeToNumber } from './time'
 
 interface Constructor<T> { new(): T, prototype: T }
 
+export type AppState = 'starting' | 'navigating' | 'settling' | 'ready'
+
 export interface Client<C extends Configuration> {
+  appState: AppState
   start: (config: C | string) => void
   startSpan: (name: string, options?: SpanOptions) => Span
   startNetworkSpan: (options: NetworkSpanOptions) => NetworkSpan
@@ -56,6 +59,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
   let processor: Processor = bufferingProcessor
   const spanContextStorage = options.spanContextStorage || new DefaultSpanContextStorage(options.backgroundingListener)
   let logger = options.schema.logger.defaultValue
+  let appState: AppState = 'starting'
   const sampler = new Sampler(1.0)
   const spanFactory = new SpanFactory(
     processor,
@@ -67,6 +71,9 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     logger,
     spanContextStorage
   )
+  const setAppState = (state: AppState) => {
+    appState = state
+  }
   const plugins = options.plugins(spanFactory, spanContextStorage)
 
   return {
@@ -142,7 +149,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       }
 
       for (const plugin of plugins) {
-        plugin.configure(configuration, spanFactory)
+        plugin.configure(configuration, spanFactory, setAppState)
       }
     },
     startSpan: (name, spanOptions?: SpanOptions) => {
@@ -179,6 +186,9 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     },
     get currentSpanContext () {
       return spanContextStorage.current
+    },
+    get appState () {
+      return appState
     },
     ...(options.platformExtensions && options.platformExtensions(spanFactory, spanContextStorage))
   } as BugsnagPerformance<C, T>
