@@ -155,14 +155,15 @@ class NativeBugsnagPerformanceImpl {
     return nativeSpanToJsSpan(nativeSpan);
   }
 
-  public void endNativeSpan(String spanId, double endTime, ReadableMap jsAttributes) {
+  public void endNativeSpan(String spanId, double endTime, ReadableMap jsAttributes, Promise promise) {
     SpanImpl nativeSpan = openSpans.remove(spanId);
-    if (nativeSpan == null) return;
+    if (nativeSpan != null) {
+      ReactNativeSpanAttributes.setAttributesFromReadableMap(nativeSpan.getAttributes(), jsAttributes);
+      long nativeEndTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)endTime);
+      nativeSpan.end(nativeEndTime);
+    }
 
-    ReactNativeSpanAttributes.setAttributesFromReadableMap(nativeSpan.getAttributes(), jsAttributes);
-
-    long nativeEndTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)endTime);
-    nativeSpan.end(nativeEndTime);
+    promise.resolve(null);
   }
 
   private WritableMap nativeSpanToJsSpan(SpanImpl nativeSpan) {
