@@ -1,3 +1,5 @@
+// Copied from BugsnagPerformanceConfiguration.h in bugsnag-cocoa-performance
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface BugsnagPerformanceConfiguration : NSObject

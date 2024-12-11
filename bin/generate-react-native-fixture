@@ -381,7 +381,7 @@ function installCocoaPerformance() {
   const podfilePath = resolve(fixtureDir, 'ios/Podfile')
   let podfile = fs.readFileSync(podfilePath, 'utf8')
 
-  const performancePod = `pod 'BugsnagPerformance', :git => 'https://github.com/bugsnag/bugsnag-cocoa-performance.git', :branch => 'integration/react-native-integration'`
+  const performancePod = `pod 'BugsnagPerformance', :git => 'https://github.com/bugsnag/bugsnag-cocoa-performance.git', :branch => 'ya/crosstalk-proxy-span-options'`
   const targetSection = 'target \'reactnative\' do'
 
   podfile = podfile.replace(targetSection, `${targetSection}\n  ${performancePod}`)

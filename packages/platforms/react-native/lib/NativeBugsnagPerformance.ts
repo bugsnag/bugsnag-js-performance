@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 import type { TurboModule } from 'react-native/Libraries/TurboModule/RCTExport'
+import type { UnsafeObject } from 'react-native/Libraries/Types/CodegenTypes'
 import { TurboModuleRegistry } from 'react-native'
 
 export type DeviceInfo = {
@@ -28,17 +29,12 @@ export type ParentContext = {
   traceId: string
 }
 
-export type NativeSpanOptions = {
-  startTime: number | undefined
-  parentContext: ParentContext | null
-}
-
 export type NativeSpan = {
   name: string
   id: string
   traceId: string
   startTime: number
-  parentSpanId: string
+  parentSpanId: string | undefined
 }
 
 export interface Spec extends TurboModule {
@@ -47,7 +43,7 @@ export interface Spec extends TurboModule {
   requestEntropyAsync: () => Promise<string>
   isNativePerformanceAvailable: () => boolean
   getNativeConfiguration: () => NativeConfiguration | null
-  startNativeSpan: (name: string, options: NativeSpanOptions) => NativeSpan
+  startNativeSpan: (name: string, options: UnsafeObject) => NativeSpan
 }
 
 export default TurboModuleRegistry.get<Spec>(
