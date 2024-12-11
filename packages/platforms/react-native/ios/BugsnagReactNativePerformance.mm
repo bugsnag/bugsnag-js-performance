@@ -1,5 +1,5 @@
 #import "BugsnagReactNativePerformance.h"
-#import "BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.h"
+#import "BugsnagReactNativePerformanceCrossTalkAPIClient.h"
 #import <sys/sysctl.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -7,6 +7,8 @@
 #endif
 
 @implementation BugsnagReactNativePerformance
+
+static NSUInteger traceIdMidpoint = 16;
 
 RCT_EXPORT_MODULE()
 
@@ -42,11 +44,18 @@ static NSString *hostArch() noexcept {
 }
 
 static uint64_t hexStringToUInt64(NSString *hexString) {
+    if (hexString == nil || [hexString length] == 0) {
+        return 0;
+    }
+
     uint64_t result = 0;
     NSScanner *scanner = [NSScanner scannerWithString:hexString];
     [scanner setScanLocation:0];
-    [scanner scanHexLongLong:&result];
-    
+
+    if (![scanner scanHexLongLong:&result]) {
+        return 0;
+    }
+
     return result;
 }
 
@@ -100,16 +109,15 @@ RCT_EXPORT_METHOD(requestEntropyAsync:(RCTPromiseResolveBlock)resolve
 }
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(isNativePerformanceAvailable) {
-BOOL isAvailable = BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.sharedInstance != nil;
-return [NSNumber numberWithBool: isAvailable];
+    return [NSNumber numberWithBool:BugsnagReactNativePerformanceCrossTalkAPIClient.isInitialized];
 }
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getNativeConfiguration) {
-    if (BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.sharedInstance == nil) {
+    if (!BugsnagReactNativePerformanceCrossTalkAPIClient.isInitialized) {
         return nil;
     }
 
-    BugsnagPerformanceConfiguration *nativeConfig = [BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.sharedInstance getConfiguration];
+    BugsnagPerformanceConfiguration *nativeConfig = [BugsnagReactNativePerformanceCrossTalkAPIClient.sharedInstance getConfiguration];
     if (nativeConfig == nil) {
         return nil;
     }
@@ -142,17 +150,35 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(startNativeSpan:(NSString *)name
                 options:(NSDictionary *)options) {
 
     // native spans are always first class and should never become the current context
-    NSMutableDictionary *spanOptions = [options mutableCopy];
-    spanOptions[@"makeCurrentContext"] = [NSNumber numberWithBool:NO];
-    spanOptions[@"firstClass"] = [NSNumber numberWithBool:YES];
+    BugsnagPerformanceSpanOptions *spanOptions = [BugsnagReactNativePerformanceCrossTalkAPIClient.sharedInstance newSpanOptions];
+    spanOptions.firstClass = BSGFirstClassYes;
+    spanOptions.makeCurrentContext = NO;
+    spanOptions.instrumentRendering = BSGInstrumentRenderingYes;
+    spanOptions.parentContext = nil;
     
-    BugsnagPerformanceSpan *nativeSpan = [BugsnagCocoaPerformanceFromBugsnagReactNativePerformance.sharedInstance startSpan:name options:spanOptions];
+    // Start times are passsed from JS as unix nanosecond timestamps
+    NSNumber *startTime = options[@"startTime"];
+    spanOptions.startTime = [NSDate dateWithTimeIntervalSince1970:([startTime doubleValue] / NSEC_PER_SEC)];
+    
+    NSDictionary *parentContext = options[@"parentContext"];
+    if (parentContext != nil) {
+        NSString *parentSpanId = parentContext[@"id"];
+        NSString *parentTraceId = parentContext[@"traceId"];
+
+        uint64_t spanId = hexStringToUInt64(parentSpanId);
+        uint64_t traceIdHi = hexStringToUInt64([parentTraceId substringToIndex:traceIdMidpoint]);
+        uint64_t traceIdLo = hexStringToUInt64([parentTraceId substringFromIndex:traceIdMidpoint]);
+
+        spanOptions.parentContext = [BugsnagReactNativePerformanceCrossTalkAPIClient.sharedInstance newSpanContext:traceIdHi traceIdLo:traceIdLo spanId:spanId];
+    }
+    
+    BugsnagPerformanceSpan *nativeSpan = [BugsnagReactNativePerformanceCrossTalkAPIClient.sharedInstance startSpan:name options:spanOptions];
     [nativeSpan.attributes removeAllObjects];
 
     NSMutableDictionary *span = [NSMutableDictionary new];
     span[@"name"] = nativeSpan.name;
     span[@"id"] = [NSString stringWithFormat:@"%llx", nativeSpan.spanId];
-    span[@"traceId"] = [NSString stringWithFormat:@"%llx%llx", nativeSpan.traceId.hi, nativeSpan.traceId.lo];
+    span[@"traceId"] = [NSString stringWithFormat:@"%llx%llx", nativeSpan.traceIdHi, nativeSpan.traceIdLo];
     span[@"startTime"] = [NSNumber numberWithDouble: [nativeSpan.startTime timeIntervalSince1970] * NSEC_PER_SEC];
     if (nativeSpan.parentId > 0) {
         span[@"parentSpanId"] = [NSString stringWithFormat:@"%llx", nativeSpan.parentId];

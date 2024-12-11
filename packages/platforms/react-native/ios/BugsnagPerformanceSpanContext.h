@@ -1,21 +1,18 @@
+// Copied from BugsnagPerformanceSpanContext.h in bugsnag-cocoa-performance
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef union {
-    __uint128_t value;
-    struct {
-        uint64_t lo;
-        uint64_t hi;
-    };
-} TraceId;
-
 typedef uint64_t SpanId;
 
+OBJC_EXPORT
 @interface BugsnagPerformanceSpanContext : NSObject
 
-@property(nonatomic) TraceId traceId;
-@property(nonatomic) SpanId spanId;
+@property(nonatomic,readonly) SpanId spanId;
+@property(nonatomic,readonly) uint64_t traceIdHi;
+@property(nonatomic,readonly) uint64_t traceIdLo;
+
+- (instancetype) initWithTraceIdHi:(uint64_t)traceIdHi traceIdLo:(uint64_t)traceIdLo spanId:(SpanId)spanId;
 
 @end
 
