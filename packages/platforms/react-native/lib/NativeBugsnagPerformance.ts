@@ -45,6 +45,7 @@ export interface Spec extends TurboModule {
   getNativeConfiguration: () => NativeConfiguration | null
   startNativeSpan: (name: string, options: UnsafeObject) => NativeSpan
   endNativeSpan: (spanId: string, endTime: number, attributes: UnsafeObject) => Promise<void>
+  markNativeSpanEndTime: (spanId: string, endTime: number) => void
 }
 
 export default TurboModuleRegistry.get<Spec>(
