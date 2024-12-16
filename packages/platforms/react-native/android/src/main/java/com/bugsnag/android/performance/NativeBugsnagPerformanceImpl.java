@@ -92,11 +92,7 @@ class NativeBugsnagPerformanceImpl {
   void exists(String path, Promise promise) {
     try {
       boolean result = new File(path).exists();
-      if (result) {
-        promise.resolve(result);
-      } else {
-        promise.reject(new Exception("File does not exist"));
-      }
+      promise.resolve(result);
     } catch(Exception e) {
       promise.reject(e);
     }
@@ -105,11 +101,7 @@ class NativeBugsnagPerformanceImpl {
   void isDir(String path, Promise promise) {
     try {
       boolean result = new File(path).isDirectory();
-      if (result) {
-        promise.resolve(result);
-      } else {
-        promise.reject(new Exception("Path is not a directory"));
-      }
+      promise.resolve(result);
     } catch(Exception e) {
       promise.reject(e);
     }
@@ -117,7 +109,13 @@ class NativeBugsnagPerformanceImpl {
 
   void ls(String path, Promise promise) {
     try {
-      promise.resolve(new File(path).list());
+      String[] files = new File(path).list();
+      WritableArray resultArray = Arguments.createArray();
+      for (String file : files) {
+        resultArray.pushString(file);
+      }
+
+      promise.resolve(resultArray);
     } catch(Exception e) {
       promise.reject(e);
     }
@@ -125,11 +123,17 @@ class NativeBugsnagPerformanceImpl {
 
   void mkdir(String path, Promise promise) {
     try {
-      boolean result = new File(path).mkdir();
+      File file = new File(path);
+      if (file.exists()) {
+        promise.reject("EEXIST", new Exception("Already exists."));
+        return;
+      }
+
+      boolean result = file.mkdirs();
       if (result) {
         promise.resolve(path);
       } else {
-        promise.reject(new Exception("Failed to create directory"));
+        promise.reject("EPERM", new Exception("Failed to create directory"));
       }
     } catch(Exception e) {
       promise.reject(e);
