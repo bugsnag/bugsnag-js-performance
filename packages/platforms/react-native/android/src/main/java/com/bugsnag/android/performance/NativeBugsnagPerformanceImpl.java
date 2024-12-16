@@ -34,6 +34,13 @@ class NativeBugsnagPerformanceImpl {
 
   private boolean isNativePerformanceAvailable = false;
 
+  /**
+   * A map of open native spans, keyed by the span ID and trace ID,
+   * so that they can be retrieved and closed/discarded from JS.
+   * 
+   * Since native spans are only ever started and ended from the JS thread,
+   * no thread synchronization is required when accessing.
+   */
   private final HashMap<String, SpanImpl> openSpans = new HashMap<>();
 
   public NativeBugsnagPerformanceImpl(ReactApplicationContext reactContext) {
@@ -150,21 +157,23 @@ class NativeBugsnagPerformanceImpl {
     SpanImpl nativeSpan = spanFactory.createCustomSpan(name, spanOptions);
 
     nativeSpan.getAttributes().getEntries$internal().clear();
-    openSpans.put(EncodingUtils.toHexString(nativeSpan.getSpanId()), nativeSpan);
+
+    String spanKey = EncodingUtils.toHexString(nativeSpan.getSpanId()) + EncodingUtils.toHexString(nativeSpan.getTraceId());
+    openSpans.put(spanKey, nativeSpan);
 
     return nativeSpanToJsSpan(nativeSpan);
   }
 
-  public void markNativeSpanEndTime(String spanId, double endTime) {
-    SpanImpl nativeSpan = openSpans.get(spanId);
+  public void markNativeSpanEndTime(String spanId, String traceId, double endTime) {
+    SpanImpl nativeSpan = openSpans.get(spanId + traceId);
     if (nativeSpan != null) {
       long nativeEndTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)endTime);
       nativeSpan.markEndTime$internal(nativeEndTime);
     }
   }
 
-  public void endNativeSpan(String spanId, double endTime, ReadableMap jsAttributes, Promise promise) {
-    SpanImpl nativeSpan = openSpans.remove(spanId);
+  public void endNativeSpan(String spanId, String traceId, double endTime, ReadableMap jsAttributes, Promise promise) {
+    SpanImpl nativeSpan = openSpans.remove(spanId + traceId);
     if (nativeSpan == null) {
       promise.resolve(null);
       return;
@@ -222,7 +231,8 @@ class NativeBugsnagPerformanceImpl {
     return spanOptions;
   }
 
-    @Nullable
+
+  @Nullable
   private String abiToArchitecture(@Nullable String abi) {
     if (abi == null) {
       return null;
