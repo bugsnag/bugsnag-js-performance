@@ -1,5 +1,6 @@
 #import "BugsnagReactNativePerformance.h"
 #import "BugsnagReactNativePerformanceCrossTalkAPIClient.h"
+#import "ReactNativeSpanAttributes.h"
 #import <sys/sysctl.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -10,7 +11,24 @@
 
 static NSUInteger traceIdMidpoint = 16;
 
+/**
+* A dictionary of open native spans, keyed by the span ID and trace ID,
+* so that they can be retrieved and closed/discarded from JS.
+* 
+* Since native spans are only ever started and ended from the JS thread,
+* no thread synchronization is required when accessing.
+*/
+NSMutableDictionary *openSpans;
+
 RCT_EXPORT_MODULE()
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        openSpans = [NSMutableDictionary new];
+    }
+    return self;
+}
 
 static NSString *sysctlString(const char *name) noexcept {
     char value[32];
@@ -174,17 +192,60 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(startNativeSpan:(NSString *)name
     
     BugsnagPerformanceSpan *nativeSpan = [BugsnagReactNativePerformanceCrossTalkAPIClient.sharedInstance startSpan:name options:spanOptions];
     [nativeSpan.attributes removeAllObjects];
+    
+    NSString *spanId = [NSString stringWithFormat:@"%llx", nativeSpan.spanId];
+    NSString *traceId = [NSString stringWithFormat:@"%llx%llx", nativeSpan.traceIdHi, nativeSpan.traceIdLo];
+    openSpans[[spanId stringByAppendingString:traceId]] = nativeSpan;
 
     NSMutableDictionary *span = [NSMutableDictionary new];
     span[@"name"] = nativeSpan.name;
-    span[@"id"] = [NSString stringWithFormat:@"%llx", nativeSpan.spanId];
-    span[@"traceId"] = [NSString stringWithFormat:@"%llx%llx", nativeSpan.traceIdHi, nativeSpan.traceIdLo];
+    span[@"id"] = spanId;
+    span[@"traceId"] = traceId;
     span[@"startTime"] = [NSNumber numberWithDouble: [nativeSpan.startTime timeIntervalSince1970] * NSEC_PER_SEC];
     if (nativeSpan.parentId > 0) {
         span[@"parentSpanId"] = [NSString stringWithFormat:@"%llx", nativeSpan.parentId];
     }
     
     return span;
+}
+
+RCT_EXPORT_METHOD(endNativeSpan:(NSString *)spanId
+                traceId:(NSString *)traceId
+                endTime:(double)endTime
+                attributes:(NSDictionary *)attributes
+                resolve:(RCTPromiseResolveBlock)resolve
+                reject:(RCTPromiseRejectBlock)reject) {
+    NSString *spanKey = [spanId stringByAppendingString:traceId];
+    BugsnagPerformanceSpan *nativeSpan = openSpans[spanKey];
+    if (nativeSpan != nil) {
+        [openSpans removeObjectForKey:spanKey];
+        
+        // Set native span attributes from JS values
+        [ReactNativeSpanAttributes setNativeAttributes:nativeSpan.attributes fromJSAttributes:attributes];
+
+        // We need to reinstate the bugsnag.sampling.p attribute here as it might not be re-populated on span end
+        nativeSpan.attributes[@"bugsnag.sampling.p"] = @(nativeSpan.samplingProbability);
+        
+        // If the end time is later than the current end time, update it
+        NSDate *nativeEndTime = [NSDate dateWithTimeIntervalSince1970: endTime / NSEC_PER_SEC];
+        if ([nativeEndTime timeIntervalSinceDate:nativeSpan.endTime] > 0) {
+            [nativeSpan markEndTime:nativeEndTime];
+        }
+        
+        [nativeSpan sendForProcessing];
+    }
+
+    resolve(nil);
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(markNativeSpanEndTime:(NSString *)spanId traceId:(NSString *)traceId endTime:(double)endTime) {
+    BugsnagPerformanceSpan *nativeSpan = openSpans[[spanId stringByAppendingString:traceId]];
+    if (nativeSpan != nil) {
+        NSDate *nativeEndTime = [NSDate dateWithTimeIntervalSince1970: endTime / NSEC_PER_SEC];
+        [nativeSpan markEndTime:nativeEndTime];
+    }
+
+    return nil;
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED

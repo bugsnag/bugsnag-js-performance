@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		DA396E142CCFD327009B37C2 /* BugsnagReactNativePerformanceCrossTalkAPIClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA396E132CCFD327009B37C2 /* BugsnagReactNativePerformanceCrossTalkAPIClient.mm */; };
+		DAC36AB22D0CA66E0076A039 /* ReactNativeSpanAttributes.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAC36AB12D0CA66E0076A039 /* ReactNativeSpanAttributes.mm */; };
 		DAE18DD42C58DF2500D52529 /* BugsnagReactNativePerformance.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAE18DD32C58DF2500D52529 /* BugsnagReactNativePerformance.mm */; };
 		DAE18DD72C58E02C00D52529 /* BugsnagReactNativePerformance.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = DAE18DD22C58DF2500D52529 /* BugsnagReactNativePerformance.h */; };
 /* End PBXBuildFile section */
@@ -33,6 +34,8 @@
 		DA434CDC2D007BD700C62B2F /* BugsnagPerformanceSpanContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagPerformanceSpanContext.h; sourceTree = "<group>"; };
 		DA434CE02D09ACE000C62B2F /* BugsnagPerformanceSpanOptions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagPerformanceSpanOptions.h; sourceTree = "<group>"; };
 		DAC1DC5B2CF8859A0009C7F9 /* BugsnagPerformanceSpan.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagPerformanceSpan.h; sourceTree = "<group>"; };
+		DAC36AB02D0CA64F0076A039 /* ReactNativeSpanAttributes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ReactNativeSpanAttributes.h; sourceTree = "<group>"; };
+		DAC36AB12D0CA66E0076A039 /* ReactNativeSpanAttributes.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ReactNativeSpanAttributes.mm; sourceTree = "<group>"; };
 		DAE18DD22C58DF2500D52529 /* BugsnagReactNativePerformance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BugsnagReactNativePerformance.h; sourceTree = "<group>"; };
 		DAE18DD32C58DF2500D52529 /* BugsnagReactNativePerformance.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BugsnagReactNativePerformance.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -59,6 +62,8 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				DAC36AB12D0CA66E0076A039 /* ReactNativeSpanAttributes.mm */,
+				DAC36AB02D0CA64F0076A039 /* ReactNativeSpanAttributes.h */,
 				DA434CE02D09ACE000C62B2F /* BugsnagPerformanceSpanOptions.h */,
 				DA434CDC2D007BD700C62B2F /* BugsnagPerformanceSpanContext.h */,
 				DAC1DC5B2CF8859A0009C7F9 /* BugsnagPerformanceSpan.h */,
@@ -128,6 +133,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAC36AB22D0CA66E0076A039 /* ReactNativeSpanAttributes.mm in Sources */,
 				DA396E142CCFD327009B37C2 /* BugsnagReactNativePerformanceCrossTalkAPIClient.mm in Sources */,
 				DAE18DD42C58DF2500D52529 /* BugsnagReactNativePerformance.mm in Sources */,
 			);

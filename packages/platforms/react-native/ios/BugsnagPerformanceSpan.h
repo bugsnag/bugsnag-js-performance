@@ -30,6 +30,7 @@ OBJC_EXPORT
 
 @property (nonatomic,readonly) NSMutableDictionary *attributes;
 @property (nonatomic,readwrite) SpanId parentId;
+@property (nonatomic) double samplingProbability;
 
 - (void)markEndTime:(NSDate *)endTime;
 
