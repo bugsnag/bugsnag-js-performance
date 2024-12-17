@@ -46,8 +46,19 @@ public class BugsnagReactNativePerformance extends NativeBugsnagPerformanceSpec 
     return impl.getNativeConfiguration();
   }
 
-  @Override public WritableMap startNativeSpan(String name, ReadableMap options) {
+  @Override 
+  public WritableMap startNativeSpan(String name, ReadableMap options) {
     return impl.startNativeSpan(name, options);
+  }
+
+  @Override
+  public void endNativeSpan(String spanId, String traceId, double endTime, ReadableMap attributes, Promise promise) {
+    impl.endNativeSpan(spanId, traceId, endTime, attributes, promise);
+  }
+
+  @Override 
+  public void markNativeSpanEndTime(String spanId, String traceId, double endTime) {
+    impl.markNativeSpanEndTime(spanId, traceId, endTime);
   }
 }
 
