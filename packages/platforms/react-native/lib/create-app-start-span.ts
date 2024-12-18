@@ -1,9 +1,9 @@
-import type { SpanFactory, SpanInternal } from '@bugsnag/core-performance'
-import type { ReactNativeConfiguration } from './config'
+import type { SpanInternal } from '@bugsnag/core-performance'
+import type { ReactNativeSpanFactory } from './span-factory'
 
 let appStartSpan: SpanInternal
 
-export function createAppStartSpan (spanFactory: SpanFactory<ReactNativeConfiguration>, appStartTime: number) {
+export function createAppStartSpan (spanFactory: ReactNativeSpanFactory, appStartTime: number) {
   if (appStartSpan) {
     return appStartSpan
   }

@@ -8,7 +8,7 @@ import type { IdGenerator } from './id-generator'
 import type { NetworkSpanOptions } from './network-span'
 import type { Processor } from './processor'
 import type { ReadonlySampler } from './sampler'
-import type { InternalSpanOptions, Span, SpanOptionSchema, SpanOptions } from './span'
+import type { InternalSpanOptions, ParentContext, Span, SpanOptionSchema, SpanOptions } from './span'
 import { SpanInternal, coreSpanOptionSchema } from './span'
 import type { SpanContextStorage } from './span-context'
 import { timeToNumber } from './time'
@@ -25,7 +25,7 @@ export class SpanFactory<C extends Configuration> {
   readonly sampler: ReadonlySampler
   private readonly idGenerator: IdGenerator
   private readonly spanAttributesSource: SpanAttributesSource<C>
-  private readonly clock: Clock
+  protected readonly clock: Clock
   private readonly spanContextStorage: SpanContextStorage
   private logger: Logger
   private spanAttributeLimits: SpanAttributesLimits = defaultSpanAttributeLimits
@@ -64,7 +64,6 @@ export class SpanFactory<C extends Configuration> {
 
   startSpan (name: string, options: SpanOptions) {
     const safeStartTime = timeToNumber(this.clock, options.startTime)
-    const spanId = this.idGenerator.generate(64)
 
     // if the parentContext option is not set use the current context
     // if parentContext is explicitly null, or there is no current context,
@@ -73,16 +72,9 @@ export class SpanFactory<C extends Configuration> {
       ? options.parentContext
       : this.spanContextStorage.current
 
-    const parentSpanId = parentContext ? parentContext.id : undefined
-    const traceId = parentContext ? parentContext.traceId : this.idGenerator.generate(128)
-
     const attributes = new SpanAttributes(new Map(), this.spanAttributeLimits, name, this.logger)
 
-    if (typeof options.isFirstClass === 'boolean') {
-      attributes.set('bugsnag.span.first_class', options.isFirstClass)
-    }
-
-    const span = new SpanInternal(spanId, traceId, name, safeStartTime, attributes, this.clock, parentSpanId)
+    const span = this.createSpanInternal(name, safeStartTime, parentContext, options.isFirstClass, attributes)
 
     // don't track spans that are started while the app is backgrounded
     if (this.isInForeground) {
@@ -94,6 +86,23 @@ export class SpanFactory<C extends Configuration> {
     }
 
     return span
+  }
+
+  protected createSpanInternal (
+    name: string,
+    startTime: number,
+    parentContext: ParentContext | null | undefined,
+    isFirstClass: boolean | undefined,
+    attributes: SpanAttributes) {
+    const spanId = this.idGenerator.generate(64)
+    const parentSpanId = parentContext ? parentContext.id : undefined
+    const traceId = parentContext ? parentContext.traceId : this.idGenerator.generate(128)
+
+    if (typeof isFirstClass === 'boolean') {
+      attributes.set('bugsnag.span.first_class', isFirstClass)
+    }
+
+    return new SpanInternal(spanId, traceId, name, startTime, attributes, this.clock, parentSpanId)
   }
 
   startNetworkSpan (options: NetworkSpanOptions) {

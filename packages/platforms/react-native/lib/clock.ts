@@ -5,7 +5,7 @@ interface Performance {
   now: () => number
 }
 
-interface ReactNativeClock extends Clock {
+export interface ReactNativeClock extends Clock {
   toUnixNanoseconds: (time: number) => number
 }
 

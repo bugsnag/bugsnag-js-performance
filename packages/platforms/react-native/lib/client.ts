@@ -15,6 +15,7 @@ import resourceAttributesSourceFactory from './resource-attributes-source'
 import createRetryQueueFactory from './retry-queue'
 import { createSpanAttributesSource } from './span-attributes-source'
 import createBrowserBackgroundingListener from './backgrounding-listener'
+import { ReactNativeSpanFactory } from './span-factory'
 
 // this is how some internal react native code detects whether the app is running
 // in the remote debugger:
@@ -47,14 +48,15 @@ const BugsnagPerformance = createClient({
   idGenerator,
   persistence,
   plugins: (spanFactory, spanContextStorage) => [
-    new AppStartPlugin(appStartTime, spanFactory, clock, AppRegistry),
+    new AppStartPlugin(appStartTime, spanFactory as ReactNativeSpanFactory, clock, AppRegistry),
     new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrRequestTracker)
   ],
   resourceAttributesSource,
   schema,
   spanAttributesSource,
   retryQueueFactory: createRetryQueueFactory(FileSystem),
-  platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(appStartTime, clock, spanFactory, spanContextStorage)
+  spanFactory: ReactNativeSpanFactory,
+  platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(appStartTime, clock, spanFactory as ReactNativeSpanFactory, spanContextStorage)
 })
 
 BugsnagPerformance.attach = (config) => {

@@ -1,6 +1,7 @@
-import type { Configuration, SpanFactory, SpanOptions } from '@bugsnag/core-performance'
+import type { SpanOptions } from '@bugsnag/core-performance'
+import type { ReactNativeSpanFactory } from './span-factory'
 
-export function createNavigationSpan <C extends Configuration> (spanFactory: SpanFactory<C>, routeName: string, spanOptions: SpanOptions) {
+export function createNavigationSpan (spanFactory: ReactNativeSpanFactory, routeName: string, spanOptions: SpanOptions) {
   // Navigation spans are always first class
   spanOptions.isFirstClass = true
 

@@ -1,12 +1,13 @@
-import type { Clock, SpanContextStorage, SpanFactory, SpanOptions } from '@bugsnag/core-performance'
+import type { Clock, SpanContextStorage, SpanOptions } from '@bugsnag/core-performance'
 import React from 'react'
-import type { ReactNativeConfiguration, ReactNativeAttachConfiguration } from './config'
+import type { ReactNativeAttachConfiguration } from './config'
 import { createAppStartSpan } from './create-app-start-span'
 import { createNavigationSpan } from './create-navigation-span'
+import type { ReactNativeSpanFactory } from './span-factory'
 
 type NavigationSpanOptions = Omit<SpanOptions, 'isFirstClass'>
 
-export const platformExtensions = (appStartTime: number, clock: Clock, spanFactory: SpanFactory<ReactNativeConfiguration>, spanContextStorage: SpanContextStorage) => ({
+export const platformExtensions = (appStartTime: number, clock: Clock, spanFactory: ReactNativeSpanFactory, spanContextStorage: SpanContextStorage) => ({
   startNavigationSpan: (routeName: string, spanOptions?: NavigationSpanOptions) => {
     const cleanOptions = spanFactory.validateSpanOptions(routeName, spanOptions)
     cleanOptions.options.isFirstClass = true
