@@ -16,7 +16,11 @@ import { isObject, isParentContext } from './validation'
 
 export const DISCARD_END_TIME = -1
 
-export class SpanFactory <C extends Configuration> {
+export type SpanFactoryConstructor<C extends Configuration> = new (
+  ...args: ConstructorParameters<typeof SpanFactory<C>>
+) => InstanceType<typeof SpanFactory<C>>
+
+export class SpanFactory<C extends Configuration> {
   private processor: Processor
   readonly sampler: ReadonlySampler
   private readonly idGenerator: IdGenerator
