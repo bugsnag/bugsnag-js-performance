@@ -46,11 +46,15 @@ module.exports = {
     {
       displayName: 'delivery-fetch',
       testMatch: ['<rootDir>/packages/delivery-fetch/**/*.test.ts'],
+      testEnvironment: 'jsdom',
+      setupFilesAfterEnv: ['<rootDir>/jest/setup/crypto.ts'],
       ...defaultModuleConfig
     },
     {
       displayName: 'browser',
       testMatch: ['<rootDir>/packages/platforms/browser/**/*.test.ts'],
+      testEnvironment: 'jsdom',
+      setupFilesAfterEnv: ['<rootDir>/jest/setup/crypto.ts'],
       ...defaultModuleConfig
     },
     {
