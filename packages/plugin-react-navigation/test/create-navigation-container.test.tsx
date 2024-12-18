@@ -1,5 +1,5 @@
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
-import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import type { ReactNativeConfiguration, ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native'
 import type { ParamListBase } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
@@ -20,7 +20,7 @@ afterEach(() => {
 describe('createNavigationContainer', () => {
   it('creates a navigation span when the route changes', () => {
     const spanFactory = new MockSpanFactory<ReactNativeConfiguration>()
-    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, spanFactory)
+    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, spanFactory as unknown as ReactNativeSpanFactory)
 
     render(
       <BugsnagNavigationContainer>
@@ -44,7 +44,7 @@ describe('createNavigationContainer', () => {
   it('forwards the provided ref to the NavigationContainer', () => {
     const navigationRef = createNavigationContainerRef()
     const spanFactory = new MockSpanFactory<ReactNativeConfiguration>()
-    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, spanFactory)
+    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, spanFactory as unknown as ReactNativeSpanFactory)
 
     render(
       <BugsnagNavigationContainer ref={navigationRef}>
