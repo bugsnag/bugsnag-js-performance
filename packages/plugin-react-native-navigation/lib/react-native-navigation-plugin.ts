@@ -1,6 +1,7 @@
 import type { Plugin, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import type { NavigationDelegate } from 'react-native-navigation/lib/dist/src/NavigationDelegate'
+import type { AppState } from '../../core/lib/core'
 
 import { createNavigationSpan } from '@bugsnag/react-native-performance'
 
@@ -18,9 +19,11 @@ class BugsnagPluginReactNativeNavigationPerformance implements Plugin<ReactNativ
   private componentsWaiting = 0
   private spanFactory?: SpanFactory<ReactNativeConfiguration>
   private previousRoute?: string
+  private setAppState: (appState: AppState) => void
 
-  constructor (Navigation: NavigationDelegate) {
+  constructor (Navigation: NavigationDelegate, setAppState: (appState: AppState) => void) {
     this.Navigation = Navigation
+    this.setAppState = setAppState
   }
 
   private clearActiveSpan () {
@@ -35,6 +38,7 @@ class BugsnagPluginReactNativeNavigationPerformance implements Plugin<ReactNativ
       this.currentNavigationSpan.setAttribute('bugsnag.navigation.ended_by', endedBy)
       this.spanFactory.endSpan(this.currentNavigationSpan, endTime)
       this.clearActiveSpan()
+      this.setAppState('ready')
     }
   }
 
@@ -89,6 +93,7 @@ class BugsnagPluginReactNativeNavigationPerformance implements Plugin<ReactNativ
 
         if (this.previousRoute) {
           this.currentNavigationSpan.setAttribute('bugsnag.navigation.previous_route', this.previousRoute)
+          this.setAppState('navigating')
         }
 
         this.previousRoute = routeName
