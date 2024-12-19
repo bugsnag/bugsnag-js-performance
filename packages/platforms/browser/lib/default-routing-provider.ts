@@ -19,7 +19,7 @@ export const createNoopRoutingProvider = () => {
 export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Location) => {
   return class DefaultRoutingProvider implements RoutingProvider {
     resolveRoute: RouteResolver
-    
+
     constructor (resolveRoute = defaultRouteResolver) {
       this.resolveRoute = resolveRoute
     }
