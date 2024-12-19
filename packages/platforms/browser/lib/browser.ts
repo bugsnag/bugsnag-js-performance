@@ -20,7 +20,7 @@ import type { AppState } from '../../../core/lib/core'
 export let onSettle: OnSettlePlugin
 export let DefaultRoutingProvider: ReturnType<typeof createDefaultRoutingProvider>
 let BugsnagPerformance: Client<BrowserConfiguration>
-let setAppState: (appState: AppState) => void;
+let setAppState: (appState: AppState) => void
 
 if (typeof window === 'undefined' || typeof document === 'undefined') {
   onSettle = createNoopOnSettle()
@@ -42,7 +42,6 @@ if (typeof window === 'undefined' || typeof document === 'undefined') {
     xhrRequestTracker,
     performance
   )
-  
   DefaultRoutingProvider = createDefaultRoutingProvider(onSettle, window.location, setAppState)
 
   BugsnagPerformance = createClient({
@@ -54,19 +53,19 @@ if (typeof window === 'undefined' || typeof document === 'undefined') {
     idGenerator,
     schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
     plugins: (spanFactory, spanContextStorage, setAppState) => {
-      DefaultRoutingProvider.setAppState = setAppState('starting');
+      DefaultRoutingProvider.setAppState = setAppState('starting')
       return [
-      onSettle,
-      new FullPageLoadPlugin(
-        document,
-        window.location,
-        spanFactory,
-        webVitals,
         onSettle,
-        backgroundingListener,
-        performance,
-        setAppState
-      ),
+        new FullPageLoadPlugin(
+          document,
+          window.location,
+          spanFactory,
+          webVitals,
+          onSettle,
+          backgroundingListener,
+          performance,
+          setAppState
+        ),
       // ResourceLoadPlugin should always come after FullPageLoad plugin, as it should use that
       // span context as the parent of it's spans
       new ResourceLoadPlugin(spanFactory, spanContextStorage, window.PerformanceObserver),

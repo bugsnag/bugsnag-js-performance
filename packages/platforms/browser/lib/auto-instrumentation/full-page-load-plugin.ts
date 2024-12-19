@@ -91,7 +91,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
 
       this.webVitals.attachTo(span)
       this.spanFactory.endSpan(span, endTime)
-      this.setAppState("ready")
+      this.setAppState('ready')
     })
   }
 }
