@@ -4,6 +4,8 @@ type PlatformConstants
   = { Manufacturer: string, Model: string, Release: string }
   | Record<string, never>
 
+const VALID_API_KEY = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6'
+
 export const Platform = new class {
   private os: Os = 'ios'
 
@@ -105,29 +107,45 @@ const createPool = () => {
   return '0123456789abcdef'.repeat(128)
 }
 
+const getDevice = (): DeviceInfo => {
+  switch (Platform.OS) {
+    case 'ios':
+      return {
+        arch: 'arm64',
+        model: 'iPhone14,1',
+        bundleVersion: '12345',
+        bundleIdentifier: 'my.cool.app'
+      }
+
+    case 'android':
+      return {
+        arch: 'x86',
+        model: 'TheGoodPhone1',
+        versionCode: '6789',
+        bundleIdentifier: 'my.cool.app'
+      }
+
+    case 'other':
+      return {}
+  }
+}
+
+const getConfiguration = () => {
+  return {
+    apiKey: VALID_API_KEY,
+    endpoint: '/traces',
+    appVersion: '1.2.3',
+    releaseStage: 'test',
+    enabledReleaseStages: ['test', 'production'],
+    serviceName: 'com.native.performance.test',
+    attributeCountLimit: 128,
+    attributeStringValueLimit: 1024,
+    attributeArrayLengthLimit: 1000
+  }
+}
+
 const BugsnagReactNativePerformance = {
-  getDeviceInfo (): DeviceInfo {
-    switch (Platform.OS) {
-      case 'ios':
-        return {
-          arch: 'arm64',
-          model: 'iPhone14,1',
-          bundleVersion: '12345',
-          bundleIdentifier: 'my.cool.app'
-        }
-
-      case 'android':
-        return {
-          arch: 'x86',
-          model: 'TheGoodPhone1',
-          versionCode: '6789',
-          bundleIdentifier: 'my.cool.app'
-        }
-
-      case 'other':
-        return {}
-    }
-  },
+  getDeviceInfo: jest.fn(getDevice),
   requestEntropy: jest.fn(() => {
     return createPool()
   }),
@@ -135,16 +153,14 @@ const BugsnagReactNativePerformance = {
     return Promise.resolve(createPool())
   }),
   isNativePerformanceAvailable: jest.fn(() => {
-    return false
+    return true
   }),
-  getNativeConfiguration: jest.fn(() => {
-    return null
-  }),
+  getNativeConfiguration: jest.fn(getConfiguration),
   startNativeSpan: jest.fn((name, options) => {
     return {
       name,
       id: 'native-span-id',
-      traceId: 'native-trace-id',
+      traceId: options.parentContext?.traceId || 'native-trace-id',
       startTime: options.startTime,
       parentSpanId: options.parentContext?.id || undefined
     }
@@ -155,6 +171,13 @@ const BugsnagReactNativePerformance = {
   markNativeSpanEndTime: jest.fn(),
   discardNativeSpan: jest.fn(() => {
     return Promise.resolve()
+  }),
+  initialise: jest.fn(() => {
+    return {
+      isNativePerformanceAvailable: true,
+      device: getDevice(),
+      configuration: getConfiguration()
+    }
   })
 }
 

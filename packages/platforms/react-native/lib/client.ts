@@ -23,14 +23,14 @@ import { ReactNativeSpanFactory } from './span-factory'
 
 // @ts-expect-error Element implicitly has an 'any' type because type 'typeof globalThis' has no index signature.
 const isDebuggingRemotely = !global.nativeCallSyncHook && !global.RN$Bridgeless
+const nativeSettings = NativeBugsnagPerformance && !isDebuggingRemotely ? NativeBugsnagPerformance.initialise() : undefined
 
 const clock = createClock(performance)
 const appStartTime = clock.now()
 const deliveryFactory = createFetchDeliveryFactory(fetch, clock)
 const spanAttributesSource = createSpanAttributesSource()
-const deviceInfo = NativeBugsnagPerformance && !isDebuggingRemotely ? NativeBugsnagPerformance.getDeviceInfo() : undefined
-const persistence = persistenceFactory(FileSystem, deviceInfo)
-const resourceAttributesSource = resourceAttributesSourceFactory(persistence, deviceInfo)
+const persistence = persistenceFactory(FileSystem, nativeSettings?.device)
+const resourceAttributesSource = resourceAttributesSourceFactory(persistence, nativeSettings?.device)
 const backgroundingListener = createBrowserBackgroundingListener(AppState)
 
 // React Native's fetch polyfill uses xhr under the hood, so we only track xhr requests
@@ -53,7 +53,14 @@ const BugsnagPerformance = createClient({
   spanAttributesSource,
   retryQueueFactory: createRetryQueueFactory(FileSystem),
   spanFactory: ReactNativeSpanFactory,
-  platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(appStartTime, clock, schema, spanFactory as ReactNativeSpanFactory, spanContextStorage)
+  platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(
+    appStartTime,
+    clock,
+    schema,
+    spanFactory as ReactNativeSpanFactory,
+    spanContextStorage,
+    nativeSettings
+  )
 })
 
 export default BugsnagPerformance

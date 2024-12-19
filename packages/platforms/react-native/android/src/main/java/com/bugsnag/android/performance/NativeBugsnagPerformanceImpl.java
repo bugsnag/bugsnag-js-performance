@@ -55,6 +55,18 @@ class NativeBugsnagPerformanceImpl {
     }
   }
 
+  public WritableMap initialise() {
+    WritableMap result = Arguments.createMap();
+    result.putMap("device", getDeviceInfo());
+    result.putBoolean("isNativePerformanceAvailable", isNativePerformanceAvailable);
+    if (!isNativePerformanceAvailable) {
+      return result;
+    }
+
+    result.putMap("configuration", getNativeConfiguration());
+    return result;
+  }
+
   public WritableMap getDeviceInfo() {
     WritableMap map = Arguments.createMap();
     try {

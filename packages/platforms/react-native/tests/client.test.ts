@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import type { ReactNativeConfiguration } from '../lib/config'
 import type { BugsnagPerformance } from '@bugsnag/core-performance'
 import type { PlatformExtensions } from '../lib/platform-extensions'
 import type { Spec } from '../lib/NativeBugsnagPerformance'
+
+// trick the client in thinking it's not running in the remote debugger
+// @ts-expect-error 'typeof globalThis' has no index signature
+global.nativeCallSyncHook = () => {}
 
 let client: BugsnagPerformance<ReactNativeConfiguration, PlatformExtensions>
 let turboModule: Spec
@@ -58,6 +62,7 @@ global.XMLHttpRequest = XMLHttpRequest as unknown as typeof globalThis.XMLHttpRe
 
 beforeEach(() => {
   jest.resetModules()
+  jest.clearAllMocks()
   mockFetch = createMockFetch()
   global.fetch = mockFetch
   turboModule = require('../lib/native').default
@@ -66,36 +71,33 @@ beforeEach(() => {
 describe('React Native client tests', () => {
   describe('attach()', () => {
     it('logs a warning and noops if native performance is not available', () => {
+      turboModule.initialise = jest.fn().mockReturnValue({
+        isNativePerformanceAvailable: false,
+        configuration: null
+      })
+
       client = require('../lib/client').default
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
 
       client.attach({})
-      expect(warnSpy).toHaveBeenCalledWith('Could not attach to native SDK. No compatible version of Bugsnag ios performance was found')
+      expect(warnSpy).toHaveBeenCalledWith('Could not attach to native SDK. No compatible version of Bugsnag Cocoa Performance was found.')
     })
 
     it('logs a warning and noops if native performance has not been started', () => {
-      turboModule.isNativePerformanceAvailable = jest.fn().mockReturnValue(true)
-      turboModule.getNativeConfiguration = jest.fn().mockReturnValue(null)
+      turboModule.initialise = jest.fn().mockReturnValue({
+        isNativePerformanceAvailable: true,
+        configuration: null
+      })
 
       client = require('../lib/client').default
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
 
       client.attach()
-      expect(warnSpy).toHaveBeenCalledWith('Could not attach to native SDK. Bugsnag ios performance has not been started')
+      expect(warnSpy).toHaveBeenCalledWith('Could not attach to native SDK. Bugsnag Cocoa Performance has not been started.')
     })
 
     it('starts the client using the native configuration', () => {
-      turboModule.isNativePerformanceAvailable = jest.fn().mockReturnValue(true)
-      turboModule.getNativeConfiguration = jest.fn().mockReturnValue({
-        apiKey: '1234567890abcdef1234567890abcdef12',
-        endpoint: '/traces',
-        releaseStage: 'production',
-        serviceName: 'unknown_service',
-        attributeCountLimit: 128,
-        attributeStringValueLimit: 1024,
-        attributeArrayLengthLimit: 1000
-      })
-
+      const nativeConfig = turboModule.initialise().configuration
       client = require('../lib/client').default
       const startSpy = jest.spyOn(client, 'start')
 
@@ -108,35 +110,27 @@ describe('React Native client tests', () => {
         generateAnonymousId: true
       })
 
-      expect(startSpy).toHaveBeenCalledWith(expect.objectContaining({
-        apiKey: '1234567890abcdef1234567890abcdef12',
-        endpoint: '/traces',
-        releaseStage: 'production',
-        serviceName: 'unknown_service',
-        attributeCountLimit: 128,
-        attributeStringValueLimit: 1024,
-        attributeArrayLengthLimit: 1000,
+      expect(startSpy).toHaveBeenCalledWith({
+        apiKey: nativeConfig!.apiKey,
+        endpoint: nativeConfig!.endpoint,
+        appVersion: nativeConfig!.appVersion,
+        releaseStage: nativeConfig!.releaseStage,
+        enabledReleaseStages: nativeConfig!.enabledReleaseStages,
+        serviceName: nativeConfig!.serviceName,
+        attributeCountLimit: nativeConfig!.attributeCountLimit,
+        attributeStringValueLimit: nativeConfig!.attributeStringValueLimit,
+        attributeArrayLengthLimit: nativeConfig!.attributeArrayLengthLimit,
         autoInstrumentAppStarts: false,
         autoInstrumentNetworkRequests: false,
         codeBundleId: '12345',
         logger: console,
         tracePropagationUrls: [/^https:\/\/example\.com/],
         generateAnonymousId: true
-      }))
+      })
     })
 
     it('does not overwrite native configuration with JS values', () => {
-      turboModule.isNativePerformanceAvailable = jest.fn().mockReturnValue(true)
-      turboModule.getNativeConfiguration = jest.fn().mockReturnValue({
-        apiKey: '1234567890abcdef1234567890abcdef12',
-        endpoint: '/traces',
-        releaseStage: 'production',
-        serviceName: 'unknown_service',
-        attributeCountLimit: 128,
-        attributeStringValueLimit: 1024,
-        attributeArrayLengthLimit: 1000
-      })
-
+      const nativeConfig = turboModule.initialise().configuration
       client = require('../lib/client').default
       const startSpy = jest.spyOn(client, 'start')
 
@@ -145,7 +139,9 @@ describe('React Native client tests', () => {
         apiKey: 'ignored',
         endpoint: 'ignored',
         releaseStage: 'ignored',
+        enabledReleaseStages: ['ignored'],
         serviceName: 'ignored',
+        appVersion: 'ignored',
         attributeCountLimit: 0,
         attributeStringValueLimit: 0,
         attributeArrayLengthLimit: 0,
@@ -158,13 +154,15 @@ describe('React Native client tests', () => {
       })
 
       expect(startSpy).toHaveBeenCalledWith(expect.objectContaining({
-        apiKey: '1234567890abcdef1234567890abcdef12',
-        endpoint: '/traces',
-        releaseStage: 'production',
-        serviceName: 'unknown_service',
-        attributeCountLimit: 128,
-        attributeStringValueLimit: 1024,
-        attributeArrayLengthLimit: 1000,
+        apiKey: nativeConfig!.apiKey,
+        endpoint: nativeConfig!.endpoint,
+        appVersion: nativeConfig!.appVersion,
+        releaseStage: nativeConfig!.releaseStage,
+        enabledReleaseStages: nativeConfig!.enabledReleaseStages,
+        serviceName: nativeConfig!.serviceName,
+        attributeCountLimit: nativeConfig!.attributeCountLimit,
+        attributeStringValueLimit: nativeConfig!.attributeStringValueLimit,
+        attributeArrayLengthLimit: nativeConfig!.attributeArrayLengthLimit,
         autoInstrumentAppStarts: false,
         autoInstrumentNetworkRequests: false,
         codeBundleId: '12345',

@@ -11,7 +11,7 @@ export type DeviceInfo = {
   bundleIdentifier: string | undefined
 }
 
-export type NativeConfiguration = {
+export type NativePerformanceConfiguration = {
   apiKey: string
   endpoint: string
   samplingProbability: number | undefined
@@ -22,6 +22,12 @@ export type NativeConfiguration = {
   attributeCountLimit: number
   attributeStringValueLimit: number
   attributeArrayLengthLimit: number
+}
+
+export type NativeSettings = {
+  device: DeviceInfo
+  isNativePerformanceAvailable: boolean
+  configuration: NativePerformanceConfiguration | null | undefined
 }
 
 export type ParentContext = {
@@ -42,11 +48,12 @@ export interface Spec extends TurboModule {
   requestEntropy: () => string
   requestEntropyAsync: () => Promise<string>
   isNativePerformanceAvailable: () => boolean
-  getNativeConfiguration: () => NativeConfiguration | null
+  getNativeConfiguration: () => NativePerformanceConfiguration | null
   startNativeSpan: (name: string, options: UnsafeObject) => NativeSpan
   endNativeSpan: (spanId: string, traceId: string, endTime: number, attributes: UnsafeObject) => Promise<void>
   markNativeSpanEndTime: (spanId: string, traceId: string, endTime: number) => void
   discardNativeSpan: (spanId: string, traceId: string) => Promise<void>
+  initialise: () => NativeSettings
 }
 
 export default TurboModuleRegistry.get<Spec>(
