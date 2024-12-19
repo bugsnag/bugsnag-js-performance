@@ -1,6 +1,7 @@
 import type { OnSettle } from './on-settle'
 import { getAbsoluteUrl } from '@bugsnag/request-tracker-performance'
 import type { RouteResolver, RoutingProvider, StartRouteChangeCallback } from './routing-provider'
+import { AppState } from '@bugsnag/core-performance/dist/types/core'
 
 export const defaultRouteResolver: RouteResolver = (url: URL) => url.pathname || '/'
 
@@ -16,21 +17,25 @@ export const createNoopRoutingProvider = () => {
   }
 }
 
-export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Location) => {
+export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Location, setAppState?: (appState: AppState) => void) => {
   return class DefaultRoutingProvider implements RoutingProvider {
     resolveRoute: RouteResolver
-
+    setAppState?: (appState: AppState) => void
+    
     constructor (resolveRoute = defaultRouteResolver) {
       this.resolveRoute = resolveRoute
+      this.setAppState = setAppState
     }
 
     listenForRouteChanges (startRouteChangeSpan: StartRouteChangeCallback) {
       addEventListener('popstate', (ev) => {
         const url = new URL(location.href)
         const span = startRouteChangeSpan(url, 'popstate')
+        this.setAppState?.('navigating')
 
         onSettle((endTime) => {
           span.end(endTime)
+          this.setAppState?.('ready')
         })
       })
 
@@ -41,9 +46,11 @@ export const createDefaultRoutingProvider = (onSettle: OnSettle, location: Locat
         if (url) {
           const absoluteURL = new URL(getAbsoluteUrl(url.toString(), document.baseURI))
           const span = startRouteChangeSpan(absoluteURL, 'pushState')
+          // this.setAppState?.('navigating')
 
           onSettle((endTime) => {
             span.end(endTime)
+            // this.setAppState?.('ready')
           })
         }
 

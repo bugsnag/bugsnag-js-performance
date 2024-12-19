@@ -4,6 +4,7 @@ import type { BrowserConfiguration } from '../config'
 import type { RouteChangeSpanEndOptions, RouteChangeSpanOptions } from '../routing-provider'
 import { getPermittedAttributes } from '../send-page-attributes'
 import { defaultRouteResolver } from '../default-routing-provider'
+import type { AppState } from '../../../../core/lib/core'
 
 // exclude isFirstClass from the route change option schema
 const { startTime, parentContext, makeCurrentContext } = coreSpanOptionSchema
@@ -27,7 +28,8 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   constructor (
     private readonly spanFactory: SpanFactory<BrowserConfiguration>,
     private readonly location: Location,
-    private readonly document: Document
+    private readonly document: Document,
+    private readonly setAppState: (appState: AppState) => void
   ) {}
 
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {
@@ -117,6 +119,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
             span.name = `[RouteChange]${route}`
             span.setAttribute('bugsnag.browser.page.route', route)
             previousRoute = route
+            this.setAppState('navigating')
 
             // update the URL attribute as well
             if (permittedAttributes.url) {
@@ -125,6 +128,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
           }
 
           this.spanFactory.toPublicApi(span).end(options.endTime)
+          this.setAppState('ready')
         }
 
       } satisfies Span
