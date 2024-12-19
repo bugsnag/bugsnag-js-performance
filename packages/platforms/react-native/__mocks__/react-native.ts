@@ -139,6 +139,22 @@ const BugsnagReactNativePerformance = {
   }),
   getNativeConfiguration: jest.fn(() => {
     return null
+  }),
+  startNativeSpan: jest.fn((name, options) => {
+    return {
+      name,
+      id: 'native-span-id',
+      traceId: 'native-trace-id',
+      startTime: options.startTime,
+      parentSpanId: options.parentContext?.id || undefined
+    }
+  }),
+  endNativeSpan: jest.fn(() => {
+    return Promise.resolve()
+  }),
+  markNativeSpanEndTime: jest.fn(),
+  discardNativeSpan: jest.fn(() => {
+    return Promise.resolve()
   })
 }
 

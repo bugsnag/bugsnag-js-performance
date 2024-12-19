@@ -60,5 +60,10 @@ public class BugsnagReactNativePerformance extends NativeBugsnagPerformanceSpec 
   public void markNativeSpanEndTime(String spanId, String traceId, double endTime) {
     impl.markNativeSpanEndTime(spanId, traceId, endTime);
   }
+
+  @Override
+  public void discardNativeSpan(String spanId, String traceId, Promise promise) {
+    impl.discardNativeSpan(spanId, traceId, promise);
+  }
 }
 

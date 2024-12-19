@@ -62,4 +62,9 @@ public class BugsnagReactNativePerformance extends ReactContextBaseJavaModule {
   public void markNativeSpanEndTime(String spanId, String traceId, double endTime) {
     impl.markNativeSpanEndTime(spanId, traceId, endTime);
   }
+
+  @ReactMethod
+  public void discardNativeSpan(String spanId, String traceId, Promise promise) {
+    impl.discardNativeSpan(spanId, traceId, promise);
+  }
 }
