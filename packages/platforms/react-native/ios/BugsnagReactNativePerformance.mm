@@ -248,6 +248,20 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(markNativeSpanEndTime:(NSString *)spanId 
     return nil;
 }
 
+RCT_EXPORT_METHOD(discardNativeSpan:(NSString *)spanId
+                traceId:(NSString *)traceId
+                resolve:(RCTPromiseResolveBlock)resolve
+                reject:(RCTPromiseRejectBlock)reject) {
+    NSString *spanKey = [spanId stringByAppendingString:traceId];
+    BugsnagPerformanceSpan *nativeSpan = openSpans[spanKey];    
+    if (nativeSpan != nil) {
+        [openSpans removeObjectForKey:spanKey];
+        [nativeSpan abortUnconditionally];
+    }
+
+    resolve(nil);
+}
+
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params

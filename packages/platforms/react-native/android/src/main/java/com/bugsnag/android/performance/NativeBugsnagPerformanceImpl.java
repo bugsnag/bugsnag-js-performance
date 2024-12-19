@@ -189,6 +189,15 @@ class NativeBugsnagPerformanceImpl {
     promise.resolve(null);
   }
 
+  public void discardNativeSpan(String spanId, String traceId, Promise promise) {
+    SpanImpl nativeSpan = openSpans.remove(spanId + traceId);
+    if (nativeSpan != null) {
+      nativeSpan.discard();
+    }
+
+    promise.resolve(null);
+  }
+
   private WritableMap nativeSpanToJsSpan(SpanImpl nativeSpan) {
     WritableMap span = Arguments.createMap();
     span.putString("name", nativeSpan.getName());
