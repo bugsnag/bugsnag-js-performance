@@ -9,6 +9,7 @@ import React from 'react'
 import type { AppRegistry, WrapperComponentProvider } from 'react-native'
 import type { ReactNativeConfiguration } from '../config'
 import { createAppStartSpan } from '../create-app-start-span'
+import type { AppState } from '../../../../core/lib/core'
 
 interface WrapperProps {
   children: ReactNode
@@ -22,17 +23,23 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
   private readonly spanFactory: SpanFactory<ReactNativeConfiguration>
   private readonly clock: Clock
   private readonly appRegistry: typeof AppRegistry
+  private readonly setAppState: (appState: AppState) => void
+  private readonly appState: AppState
 
   constructor (
     appStartTime: number,
     spanFactory: SpanFactory<ReactNativeConfiguration>,
     clock: Clock,
-    appRegistry: typeof AppRegistry
+    appRegistry: typeof AppRegistry,
+    setAppState: (appState: AppState) => void,
+    appState: AppState
   ) {
     this.appStartTime = appStartTime
     this.spanFactory = spanFactory
     this.clock = clock
     this.appRegistry = appRegistry
+    this.setAppState = setAppState
+    this.appState = appState
   }
 
   configure (configuration: InternalConfiguration<ReactNativeConfiguration>) {
@@ -44,6 +51,9 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
       React.useEffect(() => {
         if (appStartSpan.isValid()) {
           this.spanFactory.endSpan(appStartSpan, this.clock.now())
+          if (this.appState === 'starting') {
+            this.setAppState('ready')
+          }
         }
       }, [])
 

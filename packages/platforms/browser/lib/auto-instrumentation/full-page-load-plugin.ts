@@ -6,6 +6,7 @@ import { getPermittedAttributes } from '../send-page-attributes'
 import type { WebVitals } from '../web-vitals'
 import { instrumentPageLoadPhaseSpans } from './page-load-phase-spans'
 import { defaultRouteResolver } from '../default-routing-provider'
+import type { AppState } from '../../../../core/lib/core'
 
 export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   private readonly spanFactory: SpanFactory<BrowserConfiguration>
@@ -14,6 +15,8 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   private readonly onSettle: OnSettle
   private readonly webVitals: WebVitals
   private readonly performance: PerformanceWithTiming
+  private readonly setAppState: (appState: AppState) => void
+  private readonly appState: AppState
 
   // if the page was backgrounded at any point in the loading process a page
   // load span is invalidated as the browser will deprioritise the page
@@ -26,7 +29,9 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     webVitals: WebVitals,
     onSettle: OnSettle,
     backgroundingListener: BackgroundingListener,
-    performance: PerformanceWithTiming
+    performance: PerformanceWithTiming,
+    setAppState: (appState: AppState) => void,
+    appState: AppState
   ) {
     this.document = document
     this.location = location
@@ -34,6 +39,8 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     this.webVitals = webVitals
     this.onSettle = onSettle
     this.performance = performance
+    this.setAppState = setAppState
+    this.appState = appState
 
     backgroundingListener.onStateChange(state => {
       if (!this.wasBackgrounded && state === 'in-background') {
@@ -87,6 +94,9 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
 
       this.webVitals.attachTo(span)
       this.spanFactory.endSpan(span, endTime)
+      if (this.appState === 'starting') {
+        this.setAppState('ready')
+      }
     })
   }
 }
