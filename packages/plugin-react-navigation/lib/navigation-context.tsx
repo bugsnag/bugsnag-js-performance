@@ -73,15 +73,14 @@ export class NavigationContextProvider extends React.Component<Props> {
       // invalid time to cause it to be discarded from the context stack.
       if (this.currentSpan) {
         spanFactory.endSpan(this.currentSpan, DISCARDED)
-        this.props.setAppState('ready')
       }
 
       const span = createNavigationSpan(spanFactory, currentRoute, { startTime: updateTime })
+      this.props.setAppState('navigating')
       span.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-navigation-performance')
 
       if (this.previousRoute) {
         span.setAttribute('bugsnag.navigation.previous_route', this.previousRoute)
-        this.props.setAppState('navigating')
       }
 
       this.currentSpan = span
@@ -90,7 +89,6 @@ export class NavigationContextProvider extends React.Component<Props> {
 
       setTimeout(() => {
         this.triggerNavigationEnd()
-        this.props.setAppState('ready')
       })
     }
   }

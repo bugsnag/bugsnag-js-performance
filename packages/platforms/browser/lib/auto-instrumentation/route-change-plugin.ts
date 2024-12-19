@@ -63,7 +63,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
           } satisfies Span
         }
       }
-
+      this.setAppState('navigating')
       // create internal options for validation
       const routeChangeSpanOptions = {
         ...options,
@@ -81,7 +81,6 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
       // update the span name using the validated route
       cleanOptions.name += route
       const span = this.spanFactory.startSpan(cleanOptions.name, cleanOptions.options)
-
       span.setAttribute('bugsnag.span.category', 'route_change')
       span.setAttribute('bugsnag.browser.page.route', route)
       span.setAttribute('bugsnag.browser.page.previous_route', previousRoute)
@@ -119,7 +118,6 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
             span.name = `[RouteChange]${route}`
             span.setAttribute('bugsnag.browser.page.route', route)
             previousRoute = route
-            this.setAppState('navigating')
 
             // update the URL attribute as well
             if (permittedAttributes.url) {
