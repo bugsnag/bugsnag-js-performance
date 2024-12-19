@@ -15,7 +15,6 @@ import makeBrowserPersistence from './persistence'
 import createResourceAttributesSource from './resource-attributes-source'
 import createSpanAttributesSource from './span-attributes-source'
 import { WebVitals } from './web-vitals'
-import type { AppState } from '../../../core/lib/core'
 
 export let onSettle: OnSettlePlugin
 export let DefaultRoutingProvider: ReturnType<typeof createDefaultRoutingProvider>
