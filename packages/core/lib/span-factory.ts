@@ -73,6 +73,9 @@ export class SpanFactory<C extends Configuration> {
       : this.spanContextStorage.current
 
     const attributes = new SpanAttributes(new Map(), this.spanAttributeLimits, name, this.logger)
+    if (typeof options.isFirstClass === 'boolean') {
+      attributes.set('bugsnag.span.first_class', options.isFirstClass)
+    }
 
     const span = this.createSpanInternal(name, safeStartTime, parentContext, options.isFirstClass, attributes)
 
@@ -97,10 +100,6 @@ export class SpanFactory<C extends Configuration> {
     const spanId = this.idGenerator.generate(64)
     const parentSpanId = parentContext ? parentContext.id : undefined
     const traceId = parentContext ? parentContext.traceId : this.idGenerator.generate(128)
-
-    if (typeof isFirstClass === 'boolean') {
-      attributes.set('bugsnag.span.first_class', isFirstClass)
-    }
 
     return new SpanInternal(spanId, traceId, name, startTime, attributes, this.clock, parentSpanId)
   }
@@ -149,7 +148,7 @@ export class SpanFactory<C extends Configuration> {
     // - they have an explicit discard end time
     if (untracked || !isValidSpan || endTime === DISCARD_END_TIME) {
       // we still call end on the span so that it is no longer considered valid
-      span.end(endTime, this.sampler.spanProbability)
+      this.discardSpan(span, endTime)
       return
     }
 
@@ -159,9 +158,15 @@ export class SpanFactory<C extends Configuration> {
     }
 
     this.spanAttributesSource.requestAttributes(span)
+    this.sendForProcessing(span, endTime)
+  }
 
+  protected discardSpan (span: SpanInternal, endTime: number) {
+    span.end(endTime, this.sampler.spanProbability)
+  }
+
+  protected sendForProcessing (span: SpanInternal, endTime: number) {
     const spanEnded = span.end(endTime, this.sampler.spanProbability)
-
     if (this.sampler.sample(spanEnded)) {
       this.processor.add(spanEnded)
     }
