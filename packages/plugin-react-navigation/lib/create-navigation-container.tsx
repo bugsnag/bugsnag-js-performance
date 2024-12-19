@@ -1,5 +1,4 @@
-import type { SpanFactory } from '@bugsnag/core-performance'
-import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import type { ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native'
 import type { NavigationContainerProps, NavigationContainerRefWithCurrent } from '@react-navigation/native'
 import React, { forwardRef, useRef } from 'react'
@@ -8,10 +7,10 @@ import { NavigationContextProvider } from './navigation-context'
 // Prevent rollup plugin from tree shaking NavigationContextProvider
 const Provider = NavigationContextProvider
 
-type CreateNavigationContainer = (NavigationContainerComponent: typeof NavigationContainer, spanFactory: SpanFactory<ReactNativeConfiguration>) => typeof NavigationContainer
+type CreateNavigationContainer = (NavigationContainerComponent: typeof NavigationContainer, spanFactory: ReactNativeSpanFactory) => typeof NavigationContainer
 type NavigationContainerRef = NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>
 
-export const createNavigationContainer: CreateNavigationContainer = (NavigationContainerComponent = NavigationContainer, spanFactory: SpanFactory<ReactNativeConfiguration>) => {
+export const createNavigationContainer: CreateNavigationContainer = (NavigationContainerComponent = NavigationContainer, spanFactory: ReactNativeSpanFactory) => {
   return forwardRef<NavigationContainerRef, NavigationContainerProps>((props, _ref) => {
     const { onStateChange, ...rest } = props
 

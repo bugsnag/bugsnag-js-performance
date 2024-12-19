@@ -22,6 +22,7 @@ import type { Span, SpanOptions } from './span'
 import type { SpanContext, SpanContextStorage } from './span-context'
 import { DefaultSpanContextStorage } from './span-context'
 import { SpanFactory } from './span-factory'
+import type { SpanFactoryConstructor } from './span-factory'
 import { timeToNumber } from './time'
 
 interface Constructor<T> { new(): T, prototype: T }
@@ -46,6 +47,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   persistence: Persistence
   retryQueueFactory: RetryQueueFactory
   spanContextStorage?: SpanContextStorage
+  spanFactory?: SpanFactoryConstructor<C>
   platformExtensions?: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => T
 }
 
@@ -57,7 +59,10 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
   const spanContextStorage = options.spanContextStorage || new DefaultSpanContextStorage(options.backgroundingListener)
   let logger = options.schema.logger.defaultValue
   const sampler = new Sampler(1.0)
-  const spanFactory = new SpanFactory(
+
+  const SpanFactoryClass = options.spanFactory || SpanFactory
+
+  const spanFactory = new SpanFactoryClass(
     processor,
     sampler,
     options.idGenerator,

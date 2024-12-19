@@ -1,9 +1,7 @@
 import {
   DefaultSpanContextStorage,
   Sampler,
-
   SpanFactory
-
 } from '@bugsnag/core-performance'
 import type { SpanAttribute, Configuration, SpanEnded, SpanInternal, SpanOptions } from '@bugsnag/core-performance'
 import ControllableBackgroundingListener from './controllable-backgrounding-listener'

@@ -4,6 +4,7 @@ import createClock from '../../lib/clock'
 import { AppStartPlugin } from '../../lib/auto-instrumentation/app-start-plugin'
 import type { ReactNativeConfiguration } from '../../lib/config'
 import type { AppRegistry } from 'react-native'
+import type { ReactNativeSpanFactory } from '../../lib/span-factory'
 
 describe('app start plugin', () => {
   let spanFactory: MockSpanFactory<ReactNativeConfiguration>
@@ -20,7 +21,7 @@ describe('app start plugin', () => {
 
   it('starts an app start span when autoInstrumentAppStarts is true', () => {
     const appStartTime = 1234
-    const plugin = new AppStartPlugin(appStartTime, spanFactory, clock, appRegistry)
+    const plugin = new AppStartPlugin(appStartTime, spanFactory as unknown as ReactNativeSpanFactory, clock, appRegistry)
 
     plugin.configure(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: true }))
 
@@ -34,7 +35,7 @@ describe('app start plugin', () => {
   })
 
   it('does not start an app start span when autoInstrumentAppStarts is false', () => {
-    const plugin = new AppStartPlugin(1234, spanFactory, clock, appRegistry)
+    const plugin = new AppStartPlugin(1234, spanFactory as unknown as ReactNativeSpanFactory, clock, appRegistry)
 
     plugin.configure(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: false }))
 

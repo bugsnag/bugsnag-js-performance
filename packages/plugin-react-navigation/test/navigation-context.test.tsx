@@ -1,6 +1,6 @@
 import type { SpanFactory } from '@bugsnag/core-performance'
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
-import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import type { ReactNativeConfiguration, ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import React, { useContext } from 'react'
 import { Button, View } from 'react-native'
@@ -189,7 +189,7 @@ const App = ({ spanFactory }: AppProps) => {
   const [currentRoute, setCurrentRoute] = React.useState('initial-route')
 
   return (
-    <NavigationContextProvider spanFactory={spanFactory} currentRoute={currentRoute} >
+    <NavigationContextProvider spanFactory={spanFactory as unknown as ReactNativeSpanFactory} currentRoute={currentRoute} >
       <Route />
       <Button title='Change to route 1' onPress={() => { setCurrentRoute('route-1') }} />
       <Button title='Change to route 2' onPress={() => { setCurrentRoute('route-2') }} />

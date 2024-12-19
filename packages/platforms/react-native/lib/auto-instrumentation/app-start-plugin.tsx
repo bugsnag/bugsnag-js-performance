@@ -1,14 +1,14 @@
 import type {
   Clock,
   InternalConfiguration,
-  Plugin,
-  SpanFactory
+  Plugin
 } from '@bugsnag/core-performance'
 import type { ReactNode } from 'react'
 import React from 'react'
 import type { AppRegistry, WrapperComponentProvider } from 'react-native'
 import type { ReactNativeConfiguration } from '../config'
 import { createAppStartSpan } from '../create-app-start-span'
+import type { ReactNativeSpanFactory } from '../span-factory'
 
 interface WrapperProps {
   children: ReactNode
@@ -19,13 +19,13 @@ export const isWrapperComponentProvider = (value: unknown): value is WrapperComp
 
 export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
   private readonly appStartTime: number
-  private readonly spanFactory: SpanFactory<ReactNativeConfiguration>
+  private readonly spanFactory: ReactNativeSpanFactory
   private readonly clock: Clock
   private readonly appRegistry: typeof AppRegistry
 
   constructor (
     appStartTime: number,
-    spanFactory: SpanFactory<ReactNativeConfiguration>,
+    spanFactory: ReactNativeSpanFactory,
     clock: Clock,
     appRegistry: typeof AppRegistry
   ) {

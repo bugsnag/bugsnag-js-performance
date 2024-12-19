@@ -1,5 +1,5 @@
-import type { SpanFactory, SpanInternal } from '@bugsnag/core-performance'
-import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import type { SpanInternal } from '@bugsnag/core-performance'
+import type { ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
 import type { PropsWithChildren } from 'react'
 
 import React from 'react'
@@ -13,7 +13,7 @@ export const NavigationContext = React.createContext({
 
 interface Props extends PropsWithChildren {
   currentRoute?: string
-  spanFactory: SpanFactory<ReactNativeConfiguration>
+  spanFactory: ReactNativeSpanFactory
 }
 
 type EndCondition = 'condition' | 'mount' | 'unmount' | 'immediate'
