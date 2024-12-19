@@ -11,6 +11,7 @@ describe('app start plugin', () => {
   let clock: Clock
   let appRegistry: typeof AppRegistry
   let setAppState: (appState: AppState) => void
+  let appState: AppState
 
   beforeEach(() => {
     spanFactory = new MockSpanFactory()
@@ -22,7 +23,7 @@ describe('app start plugin', () => {
 
   it('starts an app start span when autoInstrumentAppStarts is true', () => {
     const appStartTime = 1234
-    const plugin = new AppStartPlugin(appStartTime, spanFactory, clock, appRegistry, setAppState)
+    const plugin = new AppStartPlugin(appStartTime, spanFactory, clock, appRegistry, setAppState, appState)
 
     plugin.configure(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: true }))
 
@@ -36,7 +37,7 @@ describe('app start plugin', () => {
   })
 
   it('does not start an app start span when autoInstrumentAppStarts is false', () => {
-    const plugin = new AppStartPlugin(1234, spanFactory, clock, appRegistry, setAppState)
+    const plugin = new AppStartPlugin(1234, spanFactory, clock, appRegistry, setAppState, appState)
 
     plugin.configure(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: false }))
 
