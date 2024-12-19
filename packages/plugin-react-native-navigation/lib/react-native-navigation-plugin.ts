@@ -86,14 +86,14 @@ class BugsnagPluginReactNativeNavigationPerformance implements Plugin<ReactNativ
     this.Navigation.events().registerComponentWillAppearListener(event => {
       if (typeof this.startTime === 'number') {
         clearTimeout(this.startTimeout)
-
+          this.setAppState('navigating')
         const routeName = event.componentName
         this.currentNavigationSpan = createNavigationSpan(spanFactory, routeName, { startTime: this.startTime })
         this.currentNavigationSpan.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-native-navigation-performance')
 
         if (this.previousRoute) {
           this.currentNavigationSpan.setAttribute('bugsnag.navigation.previous_route', this.previousRoute)
-          this.setAppState('navigating')
+
         }
 
         this.previousRoute = routeName

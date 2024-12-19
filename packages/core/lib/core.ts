@@ -149,7 +149,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       }
 
       for (const plugin of plugins) {
-        plugin.configure(configuration, spanFactory, setAppState)
+        plugin.configure(configuration, spanFactory, setAppState, appState)
       }
     },
     startSpan: (name, spanOptions?: SpanOptions) => {

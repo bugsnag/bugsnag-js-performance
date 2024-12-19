@@ -16,6 +16,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   private readonly webVitals: WebVitals
   private readonly performance: PerformanceWithTiming
   private readonly setAppState: (appState: AppState) => void
+  private readonly appState: AppState
 
   // if the page was backgrounded at any point in the loading process a page
   // load span is invalidated as the browser will deprioritise the page
@@ -29,7 +30,8 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     onSettle: OnSettle,
     backgroundingListener: BackgroundingListener,
     performance: PerformanceWithTiming,
-    setAppState: (appState: AppState) => void
+    setAppState: (appState: AppState) => void,
+    appState: AppState
   ) {
     this.document = document
     this.location = location
@@ -38,6 +40,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     this.onSettle = onSettle
     this.performance = performance
     this.setAppState = setAppState
+    this.appState = appState
 
     backgroundingListener.onStateChange(state => {
       if (!this.wasBackgrounded && state === 'in-background') {
@@ -91,7 +94,9 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
 
       this.webVitals.attachTo(span)
       this.spanFactory.endSpan(span, endTime)
-      this.setAppState('ready')
+      if(this.appState === 'starting') {
+        this.setAppState('ready')
+      }
     })
   }
 }

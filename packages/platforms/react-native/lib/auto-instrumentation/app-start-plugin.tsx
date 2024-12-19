@@ -24,19 +24,22 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
   private readonly clock: Clock
   private readonly appRegistry: typeof AppRegistry
   private readonly setAppState: (appState: AppState) => void
+  private readonly appState: AppState
 
   constructor (
     appStartTime: number,
     spanFactory: SpanFactory<ReactNativeConfiguration>,
     clock: Clock,
     appRegistry: typeof AppRegistry,
-    setAppState: (appState: AppState) => void
+    setAppState: (appState: AppState) => void,
+    appState: AppState
   ) {
     this.appStartTime = appStartTime
     this.spanFactory = spanFactory
     this.clock = clock
     this.appRegistry = appRegistry
     this.setAppState = setAppState
+    this.appState = appState
   }
 
   configure (configuration: InternalConfiguration<ReactNativeConfiguration>) {
@@ -48,7 +51,9 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
       React.useEffect(() => {
         if (appStartSpan.isValid()) {
           this.spanFactory.endSpan(appStartSpan, this.clock.now())
-          this.setAppState('ready')
+          if (this.appState === 'starting') {
+            this.setAppState('ready')
+          }
         }
       }, [])
 
