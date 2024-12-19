@@ -46,7 +46,7 @@ describe('SpanInternal', () => {
       const clock = new IncrementingClock()
       const sampler = new Sampler(0.5)
       const delivery = { send: jest.fn() }
-      const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+      const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)), runCallbacks: async () => true }
       const backgroundingListener = new ControllableBackgroundingListener()
       const spanFactory = new SpanFactory(
         processor,
@@ -80,7 +80,7 @@ describe('SpanInternal', () => {
       const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
       const sampler = new Sampler(0.5)
       const delivery = { send: jest.fn() }
-      const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+      const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)), runCallbacks: async () => true }
       const backgroundingListener = new ControllableBackgroundingListener()
       const spanFactory = new SpanFactory(
         processor,

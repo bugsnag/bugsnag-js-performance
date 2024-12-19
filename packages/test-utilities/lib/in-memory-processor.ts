@@ -1,4 +1,4 @@
-import type { SpanEnded, Processor } from '@bugsnag/core-performance'
+import type { SpanEnded, Processor, Span } from '@bugsnag/core-performance'
 
 class InMemoryProcessor implements Processor {
   public readonly spans: SpanEnded[] = []
@@ -8,6 +8,10 @@ class InMemoryProcessor implements Processor {
   }
 
   configure (): void {}
+
+  async runCallbacks (span: Span) {
+    return true
+  }
 }
 
 export default InMemoryProcessor

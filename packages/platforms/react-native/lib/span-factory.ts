@@ -1,4 +1,4 @@
-import { SpanFactory, SpanInternal } from '@bugsnag/core-performance'
+import { spanEndedToSpan, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
 import type { SpanAttributes, ParentContext } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from './config'
 import type { NativeSettings } from './NativeBugsnagPerformance'
@@ -35,12 +35,17 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
   }
 
   protected sendForProcessing (span: NativeSpanInternal, endTime: number) {
-    if (!span.isNativeSpan) {
-      return super.sendForProcessing(span, endTime)
-    }
+    span.isNativeSpan ? this.processNativeSpan(span, endTime) : super.sendForProcessing(span, endTime)
+  }
 
-    // TODO: run callbacks
+  private async processNativeSpan (span: NativeSpanInternal, endTime: number) {
     const spanEnded = span.end(endTime, this.sampler.spanProbability)
-    NativeBugsnagPerformance?.endNativeSpan(span.id, span.traceId, endTime, spanEnded.attributes.toObject())
+    const shouldSend = await this.processor.runCallbacks(spanEndedToSpan(spanEnded))
+
+    if (shouldSend) {
+      NativeBugsnagPerformance?.endNativeSpan(spanEnded.id, spanEnded.traceId, endTime, spanEnded.attributes.toObject())
+    } else {
+      NativeBugsnagPerformance?.discardNativeSpan(spanEnded.id, spanEnded.traceId)
+    }
   }
 }

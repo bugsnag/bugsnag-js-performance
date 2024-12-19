@@ -114,7 +114,7 @@ export class BatchProcessor<C extends Configuration> implements Processor {
     await this.flushQueue
   }
 
-  private async runCallbacks (span: Span): Promise<boolean> {
+  async runCallbacks (span: Span): Promise<boolean> {
     if (this.configuration.onSpanEnd) {
       const callbackStartTime = performance.now()
       let continueToBatch = true

@@ -21,7 +21,7 @@ export type SpanFactoryConstructor<C extends Configuration> = new (
 ) => InstanceType<typeof SpanFactory<C>>
 
 export class SpanFactory<C extends Configuration> {
-  private processor: Processor
+  protected processor: Processor
   readonly sampler: ReadonlySampler
   private readonly idGenerator: IdGenerator
   private readonly spanAttributesSource: SpanAttributesSource<C>
