@@ -66,12 +66,13 @@ if (typeof window === 'undefined' || typeof document === 'undefined') {
           performance,
           setAppState
         ),
-      // ResourceLoadPlugin should always come after FullPageLoad plugin, as it should use that
-      // span context as the parent of it's spans
-      new ResourceLoadPlugin(spanFactory, spanContextStorage, window.PerformanceObserver),
-      new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchRequestTracker, xhrRequestTracker),
-      new RouteChangePlugin(spanFactory, window.location, document, setAppState)
-    ]},
+        // ResourceLoadPlugin should always come after FullPageLoad plugin, as it should use that
+        // span context as the parent of it's spans
+        new ResourceLoadPlugin(spanFactory, spanContextStorage, window.PerformanceObserver),
+        new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchRequestTracker, xhrRequestTracker),
+        new RouteChangePlugin(spanFactory, window.location, document, setAppState)
+      ]
+    },
     persistence,
     retryQueueFactory: (delivery, retryQueueMaxSize) => new InMemoryQueue(delivery, retryQueueMaxSize)
   })
