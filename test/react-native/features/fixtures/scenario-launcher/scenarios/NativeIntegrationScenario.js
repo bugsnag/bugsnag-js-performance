@@ -11,14 +11,28 @@ export const initialise = async (config) => {
     endpoint: config.endpoint
   }
 
+  const onSpanEnd = [
+    async (span) => {
+      if (span.name === 'JS parent span') {
+        span.setAttribute('custom.js.attribute', 'JS span attribute')
+      } else if (span.name === 'Native child span') {
+        span.setAttribute('custom.native.attribute', 'Native span attribute')
+      }
+      return true
+    }
+  ]
+
   await NativeScenarioLauncher.startNativePerformance(nativeConfig)
 
-  BugsnagPerformance.attach({ maximumBatchSize: 1, autoInstrumentAppStarts: false, autoInstrumentNetworkRequests: false })
+  BugsnagPerformance.attach({ onSpanEnd, maximumBatchSize: 1, autoInstrumentAppStarts: false, autoInstrumentNetworkRequests: false })
 }
 
 export const App = () => {
   useEffect(() => {
-    BugsnagPerformance.startSpan('NativeIntegration').end()
+    const parentSpan = BugsnagPerformance.startSpan('JS parent span')
+    const childSpan = BugsnagPerformance.startSpan('Native child span', { isFirstClass: true })
+    childSpan.end()
+    parentSpan.end()
   }, [])
 
   return (

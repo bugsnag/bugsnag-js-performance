@@ -123,6 +123,7 @@ RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(
     config.autoInstrumentAppStarts = NO;
     config.autoInstrumentViewControllers = NO;
     config.autoInstrumentNetworkRequests = NO;
+    config.autoInstrumentRendering = YES;
     config.internal.autoTriggerExportOnBatchSize = 1;
 
     [BugsnagPerformance startWithConfiguration:config];
