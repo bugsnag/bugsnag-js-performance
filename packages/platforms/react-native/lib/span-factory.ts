@@ -22,7 +22,8 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     }
 
     const unixStartTimeNanos = (this.clock as ReactNativeClock).toUnixNanoseconds(startTime)
-    const nativeSpan = NativeBugsnagPerformance.startNativeSpan(name, { startTime: unixStartTimeNanos, parentContext })
+    const nativeParentContext = parentContext ? { id: parentContext.id, traceId: parentContext.traceId } : undefined
+    const nativeSpan = NativeBugsnagPerformance.startNativeSpan(name, { startTime: unixStartTimeNanos, parentContext: nativeParentContext })
     return new NativeSpanInternal(nativeSpan.id, nativeSpan.traceId, name, startTime, attributes, this.clock, nativeSpan.parentSpanId)
   }
 
@@ -43,7 +44,10 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     const shouldSend = await this.processor.runCallbacks(spanEndedToSpan(spanEnded))
 
     if (shouldSend) {
-      NativeBugsnagPerformance?.endNativeSpan(spanEnded.id, spanEnded.traceId, endTime, spanEnded.attributes.toObject())
+      const unixEndTimeNanos = (this.clock as ReactNativeClock).toUnixNanoseconds(endTime)
+      const attributes = spanEnded.attributes.toObject()
+      delete attributes['bugsnag.sampling.p']
+      NativeBugsnagPerformance?.endNativeSpan(spanEnded.id, spanEnded.traceId, unixEndTimeNanos, attributes)
     } else {
       NativeBugsnagPerformance?.discardNativeSpan(spanEnded.id, spanEnded.traceId)
     }
