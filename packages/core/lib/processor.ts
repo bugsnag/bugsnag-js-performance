@@ -1,11 +1,10 @@
 import type { InternalConfiguration, Configuration } from './config'
-import type { Span, SpanEnded } from './span'
+import type { SpanEnded } from './span'
 
 // processor.add is called by a Span when 'Span.end' is called
 // it can then add to a queue or send immediately
 export interface Processor {
   add: (span: SpanEnded) => void
-  runCallbacks: (span: Span) => Promise<boolean>
 }
 
 export interface ProcessorFactory<C extends Configuration> {
@@ -26,9 +25,5 @@ export class BufferingProcessor implements Processor {
 
   add (span: SpanEnded): void {
     this.spans.push(span)
-  }
-
-  async runCallbacks (span: Span) {
-    return true
   }
 }

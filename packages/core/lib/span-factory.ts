@@ -2,7 +2,7 @@ import type { SpanAttribute, SpanAttributesLimits, SpanAttributesSource } from '
 import { SpanAttributes } from './attributes'
 import type { BackgroundingListener, BackgroundingListenerState } from './backgrounding-listener'
 import type { Clock } from './clock'
-import type { Configuration, InternalConfiguration, Logger } from './config'
+import type { Configuration, InternalConfiguration, Logger, OnSpanEndCallbacks } from './config'
 import { defaultSpanAttributeLimits } from './custom-attribute-limits'
 import type { IdGenerator } from './id-generator'
 import type { NetworkSpanOptions } from './network-span'
@@ -21,14 +21,15 @@ export type SpanFactoryConstructor<C extends Configuration> = new (
 ) => InstanceType<typeof SpanFactory<C>>
 
 export class SpanFactory<C extends Configuration> {
-  protected processor: Processor
+  private processor: Processor
   readonly sampler: ReadonlySampler
   private readonly idGenerator: IdGenerator
   private readonly spanAttributesSource: SpanAttributesSource<C>
   protected readonly clock: Clock
   private readonly spanContextStorage: SpanContextStorage
-  private logger: Logger
+  protected logger: Logger
   private spanAttributeLimits: SpanAttributesLimits = defaultSpanAttributeLimits
+  protected onSpanEndCallbacks?: OnSpanEndCallbacks
 
   private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
   private isInForeground: boolean = true
@@ -124,6 +125,7 @@ export class SpanFactory<C extends Configuration> {
       attributeCountLimit: configuration.attributeCountLimit,
       attributeStringValueLimit: configuration.attributeStringValueLimit
     }
+    this.onSpanEndCallbacks = configuration.onSpanEnd
   }
 
   endSpan (

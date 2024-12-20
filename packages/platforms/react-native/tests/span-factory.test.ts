@@ -3,8 +3,10 @@ import { ReactNativeSpanFactory } from '../lib/span-factory'
 import NativeBugsnagPerformance from '../lib/native'
 import { ControllableBackgroundingListener, InMemoryProcessor, spanAttributesSource, StableIdGenerator } from '@bugsnag/js-performance-test-utilities'
 import { DefaultSpanContextStorage, Sampler } from '@bugsnag/core-performance'
+import type { InternalConfiguration } from '@bugsnag/core-performance'
 import createClock from '../lib/clock'
 import type { ReactNativeClock } from '../lib/clock'
+import type { ReactNativeConfiguration } from '../lib/config'
 
 let clock: ReactNativeClock
 let spanFactory: ReactNativeSpanFactory
@@ -149,10 +151,11 @@ describe('ReactNativeSpanFactory', () => {
       const nativeSettings = NativeBugsnagPerformance!.initialise()
       spanFactory.attach(nativeSettings)
 
-      const runCalbacksSpy = jest.spyOn(processor, 'runCallbacks').mockImplementation((span) => {
+      const onSpanEndCallback = jest.fn((span) => {
         return Promise.resolve(span.name === 'should send')
       })
 
+      spanFactory.configure(processor, { logger: jestLogger, onSpanEnd: [onSpanEndCallback] } as unknown as InternalConfiguration<ReactNativeConfiguration>)
       const startTime = clock.now()
       const validSpan = spanFactory.startSpan('should send', { startTime, isFirstClass: true })
       expect(NativeBugsnagPerformance!.startNativeSpan).toHaveBeenCalledWith('should send', expect.objectContaining({ startTime: clock.toUnixNanoseconds(startTime) }))
@@ -166,14 +169,14 @@ describe('ReactNativeSpanFactory', () => {
       spanFactory.endSpan(invalidSpan, endTime)
       await jest.runOnlyPendingTimersAsync()
 
-      expect(runCalbacksSpy).toHaveBeenCalledTimes(1)
+      expect(onSpanEndCallback).toHaveBeenCalledTimes(1)
       expect(NativeBugsnagPerformance!.endNativeSpan).not.toHaveBeenCalled()
       expect(NativeBugsnagPerformance!.discardNativeSpan).toHaveBeenCalledTimes(1)
 
       spanFactory.endSpan(validSpan, endTime)
       await jest.runOnlyPendingTimersAsync()
 
-      expect(runCalbacksSpy).toHaveBeenCalledTimes(2)
+      expect(onSpanEndCallback).toHaveBeenCalledTimes(2)
       expect(NativeBugsnagPerformance!.endNativeSpan).toHaveBeenCalledTimes(1)
       expect(NativeBugsnagPerformance!.discardNativeSpan).toHaveBeenCalledTimes(1)
 

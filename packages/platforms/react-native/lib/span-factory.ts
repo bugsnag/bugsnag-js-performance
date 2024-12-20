@@ -1,4 +1,4 @@
-import { spanEndedToSpan, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
+import { runSpanEndCallbacks, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
 import type { SpanAttributes, ParentContext } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from './config'
 import type { NativeSettings } from './NativeBugsnagPerformance'
@@ -41,7 +41,7 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
 
   private async processNativeSpan (span: NativeSpanInternal, endTime: number) {
     const spanEnded = span.end(endTime, this.sampler.spanProbability)
-    const shouldSend = await this.processor.runCallbacks(spanEndedToSpan(spanEnded))
+    const shouldSend = await runSpanEndCallbacks(spanEnded, this.logger, this.onSpanEndCallbacks)
 
     if (shouldSend) {
       const unixEndTimeNanos = (this.clock as ReactNativeClock).toUnixNanoseconds(endTime)
