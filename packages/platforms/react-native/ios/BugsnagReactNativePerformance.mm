@@ -91,18 +91,6 @@ static NSString *getRandomBytes() noexcept {
     return hexStr;
 }
 
-RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(initialise) {
-    NSMutableDictionary *result = [NSMutableDictionary new];
-    result[@"device"] = [self getDeviceInfo];
-    result[@"isNativePerformanceAvailable"] = [self isNativePerformanceAvailable];
-    if (![self isNativePerformanceAvailable]) {
-        return result;
-    }
-
-    result[@"nativeConfiguration"] = [self getNativeConfiguration];
-    return result;
-}
-
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getDeviceInfo) {
     NSMutableDictionary *info = [NSMutableDictionary new];
     auto infoDictionary = NSBundle.mainBundle.infoDictionary;

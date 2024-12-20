@@ -130,20 +130,6 @@ const getDevice = (): DeviceInfo => {
   }
 }
 
-const getConfiguration = () => {
-  return {
-    apiKey: VALID_API_KEY,
-    endpoint: '/traces',
-    appVersion: '1.2.3',
-    releaseStage: 'test',
-    enabledReleaseStages: ['test', 'production'],
-    serviceName: 'com.native.performance.test',
-    attributeCountLimit: 128,
-    attributeStringValueLimit: 1024,
-    attributeArrayLengthLimit: 1000
-  }
-}
-
 const BugsnagReactNativePerformance = {
   getDeviceInfo: jest.fn(getDevice),
   requestEntropy: jest.fn(() => {
@@ -155,7 +141,19 @@ const BugsnagReactNativePerformance = {
   isNativePerformanceAvailable: jest.fn(() => {
     return true
   }),
-  getNativeConfiguration: jest.fn(getConfiguration),
+  getNativeConfiguration: jest.fn(() => {
+    return {
+      apiKey: VALID_API_KEY,
+      endpoint: '/traces',
+      appVersion: '1.2.3',
+      releaseStage: 'test',
+      enabledReleaseStages: ['test', 'production'],
+      serviceName: 'com.native.performance.test',
+      attributeCountLimit: 128,
+      attributeStringValueLimit: 1024,
+      attributeArrayLengthLimit: 1000
+    }
+  }),
   startNativeSpan: jest.fn((name, options) => {
     return {
       name,
@@ -171,13 +169,6 @@ const BugsnagReactNativePerformance = {
   markNativeSpanEndTime: jest.fn(),
   discardNativeSpan: jest.fn(() => {
     return Promise.resolve()
-  }),
-  initialise: jest.fn(() => {
-    return {
-      isNativePerformanceAvailable: true,
-      device: getDevice(),
-      configuration: getConfiguration()
-    }
   })
 }
 

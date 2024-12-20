@@ -45,8 +45,7 @@ const jestLogger = {
 describe('ReactNativeSpanFactory', () => {
   describe('startSpan', () => {
     it('starts a native span when isFirstClass is true', () => {
-      const nativeSettings = NativeBugsnagPerformance!.initialise()
-      spanFactory.attach(nativeSettings)
+      spanFactory.onAttach()
 
       const startTime = clock.now()
       const nativeSpan = spanFactory.startSpan('native span', { startTime, isFirstClass: true })
@@ -55,8 +54,7 @@ describe('ReactNativeSpanFactory', () => {
     })
 
     it.each([false, undefined])('does not start a native span when isFirstClass is %p', isFirstClass => {
-      const nativeSettings = NativeBugsnagPerformance!.initialise()
-      spanFactory.attach(nativeSettings)
+      spanFactory.onAttach()
 
       const startTime = clock.now()
       const span = spanFactory.startSpan('not first class', { startTime, isFirstClass })
@@ -71,20 +69,8 @@ describe('ReactNativeSpanFactory', () => {
       expect(contextStorage.current).toBe(span)
     })
 
-    it('does not start a native span when native performance is not available', () => {
-      const nativeSettings = NativeBugsnagPerformance!.initialise()
-      nativeSettings.isNativePerformanceAvailable = false
-      spanFactory.attach(nativeSettings)
-
-      const startTime = clock.now()
-      const span = spanFactory.startSpan('native span', { startTime, isFirstClass: true })
-      expect(NativeBugsnagPerformance!.startNativeSpan).not.toHaveBeenCalled()
-      expect(contextStorage.current).toBe(span)
-    })
-
     it('sets the native parent context when parentContext is provided', () => {
-      const nativeSettings = NativeBugsnagPerformance!.initialise()
-      spanFactory.attach(nativeSettings)
+      spanFactory.onAttach()
 
       const startTime = clock.now()
       const parentContext = spanFactory.startSpan('parent', { startTime, isFirstClass: false })
@@ -97,8 +83,7 @@ describe('ReactNativeSpanFactory', () => {
     })
 
     it.each([null, undefined])('does not set the native parent context when parentContext is %p', parentContext => {
-      const nativeSettings = NativeBugsnagPerformance!.initialise()
-      spanFactory.attach(nativeSettings)
+      spanFactory.onAttach()
 
       const startTime = clock.now()
       const nativeSpan = spanFactory.startSpan('child', { startTime, isFirstClass: true, parentContext })
@@ -111,8 +96,7 @@ describe('ReactNativeSpanFactory', () => {
 
   describe('endSpan', () => {
     it('sends native spans to the native module', async () => {
-      const nativeSettings = NativeBugsnagPerformance!.initialise()
-      spanFactory.attach(nativeSettings)
+      spanFactory.onAttach()
 
       const startTime = clock.now()
       const nativeSpan = spanFactory.startSpan('native span', { startTime, isFirstClass: true })
@@ -133,6 +117,7 @@ describe('ReactNativeSpanFactory', () => {
     })
 
     it('sends non-native spans to the JS processor', async () => {
+      spanFactory.onAttach()
       const startTime = clock.now()
       const span = spanFactory.startSpan('not native', { startTime, isFirstClass: false })
       expect(NativeBugsnagPerformance!.startNativeSpan).not.toHaveBeenCalled()
@@ -148,8 +133,7 @@ describe('ReactNativeSpanFactory', () => {
     })
 
     it('runs onSpanEnd callbacks for native spans', async () => {
-      const nativeSettings = NativeBugsnagPerformance!.initialise()
-      spanFactory.attach(nativeSettings)
+      spanFactory.onAttach()
 
       const onSpanEndCallback = jest.fn((span) => {
         return Promise.resolve(span.name === 'should send')
@@ -186,8 +170,7 @@ describe('ReactNativeSpanFactory', () => {
 
   describe('discardSpan', () => {
     it('discards a native span', () => {
-      const nativeSettings = NativeBugsnagPerformance!.initialise()
-      spanFactory.attach(nativeSettings)
+      spanFactory.onAttach()
 
       const startTime = clock.now()
       const nativeSpan = spanFactory.startSpan('native span', { startTime, isFirstClass: true })

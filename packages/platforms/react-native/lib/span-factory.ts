@@ -1,7 +1,6 @@
 import { runSpanEndCallbacks, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
 import type { SpanAttributes, ParentContext } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from './config'
-import type { NativeSettings } from './NativeBugsnagPerformance'
 import NativeBugsnagPerformance from './native'
 import type { ReactNativeClock } from './clock'
 
@@ -12,8 +11,8 @@ class NativeSpanInternal extends SpanInternal {
 export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration> {
   private attachedToNative = false
 
-  attach (nativeConfig: NativeSettings) {
-    this.attachedToNative = nativeConfig.isNativePerformanceAvailable
+  onAttach () {
+    this.attachedToNative = true
   }
 
   protected createSpanInternal (name: string, startTime: number, parentContext: ParentContext | null | undefined, isFirstClass: boolean | undefined, attributes: SpanAttributes) {

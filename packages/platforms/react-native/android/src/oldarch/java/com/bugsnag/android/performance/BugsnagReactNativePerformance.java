@@ -24,11 +24,6 @@ public class BugsnagReactNativePerformance extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
-  public WritableMap initialise() {
-   return impl.initialise();
-  }
-
-  @ReactMethod(isBlockingSynchronousMethod = true)
   public WritableMap getDeviceInfo() {
     return impl.getDeviceInfo();
   }

@@ -22,11 +22,6 @@ public class BugsnagReactNativePerformance extends NativeBugsnagPerformanceSpec 
   }
 
   @Override
-  public WritableMap initialise() {
-   return impl.initialise();
-  }
-
-  @Override
   public WritableMap getDeviceInfo() {
     return impl.getDeviceInfo();
   }

@@ -71,10 +71,7 @@ beforeEach(() => {
 describe('React Native client tests', () => {
   describe('attach()', () => {
     it('logs a warning and noops if native performance is not available', () => {
-      turboModule.initialise = jest.fn().mockReturnValue({
-        isNativePerformanceAvailable: false,
-        configuration: null
-      })
+      turboModule.isNativePerformanceAvailable = jest.fn().mockReturnValue(false)
 
       client = require('../lib/client').default
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
@@ -84,10 +81,7 @@ describe('React Native client tests', () => {
     })
 
     it('logs a warning and noops if native performance has not been started', () => {
-      turboModule.initialise = jest.fn().mockReturnValue({
-        isNativePerformanceAvailable: true,
-        configuration: null
-      })
+      turboModule.getNativeConfiguration = jest.fn().mockReturnValue(null)
 
       client = require('../lib/client').default
       const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
@@ -97,7 +91,7 @@ describe('React Native client tests', () => {
     })
 
     it('starts the client using the native configuration', () => {
-      const nativeConfig = turboModule.initialise().configuration
+      const nativeConfig = turboModule.getNativeConfiguration()
       client = require('../lib/client').default
       const startSpy = jest.spyOn(client, 'start')
 
@@ -130,7 +124,7 @@ describe('React Native client tests', () => {
     })
 
     it('does not overwrite native configuration with JS values', () => {
-      const nativeConfig = turboModule.initialise().configuration
+      const nativeConfig = turboModule.getNativeConfiguration()
       client = require('../lib/client').default
       const startSpy = jest.spyOn(client, 'start')
 
