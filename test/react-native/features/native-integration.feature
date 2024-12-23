@@ -13,4 +13,4 @@ Feature: Native Integration
     And a span named "JS parent span" contains the attributes:
             | attribute                         | type             | value                    |
             | bugsnag.span.category             | stringValue      | custom                   |
-            | custom.native.attribute           | stringValue      | JS span attribute        |
+            | custom.js.attribute               | stringValue      | JS span attribute        |
