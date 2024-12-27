@@ -6,7 +6,7 @@ import type { Configuration, InternalConfiguration, Logger, OnSpanEndCallbacks }
 import { defaultSpanAttributeLimits } from './custom-attribute-limits'
 import type { IdGenerator } from './id-generator'
 import type { NetworkSpanOptions } from './network-span'
-import type { Processor } from './processor'
+import type { BufferingProcessor, Processor } from './processor'
 import type { ReadonlySampler } from './sampler'
 import type { InternalSpanOptions, ParentContext, Span, SpanOptionSchema, SpanOptions } from './span'
 import { SpanInternal, coreSpanOptionSchema } from './span'
@@ -117,8 +117,7 @@ export class SpanFactory<C extends Configuration> {
     return spanInternal
   }
 
-  configure (processor: Processor, configuration: InternalConfiguration<C>) {
-    this.processor = processor
+  configure (configuration: InternalConfiguration<C>) {
     this.logger = configuration.logger
     this.spanAttributeLimits = {
       attributeArrayLengthLimit: configuration.attributeArrayLengthLimit,
@@ -126,6 +125,15 @@ export class SpanFactory<C extends Configuration> {
       attributeStringValueLimit: configuration.attributeStringValueLimit
     }
     this.onSpanEndCallbacks = configuration.onSpanEnd
+  }
+
+  reprocessEarlySpans (batchProcessor: Processor) {
+    // ensure all spans in the buffering processor are added to the batch
+    for (const span of (this.processor as BufferingProcessor).spans) {
+      batchProcessor.add(span)
+    }
+
+    this.processor = batchProcessor
   }
 
   endSpan (

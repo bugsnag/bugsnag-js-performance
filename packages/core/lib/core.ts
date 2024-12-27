@@ -14,7 +14,6 @@ import type { Persistence } from './persistence'
 import type { Plugin } from './plugin'
 import ProbabilityFetcher from './probability-fetcher'
 import ProbabilityManager from './probability-manager'
-import type { Processor } from './processor'
 import { BufferingProcessor } from './processor'
 import type { RetryQueueFactory } from './retry-queue'
 import Sampler from './sampler'
@@ -55,7 +54,6 @@ export type BugsnagPerformance <C extends Configuration, T> = Client<C> & T
 
 export function createClient<S extends CoreSchema, C extends Configuration, T> (options: ClientOptions<S, C, T>): BugsnagPerformance<C, T> {
   const bufferingProcessor = new BufferingProcessor()
-  let processor: Processor = bufferingProcessor
   const spanContextStorage = options.spanContextStorage || new DefaultSpanContextStorage(options.backgroundingListener)
   let logger = options.schema.logger.defaultValue
   const sampler = new Sampler(1.0)
@@ -63,7 +61,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
   const SpanFactoryClass = options.spanFactory || SpanFactory
 
   const spanFactory = new SpanFactoryClass(
-    processor,
+    bufferingProcessor,
     sampler,
     options.idGenerator,
     options.spanAttributesSource,
@@ -101,6 +99,8 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
 
       options.spanAttributesSource.configure(configuration)
 
+      spanFactory.configure(configuration)
+
       const probabilityManagerPromise = configuration.samplingProbability === undefined
         ? ProbabilityManager.create(
           options.persistence,
@@ -110,7 +110,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         : FixedProbabilityManager.create(sampler, configuration.samplingProbability)
 
       probabilityManagerPromise.then((manager: ProbabilityManager | FixedProbabilityManager) => {
-        processor = new BatchProcessor(
+        const batchProcessor = new BatchProcessor(
           delivery,
           configuration,
           options.retryQueueFactory(delivery, configuration.retryQueueMaxSize),
@@ -119,17 +119,14 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
           new TracePayloadEncoder(options.clock, configuration, options.resourceAttributesSource)
         )
 
-        // ensure all spans started before .start() are added to the batch
-        for (const span of bufferingProcessor.spans) {
-          processor.add(span)
-        }
+        spanFactory.reprocessEarlySpans(batchProcessor)
 
         // register with the backgrounding listener - we do this in 'start' as
         // there's nothing to do if we're backgrounded before start is called
         // e.g. we can't trigger delivery until we have the apiKey and endpoint
         // from configuration
         options.backgroundingListener.onStateChange(state => {
-          (processor as BatchProcessor<C>).flush()
+          batchProcessor.flush()
 
           // ensure we have a fresh probability value when returning to the
           // foreground
@@ -139,7 +136,6 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         })
 
         logger = configuration.logger
-        spanFactory.configure(processor, configuration)
       })
 
       for (const plugin of configuration.plugins) {

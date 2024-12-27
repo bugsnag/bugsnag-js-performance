@@ -139,7 +139,7 @@ describe('ReactNativeSpanFactory', () => {
         return Promise.resolve(span.name === 'should send')
       })
 
-      spanFactory.configure(processor, { logger: jestLogger, onSpanEnd: [onSpanEndCallback] } as unknown as InternalConfiguration<ReactNativeConfiguration>)
+      spanFactory.configure({ logger: jestLogger, onSpanEnd: [onSpanEndCallback] } as unknown as InternalConfiguration<ReactNativeConfiguration>)
       const startTime = clock.now()
       const validSpan = spanFactory.startSpan('should send', { startTime, isFirstClass: true })
       expect(NativeBugsnagPerformance!.startNativeSpan).toHaveBeenCalledWith('should send', expect.objectContaining({ startTime: clock.toUnixNanoseconds(startTime) }))
