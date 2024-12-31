@@ -22,7 +22,7 @@ export const initialise = async (config) => {
     }
   ]
 
-  await NativeScenarioLauncher.startNativePerformance(nativeConfig)
+  NativeScenarioLauncher.startNativePerformance(nativeConfig)
 
   BugsnagPerformance.attach({ onSpanEnd, maximumBatchSize: 1, autoInstrumentAppStarts: false, autoInstrumentNetworkRequests: false })
 }

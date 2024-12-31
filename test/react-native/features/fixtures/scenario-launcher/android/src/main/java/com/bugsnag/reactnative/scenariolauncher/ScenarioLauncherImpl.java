@@ -161,7 +161,7 @@ class ScenarioLauncherImpl {
     System.exit(0);
   }
 
-  public void startNativePerformance(ReadableMap configuration, Promise promise) {
+  public void startNativePerformance(ReadableMap configuration) {
     try {
         PerformanceConfiguration config = PerformanceConfiguration.load(reactContext);
         config.setApiKey(configuration.getString("apiKey"));
@@ -172,12 +172,8 @@ class ScenarioLauncherImpl {
 
         BugsnagPerformance.start(config);
         Log.d(MODULE_NAME, "Started Android performance");
-    
-        promise.resolve(true);
-
     } catch (Exception e) {
         Log.d(MODULE_NAME, "Failed to start Android performance", e);
-        promise.reject(e);
     }
   }
 }

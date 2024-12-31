@@ -116,7 +116,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(exitApp) {
 }
 
 #ifdef NATIVE_INTEGRATION
-RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(startNativePerformance:(NSDictionary *)configuration) {
   NSLog(@"Starting Cocoa Performance with configuration: %@\n", configuration);
 
   NSString *apiKey = configuration[@"apiKey"];
@@ -133,13 +133,11 @@ RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(
     config.internal.autoTriggerExportOnBatchSize = 1;
 
     [BugsnagPerformance startWithConfiguration:config];
-    resolve(nil);
   });    
 }
 #else
-RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(startNativePerformance:(NSDictionary *)configuration) {
   NSLog(@"Native performance is not enabled in this build");
-  resolve(nil);
 }
 #endif
 

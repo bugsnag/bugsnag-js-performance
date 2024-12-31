@@ -47,8 +47,8 @@ public class ScenarioLauncher extends NativeScenarioLauncherSpec {
   }
 
   @Override
-  public void startNativePerformance(ReadableMap configuration, Promise promise) {
-    impl.startNativePerformance(configuration, promise);
+  public void startNativePerformance(ReadableMap configuration) {
+    impl.startNativePerformance(configuration);
   }
 }
 

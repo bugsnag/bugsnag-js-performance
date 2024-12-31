@@ -49,7 +49,7 @@ public class ScenarioLauncher extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void startNativePerformance(ReadableMap configuration, Promise promise) {
-    impl.startNativePerformance(configuration, promise);
+  public void startNativePerformance(ReadableMap configuration) {
+    impl.startNativePerformance(configuration);
   }
 }
