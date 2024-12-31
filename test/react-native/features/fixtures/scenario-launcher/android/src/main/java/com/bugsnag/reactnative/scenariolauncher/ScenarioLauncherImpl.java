@@ -120,6 +120,10 @@ class ScenarioLauncherImpl {
         editor.putInt("maximumBatchSize", configuration.getInt("maximumBatchSize"));
     }
 
+    if (configuration.hasKey("attachToNativeSDK")) {
+        editor.putBoolean("attachToNativeSDK", configuration.getBoolean("attachToNativeSDK"));
+    }
+
     editor.commit();
   }
 
@@ -136,6 +140,7 @@ class ScenarioLauncherImpl {
         startupConfig.putBoolean("autoInstrumentAppStarts", sharedPreferences.getBoolean("autoInstrumentAppStarts", false));
         startupConfig.putBoolean("autoInstrumentNetworkRequests", sharedPreferences.getBoolean("autoInstrumentNetworkRequests", false));
         startupConfig.putInt("maximumBatchSize", sharedPreferences.getInt("maximumBatchSize", 100));
+        startupConfig.putBoolean("attachToNativeSDK", sharedPreferences.getBoolean("attachToNativeSDK", false));
         return startupConfig;
     }
     finally {
@@ -147,6 +152,7 @@ class ScenarioLauncherImpl {
             .remove("autoInstrumentAppStarts")
             .remove("autoInstrumentNetworkRequests")
             .remove("maximumBatchSize")
+            .remove("attachToNativeSDK")
             .commit();
     }
   }

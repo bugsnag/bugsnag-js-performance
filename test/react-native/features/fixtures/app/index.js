@@ -6,7 +6,12 @@ import { launchScenario, NativeScenarioLauncher } from '@bugsnag/react-native-pe
 
 const startupConfig = NativeScenarioLauncher.readStartupConfig()
 if (startupConfig) {
-  BugsnagPerformance.start(startupConfig)
+  if (startupConfig.attachToNativeSDK) {
+    NativeScenarioLauncher.startNativePerformance(startupConfig)
+    BugsnagPerformance.attach(startupConfig)
+  } else {
+    BugsnagPerformance.start(startupConfig)
+  }
 }
 
 const App = () => {

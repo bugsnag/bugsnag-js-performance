@@ -68,6 +68,10 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(saveStartupConfig:(NSDictionary *)config)
     [defaults setInteger:[config[@"maximumBatchSize"] integerValue] forKey:@"maximumBatchSize"];
   }
 
+  if (config[@"attachToNativeSDK"]) {
+    [defaults setBool:[config[@"attachToNativeSDK"] boolValue] forKey:@"attachToNativeSDK"];
+  }
+
   [defaults synchronize];
 
   return nil;
@@ -87,6 +91,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(readStartupConfig) {
   config[@"autoInstrumentAppStarts"] = [NSNumber numberWithBool:[defaults boolForKey:@"autoInstrumentAppStarts"]];
   config[@"autoInstrumentNetworkRequests"] = [NSNumber numberWithBool:[defaults boolForKey:@"autoInstrumentNetworkRequests"]];
   config[@"maximumBatchSize"] = [NSNumber numberWithInteger:[defaults integerForKey:@"maximumBatchSize"]];
+  config[@"attachToNativeSDK"] = [NSNumber numberWithBool:[defaults boolForKey:@"attachToNativeSDK"]];
 
   // make sure we don't leave this config around for the next startup
   [defaults setBool:NO forKey:@"configured"];
@@ -95,6 +100,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(readStartupConfig) {
   [defaults removeObjectForKey:@"autoInstrumentAppStarts"];
   [defaults removeObjectForKey:@"autoInstrumentNetworkRequests"];
   [defaults removeObjectForKey:@"maximumBatchSize"];
+  [defaults removeObjectForKey:@"attachToNativeSDK"];
 
   [defaults synchronize];
 
