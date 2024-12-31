@@ -3,7 +3,6 @@ import React from 'react'
 import { Platform } from 'react-native'
 import NativeBugsnagPerformance from './native'
 import type { ReactNativeAttachConfiguration, ReactNativeConfiguration, ReactNativeSchema } from './config'
-import { createAppStartSpan } from './create-app-start-span'
 import { createNavigationSpan } from './create-navigation-span'
 import type { ReactNativeSpanFactory } from './span-factory'
 
@@ -17,7 +16,7 @@ export const platformExtensions = (appStartTime: number, clock: Clock, schema: R
     return spanFactory.toPublicApi(span)
   },
   withInstrumentedAppStarts: function (App: React.FC) {
-    const appStartSpan = createAppStartSpan(spanFactory, appStartTime)
+    const appStartSpan = spanFactory.createAppStartSpan(appStartTime)
 
     return () => {
       React.useEffect(() => {

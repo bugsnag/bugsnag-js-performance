@@ -1,5 +1,5 @@
-import { runSpanEndCallbacks, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
-import type { SpanAttributes, ParentContext } from '@bugsnag/core-performance'
+import { runSpanEndCallbacks, SpanFactory, SpanInternal, SpanAttributes } from '@bugsnag/core-performance'
+import type { ParentContext } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from './config'
 import NativeBugsnagPerformance from './native'
 import type { ReactNativeClock } from './clock'
@@ -10,6 +10,7 @@ class NativeSpanInternal extends SpanInternal {
 
 export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration> {
   private attachedToNative = false
+  private appStartSpan: SpanInternal | null = null
 
   onAttach () {
     this.attachedToNative = true
@@ -50,5 +51,29 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     } else {
       NativeBugsnagPerformance?.discardNativeSpan(spanEnded.id, spanEnded.traceId)
     }
+  }
+
+  createAppStartSpan (appStartTime: number) {
+    if (this.appStartSpan) return this.appStartSpan
+
+    const nativeAppStartSpan = this.attachedToNative ? NativeBugsnagPerformance?.getAppStartSpan() : null
+
+    if (nativeAppStartSpan) {
+      appStartTime = (this.clock as ReactNativeClock).fromUnixNanoseconds(nativeAppStartSpan.startTime)
+      const attributes = new SpanAttributes(new Map(), this.spanAttributeLimits, nativeAppStartSpan.name, this.logger)
+      this.appStartSpan = new NativeSpanInternal(nativeAppStartSpan.id, nativeAppStartSpan.traceId, nativeAppStartSpan.name, appStartTime, attributes, this.clock, nativeAppStartSpan.parentSpanId)
+
+      if (this.isInForeground) {
+        this.openSpans.add(this.appStartSpan)
+        this.spanContextStorage.push(this.appStartSpan)
+      }
+    } else {
+      this.appStartSpan = this.startSpan('[AppStart/ReactNativeInit]', { startTime: appStartTime, parentContext: null })
+    }
+
+    this.appStartSpan.setAttribute('bugsnag.span.category', 'app_start')
+    this.appStartSpan.setAttribute('bugsnag.app_start.type', 'ReactNativeInit')
+    this.appStartSpan.setAttribute('bugsnag.span.first_class', true)
+    return this.appStartSpan
   }
 }

@@ -19,6 +19,8 @@ beforeEach(() => {
   jest.resetModules()
   jest.clearAllMocks()
 
+  const timeOrigin = new Date('1970-01-01T00:00:00.000Z')
+  jest.setSystemTime(timeOrigin)
   clock = createClock(performance)
   processor = new InMemoryProcessor()
   backgroundingListener = new ControllableBackgroundingListener()
@@ -191,6 +193,90 @@ describe('ReactNativeSpanFactory', () => {
       spanFactory.endSpan(span, clock.now())
       expect(NativeBugsnagPerformance!.discardNativeSpan).not.toHaveBeenCalled()
       expect(NativeBugsnagPerformance!.endNativeSpan).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('createAppStartSpan', () => {
+    it('creates an app start span with the supplied start time', () => {
+      const appStartSpan = spanFactory.createAppStartSpan(12345)
+      const appStartSpanEnded = appStartSpan.end(12345, spanFactory.sampler.spanProbability)
+
+      expect(appStartSpanEnded.name).toBe('[AppStart/ReactNativeInit]')
+      expect(appStartSpanEnded.startTime).toBe(12345)
+    })
+
+    it('sets the parent context to null', () => {
+      spanFactory.startSpan('should not become parent', { startTime: 12345 })
+
+      const appStartSpan = spanFactory.createAppStartSpan(12345)
+      const appStartSpanEnded = appStartSpan.end(54321, spanFactory.sampler.spanProbability)
+
+      expect(appStartSpanEnded.parentSpanId).toBeUndefined()
+    })
+
+    it('sets the required attributes', () => {
+      const appStartSpan = spanFactory.createAppStartSpan(12345)
+      const appStartSpanEnded = appStartSpan.end(12345, spanFactory.sampler.spanProbability)
+
+      expect(appStartSpanEnded.attributes.toJson()).toStrictEqual([
+        { key: 'bugsnag.span.category', value: { stringValue: 'app_start' } },
+        { key: 'bugsnag.app_start.type', value: { stringValue: 'ReactNativeInit' } },
+        { key: 'bugsnag.span.first_class', value: { boolValue: true } },
+        { key: 'bugsnag.sampling.p', value: { doubleValue: 1 } }
+      ])
+    })
+
+    it('prevents multiple app start spans from being created', () => {
+      const startSpanSpy = jest.spyOn(spanFactory, 'startSpan')
+      const appStartSpan1 = spanFactory.createAppStartSpan(12345)
+
+      expect(startSpanSpy).toHaveBeenCalledTimes(1)
+
+      const appStartSpan2 = spanFactory.createAppStartSpan(12345)
+
+      expect(startSpanSpy).toHaveBeenCalledTimes(1)
+      expect(appStartSpan1).toBe(appStartSpan2)
+    })
+
+    it('creates a JS app start span when not attached to native', () => {
+      const startSpanSpy = jest.spyOn(spanFactory, 'startSpan')
+      const appStartSpan = spanFactory.createAppStartSpan(12345)
+
+      expect(startSpanSpy).toHaveBeenCalledTimes(1)
+      expect(contextStorage.current).toBe(appStartSpan)
+      expect(NativeBugsnagPerformance!.getAppStartSpan).not.toHaveBeenCalled()
+    })
+
+    it('creates a native app start span when attached to native', async () => {
+      const startSpanSpy = jest.spyOn(spanFactory, 'startSpan')
+      spanFactory.onAttach()
+
+      const appStartSpan = spanFactory.createAppStartSpan(clock.now())
+      expect(NativeBugsnagPerformance!.getAppStartSpan).toHaveBeenCalledTimes(1)
+      expect(startSpanSpy).not.toHaveBeenCalled()
+
+      // @ts-expect-error 'isNativeSpan' does not exist on type 'SpanInternal'
+      expect(appStartSpan.isNativeSpan).toBe(true)
+      expect(appStartSpan.id).toBe('native-app-start-id')
+      expect(appStartSpan.traceId).toBe('native-app-start-trace-id')
+      expect(contextStorage.current).toBe(appStartSpan)
+
+      const endTime = clock.now()
+      spanFactory.endSpan(appStartSpan, endTime)
+      await jest.runOnlyPendingTimersAsync()
+
+      expect(contextStorage.current).toBeUndefined()
+      expect(processor.spans.length).toBe(0)
+      expect(NativeBugsnagPerformance!.endNativeSpan).toHaveBeenCalledWith(
+        appStartSpan.id,
+        appStartSpan.traceId,
+        clock.toUnixNanoseconds(endTime),
+        {
+          'bugsnag.span.category': 'app_start',
+          'bugsnag.app_start.type': 'ReactNativeInit',
+          'bugsnag.span.first_class': true
+        }
+      )
     })
   })
 })

@@ -169,6 +169,14 @@ const BugsnagReactNativePerformance = {
   markNativeSpanEndTime: jest.fn(),
   discardNativeSpan: jest.fn(() => {
     return Promise.resolve()
+  }),
+  getAppStartSpan: jest.fn(() => {
+    return {
+      name: '[AppStart/ReactNativeInit]',
+      id: 'native-app-start-id',
+      traceId: 'native-app-start-trace-id',
+      startTime: 123456789_000000
+    }
   })
 }
 

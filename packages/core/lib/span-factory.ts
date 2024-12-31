@@ -26,13 +26,13 @@ export class SpanFactory<C extends Configuration> {
   private readonly idGenerator: IdGenerator
   private readonly spanAttributesSource: SpanAttributesSource<C>
   protected readonly clock: Clock
-  private readonly spanContextStorage: SpanContextStorage
+  protected readonly spanContextStorage: SpanContextStorage
   protected logger: Logger
-  private spanAttributeLimits: SpanAttributesLimits = defaultSpanAttributeLimits
+  protected spanAttributeLimits: SpanAttributesLimits = defaultSpanAttributeLimits
   protected onSpanEndCallbacks?: OnSpanEndCallbacks
 
-  private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
-  private isInForeground: boolean = true
+  protected openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
+  protected isInForeground: boolean = true
 
   constructor (
     processor: Processor,

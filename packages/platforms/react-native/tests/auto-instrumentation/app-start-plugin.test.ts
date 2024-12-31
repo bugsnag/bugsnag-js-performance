@@ -1,22 +1,44 @@
-import { MockSpanFactory, createConfiguration } from '@bugsnag/js-performance-test-utilities'
-import type { Clock } from '@bugsnag/core-performance'
+import { ControllableBackgroundingListener, InMemoryProcessor, StableIdGenerator, createConfiguration, spanAttributesSource } from '@bugsnag/js-performance-test-utilities'
+import { DefaultSpanContextStorage, Sampler } from '@bugsnag/core-performance'
 import createClock from '../../lib/clock'
+import type { ReactNativeClock } from '../../lib/clock'
 import { AppStartPlugin } from '../../lib/auto-instrumentation/app-start-plugin'
 import type { ReactNativeConfiguration } from '../../lib/config'
 import type { AppRegistry } from 'react-native'
-import type { ReactNativeSpanFactory } from '../../lib/span-factory'
+import { ReactNativeSpanFactory } from '../../lib/span-factory'
+
+const jestLogger = {
+  debug: jest.fn(),
+  error: jest.fn(),
+  info: jest.fn(),
+  warn: jest.fn()
+}
 
 describe('app start plugin', () => {
-  let spanFactory: MockSpanFactory<ReactNativeConfiguration>
-  let clock: Clock
+  let clock: ReactNativeClock
+  let spanFactory: ReactNativeSpanFactory
   let appRegistry: typeof AppRegistry
+  let appStartSpy: jest.SpyInstance
 
   beforeEach(() => {
-    spanFactory = new MockSpanFactory()
     clock = createClock(performance)
+    const backgroundingListener = new ControllableBackgroundingListener()
+    spanFactory = new ReactNativeSpanFactory(
+      new InMemoryProcessor(),
+      new Sampler(1.0),
+      new StableIdGenerator(),
+      spanAttributesSource,
+      clock,
+      backgroundingListener,
+      jestLogger,
+      new DefaultSpanContextStorage(backgroundingListener)
+    )
+
     appRegistry = {
       setWrapperComponentProvider: jest.fn()
     } as unknown as typeof AppRegistry
+
+    appStartSpy = jest.spyOn(spanFactory, 'createAppStartSpan')
   })
 
   it('starts an app start span when autoInstrumentAppStarts is true', () => {
@@ -25,11 +47,7 @@ describe('app start plugin', () => {
 
     plugin.configure(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: true }))
 
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[AppStart/ReactNativeInit]',
-      expect.objectContaining({
-        startTime: appStartTime,
-        parentContext: null
-      }))
+    expect(appStartSpy).toHaveBeenCalledWith(appStartTime)
 
     expect(appRegistry.setWrapperComponentProvider).toHaveBeenCalledWith(expect.any(Function))
   })
@@ -39,7 +57,7 @@ describe('app start plugin', () => {
 
     plugin.configure(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: false }))
 
-    expect(spanFactory.startSpan).not.toHaveBeenCalled()
+    expect(appStartSpy).not.toHaveBeenCalled()
     expect(appRegistry.setWrapperComponentProvider).not.toHaveBeenCalled()
   })
 })

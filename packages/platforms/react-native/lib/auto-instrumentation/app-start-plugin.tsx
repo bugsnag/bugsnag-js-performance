@@ -7,7 +7,6 @@ import type { ReactNode } from 'react'
 import React from 'react'
 import type { AppRegistry, WrapperComponentProvider } from 'react-native'
 import type { ReactNativeConfiguration } from '../config'
-import { createAppStartSpan } from '../create-app-start-span'
 import type { ReactNativeSpanFactory } from '../span-factory'
 
 interface WrapperProps {
@@ -38,7 +37,7 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
   configure (configuration: InternalConfiguration<ReactNativeConfiguration>) {
     if (!configuration.autoInstrumentAppStarts) return
 
-    const appStartSpan = createAppStartSpan(this.spanFactory, this.appStartTime)
+    const appStartSpan = this.spanFactory.createAppStartSpan(this.appStartTime)
 
     const AppStartWrapper = ({ children }: WrapperProps) => {
       React.useEffect(() => {
