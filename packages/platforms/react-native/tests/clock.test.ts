@@ -97,4 +97,34 @@ describe('React Native Clock', () => {
       expect(unixTimeStamp).toBe('69000000')
     })
   })
+
+  describe('clock.toUnixNanoseconds()', () => {
+    it('converts milliseconds since timeOrigin to unix time in nanoseconds', () => {
+      const timeOrigin = new Date('1970-01-01T00:00:00.000Z')
+      jest.setSystemTime(timeOrigin)
+
+      const clock = createClock(performance)
+
+      jest.advanceTimersByTime(69)
+
+      const startTime = clock.now()
+      const unixNanoseconds = clock.toUnixNanoseconds(startTime)
+
+      expect(unixNanoseconds).toBe(69000000)
+    })
+  })
+
+  describe('clock.fromUnixNanoseconds()', () => {
+    it('converts unix time in nanoseconds to milliseconds since timeOrigin', () => {
+      const timeOrigin = new Date('1970-01-01T00:00:00.000Z')
+      jest.setSystemTime(timeOrigin)
+
+      const clock = createClock(performance)
+
+      const unixNanoseconds = 69000000
+      const milliseconds = clock.fromUnixNanoseconds(unixNanoseconds)
+
+      expect(milliseconds).toBe(69)
+    })
+  })
 })
