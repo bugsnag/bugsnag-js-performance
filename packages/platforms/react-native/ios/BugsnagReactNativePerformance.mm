@@ -20,12 +20,25 @@ static NSUInteger traceIdMidpoint = 16;
 */
 NSMutableDictionary *openSpans;
 
+NSString *appStartSpanKey;
+
 RCT_EXPORT_MODULE()
 
 - (instancetype)init
 {
     if (self = [super init]) {
         openSpans = [NSMutableDictionary new];
+
+        if (BugsnagReactNativePerformanceCrossTalkAPIClient.isInitialized) {
+            BugsnagPerformanceSpanOptions *spanOptions = [self defaultSpanOptions];
+            BugsnagPerformanceSpan *appStartSpan = [BugsnagReactNativePerformanceCrossTalkAPIClient.sharedInstance startSpan:@"[AppStart/ReactNativeInit]" options:spanOptions];
+            [appStartSpan.attributes removeAllObjects];
+
+            NSString *spanId = [NSString stringWithFormat:@"%llx", appStartSpan.spanId];
+            NSString *traceId = [NSString stringWithFormat:@"%llx%llx", appStartSpan.traceIdHi, appStartSpan.traceIdLo];
+            appStartSpanKey = [spanId stringByAppendingString:traceId];
+            openSpans[appStartSpanKey] = appStartSpan;
+        }
     }
     return self;
 }
@@ -167,12 +180,8 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getNativeConfiguration) {
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(startNativeSpan:(NSString *)name
                 options:(NSDictionary *)options) {
 
-    // native spans are always first class and should never become the current context
-    BugsnagPerformanceSpanOptions *spanOptions = [BugsnagReactNativePerformanceCrossTalkAPIClient.sharedInstance newSpanOptions];
-    spanOptions.firstClass = BSGFirstClassYes;
-    spanOptions.makeCurrentContext = NO;
-    spanOptions.instrumentRendering = BSGInstrumentRenderingYes;
-    spanOptions.parentContext = nil;
+    
+    BugsnagPerformanceSpanOptions *spanOptions = [self defaultSpanOptions];
     
     // Start times are passsed from JS as unix nanosecond timestamps
     NSNumber *startTime = options[@"startTime"];
@@ -197,16 +206,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(startNativeSpan:(NSString *)name
     NSString *traceId = [NSString stringWithFormat:@"%llx%llx", nativeSpan.traceIdHi, nativeSpan.traceIdLo];
     openSpans[[spanId stringByAppendingString:traceId]] = nativeSpan;
 
-    NSMutableDictionary *span = [NSMutableDictionary new];
-    span[@"name"] = nativeSpan.name;
-    span[@"id"] = spanId;
-    span[@"traceId"] = traceId;
-    span[@"startTime"] = [NSNumber numberWithDouble: [nativeSpan.startTime timeIntervalSince1970] * NSEC_PER_SEC];
-    if (nativeSpan.parentId > 0) {
-        span[@"parentSpanId"] = [NSString stringWithFormat:@"%llx", nativeSpan.parentId];
-    }
-    
-    return span;
+    return [self nativeSpanToJsSpan:nativeSpan];
 }
 
 RCT_EXPORT_METHOD(endNativeSpan:(NSString *)spanId
@@ -260,6 +260,41 @@ RCT_EXPORT_METHOD(discardNativeSpan:(NSString *)spanId
     }
 
     resolve(nil);
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getAppStartSpan) {
+    if (appStartSpanKey == nil) {
+        return nil;
+    }
+
+    BugsnagPerformanceSpan *appStartSpan = openSpans[appStartSpanKey];
+    if (appStartSpan == nil) {
+        return nil;
+    }
+
+    return [self nativeSpanToJsSpan:appStartSpan];
+}
+
+- (BugsnagPerformanceSpanOptions *)defaultSpanOptions {
+    // native spans are always first class and should never become the current context
+    BugsnagPerformanceSpanOptions *spanOptions = [BugsnagReactNativePerformanceCrossTalkAPIClient.sharedInstance newSpanOptions];
+    spanOptions.firstClass = BSGFirstClassYes;
+    spanOptions.makeCurrentContext = NO;
+    spanOptions.instrumentRendering = BSGInstrumentRenderingYes;
+    spanOptions.parentContext = nil;
+    return spanOptions;
+}
+
+- (NSMutableDictionary *)nativeSpanToJsSpan:(BugsnagPerformanceSpan *)nativeSpan {
+    NSMutableDictionary *span = [NSMutableDictionary new];
+    span[@"name"] = nativeSpan.name;
+    span[@"id"] = [NSString stringWithFormat:@"%llx", nativeSpan.spanId];
+    span[@"traceId"] = [NSString stringWithFormat:@"%llx%llx", nativeSpan.traceIdHi, nativeSpan.traceIdLo];
+    span[@"startTime"] = [NSNumber numberWithDouble: [nativeSpan.startTime timeIntervalSince1970] * NSEC_PER_SEC];
+    if (nativeSpan.parentId > 0) {
+        span[@"parentSpanId"] = [NSString stringWithFormat:@"%llx", nativeSpan.parentId];
+    }
+    return span;
 }
 
 #ifdef RCT_NEW_ARCH_ENABLED

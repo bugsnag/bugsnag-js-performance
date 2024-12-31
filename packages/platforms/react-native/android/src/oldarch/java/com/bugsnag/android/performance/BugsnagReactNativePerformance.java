@@ -67,4 +67,9 @@ public class BugsnagReactNativePerformance extends ReactContextBaseJavaModule {
   public void discardNativeSpan(String spanId, String traceId, Promise promise) {
     impl.discardNativeSpan(spanId, traceId, promise);
   }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public WritableMap getAppStartSpan() {
+    return impl.getAppStartSpan();
+  }
 }

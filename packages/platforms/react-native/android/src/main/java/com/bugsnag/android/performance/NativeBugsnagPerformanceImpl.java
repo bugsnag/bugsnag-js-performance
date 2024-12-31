@@ -43,11 +43,29 @@ class NativeBugsnagPerformanceImpl {
    */
   private final HashMap<String, SpanImpl> openSpans = new HashMap<>();
 
+  private String appStartSpanKey = null;
+
   public NativeBugsnagPerformanceImpl(ReactApplicationContext reactContext) {
     this.reactContext = reactContext;
 
     try {
+      // This will throw a LinkageError if the Android Performance SDK is not installed or is incompatible
       BugsnagPerformance.INSTANCE.getInstrumentedAppState$internal().getConfig$internal();
+
+      // Create a native app start span on initialisation
+      SpanFactory spanFactory = BugsnagPerformance.INSTANCE.getInstrumentedAppState$internal().getSpanFactory();
+      SpanOptions spanOptions = SpanOptions.DEFAULTS
+      .setFirstClass(true)
+      .makeCurrentContext(false)
+      .within(null);
+
+      SpanImpl appStartSpan = spanFactory.createCustomSpan("[AppStart/ReactNativeInit]", spanOptions);
+      appStartSpan.getAttributes().getEntries$internal().removeIf(entry -> !entry.getKey().equals("bugsnag.sampling.p"));
+
+      appStartSpanKey = EncodingUtils.toHexString(appStartSpan.getSpanId()) + EncodingUtils.toHexString(appStartSpan.getTraceId());
+      openSpans.put(appStartSpanKey, appStartSpan);
+
+      // If we reach this point, the SDK is available
       isNativePerformanceAvailable = true;
     }
     catch (LinkageError e) {
@@ -196,6 +214,20 @@ class NativeBugsnagPerformanceImpl {
     }
 
     promise.resolve(null);
+  }
+
+  @Nullable
+  public WritableMap getAppStartSpan() {
+    if (appStartSpanKey == null) {
+      return null;
+    }
+
+    SpanImpl appStartSpan = openSpans.get(appStartSpanKey);
+    if (appStartSpan == null) {
+      return null;
+    }
+
+    return nativeSpanToJsSpan(appStartSpan);
   }
 
   private WritableMap nativeSpanToJsSpan(SpanImpl nativeSpan) {
