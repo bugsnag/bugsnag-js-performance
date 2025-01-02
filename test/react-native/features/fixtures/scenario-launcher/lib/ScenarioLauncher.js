@@ -70,7 +70,7 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
 
     const Scenario = () => 
       <ScenarioContext.Provider value={{ reflectEndpoint }}>
-        <SafeAreaView>
+        <SafeAreaView style={{ flex: 1 }}>
           <scenario.App />
         </SafeAreaView>
       </ScenarioContext.Provider>

@@ -21,3 +21,4 @@ export * as ReactNavigationScenario from './ReactNavigationScenario'
 
 // Native Integration Scenarios
 export * as NativeIntegrationScenario from './NativeIntegrationScenario'
+export * as RenderingMetricsScenario from './RenderingMetricsScenario'
