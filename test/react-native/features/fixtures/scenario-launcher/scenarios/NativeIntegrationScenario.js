@@ -13,11 +13,13 @@ export const initialise = async (config) => {
 
   const onSpanEnd = [
     async (span) => {
-      if (span.name === 'JS parent span') {
-        span.setAttribute('custom.js.attribute', 'JS span attribute')
-      } else if (span.name === 'Native child span') {
-        span.setAttribute('custom.native.attribute', 'Native span attribute')
-      }
+      span.setAttribute('custom.string.attribute', 'test')
+      span.setAttribute('custom.int.attribute', 12345)
+      span.setAttribute('custom.double.attribute', 123.45)
+      span.setAttribute('custom.boolean.attribute', true)
+      span.setAttribute('custom.stringarray.attribute', ['a', 'b', 'c'])
+      span.setAttribute('custom.intarray.attribute', [1, 2, 3])
+      span.setAttribute('custom.doublearray.attribute', [1.1, 2.2, 3.3])
       return true
     }
   ]
