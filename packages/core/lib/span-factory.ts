@@ -30,6 +30,7 @@ export class SpanFactory<C extends Configuration> {
   protected logger: Logger
   private spanAttributeLimits: SpanAttributesLimits = defaultSpanAttributeLimits
   protected onSpanEndCallbacks?: OnSpanEndCallbacks
+  protected backgroundingListener: BackgroundingListener
 
   private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
   private isInForeground: boolean = true
@@ -51,6 +52,7 @@ export class SpanFactory<C extends Configuration> {
     this.clock = clock
     this.logger = logger
     this.spanContextStorage = spanContextStorage
+    this.backgroundingListener = backgroundingListener
 
     // this will fire immediately if the app is already backgrounded
     backgroundingListener.onStateChange(this.onBackgroundStateChange)

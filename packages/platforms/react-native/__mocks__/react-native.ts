@@ -169,6 +169,9 @@ const BugsnagReactNativePerformance = {
   markNativeSpanEndTime: jest.fn(),
   discardNativeSpan: jest.fn(() => {
     return Promise.resolve()
+  }),
+  discardAllNativeSpans: jest.fn(() => {
+    return Promise.resolve()
   })
 }
 

@@ -262,6 +262,17 @@ RCT_EXPORT_METHOD(discardNativeSpan:(NSString *)spanId
     resolve(nil);
 }
 
+RCT_EXPORT_METHOD(discardAllNativeSpans:(RCTPromiseResolveBlock)resolve
+                reject:(RCTPromiseRejectBlock)reject) {
+    for (NSString *spanKey in openSpans) {
+        BugsnagPerformanceSpan *nativeSpan = openSpans[spanKey];
+        [nativeSpan abortUnconditionally];
+    }
+
+    [openSpans removeAllObjects];
+    resolve(nil);
+}
+
 #ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params

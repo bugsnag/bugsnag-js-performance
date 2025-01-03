@@ -13,6 +13,12 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
 
   onAttach () {
     this.attachedToNative = true
+
+    this.backgroundingListener.onStateChange((state) => {
+      if (state === 'in-background') {
+        NativeBugsnagPerformance?.discardAllNativeSpans()
+      }
+    })
   }
 
   protected createSpanInternal (name: string, startTime: number, parentContext: ParentContext | null | undefined, isFirstClass: boolean | undefined, attributes: SpanAttributes) {

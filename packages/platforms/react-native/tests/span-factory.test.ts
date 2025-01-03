@@ -193,4 +193,12 @@ describe('ReactNativeSpanFactory', () => {
       expect(NativeBugsnagPerformance!.endNativeSpan).not.toHaveBeenCalled()
     })
   })
+
+  describe('backgroundingListener', () => {
+    it('discards all native spans when the app goes to the background', () => {
+      spanFactory.onAttach()
+      backgroundingListener.sendToBackground()
+      expect(NativeBugsnagPerformance!.discardAllNativeSpans).toHaveBeenCalledTimes(1)
+    })
+  })
 })
