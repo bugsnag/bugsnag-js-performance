@@ -1,5 +1,5 @@
 import type { SpanFactory } from '@bugsnag/core-performance'
-import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
+import { MockReactNativeSpanFactory } from '@bugsnag/js-performance-test-utilities'
 import type { ReactNativeConfiguration, ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import React, { useContext } from 'react'
@@ -16,7 +16,7 @@ afterEach(() => {
 
 describe('NavigationContextProvider', () => {
   it('Creates a navigation span when the currentRoute changes', () => {
-    const spanFactory = new MockSpanFactory()
+    const spanFactory = new MockReactNativeSpanFactory()
     render(<App spanFactory={spanFactory} />)
 
     // Initial route should not create a span
@@ -43,7 +43,7 @@ describe('NavigationContextProvider', () => {
   })
 
   it('Discards the active navigation span when the route changes', () => {
-    const spanFactory = new MockSpanFactory()
+    const spanFactory = new MockReactNativeSpanFactory()
     render(<App spanFactory={spanFactory} />)
 
     // Change to a new route but block the navigation span from ending
@@ -79,7 +79,7 @@ describe('NavigationContextProvider', () => {
   })
 
   it('Prevents a navigation span from ending when navigation is blocked', () => {
-    const spanFactory = new MockSpanFactory()
+    const spanFactory = new MockReactNativeSpanFactory()
     render(<App spanFactory={spanFactory} />)
 
     // Start a navigation
@@ -106,7 +106,7 @@ describe('NavigationContextProvider', () => {
   })
 
   it('Does not end a navigation span while multiple components are blocking', () => {
-    const spanFactory = new MockSpanFactory()
+    const spanFactory = new MockReactNativeSpanFactory()
     render(<App spanFactory={spanFactory} />)
 
     // Start a navigation
@@ -133,7 +133,7 @@ describe('NavigationContextProvider', () => {
   it('resets the lastRenderTime when a navigation span ends', () => {
     jest.useFakeTimers()
 
-    const spanFactory = new MockSpanFactory()
+    const spanFactory = new MockReactNativeSpanFactory()
     render(<App spanFactory={spanFactory} />)
 
     // start navigation

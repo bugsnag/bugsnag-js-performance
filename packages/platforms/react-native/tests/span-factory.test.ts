@@ -194,4 +194,34 @@ describe('ReactNativeSpanFactory', () => {
       expect(processor.spans.length).toBe(0)
     })
   })
+
+  describe('startNavigationSpan', () => {
+    it('sets the span name to the route prefixed with [Navigation]', () => {
+      const span = spanFactory.startNavigationSpan('testRoute', {})
+      const endedSpan = span.end(12345, spanFactory.sampler.spanProbability)
+
+      expect(endedSpan.name).toBe('[Navigation]testRoute')
+    })
+
+    it('always sets the span as first class', () => {
+      const span = spanFactory.startNavigationSpan('testRoute', { isFirstClass: false })
+      const endedSpan = span.end(12345, spanFactory.sampler.spanProbability)
+
+      expect(endedSpan.attributes.toJson()).toContainEqual({ key: 'bugsnag.span.first_class', value: { boolValue: true } })
+    })
+
+    it('includes navigation category attribute', () => {
+      const span = spanFactory.startNavigationSpan('testRoute', {})
+      const endedSpan = span.end(12345, spanFactory.sampler.spanProbability)
+
+      expect(endedSpan.attributes.toJson()).toContainEqual({ key: 'bugsnag.span.category', value: { stringValue: 'navigation' } })
+    })
+
+    it('includes the route attribute', () => {
+      const span = spanFactory.startNavigationSpan('testRoute', {})
+      const endedSpan = span.end(12345, spanFactory.sampler.spanProbability)
+
+      expect(endedSpan.attributes.toJson()).toContainEqual({ key: 'bugsnag.navigation.route', value: { stringValue: 'testRoute' } })
+    })
+  })
 })

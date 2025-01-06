@@ -1,5 +1,5 @@
 import { runSpanEndCallbacks, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
-import type { SpanAttributes, ParentContext } from '@bugsnag/core-performance'
+import type { SpanAttributes, ParentContext, SpanOptions } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from './config'
 import NativeBugsnagPerformance from './native'
 import type { ReactNativeClock } from './clock'
@@ -50,5 +50,19 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     } else {
       NativeBugsnagPerformance?.discardNativeSpan(spanEnded.id, spanEnded.traceId)
     }
+  }
+
+  startNavigationSpan (routeName: string, spanOptions: SpanOptions) {
+    // Navigation spans are always first class
+    spanOptions.isFirstClass = true
+
+    const spanName = '[Navigation]' + routeName
+    const span = this.startSpan(spanName, spanOptions)
+
+    // Default navigation span attributes
+    span.setAttribute('bugsnag.span.category', 'navigation')
+    span.setAttribute('bugsnag.navigation.route', routeName)
+
+    return span
   }
 }

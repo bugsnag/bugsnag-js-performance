@@ -5,5 +5,4 @@ export type { PlatformExtensions } from './platform-extensions'
 
 export default BugsnagPerformance
 
-export { createNavigationSpan } from './create-navigation-span'
 export * from './span-factory'
