@@ -31,7 +31,7 @@ export const platformExtensions = (appStartTime: number, clock: Clock, schema: R
   },
   attach: function (config?: ReactNativeAttachConfiguration) {
     const logger = schema.logger.validate(config?.logger) ? config.logger : schema.logger.defaultValue
-    const platform = Platform.OS ? 'Cocoa' : 'Android'
+    const platform = Platform.OS === 'ios' ? 'Cocoa' : 'Android'
     const isNativePerformanceAvailable = NativeBugsnagPerformance?.isNativePerformanceAvailable()
     if (!isNativePerformanceAvailable) {
       logger.warn(`Could not attach to native SDK. No compatible version of Bugsnag ${platform} Performance was found.`)
