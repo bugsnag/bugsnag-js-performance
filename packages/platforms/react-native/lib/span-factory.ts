@@ -26,12 +26,12 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     return new NativeSpanInternal(nativeSpan.id, nativeSpan.traceId, name, startTime, attributes, this.clock, nativeSpan.parentSpanId)
   }
 
-  protected discardSpan (span: NativeSpanInternal, endTime: number) {
+  protected discardSpan (span: NativeSpanInternal) {
     if (span.isNativeSpan) {
       NativeBugsnagPerformance?.discardNativeSpan(span.id, span.traceId)
     }
 
-    super.discardSpan(span, endTime)
+    super.discardSpan(span)
   }
 
   protected sendForProcessing (span: NativeSpanInternal, endTime: number) {

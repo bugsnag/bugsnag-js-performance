@@ -157,8 +157,7 @@ export class SpanFactory<C extends Configuration> {
     // - they are already invalid
     // - they have an explicit discard end time
     if (untracked || !isValidSpan || endTime === DISCARD_END_TIME) {
-      // we still call end on the span so that it is no longer considered valid
-      this.discardSpan(span, endTime)
+      this.discardSpan(span)
       return
     }
 
@@ -171,8 +170,9 @@ export class SpanFactory<C extends Configuration> {
     this.sendForProcessing(span, endTime)
   }
 
-  protected discardSpan (span: SpanInternal, endTime: number) {
-    span.end(endTime, this.sampler.spanProbability)
+  protected discardSpan (span: SpanInternal) {
+    // we still call end on the span so that it is no longer considered valid
+    span.end(DISCARD_END_TIME, this.sampler.spanProbability)
   }
 
   protected sendForProcessing (span: SpanInternal, endTime: number) {

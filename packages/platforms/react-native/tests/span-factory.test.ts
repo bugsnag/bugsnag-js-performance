@@ -2,7 +2,7 @@
 import { ReactNativeSpanFactory } from '../lib/span-factory'
 import NativeBugsnagPerformance from '../lib/native'
 import { ControllableBackgroundingListener, InMemoryProcessor, spanAttributesSource, StableIdGenerator } from '@bugsnag/js-performance-test-utilities'
-import { DefaultSpanContextStorage, Sampler } from '@bugsnag/core-performance'
+import { DefaultSpanContextStorage, Sampler, DISCARD_END_TIME } from '@bugsnag/core-performance'
 import type { InternalConfiguration } from '@bugsnag/core-performance'
 import createClock from '../lib/clock'
 import type { ReactNativeClock } from '../lib/clock'
@@ -169,28 +169,29 @@ describe('ReactNativeSpanFactory', () => {
   })
 
   describe('discardSpan', () => {
-    it('discards a native span', () => {
+    it('calls discardNativeSpan for native spans', () => {
       spanFactory.onAttach()
 
       const startTime = clock.now()
       const nativeSpan = spanFactory.startSpan('native span', { startTime, isFirstClass: true })
       expect(NativeBugsnagPerformance!.startNativeSpan).toHaveBeenCalledWith('native span', expect.objectContaining({ startTime: clock.toUnixNanoseconds(startTime) }))
 
-      backgroundingListener.sendToBackground()
-
-      spanFactory.endSpan(nativeSpan, clock.now())
+      spanFactory.endSpan(nativeSpan, DISCARD_END_TIME)
       expect(NativeBugsnagPerformance!.endNativeSpan).not.toHaveBeenCalled()
       expect(NativeBugsnagPerformance!.discardNativeSpan).toHaveBeenCalledWith(nativeSpan.id, nativeSpan.traceId)
     })
 
-    it('does not discard a non-native span', () => {
+    it('does not call discardNativeSpan for non-native spans', () => {
+      spanFactory.onAttach()
+
       const startTime = clock.now()
       const span = spanFactory.startSpan('not native', { startTime, isFirstClass: false })
       expect(NativeBugsnagPerformance!.startNativeSpan).not.toHaveBeenCalled()
 
-      spanFactory.endSpan(span, clock.now())
+      spanFactory.endSpan(span, DISCARD_END_TIME)
       expect(NativeBugsnagPerformance!.discardNativeSpan).not.toHaveBeenCalled()
       expect(NativeBugsnagPerformance!.endNativeSpan).not.toHaveBeenCalled()
+      expect(processor.spans.length).toBe(0)
     })
   })
 })
