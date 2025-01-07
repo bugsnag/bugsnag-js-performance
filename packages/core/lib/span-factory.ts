@@ -2,11 +2,11 @@ import type { SpanAttribute, SpanAttributesLimits, SpanAttributesSource } from '
 import { SpanAttributes } from './attributes'
 import type { BackgroundingListener, BackgroundingListenerState } from './backgrounding-listener'
 import type { Clock } from './clock'
-import type { Configuration, InternalConfiguration, Logger } from './config'
+import type { Configuration, InternalConfiguration, Logger, OnSpanEndCallbacks } from './config'
 import { defaultSpanAttributeLimits } from './custom-attribute-limits'
 import type { IdGenerator } from './id-generator'
 import type { NetworkSpanOptions } from './network-span'
-import type { Processor } from './processor'
+import type { BufferingProcessor, Processor } from './processor'
 import type { ReadonlySampler } from './sampler'
 import type { InternalSpanOptions, ParentContext, Span, SpanOptionSchema, SpanOptions } from './span'
 import { SpanInternal, coreSpanOptionSchema } from './span'
@@ -27,8 +27,9 @@ export class SpanFactory<C extends Configuration> {
   private readonly spanAttributesSource: SpanAttributesSource<C>
   protected readonly clock: Clock
   private readonly spanContextStorage: SpanContextStorage
-  private logger: Logger
+  protected logger: Logger
   private spanAttributeLimits: SpanAttributesLimits = defaultSpanAttributeLimits
+  protected onSpanEndCallbacks?: OnSpanEndCallbacks
 
   private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
   private isInForeground: boolean = true
@@ -73,6 +74,9 @@ export class SpanFactory<C extends Configuration> {
       : this.spanContextStorage.current
 
     const attributes = new SpanAttributes(new Map(), this.spanAttributeLimits, name, this.logger)
+    if (typeof options.isFirstClass === 'boolean') {
+      attributes.set('bugsnag.span.first_class', options.isFirstClass)
+    }
 
     const span = this.createSpanInternal(name, safeStartTime, parentContext, options.isFirstClass, attributes)
 
@@ -98,10 +102,6 @@ export class SpanFactory<C extends Configuration> {
     const parentSpanId = parentContext ? parentContext.id : undefined
     const traceId = parentContext ? parentContext.traceId : this.idGenerator.generate(128)
 
-    if (typeof isFirstClass === 'boolean') {
-      attributes.set('bugsnag.span.first_class', isFirstClass)
-    }
-
     return new SpanInternal(spanId, traceId, name, startTime, attributes, this.clock, parentSpanId)
   }
 
@@ -117,14 +117,23 @@ export class SpanFactory<C extends Configuration> {
     return spanInternal
   }
 
-  configure (processor: Processor, configuration: InternalConfiguration<C>) {
-    this.processor = processor
+  configure (configuration: InternalConfiguration<C>) {
     this.logger = configuration.logger
     this.spanAttributeLimits = {
       attributeArrayLengthLimit: configuration.attributeArrayLengthLimit,
       attributeCountLimit: configuration.attributeCountLimit,
       attributeStringValueLimit: configuration.attributeStringValueLimit
     }
+    this.onSpanEndCallbacks = configuration.onSpanEnd
+  }
+
+  reprocessEarlySpans (batchProcessor: Processor) {
+    // ensure all spans in the buffering processor are added to the batch
+    for (const span of (this.processor as BufferingProcessor).spans) {
+      batchProcessor.add(span)
+    }
+
+    this.processor = batchProcessor
   }
 
   endSpan (
@@ -148,8 +157,7 @@ export class SpanFactory<C extends Configuration> {
     // - they are already invalid
     // - they have an explicit discard end time
     if (untracked || !isValidSpan || endTime === DISCARD_END_TIME) {
-      // we still call end on the span so that it is no longer considered valid
-      span.end(endTime, this.sampler.spanProbability)
+      this.discardSpan(span)
       return
     }
 
@@ -159,9 +167,16 @@ export class SpanFactory<C extends Configuration> {
     }
 
     this.spanAttributesSource.requestAttributes(span)
+    this.sendForProcessing(span, endTime)
+  }
 
+  protected discardSpan (span: SpanInternal) {
+    // we still call end on the span so that it is no longer considered valid
+    span.end(DISCARD_END_TIME, this.sampler.spanProbability)
+  }
+
+  protected sendForProcessing (span: SpanInternal, endTime: number) {
     const spanEnded = span.end(endTime, this.sampler.spanProbability)
-
     if (this.sampler.sample(spanEnded)) {
       this.processor.add(spanEnded)
     }

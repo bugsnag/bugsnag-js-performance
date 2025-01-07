@@ -11,14 +11,30 @@ export const initialise = async (config) => {
     endpoint: config.endpoint
   }
 
+  const onSpanEnd = [
+    async (span) => {
+      span.setAttribute('custom.string.attribute', 'test')
+      span.setAttribute('custom.int.attribute', 12345)
+      span.setAttribute('custom.double.attribute', 123.45)
+      span.setAttribute('custom.boolean.attribute', true)
+      span.setAttribute('custom.stringarray.attribute', ['a', 'b', 'c'])
+      span.setAttribute('custom.intarray.attribute', [1, 2, 3])
+      span.setAttribute('custom.doublearray.attribute', [1.1, 2.2, 3.3])
+      return true
+    }
+  ]
+
   await NativeScenarioLauncher.startNativePerformance(nativeConfig)
 
-  BugsnagPerformance.attach({ maximumBatchSize: 1, autoInstrumentAppStarts: false, autoInstrumentNetworkRequests: false })
+  BugsnagPerformance.attach({ onSpanEnd, maximumBatchSize: 1, autoInstrumentAppStarts: false, autoInstrumentNetworkRequests: false })
 }
 
 export const App = () => {
   useEffect(() => {
-    BugsnagPerformance.startSpan('NativeIntegration').end()
+    const parentSpan = BugsnagPerformance.startSpan('JS parent span')
+    const childSpan = BugsnagPerformance.startSpan('Native child span', { isFirstClass: true })
+    childSpan.end()
+    parentSpan.end()
   }, [])
 
   return (

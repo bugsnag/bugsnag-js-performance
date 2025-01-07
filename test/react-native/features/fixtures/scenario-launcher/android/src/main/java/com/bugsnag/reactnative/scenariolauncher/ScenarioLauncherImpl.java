@@ -162,6 +162,7 @@ class ScenarioLauncherImpl {
         config.setEndpoint(configuration.getString("endpoint"));
         config.setAutoInstrumentAppStarts(false);
         config.setAutoInstrumentActivities(AutoInstrument.OFF);
+        config.setAutoInstrumentRendering(true);
 
         BugsnagPerformance.start(config);
         Log.d(MODULE_NAME, "Started Android performance");

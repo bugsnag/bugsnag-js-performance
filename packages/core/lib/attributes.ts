@@ -113,6 +113,10 @@ export class SpanAttributes {
     Array.from(this.attributes).forEach(([key, value]) => { this.validateAttribute(key, value) })
     return Array.from(this.attributes).map(([key, value]) => attributeToJson(key, value))
   }
+
+  toObject () {
+    return Object.fromEntries(this.attributes)
+  }
 }
 
 export class ResourceAttributes extends SpanAttributes {

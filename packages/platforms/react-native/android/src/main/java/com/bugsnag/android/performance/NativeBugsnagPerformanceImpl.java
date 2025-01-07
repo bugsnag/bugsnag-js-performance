@@ -156,7 +156,7 @@ class NativeBugsnagPerformanceImpl {
     SpanFactory spanFactory = BugsnagPerformance.INSTANCE.getInstrumentedAppState$internal().getSpanFactory();
     SpanImpl nativeSpan = spanFactory.createCustomSpan(name, spanOptions);
 
-    nativeSpan.getAttributes().getEntries$internal().clear();
+    nativeSpan.getAttributes().getEntries$internal().removeIf(entry -> !entry.getKey().equals("bugsnag.sampling.p"));
 
     String spanKey = EncodingUtils.toHexString(nativeSpan.getSpanId()) + EncodingUtils.toHexString(nativeSpan.getTraceId());
     openSpans.put(spanKey, nativeSpan);
