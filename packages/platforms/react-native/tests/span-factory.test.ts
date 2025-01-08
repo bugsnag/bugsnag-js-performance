@@ -62,6 +62,15 @@ describe('ReactNativeSpanFactory', () => {
       expect(contextStorage.current).toBe(span)
     })
 
+    it('does not start a native span when doNotDelegateToNativeSDK is true', () => {
+      spanFactory.onAttach()
+
+      const startTime = clock.now()
+      const span = spanFactory.startSpan('first class', { startTime, isFirstClass: true, doNotDelegateToNativeSDK: true })
+      expect(NativeBugsnagPerformance!.startNativeSpan).not.toHaveBeenCalled()
+      expect(contextStorage.current).toBe(span)
+    })
+
     it('does not start a native span when not attached to native', () => {
       const startTime = clock.now()
       const span = spanFactory.startSpan('first class', { startTime, isFirstClass: true })

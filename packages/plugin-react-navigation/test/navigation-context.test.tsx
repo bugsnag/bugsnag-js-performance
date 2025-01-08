@@ -20,11 +20,11 @@ describe('NavigationContextProvider', () => {
     render(<App spanFactory={spanFactory} />)
 
     // Initial route should not create a span
-    expect(spanFactory.startSpan).not.toHaveBeenCalled()
+    expect(spanFactory.startNavigationSpan).not.toHaveBeenCalled()
 
     // Route change should create a navigation span
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
 
     // Await the navigation span to end
     jest.advanceTimersByTime(100)
@@ -49,8 +49,8 @@ describe('NavigationContextProvider', () => {
     // Change to a new route but block the navigation span from ending
     fireEvent.press(screen.getByText('Change to route 1'))
     fireEvent.press(screen.getByText('Block Navigation'))
-    expect(spanFactory.startSpan).toHaveBeenCalledTimes(1)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledTimes(1)
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
 
     // Navigation span should not end after timeout
     jest.advanceTimersByTime(100)
@@ -58,8 +58,8 @@ describe('NavigationContextProvider', () => {
 
     // Change to a second route while the first navigation span is still open
     fireEvent.press(screen.getByText('Change to route 2'))
-    expect(spanFactory.startSpan).toHaveBeenCalledTimes(2)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-2', { isFirstClass: true, startTime: 100 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledTimes(2)
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-2', { isFirstClass: true, startTime: 100, doNotDelegateToNativeSDK: true })
 
     // End the navigation
     fireEvent.press(screen.getByText('Unblock Navigation'))
@@ -84,7 +84,7 @@ describe('NavigationContextProvider', () => {
 
     // Start a navigation
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
 
     // Prevent navigation from ending
     fireEvent.press(screen.getByText('Block Navigation'))
@@ -111,7 +111,7 @@ describe('NavigationContextProvider', () => {
 
     // Start a navigation
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
 
     // Block navigation from completing
     fireEvent.press(screen.getByText('Block Navigation'))
@@ -138,7 +138,7 @@ describe('NavigationContextProvider', () => {
 
     // start navigation
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
 
     // lastRenderTime should be set to 2
 
@@ -158,7 +158,7 @@ describe('NavigationContextProvider', () => {
 
     // start second navigation
     fireEvent.press(screen.getByText('Change to route 2'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-2', { isFirstClass: true, startTime: 200 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-2', { isFirstClass: true, startTime: 200, doNotDelegateToNativeSDK: true })
     jest.advanceTimersByTime(100)
 
     // check delivered span

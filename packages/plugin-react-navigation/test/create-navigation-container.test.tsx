@@ -30,14 +30,14 @@ describe('createNavigationContainer', () => {
     fireEvent.press(screen.getByText('Go to route 2'))
     expect(screen.getByText('Route 2')).toBeOnTheScreen()
 
-    expect(spanFactory.startSpan).toHaveBeenCalledTimes(1)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 2', { isFirstClass: true, startTime: 0 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledTimes(1)
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('Route 2', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
 
     fireEvent.press(screen.getByText('Go back'))
     expect(screen.getByText('Route 1')).toBeOnTheScreen()
 
-    expect(spanFactory.startSpan).toHaveBeenCalledTimes(2)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 1', { isFirstClass: true, startTime: 0 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledTimes(2)
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('Route 1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
   })
 
   it('forwards the provided ref to the NavigationContainer', () => {
@@ -56,8 +56,8 @@ describe('createNavigationContainer', () => {
       navigationRef.navigate('Route 2')
     })
 
-    expect(spanFactory.startSpan).toHaveBeenCalledTimes(1)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 2', { isFirstClass: true, startTime: 0 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledTimes(1)
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('Route 2', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
   })
 })
 

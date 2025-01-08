@@ -72,7 +72,7 @@ export class NavigationContextProvider extends React.Component<Props> {
         spanFactory.endSpan(this.currentSpan, DISCARDED)
       }
 
-      const span = spanFactory.startNavigationSpan(currentRoute, { startTime: updateTime })
+      const span = spanFactory.startNavigationSpan(currentRoute, { startTime: updateTime, doNotDelegateToNativeSDK: true })
       span.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-navigation-performance')
 
       if (this.previousRoute) {
