@@ -17,7 +17,7 @@ export type NativeDirs = {
 }
 
 export interface Spec extends TurboModule {
-  getDeviceInfo: () => DeviceInfo
+  getDeviceInfo: () => DeviceInfo | undefined
   requestEntropy: () => string
   requestEntropyAsync: () => Promise<string>
   getNativeConstants: () => NativeDirs

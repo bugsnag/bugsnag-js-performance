@@ -102,4 +102,20 @@ describe('React Native ID generator', () => {
       expect(id).toMatch(/^[a-f0-9]{16}$/)
     })
   })
+
+  // Test written here so it does not clash with native module jest override
+  describe('React Native turbomodule is not null so implementation uses turbomodule', () => {
+    it('getDeviceInfo returns expected values', () => {
+      expect(NativeBugsnagPerformance.getDeviceInfo()).toStrictEqual({
+        arch: 'arm64',
+        model: 'iPhone14,1',
+        bundleVersion: '12345',
+        bundleIdentifier: 'my.cool.app'
+      })
+    })
+
+    it('getNativeConstants returns expected values', () => {
+      expect(NativeBugsnagPerformance.getNativeConstants()).toStrictEqual({ CacheDir: '/mock/CacheDir', DocumentDir: '/mock/DocumentDir' })
+    })
+  })
 })
