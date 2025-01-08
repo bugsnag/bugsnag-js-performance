@@ -38,7 +38,7 @@ export const platformExtensions = (appStartTime: number, clock: Clock, schema: R
       return
     }
 
-    const nativeConfig = NativeBugsnagPerformance?.getNativeConfiguration()
+    const nativeConfig = NativeBugsnagPerformance?.attachToNativeSDK()
     if (!nativeConfig) {
       logger.warn(`Could not attach to native SDK. Bugsnag ${platform} Performance has not been started.`)
       return
