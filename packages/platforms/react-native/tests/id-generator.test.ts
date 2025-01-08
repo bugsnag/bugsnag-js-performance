@@ -1,6 +1,5 @@
 import createIdGenerator, { toHex, createRandomString } from '../lib/id-generator'
-import type { IdGenerator } from '@bugsnag/core-performance'
-import NativeBugsnagPerformance from '../lib/NativeBugsnagPerformance'
+import NativeBugsnagPerformance from '../lib/native'
 
 jest.useFakeTimers()
 
@@ -28,15 +27,8 @@ describe('React Native ID generator', () => {
     })
   })
 
-  let idGenerator: IdGenerator
-  beforeAll(() => {
-    idGenerator = createIdGenerator(NativeBugsnagPerformance)
-  })
-
   describe('idGenerator', () => {
-    // @ts-expect-error NativeBugsnagPerformance is possibly null
     const requestEntropy = NativeBugsnagPerformance.requestEntropy as jest.MockedFunction<typeof NativeBugsnagPerformance.requestEntropy>
-    // @ts-expect-error NativeBugsnagPerformance is possibly null
     const requestEntropyAsync = NativeBugsnagPerformance.requestEntropyAsync as jest.MockedFunction<typeof NativeBugsnagPerformance.requestEntropyAsync>
 
     beforeEach(() => {
@@ -45,27 +37,27 @@ describe('React Native ID generator', () => {
     })
 
     it('generates random 64 bit ID', () => {
-      const idGenerator = createIdGenerator(NativeBugsnagPerformance)
+      const idGenerator = createIdGenerator()
       const id = idGenerator.generate(64)
 
       expect(id).toMatch(/^[a-f0-9]{16}$/)
     })
 
     it('generates random 128 bit ID', () => {
-      idGenerator = createIdGenerator(NativeBugsnagPerformance)
+      const idGenerator = createIdGenerator()
       const id = idGenerator.generate(128)
 
       expect(id).toMatch(/^[a-f0-9]{32}$/)
     })
 
     it('initialises the pool from the synchronous native entropy source', () => {
-      createIdGenerator(NativeBugsnagPerformance)
+      createIdGenerator()
       expect(requestEntropy).toHaveBeenCalled()
       expect(requestEntropyAsync).not.toHaveBeenCalled()
     })
 
     it('regenerates the pool after 1000 calls', async () => {
-      const idGenerator = createIdGenerator(NativeBugsnagPerformance)
+      const idGenerator = createIdGenerator()
 
       for (let i = 0; i < 999; i++) {
         const id = idGenerator.generate(64)
@@ -78,17 +70,11 @@ describe('React Native ID generator', () => {
       expect(requestEntropyAsync).toHaveBeenCalled()
     })
 
-    it('falls back to JS entropy source if native module is null', () => {
-      const idGenerator = createIdGenerator(null)
-      const id = idGenerator.generate(64)
-      expect(id).toMatch(/^[a-f0-9]{16}$/)
-    })
-
     it('falls back to JS entropy source if native module returns an empty string', async () => {
       requestEntropy.mockReturnValueOnce('')
       requestEntropyAsync.mockResolvedValueOnce('')
 
-      const idGenerator = createIdGenerator(NativeBugsnagPerformance)
+      const idGenerator = createIdGenerator()
       expect(requestEntropy).toHaveBeenCalled()
 
       for (let i = 0; i < 1000; i++) {
@@ -106,7 +92,11 @@ describe('React Native ID generator', () => {
     })
 
     it('falls back to JS entropy source if remote debugging is enabled', () => {
-      const idGenerator = createIdGenerator(NativeBugsnagPerformance, true)
+      // ensuring the native module is "loaded" and returns some not empty value
+      requestEntropy.mockReturnValue('a3b9c8d7e6f5g4h2')
+      requestEntropyAsync.mockResolvedValue('a3b9c8d7e6f5g4h2')
+
+      const idGenerator = createIdGenerator(true)
       expect(requestEntropy).not.toHaveBeenCalled()
       const id = idGenerator.generate(64)
       expect(id).toMatch(/^[a-f0-9]{16}$/)
