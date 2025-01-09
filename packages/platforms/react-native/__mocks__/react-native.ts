@@ -1,5 +1,3 @@
-import type { NativeDirs } from '../lib/NativeBugsnagPerformance'
-
 type Os = 'android' | 'ios' | 'other'
 interface SelectOptions<T> { android: T, ios: T, default: T }
 type PlatformConstants
@@ -136,7 +134,7 @@ const BugsnagReactNativePerformance = {
   requestEntropyAsync: jest.fn(() => {
     return Promise.resolve(createPool())
   }),
-  getNativeConstants (): NativeDirs {
+  getNativeConstants () {
     return {
       CacheDir: '/mock/CacheDir',
       DocumentDir: '/mock/DocumentDir'
