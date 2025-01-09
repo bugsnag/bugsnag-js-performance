@@ -1,11 +1,15 @@
-import { runSpanEndCallbacks, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
-import type { SpanAttributes, ParentContext } from '@bugsnag/core-performance'
+import { runSpanEndCallbacks, SpanFactory, SpanInternal, timeToNumber } from '@bugsnag/core-performance'
+import type { SpanAttributes, SpanOptions } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from './config'
 import NativeBugsnagPerformance from './native'
 import type { ReactNativeClock } from './clock'
 
 class NativeSpanInternal extends SpanInternal {
   public readonly isNativeSpan: boolean = true
+}
+
+interface ReactNativeSpanOptions extends SpanOptions {
+  doNotDelegateToNativeSDK?: boolean
 }
 
 export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration> {
@@ -15,15 +19,20 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     this.attachedToNative = true
   }
 
-  protected createSpanInternal (name: string, startTime: number, parentContext: ParentContext | null | undefined, isFirstClass: boolean | undefined, attributes: SpanAttributes) {
-    if (!NativeBugsnagPerformance || !this.attachedToNative || isFirstClass !== true) {
-      return super.createSpanInternal(name, startTime, parentContext, isFirstClass, attributes)
+  startSpan (name: string, options: ReactNativeSpanOptions) {
+    return super.startSpan(name, options)
+  }
+
+  protected createSpanInternal (name: string, options: ReactNativeSpanOptions, attributes: SpanAttributes) {
+    if (!NativeBugsnagPerformance || !this.attachedToNative || options.isFirstClass !== true || options.doNotDelegateToNativeSDK === true) {
+      return super.createSpanInternal(name, options, attributes)
     }
 
-    const unixStartTimeNanos = (this.clock as ReactNativeClock).toUnixNanoseconds(startTime)
-    const nativeParentContext = parentContext ? { id: parentContext.id, traceId: parentContext.traceId } : undefined
+    const safeStartTime = timeToNumber(this.clock, options.startTime)
+    const unixStartTimeNanos = (this.clock as ReactNativeClock).toUnixNanoseconds(safeStartTime)
+    const nativeParentContext = options.parentContext ? { id: options.parentContext.id, traceId: options.parentContext.traceId } : undefined
     const nativeSpan = NativeBugsnagPerformance.startNativeSpan(name, { startTime: unixStartTimeNanos, parentContext: nativeParentContext })
-    return new NativeSpanInternal(nativeSpan.id, nativeSpan.traceId, name, startTime, attributes, this.clock, nativeSpan.parentSpanId)
+    return new NativeSpanInternal(nativeSpan.id, nativeSpan.traceId, name, safeStartTime, attributes, this.clock, nativeSpan.parentSpanId)
   }
 
   protected discardSpan (span: NativeSpanInternal) {
@@ -50,5 +59,19 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     } else {
       NativeBugsnagPerformance?.discardNativeSpan(spanEnded.id, spanEnded.traceId)
     }
+  }
+
+  startNavigationSpan (routeName: string, spanOptions: ReactNativeSpanOptions) {
+    // Navigation spans are always first class
+    spanOptions.isFirstClass = true
+
+    const spanName = '[Navigation]' + routeName
+    const span = this.startSpan(spanName, spanOptions)
+
+    // Default navigation span attributes
+    span.setAttribute('bugsnag.span.category', 'navigation')
+    span.setAttribute('bugsnag.navigation.route', routeName)
+
+    return span
   }
 }

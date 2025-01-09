@@ -4,7 +4,6 @@ import { Platform } from 'react-native'
 import NativeBugsnagPerformance from './native'
 import type { ReactNativeAttachConfiguration, ReactNativeConfiguration, ReactNativeSchema } from './config'
 import { createAppStartSpan } from './create-app-start-span'
-import { createNavigationSpan } from './create-navigation-span'
 import type { ReactNativeSpanFactory } from './span-factory'
 
 type NavigationSpanOptions = Omit<SpanOptions, 'isFirstClass'>
@@ -12,8 +11,7 @@ type NavigationSpanOptions = Omit<SpanOptions, 'isFirstClass'>
 export const platformExtensions = (appStartTime: number, clock: Clock, schema: ReactNativeSchema, spanFactory: ReactNativeSpanFactory, spanContextStorage: SpanContextStorage) => ({
   startNavigationSpan: function (routeName: string, spanOptions?: NavigationSpanOptions) {
     const cleanOptions = spanFactory.validateSpanOptions(routeName, spanOptions)
-    cleanOptions.options.isFirstClass = true
-    const span = createNavigationSpan(spanFactory, cleanOptions.name, cleanOptions.options)
+    const span = spanFactory.startNavigationSpan(cleanOptions.name, cleanOptions.options)
     return spanFactory.toPublicApi(span)
   },
   withInstrumentedAppStarts: function (App: React.FC) {

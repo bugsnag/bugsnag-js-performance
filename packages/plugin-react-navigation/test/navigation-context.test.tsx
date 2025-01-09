@@ -1,5 +1,5 @@
 import type { SpanFactory } from '@bugsnag/core-performance'
-import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
+import { MockReactNativeSpanFactory } from '@bugsnag/js-performance-test-utilities'
 import type { ReactNativeConfiguration, ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import React, { useContext } from 'react'
@@ -16,15 +16,15 @@ afterEach(() => {
 
 describe('NavigationContextProvider', () => {
   it('Creates a navigation span when the currentRoute changes', () => {
-    const spanFactory = new MockSpanFactory()
+    const spanFactory = new MockReactNativeSpanFactory()
     render(<App spanFactory={spanFactory} />)
 
     // Initial route should not create a span
-    expect(spanFactory.startSpan).not.toHaveBeenCalled()
+    expect(spanFactory.startNavigationSpan).not.toHaveBeenCalled()
 
     // Route change should create a navigation span
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
 
     // Await the navigation span to end
     jest.advanceTimersByTime(100)
@@ -43,14 +43,14 @@ describe('NavigationContextProvider', () => {
   })
 
   it('Discards the active navigation span when the route changes', () => {
-    const spanFactory = new MockSpanFactory()
+    const spanFactory = new MockReactNativeSpanFactory()
     render(<App spanFactory={spanFactory} />)
 
     // Change to a new route but block the navigation span from ending
     fireEvent.press(screen.getByText('Change to route 1'))
     fireEvent.press(screen.getByText('Block Navigation'))
-    expect(spanFactory.startSpan).toHaveBeenCalledTimes(1)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledTimes(1)
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
 
     // Navigation span should not end after timeout
     jest.advanceTimersByTime(100)
@@ -58,8 +58,8 @@ describe('NavigationContextProvider', () => {
 
     // Change to a second route while the first navigation span is still open
     fireEvent.press(screen.getByText('Change to route 2'))
-    expect(spanFactory.startSpan).toHaveBeenCalledTimes(2)
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-2', { isFirstClass: true, startTime: 100 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledTimes(2)
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-2', { isFirstClass: true, startTime: 100, doNotDelegateToNativeSDK: true })
 
     // End the navigation
     fireEvent.press(screen.getByText('Unblock Navigation'))
@@ -79,12 +79,12 @@ describe('NavigationContextProvider', () => {
   })
 
   it('Prevents a navigation span from ending when navigation is blocked', () => {
-    const spanFactory = new MockSpanFactory()
+    const spanFactory = new MockReactNativeSpanFactory()
     render(<App spanFactory={spanFactory} />)
 
     // Start a navigation
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
 
     // Prevent navigation from ending
     fireEvent.press(screen.getByText('Block Navigation'))
@@ -106,12 +106,12 @@ describe('NavigationContextProvider', () => {
   })
 
   it('Does not end a navigation span while multiple components are blocking', () => {
-    const spanFactory = new MockSpanFactory()
+    const spanFactory = new MockReactNativeSpanFactory()
     render(<App spanFactory={spanFactory} />)
 
     // Start a navigation
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
 
     // Block navigation from completing
     fireEvent.press(screen.getByText('Block Navigation'))
@@ -133,12 +133,12 @@ describe('NavigationContextProvider', () => {
   it('resets the lastRenderTime when a navigation span ends', () => {
     jest.useFakeTimers()
 
-    const spanFactory = new MockSpanFactory()
+    const spanFactory = new MockReactNativeSpanFactory()
     render(<App spanFactory={spanFactory} />)
 
     // start navigation
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
 
     // lastRenderTime should be set to 2
 
@@ -158,7 +158,7 @@ describe('NavigationContextProvider', () => {
 
     // start second navigation
     fireEvent.press(screen.getByText('Change to route 2'))
-    expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]route-2', { isFirstClass: true, startTime: 200 })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-2', { isFirstClass: true, startTime: 200, doNotDelegateToNativeSDK: true })
     jest.advanceTimersByTime(100)
 
     // check delivered span
