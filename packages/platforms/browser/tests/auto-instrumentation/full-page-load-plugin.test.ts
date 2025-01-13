@@ -27,7 +27,7 @@ import {
   createPerformancePaintTimingFake
 } from '../utilities'
 import MockRoutingProvider from '../utilities/mock-routing-provider'
-import type { AppState } from '@bugsnag/core-performance/dist/types/core'
+import type { AppState } from '../../../../core/lib/core'
 
 jest.useFakeTimers()
 

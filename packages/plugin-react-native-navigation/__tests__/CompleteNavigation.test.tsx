@@ -6,6 +6,7 @@ import { Button, View } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 import { CompleteNavigation } from '../lib/CompleteNavigation'
 import ReactNativeNavigationPlugin from '../lib/react-native-navigation-plugin'
+import type { AppState } from '../../core/lib/core'
 
 jest.mock('react-native-navigation')
 
@@ -31,7 +32,11 @@ function createMockClient (plugin: ReactNativeNavigationPlugin) {
 
 describe('CompleteNavigation', () => {
   it('calls the appropriate methods on mount', () => {
-    const plugin = new ReactNativeNavigationPlugin(Navigation)
+    let appState: AppState
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
+    const plugin = new ReactNativeNavigationPlugin(Navigation, setAppState)
     createMockClient(plugin)
 
     render(
@@ -48,7 +53,11 @@ describe('CompleteNavigation', () => {
   })
 
   it('calls the appropriate methods on unmount', () => {
-    const plugin = new ReactNativeNavigationPlugin(Navigation)
+    let appState: AppState
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
+    const plugin = new ReactNativeNavigationPlugin(Navigation, setAppState)
     createMockClient(plugin)
 
     function TestApp () {
@@ -75,7 +84,11 @@ describe('CompleteNavigation', () => {
   })
 
   it('calls the appropriate method when the "on" condition changes to true', () => {
-    const plugin = new ReactNativeNavigationPlugin(Navigation)
+    let appState: AppState
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
+    const plugin = new ReactNativeNavigationPlugin(Navigation, setAppState)
     createMockClient(plugin)
 
     function TestApp () {
