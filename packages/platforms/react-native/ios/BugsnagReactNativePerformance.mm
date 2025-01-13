@@ -232,25 +232,28 @@ RCT_EXPORT_METHOD(endNativeSpan:(NSString *)spanId
                 reject:(RCTPromiseRejectBlock)reject) {
     NSString *spanKey = [spanId stringByAppendingString:traceId];
 
+    BugsnagPerformanceSpan *nativeSpan;
     @synchronized (openSpans) {
-        BugsnagPerformanceSpan *nativeSpan = openSpans[spanKey];
+        nativeSpan = openSpans[spanKey];
         if (nativeSpan != nil) {
             [openSpans removeObjectForKey:spanKey];
-            
-            // Set native span attributes from JS values
-            [ReactNativeSpanAttributes setNativeAttributes:nativeSpan.attributes fromJSAttributes:attributes];
-
-            // We need to reinstate the bugsnag.sampling.p attribute here as it might not be re-populated on span end
-            nativeSpan.attributes[@"bugsnag.sampling.p"] = @(nativeSpan.samplingProbability);
-            
-            // If the end time is later than the current end time, update it
-            NSDate *nativeEndTime = [NSDate dateWithTimeIntervalSince1970: endTime / NSEC_PER_SEC];
-            if ([nativeEndTime timeIntervalSinceDate:nativeSpan.endTime] > 0) {
-                [nativeSpan markEndTime:nativeEndTime];
-            }
-            
-            [nativeSpan sendForProcessing];
         }
+    }
+
+    if (nativeSpan != nil) {
+        // Set native span attributes from JS values
+        [ReactNativeSpanAttributes setNativeAttributes:nativeSpan.attributes fromJSAttributes:attributes];
+
+        // We need to reinstate the bugsnag.sampling.p attribute here as it might not be re-populated on span end
+        nativeSpan.attributes[@"bugsnag.sampling.p"] = @(nativeSpan.samplingProbability);
+        
+        // If the end time is later than the current end time, update it
+        NSDate *nativeEndTime = [NSDate dateWithTimeIntervalSince1970: endTime / NSEC_PER_SEC];
+        if ([nativeEndTime timeIntervalSinceDate:nativeSpan.endTime] > 0) {
+            [nativeSpan markEndTime:nativeEndTime];
+        }
+        
+        [nativeSpan sendForProcessing];
     }
 
     resolve(nil);
