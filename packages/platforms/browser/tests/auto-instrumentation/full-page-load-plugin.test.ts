@@ -27,7 +27,7 @@ import {
   createPerformancePaintTimingFake
 } from '../utilities'
 import MockRoutingProvider from '../utilities/mock-routing-provider'
-import { AppState } from '@bugsnag/core-performance/dist/types/core'
+import type { AppState } from '@bugsnag/core-performance/dist/types/core'
 
 jest.useFakeTimers()
 
@@ -65,9 +65,9 @@ describe('FullPageLoadPlugin', () => {
           performance,
           setAppState,
           appState
-        ),
-      ],
-    });
+        )
+      ]
+    })
 
     // largest contentful paint
     manager.queueEntry(createLargestContentfulPaintFake({ startTime: 64 }))
@@ -143,9 +143,9 @@ describe('FullPageLoadPlugin', () => {
           performance,
           setAppState,
           appState
-        ),
-      ],
-    });
+        )
+      ]
+    })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentFullPageLoads: false })
 

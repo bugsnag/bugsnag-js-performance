@@ -65,7 +65,7 @@ describe('RouteChangePlugin', () => {
     document.title = 'Title 3'
 
     expect(appState).toBe('navigating')
-    
+
     await jest.runOnlyPendingTimersAsync()
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({
@@ -110,7 +110,7 @@ describe('RouteChangePlugin', () => {
     jest.runAllTimers()
 
     expect(appState).toBe('navigating')
-    
+
     await jest.runOnlyPendingTimersAsync()
 
     const firstSpan = expect.objectContaining({
@@ -163,7 +163,7 @@ describe('RouteChangePlugin', () => {
     const DefaultRoutingProvider = createDefaultRoutingProvider(mockOnSettle, window.location)
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
-    let appState: AppState = 'starting'
+    let appState: AppState
     const setAppState = jest.fn((state: AppState) => {
       appState = state
     })
@@ -253,7 +253,7 @@ describe('RouteChangePlugin', () => {
       const span = routeChangeCallback(url, 'trigger')
       expect(jestLogger.warn).toHaveBeenCalledWith('Invalid span options\n  - url should be a URL')
       expect(setAppState).not.toHaveBeenCalled()
-      
+
       span.end()
 
       await jest.runOnlyPendingTimersAsync()
@@ -343,9 +343,9 @@ describe('RouteChangePlugin', () => {
 
     // trigger the route change
     const span = routeChangeCallback(new URL('https://bugsnag.com/current-route'), 'trigger', {})
-    
+
     expect(appState).toBe('navigating')
-    
+
     span.end({ url: new URL('https://bugsnag.com/updated-route') })
 
     await jest.runOnlyPendingTimersAsync()
@@ -378,7 +378,7 @@ describe('RouteChangePlugin', () => {
     testClient.start({ apiKey: VALID_API_KEY, sendPageAttributes: { url: false, title: false } })
 
     history.pushState({}, '', 'https://bugsnag.com/second-route')
-    
+
     expect(appState).toBe('navigating')
 
     await jest.runOnlyPendingTimersAsync()

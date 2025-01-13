@@ -2,7 +2,7 @@ import { MockSpanFactory, createConfiguration } from '@bugsnag/js-performance-te
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import { Navigation } from 'react-native-navigation'
 import ReactNativeNavigationPlugin from '../lib/react-native-navigation-plugin'
-import type { AppState } from "../../core/lib/core"
+import type { AppState } from '../../core/lib/core'
 
 jest.mock('react-native-navigation')
 
@@ -37,10 +37,10 @@ describe('ReactNativeNavigationPlugin', () => {
       componentName: 'TestScreen',
       componentType: 'Component'
     })
-    
+
     expect(setAppState).toHaveBeenCalled()
     expect(appState).toBe('navigating')
-    
+
     jest.advanceTimersByTime(100)
 
     expect(spanFactory.endSpan).toHaveBeenCalledTimes(1)

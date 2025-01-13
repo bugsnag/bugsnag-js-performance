@@ -20,7 +20,7 @@ let appState: AppState
 describe('NavigationContextProvider', () => {
   it('Creates a navigation span when the currentRoute changes', () => {
     const spanFactory = new MockSpanFactory()
-    
+
     const setAppState = jest.fn((state: AppState) => {
       appState = state
     })
