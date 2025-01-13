@@ -2,6 +2,7 @@ import { MockSpanFactory, createConfiguration } from '@bugsnag/js-performance-te
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import { Navigation } from 'react-native-navigation'
 import ReactNativeNavigationPlugin from '../lib/react-native-navigation-plugin'
+import type { AppState } from "../../core/lib/core"
 
 jest.mock('react-native-navigation')
 
@@ -13,9 +14,14 @@ afterEach(() => {
   jest.useRealTimers()
 })
 
+let appState: AppState
+
 describe('ReactNativeNavigationPlugin', () => {
   it('creates a navigation span when the route changes', () => {
-    const plugin = new ReactNativeNavigationPlugin(Navigation)
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
+    const plugin = new ReactNativeNavigationPlugin(Navigation, setAppState)
     const configuration = createConfiguration<ReactNativeConfiguration>()
     const spanFactory = new MockSpanFactory()
     plugin.configure(configuration, spanFactory)
@@ -31,11 +37,16 @@ describe('ReactNativeNavigationPlugin', () => {
       componentName: 'TestScreen',
       componentType: 'Component'
     })
-
+    
+    expect(setAppState).toHaveBeenCalled()
+    expect(appState).toBe('navigating')
+    
     jest.advanceTimersByTime(100)
 
     expect(spanFactory.endSpan).toHaveBeenCalledTimes(1)
     expect(spanFactory.createdSpans).toHaveLength(1)
+
+    expect(appState).toBe('ready')
 
     const span = spanFactory.createdSpans[0]
     expect(span.name).toEqual('[Navigation]TestScreen')
@@ -47,7 +58,10 @@ describe('ReactNativeNavigationPlugin', () => {
   })
 
   it('does not end the current navigation while there are components waiting', () => {
-    const plugin = new ReactNativeNavigationPlugin(Navigation)
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
+    const plugin = new ReactNativeNavigationPlugin(Navigation, setAppState)
     const configuration = createConfiguration<ReactNativeConfiguration>()
     const spanFactory = new MockSpanFactory()
     plugin.configure(configuration, spanFactory)
@@ -65,6 +79,9 @@ describe('ReactNativeNavigationPlugin', () => {
     })
 
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(1)
+
+    expect(setAppState).toHaveBeenCalled()
+    expect(appState).toBe('navigating')
 
     plugin.blockNavigationEnd()
     plugin.blockNavigationEnd()
@@ -86,6 +103,9 @@ describe('ReactNativeNavigationPlugin', () => {
     jest.advanceTimersByTime(100)
     expect(spanFactory.endSpan).toHaveBeenCalled()
 
+    expect(setAppState).toHaveBeenCalled()
+    expect(appState).toBe('ready')
+
     const span = spanFactory.createdSpans[0]
     expect(span.name).toEqual('[Navigation]TestScreen')
     expect(span).toHaveAttribute('bugsnag.span.category', 'navigation')
@@ -96,7 +116,10 @@ describe('ReactNativeNavigationPlugin', () => {
   })
 
   it('discards the active navigation span when the route changes', () => {
-    const plugin = new ReactNativeNavigationPlugin(Navigation)
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
+    const plugin = new ReactNativeNavigationPlugin(Navigation, setAppState)
     const configuration = createConfiguration<ReactNativeConfiguration>()
     const spanFactory = new MockSpanFactory()
     plugin.configure(configuration, spanFactory)
@@ -127,11 +150,16 @@ describe('ReactNativeNavigationPlugin', () => {
       componentType: 'Component'
     })
 
+    expect(appState).toBe('navigating')
+
     jest.advanceTimersByTime(100)
 
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(2)
     expect(spanFactory.endSpan).toHaveBeenCalledTimes(1)
     expect(spanFactory.createdSpans).toHaveLength(1)
+
+    expect(setAppState).toHaveBeenCalledTimes(3)
+    expect(appState).toBe('ready')
 
     const span = spanFactory.createdSpans[0]
     expect(span.name).toEqual('[Navigation]SecondScreen')

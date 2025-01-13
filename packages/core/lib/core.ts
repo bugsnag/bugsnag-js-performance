@@ -45,7 +45,6 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   resourceAttributesSource: ResourceAttributeSource<C>
   spanAttributesSource: SpanAttributesSource<C>
   schema: S
-  // plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => Array<Plugin<C>>
   plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage, setAppState: (appState: AppState) => void, appState: AppState) => Array<Plugin<C>>
   persistence: Persistence
   retryQueueFactory: RetryQueueFactory

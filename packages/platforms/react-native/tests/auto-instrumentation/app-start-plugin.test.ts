@@ -19,6 +19,7 @@ describe('app start plugin', () => {
     appRegistry = {
       setWrapperComponentProvider: jest.fn()
     } as unknown as typeof AppRegistry
+    appState = 'starting'
   })
 
   it('starts an app start span when autoInstrumentAppStarts is true', () => {
@@ -32,6 +33,8 @@ describe('app start plugin', () => {
         startTime: appStartTime,
         parentContext: null
       }))
+
+    expect(appState).toBe('starting')
 
     expect(appRegistry.setWrapperComponentProvider).toHaveBeenCalledWith(expect.any(Function))
   })

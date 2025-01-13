@@ -10,6 +10,7 @@ import type { BrowserConfiguration, BrowserSchema } from '../../lib/config'
 import { createDefaultRoutingProvider } from '../../lib/default-routing-provider'
 import type { OnSettle } from '../../lib/on-settle'
 import type { StartRouteChangeCallback } from '../../lib/routing-provider'
+import type { AppState } from '../../../../core/lib/core'
 
 jest.useFakeTimers()
 
@@ -39,17 +40,23 @@ describe('RouteChangePlugin', () => {
     const DefaultRoutingProvider = createDefaultRoutingProvider(mockOnSettle, window.location)
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
+    let appState: AppState = 'starting'
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
     })
 
     document.title = 'Title 1'
 
     testClient.start({ apiKey: VALID_API_KEY })
+
+    expect(appState).toBe('starting')
 
     document.title = 'Title 2'
 
@@ -57,6 +64,8 @@ describe('RouteChangePlugin', () => {
 
     document.title = 'Title 3'
 
+    expect(appState).toBe('navigating')
+    
     await jest.runOnlyPendingTimersAsync()
 
     expect(delivery).toHaveSentSpan(expect.objectContaining({
@@ -64,6 +73,9 @@ describe('RouteChangePlugin', () => {
       startTimeUnixNano: '1000000',
       endTimeUnixNano: '32000000'
     }))
+
+    expect(setAppState).toHaveBeenCalledTimes(2)
+    expect(appState).toBe('ready')
 
     const span = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
     expect(span).toHaveAttribute('bugsnag.span.category', 'route_change')
@@ -78,12 +90,16 @@ describe('RouteChangePlugin', () => {
     const DefaultRoutingProvider = createDefaultRoutingProvider(mockOnSettle, window.location)
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
+    let appState: AppState = 'starting'
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
     })
 
     history.pushState({}, '', '/first-route')
@@ -92,6 +108,9 @@ describe('RouteChangePlugin', () => {
 
     history.back()
     jest.runAllTimers()
+
+    expect(appState).toBe('navigating')
+    
     await jest.runOnlyPendingTimersAsync()
 
     const firstSpan = expect.objectContaining({
@@ -106,6 +125,9 @@ describe('RouteChangePlugin', () => {
       endTimeUnixNano: '32000000'
     })
 
+    expect(setAppState).toHaveBeenCalledTimes(2)
+    expect(appState).toBe('ready')
+
     expect(delivery).toHaveSentSpan(firstSpan)
     expect(delivery).not.toHaveSentSpan(secondSpan)
 
@@ -119,6 +141,9 @@ describe('RouteChangePlugin', () => {
     history.forward()
     jest.runAllTimers()
     await jest.runOnlyPendingTimersAsync()
+
+    expect(setAppState).toHaveBeenCalledTimes(4)
+    expect(appState).toBe('ready')
 
     expect(delivery).toHaveSentSpan(secondSpan)
 
@@ -138,12 +163,16 @@ describe('RouteChangePlugin', () => {
     const DefaultRoutingProvider = createDefaultRoutingProvider(mockOnSettle, window.location)
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
+    let appState: AppState = 'starting'
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -154,17 +183,22 @@ describe('RouteChangePlugin', () => {
 
     // No delivery
     expect(delivery.requests).toHaveLength(0)
+    expect(setAppState).not.toHaveBeenCalled()
   })
 
   it('does not create route change spans with autoInstrumentFullPageLoads set to false', async () => {
     const DefaultRoutingProvider = createDefaultRoutingProvider(mockOnSettle, window.location)
     const clock = new IncrementingClock()
     const delivery = new InMemoryDelivery()
+    let appState: AppState
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentRouteChanges: false })
@@ -176,6 +210,7 @@ describe('RouteChangePlugin', () => {
     expect(delivery).not.toHaveSentSpan(expect.objectContaining({
       name: '[RouteChange]/second-route'
     }))
+    expect(setAppState).not.toHaveBeenCalled()
   })
 
   describe('validation', () => {
@@ -200,11 +235,15 @@ describe('RouteChangePlugin', () => {
         routeChangeCallback = startRouteChangeSpan
       }
 
+      let appState: AppState
+      const setAppState = jest.fn((state: AppState) => {
+        appState = state
+      })
       const delivery = new InMemoryDelivery()
       const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         deliveryFactory: () => delivery,
         schema: createSchema(window.location.hostname, routingProvider),
-        plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
+        plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
       })
 
       testClient.start({ apiKey: VALID_API_KEY, logger: jestLogger })
@@ -213,7 +252,8 @@ describe('RouteChangePlugin', () => {
       // trigger the route change
       const span = routeChangeCallback(url, 'trigger')
       expect(jestLogger.warn).toHaveBeenCalledWith('Invalid span options\n  - url should be a URL')
-
+      expect(setAppState).not.toHaveBeenCalled()
+      
       span.end()
 
       await jest.runOnlyPendingTimersAsync()
@@ -244,11 +284,15 @@ describe('RouteChangePlugin', () => {
         routeChangeCallback = startRouteChangeSpan
       }
 
+      let appState: AppState = 'starting'
+      const setAppState = jest.fn((state: AppState) => {
+        appState = state
+      })
       const delivery = new InMemoryDelivery()
       const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         deliveryFactory: () => delivery,
         schema: createSchema(window.location.hostname, routingProvider),
-        plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
+        plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
       })
 
       testClient.start({ apiKey: VALID_API_KEY, logger: jestLogger })
@@ -257,6 +301,7 @@ describe('RouteChangePlugin', () => {
       // trigger the route change
       const span = routeChangeCallback(new URL('https://bugsnag.com/route'), trigger, {})
       expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid span options\n  - trigger should be a string, got ${typeof trigger}`)
+      expect(appState).toBe('navigating')
 
       span.end()
 
@@ -265,6 +310,9 @@ describe('RouteChangePlugin', () => {
       expect(delivery).toHaveSentSpan(expect.objectContaining({
         name: '[RouteChange]/route'
       }))
+
+      expect(setAppState).toHaveBeenCalled()
+      expect(appState).toBe('ready')
 
       const routeChangeSpan = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans[0]
       expect(routeChangeSpan).toHaveAttribute('bugsnag.browser.page.route_change.trigger', String(trigger))
@@ -279,11 +327,15 @@ describe('RouteChangePlugin', () => {
       routeChangeCallback = startRouteChangeSpan
     }
 
+    let appState: AppState = 'starting'
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
     const delivery = new InMemoryDelivery()
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, routingProvider),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, logger: jestLogger })
@@ -291,7 +343,9 @@ describe('RouteChangePlugin', () => {
 
     // trigger the route change
     const span = routeChangeCallback(new URL('https://bugsnag.com/current-route'), 'trigger', {})
-
+    
+    expect(appState).toBe('navigating')
+    
     span.end({ url: new URL('https://bugsnag.com/updated-route') })
 
     await jest.runOnlyPendingTimersAsync()
@@ -309,20 +363,27 @@ describe('RouteChangePlugin', () => {
     const DefaultRoutingProvider = createDefaultRoutingProvider(mockOnSettle, window.location)
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
+    let appState: AppState = 'starting'
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, sendPageAttributes: { url: false, title: false } })
 
     history.pushState({}, '', 'https://bugsnag.com/second-route')
+    
+    expect(appState).toBe('navigating')
 
     await jest.runOnlyPendingTimersAsync()
 
+    expect(appState).toBe('ready')
     expect(delivery).toHaveSentSpan(expect.objectContaining({
       name: '[RouteChange]/second-route',
       startTimeUnixNano: '1000000',
