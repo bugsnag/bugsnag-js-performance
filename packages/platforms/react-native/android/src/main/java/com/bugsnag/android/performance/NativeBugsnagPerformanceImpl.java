@@ -3,6 +3,8 @@ package com.bugsnag.reactnative.performance;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageInfo;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 
 import androidx.annotation.Nullable;
@@ -13,10 +15,9 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import java.security.SecureRandom;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.bugsnag.android.performance.BugsnagPerformance;
@@ -39,16 +40,24 @@ class NativeBugsnagPerformanceImpl {
 
   private boolean isNativePerformanceAvailable = false;
 
-  private boolean spanCleanupTaskScheduled = false;
+  private boolean isCleanupTaskScheduled = false;
 
   /**
    * A map of open native spans, keyed by the span ID and trace ID,
    * so that they can be retrieved and closed/discarded from JS.
-   * 
-   * Since native spans are only ever started and ended from the JS thread,
-   * no thread synchronization is required when accessing.
    */
   private final ConcurrentHashMap<String, SpanImpl> openSpans = new ConcurrentHashMap<>();
+
+  private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+  private final Runnable spanCleanupTask = new Runnable() {
+    @Override
+    public void run() {
+      discardLongRunningSpans();
+      // Reschedule the task to run again after one hour
+      mainHandler.postDelayed(this, TimeUnit.HOURS.toMillis(1));
+    }
+  };
 
   public NativeBugsnagPerformanceImpl(ReactApplicationContext reactContext) {
     this.reactContext = reactContext;
@@ -126,10 +135,9 @@ class NativeBugsnagPerformanceImpl {
       return null;
     }
 
-    if (!spanCleanupTaskScheduled) {
-      ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-      scheduler.scheduleWithFixedDelay(this::discardLongRunningSpans, 1, 1, TimeUnit.HOURS);
-      spanCleanupTaskScheduled = true;
+    if (!isCleanupTaskScheduled) {
+      mainHandler.postDelayed(spanCleanupTask, TimeUnit.HOURS.toMillis(1));
+      isCleanupTaskScheduled = true;
     }
     
     WritableMap result = Arguments.createMap();
@@ -255,10 +263,12 @@ class NativeBugsnagPerformanceImpl {
 
   private void discardLongRunningSpans() {
     long oneHourAgo = SystemClock.elapsedRealtimeNanos() - TimeUnit.HOURS.toNanos(1);
-    for (Map.Entry<String, SpanImpl> entry : openSpans.entrySet()) {
+    Iterator<Map.Entry<String, SpanImpl>> entries = openSpans.entrySet().iterator();
+    while (entries.hasNext()) {
+      Map.Entry<String, SpanImpl> entry = entries.next();
       SpanImpl span = entry.getValue();
       if (span.getStartTime$internal() < oneHourAgo) {
-        openSpans.remove(entry.getKey());
+        entries.remove();
         span.discard();
       }
     }
