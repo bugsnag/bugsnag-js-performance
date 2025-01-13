@@ -42,8 +42,8 @@ public class BugsnagReactNativePerformance extends NativeBugsnagPerformanceSpec 
   }
 
   @Override
-  public WritableMap getNativeConfiguration() {
-    return impl.getNativeConfiguration();
+  public WritableMap attachToNativeSDK() {
+    return impl.attachToNativeSDK();
   }
 
   @Override 

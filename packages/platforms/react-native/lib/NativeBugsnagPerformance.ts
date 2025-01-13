@@ -42,7 +42,7 @@ export interface Spec extends TurboModule {
   requestEntropy: () => string
   requestEntropyAsync: () => Promise<string>
   isNativePerformanceAvailable: () => boolean
-  getNativeConfiguration: () => NativeConfiguration | null
+  attachToNativeSDK: () => NativeConfiguration | null
   startNativeSpan: (name: string, options: UnsafeObject) => NativeSpan
   endNativeSpan: (spanId: string, traceId: string, endTime: number, attributes: UnsafeObject) => Promise<void>
   markNativeSpanEndTime: (spanId: string, traceId: string, endTime: number) => void

@@ -141,7 +141,7 @@ const BugsnagReactNativePerformance = {
   isNativePerformanceAvailable: jest.fn(() => {
     return true
   }),
-  getNativeConfiguration: jest.fn(() => {
+  attachToNativeSDK: jest.fn(() => {
     return {
       apiKey: VALID_API_KEY,
       endpoint: '/traces',
