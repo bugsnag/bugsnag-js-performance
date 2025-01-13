@@ -163,7 +163,7 @@ describe('RouteChangePlugin', () => {
     const DefaultRoutingProvider = createDefaultRoutingProvider(mockOnSettle, window.location)
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
-    let appState: AppState
+    let appState: AppState = 'starting'
     const setAppState = jest.fn((state: AppState) => {
       appState = state
     })
@@ -190,7 +190,7 @@ describe('RouteChangePlugin', () => {
     const DefaultRoutingProvider = createDefaultRoutingProvider(mockOnSettle, window.location)
     const clock = new IncrementingClock()
     const delivery = new InMemoryDelivery()
-    let appState: AppState
+    let appState: AppState = 'starting'
     const setAppState = jest.fn((state: AppState) => {
       appState = state
     })
@@ -235,7 +235,7 @@ describe('RouteChangePlugin', () => {
         routeChangeCallback = startRouteChangeSpan
       }
 
-      let appState: AppState
+      let appState: AppState = 'starting'
       const setAppState = jest.fn((state: AppState) => {
         appState = state
       })
