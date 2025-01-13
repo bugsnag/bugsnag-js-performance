@@ -177,6 +177,8 @@ describe('RouteChangePlugin', () => {
 
     testClient.start({ apiKey: VALID_API_KEY })
 
+    expect(appState).toBe('starting')
+
     history.pushState({}, '', url)
 
     await jest.runOnlyPendingTimersAsync()
@@ -202,6 +204,8 @@ describe('RouteChangePlugin', () => {
     })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentRouteChanges: false })
+
+    expect(appState).toBe('starting')
 
     history.pushState('', '', new URL('https://bugsnag.com/second-route'))
 
@@ -247,6 +251,8 @@ describe('RouteChangePlugin', () => {
       })
 
       testClient.start({ apiKey: VALID_API_KEY, logger: jestLogger })
+      expect(appState).toBe('starting')
+
       await jest.runOnlyPendingTimersAsync()
 
       // trigger the route change
