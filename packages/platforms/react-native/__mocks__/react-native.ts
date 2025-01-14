@@ -169,7 +169,20 @@ const BugsnagReactNativePerformance = {
   markNativeSpanEndTime: jest.fn(),
   discardNativeSpan: jest.fn(() => {
     return Promise.resolve()
-  })
+  }),
+  getNativeConstants () {
+    return {
+      CacheDir: '/mock/CacheDir',
+      DocumentDir: '/mock/DocumentDir'
+    }
+  },
+  exists: jest.fn(),
+  isDir: jest.fn(),
+  ls: jest.fn(),
+  mkdir: jest.fn(),
+  readFile: jest.fn(),
+  unlink: jest.fn(),
+  writeFile: jest.fn()
 }
 
 export const TurboModuleRegistry = {

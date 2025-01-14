@@ -39,6 +39,46 @@ public class BugsnagReactNativePerformance extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
+  public WritableMap getNativeConstants() {
+    return impl.getNativeConstants();
+  }
+
+  @ReactMethod
+  public void exists(String path, Promise promise) {
+    impl.exists(path, promise);
+  }
+
+  @ReactMethod
+  public void isDir(String path, Promise promise) {
+    impl.isDir(path, promise);
+  }
+
+  @ReactMethod
+  public void ls(String path, Promise promise) {
+    impl.ls(path, promise);
+  }
+
+  @ReactMethod
+  public void mkdir(String path, Promise promise) {
+    impl.mkdir(path, promise);
+  }
+
+  @ReactMethod
+  public void readFile(String path, String encoding, Promise promise) {
+    impl.readFile(path, encoding, promise);
+  }
+
+  @ReactMethod
+  public void unlink(String path, Promise promise) {
+    impl.unlink(path, promise);
+  }
+
+  @ReactMethod
+  public void writeFile(String path, String data, String encoding, Promise promise) {
+    impl.writeFile(path, data, encoding, promise);
+  }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
   public boolean isNativePerformanceAvailable() {
     return impl.isNativePerformanceAvailable();
   }

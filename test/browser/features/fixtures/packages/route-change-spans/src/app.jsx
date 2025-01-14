@@ -2,7 +2,7 @@ import React, { useEffect } from "react"
 import { createRoot } from 'react-dom/client'
 import {
   BrowserRouter as Router,
-  Switch,
+  Routes,
   Route,
   Link
 } from "react-router-dom"
@@ -26,14 +26,11 @@ function App() {
   return (
     <Router>
       <Navigation />
-      <Switch>
-        <Route path="/docs/route-change-spans">
-          <Home />
-        </Route>
-        <Route path="/new-route">
-          <About />
-        </Route>
-      </Switch>
+      <Routes>
+        <Route index element={<Home />} />
+        <Route path="/docs/route-change-spans" element={<Home />} />
+        <Route path="/new-route" element={<About />} />
+      </Routes>
     </Router>
   )
 }

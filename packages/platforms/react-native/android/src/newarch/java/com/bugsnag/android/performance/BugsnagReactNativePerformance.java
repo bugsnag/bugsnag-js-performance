@@ -37,6 +37,46 @@ public class BugsnagReactNativePerformance extends NativeBugsnagPerformanceSpec 
   }
 
   @Override
+  public WritableMap getNativeConstants() {
+    return impl.getNativeConstants();
+  }
+
+  @Override
+  public void exists(String path, Promise promise) {
+    impl.exists(path, promise);
+  }
+
+  @Override
+  public void isDir(String path, Promise promise) {
+    impl.isDir(path, promise);
+  }
+
+  @Override
+  public void ls(String path, Promise promise) {
+    impl.ls(path, promise);
+  }
+
+  @Override
+  public void mkdir(String path, Promise promise) {
+    impl.mkdir(path, promise);
+  }
+
+  @Override
+  public void readFile(String path, String encoding, Promise promise) {
+    impl.readFile(path, encoding, promise);
+  }
+
+  @Override
+  public void unlink(String path, Promise promise) {
+    impl.unlink(path, promise);
+  }
+
+  @Override
+  public void writeFile(String path, String data, String encoding, Promise promise){
+    impl.writeFile(path, data, encoding, promise);
+  }
+
+  @Override
   public boolean isNativePerformanceAvailable() {
     return impl.isNativePerformanceAvailable();
   }

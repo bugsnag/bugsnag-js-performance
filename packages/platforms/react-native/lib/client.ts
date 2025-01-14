@@ -2,7 +2,7 @@ import { createClient } from '@bugsnag/core-performance'
 import createFetchDeliveryFactory from '@bugsnag/delivery-fetch-performance'
 import { createXmlHttpRequestTracker } from '@bugsnag/request-tracker-performance'
 import { AppRegistry, AppState } from 'react-native'
-import { FileSystem } from 'react-native-file-access'
+import { FileSystem } from './persistence/file-native'
 import { AppStartPlugin, NetworkRequestPlugin } from './auto-instrumentation'
 import createClock from './clock'
 import createSchema from './config'
@@ -28,7 +28,7 @@ const clock = createClock(performance)
 const appStartTime = clock.now()
 const deliveryFactory = createFetchDeliveryFactory(fetch, clock)
 const spanAttributesSource = createSpanAttributesSource()
-const deviceInfo = NativeBugsnagPerformance && !isDebuggingRemotely ? NativeBugsnagPerformance.getDeviceInfo() : undefined
+const deviceInfo = !isDebuggingRemotely ? NativeBugsnagPerformance.getDeviceInfo() : undefined
 const persistence = persistenceFactory(FileSystem, deviceInfo)
 const resourceAttributesSource = resourceAttributesSourceFactory(persistence, deviceInfo)
 const backgroundingListener = createBrowserBackgroundingListener(AppState)
@@ -36,7 +36,7 @@ const backgroundingListener = createBrowserBackgroundingListener(AppState)
 // React Native's fetch polyfill uses xhr under the hood, so we only track xhr requests
 const xhrRequestTracker = createXmlHttpRequestTracker(XMLHttpRequest, clock)
 
-const idGenerator = createIdGenerator(NativeBugsnagPerformance, isDebuggingRemotely)
+const idGenerator = createIdGenerator(isDebuggingRemotely)
 const schema = createSchema()
 const BugsnagPerformance = createClient({
   backgroundingListener,

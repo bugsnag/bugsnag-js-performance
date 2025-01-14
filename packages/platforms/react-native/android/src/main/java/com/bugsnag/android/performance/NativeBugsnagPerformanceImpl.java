@@ -14,6 +14,14 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
+
+import java.io.File;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.security.SecureRandom;
 import java.util.Iterator;
 import java.util.Map;
@@ -71,7 +79,7 @@ class NativeBugsnagPerformanceImpl {
     }
   }
 
-  public WritableMap getDeviceInfo() {
+  WritableMap getDeviceInfo() {
     WritableMap map = Arguments.createMap();
     try {
       String bundleIdentifier = this.reactContext.getPackageName();
@@ -101,7 +109,7 @@ class NativeBugsnagPerformanceImpl {
     return map;
   }
 
-  public String requestEntropy() {
+  String requestEntropy() {
     byte[] bytes = new byte[1024];
     random.nextBytes(bytes);
 
@@ -116,16 +124,16 @@ class NativeBugsnagPerformanceImpl {
     return hex.toString();
   }
 
-  public void requestEntropyAsync(Promise promise) {
+  void requestEntropyAsync(Promise promise) {
     promise.resolve(requestEntropy());
   }
 
-  public boolean isNativePerformanceAvailable() {
+  boolean isNativePerformanceAvailable() {
     return isNativePerformanceAvailable;
   }
 
   @Nullable
-  public WritableMap attachToNativeSDK() {
+  WritableMap attachToNativeSDK() {
     if (!isNativePerformanceAvailable) {
       return null;
     }
@@ -168,7 +176,7 @@ class NativeBugsnagPerformanceImpl {
   }
 
   @Nullable
-  public WritableMap startNativeSpan(String name, ReadableMap options) {
+  WritableMap startNativeSpan(String name, ReadableMap options) {
     if (!isNativePerformanceAvailable) {
       return null;
     }
@@ -185,7 +193,7 @@ class NativeBugsnagPerformanceImpl {
     return nativeSpanToJsSpan(nativeSpan);
   }
 
-  public void markNativeSpanEndTime(String spanId, String traceId, double endTime) {
+  void markNativeSpanEndTime(String spanId, String traceId, double endTime) {
     SpanImpl nativeSpan = openSpans.get(spanId + traceId);
     if (nativeSpan != null) {
       long nativeEndTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)endTime);
@@ -193,7 +201,7 @@ class NativeBugsnagPerformanceImpl {
     }
   }
 
-  public void endNativeSpan(String spanId, String traceId, double endTime, ReadableMap jsAttributes, Promise promise) {
+  void endNativeSpan(String spanId, String traceId, double endTime, ReadableMap jsAttributes, Promise promise) {
     SpanImpl nativeSpan = openSpans.remove(spanId + traceId);
     if (nativeSpan == null) {
       promise.resolve(null);
@@ -210,7 +218,7 @@ class NativeBugsnagPerformanceImpl {
     promise.resolve(null);
   }
 
-  public void discardNativeSpan(String spanId, String traceId, Promise promise) {
+  void discardNativeSpan(String spanId, String traceId, Promise promise) {
     SpanImpl nativeSpan = openSpans.remove(spanId + traceId);
     if (nativeSpan != null) {
       nativeSpan.discard();
@@ -271,6 +279,108 @@ class NativeBugsnagPerformanceImpl {
         entries.remove();
         span.discard();
       }
+    }
+  }
+
+  WritableMap getNativeConstants() {
+    WritableMap map = Arguments.createMap();
+    map.putString("CacheDir", this.reactContext.getCacheDir().getAbsolutePath());
+    map.putString("DocumentDir", this.reactContext.getFilesDir().getAbsolutePath());
+
+    return map;
+  }
+
+  void exists(String path, Promise promise) {
+    try {
+      boolean result = new File(path).exists();
+      promise.resolve(result);
+    } catch(Exception e) {
+      promise.reject(e);
+    }
+  }
+
+  void isDir(String path, Promise promise) {
+    try {
+      boolean result = new File(path).isDirectory();
+      promise.resolve(result);
+    } catch(Exception e) {
+      promise.reject(e);
+    }
+  }
+
+  void ls(String path, Promise promise) {
+    try {
+      String[] files = new File(path).list();
+      WritableArray resultArray = Arguments.createArray();
+      for (String file : files) {
+        resultArray.pushString(file);
+      }
+
+      promise.resolve(resultArray);
+    } catch(Exception e) {
+      promise.reject(e);
+    }
+  }
+
+  void mkdir(String path, Promise promise) {
+    try {
+      File file = new File(path);
+      if (file.exists()) {
+        promise.reject("EEXIST", new Exception("Already exists."));
+        return;
+      }
+
+      boolean result = file.mkdirs();
+      if (result) {
+        promise.resolve(path);
+      } else {
+        promise.reject("EPERM", new Exception("Failed to create directory"));
+      }
+    } catch(Exception e) {
+      promise.reject(e);
+    }
+  }
+
+  void readFile(String path, String encoding, Promise promise) {
+    File file = new File(path);
+    StringBuilder fileContent = new StringBuilder((int) file.length());
+    try(
+      FileInputStream fin = new FileInputStream(file);
+      InputStreamReader isr = new InputStreamReader(fin, encoding);
+    ) {
+      char[] buffer = new char[4096];
+      int charsRead = 0;
+      while ((charsRead = isr.read(buffer)) != -1) {
+        fileContent.append(buffer, 0, charsRead);
+      }
+      promise.resolve(fileContent.toString());
+    } catch (Exception e) {
+      promise.reject(e);
+    }
+  }
+
+  void unlink(String path, Promise promise) {
+    try {
+      boolean result = new File(path).delete();
+      if (result) {
+        promise.resolve(null);
+      } else {
+        promise.reject(new Exception("Failed to delete file/directory"));
+      }
+    } catch(Exception e) {
+      promise.reject(e);
+    }
+  }
+
+  void writeFile(String path, String data, String encoding, Promise promise) {
+    try(
+      FileOutputStream fout = new FileOutputStream(path);
+      Writer w = new OutputStreamWriter(fout, encoding);
+    ) {
+      w.write(data);
+      promise.resolve(null);
+    } catch (Exception e) {
+      promise.reject(e);
     }
   }
 
