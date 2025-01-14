@@ -4,7 +4,6 @@
  */
 
 import { spanContextEquals } from '@bugsnag/core-performance'
-import type { AppState } from '@bugsnag/core-performance'
 import {
   ControllableBackgroundingListener,
   InMemoryDelivery,
