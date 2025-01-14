@@ -1,5 +1,5 @@
 import { isObject } from '@bugsnag/core-performance'
-import type { FileSystem } from 'react-native-file-access'
+import type { FileSystem } from '../persistence/file-native'
 import { Util } from '../persistence'
 import timestampFromFilename from './timestamp-from-filename'
 

@@ -1,16 +1,22 @@
+agents:
+  queue: macos
+
 steps:
 
   #
   # Upload all full pipelines
   #
   - label: ":pipeline_upload: Full browser pipeline"
+    timeout_in_minutes: 2
     commands:
       - buildkite-agent pipeline upload .buildkite/browser-pipeline.full.yml
 
   - label: ":pipeline_upload: Full react native pipeline"
+    timeout_in_minutes: 2
     commands:
       - buildkite-agent pipeline upload .buildkite/react-native-pipeline.full.yml
 
   - label: ":pipeline_upload: Full react native navigation pipeline"
+    timeout_in_minutes: 2
     commands:
       - buildkite-agent pipeline upload .buildkite/react-native-navigation-pipeline.full.yml

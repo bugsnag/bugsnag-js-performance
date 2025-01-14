@@ -1,3 +1,6 @@
+agents:
+  queue: "opensource"
+
 steps:
   - group: "React Native Tests"
     steps:
@@ -6,7 +9,7 @@ steps:
       #
       - label: ':android: Build RN {{matrix.reactnative}} test fixture APK (Old Arch)'
         key: "build-react-native-android-fixture-old-arch-full"
-        timeout_in_minutes: 30
+        timeout_in_minutes: 15
         agents:
           queue: macos-14
         env:
@@ -39,7 +42,7 @@ steps:
 
       - label: ':android: Build RN {{matrix}} test fixture APK (New Arch)'
         key: "build-react-native-android-fixture-new-arch-full"
-        timeout_in_minutes: 30
+        timeout_in_minutes: 15
         agents:
           queue: macos-14
         env:
@@ -65,7 +68,7 @@ steps:
 
       - label: ':mac: Build RN {{matrix}} test fixture ipa (Old Arch)'
         key: "build-react-native-ios-fixture-old-arch-full"
-        timeout_in_minutes: 30
+        timeout_in_minutes: 15
         agents:
           queue: "macos-14"
         env:
@@ -92,7 +95,7 @@ steps:
 
       - label: ':mac: Build RN {{matrix}} test fixture ipa (New Arch)'
         key: "build-react-native-ios-fixture-new-arch-full"
-        timeout_in_minutes: 30
+        timeout_in_minutes: 15
         agents:
           queue: "macos-14"
         env:
@@ -122,7 +125,7 @@ steps:
         #
       - label: ":bitbar: :android: RN {{matrix}} Android 12 (Old Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-old-arch-full"
-        timeout_in_minutes: 60
+        timeout_in_minutes: 30
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/old-arch/{{matrix}}/reactnative.apk"
@@ -160,7 +163,7 @@ steps:
 
       - label: ":bitbar: :android: RN {{matrix}} Android 12 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-new-arch-full"
-        timeout_in_minutes: 60
+        timeout_in_minutes: 30
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/new-arch/{{matrix}}/reactnative.apk"
@@ -199,7 +202,7 @@ steps:
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS 14 (Old Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-old-arch-full"
-        timeout_in_minutes: 60
+        timeout_in_minutes: 30
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/old-arch/{{matrix}}/output/reactnative.ipa"
@@ -237,7 +240,7 @@ steps:
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS 14 (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-new-arch-full"
-        timeout_in_minutes: 60
+        timeout_in_minutes: 30
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/new-arch/{{matrix}}/output/reactnative.ipa"

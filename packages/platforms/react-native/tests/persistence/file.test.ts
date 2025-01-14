@@ -1,10 +1,10 @@
 import { File, ReadOnlyFile, NullFile } from '../../lib/persistence/file'
-import { FileSystem } from 'react-native-file-access'
+// eslint-disable-next-line jest/no-mocks-import
+import { FileSystem } from '../../__mocks__/file-native'
 
 beforeEach(() => {
   // reset the FileSystem mock between tests, otherwise they will interfere
   // with each other
-  // @ts-expect-error this exists on 'FileSystemMock' (see '__mocks__')
   FileSystem.filesystem = new Map<string, string>()
 })
 
