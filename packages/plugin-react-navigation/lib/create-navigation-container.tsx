@@ -4,14 +4,15 @@ import { NavigationContainer, useNavigationContainerRef } from '@react-navigatio
 import type { NavigationContainerProps, NavigationContainerRefWithCurrent } from '@react-navigation/native'
 import React, { forwardRef, useRef } from 'react'
 import { NavigationContextProvider } from './navigation-context'
+import type { AppState } from '../../core/lib/core'
 
 // Prevent rollup plugin from tree shaking NavigationContextProvider
 const Provider = NavigationContextProvider
 
-type CreateNavigationContainer = (NavigationContainerComponent: typeof NavigationContainer, spanFactory: SpanFactory<ReactNativeConfiguration>) => typeof NavigationContainer
+type CreateNavigationContainer = (NavigationContainerComponent: typeof NavigationContainer, spanFactory: SpanFactory<ReactNativeConfiguration>, setAppState: (appState: AppState) => void) => typeof NavigationContainer
 type NavigationContainerRef = NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>
 
-export const createNavigationContainer: CreateNavigationContainer = (NavigationContainerComponent = NavigationContainer, spanFactory: SpanFactory<ReactNativeConfiguration>) => {
+export const createNavigationContainer: CreateNavigationContainer = (NavigationContainerComponent = NavigationContainer, spanFactory: SpanFactory<ReactNativeConfiguration>, setAppState: (appState: AppState) => void) => {
   return forwardRef<NavigationContainerRef, NavigationContainerProps>((props, _ref) => {
     const { onStateChange, ...rest } = props
 
@@ -37,7 +38,7 @@ export const createNavigationContainer: CreateNavigationContainer = (NavigationC
     }
 
     return (
-      <Provider spanFactory={spanFactory} currentRoute={routeName}>
+      <Provider spanFactory={spanFactory} currentRoute={routeName} setAppState={setAppState}>
         <NavigationContainerComponent
           {...rest}
           onStateChange={wrappedOnStateChange}

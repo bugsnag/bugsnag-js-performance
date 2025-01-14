@@ -9,6 +9,7 @@ import { createSchema } from '../lib/config'
 import type { BrowserConfiguration, BrowserSchema } from '../lib/config'
 import { createDefaultRoutingProvider } from '../lib/default-routing-provider'
 import { isRoutingProvider } from '../lib/routing-provider'
+import type { AppState } from '../../../core/lib/core'
 
 jest.useFakeTimers()
 
@@ -20,11 +21,15 @@ describe('DefaultRoutingProvider', () => {
     const delivery = new InMemoryDelivery()
     const routeResolverFn = jest.fn((url: URL | string) => '/resolved-route')
     const routingProvier = new DefaultRoutingProvider(routeResolverFn)
+    let appState: AppState = 'starting'
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, routingProvier),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
+      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -35,6 +40,8 @@ describe('DefaultRoutingProvider', () => {
 
     expect(routeResolverFn).toHaveBeenCalled()
     expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[RouteChange]/resolved-route' }))
+    expect(setAppState).toHaveBeenCalled()
+    expect(appState).toBe('ready')
   })
 
   describe('defaultRouteResolver', () => {
@@ -42,11 +49,15 @@ describe('DefaultRoutingProvider', () => {
       const clock = new IncrementingClock('1970-01-01T00:00:00Z')
       const delivery = new InMemoryDelivery()
       const routingProvier = new DefaultRoutingProvider()
+      let appState: AppState = 'starting'
+      const setAppState = jest.fn((state: AppState) => {
+        appState = state
+      })
       const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         clock,
         deliveryFactory: () => delivery,
         schema: createSchema(window.location.hostname, routingProvier),
-        plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
+        plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
       })
 
       testClient.start({ apiKey: VALID_API_KEY })
@@ -57,6 +68,8 @@ describe('DefaultRoutingProvider', () => {
       await jest.runOnlyPendingTimersAsync()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[RouteChange]/platforms/javascript' }))
+      expect(setAppState).toHaveBeenCalled()
+      expect(appState).toBe('ready')
     })
   })
 })
