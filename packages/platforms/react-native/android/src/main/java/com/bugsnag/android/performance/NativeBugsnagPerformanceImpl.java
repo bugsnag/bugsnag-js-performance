@@ -187,7 +187,15 @@ class NativeBugsnagPerformanceImpl {
     SpanFactory spanFactory = BugsnagPerformance.INSTANCE.getInstrumentedAppState$internal().getSpanFactory();
     SpanImpl nativeSpan = spanFactory.createCustomSpan(name, spanOptions);
 
-    nativeSpan.getAttributes().getEntries$internal().removeIf(entry -> !entry.getKey().equals("bugsnag.sampling.p"));
+    // all span attributes are set from JS, with the exception of the bugsnag.sampling.p attribute
+    // this needs to be preserved as it may not be re-populated when the span is processed
+    Iterator<Map.Entry<String, Object>> entries = nativeSpan.getAttributes().getEntries$internal().iterator();
+    while (entries.hasNext()) {
+      Map.Entry<String, Object> entry = entries.next();
+      if (!entry.getKey().equals("bugsnag.sampling.p")) {
+        entries.remove();
+      }
+    }
 
     String spanKey = EncodingUtils.toHexString(nativeSpan.getSpanId()) + EncodingUtils.toHexString(nativeSpan.getTraceId());
     openSpans.put(spanKey, nativeSpan);
