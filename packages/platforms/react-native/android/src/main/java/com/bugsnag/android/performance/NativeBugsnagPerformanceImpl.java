@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.security.SecureRandom;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -158,17 +159,17 @@ class NativeBugsnagPerformanceImpl {
     result.putInt("attributeStringValueLimit", nativeConfig.getAttributeStringValueLimit());
     result.putInt("attributeArrayLengthLimit", nativeConfig.getAttributeArrayLengthLimit());
 
-    var appVersion = nativeConfig.getAppVersion();
+    String appVersion = nativeConfig.getAppVersion();
     if (appVersion != null) {
       result.putString("appVersion", nativeConfig.getAppVersion());
     }
 
-    var samplingProbability = nativeConfig.getSamplingProbability();
+    Double samplingProbability = nativeConfig.getSamplingProbability();
     if (samplingProbability != null) {
       result.putDouble("samplingProbability", samplingProbability);
     }
 
-    var enabledReleaseStages = nativeConfig.getEnabledReleaseStages();
+    Set<String> enabledReleaseStages = nativeConfig.getEnabledReleaseStages();
     if (enabledReleaseStages != null) {
       result.putArray("enabledReleaseStages", Arguments.fromArray(enabledReleaseStages.toArray(new String[0])));
     }
