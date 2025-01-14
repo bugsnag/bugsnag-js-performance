@@ -40,10 +40,6 @@ describe('FullPageLoadPlugin', () => {
     performance.addEntry(createPerformancePaintTimingFake({ startTime: 128 }))
     performance.addEntry(createPerformanceEventTimingFake({ startTime: 0.4, processingStart: 1 }))
 
-    let appState: AppState = 'starting'
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => {
@@ -54,7 +50,7 @@ describe('FullPageLoadPlugin', () => {
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -91,13 +87,12 @@ describe('FullPageLoadPlugin', () => {
     document.title = 'Full page load'
 
     testClient.start({ apiKey: VALID_API_KEY })
-    expect(appState).toBe('starting')
+    expect(testClient.appState).toBe('starting')
     document.title = 'Updated title'
 
     await jest.runOnlyPendingTimersAsync()
 
-    expect(setAppState).toHaveBeenCalled()
-    expect(appState).toBe('ready')
+    expect(testClient.appState).toBe('ready')
     expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/initial-route' }))
 
     const spans = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans
@@ -125,14 +120,10 @@ describe('FullPageLoadPlugin', () => {
     const performance = new PerformanceFake()
     const Observer = manager.createPerformanceObserverFakeClass()
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
-    let appState: AppState
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -163,16 +154,12 @@ describe('FullPageLoadPlugin', () => {
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const backgroundingListener = new ControllableBackgroundingListener()
     const performance = new PerformanceFake()
-    let appState: AppState
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -205,16 +192,12 @@ describe('FullPageLoadPlugin', () => {
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const backgroundingListener = new ControllableBackgroundingListener()
     const performance = new PerformanceFake()
-    let appState: AppState
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -250,16 +233,12 @@ describe('FullPageLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const backgroundingListener = new ControllableBackgroundingListener()
-    let appState: AppState
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -294,16 +273,12 @@ describe('FullPageLoadPlugin', () => {
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const backgroundingListener = new ControllableBackgroundingListener()
     const performance = new PerformanceFake()
-    let appState: AppState
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -339,16 +314,12 @@ describe('FullPageLoadPlugin', () => {
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const backgroundingListener = new ControllableBackgroundingListener()
     const performance = new PerformanceFake()
-    let appState: AppState = 'starting'
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -365,11 +336,11 @@ describe('FullPageLoadPlugin', () => {
 
     testClient.start({ apiKey: VALID_API_KEY })
 
-    expect(appState).toBe('starting')
+    expect(testClient.appState).toBe('starting')
 
     await jest.runOnlyPendingTimersAsync()
 
-    expect(appState).toBe('ready')
+    expect(testClient.appState).toBe('ready')
 
     backgroundingListener.sendToBackground()
 
@@ -387,16 +358,12 @@ describe('FullPageLoadPlugin', () => {
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const backgroundingListener = new ControllableBackgroundingListener()
     const performance = new PerformanceFake()
-    let appState: AppState
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -442,16 +409,12 @@ describe('FullPageLoadPlugin', () => {
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const backgroundingListener = new ControllableBackgroundingListener()
     const performance = new PerformanceFake()
-    let appState: AppState
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -492,10 +455,6 @@ describe('FullPageLoadPlugin', () => {
     const onSettle: OnSettle = (onSettleCallback) => {
       Promise.resolve().then(() => { onSettleCallback(1234) })
     }
-    let appState: AppState
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
     const performance = new PerformanceFake()
     const manager = new PerformanceObserverManager()
     const Observer = manager.createPerformanceObserverFakeClass()
@@ -504,7 +463,7 @@ describe('FullPageLoadPlugin', () => {
       idGenerator: new IncrementingIdGenerator(),
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -555,10 +514,6 @@ describe('FullPageLoadPlugin', () => {
     const onSettle: OnSettle = (onSettleCallback) => {
       Promise.resolve().then(() => { onSettleCallback(1234) })
     }
-    let appState: AppState
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
     const performance = new PerformanceFake()
     const manager = new PerformanceObserverManager()
     const Observer = manager.createPerformanceObserverFakeClass()
@@ -567,7 +522,7 @@ describe('FullPageLoadPlugin', () => {
       idGenerator: new IncrementingIdGenerator(),
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -617,15 +572,11 @@ describe('FullPageLoadPlugin', () => {
     const delivery = new InMemoryDelivery()
     const onSettle: OnSettle = (onSettleCallback) => { Promise.resolve().then(() => { onSettleCallback(1234) }) }
     const webVitals = new WebVitals(performance, clock, manager.createPerformanceObserverFakeClass())
-    let appState: AppState
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -663,10 +614,6 @@ describe('FullPageLoadPlugin', () => {
       it('uses the latest lcp entry (multiple entries)', async () => {
         const manager = new PerformanceObserverManager()
         const performance = new PerformanceFake()
-        let appState: AppState
-        const setAppState = jest.fn((state: AppState) => {
-          appState = state
-        })
 
         const clock = new IncrementingClock('1970-01-01T00:00:00Z')
         const delivery = new InMemoryDelivery()
@@ -676,7 +623,7 @@ describe('FullPageLoadPlugin', () => {
           clock,
           deliveryFactory: () => delivery,
           schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-          plugins: (spanFactory) => [
+          plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
             new FullPageLoadPlugin(
               document,
               window.location,
@@ -716,10 +663,6 @@ describe('FullPageLoadPlugin', () => {
       it('uses the latest lcp entry (multiple batches)', async () => {
         const manager = new PerformanceObserverManager()
         const performance = new PerformanceFake()
-        let appState: AppState
-        const setAppState = jest.fn((state: AppState) => {
-          appState = state
-        })
         const clock = new IncrementingClock('1970-01-01T00:00:00Z')
         const delivery = new InMemoryDelivery()
         const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
@@ -728,7 +671,7 @@ describe('FullPageLoadPlugin', () => {
           clock,
           deliveryFactory: () => delivery,
           schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-          plugins: (spanFactory) => [
+          plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
             new FullPageLoadPlugin(
               document,
               window.location,
@@ -774,10 +717,6 @@ describe('FullPageLoadPlugin', () => {
       it('handles there being no lcp entry', async () => {
         const manager = new PerformanceObserverManager()
         const performance = new PerformanceFake()
-        let appState: AppState
-        const setAppState = jest.fn((state: AppState) => {
-          appState = state
-        })
 
         const clock = new IncrementingClock('1970-01-01T00:00:00Z')
         const delivery = new InMemoryDelivery()
@@ -787,7 +726,7 @@ describe('FullPageLoadPlugin', () => {
           clock,
           deliveryFactory: () => delivery,
           schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-          plugins: (spanFactory) => [
+          plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
             new FullPageLoadPlugin(
               document,
               window.location,
@@ -822,10 +761,6 @@ describe('FullPageLoadPlugin', () => {
 
     it('handles PerformanceObserver not being available', async () => {
       const performance = new PerformanceFake()
-      let appState: AppState
-      const setAppState = jest.fn((state: AppState) => {
-        appState = state
-      })
 
       const clock = new IncrementingClock('1970-01-01T00:00:00Z')
       const delivery = new InMemoryDelivery()
@@ -835,7 +770,7 @@ describe('FullPageLoadPlugin', () => {
         clock,
         deliveryFactory: () => delivery,
         schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-        plugins: (spanFactory) => [
+        plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
           new FullPageLoadPlugin(
             document,
             window.location,
@@ -873,10 +808,6 @@ describe('FullPageLoadPlugin', () => {
       const onSettle: OnSettle = (onSettleCallback) => {
         Promise.resolve().then(() => { onSettleCallback(1234) })
       }
-      let appState: AppState
-      const setAppState = jest.fn((state: AppState) => {
-        appState = state
-      })
       const performance = new PerformanceFake()
       const manager = new PerformanceObserverManager()
       const Observer = manager.createPerformanceObserverFakeClass()
@@ -885,7 +816,7 @@ describe('FullPageLoadPlugin', () => {
         idGenerator: new IncrementingIdGenerator(),
         schema: createSchema(window.location.hostname, new MockRoutingProvider()),
         deliveryFactory: () => delivery,
-        plugins: (spanFactory) => [
+        plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
           new FullPageLoadPlugin(
             document,
             window.location,
@@ -939,10 +870,6 @@ describe('FullPageLoadPlugin', () => {
       const onSettle: OnSettle = (onSettleCallback) => {
         Promise.resolve().then(() => { onSettleCallback(1234) })
       }
-      let appState: AppState
-      const setAppState = jest.fn((state: AppState) => {
-        appState = state
-      })
       const performance = new PerformanceFake()
       const manager = new PerformanceObserverManager()
       const Observer = manager.createPerformanceObserverFakeClass()
@@ -951,7 +878,7 @@ describe('FullPageLoadPlugin', () => {
         idGenerator: new IncrementingIdGenerator(),
         schema: createSchema(window.location.hostname, new MockRoutingProvider()),
         deliveryFactory: () => delivery,
-        plugins: (spanFactory) => [
+        plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
           new FullPageLoadPlugin(
             document,
             window.location,

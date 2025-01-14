@@ -1,6 +1,5 @@
-import type { SpanFactory } from '@bugsnag/core-performance'
+import type { AppState, SpanFactory } from "@bugsnag/core-performance";
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
-import type { AppState } from '@bugsnag/core-performance'
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native'
 import type { NavigationContainerProps, NavigationContainerRefWithCurrent } from '@react-navigation/native'
 import React, { forwardRef, useRef } from 'react'
