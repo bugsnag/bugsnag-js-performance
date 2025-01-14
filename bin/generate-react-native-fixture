@@ -338,7 +338,7 @@ function replaceGeneratedFixtureFiles() {
 
 function publishLocalAndroidPerformance() {
   // add bugsnag-android-performance as a git submodule
-  execSync(`git submodule add -b integration/react-native-integration https://github.com/bugsnag/bugsnag-android-performance`, { cwd: fixtureDir, stdio: 'inherit' })
+  execSync(`git submodule add -b next https://github.com/bugsnag/bugsnag-android-performance`, { cwd: fixtureDir, stdio: 'inherit' })
 
   // build and publish bugsnag-android-performance to maven local
   execSync(`./gradlew -PVERSION_NAME=9.9.9 clean publishToMavenLocal`, { cwd: `${fixtureDir}/bugsnag-android-performance`, stdio: 'inherit' })
