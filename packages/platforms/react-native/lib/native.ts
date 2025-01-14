@@ -7,8 +7,22 @@ declare const global: {
 
 const isTurboModuleEnabled = () => global.__turboModuleProxy != null
 
-export const NativeBugsnagPerformance = isTurboModuleEnabled()
+const NativeBsgModule = isTurboModuleEnabled()
   ? TurboModuleRegistry.get('BugsnagReactNativePerformance')
   : NativeModules.BugsnagReactNativePerformance
 
-export default NativeBugsnagPerformance as Spec | null
+const NativeBugsnagPerformance = NativeBsgModule || {
+  getDeviceInfo: () => undefined,
+  requestEntropy: () => '',
+  requestEntropyAsync: async () => '',
+  getNativeConstants: () => ({ CacheDir: '', DocumentDir: '' }),
+  exists: async (path: string) => false,
+  isDir: async (path: string) => false,
+  ls: async (path: string) => [],
+  mkdir: async (path: string) => '',
+  readFile: async (path: string, encoding: string) => '',
+  unlink: async (path: string) => { },
+  writeFile: async (path: string, data: string, encoding: string) => { }
+}
+
+export default NativeBugsnagPerformance as Spec
