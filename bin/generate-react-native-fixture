@@ -182,6 +182,14 @@ if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
 /** Update fixture configuration to support React Native 0.64 */
 function configureRN064Fixture(fixtureDir) {
   // Android
+  const gradlePath = resolve(fixtureDir, 'android/build.gradle')
+  let gradle = fs.readFileSync(gradlePath, 'utf8')
+  // add kotlinVersion = "1.4.10" to the buildscript ext block
+  const buildscriptExt = 'ext {'
+  const kotlinVersion = 'kotlinVersion = "1.4.10"'
+  gradle = gradle.replace(buildscriptExt, `${buildscriptExt}\n        ${kotlinVersion}`)
+  fs.writeFileSync(gradlePath, gradle)
+
   const moduleGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
   let moduleGradle = fs.readFileSync(moduleGradlePath, 'utf8')
 
