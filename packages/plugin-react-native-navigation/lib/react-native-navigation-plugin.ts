@@ -1,7 +1,6 @@
-import type { Plugin, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
+import type { AppState, Plugin, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import type { NavigationDelegate } from 'react-native-navigation/lib/dist/src/NavigationDelegate'
-import type { AppState } from '../../core/lib/core'
 
 import { createNavigationSpan } from '@bugsnag/react-native-performance'
 

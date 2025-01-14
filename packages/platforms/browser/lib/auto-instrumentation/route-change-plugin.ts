@@ -1,10 +1,9 @@
 import { coreSpanOptionSchema, isString, isObject } from '@bugsnag/core-performance'
-import type { InternalConfiguration, Plugin, Span, SpanFactory, SpanOptionSchema, Time } from '@bugsnag/core-performance'
+import type { InternalConfiguration, Plugin, Span, SpanFactory, SpanOptionSchema, Time, AppState } from '@bugsnag/core-performance'
 import type { BrowserConfiguration } from '../config'
 import type { RouteChangeSpanEndOptions, RouteChangeSpanOptions } from '../routing-provider'
 import { getPermittedAttributes } from '../send-page-attributes'
 import { defaultRouteResolver } from '../default-routing-provider'
-import type { AppState } from '../../../../core/lib/core'
 
 // exclude isFirstClass from the route change option schema
 const { startTime, parentContext, makeCurrentContext } = coreSpanOptionSchema

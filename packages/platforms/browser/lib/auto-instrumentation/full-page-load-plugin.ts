@@ -1,4 +1,4 @@
-import type { ParentContext, BackgroundingListener, InternalConfiguration, Plugin, SpanFactory } from '@bugsnag/core-performance'
+import type { ParentContext, BackgroundingListener, InternalConfiguration, Plugin, SpanFactory, AppState } from '@bugsnag/core-performance'
 import type { BrowserConfiguration } from '../config'
 import type { OnSettle } from '../on-settle'
 import type { PerformanceWithTiming } from '../on-settle/load-event-end-settler'
@@ -6,7 +6,6 @@ import { getPermittedAttributes } from '../send-page-attributes'
 import type { WebVitals } from '../web-vitals'
 import { instrumentPageLoadPhaseSpans } from './page-load-phase-spans'
 import { defaultRouteResolver } from '../default-routing-provider'
-import type { AppState } from '../../../../core/lib/core'
 
 export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   private readonly spanFactory: SpanFactory<BrowserConfiguration>

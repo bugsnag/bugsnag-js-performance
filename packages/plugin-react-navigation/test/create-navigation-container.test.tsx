@@ -1,5 +1,6 @@
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import type { AppState } from '@bugsnag/core-performance'
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native'
 import type { ParamListBase } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
@@ -8,7 +9,6 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import React from 'react'
 import { Button, Text, View } from 'react-native'
 import { createNavigationContainer } from '../lib/create-navigation-container'
-import type { AppState } from '../../core/lib/core'
 
 beforeEach(() => {
   jest.useFakeTimers()

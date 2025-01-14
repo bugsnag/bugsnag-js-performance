@@ -1,4 +1,5 @@
 import type {
+  AppState,
   Clock,
   InternalConfiguration,
   Plugin,
@@ -9,7 +10,6 @@ import React from 'react'
 import type { AppRegistry, WrapperComponentProvider } from 'react-native'
 import type { ReactNativeConfiguration } from '../config'
 import { createAppStartSpan } from '../create-app-start-span'
-import type { AppState } from '../../../../core/lib/core'
 
 interface WrapperProps {
   children: ReactNode

@@ -4,6 +4,7 @@
  */
 
 import { spanContextEquals } from '@bugsnag/core-performance'
+import type { AppState } from '@bugsnag/core-performance'
 import {
   ControllableBackgroundingListener,
   InMemoryDelivery,
@@ -27,7 +28,6 @@ import {
   createPerformancePaintTimingFake
 } from '../utilities'
 import MockRoutingProvider from '../utilities/mock-routing-provider'
-import type { AppState } from '../../../../core/lib/core'
 
 jest.useFakeTimers()
 

@@ -1,12 +1,12 @@
 import { VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
+import type { AppState } from '@bugsnag/core-performance'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import React, { useState } from 'react'
 import { Button, View } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 import { CompleteNavigation } from '../lib/CompleteNavigation'
 import ReactNativeNavigationPlugin from '../lib/react-native-navigation-plugin'
-import type { AppState } from '../../core/lib/core'
 
 jest.mock('react-native-navigation')
 

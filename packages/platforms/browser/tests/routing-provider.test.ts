@@ -4,12 +4,12 @@
  */
 
 import { InMemoryDelivery, IncrementingClock, VALID_API_KEY, createTestClient } from '@bugsnag/js-performance-test-utilities'
+import type { AppState } from '@bugsnag/core-performance'
 import { RouteChangePlugin } from '../lib/auto-instrumentation/route-change-plugin'
 import { createSchema } from '../lib/config'
 import type { BrowserConfiguration, BrowserSchema } from '../lib/config'
 import { createDefaultRoutingProvider } from '../lib/default-routing-provider'
 import { isRoutingProvider } from '../lib/routing-provider'
-import type { AppState } from '../../../core/lib/core'
 
 jest.useFakeTimers()
 
