@@ -1,16 +1,16 @@
+import type { AppState, Clock, SetAppState } from '@bugsnag/core-performance'
 import { MockSpanFactory, createConfiguration } from '@bugsnag/js-performance-test-utilities'
-import type { Clock, AppState } from '@bugsnag/core-performance'
-import createClock from '../../lib/clock'
-import { AppStartPlugin } from '../../lib/auto-instrumentation/app-start-plugin'
-import type { ReactNativeConfiguration } from '../../lib/config'
 import type { AppRegistry } from 'react-native'
+import { AppStartPlugin } from '../../lib/auto-instrumentation/app-start-plugin'
+import createClock from '../../lib/clock'
+import type { ReactNativeConfiguration } from '../../lib/config'
 
 describe('app start plugin', () => {
   let spanFactory: MockSpanFactory<ReactNativeConfiguration>
   let clock: Clock
   let appRegistry: typeof AppRegistry
-  let setAppState: (appState: AppState) => void
-  let appState: AppState
+  const setAppState: SetAppState = jest.fn()
+  const appState: AppState = 'starting'
 
   beforeEach(() => {
     spanFactory = new MockSpanFactory()
@@ -18,7 +18,6 @@ describe('app start plugin', () => {
     appRegistry = {
       setWrapperComponentProvider: jest.fn()
     } as unknown as typeof AppRegistry
-    appState = 'starting'
   })
 
   it('starts an app start span when autoInstrumentAppStarts is true', () => {
@@ -32,8 +31,6 @@ describe('app start plugin', () => {
         startTime: appStartTime,
         parentContext: null
       }))
-
-    expect(appState).toBe('starting')
 
     expect(appRegistry.setWrapperComponentProvider).toHaveBeenCalledWith(expect.any(Function))
   })

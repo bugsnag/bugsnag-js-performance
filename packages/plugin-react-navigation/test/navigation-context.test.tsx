@@ -1,4 +1,4 @@
-import type { AppState, SpanFactory } from '@bugsnag/core-performance'
+import type { AppState, SetAppState, SpanFactory } from '@bugsnag/core-performance'
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import { fireEvent, render, screen } from '@testing-library/react-native'
@@ -223,7 +223,7 @@ const Route = () => {
 
 interface AppProps {
   spanFactory: SpanFactory<ReactNativeConfiguration>
-  setAppState: (appState: AppState) => void
+  setAppState: SetAppState
 }
 
 const App = ({ spanFactory, setAppState }: AppProps) => {
