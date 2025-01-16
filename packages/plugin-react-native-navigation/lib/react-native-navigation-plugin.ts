@@ -18,11 +18,10 @@ class BugsnagPluginReactNativeNavigationPerformance implements Plugin<ReactNativ
   private componentsWaiting = 0
   private spanFactory?: SpanFactory<ReactNativeConfiguration>
   private previousRoute?: string
-  private setAppState: (appState: AppState) => void
+  private setAppState?: (appState: AppState) => void
 
-  constructor (Navigation: NavigationDelegate, setAppState: (appState: AppState) => void) {
+  constructor (Navigation: NavigationDelegate) {
     this.Navigation = Navigation
-    this.setAppState = setAppState
   }
 
   private clearActiveSpan () {
@@ -37,7 +36,9 @@ class BugsnagPluginReactNativeNavigationPerformance implements Plugin<ReactNativ
       this.currentNavigationSpan.setAttribute('bugsnag.navigation.ended_by', endedBy)
       this.spanFactory.endSpan(this.currentNavigationSpan, endTime)
       this.clearActiveSpan()
-      this.setAppState('ready')
+      if (this.setAppState) {
+        this.setAppState('ready')
+      }
     }
   }
 
@@ -69,8 +70,9 @@ class BugsnagPluginReactNativeNavigationPerformance implements Plugin<ReactNativ
     }
   }
 
-  configure (configuration: ReactNativeConfiguration, spanFactory: SpanFactory<ReactNativeConfiguration>) {
+  configure (configuration: ReactNativeConfiguration, spanFactory: SpanFactory<ReactNativeConfiguration>, setAppState: (appState: AppState) => void) {
     this.spanFactory = spanFactory
+    this.setAppState = setAppState
 
     // Potential for a navigation to occur
     this.Navigation.events().registerCommandListener((name, params) => {
@@ -84,8 +86,11 @@ class BugsnagPluginReactNativeNavigationPerformance implements Plugin<ReactNativ
     // Navigation has occurred
     this.Navigation.events().registerComponentWillAppearListener(event => {
       if (typeof this.startTime === 'number') {
+        if (this.setAppState) {
+          this.setAppState('navigating')
+        }
+
         clearTimeout(this.startTimeout)
-        this.setAppState('navigating')
         const routeName = event.componentName
         this.currentNavigationSpan = createNavigationSpan(spanFactory, routeName, { startTime: this.startTime })
         this.currentNavigationSpan.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-native-navigation-performance')
