@@ -1,4 +1,4 @@
-import type { ParentContext, BackgroundingListener, InternalConfiguration, Plugin, SpanFactory, AppState } from '@bugsnag/core-performance'
+import type { ParentContext, BackgroundingListener, InternalConfiguration, Plugin, SpanFactory, AppState, SetAppState } from '@bugsnag/core-performance'
 import type { BrowserConfiguration } from '../config'
 import type { OnSettle } from '../on-settle'
 import type { PerformanceWithTiming } from '../on-settle/load-event-end-settler'
@@ -14,7 +14,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   private readonly onSettle: OnSettle
   private readonly webVitals: WebVitals
   private readonly performance: PerformanceWithTiming
-  private readonly setAppState: (appState: AppState) => void
+  private readonly setAppState: SetAppState
   private readonly appState: AppState
 
   // if the page was backgrounded at any point in the loading process a page
@@ -29,7 +29,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     onSettle: OnSettle,
     backgroundingListener: BackgroundingListener,
     performance: PerformanceWithTiming,
-    setAppState: (appState: AppState) => void,
+    setAppState: SetAppState,
     appState: AppState
   ) {
     this.document = document

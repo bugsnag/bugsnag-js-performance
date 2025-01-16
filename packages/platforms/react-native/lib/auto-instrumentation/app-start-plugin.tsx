@@ -3,6 +3,7 @@ import type {
   Clock,
   InternalConfiguration,
   Plugin,
+  SetAppState,
   SpanFactory
 } from '@bugsnag/core-performance'
 import type { ReactNode } from 'react'
@@ -23,7 +24,7 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
   private readonly spanFactory: SpanFactory<ReactNativeConfiguration>
   private readonly clock: Clock
   private readonly appRegistry: typeof AppRegistry
-  private readonly setAppState: (appState: AppState) => void
+  private readonly setAppState: SetAppState
   private readonly appState: AppState
 
   constructor (
@@ -31,7 +32,7 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
     spanFactory: SpanFactory<ReactNativeConfiguration>,
     clock: Clock,
     appRegistry: typeof AppRegistry,
-    setAppState: (appState: AppState) => void,
+    setAppState: SetAppState,
     appState: AppState
   ) {
     this.appStartTime = appStartTime

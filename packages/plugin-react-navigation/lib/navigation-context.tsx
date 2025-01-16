@@ -1,9 +1,9 @@
-import type { AppState, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
+import type { SetAppState, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import type { PropsWithChildren } from 'react'
 
-import React from 'react'
 import { createNavigationSpan } from '@bugsnag/react-native-performance'
+import React from 'react'
 
 export const NavigationContext = React.createContext({
   blockNavigationEnd: () => {},
@@ -14,7 +14,7 @@ export const NavigationContext = React.createContext({
 interface Props extends PropsWithChildren {
   currentRoute?: string
   spanFactory: SpanFactory<ReactNativeConfiguration>
-  setAppState: (appState: AppState) => void
+  setAppState: SetAppState
 }
 
 type EndCondition = 'condition' | 'mount' | 'unmount' | 'immediate'

@@ -1,5 +1,5 @@
 import { coreSpanOptionSchema, isString, isObject } from '@bugsnag/core-performance'
-import type { InternalConfiguration, Plugin, Span, SpanFactory, SpanOptionSchema, Time, AppState } from '@bugsnag/core-performance'
+import type { InternalConfiguration, Plugin, Span, SpanFactory, SpanOptionSchema, Time, AppState, SetAppState } from '@bugsnag/core-performance'
 import type { BrowserConfiguration } from '../config'
 import type { RouteChangeSpanEndOptions, RouteChangeSpanOptions } from '../routing-provider'
 import { getPermittedAttributes } from '../send-page-attributes'
@@ -28,7 +28,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
     private readonly spanFactory: SpanFactory<BrowserConfiguration>,
     private readonly location: Location,
     private readonly document: Document,
-    private readonly setAppState: (appState: AppState) => void
+    private readonly setAppState: SetAppState
   ) {}
 
   configure (configuration: InternalConfiguration<BrowserConfiguration>) {

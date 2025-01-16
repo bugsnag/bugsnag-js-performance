@@ -6,25 +6,26 @@ import ReactNativeNavigationPlugin from '../lib/react-native-navigation-plugin'
 
 jest.mock('react-native-navigation')
 
+let appState: AppState = 'starting'
+
 beforeEach(() => {
   jest.useFakeTimers()
+  appState = 'starting'
 })
 
 afterEach(() => {
   jest.useRealTimers()
 })
 
-let appState: AppState
-
 describe('ReactNativeNavigationPlugin', () => {
   it('creates a navigation span when the route changes', () => {
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
-    const plugin = new ReactNativeNavigationPlugin(Navigation, setAppState)
+    const setAppState = jest.fn((state: AppState) => { appState = state })
+    const plugin = new ReactNativeNavigationPlugin(Navigation)
     const configuration = createConfiguration<ReactNativeConfiguration>()
     const spanFactory = new MockSpanFactory()
-    plugin.configure(configuration, spanFactory)
+    plugin.configure(configuration, spanFactory, setAppState)
+
+    expect(appState).toBe('starting')
 
     // Simulate a route change
     jest.mocked(Navigation.events().registerCommandListener).mock.calls[0][0]('push', {
@@ -58,13 +59,13 @@ describe('ReactNativeNavigationPlugin', () => {
   })
 
   it('does not end the current navigation while there are components waiting', () => {
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
-    const plugin = new ReactNativeNavigationPlugin(Navigation, setAppState)
+    const setAppState = jest.fn((state: AppState) => { appState = state })
+    const plugin = new ReactNativeNavigationPlugin(Navigation)
     const configuration = createConfiguration<ReactNativeConfiguration>()
     const spanFactory = new MockSpanFactory()
-    plugin.configure(configuration, spanFactory)
+    plugin.configure(configuration, spanFactory, setAppState)
+
+    expect(appState).toBe('starting')
 
     // Simulate a route change
     jest.mocked(Navigation.events().registerCommandListener).mock.calls[1][0]('push', {
@@ -116,13 +117,13 @@ describe('ReactNativeNavigationPlugin', () => {
   })
 
   it('discards the active navigation span when the route changes', () => {
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
-    const plugin = new ReactNativeNavigationPlugin(Navigation, setAppState)
+    const setAppState = jest.fn((state: AppState) => { appState = state })
+    const plugin = new ReactNativeNavigationPlugin(Navigation)
     const configuration = createConfiguration<ReactNativeConfiguration>()
     const spanFactory = new MockSpanFactory()
-    plugin.configure(configuration, spanFactory)
+    plugin.configure(configuration, spanFactory, setAppState)
+
+    expect(appState).toBe('starting')
 
     // Simulate a route change
     jest.mocked(Navigation.events().registerCommandListener).mock.calls[2][0]('push', {
@@ -135,6 +136,8 @@ describe('ReactNativeNavigationPlugin', () => {
       componentName: 'FirstScreen',
       componentType: 'Component'
     })
+
+    expect(appState).toBe('navigating')
 
     jest.advanceTimersByTime(50)
 

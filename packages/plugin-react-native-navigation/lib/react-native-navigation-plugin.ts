@@ -1,4 +1,4 @@
-import type { AppState, Plugin, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
+import type { Plugin, SetAppState, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import type { NavigationDelegate } from 'react-native-navigation/lib/dist/src/NavigationDelegate'
 
@@ -18,7 +18,7 @@ class BugsnagPluginReactNativeNavigationPerformance implements Plugin<ReactNativ
   private componentsWaiting = 0
   private spanFactory?: SpanFactory<ReactNativeConfiguration>
   private previousRoute?: string
-  private setAppState?: (appState: AppState) => void
+  private setAppState?: SetAppState
 
   constructor (Navigation: NavigationDelegate) {
     this.Navigation = Navigation
@@ -70,7 +70,7 @@ class BugsnagPluginReactNativeNavigationPerformance implements Plugin<ReactNativ
     }
   }
 
-  configure (configuration: ReactNativeConfiguration, spanFactory: SpanFactory<ReactNativeConfiguration>, setAppState: (appState: AppState) => void) {
+  configure (_configuration: ReactNativeConfiguration, spanFactory: SpanFactory<ReactNativeConfiguration>, setAppState: SetAppState) {
     this.spanFactory = spanFactory
     this.setAppState = setAppState
 
