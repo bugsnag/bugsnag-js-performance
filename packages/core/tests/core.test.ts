@@ -342,7 +342,7 @@ describe('Core', () => {
 
               await jest.runOnlyPendingTimersAsync()
 
-              expect(deliveryFactory).toHaveBeenCalledWith('https://a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6.otlp.bugsnag.com/v1/traces')
+              expect(deliveryFactory).toHaveBeenCalledWith('https://a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6.otlp.bugsnag.com/v1/traces', false)
             })
           })
 
@@ -356,7 +356,7 @@ describe('Core', () => {
 
               await jest.runOnlyPendingTimersAsync()
 
-              expect(deliveryFactory).toHaveBeenCalledWith('https://my-custom-otel-repeater.com')
+              expect(deliveryFactory).toHaveBeenCalledWith('https://my-custom-otel-repeater.com', false)
             })
           })
         })
