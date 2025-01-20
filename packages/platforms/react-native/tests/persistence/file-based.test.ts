@@ -1,7 +1,8 @@
 import { File, ReadOnlyFile } from '../../lib/persistence/file'
 import FileBasedPersistence from '../../lib/persistence/file-based'
-import { FileSystem } from 'react-native-file-access'
 import { Platform } from 'react-native'
+// eslint-disable-next-line jest/no-mocks-import
+import { FileSystem } from '../../__mocks__/file-native'
 
 const PATH = '/test/path/persistent-state.json'
 const NATIVE_DEVICE_ID_PATH_IOS = '/mock/CacheDir/bugsnag-shared-my.cool.app/device-id.json'
@@ -16,7 +17,6 @@ describe('FileBasedPersistence', () => {
   beforeEach(() => {
     // reset the FileSystem mock between tests, otherwise they will interfere
     // with each other
-    // @ts-expect-error this exists on 'FileSystemMock' (see '__mocks__')
     FileSystem.filesystem = new Map<string, string>()
   })
 

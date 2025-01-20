@@ -3,12 +3,12 @@ import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
 import { Platform } from 'react-native'
 import type { ReactNativeConfiguration } from '../lib/config'
 import resourceAttributesSourceFactory from '../lib/resource-attributes-source'
-import NativeBugsnagPerformance from '../lib/NativeBugsnagPerformance'
+import NativeBugsnagPerformance from '../lib/native'
 
 describe('resourceAttributesSource', () => {
   it('includes all expected attributes (iOS)', async () => {
     const configuration = createConfiguration<ReactNativeConfiguration>({ releaseStage: 'test', appVersion: '1.0.0', codeBundleId: '12345678' })
-    const deviceInfo = NativeBugsnagPerformance?.getDeviceInfo()
+    const deviceInfo = NativeBugsnagPerformance.getDeviceInfo()
     const resourceAttributesSource = resourceAttributesSourceFactory(new InMemoryPersistence(), deviceInfo)
     const resourceAttributes = await resourceAttributesSource(configuration)
     const jsonAttributes = resourceAttributes.toJson()
@@ -39,7 +39,7 @@ describe('resourceAttributesSource', () => {
     //                  our Platform mock (see '__mocks__/react-native.ts')
     await Platform.bugsnagWithTestPlatformSetTo('android', async () => {
       const configuration = createConfiguration<ReactNativeConfiguration>({ releaseStage: 'test', appVersion: '1.0.0', codeBundleId: '12345678' })
-      const deviceInfo = NativeBugsnagPerformance?.getDeviceInfo()
+      const deviceInfo = NativeBugsnagPerformance.getDeviceInfo()
       const resourceAttributesSource = resourceAttributesSourceFactory(new InMemoryPersistence(), deviceInfo)
       const resourceAttributes = await resourceAttributesSource(configuration)
       const jsonAttributes = resourceAttributes.toJson()

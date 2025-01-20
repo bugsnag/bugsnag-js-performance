@@ -34,7 +34,7 @@ public class BugsnagReactNativePerformancePackage extends TurboReactPackage {
             NativeBugsnagPerformanceImpl.MODULE_NAME,
             false, // canOverrideExistingModule
             true,  // needsEagerInit
-            false, // hasConstants
+            true, // hasConstants
             false, // isCxxModule
             true   // isTurboModule
           )

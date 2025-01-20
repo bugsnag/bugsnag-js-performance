@@ -1,15 +1,9 @@
 import type { BitLength, IdGenerator } from '@bugsnag/core-performance'
-import type { Spec as NativeBugsnag } from './NativeBugsnagPerformance'
+import NativeBugsnagPerformance from './native'
 
 const POOL_SIZE = 1024
 
 const CALLS_BEFORE_POOL_REFRESH = 1000
-
-const isNativeModuleEnabled = (nativeModule: NativeBugsnag | null): nativeModule is NativeBugsnag => {
-  return nativeModule !== null &&
-  typeof nativeModule.requestEntropy === 'function' &&
-  typeof nativeModule.requestEntropyAsync === 'function'
-}
 
 export function toHex (value: number): string {
   const hex = value.toString(16)
@@ -32,19 +26,18 @@ export function createRandomString (): string {
   return random
 }
 
-function createIdGenerator (NativeBugsnagPerformance: NativeBugsnag | null, isDebuggingRemotely = false): IdGenerator {
+function createIdGenerator (isDebuggingRemotely = false): IdGenerator {
   // If the native module is not available or remote debugging is enabled, fall back to a JS implementation
-  const requestEntropy = isNativeModuleEnabled(NativeBugsnagPerformance) && !isDebuggingRemotely
+  const requestEntropy = !isDebuggingRemotely
     ? NativeBugsnagPerformance.requestEntropy
     : createRandomString
-  const requestEntropyAsync = isNativeModuleEnabled(NativeBugsnagPerformance) ? NativeBugsnagPerformance.requestEntropyAsync : async () => createRandomString()
 
   // initialise the pool synchronously
   const randomValues = requestEntropy()
   let randomPool = randomValues.length > 0 ? randomValues : createRandomString()
 
   const regeneratePool = async () => {
-    const randomValues = await requestEntropyAsync()
+    const randomValues = await NativeBugsnagPerformance.requestEntropyAsync()
     randomPool = randomValues.length > 0 ? randomValues : createRandomString()
   }
 

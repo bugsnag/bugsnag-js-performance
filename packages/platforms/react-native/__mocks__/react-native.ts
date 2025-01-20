@@ -133,7 +133,20 @@ const BugsnagReactNativePerformance = {
   }),
   requestEntropyAsync: jest.fn(() => {
     return Promise.resolve(createPool())
-  })
+  }),
+  getNativeConstants () {
+    return {
+      CacheDir: '/mock/CacheDir',
+      DocumentDir: '/mock/DocumentDir'
+    }
+  },
+  exists: jest.fn(),
+  isDir: jest.fn(),
+  ls: jest.fn(),
+  mkdir: jest.fn(),
+  readFile: jest.fn(),
+  unlink: jest.fn(),
+  writeFile: jest.fn()
 }
 
 export const TurboModuleRegistry = {
@@ -146,6 +159,10 @@ export const TurboModuleRegistry = {
         return null
     }
   }
+}
+
+export const NativeModules = {
+  BugsnagReactNativePerformance
 }
 
 export type AppStateStatus = 'active' | 'inactive' | 'background'
