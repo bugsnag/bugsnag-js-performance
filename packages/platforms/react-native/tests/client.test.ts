@@ -70,24 +70,16 @@ beforeEach(() => {
 
 describe('React Native client tests', () => {
   describe('attach()', () => {
-    it('logs a warning and noops if native performance is not available', () => {
+    it('throws an error if native performance is not available', () => {
       turboModule.isNativePerformanceAvailable = jest.fn().mockReturnValue(false)
-
       client = require('../lib/client').default
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
-
-      client.attach({})
-      expect(warnSpy).toHaveBeenCalledWith('Could not attach to native SDK. No compatible version of Bugsnag Cocoa Performance was found.')
+      expect(client.attach).toThrow('Could not attach to native SDK. No compatible version of Bugsnag Cocoa Performance was found.')
     })
 
-    it('logs a warning and noops if native performance has not been started', () => {
+    it('throws an error if native performance has not been started', () => {
       turboModule.attachToNativeSDK = jest.fn().mockReturnValue(null)
-
       client = require('../lib/client').default
-      const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
-
-      client.attach()
-      expect(warnSpy).toHaveBeenCalledWith('Could not attach to native SDK. Bugsnag Cocoa Performance has not been started.')
+      expect(client.attach).toThrow('Could not attach to native SDK. Bugsnag Cocoa Performance has not been started.')
     })
 
     it('starts the client using the native configuration', () => {

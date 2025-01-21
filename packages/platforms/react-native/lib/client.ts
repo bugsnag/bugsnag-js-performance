@@ -37,7 +37,6 @@ const backgroundingListener = createBrowserBackgroundingListener(AppState)
 const xhrRequestTracker = createXmlHttpRequestTracker(XMLHttpRequest, clock)
 
 const idGenerator = createIdGenerator(isDebuggingRemotely)
-const schema = createSchema()
 const BugsnagPerformance = createClient({
   backgroundingListener,
   clock,
@@ -49,11 +48,11 @@ const BugsnagPerformance = createClient({
     new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrRequestTracker)
   ],
   resourceAttributesSource,
-  schema,
+  schema: createSchema(),
   spanAttributesSource,
   retryQueueFactory: createRetryQueueFactory(FileSystem),
   spanFactory: ReactNativeSpanFactory,
-  platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(appStartTime, clock, schema, spanFactory as ReactNativeSpanFactory, spanContextStorage)
+  platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(appStartTime, clock, spanFactory as ReactNativeSpanFactory, spanContextStorage)
 })
 
 export default BugsnagPerformance
