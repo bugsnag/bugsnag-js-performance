@@ -1,5 +1,4 @@
 import { ReactNativeSpanFactory } from '../lib/span-factory'
-import createSchema from '../lib/config'
 import { platformExtensions } from '../lib/platform-extensions'
 import { createTestClient, IncrementingClock, InMemoryDelivery, VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 
@@ -12,7 +11,7 @@ describe('startNavigationSpan', () => {
     const testClient = createTestClient({
       deliveryFactory: () => delivery,
       spanFactory: ReactNativeSpanFactory,
-      platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(0, clock, createSchema(), spanFactory as ReactNativeSpanFactory, spanContextStorage)
+      platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(0, clock, spanFactory as ReactNativeSpanFactory, spanContextStorage)
     })
 
     testClient.start({ apiKey: VALID_API_KEY })

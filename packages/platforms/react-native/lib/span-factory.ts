@@ -24,7 +24,7 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
   }
 
   protected createSpanInternal (name: string, options: ReactNativeSpanOptions, attributes: SpanAttributes) {
-    if (!NativeBugsnagPerformance || !this.attachedToNative || options.isFirstClass !== true || options.doNotDelegateToNativeSDK === true) {
+    if (!this.attachedToNative || options.isFirstClass !== true || options.doNotDelegateToNativeSDK === true) {
       return super.createSpanInternal(name, options, attributes)
     }
 
@@ -37,7 +37,7 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
 
   protected discardSpan (span: NativeSpanInternal) {
     if (span.isNativeSpan) {
-      NativeBugsnagPerformance?.discardNativeSpan(span.id, span.traceId)
+      NativeBugsnagPerformance.discardNativeSpan(span.id, span.traceId)
     }
 
     super.discardSpan(span)
@@ -55,9 +55,9 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
       const unixEndTimeNanos = (this.clock as ReactNativeClock).toUnixNanoseconds(endTime)
       const attributes = spanEnded.attributes.toObject()
       delete attributes['bugsnag.sampling.p']
-      NativeBugsnagPerformance?.endNativeSpan(spanEnded.id, spanEnded.traceId, unixEndTimeNanos, attributes)
+      NativeBugsnagPerformance.endNativeSpan(spanEnded.id, spanEnded.traceId, unixEndTimeNanos, attributes)
     } else {
-      NativeBugsnagPerformance?.discardNativeSpan(spanEnded.id, spanEnded.traceId)
+      NativeBugsnagPerformance.discardNativeSpan(spanEnded.id, spanEnded.traceId)
     }
   }
 
