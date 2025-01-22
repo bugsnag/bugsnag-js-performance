@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.security.SecureRandom;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -158,17 +159,17 @@ class NativeBugsnagPerformanceImpl {
     result.putInt("attributeStringValueLimit", nativeConfig.getAttributeStringValueLimit());
     result.putInt("attributeArrayLengthLimit", nativeConfig.getAttributeArrayLengthLimit());
 
-    var appVersion = nativeConfig.getAppVersion();
+    String appVersion = nativeConfig.getAppVersion();
     if (appVersion != null) {
       result.putString("appVersion", nativeConfig.getAppVersion());
     }
 
-    var samplingProbability = nativeConfig.getSamplingProbability();
+    Double samplingProbability = nativeConfig.getSamplingProbability();
     if (samplingProbability != null) {
       result.putDouble("samplingProbability", samplingProbability);
     }
 
-    var enabledReleaseStages = nativeConfig.getEnabledReleaseStages();
+    Set<String> enabledReleaseStages = nativeConfig.getEnabledReleaseStages();
     if (enabledReleaseStages != null) {
       result.putArray("enabledReleaseStages", Arguments.fromArray(enabledReleaseStages.toArray(new String[0])));
     }
@@ -186,7 +187,15 @@ class NativeBugsnagPerformanceImpl {
     SpanFactory spanFactory = BugsnagPerformance.INSTANCE.getInstrumentedAppState$internal().getSpanFactory();
     SpanImpl nativeSpan = spanFactory.createCustomSpan(name, spanOptions);
 
-    nativeSpan.getAttributes().getEntries$internal().removeIf(entry -> !entry.getKey().equals("bugsnag.sampling.p"));
+    // all span attributes are set from JS, with the exception of the bugsnag.sampling.p attribute
+    // this needs to be preserved as it may not be re-populated when the span is processed
+    Iterator<Map.Entry<String, Object>> entries = nativeSpan.getAttributes().getEntries$internal().iterator();
+    while (entries.hasNext()) {
+      Map.Entry<String, Object> entry = entries.next();
+      if (!entry.getKey().equals("bugsnag.sampling.p")) {
+        entries.remove();
+      }
+    }
 
     String spanKey = EncodingUtils.toHexString(nativeSpan.getSpanId()) + EncodingUtils.toHexString(nativeSpan.getTraceId());
     openSpans.put(spanKey, nativeSpan);

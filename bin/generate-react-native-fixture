@@ -128,12 +128,6 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
 // generate Android Fixture
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
-  // build and publish bugsnag-android-performance to local maven repo
-  // this is required even if we're not building the native integration fixture because
-  // @bugsnag/react-native-performance has a compileOnly dependency on bugsnag-android-performance
-  // TODO: remove this once changes have been released in bugsnag-android-performance
-  publishLocalAndroidPerformance()
-
   execFileSync('./gradlew', ['assembleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
   fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
 }
@@ -182,6 +176,14 @@ if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
 /** Update fixture configuration to support React Native 0.64 */
 function configureRN064Fixture(fixtureDir) {
   // Android
+  const gradlePath = resolve(fixtureDir, 'android/build.gradle')
+  let gradle = fs.readFileSync(gradlePath, 'utf8')
+  // add kotlinVersion = "1.4.10" to the buildscript ext block
+  const buildscriptExt = 'ext {'
+  const kotlinVersion = 'kotlinVersion = "1.4.10"'
+  gradle = gradle.replace(buildscriptExt, `${buildscriptExt}\n        ${kotlinVersion}`)
+  fs.writeFileSync(gradlePath, gradle)
+
   const moduleGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
   let moduleGradle = fs.readFileSync(moduleGradlePath, 'utf8')
 
@@ -212,18 +214,6 @@ function configureRN064Fixture(fixtureDir) {
 
   moduleGradle = moduleGradle.replace(currentReactConfig, updatedReactConfig).replace(flipperDependencies, '')
   fs.writeFileSync(moduleGradlePath, moduleGradle)
-
-  // iOS
-  const podfilePath = resolve(fixtureDir, 'ios/Podfile')
-  let podfile = fs.readFileSync(podfilePath, 'utf8')
-
-  // disable flipper
-  podfile = podfile.replace("use_flipper!", "# use_flipper!")
-
-  // bump the minimum iOS version to 11
-  podfile = podfile.replace("platform :ios, '10.0'", "platform :ios, '11.0'")
-
-  fs.writeFileSync(podfilePath, podfile)
 
   // set --openssl-legacy-provider node option in pbxproj file
   const pbxprojPath = resolve(fixtureDir, 'ios/reactnative.xcodeproj/project.pbxproj')
@@ -331,6 +321,11 @@ function replaceGeneratedFixtureFiles() {
     podfileContents = podfileContents.replace(/:flipper_configuration/, '# :flipper_configuration')
   }
 
+  // for RN versions < 0.73, bump the minimum iOS version to 13 (required for Cocoa Performance)
+  if (parseFloat(reactNativeVersion) < 0.73) {
+    podfileContents = podfileContents.replace(/platform\s*:ios,\s*(?:'[\d.]+'|min_ios_version_supported)/, "platform :ios, '13.0'")
+  }
+  
   fs.writeFileSync(`${fixtureDir}/ios/Podfile`, podfileContents)
 
   // pin xcodeproj version to < 1.26.0
@@ -343,34 +338,12 @@ function replaceGeneratedFixtureFiles() {
   }
 }
 
-function publishLocalAndroidPerformance() {
-  // add bugsnag-android-performance as a git submodule
-  execSync(`git submodule add -b integration/react-native-integration https://github.com/bugsnag/bugsnag-android-performance`, { cwd: fixtureDir, stdio: 'inherit' })
-
-  // build and publish bugsnag-android-performance to maven local
-  execSync(`./gradlew -PVERSION_NAME=9.9.9 clean publishToMavenLocal`, { cwd: `${fixtureDir}/bugsnag-android-performance`, stdio: 'inherit' })
-
-  // add mavenLocal() to the repositories section in the android/build.gradle file
-  const buildGradlePath = resolve(fixtureDir, 'android/build.gradle')
-  let buildGradle = fs.readFileSync(buildGradlePath, 'utf8')
-  const repositoriesBlock = `allprojects {
-  repositories {
-    mavenLocal()
-    mavenCentral()
-    google()
-  }
-}`
-
-  buildGradle = `${repositoriesBlock}\n${buildGradle}`
-  fs.writeFileSync(buildGradlePath, buildGradle)
-}
-
 function installAndroidPerformance() {
   // declare dependency in the app/build.gradle file
   const appGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
   let appGradle = fs.readFileSync(appGradlePath, 'utf8')
 
-  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:9.9.9")'
+  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:1.+")'
   const dependenciesSection = 'dependencies {'
 
   appGradle = appGradle.replace(dependenciesSection, `${dependenciesSection}\n    ${performanceDependency}`)
@@ -382,7 +355,7 @@ function installCocoaPerformance() {
   const podfilePath = resolve(fixtureDir, 'ios/Podfile')
   let podfile = fs.readFileSync(podfilePath, 'utf8')
 
-  const performancePod = `pod 'BugsnagPerformance', :git => 'https://github.com/bugsnag/bugsnag-cocoa-performance.git', :branch => 'integration/react-native-integration'`
+  const performancePod = `pod 'BugsnagPerformance'`
   const targetSection = 'target \'reactnative\' do'
 
   podfile = podfile.replace(targetSection, `${targetSection}\n  ${performancePod}`)
