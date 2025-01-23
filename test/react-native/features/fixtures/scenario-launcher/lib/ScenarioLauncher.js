@@ -51,8 +51,10 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
 
   await scenario.initialise(scenarioConfig)
 
-  BugsnagPerformance.start(scenarioConfig)
-
+  if (!scenario.doNotStartBugsnagPerformance) {
+    BugsnagPerformance.start(scenarioConfig)
+  }
+  
   if (process.env.REACT_NATIVE_NAVIGATION) {
     loadReactNavigationScenario(scenario)
   } else {

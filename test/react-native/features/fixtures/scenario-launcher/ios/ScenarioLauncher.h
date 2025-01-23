@@ -13,6 +13,7 @@
     - (id) saveStartupConfig:(NSDictionary *)config;
     - (NSDictionary *) readStartupConfig;
     - (id) exitApp;
+    - (void) startNativePerformance:(NSDictionary *)configuration resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject;
 @end
 
 #ifdef RCT_NEW_ARCH_ENABLED

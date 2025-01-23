@@ -4,6 +4,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
 import java.util.Map;
@@ -75,5 +76,35 @@ public class BugsnagReactNativePerformance extends ReactContextBaseJavaModule {
   @ReactMethod
   public void writeFile(String path, String data, String encoding, Promise promise) {
     impl.writeFile(path, data, encoding, promise);
+  }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public boolean isNativePerformanceAvailable() {
+    return impl.isNativePerformanceAvailable();
+  }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public WritableMap attachToNativeSDK() {
+    return impl.attachToNativeSDK();
+  }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public WritableMap startNativeSpan(String name, ReadableMap options) {
+    return impl.startNativeSpan(name, options);
+  }
+
+  @ReactMethod
+  public void endNativeSpan(String spanId, String traceId, double endTime, ReadableMap attributes, Promise promise) {
+    impl.endNativeSpan(spanId, traceId, endTime, attributes,  promise);
+  }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  public void markNativeSpanEndTime(String spanId, String traceId, double endTime) {
+    impl.markNativeSpanEndTime(spanId, traceId, endTime);
+  }
+
+  @ReactMethod
+  public void discardNativeSpan(String spanId, String traceId, Promise promise) {
+    impl.discardNativeSpan(spanId, traceId, promise);
   }
 }
