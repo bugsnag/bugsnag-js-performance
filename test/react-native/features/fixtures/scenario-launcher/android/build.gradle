@@ -35,6 +35,7 @@ repositories {
 }
 
 dependencies {
-  api "com.bugsnag:bugsnag-android:6.+"
+  compileOnly "com.bugsnag:bugsnag-android:6.+"
+  compileOnly("com.bugsnag:bugsnag-android-performance:1.11.0")
   implementation 'com.facebook.react:react-native'
 }

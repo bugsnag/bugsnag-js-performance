@@ -1,5 +1,15 @@
 # Changelog
 
+## [v2.11.0] (2025-01-23)
+
+### Added
+
+- (react-native) Added `BugsnagPerformance.attach` method to support integration with native BugSnag Performance Monitoring SDKs for Android and iOS [#573](https://github.com/bugsnag/bugsnag-js-performance/pull/573)
+
+### Changed
+
+- (react-native) Replaced `react-native-file-access` peer dependency with internal native module implementation. This peer dependency is no longer required by the SDK. [#561](https://github.com/bugsnag/bugsnag-js-performance/pull/561)
+
 ## [v2.10.1] (2024-11-12)
 
 ### Fixed

@@ -1,5 +1,5 @@
 import { isObject } from '@bugsnag/core-performance'
-import type { FileSystem } from 'react-native-file-access'
+import type { FileSystem } from './file-native'
 import { Util } from './file-utils'
 
 export interface ReadableFile {
@@ -13,7 +13,7 @@ export interface WritableFile {
 export type ReadWriteFile = ReadableFile & WritableFile
 
 /**
- * A wrapper around 'react-native-file-access' that allows reading from a
+ * A wrapper around react-native file i/o that allows reading from a
  * specific file without having to specify the path every time it's used
  */
 export class ReadOnlyFile implements ReadableFile {

@@ -3,6 +3,11 @@ BeforeAll do
     Maze.config.android_app_files_directory = '/data/local/tmp'
   end
   Maze.config.enforce_bugsnag_integrity = false
+
+  if ENV["NATIVE_INTEGRATION"]
+    Maze.config.receive_requests_wait = 60
+  end
+
 end
 
 Before('@skip') do
@@ -23,4 +28,8 @@ end
 
 Before('@skip_react_native_navigation') do |scenario|
   skip_this_scenario("Skipping scenario") if ENV["REACT_NATIVE_NAVIGATION"]
+end
+
+Before('@native_integration') do |scenario|
+  skip_this_scenario("Skipping scenario: Not running native integration fixture") unless ENV["NATIVE_INTEGRATION"]
 end

@@ -1,9 +1,14 @@
+agents:
+  queue: macos
+
 steps:
 
   #
   # License audit
   #
   - label: ":copyright: License Audit"
+    agents:
+      queue: opensource
     timeout_in_minutes: 20
     plugins:
       - docker-compose#v4.12.0:
@@ -13,14 +18,17 @@ steps:
   # Upload each basic pipeline
   #
   - label: ":pipeline_upload: Basic browser pipeline"
+    timeout_in_minutes: 2
     commands:
       - buildkite-agent pipeline upload .buildkite/browser-pipeline.yml
 
   - label: ":pipeline_upload: React Native pipeline"
+    timeout_in_minutes: 2
     commands:
       - buildkite-agent pipeline upload .buildkite/react-native-pipeline.yml
 
   - label: ":pipeline_upload: React Native Navigation pipeline"
+    timeout_in_minutes: 2
     commands:
       - buildkite-agent pipeline upload .buildkite/react-native-navigation-pipeline.yml
 
@@ -28,5 +36,5 @@ steps:
   # Conditionally trigger full pipeline
   #
   - label: 'Conditionally trigger full set of tests'
-    timeout_in_minutes: 30
+    timeout_in_minutes: 2
     command: sh -c .buildkite/pipeline_trigger.sh

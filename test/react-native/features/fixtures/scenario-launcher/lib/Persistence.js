@@ -5,6 +5,16 @@ const PERSISTED_STATE_DIRECTORY = `${Dirs.CacheDir}/bugsnag-performance-react-na
 const PERSISTED_STATE_PATH = `${PERSISTED_STATE_DIRECTORY}/persisted-state.json`
 const RETRY_QUEUE_DIRECTORY = `${PERSISTED_STATE_DIRECTORY}/retry-queue`
 
+function getNativeDeviceIdFilePath () {
+    const nativeDeviceIdFilePath = Platform.select({
+        ios: undefined,
+        android: `${Dirs.DocumentDir}/device-id`,
+        default: undefined
+      })
+
+    return nativeDeviceIdFilePath
+}
+
 async function writePersistedStateFile(contents) {
     if (!await FileSystem.exists(PERSISTED_STATE_DIRECTORY)) {
         console.error(`[BugsnagPerformance] creating persisted state directory: ${PERSISTED_STATE_DIRECTORY}`)
@@ -42,5 +52,10 @@ export async function clearPersistedState() {
         for (const file of files) {
             await FileSystem.unlink(`${RETRY_QUEUE_DIRECTORY}/${file}`)
         }
+    }
+    const nativeDeviceIdFilePath = getNativeDeviceIdFilePath()
+    if (await FileSystem.exists(nativeDeviceIdFilePath)) {
+        console.error(`[BugsnagPerformance] Clearing persisted data at path: ${nativeDeviceIdFilePath}`)
+        await FileSystem.unlink(nativeDeviceIdFilePath)
     }
 }

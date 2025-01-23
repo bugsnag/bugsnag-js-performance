@@ -2,7 +2,7 @@ import { createClient } from '@bugsnag/core-performance'
 import createFetchDeliveryFactory from '@bugsnag/delivery-fetch-performance'
 import { createXmlHttpRequestTracker } from '@bugsnag/request-tracker-performance'
 import { AppRegistry, AppState } from 'react-native'
-import { FileSystem } from 'react-native-file-access'
+import { FileSystem } from './persistence/file-native'
 import { AppStartPlugin, NetworkRequestPlugin } from './auto-instrumentation'
 import createClock from './clock'
 import createSchema from './config'
@@ -14,6 +14,7 @@ import resourceAttributesSourceFactory from './resource-attributes-source'
 import createRetryQueueFactory from './retry-queue'
 import { createSpanAttributesSource } from './span-attributes-source'
 import createBrowserBackgroundingListener from './backgrounding-listener'
+import { ReactNativeSpanFactory } from './span-factory'
 
 // this is how some internal react native code detects whether the app is running
 // in the remote debugger:
@@ -27,7 +28,7 @@ const clock = createClock(performance)
 const appStartTime = clock.now()
 const deliveryFactory = createFetchDeliveryFactory(fetch, clock)
 const spanAttributesSource = createSpanAttributesSource()
-const deviceInfo = NativeBugsnagPerformance && !isDebuggingRemotely ? NativeBugsnagPerformance.getDeviceInfo() : undefined
+const deviceInfo = !isDebuggingRemotely ? NativeBugsnagPerformance.getDeviceInfo() : undefined
 const persistence = persistenceFactory(FileSystem, deviceInfo)
 const resourceAttributesSource = resourceAttributesSourceFactory(persistence, deviceInfo)
 const backgroundingListener = createBrowserBackgroundingListener(AppState)
@@ -35,8 +36,7 @@ const backgroundingListener = createBrowserBackgroundingListener(AppState)
 // React Native's fetch polyfill uses xhr under the hood, so we only track xhr requests
 const xhrRequestTracker = createXmlHttpRequestTracker(XMLHttpRequest, clock)
 
-const idGenerator = createIdGenerator(NativeBugsnagPerformance, isDebuggingRemotely)
-
+const idGenerator = createIdGenerator(isDebuggingRemotely)
 const BugsnagPerformance = createClient({
   backgroundingListener,
   clock,
@@ -44,14 +44,15 @@ const BugsnagPerformance = createClient({
   idGenerator,
   persistence,
   plugins: (spanFactory, spanContextStorage) => [
-    new AppStartPlugin(appStartTime, spanFactory, clock, AppRegistry),
+    new AppStartPlugin(appStartTime, spanFactory as ReactNativeSpanFactory, clock, AppRegistry),
     new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrRequestTracker)
   ],
   resourceAttributesSource,
   schema: createSchema(),
   spanAttributesSource,
   retryQueueFactory: createRetryQueueFactory(FileSystem),
-  platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(appStartTime, clock, spanFactory, spanContextStorage)
+  spanFactory: ReactNativeSpanFactory,
+  platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(appStartTime, clock, spanFactory as ReactNativeSpanFactory, spanContextStorage)
 })
 
 export default BugsnagPerformance

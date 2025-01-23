@@ -1,6 +1,5 @@
 import type { Configuration, Plugin } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
-export { createNavigationSpan } from '@bugsnag/react-native-performance/lib/create-navigation-span'
 
 const plugins: Array<Plugin<Configuration>> = []
 

@@ -1,5 +1,7 @@
 import type { SpanAttribute, SpanAttributes } from './attributes'
+import { millisecondsToNanoseconds } from './clock'
 import type { Clock } from './clock'
+import type { Logger, OnSpanEndCallbacks } from './config'
 import type { DeliverySpan } from './delivery'
 import { SpanEvents } from './events'
 import type { SpanContext } from './span-context'
@@ -84,6 +86,36 @@ export function spanEndedToSpan (span: SpanEnded): Span {
     end: () => {}, // no-op
     setAttribute: (name, value) => { span.attributes.setCustom(name, value) }
   }
+}
+
+export async function runSpanEndCallbacks (spanEnded: SpanEnded, logger: Logger, callbacks?: OnSpanEndCallbacks) {
+  if (!callbacks) return true
+
+  const span = spanEndedToSpan(spanEnded)
+  const callbackStartTime = performance.now()
+  let shouldSample = true
+  for (const callback of callbacks) {
+    try {
+      let result = callback(span)
+
+      // @ts-expect-error result may or may not be a promise
+      if (typeof result.then === 'function') {
+        result = await result
+      }
+
+      if (result === false) {
+        shouldSample = false
+        break
+      }
+    } catch (err) {
+      logger.error('Error in onSpanEnd callback: ' + err)
+    }
+  }
+  if (shouldSample) {
+    const duration = millisecondsToNanoseconds(performance.now() - callbackStartTime)
+    span.setAttribute('bugsnag.span.callbacks_duration', duration)
+  }
+  return shouldSample
 }
 
 export class SpanInternal implements SpanContext {

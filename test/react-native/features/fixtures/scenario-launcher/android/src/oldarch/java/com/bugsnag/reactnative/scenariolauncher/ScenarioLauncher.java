@@ -47,4 +47,9 @@ public class ScenarioLauncher extends ReactContextBaseJavaModule {
   public void exitApp() {
     impl.exitApp();
   }
+
+  @ReactMethod
+  public void startNativePerformance(ReadableMap configuration, Promise promise) {
+    impl.startNativePerformance(configuration, promise);
+  }
 }

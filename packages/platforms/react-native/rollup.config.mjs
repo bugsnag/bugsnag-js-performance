@@ -25,7 +25,6 @@ const config = createRollupConfig({
     '@react-native-community/netinfo',
     'react',
     'react-native',
-    'react-native-file-access',
   ]
 })
 

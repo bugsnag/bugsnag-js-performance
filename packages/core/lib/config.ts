@@ -1,4 +1,3 @@
-import type { OnSpanEndCallbacks } from './batch-processor'
 import {
   ATTRIBUTE_ARRAY_LENGTH_LIMIT_DEFAULT,
   ATTRIBUTE_COUNT_LIMIT_DEFAULT,
@@ -8,6 +7,7 @@ import {
   ATTRIBUTE_STRING_VALUE_LIMIT_MAX
 } from './custom-attribute-limits'
 import type { Plugin } from './plugin'
+import type { Span } from './span'
 import { isLogger, isNumber, isObject, isOnSpanEndCallbacks, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
 
 type SetTraceCorrelation = (traceId: string, spanId: string) => void
@@ -38,6 +38,9 @@ export interface Logger {
   warn: (message: string) => void
   error: (message: string) => void
 }
+
+export type OnSpanEndCallback = (span: Span) => boolean | Promise<boolean>
+export type OnSpanEndCallbacks = OnSpanEndCallback[]
 
 export interface Configuration {
   apiKey: string
