@@ -1,7 +1,9 @@
 import type {
+  AppState,
   Clock,
   InternalConfiguration,
-  Plugin
+  Plugin,
+  SetAppState
 } from '@bugsnag/core-performance'
 import type { ReactNode } from 'react'
 import React from 'react'
@@ -22,17 +24,23 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
   private readonly spanFactory: ReactNativeSpanFactory
   private readonly clock: Clock
   private readonly appRegistry: typeof AppRegistry
+  private readonly setAppState: SetAppState
+  private readonly appState: AppState
 
   constructor (
     appStartTime: number,
     spanFactory: ReactNativeSpanFactory,
     clock: Clock,
-    appRegistry: typeof AppRegistry
+    appRegistry: typeof AppRegistry,
+    setAppState: SetAppState,
+    appState: AppState
   ) {
     this.appStartTime = appStartTime
     this.spanFactory = spanFactory
     this.clock = clock
     this.appRegistry = appRegistry
+    this.setAppState = setAppState
+    this.appState = appState
   }
 
   configure (configuration: InternalConfiguration<ReactNativeConfiguration>) {
@@ -44,6 +52,9 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
       React.useEffect(() => {
         if (appStartSpan.isValid()) {
           this.spanFactory.endSpan(appStartSpan, this.clock.now())
+          if (this.appState === 'starting') {
+            this.setAppState('ready')
+          }
         }
       }, [])
 
