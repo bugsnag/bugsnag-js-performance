@@ -1,4 +1,4 @@
-import type { ParentContext, BackgroundingListener, InternalConfiguration, Plugin, SpanFactory } from '@bugsnag/core-performance'
+import type { ParentContext, BackgroundingListener, InternalConfiguration, Plugin, SpanFactory, AppState, SetAppState } from '@bugsnag/core-performance'
 import type { BrowserConfiguration } from '../config'
 import type { OnSettle } from '../on-settle'
 import type { PerformanceWithTiming } from '../on-settle/load-event-end-settler'
@@ -14,6 +14,8 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   private readonly onSettle: OnSettle
   private readonly webVitals: WebVitals
   private readonly performance: PerformanceWithTiming
+  private readonly setAppState: SetAppState
+  private readonly appState: AppState
 
   // if the page was backgrounded at any point in the loading process a page
   // load span is invalidated as the browser will deprioritise the page
@@ -26,7 +28,9 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     webVitals: WebVitals,
     onSettle: OnSettle,
     backgroundingListener: BackgroundingListener,
-    performance: PerformanceWithTiming
+    performance: PerformanceWithTiming,
+    setAppState: SetAppState,
+    appState: AppState
   ) {
     this.document = document
     this.location = location
@@ -34,6 +38,8 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     this.webVitals = webVitals
     this.onSettle = onSettle
     this.performance = performance
+    this.setAppState = setAppState
+    this.appState = appState
 
     backgroundingListener.onStateChange(state => {
       if (!this.wasBackgrounded && state === 'in-background') {
@@ -87,6 +93,9 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
 
       this.webVitals.attachTo(span)
       this.spanFactory.endSpan(span, endTime)
+      if (this.appState === 'starting') {
+        this.setAppState('ready')
+      }
     })
   }
 }

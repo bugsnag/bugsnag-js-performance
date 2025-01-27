@@ -1,5 +1,6 @@
 import { MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import type { AppState } from '@bugsnag/core-performance'
 import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native'
 import type { ParamListBase } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
@@ -19,8 +20,12 @@ afterEach(() => {
 
 describe('createNavigationContainer', () => {
   it('creates a navigation span when the route changes', () => {
+    let appState: AppState = 'starting'
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
     const spanFactory = new MockSpanFactory<ReactNativeConfiguration>()
-    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, spanFactory)
+    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, spanFactory, setAppState)
 
     render(
       <BugsnagNavigationContainer>
@@ -33,18 +38,25 @@ describe('createNavigationContainer', () => {
 
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(1)
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 2', { isFirstClass: true, startTime: 0 })
+    expect(setAppState).toHaveBeenCalled()
+    expect(appState).toBe('navigating')
 
     fireEvent.press(screen.getByText('Go back'))
     expect(screen.getByText('Route 1')).toBeOnTheScreen()
 
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(2)
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 1', { isFirstClass: true, startTime: 0 })
+    expect(setAppState).toHaveBeenCalledTimes(2)
   })
 
   it('forwards the provided ref to the NavigationContainer', () => {
+    let appState: AppState = 'starting'
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
     const navigationRef = createNavigationContainerRef()
     const spanFactory = new MockSpanFactory<ReactNativeConfiguration>()
-    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, spanFactory)
+    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, spanFactory, setAppState)
 
     render(
       <BugsnagNavigationContainer ref={navigationRef}>
@@ -59,6 +71,8 @@ describe('createNavigationContainer', () => {
 
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(1)
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[Navigation]Route 2', { isFirstClass: true, startTime: 0 })
+    expect(setAppState).toHaveBeenCalledTimes(1)
+    expect(appState).toBe('navigating')
   })
 })
 

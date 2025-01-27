@@ -27,6 +27,7 @@ import { timeToNumber } from './time'
 interface Constructor<T> { new(): T, prototype: T }
 
 export type AppState = 'starting' | 'navigating' | 'settling' | 'ready'
+export type SetAppState = (appState: AppState) => void
 
 export interface Client<C extends Configuration> {
   appState: AppState
@@ -45,7 +46,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   resourceAttributesSource: ResourceAttributeSource<C>
   spanAttributesSource: SpanAttributesSource<C>
   schema: S
-  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => Array<Plugin<C>>
+  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage, setAppState: SetAppState, appState: AppState) => Array<Plugin<C>>
   persistence: Persistence
   retryQueueFactory: RetryQueueFactory
   spanContextStorage?: SpanContextStorage
@@ -74,7 +75,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
   const setAppState = (state: AppState) => {
     appState = state
   }
-  const plugins = options.plugins(spanFactory, spanContextStorage)
+  const plugins = options.plugins(spanFactory, spanContextStorage, setAppState, appState)
 
   return {
     start: (config: C | string) => {
@@ -149,7 +150,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       }
 
       for (const plugin of plugins) {
-        plugin.configure(configuration, spanFactory, setAppState)
+        plugin.configure(configuration, spanFactory, setAppState, appState)
       }
     },
     startSpan: (name, spanOptions?: SpanOptions) => {

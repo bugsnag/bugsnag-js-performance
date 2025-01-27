@@ -1,7 +1,7 @@
 import { VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 import { fireEvent, render, screen } from '@testing-library/react-native'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Button, View } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 import { CompleteNavigation } from '../lib/CompleteNavigation'
@@ -27,6 +27,8 @@ function createMockClient (plugin: ReactNativeNavigationPlugin) {
     apiKey: VALID_API_KEY,
     plugins: [plugin]
   })
+
+  return BugsnagPerformance
 }
 
 describe('CompleteNavigation', () => {
@@ -35,9 +37,9 @@ describe('CompleteNavigation', () => {
     createMockClient(plugin)
 
     render(
-        <View>
-            <CompleteNavigation on='mount' />
-        </View>
+      <View>
+        <CompleteNavigation on='mount' />
+      </View>
     )
 
     // Wait for component to mount
@@ -55,10 +57,10 @@ describe('CompleteNavigation', () => {
       const [showComponent, setShowComponent] = useState(true)
 
       return (
-          <View>
-            {showComponent && <CompleteNavigation on='unmount' />}
-            <Button title='Unmount component' onPress={() => { setShowComponent(false) }} />
-          </View>
+        <View>
+          {showComponent && <CompleteNavigation on='unmount' />}
+          <Button title='Unmount component' onPress={() => { setShowComponent(false) }} />
+        </View>
       )
     }
 
@@ -82,10 +84,10 @@ describe('CompleteNavigation', () => {
       const [loaded, setLoaded] = useState(false)
 
       return (
-          <View>
-            <CompleteNavigation on={loaded} />
-            <Button title='Finish loading' onPress={() => { setLoaded(true) }} />
-          </View>
+        <View>
+          <CompleteNavigation on={loaded} />
+          <Button title='Finish loading' onPress={() => { setLoaded(true) }} />
+        </View>
       )
     }
 
