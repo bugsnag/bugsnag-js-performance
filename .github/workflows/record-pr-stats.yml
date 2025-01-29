@@ -90,13 +90,13 @@ jobs:
           script: |
             return require('./coverage/coverage-summary.json')
 
-        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+      - uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
           name: packages-${{ inputs.ref }}
           path: |
             bugsnag-*.tgz
 
-        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+      - uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
         with:
           name: bundles-${{ inputs.ref }}
           path: |
