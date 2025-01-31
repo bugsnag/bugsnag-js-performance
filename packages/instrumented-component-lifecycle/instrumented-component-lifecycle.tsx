@@ -1,14 +1,16 @@
 import type { Clock, SetAppState, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
-import { BrowserConfiguration } from '@bugsnag/browser-performance'
-import React, { PropsWithChildren, ReactNode } from 'react'
+import type { BrowserConfiguration } from '@bugsnag/browser-performance'
+import React from 'react'
+import type { PropsWithChildren, ReactNode } from 'react'
+
 
 interface InstrumentedComponentLifecycleProps extends PropsWithChildren {
-  name: string;
-  includeComponentUpdates: boolean;
-  children: ReactNode;
-  updateProps: { [key: string]: unknown };
-  spanFactory: SpanFactory<BrowserConfiguration>;
-  setAppState: SetAppState;
+  name: string
+  includeComponentUpdates: boolean
+  children: ReactNode
+  updateProps: { [key: string]: unknown }
+  spanFactory: SpanFactory<BrowserConfiguration>
+  setAppState: SetAppState
 }
 
 class InstrumentedComponentLifecycle extends React.Component<InstrumentedComponentLifecycleProps> {
@@ -18,7 +20,7 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
   private readonly clock: Clock
 
   public static defaultProps: Partial<InstrumentedComponentLifecycleProps> = {
-    includeComponentUpdates: true,
+    includeComponentUpdates: true
   }
 
   public constructor(props: InstrumentedComponentLifecycleProps, spanFactory: SpanFactory<BrowserConfiguration>, clock: Clock) {
