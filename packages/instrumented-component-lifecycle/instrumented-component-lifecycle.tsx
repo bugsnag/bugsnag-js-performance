@@ -56,21 +56,17 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
   }
 }
 
-function withInstrumentedComponentLifecycle<P extends Record<string, any>> (
+export function withInstrumentedComponentLifecycle<P extends Record<string, any>> (
   Component: React.ComponentType<P>,
   options?: Pick<Partial<InstrumentedComponentLifecycleProps>, Exclude<keyof InstrumentedComponentLifecycleProps, 'updateProps' | 'children'>>
 ): React.FC<P> {
   const componentDisplayName = (options && options.name) || Component.displayName || Component.name || 'unknown'
 
-  const Wrapped: React.FC<P> = (props: P) => (
+  const WrappedComponent: React.FC<P> = (props: P) => (
     <InstrumentedComponentLifecycle {...options} name={componentDisplayName}>
       <Component {...props} />
     </InstrumentedComponentLifecycle>
   )
 
-  Wrapped.displayName = `instrumented-lifecycle-(${componentDisplayName})`
-
-  return Wrapped
+  return WrappedComponent
 }
-
-export { withInstrumentedComponentLifecycle }
