@@ -26,7 +26,7 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
 
   async componentDidMount () {
     if (this.componentMountSpan && BugsnagPerformance.appState === 'ready') {
-      this.componentMountSpan.end();
+      this.componentMountSpan.end()
     }
   }
 
@@ -43,7 +43,7 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
     }
   }
 
-  public componentWillUnmount() {
+  public componentWillUnmount () {
     this.componentUnmountSpan = BugsnagPerformance.appState !== 'ready' ? BugsnagPerformance.startSpan(`[ViewLoadPhase/Component]${this.props.name}`) : undefined
     if (this.componentUnmountSpan && BugsnagPerformance.appState === 'ready') {
       this.componentUnmountSpan.end()
