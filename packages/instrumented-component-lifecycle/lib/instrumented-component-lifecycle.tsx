@@ -1,5 +1,5 @@
 import BugsnagPerformance from '@bugsnag/browser-performance'
-import type { Span } from '@bugsnag/core-performance'
+import { DISCARD_END_TIME, type Span } from '@bugsnag/core-performance'
 import React from 'react'
 import type { PropsWithChildren } from 'react'
 
@@ -12,6 +12,7 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
   private componentMountSpan: Span | undefined
   private componentUpdateSpan: Span | undefined
   private componentUnmountSpan: Span | undefined
+  private componentLifetimeSpan: Span | undefined
 
   public static defaultProps: Partial<InstrumentedComponentLifecycleProps> = {
     includeComponentUpdates: true
@@ -21,7 +22,8 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
     super(props)
     const { name } = this.props
 
-    this.componentMountSpan = BugsnagPerformance.appState !== 'ready' ? BugsnagPerformance.startSpan(`[ViewLoad/Component]${name}`) : undefined
+    this.componentLifetimeSpan = BugsnagPerformance.appState !== 'ready' ? BugsnagPerformance.startSpan(`[ViewLoad/Component]${name}`) : undefined
+    this.componentMountSpan = BugsnagPerformance.appState !== 'ready' ? BugsnagPerformance.startSpan(`[ViewLoadPhase/Mount]${name}`) : undefined
   }
 
   async componentDidMount () {
@@ -45,9 +47,12 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
 
   public componentWillUnmount () {
     this.componentUnmountSpan = BugsnagPerformance.appState !== 'ready' ? BugsnagPerformance.startSpan(`[ViewLoadPhase/Component]${this.props.name}`) : undefined
-    if (this.componentUnmountSpan && BugsnagPerformance.appState === 'ready') {
+    if (this.componentUnmountSpan) {
       this.componentUnmountSpan.end()
     }
+    if (this.componentLifetimeSpan) {
+      const endTime = BugsnagPerformance.appState === "ready" ? DISCARD_END_TIME : undefined
+      this.componentLifetimeSpan.end(endTime)}
   }
 
   public render (): React.ReactNode {
