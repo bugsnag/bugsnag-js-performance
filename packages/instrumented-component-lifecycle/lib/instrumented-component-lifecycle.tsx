@@ -1,5 +1,6 @@
 import BugsnagPerformance from '@bugsnag/browser-performance'
-import { DISCARD_END_TIME, type Span } from '@bugsnag/core-performance'
+import { DISCARD_END_TIME } from '@bugsnag/core-performance'
+import type { Span } from '@bugsnag/core-performance'
 import React from 'react'
 import type { PropsWithChildren } from 'react'
 
@@ -51,8 +52,9 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
       this.componentUnmountSpan.end()
     }
     if (this.componentLifetimeSpan) {
-      const endTime = BugsnagPerformance.appState === "ready" ? DISCARD_END_TIME : undefined
-      this.componentLifetimeSpan.end(endTime)}
+      const endTime = BugsnagPerformance.appState === 'ready' ? DISCARD_END_TIME : undefined
+      this.componentLifetimeSpan.end(endTime)
+    }
   }
 
   public render (): React.ReactNode {

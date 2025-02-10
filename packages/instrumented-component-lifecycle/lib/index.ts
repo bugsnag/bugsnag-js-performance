@@ -1,1 +1,1 @@
-export { withInstrumentedComponentLifecycle } from './instrumented-component-lifecycle';
+export { withInstrumentedComponentLifecycle } from './instrumented-component-lifecycle'
