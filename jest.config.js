@@ -73,7 +73,24 @@ module.exports = {
       displayName: 'instrumented-component-lifecycle',
       testEnvironment: 'jsdom',
       testMatch: ['<rootDir>/packages/instrumented-component-lifecycle/**/*.test.tsx'],
-      moduleNameMapper
+      moduleNameMapper,
+      transform: {
+        '^.+\\.jsx?$': [
+          'babel-jest',
+          {
+            presets: ['@babel/preset-react']
+          }
+        ],
+        '^.+\\.m?tsx?$': [
+          'ts-jest',
+          {
+            tsconfig: { paths },
+            babelConfig: {
+              presets: ['@babel/preset-react']
+            }
+          }
+        ]
+      }
     },
     {
       displayName: 'angular',

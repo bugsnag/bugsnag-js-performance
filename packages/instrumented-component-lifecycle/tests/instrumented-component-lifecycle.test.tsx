@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react'
-import React from 'react'
+import * as React from 'react'
 import { withInstrumentedComponentLifecycle } from '../lib/instrumented-component-lifecycle'
 
 jest.useFakeTimers()
@@ -12,11 +12,14 @@ describe('withInstrumentedComponentLifecycle', () => {
     const Component = () => <h1>Testing</h1>
     const WrappedComponent = withInstrumentedComponentLifecycle(Component, {
       name: 'TestComponent'
-    });
+    })
 
     expect(mockStartSpan).toHaveBeenCalledTimes(0)
 
-    render(<WrappedComponent />)
+    const { getByText } = render(<WrappedComponent />)
+
+    // @ts-expect-error toBeInTheDocument is not being picked up
+    expect(getByText('Testing')).toBeInTheDocument()
 
     expect(mockStartSpan).toHaveBeenCalledTimes(1)
   })
@@ -27,8 +30,8 @@ describe('withInstrumentedComponentLifecycle', () => {
 
     expect(mockStartSpan).toHaveBeenCalledTimes(0)
 
-    const component = render(<WrappedComponent />)
-    component.unmount()
+    const { unmount } = render(<WrappedComponent />)
+    unmount()
 
     expect(mockStartSpan).toHaveBeenCalledTimes(1)
     expect(mockEndSpan).toHaveBeenCalled()

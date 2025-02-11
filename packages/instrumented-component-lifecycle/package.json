@@ -24,12 +24,10 @@
     "@testing-library/react": "^16.2.0",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
-    "jest-environment-jsdom": "^29.7.0"
+    "jest-environment-jsdom": "^29.7.0",
+    "react": "^19.0.0"
   },
-  "peerDependencies": {
-    "@bugsnag/core-performance": "*",
-    "react": "*"
-  },
+  "peerDependencies": {},
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
