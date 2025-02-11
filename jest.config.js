@@ -72,6 +72,7 @@ module.exports = {
     {
       displayName: 'instrumented-component-lifecycle',
       testEnvironment: 'jsdom',
+      setupFilesAfterEnv: ['<rootDir>/jest/setup/react.ts'],
       testMatch: ['<rootDir>/packages/instrumented-component-lifecycle/**/*.test.tsx'],
       moduleNameMapper,
       transform: {

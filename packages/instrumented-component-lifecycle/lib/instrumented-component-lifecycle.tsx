@@ -1,7 +1,7 @@
 import BugsnagPerformance from '@bugsnag/browser-performance'
 import { DISCARD_END_TIME } from '@bugsnag/core-performance'
 import type { Span } from '@bugsnag/core-performance'
-import React from 'react'
+import * as React from 'react'
 import type { PropsWithChildren } from 'react'
 
 interface InstrumentedComponentLifecycleProps extends PropsWithChildren {
@@ -65,10 +65,10 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
 export function withInstrumentedComponentLifecycle<P extends Record<string, any>> (
   Component: React.ComponentType<P>,
   options?: Partial<InstrumentedComponentLifecycleProps>
-): React.FC<P> {
+) {
   const componentDisplayName = (options && options.name) || Component.displayName || Component.name || 'unknown'
 
-  const WrappedComponent: React.FC<P> = (props: P) => (
+  const WrappedComponent = (props: P) => (
     <InstrumentedComponentLifecycle {...options} name={componentDisplayName}>
       <Component {...props} />
     </InstrumentedComponentLifecycle>
