@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react-native'
+import { render } from '@testing-library/react'
 import React from 'react'
 import { withInstrumentedComponentLifecycle } from '../lib/instrumented-component-lifecycle'
 

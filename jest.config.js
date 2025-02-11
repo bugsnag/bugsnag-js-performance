@@ -71,30 +71,9 @@ module.exports = {
     },
     {
       displayName: 'instrumented-component-lifecycle',
+      testEnvironment: 'jsdom',
       testMatch: ['<rootDir>/packages/instrumented-component-lifecycle/**/*.test.tsx'],
-      moduleNameMapper,
-      transform: {
-        '^.+\\.jsx?$': [
-          'babel-jest',
-          {
-            presets: ['module:metro-react-native-babel-preset'],
-            plugins: [
-              ['@babel/plugin-transform-private-methods', {
-                loose: true
-              }]
-            ]
-          }
-        ],
-        '^.+\\.tsx?$': [
-          'ts-jest',
-          {
-            tsconfig: { paths },
-            babelConfig: {
-              presets: ['module:metro-react-native-babel-preset']
-            }
-          }
-        ]
-      }
+      moduleNameMapper
     },
     {
       displayName: 'angular',

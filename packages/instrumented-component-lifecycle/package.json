@@ -20,19 +20,14 @@
   },
   "devDependencies": {
     "@bugsnag/core-performance": "^2.10.0",
-    "@bugsnag/react-native-performance": "^2.10.1",
-    "@react-native/babel-preset": "^0.74.0",
-    "@react-navigation/native": "^6.1.9",
-    "@react-navigation/native-stack": "^6.9.17",
-    "@testing-library/jest-native": "^5.4.3",
-    "@testing-library/react-native": "^12.4.1",
-    "identity-obj-proxy": "^3.0.0",
-    "react": "^18.2.0"
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.2.0",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "jest-environment-jsdom": "^29.7.0"
   },
   "peerDependencies": {
     "@bugsnag/core-performance": "*",
-    "@bugsnag/react-native-performance": "^2.10.0",
-    "@react-navigation/native": "*",
     "react": "*"
   },
   "type": "module",
