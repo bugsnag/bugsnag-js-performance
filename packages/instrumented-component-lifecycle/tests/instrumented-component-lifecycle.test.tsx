@@ -9,26 +9,26 @@ const mockEndSpan = jest.fn()
 
 describe('withInstrumentedComponentLifecycle', () => {
   it('creates componentMountSpan when a component is mounted', () => {
-    const Component = () => <h1>Testing</h1>;
+    const Component = () => <h1>Testing</h1>
     const WrappedComponent = withInstrumentedComponentLifecycle(Component, {
-      name: "TestComponent",
+      name: 'TestComponent'
     });
 
-    expect(mockStartSpan).toHaveBeenCalledTimes(0);
+    expect(mockStartSpan).toHaveBeenCalledTimes(0)
 
-    render(<WrappedComponent />);
+    render(<WrappedComponent />)
 
-    expect(mockStartSpan).toHaveBeenCalledTimes(1);
-  });
+    expect(mockStartSpan).toHaveBeenCalledTimes(1)
+  })
 
   it('creates componentUnmountSpan when a component is unmounted', () => {
     const Component = () => <h1>Testing</h1>
-    const WrappedComponent = withInstrumentedComponentLifecycle(Component, {name: 'TestComponent'})
+    const WrappedComponent = withInstrumentedComponentLifecycle(Component, { name: 'TestComponent' })
 
     expect(mockStartSpan).toHaveBeenCalledTimes(0)
 
     const component = render(<WrappedComponent />)
-    component.unmount
+    component.unmount()
 
     expect(mockStartSpan).toHaveBeenCalledTimes(1)
     expect(mockEndSpan).toHaveBeenCalled()
