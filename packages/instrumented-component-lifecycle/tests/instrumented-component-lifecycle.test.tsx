@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { render, screen } from '@testing-library/react'
 import { withInstrumentedComponentLifecycle } from '../lib/instrumented-component-lifecycle'
+import BugsnagPerformance from '@bugsnag/browser-performance'
 
 jest.useFakeTimers()
 
@@ -10,6 +11,8 @@ describe('withInstrumentedComponentLifecycle', () => {
     const WrappedComponent = withInstrumentedComponentLifecycle(Component, {
       name: 'TestComponent'
     })
+
+    expect(BugsnagPerformance.appState).toBe('starting')
 
     render(<WrappedComponent />)
 

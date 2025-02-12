@@ -19,14 +19,17 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "devDependencies": {
-    "@bugsnag/core-performance": "^2.10.0",
+    "@bugsnag/browser-performance": "^2.10.1",
     "@testing-library/react": "^16.2.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@types/react": "^19.0.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
-  "peerDependencies": {},
+  "peerDependencies": {
+    "@bugsnag/browser-performance": "^2.10.1",
+    "react": "*"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
