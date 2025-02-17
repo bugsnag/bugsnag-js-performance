@@ -17,6 +17,7 @@ steps:
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
           NOTIFIER_VERSION: '8.0.0'
+          RCT_NEW_ARCH_ENABLED: "0"
           BUILD_ANDROID: "true"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/old-arch/**/reactnative.apk"
@@ -24,7 +25,7 @@ steps:
           - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
-          - "0.75"
+          - "0.77"
         retry:
           automatic:
             - exit_status: "*"
@@ -48,7 +49,7 @@ steps:
           - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
-          - "0.75"
+          - "0.77"
         retry:
           automatic:
             - exit_status: "*"
@@ -64,6 +65,7 @@ steps:
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
           NOTIFIER_VERSION: '8.0.0'
+          RCT_NEW_ARCH_ENABLED: "0"
           BUILD_ANDROID: "true"
           NATIVE_INTEGRATION: "1"
         artifact_paths:
@@ -72,7 +74,7 @@ steps:
           - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
-          - "0.75"
+          - "0.77"
         retry:
           automatic:
             - exit_status: "*"
@@ -97,7 +99,7 @@ steps:
           - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
-          - "0.75"
+          - "0.77"
         retry:
           automatic:
             - exit_status: "*"
@@ -111,6 +113,7 @@ steps:
         env:
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
+          RCT_NEW_ARCH_ENABLED: "0"
           NOTIFIER_VERSION: '8.0.0'
           BUILD_IOS: "true"
           XCODE_VERSION: "15.3.0"
@@ -120,7 +123,7 @@ steps:
           - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
-          - "0.75"
+          - "0.77"
         retry:
           automatic:
             - exit_status: "*"
@@ -144,7 +147,7 @@ steps:
           - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
-          - "0.75"
+          - "0.77"
         retry:
           automatic:
             - exit_status: "*"
@@ -158,6 +161,7 @@ steps:
         env:
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
+          RCT_NEW_ARCH_ENABLED: "0"
           NOTIFIER_VERSION: '8.0.0'
           BUILD_IOS: "true"
           XCODE_VERSION: "15.3.0"
@@ -168,7 +172,7 @@ steps:
           - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
-          - "0.75"
+          - "0.77"
         retry:
           automatic:
             - exit_status: "*"
@@ -193,7 +197,7 @@ steps:
           - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
-          - "0.75"
+          - "0.77"
         retry:
           automatic:
             - exit_status: "*"
@@ -234,7 +238,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.75"
+          - "0.77"
 
       - label: ":bitbar: :android: RN {{matrix}} Android 12 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-new-arch"
@@ -270,7 +274,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.75"
+          - "0.77"
 
       - label: ":bitbar: :android: RN {{matrix}} native integration Android 12 (Old Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-native-integration-old-arch"
@@ -307,7 +311,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.75"
+          - "0.77"
 
       - label: ":bitbar: :android: RN {{matrix}} native integration Android 12 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-native-integration-new-arch"
@@ -345,7 +349,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.75"
+          - "0.77"
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS 14 (Old Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-old-arch"
@@ -379,7 +383,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.75"
+          - "0.77"
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS 14 (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-new-arch"
@@ -415,7 +419,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.75"
+          - "0.77"
 
       - label: ":bitbar: :mac: RN {{matrix}} native integration iOS 14 (Old Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-native-integration-old-arch"
@@ -452,7 +456,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.75"
+          - "0.77"
 
       - label: ":bitbar: :mac: RN {{matrix}} native integration iOS 14 (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-native-integration-new-arch"
@@ -490,4 +494,4 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.75"
+          - "0.77"
