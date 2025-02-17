@@ -40,7 +40,7 @@ steps:
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
           NOTIFIER_VERSION: '8.0.0'
-          RCT_NEW_ARCH_ENABLED: "true"
+          RCT_NEW_ARCH_ENABLED: "1"
           BUILD_ANDROID: "true"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/new-arch/**/reactnative.apk"
@@ -88,7 +88,7 @@ steps:
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
           NOTIFIER_VERSION: '8.0.0'
-          RCT_NEW_ARCH_ENABLED: "true"
+          RCT_NEW_ARCH_ENABLED: "1"
           BUILD_ANDROID: "true"
           NATIVE_INTEGRATION: "1"
         artifact_paths:

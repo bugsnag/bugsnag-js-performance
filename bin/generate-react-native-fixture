@@ -15,8 +15,15 @@ if (!process.env.NOTIFIER_VERSION) {
   process.exit(1)
 }
 
+if (!process.env.RCT_NEW_ARCH_ENABLED || (process.env.RCT_NEW_ARCH_ENABLED !== '1' && process.env.RCT_NEW_ARCH_ENABLED !== '0')) {
+  console.error('RCT_NEW_ARCH_ENABLED must be set to 1 or 0')
+  process.exit(1)
+}
+
 const reactNativeVersion = process.env.RN_VERSION
 const ROOT_DIR = resolve(__dirname, '../')
+
+const isNewArchEnabled = process.env.RCT_NEW_ARCH_ENABLED === '1'
 
 let fixturePath = 'test/react-native/features/fixtures/generated/'
 if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
@@ -27,7 +34,7 @@ if (process.env.NATIVE_INTEGRATION) {
   fixturePath += 'native-integration/'
 }
 
-if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
+if (isNewArchEnabled) {
   fixturePath += 'new-arch/'
 } else {
   fixturePath += 'old-arch/'
@@ -82,7 +89,7 @@ const REACT_NATIVE_NAVIGATION_DEPENDENCIES = [
 // add dependencies for react-native-navigation (wix)
 if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
   DEPENDENCIES.push(...REACT_NATIVE_NAVIGATION_DEPENDENCIES)
-} else if (!process.env.RCT_NEW_ARCH_ENABLED) {
+} else if (!isNewArchEnabled) {
   // add dependencies for @react-navigation
   DEPENDENCIES.push(...REACT_NAVIGATION_DEPENDENCIES)
 }
@@ -298,13 +305,13 @@ function replaceGeneratedFixtureFiles() {
   babelConfig.plugins.push('@babel/plugin-transform-export-namespace-from', 'module:react-native-dotenv')
   fs.writeFileSync(resolve(fixtureDir, 'babel.config.js'), `module.exports = ${util.inspect(babelConfig)}`)
 
-  // If we're building with the new architecture, replace the gradle.properties file
-  if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
-    fs.copyFileSync(
-      resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/newarch.gradle.properties'),
-      resolve(fixtureDir, 'android/gradle.properties')
-    )
-  } else {
+  // enable/disable the new architecture in gradle.properties
+  const gradlePropertiesPath = `${fixtureDir}/android/gradle.properties`
+  let gradlePropertiesContents = fs.readFileSync(gradlePropertiesPath, 'utf8')
+  gradlePropertiesContents = gradlePropertiesContents.replace(/newArchEnabled\s*=\s*(true|false)/, `newArchEnabled=${isNewArchEnabled}`)
+  fs.writeFileSync(gradlePropertiesPath, gradlePropertiesContents)
+
+  if (!isNewArchEnabled) {
     // react navigation setup
     const fileExtension = parseFloat(reactNativeVersion) < 0.73 ? 'java' : 'kt'
     fs.copyFileSync(
