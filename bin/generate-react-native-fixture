@@ -71,10 +71,22 @@ const DEPENDENCIES = [
   `react-native-file-access@${reactNativeFileAccessVersion}`
 ]
 
-const reactNavigationVersion = '6.1.18'
-const reactNavigationNativeStackVersion = '6.11.0'
-const reactNativeScreensVersion = parseFloat(reactNativeVersion) <= 0.64 ? '3.14.0' : '3.35.0'
-const reactNativeSafeAreaContextVersion = parseFloat(reactNativeVersion) <= 0.64 ? '4.1.0' : '4.14.0'
+let reactNavigationVersion = '6.1.18'
+let reactNavigationNativeStackVersion = '6.11.0'
+let reactNativeScreensVersion = '3.35.0'
+let reactNativeSafeAreaContextVersion = '4.14.0'
+
+// RN 0.77 requires react-native-screens 4.6.0, which in turn requires react navigation v7
+if (parseFloat(reactNativeVersion) >= 0.77) {
+  reactNavigationVersion = '7.0.14'
+  reactNavigationNativeStackVersion = '7.2.0'
+  reactNativeScreensVersion = '4.6.0'
+  reactNativeSafeAreaContextVersion = '5.2.0'
+} else if (parseFloat(reactNativeVersion) <= 0.64) {
+  reactNativeScreensVersion = '3.14.0'
+  reactNativeSafeAreaContextVersion = '4.1.0'
+}
+
 const REACT_NAVIGATION_DEPENDENCIES = [
   `@react-navigation/native@${reactNavigationVersion}`,
   `@react-navigation/native-stack@${reactNavigationNativeStackVersion}`,
