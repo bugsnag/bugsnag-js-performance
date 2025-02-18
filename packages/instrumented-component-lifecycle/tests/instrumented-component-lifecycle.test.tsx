@@ -38,6 +38,8 @@ describe('withInstrumentedComponentLifecycle', () => {
     expect(screen.getByText('Testing')).toBeTruthy()
 
     expect(spy).toHaveBeenCalledTimes(2)
+    expect(spy).toHaveBeenCalledWith('[ViewLoad/Component]TestComponent')
+    expect(spy).toHaveBeenCalledWith('[ViewLoadPhase/Mount]TestComponent')
   })
 
   it('creates componentUnmountSpan when a component is unmounted', async () => {
@@ -47,39 +49,38 @@ describe('withInstrumentedComponentLifecycle', () => {
     const spy = jest.spyOn(BugsnagPerformance, 'startSpan')
 
     expect(spy).toHaveBeenCalledTimes(0)
-    // let span = await BugsnagPerformance.startSpan('span')
     const { unmount } = render(<WrappedComponent />)
     unmount()
 
     expect(spy).toHaveBeenCalledTimes(3)
-    // expect(span.end()).toHaveBeenCalled()
+    expect(spy).toHaveBeenCalledWith('[ViewLoadPhase/Unmount]TestComponent')
   })
 
   it('creates componentUpdateSpan when a component is updated', () => {
-    const WrappedComponent = withInstrumentedComponentLifecycle((props: { count: number }) => <div>{ props.count }</div>)
+    const Counter = (props: { count: number }) => <div>{ props.count }</div>
+    const WrappedComponent = withInstrumentedComponentLifecycle(Counter)
+    const spy = jest.spyOn(BugsnagPerformance, 'startSpan')
     const { rerender } = render(<WrappedComponent count={0} />)
 
-    const spy = jest.spyOn(BugsnagPerformance, 'startSpan')
     expect(spy).toHaveBeenCalledTimes(2)
-    // expect(mockEndSpan).toHaveBeenCalledTimes(1)
 
     rerender(<WrappedComponent count={1} />)
     expect(spy).toHaveBeenCalledTimes(3)
-    // expect(mockEndSpan).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledWith('[ViewLoadPhase/Update]Counter')
   })
 
   it('does not create componentUpdateSpan if includeComponentUpdates false', () => {
-    const WrappedComponent = withInstrumentedComponentLifecycle(
-      (props: { count: number }) => <div>{props.count}</div>,
-      { includeComponentUpdates: false }
-    )
+    const Counter = (props: { count: number }) => <div>{props.count}</div>;
+    const WrappedComponent = withInstrumentedComponentLifecycle(Counter, {
+      includeComponentUpdates: false,
+    })
+    const spy = jest.spyOn(BugsnagPerformance, 'startSpan')
     const { rerender } = render(<WrappedComponent count={0} />)
 
-    const spy = jest.spyOn(BugsnagPerformance, 'startSpan')
     expect(spy).toHaveBeenCalledTimes(2)
-    // expect(mockEndSpan).toHaveBeenCalledTimes(1)
 
     rerender(<WrappedComponent count={4} />)
-    // expect(mockUpdateSpan).not.toHaveBeenCalled()
+    expect(spy).toHaveBeenCalledTimes(2)
+    expect(spy).not.toHaveBeenCalledWith("[ViewLoadPhase/Update]Counter");
   })
 })

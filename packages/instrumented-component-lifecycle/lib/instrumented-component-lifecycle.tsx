@@ -34,7 +34,7 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
   }
 
   public shouldComponentUpdate ({ includeComponentUpdates = true }: InstrumentedComponentLifecycleProps, nextProps: any): boolean {
-    if (includeComponentUpdates && this.componentMountSpan && nextProps !== this.props.children) {
+    if (includeComponentUpdates && this.componentMountSpan && nextProps !== this.props) {
       this.componentUpdateSpan = BugsnagPerformance.startSpan(`[ViewLoadPhase/Update]${this.props.name}`)
     }
     return true
@@ -47,9 +47,8 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
   }
 
   public componentWillUnmount () {
-    this.componentUnmountSpan = BugsnagPerformance.appState !== 'ready' ? BugsnagPerformance.startSpan(`[ViewLoadPhase/Component]${this.props.name}`) : undefined
-    if (this.componentUnmountSpan) {
-      this.componentUnmountSpan.end()
+    if (BugsnagPerformance.appState !== "ready") {
+      BugsnagPerformance.startSpan(`[ViewLoadPhase/Unmount]${this.props.name}`).end()
     }
     if (this.componentLifetimeSpan) {
       const endTime = BugsnagPerformance.appState === 'ready' ? DISCARD_END_TIME : undefined

@@ -5,7 +5,6 @@ import jsx from 'acorn-jsx'
 const config = createRollupConfig({
   external: [
     '@bugsnag/browser-performance',
-    '@bugsnag/core-performance',
     'react'
   ]
 })
