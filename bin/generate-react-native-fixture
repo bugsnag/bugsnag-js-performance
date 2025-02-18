@@ -84,7 +84,7 @@ if (parseFloat(reactNativeVersion) >= 0.77) {
   reactNativeSafeAreaContextVersion = '5.2.0'
 } else if (parseFloat(reactNativeVersion) <= 0.64) {
   reactNativeScreensVersion = '3.14.0'
-  reactNativeSafeAreaContextVersion = '4.1.0'
+  reactNativeSafeAreaContextVersion = '4.3.4'
 }
 
 const REACT_NAVIGATION_DEPENDENCIES = [
@@ -201,10 +201,15 @@ function configureRN064Fixture(fixtureDir) {
   // Android
   const gradlePath = resolve(fixtureDir, 'android/build.gradle')
   let gradle = fs.readFileSync(gradlePath, 'utf8')
+  
   // add kotlinVersion = "1.4.10" to the buildscript ext block
   const buildscriptExt = 'ext {'
   const kotlinVersion = 'kotlinVersion = "1.4.10"'
   gradle = gradle.replace(buildscriptExt, `${buildscriptExt}\n        ${kotlinVersion}`)
+  
+  // bump android sdk version to 30
+  gradle = gradle.replace(/compileSdkVersion = 29/, 'compileSdkVersion = 30').replace(/targetSdkVersion = 29/, 'targetSdkVersion = 30')
+
   fs.writeFileSync(gradlePath, gradle)
 
   const moduleGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
