@@ -26,9 +26,7 @@ steps:
         matrix:
           setup:
             reactnative:
-              - "0.71"
               - "0.72"
-              - "0.73"
               - "0.74"
               - "0.75"
               - "0.76"
@@ -60,9 +58,7 @@ steps:
         commands:
           - ./bin/generate-react-native-fixture
         matrix:
-          - "0.71"
           - "0.72"
-          - "0.73"
           - "0.74"
           - "0.75"
           - "0.76"
@@ -92,9 +88,7 @@ steps:
         matrix:
           setup:
             reactnative:
-              - "0.71"
               - "0.72"
-              - "0.73"
               - "0.74"
               - "0.75"
               - "0.76"
@@ -128,9 +122,7 @@ steps:
           - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
-          - "0.71"
           - "0.72"
-          - "0.73"
           - "0.74"
           - "0.75"
           - "0.76"
@@ -158,9 +150,7 @@ steps:
           - ./bin/generate-react-native-fixture
         matrix:
           - "0.64"
-          - "0.71"
           - "0.72"
-          - "0.73"
           - "0.74"
           - "0.75"
           - "0.76"
@@ -187,9 +177,7 @@ steps:
           - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
-          - "0.71"
           - "0.72"
-          - "0.73"
           - "0.74"
           - "0.75"
           - "0.76"
@@ -218,9 +206,7 @@ steps:
           - ./bin/generate-react-native-fixture
         matrix:
           - "0.64"
-          - "0.71"
           - "0.72"
-          - "0.73"
           - "0.74"
           - "0.75"
           - "0.76"
@@ -248,9 +234,7 @@ steps:
           - bundle install
           - ./bin/generate-react-native-fixture
         matrix:
-          - "0.71"
           - "0.72"
-          - "0.73"
           - "0.74"
           - "0.75"
           - "0.76"
@@ -295,9 +279,7 @@ steps:
         concurrency_method: eager
         matrix:
           - "0.64"
-          - "0.71"
           - "0.72"
-          - "0.73"
           - "0.74"
           - "0.75"
           - "0.76"
@@ -336,9 +318,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.71"
           - "0.72"
-          - "0.73"
           - "0.74"
           - "0.75"
           - "0.76"
@@ -379,9 +359,7 @@ steps:
         concurrency_method: eager
         matrix:
           - "0.64"
-          - "0.71"
           - "0.72"
-          - "0.73"
           - "0.74"
           - "0.75"
           - "0.76"
@@ -422,9 +400,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.71"
           - "0.72"
-          - "0.73"
           - "0.74"
           - "0.75"
           - "0.76"
@@ -462,9 +438,7 @@ steps:
         concurrency_method: eager
         matrix:
           - "0.64"
-          - "0.71"
           - "0.72"
-          - "0.73"
           - "0.74"
           - "0.75"
           - "0.76"
@@ -503,9 +477,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.71"
           - "0.72"
-          - "0.73"
           - "0.74"
           - "0.75"
           - "0.76"
@@ -546,9 +518,7 @@ steps:
         concurrency_method: eager
         matrix:
           - "0.64"
-          - "0.71"
           - "0.72"
-          - "0.73"
           - "0.74"
           - "0.75"
           - "0.76"
@@ -589,9 +559,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.71"
           - "0.72"
-          - "0.73"
           - "0.74"
           - "0.75"
           - "0.76"
