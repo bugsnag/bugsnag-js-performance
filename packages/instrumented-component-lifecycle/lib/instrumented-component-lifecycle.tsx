@@ -47,7 +47,7 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
   }
 
   public componentWillUnmount () {
-    if (BugsnagPerformance.appState !== "ready") {
+    if (BugsnagPerformance.appState !== 'ready') {
       BugsnagPerformance.startSpan(`[ViewLoadPhase/Unmount]${this.props.name}`).end()
     }
     if (this.componentLifetimeSpan) {
