@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+This release adds support for React Native 0.77 to `@bugsnag/react-native-performance`
+
+### Fixed
+
+- (react-native) Fix turbo module check in React Native 0.77 [#578](https://github.com/bugsnag/bugsnag-js-performance/pull/578)
+
 ## [v2.11.0] (2025-01-23)
 
 ### Added

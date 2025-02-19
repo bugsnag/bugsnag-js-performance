@@ -2,10 +2,11 @@ import { TurboModuleRegistry, NativeModules } from 'react-native'
 import type { Spec } from './NativeBugsnagPerformance'
 
 declare const global: {
-  __turboModuleProxy: any
+  __turboModuleProxy?: any
+  RN$Bridgeless?: boolean
 }
 
-const isTurboModuleEnabled = () => global.__turboModuleProxy != null
+const isTurboModuleEnabled = () => global.RN$Bridgeless || global.__turboModuleProxy != null
 
 const NativeBsgModule = isTurboModuleEnabled()
   ? TurboModuleRegistry.get('BugsnagReactNativePerformance')
