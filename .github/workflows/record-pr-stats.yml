@@ -1,5 +1,8 @@
 name: Record PR stats
 
+permissions:
+  pull-requests: write
+
 on:
   workflow_call:
     inputs:
