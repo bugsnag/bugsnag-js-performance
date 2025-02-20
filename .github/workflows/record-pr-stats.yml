@@ -1,7 +1,6 @@
 name: Record PR stats
 
-permissions:
-  pull-requests: write
+permissions: read-all
 
 on:
   workflow_call:
@@ -29,6 +28,8 @@ on:
 jobs:
   record-sizes:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
 
     outputs:
       package-size: ${{ steps.package.outputs.result }}

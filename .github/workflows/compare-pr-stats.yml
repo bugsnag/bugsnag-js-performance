@@ -2,8 +2,7 @@ name: Compare PR stats
 
 on: [pull_request]
 
-permissions:
-  pull-requests: write
+permissions: read-all
 
 concurrency:
   # only allow one run of this workflow per branch, otherwise the comment could
@@ -24,6 +23,8 @@ jobs:
 
   compare-pr-stats:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     needs: [base-branch, head-branch]
     steps:
       - uses: actions/checkout@v3
