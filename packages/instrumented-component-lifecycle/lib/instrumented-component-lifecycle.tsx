@@ -5,9 +5,9 @@ import * as React from 'react'
 import type { PropsWithChildren } from 'react'
 
 interface InstrumentedComponentLifecycleProps extends PropsWithChildren {
-  name: string
-  includeComponentUpdates: boolean
-  componentProps: { [key: string]: any }
+  name: string;
+  includeComponentUpdates: boolean;
+  componentProps: Record<string, unknown>
 }
 
 class InstrumentedComponentLifecycle extends React.Component<InstrumentedComponentLifecycleProps> {
