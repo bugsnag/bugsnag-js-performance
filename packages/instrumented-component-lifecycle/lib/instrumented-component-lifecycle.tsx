@@ -7,7 +7,7 @@ import type { PropsWithChildren } from 'react'
 interface InstrumentedComponentLifecycleProps extends PropsWithChildren {
   name: string
   includeComponentUpdates: boolean
-  componentProps: {[key: string]: any}
+  componentProps: { [key: string]: any }
 }
 
 class InstrumentedComponentLifecycle extends React.Component<InstrumentedComponentLifecycleProps> {
@@ -36,7 +36,7 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
   public shouldComponentUpdate ({ includeComponentUpdates = true, componentProps }: InstrumentedComponentLifecycleProps): boolean {
     if (includeComponentUpdates && this.componentMountSpan && componentProps !== this.props.componentProps) {
       this.componentUpdateSpan = BugsnagPerformance.startSpan(`[ViewLoadPhase/Update]${this.props.name}`)
-      const updatedProps = Object.keys(componentProps).filter((prop) => {componentProps[prop] != this.props.componentProps[prop]})
+      const updatedProps = Object.keys(componentProps).filter(prop => componentProps[prop] !== this.props.componentProps[prop])
       this.componentUpdateSpan.setAttribute('bugsnag.component.update.props', updatedProps)
     }
     return true
