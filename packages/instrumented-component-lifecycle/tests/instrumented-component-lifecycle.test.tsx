@@ -11,7 +11,7 @@ afterEach(() => {
 
 describe('withInstrumentedComponentLifecycle', () => {
   it('renders the provided component', () => {
-    const Component = () => <h1>Testing</h1>
+    const Component = () => <div>Test Component</div>
     const WrappedComponent = withInstrumentedComponentLifecycle(Component, {
       name: 'TestComponent'
     })
@@ -20,11 +20,11 @@ describe('withInstrumentedComponentLifecycle', () => {
 
     render(<WrappedComponent />)
 
-    expect(screen.getByText('Testing')).toBeInTheDocument()
+    expect(screen.getByText('Test Component')).toBeInTheDocument()
   })
 
   it('creates componentMountSpan when a appState is not ready and component is mounted', () => {
-    const Component = () => <h1>Testing</h1>
+    const Component = () => <div>Test Component</div>
     const WrappedComponent = withInstrumentedComponentLifecycle(Component, {
       name: 'TestComponent'
     })
@@ -35,7 +35,7 @@ describe('withInstrumentedComponentLifecycle', () => {
 
     render(<WrappedComponent />)
 
-    expect(screen.getByText('Testing')).toBeTruthy()
+    expect(screen.getByText('Test Component')).toBeTruthy()
 
     expect(spy).toHaveBeenCalledTimes(2)
     expect(spy).toHaveBeenCalledWith('[ViewLoad/Component]TestComponent')
@@ -43,7 +43,7 @@ describe('withInstrumentedComponentLifecycle', () => {
   })
 
   it('creates componentUnmountSpan when a component is unmounted', async () => {
-    const Component = () => <h1>Testing</h1>
+    const Component = () => <div>Test Component</div>
     const WrappedComponent = withInstrumentedComponentLifecycle(Component, { name: 'TestComponent' })
 
     const spy = jest.spyOn(BugsnagPerformance, 'startSpan')

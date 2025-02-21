@@ -7,12 +7,12 @@ import type { PropsWithChildren } from 'react'
 interface InstrumentedComponentLifecycleProps extends PropsWithChildren {
   name: string
   includeComponentUpdates: boolean
+  componentProps: {[key: string]: any}
 }
 
 class InstrumentedComponentLifecycle extends React.Component<InstrumentedComponentLifecycleProps> {
   private componentMountSpan: Span | undefined
   private componentUpdateSpan: Span | undefined
-  private componentUnmountSpan: Span | undefined
   private componentLifetimeSpan: Span | undefined
 
   public static defaultProps: Partial<InstrumentedComponentLifecycleProps> = {
@@ -33,9 +33,11 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
     }
   }
 
-  public shouldComponentUpdate ({ includeComponentUpdates = true }: InstrumentedComponentLifecycleProps, nextProps: any): boolean {
-    if (includeComponentUpdates && this.componentMountSpan && nextProps !== this.props) {
+  public shouldComponentUpdate ({ includeComponentUpdates = true, componentProps }: InstrumentedComponentLifecycleProps): boolean {
+    if (includeComponentUpdates && this.componentMountSpan && componentProps !== this.props.componentProps) {
       this.componentUpdateSpan = BugsnagPerformance.startSpan(`[ViewLoadPhase/Update]${this.props.name}`)
+      const updatedProps = Object.keys(componentProps).filter((prop) => {componentProps[prop] != this.props.componentProps[prop]})
+      this.componentUpdateSpan.setAttribute('bugsnag.component.update.props', updatedProps)
     }
     return true
   }
@@ -68,7 +70,7 @@ export function withInstrumentedComponentLifecycle<P extends Record<string, any>
   const componentDisplayName = (options && options.name) || Component.displayName || Component.name || 'unknown'
 
   const WrappedComponent = (props: P) => (
-    <InstrumentedComponentLifecycle {...options} name={componentDisplayName}>
+    <InstrumentedComponentLifecycle {...options} name={componentDisplayName} componentProps={props}>
       <Component {...props} />
     </InstrumentedComponentLifecycle>
   )
