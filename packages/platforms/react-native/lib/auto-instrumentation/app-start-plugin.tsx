@@ -3,8 +3,7 @@ import type {
   Clock,
   InternalConfiguration,
   Plugin,
-  SetAppState,
-  SpanFactory
+  SetAppState
 } from '@bugsnag/core-performance'
 import type { ReactNode } from 'react'
 import React from 'react'

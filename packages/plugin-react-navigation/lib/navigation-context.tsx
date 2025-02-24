@@ -1,8 +1,7 @@
-import type { SetAppState, SpanFactory, SpanInternal } from '@bugsnag/core-performance'
-import type { ReactNativeConfiguration, ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
+import type { SetAppState, SpanInternal } from '@bugsnag/core-performance'
+import type { ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
 import type { PropsWithChildren } from 'react'
 
-import { createNavigationSpan } from '@bugsnag/react-native-performance'
 import React from 'react'
 
 export const NavigationContext = React.createContext({

@@ -139,7 +139,7 @@ describe('NavigationContextProvider', () => {
 
     // Start a navigation
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
     expect(setAppState).toHaveBeenCalled()
     expect(appState).toBe('navigating')
 
@@ -174,7 +174,7 @@ describe('NavigationContextProvider', () => {
 
     // start navigation
     fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('[Navigation]route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
     expect(setAppState).toHaveBeenCalled()
     expect(appState).toBe('navigating')
 
