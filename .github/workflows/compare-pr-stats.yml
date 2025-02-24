@@ -12,19 +12,23 @@ concurrency:
 
 jobs:
   base-branch:
+    permissions:
+      pull-requests: write
     uses: ./.github/workflows/record-pr-stats.yml
     with:
       ref: ${{ github.event.pull_request.base.sha }}
 
   head-branch:
+    permissions:
+      pull-requests: write
     uses: ./.github/workflows/record-pr-stats.yml
     with:
       ref: ${{ github.sha }}
 
   compare-pr-stats:
-    runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+    runs-on: ubuntu-latest
     needs: [base-branch, head-branch]
     steps:
       - uses: actions/checkout@v3
