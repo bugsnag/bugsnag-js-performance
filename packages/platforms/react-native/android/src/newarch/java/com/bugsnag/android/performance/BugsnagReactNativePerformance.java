@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import com.bugsnag.reactnative.performance.NativeBugsnagPerformanceSpec;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
 public class BugsnagReactNativePerformance extends NativeBugsnagPerformanceSpec {
@@ -73,6 +74,36 @@ public class BugsnagReactNativePerformance extends NativeBugsnagPerformanceSpec 
   @Override
   public void writeFile(String path, String data, String encoding, Promise promise){
     impl.writeFile(path, data, encoding, promise);
+  }
+
+  @Override
+  public boolean isNativePerformanceAvailable() {
+    return impl.isNativePerformanceAvailable();
+  }
+
+  @Override
+  public WritableMap attachToNativeSDK() {
+    return impl.attachToNativeSDK();
+  }
+
+  @Override 
+  public WritableMap startNativeSpan(String name, ReadableMap options) {
+    return impl.startNativeSpan(name, options);
+  }
+
+  @Override
+  public void endNativeSpan(String spanId, String traceId, double endTime, ReadableMap attributes, Promise promise) {
+    impl.endNativeSpan(spanId, traceId, endTime, attributes, promise);
+  }
+
+  @Override 
+  public void markNativeSpanEndTime(String spanId, String traceId, double endTime) {
+    impl.markNativeSpanEndTime(spanId, traceId, endTime);
+  }
+
+  @Override
+  public void discardNativeSpan(String spanId, String traceId, Promise promise) {
+    impl.discardNativeSpan(spanId, traceId, promise);
   }
 }
 

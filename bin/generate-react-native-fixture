@@ -15,14 +15,26 @@ if (!process.env.NOTIFIER_VERSION) {
   process.exit(1)
 }
 
+if (!process.env.RCT_NEW_ARCH_ENABLED || (process.env.RCT_NEW_ARCH_ENABLED !== '1' && process.env.RCT_NEW_ARCH_ENABLED !== '0')) {
+  console.error('RCT_NEW_ARCH_ENABLED must be set to 1 or 0')
+  process.exit(1)
+}
+
 const reactNativeVersion = process.env.RN_VERSION
 const ROOT_DIR = resolve(__dirname, '../')
+
+const isNewArchEnabled = process.env.RCT_NEW_ARCH_ENABLED === '1'
 
 let fixturePath = 'test/react-native/features/fixtures/generated/'
 if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
   fixturePath += 'react-native-navigation/'
 }
-if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
+
+if (process.env.NATIVE_INTEGRATION) {
+  fixturePath += 'native-integration/'
+}
+
+if (isNewArchEnabled) {
   fixturePath += 'new-arch/'
 } else {
   fixturePath += 'old-arch/'
@@ -59,10 +71,22 @@ const DEPENDENCIES = [
   `react-native-file-access@${reactNativeFileAccessVersion}`
 ]
 
-const reactNavigationVersion = '6.1.18'
-const reactNavigationNativeStackVersion = '6.11.0'
-const reactNativeScreensVersion = parseFloat(reactNativeVersion) <= 0.64 ? '3.14.0' : '3.35.0'
-const reactNativeSafeAreaContextVersion = parseFloat(reactNativeVersion) <= 0.64 ? '4.1.0' : '4.14.0'
+let reactNavigationVersion = '6.1.18'
+let reactNavigationNativeStackVersion = '6.11.0'
+let reactNativeScreensVersion = '3.35.0'
+let reactNativeSafeAreaContextVersion = '4.14.0'
+
+// RN 0.77 requires react-native-screens 4.6.0, which in turn requires react navigation v7
+if (parseFloat(reactNativeVersion) >= 0.77) {
+  reactNavigationVersion = '7.0.14'
+  reactNavigationNativeStackVersion = '7.2.0'
+  reactNativeScreensVersion = '4.6.0'
+  reactNativeSafeAreaContextVersion = '5.2.0'
+} else if (parseFloat(reactNativeVersion) <= 0.64) {
+  reactNativeScreensVersion = '3.14.0'
+  reactNativeSafeAreaContextVersion = '4.3.4'
+}
+
 const REACT_NAVIGATION_DEPENDENCIES = [
   `@react-navigation/native@${reactNavigationVersion}`,
   `@react-navigation/native-stack@${reactNavigationNativeStackVersion}`,
@@ -77,7 +101,7 @@ const REACT_NATIVE_NAVIGATION_DEPENDENCIES = [
 // add dependencies for react-native-navigation (wix)
 if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
   DEPENDENCIES.push(...REACT_NATIVE_NAVIGATION_DEPENDENCIES)
-} else if (!process.env.RCT_NEW_ARCH_ENABLED) {
+} else if (!isNewArchEnabled) {
   // add dependencies for @react-navigation
   DEPENDENCIES.push(...REACT_NAVIGATION_DEPENDENCIES)
 }
@@ -103,11 +127,20 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   replaceGeneratedFixtureFiles()
 
+  configureAndroidProject()
+
+  configureIOSProject()
+
   installFixtureDependencies()
 
   // apply additional modifications required for RN 0.64
   if (parseFloat(reactNativeVersion) === 0.64) {
     configureRN064Fixture(fixtureDir)
+  }
+
+  if (process.env.NATIVE_INTEGRATION === '1') {
+    installAndroidPerformance()
+    installCocoaPerformance()
   }
 
   // link react-native-navigation using rnn-link tool
@@ -166,6 +199,19 @@ if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
 /** Update fixture configuration to support React Native 0.64 */
 function configureRN064Fixture(fixtureDir) {
   // Android
+  const gradlePath = resolve(fixtureDir, 'android/build.gradle')
+  let gradle = fs.readFileSync(gradlePath, 'utf8')
+  
+  // add kotlinVersion = "1.4.10" to the buildscript ext block
+  const buildscriptExt = 'ext {'
+  const kotlinVersion = 'kotlinVersion = "1.4.10"'
+  gradle = gradle.replace(buildscriptExt, `${buildscriptExt}\n        ${kotlinVersion}`)
+  
+  // bump android sdk version to 30
+  gradle = gradle.replace(/compileSdkVersion = 29/, 'compileSdkVersion = 30').replace(/targetSdkVersion = 29/, 'targetSdkVersion = 30')
+
+  fs.writeFileSync(gradlePath, gradle)
+
   const moduleGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
   let moduleGradle = fs.readFileSync(moduleGradlePath, 'utf8')
 
@@ -196,18 +242,6 @@ function configureRN064Fixture(fixtureDir) {
 
   moduleGradle = moduleGradle.replace(currentReactConfig, updatedReactConfig).replace(flipperDependencies, '')
   fs.writeFileSync(moduleGradlePath, moduleGradle)
-
-  // iOS
-  const podfilePath = resolve(fixtureDir, 'ios/Podfile')
-  let podfile = fs.readFileSync(podfilePath, 'utf8')
-
-  // disable flipper
-  podfile = podfile.replace("use_flipper!", "# use_flipper!")
-
-  // bump the minimum iOS version to 11
-  podfile = podfile.replace("platform :ios, '10.0'", "platform :ios, '11.0'")
-
-  fs.writeFileSync(podfilePath, podfile)
 
   // set --openssl-legacy-provider node option in pbxproj file
   const pbxprojPath = resolve(fixtureDir, 'ios/reactnative.xcodeproj/project.pbxproj')
@@ -268,16 +302,6 @@ function replaceGeneratedFixtureFiles() {
   }
 
   fs.copyFileSync(
-    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/AndroidManifest.xml'),
-    resolve(fixtureDir, 'android/app/src/main/AndroidManifest.xml')
-  )
-
-  fs.copyFileSync(
-    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/Info.plist'),
-    resolve(fixtureDir, 'ios/reactnative/Info.plist')
-  )
-
-  fs.copyFileSync(
     resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/ios/exportOptions.plist'),
     resolve(fixtureDir, 'exportOptions.plist')
   )
@@ -291,22 +315,9 @@ function replaceGeneratedFixtureFiles() {
   if (!babelConfig.plugins) babelConfig.plugins = []
   babelConfig.plugins.push('@babel/plugin-transform-export-namespace-from', 'module:react-native-dotenv')
   fs.writeFileSync(resolve(fixtureDir, 'babel.config.js'), `module.exports = ${util.inspect(babelConfig)}`)
+}
 
-  // If we're building with the new architecture, replace the gradle.properties file
-  if (process.env.RCT_NEW_ARCH_ENABLED === 'true' || process.env.RCT_NEW_ARCH_ENABLED === '1') {
-    fs.copyFileSync(
-      resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/android/newarch.gradle.properties'),
-      resolve(fixtureDir, 'android/gradle.properties')
-    )
-  } else {
-    // react navigation setup
-    const fileExtension = parseFloat(reactNativeVersion) < 0.73 ? 'java' : 'kt'
-    fs.copyFileSync(
-      resolve(ROOT_DIR, `test/react-native/features/fixtures/app/android/MainActivity.${reactNativeVersion}.${fileExtension}`),
-      resolve(fixtureDir, `android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${fileExtension}`)
-    )
-  }
-
+function configureIOSProject() {
   // disable Flipper
   let podfileContents = fs.readFileSync(`${fixtureDir}/ios/Podfile`, 'utf8')
   if (podfileContents.includes('use_flipper!')) {
@@ -315,14 +326,127 @@ function replaceGeneratedFixtureFiles() {
     podfileContents = podfileContents.replace(/:flipper_configuration/, '# :flipper_configuration')
   }
 
+  // for RN versions < 0.73, bump the minimum iOS version to 13 (required for Cocoa Performance)
+  if (parseFloat(reactNativeVersion) < 0.73) {
+    podfileContents = podfileContents.replace(/platform\s*:ios,\s*(?:'[\d.]+'|min_ios_version_supported)/, "platform :ios, '13.0'")
+  }
+  
   fs.writeFileSync(`${fixtureDir}/ios/Podfile`, podfileContents)
 
   // pin xcodeproj version to < 1.26.0
   const gemfilePath = resolve(fixtureDir, 'Gemfile')
   if (fs.existsSync(gemfilePath)) {
     let gemfileContents = fs.readFileSync(gemfilePath, 'utf8')
-    gemfileContents += `\ngem 'xcodeproj', '< 1.26.0'`
-    gemfileContents += `\ngem 'concurrent-ruby', '1.3.4'`
+    if (!gemfileContents.includes('xcodeproj')) {
+      gemfileContents += `\ngem 'xcodeproj', '< 1.26.0'`
+    }
+    if (!gemfileContents.includes('concurrent-ruby')) {
+      gemfileContents += `\ngem 'concurrent-ruby', '<= 1.3.4'`
+    }
     fs.writeFileSync(gemfilePath, gemfileContents)
   }
+
+  // set NSAllowsArbitraryLoads to allow http traffic for all domains (bitbar public IP + bs-local.com)
+  const plistpath = `${fixtureDir}/ios/reactnative/Info.plist`
+  let plistContents = fs.readFileSync(plistpath, 'utf8')
+  const allowArbitraryLoads = '<key>NSAllowsArbitraryLoads</key>\n\t\t<true/>'
+  let searchPattern, replacement
+  if (plistContents.includes('<key>NSAllowsArbitraryLoads</key>')) {
+    searchPattern = '<key>NSAllowsArbitraryLoads</key>\n\t\t<false/>'
+    replacement = allowArbitraryLoads
+  } else {
+    searchPattern = '<key>NSAppTransportSecurity</key>\n\t<dict>'
+    replacement = `${searchPattern}\n\t\t${allowArbitraryLoads}`
+  }
+
+  // remove the NSAllowsLocalNetworking key if it exists as this causes NSAllowsArbitraryLoads to be ignored
+  const allowLocalNetworking = '<key>NSAllowsLocalNetworking</key>\n\t\t<true/>'
+  plistContents = plistContents.replace(allowLocalNetworking, '')
+
+  fs.writeFileSync(plistpath, plistContents.replace(searchPattern, replacement))
+}
+
+function configureAndroidProject() {
+  // set android:usesCleartextTraffic="true" in AndroidManifest.xml
+  const androidManifestPath = `${fixtureDir}/android/app/src/main/AndroidManifest.xml`
+  let androidManifestContents = fs.readFileSync(androidManifestPath, 'utf8')
+  androidManifestContents = androidManifestContents.replace('<application', '<application android:usesCleartextTraffic="true"')
+  fs.writeFileSync(androidManifestPath, androidManifestContents)
+
+  // enable/disable the new architecture in gradle.properties
+  const gradlePropertiesPath = `${fixtureDir}/android/gradle.properties`
+  let gradlePropertiesContents = fs.readFileSync(gradlePropertiesPath, 'utf8')
+  gradlePropertiesContents = gradlePropertiesContents.replace(/newArchEnabled\s*=\s*(true|false)/, `newArchEnabled=${isNewArchEnabled}`)
+  fs.writeFileSync(gradlePropertiesPath, gradlePropertiesContents)
+
+  if (!isNewArchEnabled) {
+    // react navigation setup
+    configureReactNavigationAndroid()
+  }
+}
+
+function installAndroidPerformance() {
+  // declare dependency in the app/build.gradle file
+  const appGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
+  let appGradle = fs.readFileSync(appGradlePath, 'utf8')
+
+  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:1.+")'
+  const dependenciesSection = 'dependencies {'
+
+  appGradle = appGradle.replace(dependenciesSection, `${dependenciesSection}\n    ${performanceDependency}`)
+  fs.writeFileSync(appGradlePath, appGradle)
+}
+
+function installCocoaPerformance() {
+  // add 'pod "BugsnagPerformance"' to the Podfile
+  const podfilePath = resolve(fixtureDir, 'ios/Podfile')
+  let podfile = fs.readFileSync(podfilePath, 'utf8')
+
+  const performancePod = `pod 'BugsnagPerformance'`
+  const targetSection = 'target \'reactnative\' do'
+
+  podfile = podfile.replace(targetSection, `${targetSection}\n  ${performancePod}`)
+  fs.writeFileSync(podfilePath, podfile)
+}
+
+function configureReactNavigationAndroid () {
+  const fileExtension = parseFloat(reactNativeVersion) < 0.73 ? 'java' : 'kt'
+  let mainActivityPattern, mainActivityReplacement
+  if (fileExtension === 'java') {
+    mainActivityPattern = 'public class MainActivity extends ReactActivity {'
+    mainActivityReplacement = `
+import android.os.Bundle;
+
+public class MainActivity extends ReactActivity {
+
+  /**
+   * Required for react-navigation/native implementation
+   * https://reactnavigation.org/docs/getting-started/#installing-dependencies-into-a-bare-react-native-project
+   */
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(null);
+  }
+`
+  } else if (fileExtension === 'kt') {
+    mainActivityPattern = 'class MainActivity : ReactActivity() {'
+    mainActivityReplacement = `
+import android.os.Bundle
+
+class MainActivity : ReactActivity() {
+
+  /**
+   * Required for react-navigation/native implementation
+   * https://reactnavigation.org/docs/getting-started/#installing-dependencies-into-a-bare-react-native-project
+   */
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(null)
+  }
+`
+  }
+
+  const mainActivityPath = `${fixtureDir}/android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${fileExtension}`
+  let mainActivityContents = fs.readFileSync(mainActivityPath, 'utf8')
+  mainActivityContents = mainActivityContents.replace(mainActivityPattern, mainActivityReplacement)
+  fs.writeFileSync(mainActivityPath, mainActivityContents)
 }

@@ -2,6 +2,8 @@ name: Compare PR stats
 
 on: [pull_request]
 
+permissions: read-all
+
 concurrency:
   # only allow one run of this workflow per branch, otherwise the comment could
   # be overwritten by an earlier commit that runs slower than the latest commit
@@ -21,11 +23,13 @@ jobs:
 
   compare-pr-stats:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     needs: [base-branch, head-branch]
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/setup-node@1a4442cacd436585916779262731d5b162bc6ec7 # v3.8.2
+      - uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
         with:
           node-version: 18
           cache: 'npm'

@@ -2,10 +2,11 @@ import { TurboModuleRegistry, NativeModules } from 'react-native'
 import type { Spec } from './NativeBugsnagPerformance'
 
 declare const global: {
-  __turboModuleProxy: any
+  __turboModuleProxy?: any
+  RN$Bridgeless?: boolean
 }
 
-const isTurboModuleEnabled = () => global.__turboModuleProxy != null
+const isTurboModuleEnabled = () => global.RN$Bridgeless || global.__turboModuleProxy != null
 
 const NativeBsgModule = isTurboModuleEnabled()
   ? TurboModuleRegistry.get('BugsnagReactNativePerformance')
@@ -22,7 +23,13 @@ const NativeBugsnagPerformance = NativeBsgModule || {
   mkdir: async (path: string) => '',
   readFile: async (path: string, encoding: string) => '',
   unlink: async (path: string) => { },
-  writeFile: async (path: string, data: string, encoding: string) => { }
+  writeFile: async (path: string, data: string, encoding: string) => { },
+  isNativePerformanceAvailable: () => false,
+  attachToNativeSDK: () => null,
+  startNativeSpan: (name: string, options: object) => ({ name, id: '', traceId: '', startTime: 0, parentSpanId: '' }),
+  endNativeSpan: async (spanId: string, traceId: string, endTime: number, attributes: object) => { },
+  markNativeSpanEndTime: (spanId: string, traceId: string, endTime: number) => { },
+  discardNativeSpan: async (spanId: string, traceId: string) => { }
 }
 
 export default NativeBugsnagPerformance as Spec

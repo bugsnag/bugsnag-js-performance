@@ -1,5 +1,4 @@
-import type { OnSpanEndCallback } from './batch-processor'
-import type { Configuration, Logger } from './config'
+import type { Configuration, Logger, OnSpanEndCallback } from './config'
 import type { PersistedProbability } from './persistence'
 import type { Plugin } from './plugin'
 import type { ParentContext } from './span'
