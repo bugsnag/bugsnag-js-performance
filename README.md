@@ -11,6 +11,7 @@
 [![Documentation](https://img.shields.io/badge/documentation-latest-blue.svg)](https://docs.bugsnag.com/performance/browser-js/)
 [![Build status](https://badge.buildkite.com/a1ed35adfab0cd5f2c0030cc54961209cb720aa5ed2284cb73.svg?branch=main)](https://buildkite.com/bugsnag/bugsnag-js-performance)
 [![Node CI](https://github.com/bugsnag/bugsnag-js-performance/actions/workflows/node-ci.yml/badge.svg)](https://github.com/bugsnag/bugsnag-js-performance/actions/workflows/node-ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/bugsnag/bugsnag-js-performance/badge)](https://scorecard.dev/viewer/?uri=github.com/bugsnag/bugsnag-js-performance)
 
 Monitor the page load speed, capture [WebVitals](https://web.dev/vitals/) and take other measurements in your web app and see the results in your [BugSnag](https://www.bugsnag.com) dashboard.
 
