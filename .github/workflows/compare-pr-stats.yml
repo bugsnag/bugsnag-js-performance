@@ -13,14 +13,14 @@ concurrency:
 jobs:
   base-branch:
     permissions:
-      pull-requests: write
+      id-token: write
     uses: ./.github/workflows/record-pr-stats.yml
     with:
       ref: ${{ github.event.pull_request.base.sha }}
 
   head-branch:
     permissions:
-      pull-requests: write
+      id-token: write
     uses: ./.github/workflows/record-pr-stats.yml
     with:
       ref: ${{ github.sha }}
