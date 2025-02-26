@@ -1,19 +1,20 @@
-import type { Clock, SpanContextStorage, SpanFactory, SpanOptions } from '@bugsnag/core-performance'
+import type { Client, Clock, SpanContextStorage, SpanOptions } from '@bugsnag/core-performance'
 import React from 'react'
-import type { ReactNativeConfiguration } from './config'
+import { Platform } from 'react-native'
+import NativeBugsnagPerformance from './native'
+import type { ReactNativeAttachConfiguration, ReactNativeConfiguration } from './config'
 import { createAppStartSpan } from './create-app-start-span'
-import { createNavigationSpan } from './create-navigation-span'
+import type { ReactNativeSpanFactory } from './span-factory'
 
 type NavigationSpanOptions = Omit<SpanOptions, 'isFirstClass'>
 
-export const platformExtensions = (appStartTime: number, clock: Clock, spanFactory: SpanFactory<ReactNativeConfiguration>, spanContextStorage: SpanContextStorage) => ({
-  startNavigationSpan: (routeName: string, spanOptions?: NavigationSpanOptions) => {
+export const platformExtensions = (appStartTime: number, clock: Clock, spanFactory: ReactNativeSpanFactory, spanContextStorage: SpanContextStorage) => ({
+  startNavigationSpan: function (routeName: string, spanOptions?: NavigationSpanOptions) {
     const cleanOptions = spanFactory.validateSpanOptions(routeName, spanOptions)
-    cleanOptions.options.isFirstClass = true
-    const span = createNavigationSpan(spanFactory, cleanOptions.name, cleanOptions.options)
+    const span = spanFactory.startNavigationSpan(cleanOptions.name, cleanOptions.options)
     return spanFactory.toPublicApi(span)
   },
-  withInstrumentedAppStarts: (App: React.FC) => {
+  withInstrumentedAppStarts: function (App: React.FC) {
     const appStartSpan = createAppStartSpan(spanFactory, appStartTime)
 
     return () => {
@@ -25,6 +26,27 @@ export const platformExtensions = (appStartTime: number, clock: Clock, spanFacto
 
       return <App />
     }
+  },
+  attach: function (config?: ReactNativeAttachConfiguration) {
+    const platform = Platform.OS === 'ios' ? 'Cocoa' : 'Android'
+    const isNativePerformanceAvailable = NativeBugsnagPerformance?.isNativePerformanceAvailable()
+    if (!isNativePerformanceAvailable) {
+      throw new Error(`Could not attach to native SDK. No compatible version of Bugsnag ${platform} Performance was found.`)
+    }
+
+    const nativeConfig = NativeBugsnagPerformance?.attachToNativeSDK()
+    if (!nativeConfig) {
+      throw new Error(`Could not attach to native SDK. Bugsnag ${platform} Performance has not been started.`)
+    }
+
+    const finalConfig: ReactNativeConfiguration = {
+      ...config,
+      ...nativeConfig
+    }
+
+    spanFactory.onAttach()
+    const client = this as unknown as Client<ReactNativeConfiguration>
+    client.start(finalConfig)
   }
 })
 

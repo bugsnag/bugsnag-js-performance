@@ -9,7 +9,7 @@ import { clearPersistedState, setDeviceId, setSamplingProbability } from './Pers
 import { ScenarioContext } from './ScenarioContext'
 import { NativeScenarioLauncher } from './native'
 
-const isTurboModuleEnabled = () => global.__turboModuleProxy != null
+const isTurboModuleEnabled = () => global.RN$Bridgeless || global.__turboModuleProxy != null
 
 async function loadReactNavigationScenario (scenario) {
   if (typeof scenario.registerScreens === 'function') {
@@ -51,8 +51,10 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
 
   await scenario.initialise(scenarioConfig)
 
-  BugsnagPerformance.start(scenarioConfig)
-
+  if (!scenario.doNotStartBugsnagPerformance) {
+    BugsnagPerformance.start(scenarioConfig)
+  }
+  
   if (process.env.REACT_NATIVE_NAVIGATION) {
     loadReactNavigationScenario(scenario)
   } else {

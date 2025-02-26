@@ -1,4 +1,4 @@
-import { MockSpanFactory, createConfiguration } from '@bugsnag/js-performance-test-utilities'
+import { MockReactNativeSpanFactory, createConfiguration } from '@bugsnag/js-performance-test-utilities'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import type { AppState } from '@bugsnag/core-performance'
 import { Navigation } from 'react-native-navigation'
@@ -22,7 +22,7 @@ describe('ReactNativeNavigationPlugin', () => {
     const setAppState = jest.fn((state: AppState) => { appState = state })
     const plugin = new ReactNativeNavigationPlugin(Navigation)
     const configuration = createConfiguration<ReactNativeConfiguration>()
-    const spanFactory = new MockSpanFactory()
+    const spanFactory = new MockReactNativeSpanFactory()
     plugin.configure(configuration, spanFactory, setAppState)
 
     expect(appState).toBe('starting')
@@ -62,7 +62,7 @@ describe('ReactNativeNavigationPlugin', () => {
     const setAppState = jest.fn((state: AppState) => { appState = state })
     const plugin = new ReactNativeNavigationPlugin(Navigation)
     const configuration = createConfiguration<ReactNativeConfiguration>()
-    const spanFactory = new MockSpanFactory()
+    const spanFactory = new MockReactNativeSpanFactory()
     plugin.configure(configuration, spanFactory, setAppState)
 
     expect(appState).toBe('starting')
@@ -120,7 +120,7 @@ describe('ReactNativeNavigationPlugin', () => {
     const setAppState = jest.fn((state: AppState) => { appState = state })
     const plugin = new ReactNativeNavigationPlugin(Navigation)
     const configuration = createConfiguration<ReactNativeConfiguration>()
-    const spanFactory = new MockSpanFactory()
+    const spanFactory = new MockReactNativeSpanFactory()
     plugin.configure(configuration, spanFactory, setAppState)
 
     expect(appState).toBe('starting')

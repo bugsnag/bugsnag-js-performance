@@ -17,7 +17,6 @@ x-common-environment: &common-environment
   BUILDKITE_STEP_KEY:
   MAZE_ASPECTO_REPEATER_API_KEY:
   MAZE_BUGSNAG_API_KEY:
-  MAZE_REPEATER_API_KEY:
   MAZE_NO_FAIL_FAST:
 
 services:
@@ -41,6 +40,7 @@ services:
       BITBAR_ACCESS_KEY:
       HOST: "${HOST:-maze-runner}"
       API_HOST: "${API_HOST:-maze-runner}"
+      MAZE_REPEATER_API_KEY: "${MAZE_REPEATER_API_KEY_JS:-}"
     networks:
       default:
         aliases:
@@ -66,6 +66,7 @@ services:
       BROWSER_STACK_ACCESS_KEY:
       HOST: "${HOST:-maze-runner}"
       API_HOST: "${API_HOST:-maze-runner}"
+      MAZE_REPEATER_API_KEY: "${MAZE_REPEATER_API_KEY_JS:-}"
     networks:
       default:
         aliases:
@@ -86,6 +87,7 @@ services:
       BROWSER_STACK_USERNAME:
       BROWSER_STACK_ACCESS_KEY:
       USE_LEGACY_DRIVER: 1
+      MAZE_REPEATER_API_KEY: "${MAZE_REPEATER_API_KEY_JS:-}"
     networks:
       default:
         aliases:
@@ -102,6 +104,8 @@ services:
       BITBAR_ACCESS_KEY:
       RCT_NEW_ARCH_ENABLED:
       REACT_NATIVE_NAVIGATION:
+      NATIVE_INTEGRATION:
+      MAZE_REPEATER_API_KEY: "${MAZE_REPEATER_API_KEY_RN:-}"
     ports:
       - "9000-9499:9339"
     networks:

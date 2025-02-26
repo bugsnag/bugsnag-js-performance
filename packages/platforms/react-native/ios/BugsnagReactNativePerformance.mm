@@ -1,4 +1,6 @@
 #import "BugsnagReactNativePerformance.h"
+#import "BugsnagReactNativePerformanceCrossTalkAPIClient.h"
+#import "ReactNativeSpanAttributes.h"
 #import <sys/sysctl.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -7,7 +9,30 @@
 
 @implementation BugsnagReactNativePerformance
 
+static NSUInteger traceIdMidpoint = 16;
+
+static NSTimeInterval hourInSeconds = 3600;
+
+/**
+* A dictionary of open native spans, keyed by the span ID and trace ID,
+* so that they can be retrieved and closed/discarded from JS.
+* 
+* Since native spans are only ever started and ended from the JS thread,
+* no thread synchronization is required when accessing.
+*/
+NSMutableDictionary *openSpans;
+
+NSTimer *longRunningSpansTimer;
+
 RCT_EXPORT_MODULE()
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        openSpans = [NSMutableDictionary new];
+    }
+    return self;
+}
 
 static NSString *sysctlString(const char *name) noexcept {
     char value[32];
@@ -38,6 +63,22 @@ static NSString *hostArch() noexcept {
 #elif TARGET_CPU_X86_64
     return @"amd64";
 #endif
+}
+
+static uint64_t hexStringToUInt64(NSString *hexString) {
+    if (hexString == nil || [hexString length] == 0) {
+        return 0;
+    }
+
+    uint64_t result = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:hexString];
+    [scanner setScanLocation:0];
+
+    if (![scanner scanHexLongLong:&result]) {
+        return 0;
+    }
+
+    return result;
 }
 
 static NSString *getRandomBytes() noexcept {
@@ -199,6 +240,179 @@ RCT_EXPORT_METHOD(writeFile:(NSString *)path
         } else {
             reject(@"ERR", @"Failed to write to '\(path)', invalid base64.", nil);
         }
+    }
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(isNativePerformanceAvailable) {
+    return [NSNumber numberWithBool:BugsnagReactNativePerformanceCrossTalkAPIClient.isInitialized];
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(attachToNativeSDK) {
+    if (!BugsnagReactNativePerformanceCrossTalkAPIClient.isInitialized) {
+        return nil;
+    }
+
+    BugsnagPerformanceConfiguration *nativeConfig = [BugsnagReactNativePerformanceCrossTalkAPIClient.sharedInstance getConfiguration];
+    if (nativeConfig == nil) {
+        return nil;
+    }
+
+    if (longRunningSpansTimer == nil) {
+        longRunningSpansTimer = [NSTimer scheduledTimerWithTimeInterval:hourInSeconds
+                                                                target:self
+                                                              selector:@selector(discardLongRunningSpans)
+                                                              userInfo:nil
+                                                               repeats:YES];
+    }
+
+    NSMutableDictionary *config = [NSMutableDictionary new];
+    config[@"apiKey"] = nativeConfig.apiKey;
+    config[@"endpoint"] = [nativeConfig.endpoint absoluteString];
+    config[@"releaseStage"] = nativeConfig.releaseStage;
+    config[@"serviceName"] = nativeConfig.serviceName;
+    config[@"attributeCountLimit"] = [NSNumber numberWithUnsignedInteger: nativeConfig.attributeCountLimit];
+    config[@"attributeStringValueLimit"] = [NSNumber numberWithUnsignedInteger: nativeConfig.attributeStringValueLimit];
+    config[@"attributeArrayLengthLimit"] = [NSNumber numberWithUnsignedInteger: nativeConfig.attributeArrayLengthLimit];
+
+    if (nativeConfig.samplingProbability != nil) {
+        config[@"samplingProbability"] = nativeConfig.samplingProbability;
+    }
+
+    if (nativeConfig.appVersion != nil) {
+        config[@"appVersion"] = nativeConfig.appVersion;
+    }
+
+    if (nativeConfig.enabledReleaseStages != nil && nativeConfig.enabledReleaseStages.count > 0) {
+        config[@"enabledReleaseStages"] = [nativeConfig.enabledReleaseStages allObjects];
+    }
+
+    return config;
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(startNativeSpan:(NSString *)name
+                options:(NSDictionary *)options) {
+
+    // native spans are always first class and should never become the current context
+    BugsnagPerformanceSpanOptions *spanOptions = [BugsnagReactNativePerformanceCrossTalkAPIClient.sharedInstance newSpanOptions];
+    spanOptions.firstClass = BSGFirstClassYes;
+    spanOptions.makeCurrentContext = NO;
+    spanOptions.instrumentRendering = BSGInstrumentRenderingYes;
+    spanOptions.parentContext = nil;
+    
+    // Start times are passsed from JS as unix nanosecond timestamps
+    NSNumber *startTime = options[@"startTime"];
+    spanOptions.startTime = [NSDate dateWithTimeIntervalSince1970:([startTime doubleValue] / NSEC_PER_SEC)];
+    
+    NSDictionary *parentContext = options[@"parentContext"];
+    if (parentContext != nil) {
+        NSString *parentSpanId = parentContext[@"id"];
+        NSString *parentTraceId = parentContext[@"traceId"];
+
+        uint64_t spanId = hexStringToUInt64(parentSpanId);
+        uint64_t traceIdHi = hexStringToUInt64([parentTraceId substringToIndex:traceIdMidpoint]);
+        uint64_t traceIdLo = hexStringToUInt64([parentTraceId substringFromIndex:traceIdMidpoint]);
+
+        spanOptions.parentContext = [BugsnagReactNativePerformanceCrossTalkAPIClient.sharedInstance newSpanContext:traceIdHi traceIdLo:traceIdLo spanId:spanId];
+    }
+    
+    BugsnagPerformanceSpan *nativeSpan = [BugsnagReactNativePerformanceCrossTalkAPIClient.sharedInstance startSpan:name options:spanOptions];
+    [nativeSpan.attributes removeAllObjects];
+    
+    NSString *spanId = [NSString stringWithFormat:@"%llx", nativeSpan.spanId];
+    NSString *traceId = [NSString stringWithFormat:@"%llx%llx", nativeSpan.traceIdHi, nativeSpan.traceIdLo];
+
+    @synchronized (openSpans) {
+        openSpans[[spanId stringByAppendingString:traceId]] = nativeSpan;
+    }
+
+    NSMutableDictionary *span = [NSMutableDictionary new];
+    span[@"name"] = nativeSpan.name;
+    span[@"id"] = spanId;
+    span[@"traceId"] = traceId;
+    span[@"startTime"] = [NSNumber numberWithDouble: [nativeSpan.startTime timeIntervalSince1970] * NSEC_PER_SEC];
+    if (nativeSpan.parentId > 0) {
+        span[@"parentSpanId"] = [NSString stringWithFormat:@"%llx", nativeSpan.parentId];
+    }
+    
+    return span;
+}
+
+RCT_EXPORT_METHOD(endNativeSpan:(NSString *)spanId
+                traceId:(NSString *)traceId
+                endTime:(double)endTime
+                attributes:(NSDictionary *)attributes
+                resolve:(RCTPromiseResolveBlock)resolve
+                reject:(RCTPromiseRejectBlock)reject) {
+    NSString *spanKey = [spanId stringByAppendingString:traceId];
+
+    BugsnagPerformanceSpan *nativeSpan;
+    @synchronized (openSpans) {
+        nativeSpan = openSpans[spanKey];
+        if (nativeSpan != nil) {
+            [openSpans removeObjectForKey:spanKey];
+        }
+    }
+
+    if (nativeSpan != nil) {
+        // Set native span attributes from JS values
+        [ReactNativeSpanAttributes setNativeAttributes:nativeSpan.attributes fromJSAttributes:attributes];
+
+        // We need to reinstate the bugsnag.sampling.p attribute here as it might not be re-populated on span end
+        nativeSpan.attributes[@"bugsnag.sampling.p"] = @(nativeSpan.samplingProbability);
+        
+        // If the end time is later than the current end time, update it
+        NSDate *nativeEndTime = [NSDate dateWithTimeIntervalSince1970: endTime / NSEC_PER_SEC];
+        if ([nativeEndTime timeIntervalSinceDate:nativeSpan.endTime] > 0) {
+            [nativeSpan markEndTime:nativeEndTime];
+        }
+        
+        [nativeSpan sendForProcessing];
+    }
+
+    resolve(nil);
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(markNativeSpanEndTime:(NSString *)spanId traceId:(NSString *)traceId endTime:(double)endTime) {
+    @synchronized (openSpans) {
+        BugsnagPerformanceSpan *nativeSpan = openSpans[[spanId stringByAppendingString:traceId]];
+        if (nativeSpan != nil) {
+            NSDate *nativeEndTime = [NSDate dateWithTimeIntervalSince1970: endTime / NSEC_PER_SEC];
+            [nativeSpan markEndTime:nativeEndTime];
+        }
+    }
+    
+    return nil;
+}
+
+RCT_EXPORT_METHOD(discardNativeSpan:(NSString *)spanId
+                traceId:(NSString *)traceId
+                resolve:(RCTPromiseResolveBlock)resolve
+                reject:(RCTPromiseRejectBlock)reject) {
+    NSString *spanKey = [spanId stringByAppendingString:traceId];
+    @synchronized (openSpans) {
+        BugsnagPerformanceSpan *nativeSpan = openSpans[spanKey];    
+        if (nativeSpan != nil) {
+            [openSpans removeObjectForKey:spanKey];
+            [nativeSpan abortUnconditionally];
+        }
+    }
+
+    resolve(nil);
+}
+
+- (void)discardLongRunningSpans {
+    NSDate *oneHourAgo = [NSDate dateWithTimeIntervalSinceNow:-hourInSeconds];
+    NSMutableArray *keysToRemove = [NSMutableArray new];
+    
+    @synchronized (openSpans) {
+        for (NSString *key in openSpans) {
+            BugsnagPerformanceSpan *span = openSpans[key];
+            if ([span.startTime compare:oneHourAgo] == NSOrderedAscending) {
+                [keysToRemove addObject:key];
+            }
+        }
+        
+        [openSpans removeObjectsForKeys:keysToRemove];
     }
 }
 

@@ -1,3 +1,4 @@
+import { ReactNativeSpanFactory } from '../lib/span-factory'
 import { platformExtensions } from '../lib/platform-extensions'
 import { createTestClient, IncrementingClock, InMemoryDelivery, VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
 
@@ -7,7 +8,12 @@ describe('startNavigationSpan', () => {
   it('creates a navigation span', async () => {
     const delivery = new InMemoryDelivery()
     const clock = new IncrementingClock()
-    const testClient = createTestClient({ deliveryFactory: () => delivery, platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(0, clock, spanFactory, spanContextStorage) })
+    const testClient = createTestClient({
+      deliveryFactory: () => delivery,
+      spanFactory: ReactNativeSpanFactory,
+      platformExtensions: (spanFactory, spanContextStorage) => platformExtensions(0, clock, spanFactory as ReactNativeSpanFactory, spanContextStorage)
+    })
+
     testClient.start({ apiKey: VALID_API_KEY })
     await jest.runOnlyPendingTimersAsync()
 
