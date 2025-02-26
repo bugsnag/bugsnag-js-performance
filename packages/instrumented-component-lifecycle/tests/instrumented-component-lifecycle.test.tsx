@@ -2,6 +2,14 @@ import * as React from 'react'
 import { render, screen } from '@testing-library/react'
 import { withInstrumentedComponentLifecycle } from '../lib/instrumented-component-lifecycle'
 import BugsnagPerformance from '@bugsnag/browser-performance'
+import { createTestClient } from '@bugsnag/js-performance-test-utilities'
+
+const mockClient = createTestClient()
+
+// Use doMock to prevent hoisting
+jest.doMock('@bugsnag/browser-performance', () => {
+  return mockClient
+})
 
 jest.useFakeTimers()
 
