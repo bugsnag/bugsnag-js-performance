@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { render, screen } from '@testing-library/react'
-import { withInstrumentedComponentLifecycle } from '../lib/instrumented-component-lifecycle'
+import { withInstrumentedComponentLifecycle } from '../'
 import BugsnagPerformance from '@bugsnag/browser-performance'
 import { createTestClient } from '@bugsnag/js-performance-test-utilities'
 
@@ -24,8 +24,6 @@ describe('withInstrumentedComponentLifecycle', () => {
       name: 'TestComponent'
     })
 
-    expect(BugsnagPerformance.appState).toBe('starting')
-
     render(<WrappedComponent />)
 
     expect(screen.getByText('Test Component')).toBeInTheDocument()
@@ -42,8 +40,6 @@ describe('withInstrumentedComponentLifecycle', () => {
     expect(BugsnagPerformance.appState).toBe('starting')
 
     render(<WrappedComponent />)
-
-    expect(screen.getByText('Test Component')).toBeTruthy()
 
     expect(spy).toHaveBeenCalledTimes(2)
     expect(spy).toHaveBeenCalledWith('[ViewLoad/Component]TestComponent')

@@ -23,8 +23,10 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
     super(props)
     const { name } = this.props
 
-    this.componentLifetimeSpan = BugsnagPerformance.appState !== 'ready' ? BugsnagPerformance.startSpan(`[ViewLoad/Component]${name}`) : undefined
-    this.componentMountSpan = BugsnagPerformance.appState !== 'ready' ? BugsnagPerformance.startSpan(`[ViewLoadPhase/Mount]${name}`) : undefined
+    if (BugsnagPerformance.appState !== "ready") {
+      this.componentLifetimeSpan = BugsnagPerformance.startSpan(`[ViewLoad/Component]${name}`)
+      this.componentMountSpan = BugsnagPerformance.startSpan(`[ViewLoadPhase/Mount]${name}`)
+    }
   }
 
   async componentDidMount () {

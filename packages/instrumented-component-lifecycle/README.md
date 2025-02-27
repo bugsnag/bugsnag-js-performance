@@ -1,6 +1,6 @@
 # `@bugsnag/instrumented-component-lifecycle`
 
-A HOC component for instrumenting BugSnag Performance spans.
+A higher order component (HOC) for instrumenting BugSnag Performance spans.
 
 ## Usage
 
