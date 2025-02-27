@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { render, screen } from '@testing-library/react'
-import { withInstrumentedComponentLifecycle } from '../'
+import { withInstrumentedComponentLifecycle } from '../lib'
 import BugsnagPerformance from '@bugsnag/browser-performance'
 import { createTestClient } from '@bugsnag/js-performance-test-utilities'
 
