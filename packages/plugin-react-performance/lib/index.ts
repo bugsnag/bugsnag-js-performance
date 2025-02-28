@@ -1,1 +1,1 @@
-export { withInstrumentedComponent } from './with-instrumented-component';
+export { withInstrumentedComponent } from './with-instrumented-component'
