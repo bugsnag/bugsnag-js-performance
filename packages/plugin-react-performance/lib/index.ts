@@ -1,1 +1,1 @@
-export { withInstrumentedComponent } from './plugin-react-performance'
+export { withInstrumentedComponent } from './with-instrumented-component';
