@@ -4,22 +4,22 @@ import type { Span } from '@bugsnag/core-performance'
 import * as React from 'react'
 import type { PropsWithChildren } from 'react'
 
-interface InstrumentedComponentLifecycleProps extends PropsWithChildren {
+interface InstrumentedComponentProps extends PropsWithChildren {
   name: string
   includeComponentUpdates: boolean
   componentProps: Record<string, unknown>
 }
 
-class InstrumentedComponentLifecycle extends React.Component<InstrumentedComponentLifecycleProps> {
+class InstrumentedComponent extends React.Component<InstrumentedComponentProps> {
   private componentMountSpan: Span | undefined
   private componentUpdateSpan: Span | undefined
   private componentLifetimeSpan: Span | undefined
 
-  public static defaultProps: Partial<InstrumentedComponentLifecycleProps> = {
+  public static defaultProps: Partial<InstrumentedComponentProps> = {
     includeComponentUpdates: true
   }
 
-  public constructor (props: InstrumentedComponentLifecycleProps) {
+  public constructor (props: InstrumentedComponentProps) {
     super(props)
     const { name } = this.props
 
@@ -35,7 +35,7 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
     }
   }
 
-  public shouldComponentUpdate ({ includeComponentUpdates = true, componentProps }: InstrumentedComponentLifecycleProps): boolean {
+  public shouldComponentUpdate ({ includeComponentUpdates = true, componentProps }: InstrumentedComponentProps): boolean {
     if (includeComponentUpdates && this.componentMountSpan && componentProps !== this.props.componentProps) {
       this.componentUpdateSpan = BugsnagPerformance.startSpan(`[ViewLoadPhase/Update]${this.props.name}`)
       const updatedProps = Object.keys(componentProps).filter(prop => componentProps[prop] !== this.props.componentProps[prop])
@@ -65,16 +65,16 @@ class InstrumentedComponentLifecycle extends React.Component<InstrumentedCompone
   }
 }
 
-export function withInstrumentedComponentLifecycle<P extends Record<string, any>> (
+export function withInstrumentedComponent<P extends Record<string, any>> (
   Component: React.ComponentType<P>,
-  options?: Partial<InstrumentedComponentLifecycleProps>
+  options?: Partial<InstrumentedComponentProps>
 ) {
   const componentDisplayName = (options && options.name) || Component.displayName || Component.name || 'unknown'
 
   const WrappedComponent = (props: P) => (
-    <InstrumentedComponentLifecycle {...options} name={componentDisplayName} componentProps={props}>
+    <InstrumentedComponent {...options} name={componentDisplayName} componentProps={props}>
       <Component {...props} />
-    </InstrumentedComponentLifecycle>
+    </InstrumentedComponent>
   )
 
   return WrappedComponent

@@ -1,5 +1,5 @@
 {
-  "name": "@bugsnag/instrumented-component-lifecycle",
+  "name": "@bugsnag/plugin-react-performance",
   "version": "2.10.1",
   "description": "BugSnag performance monitoring",
   "homepage": "https://www.bugsnag.com/",

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { render, screen } from '@testing-library/react'
-import { withInstrumentedComponentLifecycle } from '../lib'
+import { withInstrumentedComponent } from '../lib'
 import BugsnagPerformance from '@bugsnag/browser-performance'
 import { createTestClient } from '@bugsnag/js-performance-test-utilities'
 
@@ -17,10 +17,10 @@ afterEach(() => {
   jest.clearAllMocks()
 })
 
-describe('withInstrumentedComponentLifecycle', () => {
+describe('withInstrumentedComponent', () => {
   it('renders the provided component', () => {
     const Component = () => <div>Test Component</div>
-    const WrappedComponent = withInstrumentedComponentLifecycle(Component, {
+    const WrappedComponent = withInstrumentedComponent(Component, {
       name: 'TestComponent'
     })
 
@@ -31,7 +31,7 @@ describe('withInstrumentedComponentLifecycle', () => {
 
   it('creates componentMountSpan when a appState is not ready and component is mounted', () => {
     const Component = () => <div>Test Component</div>
-    const WrappedComponent = withInstrumentedComponentLifecycle(Component, {
+    const WrappedComponent = withInstrumentedComponent(Component, {
       name: 'TestComponent'
     })
 
@@ -48,7 +48,7 @@ describe('withInstrumentedComponentLifecycle', () => {
 
   it('creates componentUnmountSpan when a component is unmounted', async () => {
     const Component = () => <div>Test Component</div>
-    const WrappedComponent = withInstrumentedComponentLifecycle(Component, { name: 'TestComponent' })
+    const WrappedComponent = withInstrumentedComponent(Component, { name: 'TestComponent' })
 
     const spy = jest.spyOn(BugsnagPerformance, 'startSpan')
 
@@ -62,7 +62,7 @@ describe('withInstrumentedComponentLifecycle', () => {
 
   it('creates componentUpdateSpan when a component is updated', () => {
     const Counter = (props: { count: number }) => <div>{ props.count }</div>
-    const WrappedComponent = withInstrumentedComponentLifecycle(Counter)
+    const WrappedComponent = withInstrumentedComponent(Counter)
     const spy = jest.spyOn(BugsnagPerformance, 'startSpan')
     const { rerender } = render(<WrappedComponent count={0} />)
 
@@ -75,7 +75,7 @@ describe('withInstrumentedComponentLifecycle', () => {
 
   it('does not create componentUpdateSpan if includeComponentUpdates false', () => {
     const Counter = (props: { count: number }) => <div>{props.count}</div>
-    const WrappedComponent = withInstrumentedComponentLifecycle(Counter, {
+    const WrappedComponent = withInstrumentedComponent(Counter, {
       includeComponentUpdates: false
     })
     const spy = jest.spyOn(BugsnagPerformance, 'startSpan')

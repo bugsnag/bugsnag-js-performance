@@ -11,7 +11,7 @@ const config = createRollupConfig({
 
 config.acornInjectPlugins = [jsx()]
 config.plugins = config.plugins.concat([
-  noTreeShakingPlugin('instrumented-component-lifecycle.tsx')
+  noTreeShakingPlugin('plugin-react-performance.tsx')
 ])
 
 export default config

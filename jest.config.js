@@ -13,7 +13,7 @@ const paths = {
   '@bugsnag/angular-performance': ['./packages/angular/lib/index.ts'],
   '@bugsnag/plugin-react-native-navigation-performance': ['./packages/plugin-react-native-navigation/lib/index.ts'],
   '@bugsnag/plugin-react-navigation-performance': ['./packages/plugin-react-navigation/lib/index.ts'],
-  '@bugsnag/instrumented-component-lifecycle': ['./packages/instrumented-component-lifecycle/lib/index.ts']
+  '@bugsnag/plugin-react-performance': ['./packages/plugin-react-performance/lib/index.ts']
 }
 
 // convert the tsconfig "paths" option into Jest's "moduleNameMapper" option
@@ -70,10 +70,10 @@ module.exports = {
       ...defaultModuleConfig
     },
     {
-      displayName: 'instrumented-component-lifecycle',
+      displayName: 'plugin-react-performance',
       testEnvironment: 'jsdom',
       setupFilesAfterEnv: ['<rootDir>/jest/setup/react.ts'],
-      testMatch: ['<rootDir>/packages/instrumented-component-lifecycle/**/*.test.tsx'],
+      testMatch: ['<rootDir>/packages/plugin-react-performance/**/*.test.tsx'],
       moduleNameMapper,
       transform: {
         '^.+\\.jsx?$': [

@@ -1,4 +1,4 @@
-# `@bugsnag/instrumented-component-lifecycle`
+# `@bugsnag/plugin-react-performance`
 
 A higher order component (HOC) for instrumenting BugSnag Performance spans.
 
@@ -6,7 +6,7 @@ A higher order component (HOC) for instrumenting BugSnag Performance spans.
 
 ```typescript
 import BugsnagPerformance from "@bugsnag/browser-performance"
-import withInstrumentedComponentLifecycle from "@bugsnag/instrumented-component-lifecycle"
+import withInstrumentedComponent from "@bugsnag/plugin-react-performance"
 
 BugsnagPerformance.start({ apiKey: "my-api-key" });
 
@@ -19,5 +19,5 @@ class App extends React.Component {
     )
   }
 }
-export default withInstrumentedComponentLifecycle(App, { name: 'ComponentName' })
+export default withInstrumentedComponent(App, { name: 'ComponentName' })
 ```
