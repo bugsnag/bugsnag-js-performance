@@ -1,8 +1,14 @@
-import BugsnagPerformance from '@bugsnag/browser-performance'
+// import BugsnagPerformance from '@bugsnag/browser-performance'
 import { DISCARD_END_TIME } from '@bugsnag/core-performance'
 import type { Span } from '@bugsnag/core-performance'
 import * as React from 'react'
 import type { PropsWithChildren } from 'react'
+
+try {
+  var BugsnagPerformance = require('@bugsnag/browser-performance')
+} catch(e) {
+  var BugsnagPerformance = require('@bugsnag/react-native-performance')
+}
 
 interface InstrumentedComponentProps extends PropsWithChildren {
   name: string
@@ -39,7 +45,7 @@ class InstrumentedComponent extends React.Component<InstrumentedComponentProps> 
     if (includeComponentUpdates && this.componentMountSpan && componentProps !== this.props.componentProps) {
       this.componentUpdateSpan = BugsnagPerformance.startSpan(`[ViewLoadPhase/Update]${this.props.name}`)
       const updatedProps = Object.keys(componentProps).filter(prop => componentProps[prop] !== this.props.componentProps[prop])
-      this.componentUpdateSpan.setAttribute('bugsnag.component.update.props', updatedProps)
+      this.componentUpdateSpan?.setAttribute('bugsnag.component.update.props', updatedProps)
     }
     return true
   }
