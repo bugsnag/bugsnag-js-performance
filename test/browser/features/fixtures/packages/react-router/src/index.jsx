@@ -1,14 +1,14 @@
-import BugsnagPerformance from '@bugsnag/browser-performance'
-import { withInstrumentedComponent } from '@bugsnag/plugin-react-performance'
-import { ReactRouterRoutingProvider } from '@bugsnag/react-router-performance'
 import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 import {
   createBrowserRouter,
+  RouterProvider,
   Link,
   Outlet,
-  RouterProvider,
-} from 'react-router-dom'
+} from "react-router-dom";
+import BugsnagPerformance from '@bugsnag/browser-performance'
+import { withInstrumentedComponent } from '@bugsnag/plugin-react-performance'
+import { ReactRouterRoutingProvider } from '@bugsnag/react-router-performance'
 
 const parameters = new URLSearchParams(window.location.search)
 const apiKey = parameters.get('api_key')
@@ -19,10 +19,10 @@ const basename = '/docs/react-router'
 function Root() {
   return (
     <>
-      <Link id='change-route' to='/contacts/1'>
+      <Link id="change-route" to="/contacts/1">
         Contact 1
       </Link>
-      <Link id='change-route-nested-component' to='/nested-component'>
+      <Link id="change-route-nested-component" to="/nested-component">
         Nested Component
       </Link>
       <Outlet />
@@ -35,7 +35,7 @@ function Contact() {
     document.title = 'Contact 1'
   }, [])
 
-  return <div id='contact'>Contact</div>
+  return <div id="contact">Contact</div>
 }
 
 function Component(count) {
@@ -74,36 +74,36 @@ function NestedComponent() {
 }
 
 const routes = [
-  {
-    path: '/',
-    element: <Root />,
-    children: [
-      {
-        path: 'contacts/:contactId',
-        element: <Contact />,
-      },
-      {
-        path: 'nested-component',
-        element: <NestedComponent />,
-      },
-    ],
-  },
+    {
+        path: '/',
+        element: <Root />,
+        children: [
+          {
+              path: 'contacts/:contactId',
+              element: <Contact />,
+          },
+          {
+              path: 'nested-component',
+              element: <NestedComponent />,
+          },
+        ],
+    },
 ]
 
 const router = createBrowserRouter(routes, { basename })
 
 BugsnagPerformance.start({
-  apiKey,
-  endpoint,
-  maximumBatchSize: 2,
-  batchInactivityTimeoutMs: 5000,
-  autoInstrumentFullPageLoads: false,
-  autoInstrumentNetworkRequests: false,
-  routingProvider: new ReactRouterRoutingProvider(routes, basename),
+    apiKey,
+    endpoint,
+    maximumBatchSize: 2,
+    batchInactivityTimeoutMs: 5000,
+    autoInstrumentFullPageLoads: false,
+    autoInstrumentNetworkRequests: false,
+    routingProvider: new ReactRouterRoutingProvider(routes, basename),
 })
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <RouterProvider router={router} />
-  </React.StrictMode>
+  </React.StrictMode>,
 )

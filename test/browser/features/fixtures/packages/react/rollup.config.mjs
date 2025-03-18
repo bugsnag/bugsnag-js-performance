@@ -17,7 +17,7 @@ const cdnConfig = {
   // against NPM packages
   external: (id) =>
     id !== "src/index.jsx" &&
-    !id.endsWith("packages/react-router/src/index.jsx"),
+    !id.endsWith("packages/react/src/index.jsx"),
   output: {
     ...baseConfig.output,
     globals: {
