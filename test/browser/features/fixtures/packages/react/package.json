@@ -10,5 +10,8 @@
     "@rollup/plugin-babel": "^6.0.3",
     "@rollup/plugin-replace": "^5.0.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
 }

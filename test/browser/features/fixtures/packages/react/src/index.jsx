@@ -1,13 +1,11 @@
 import BugsnagPerformance from '@bugsnag/browser-performance'
 import { withInstrumentedComponent } from '@bugsnag/plugin-react-performance'
-import React from 'react'
-import ReactDOM from 'react-dom/client'
+import React, { useState } from 'react'
+import { createRoot } from 'react-dom/client'
 
 const parameters = new URLSearchParams(window.location.search)
 const apiKey = parameters.get('api_key')
 const endpoint = parameters.get('endpoint')
-
-const basename = '/docs/react'
 
 function Component(count) {
   return (
@@ -52,4 +50,4 @@ BugsnagPerformance.start({
   autoInstrumentNetworkRequests: false,
 })
 
-ReactDOM.createRoot(document.getElementById('root')).render(<Root />)
+createRoot(document.getElementById('root')).render(<Root />)

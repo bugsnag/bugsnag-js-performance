@@ -13,8 +13,7 @@ const cdnOutputOptions = {
     ? 'import BugsnagPerformance from "/docs/bugsnag-performance.js"\n'
     : 'import BugsnagPerformance from "/docs/bugsnag-performance.min.js"\n',
   globals: {
-    '@bugsnag/browser-performance': 'BugsnagPerformance',
-    '@bugsnag/react-router-performance': 'BugsnagReactRouterPerformance',
+    '@bugsnag/browser-performance': 'BugsnagPerformance'
   },
 }
 
