@@ -4,8 +4,8 @@ import {
   createBrowserRouter,
   RouterProvider,
   Link,
-  Outlet,
-} from "react-router-dom";
+  Outlet
+} from 'react-router-dom'
 import BugsnagPerformance from '@bugsnag/browser-performance'
 import { withInstrumentedComponent } from '@bugsnag/plugin-react-performance'
 import { ReactRouterRoutingProvider } from '@bugsnag/react-router-performance'
@@ -99,7 +99,7 @@ BugsnagPerformance.start({
     batchInactivityTimeoutMs: 5000,
     autoInstrumentFullPageLoads: false,
     autoInstrumentNetworkRequests: false,
-    routingProvider: new ReactRouterRoutingProvider(routes, basename),
+    routingProvider: new ReactRouterRoutingProvider(routes, basename)
 })
 
 ReactDOM.createRoot(document.getElementById('root')).render(
