@@ -21,13 +21,10 @@
   "devDependencies": {
     "@bugsnag/browser-performance": "^2.10.1",
     "@testing-library/react": "^16.2.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@types/react": "^18.0.0",
-    "react": "^18.0.0"
+    "@testing-library/jest-dom": "^6.6.3"
   },
   "peerDependencies": {
-    "@bugsnag/browser-performance": "^2.10.1",
-    "react": "*"
+    "@bugsnag/browser-performance": "^2.10.1"
   },
   "type": "module",
   "main": "dist/index.js",
