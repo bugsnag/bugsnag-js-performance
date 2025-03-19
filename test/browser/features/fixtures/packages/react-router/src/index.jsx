@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import {
   createBrowserRouter,
@@ -7,7 +7,6 @@ import {
   Outlet
 } from 'react-router-dom'
 import BugsnagPerformance from '@bugsnag/browser-performance'
-import { withInstrumentedComponent } from '@bugsnag/plugin-react-performance'
 import { ReactRouterRoutingProvider } from '@bugsnag/react-router-performance'
 
 const parameters = new URLSearchParams(window.location.search)
@@ -49,7 +48,7 @@ function Component(count) {
   )
 }
 
-const WrappedComponent = withInstrumentedComponent(Component)
+// const WrappedComponent = withInstrumentedComponent(Component)
 
 function NestedComponent() {
   const [show, setShow] = useState(true)
@@ -68,7 +67,7 @@ function NestedComponent() {
       >
         {show ? 'Unmount Component' : 'Mount Component'}
       </button>
-      {show && <WrappedComponent count={count} />}
+      {show && <Component count={count} />}
     </div>
   )
 }

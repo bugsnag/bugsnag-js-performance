@@ -1,5 +1,5 @@
 {
-  "name": "react",
+  "name": "bugsnag-performance-react-fixture",
   "private": true,
   "scripts": {
     "build": "rollup --config ./rollup.config.mjs",
