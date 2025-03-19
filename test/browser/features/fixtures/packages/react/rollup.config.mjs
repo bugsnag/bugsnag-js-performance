@@ -5,50 +5,37 @@ import replace from "@rollup/plugin-replace";
 import path from "path";
 import url from "url";
 
-import baseConfig, { isCdnBuild } from "../rollup.config.mjs";
-
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
-const cdnConfig = {
-  // mark everything other than 'src/index.jsx' as an external module when
-  // using the CDN build
-  // this stops rollup trying to resolve these modules as we don't run
-  // 'npm install' when using the CDN build to avoid accidentally testing
-  // against NPM packages
-  external: (id) => id !== "src/index.jsx",
-  output: {
-    ...baseConfig.output,
-    globals: {
-      ...baseConfig.output.globals,
-      react: "React",
-      "react-dom/client": "ReactDom",
-      "@bugsnag/plugin-react-performance": "BugsnagPluginReactPerformance",
-    },
-  }
-};
-
-const npmConfig = {
-  external: ["react", "@bugsnag/plugin-react-performance"],
-  output: cdnConfig.output
-}
-
 export default {
-  ...baseConfig,
-  input: "src/index.jsx",
+  input: 'src/index.jsx',
+  output: {
+    file: 'dist/bundle.js',
+    format: 'iife'
+  },
   plugins: [
     nodeResolve({
+      extensions: ['.js', 'jsx'],
       browser: true,
       jail: path.resolve(`${__dirname}/../..`),
-      extensions: [".mjs", ".js", ".json", ".node", ".jsx"],
+    }),
+    babel({
+      babelHelpers: 'bundled',
+      presets: ['@babel/preset-react'],
+      extensions: ['.js', '.jsx']
     }),
     commonjs(),
-    babel({ babelHelpers: "bundled" }),
     replace({
-      preventAssignment: true,
-      values: {
-        "process.env.NODE_ENV": JSON.stringify("production"),
-      },
-    }),
+      preventAssignment: false,
+      'process.env.NODE_ENV': '"development"'
+    })
   ],
-  ...(isCdnBuild ? cdnConfig : npmConfig),
-};
+  onLog (level, log, defaultHandler) {
+    // turn warnings into errors
+    if (level === 'warn') {
+      level = 'error'
+    }
+
+    defaultHandler(level, log)
+  }
+}
