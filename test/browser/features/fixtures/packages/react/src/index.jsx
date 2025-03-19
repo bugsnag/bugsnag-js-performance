@@ -1,41 +1,59 @@
-import BugsnagPerformance from '@bugsnag/browser-performance'
-import { withInstrumentedComponent } from '@bugsnag/plugin-react-performance'
-import React, { useState } from 'react'
-import { createRoot } from 'react-dom/client'
+import React, { useState, useRef, useEffect } from "react"
+import { createRoot } from "react-dom/client"
+import BugsnagPerformance from "@bugsnag/browser-performance"
+import { withInstrumentedComponent } from "@bugsnag/plugin-react-performance"
 
 const parameters = new URLSearchParams(window.location.search)
-const apiKey = parameters.get('api_key')
-const endpoint = parameters.get('endpoint')
+const apiKey = parameters.get("api_key")
+const endpoint = parameters.get("endpoint")
 
-function Component(count) {
+function Component({ count }) {
   return (
-    <>
       <div>
         <p>I am a wrapped component!</p>
+        <p>{count}</p>
       </div>
-      <div>{count}</div>
-    </>
   )
 }
 
 const WrappedComponent = withInstrumentedComponent(Component)
 
-function Root() {
-  const [show, setShow] = useState(true)
+const KeepAlive = () => {
   const [count, setCount] = useState(0)
+  const timerRef = useRef()
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setCount(prevCount => prevCount + 1)
+    }, 50)
+
+    return () => {
+      clearInterval(timerRef.current)
+    }
+  }, [])
 
   return (
     <div>
-      <button id='update-component' onClick={() => setCount(count + 1)}>
+      <p>I am here to keep the page load alive: {count}</p>
+      <button id="end-page-load" onClick={() => { clearInterval(timerRef.current) }}>
+        End page load
+      </button>
+    </div>
+  )
+}
+
+const Root = () => {
+  const [show, setShow] = React.useState(true)
+  const [count, setCount] = React.useState(0)
+
+  return (
+    <div>
+     <KeepAlive />
+      <button id="update-component" onClick={() => setCount(prevCount => prevCount + 1)}>
         Increment
       </button>
-      <button
-        id='unmount-component'
-        onClick={() => {
-          setShow(!show)
-        }}
-      >
-        {show ? 'Unmount Component' : 'Mount Component'}
+      <button id="unmount-component" onClick={() => { setShow(false) }}>
+        Unmount Component
       </button>
       {show && <WrappedComponent count={count} />}
     </div>
@@ -45,9 +63,15 @@ function Root() {
 BugsnagPerformance.start({
   apiKey,
   endpoint,
-  maximumBatchSize: 10,
+  maximumBatchSize: 15,
   batchInactivityTimeoutMs: 5000,
   autoInstrumentNetworkRequests: false,
 })
 
-createRoot(document.getElementById('root')).render(<Root />)
+const container = document.getElementById('root')
+const root = createRoot(container)
+root.render(
+  <React.StrictMode>
+    <Root />
+  </React.StrictMode>
+)

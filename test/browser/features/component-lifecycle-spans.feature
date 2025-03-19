@@ -1,15 +1,17 @@
+@skip_on_cdn_build
 Feature: Component lifecycle spans
     Scenario: Component lifecycle spans are automatically instrumented
         Given I navigate to the test URL "/docs/react"
-        And I wait to receive 2 spans
-        Then a span name equals "[ViewLoad/Component]ComponentName"
-        And a span name equals "[ViewLoadPhase/Mount]ComponentName"
-        Then I click the element "update-component"
-        And I wait to receive 1 span
-        Then a span name equals "[ViewLoadPhase/Update]ComponentName"
+        And I click the element "update-component"
         Then I click the element "unmount-component"
-        And I wait to receive 1 span
-        Then a span name equals "[ViewLoadPhase/Unmount]ComponentName"
+        Then I click the element "end-page-load"
+        When I wait to receive 1 trace
+        Then a span name equals "[ViewLoad/Component]Component"
+        And a span name equals "[ViewLoadPhase/Mount]Component"
+        And a span name equals "[ViewLoadPhase/Unmount]Component"
+        And a span named "[ViewLoadPhase/Update]Component" contains the attributes: 
+            | attribute                                 | type         | value                | 
+            | bugsnag.component.update.props            | stringValue  | count            |
 
     @skip
     Scenario: Component lifecycle spans are instrumented with React Router
