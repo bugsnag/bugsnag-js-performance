@@ -8,10 +8,11 @@ Feature: Component lifecycle spans
         When I wait to receive 1 trace
         Then a span name equals "[ViewLoad/Component]Component"
         And a span name equals "[ViewLoadPhase/Mount]Component"
+        And a span name equals "[ViewLoadPhase/Update]Component"
         And a span name equals "[ViewLoadPhase/Unmount]Component"
-        And a span named "[ViewLoadPhase/Update]Component" contains the attributes: 
-            | attribute                                 | type         | value                | 
-            | bugsnag.component.update.props            | stringValue  | count            |
+        # [ViewLoadPhase/Update]Component attributes
+        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" string array attribute "bugsnag.component.update.props" equals the array:
+            | count |
 
     @skip
     Scenario: Component lifecycle spans are instrumented with React Router
