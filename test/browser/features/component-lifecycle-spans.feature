@@ -2,16 +2,13 @@
 Feature: Component lifecycle spans
     Scenario: Component lifecycle spans are automatically instrumented
         Given I navigate to the test URL "/docs/react"
-        And I click the element "update-component"
-        Then I click the element "unmount-component"
-        Then I click the element "end-page-load"
         When I wait to receive 1 trace
         Then a span name equals "[ViewLoad/Component]Component"
         And a span name equals "[ViewLoadPhase/Mount]Component"
         And a span name equals "[ViewLoadPhase/Update]Component"
         And a span name equals "[ViewLoadPhase/Unmount]Component"
         # [ViewLoadPhase/Update]Component attributes
-        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.1" string array attribute "bugsnag.component.update.props" equals the array:
+        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2" string array attribute "bugsnag.component.update.props" equals the array:
             | count |
 
     @skip

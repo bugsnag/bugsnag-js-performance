@@ -43,18 +43,25 @@ const KeepAlive = () => {
 }
 
 const Root = () => {
-  const [show, setShow] = React.useState(true)
+  const [show, setShow] = React.useState(false)
   const [count, setCount] = React.useState(0)
+
+  useEffect(() => {
+    (async () => {
+      await new Promise(resolve => setTimeout(resolve, 100))
+      setShow(true)
+      await new Promise(resolve => setTimeout(resolve, 100))
+      setCount(n => n + 1)
+      await new Promise(resolve => setTimeout(resolve, 100))
+      setShow(false)
+      await new Promise(resolve => setTimeout(resolve, 100))
+      document.getElementById("end-page-load").click()
+    })()
+  }, [])
 
   return (
     <div>
      <KeepAlive />
-      <button id="update-component" onClick={() => setCount(prevCount => prevCount + 1)}>
-        Increment
-      </button>
-      <button id="unmount-component" onClick={() => { setShow(false) }}>
-        Unmount Component
-      </button>
       {show && <WrappedComponent count={count} />}
     </div>
   )
