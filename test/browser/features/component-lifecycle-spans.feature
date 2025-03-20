@@ -5,10 +5,8 @@ Feature: Component lifecycle spans
         When I wait to receive 1 trace
         Then a span name equals "[ViewLoad/Component]Component"
         And a span name equals "[ViewLoadPhase/Mount]Component"
-        And a span name equals "[ViewLoadPhase/Update]Component"
         And a span name equals "[ViewLoadPhase/Unmount]Component"
-        # [ViewLoadPhase/Update]Component attributes
-        And the trace payload field "resourceSpans.0.scopeSpans.0.spans.2" string array attribute "bugsnag.component.update.props" equals the array:
+        And a span named "[ViewLoadPhase/Update]Component" contains the string array attribute "bugsnag.component.update.props":
             | count |
 
     @skip

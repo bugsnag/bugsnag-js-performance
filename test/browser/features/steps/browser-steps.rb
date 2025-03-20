@@ -195,6 +195,26 @@ Then('if a span named {string} exists, it has a parent named {string}') do |chil
   end
 end
 
+Then('a span named {string} contains the string array attribute {string}:') do |span_name, attribute, table|
+  spans = spans_from_request_list(Maze::Server.list_for('traces'))
+  named_spans = spans.find_all { |span| span['name'].eql?(span_name) }
+  raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{span_name}" if named_spans.empty?
+
+  expected_values = table.raw.flatten
+
+  named_spans.each do |span|
+    attribute_values = span['attributes'].find { |attr| attr['key'].eql?(attribute) }&.dig('value', 'arrayValue', 'values')&.map { |v| v['stringValue'] }
+    if attribute_values.nil?
+      raise Test::Unit::AssertionFailedError.new "Attribute #{attribute} was not found on span #{span_name}"
+    end
+
+    missing_values = expected_values - attribute_values
+    unless missing_values.empty?
+      raise Test::Unit::AssertionFailedError.new "Attribute #{attribute} on span #{span_name} is missing values: #{missing_values.join(', ')}"
+    end
+  end
+end
+
 Then('a span named {string} does not contain the attribute {string}') do |span_name, expected_attribute|
   spans = spans_from_request_list(Maze::Server.list_for('traces'))
   named_spans = spans.find_all { |span| span['name'].eql?(span_name) }
