@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 import {
   createBrowserRouter,
   RouterProvider,
   Link,
   Outlet
-} from 'react-router-dom'
+} from 'react-router-dom';
 import BugsnagPerformance from '@bugsnag/browser-performance'
 import { ReactRouterRoutingProvider } from '@bugsnag/react-router-performance'
 
@@ -21,9 +21,6 @@ function Root() {
       <Link id="change-route" to="/contacts/1">
         Contact 1
       </Link>
-      <Link id="change-route-nested-component" to="/nested-component">
-        Nested Component
-      </Link>
       <Outlet />
     </>
   )
@@ -37,41 +34,6 @@ function Contact() {
   return <div id="contact">Contact</div>
 }
 
-function Component(count) {
-  return (
-    <>
-      <div>
-        <p>I am a wrapped component!</p>
-      </div>
-      <div>{count}</div>
-    </>
-  )
-}
-
-// const WrappedComponent = withInstrumentedComponent(Component)
-
-function NestedComponent() {
-  const [show, setShow] = useState(true)
-  const [count, setCount] = useState(0)
-
-  return (
-    <div>
-      <button id='update-component' onClick={() => setCount(count + 1)}>
-        Increment
-      </button>
-      <button
-        id='unmount-component'
-        onClick={() => {
-          setShow(!show)
-        }}
-      >
-        {show ? 'Unmount Component' : 'Mount Component'}
-      </button>
-      {show && <Component count={count} />}
-    </div>
-  )
-}
-
 const routes = [
     {
         path: '/',
@@ -81,11 +43,7 @@ const routes = [
               path: 'contacts/:contactId',
               element: <Contact />,
           },
-          {
-              path: 'nested-component',
-              element: <NestedComponent />,
-          },
-        ],
+        ]
     },
 ]
 
