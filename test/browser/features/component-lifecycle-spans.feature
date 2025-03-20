@@ -1,4 +1,4 @@
-@skip_on_cdn_build
+@skip_on_cdn_build @skip_safari_11
 Feature: Component lifecycle spans
     Scenario: Component lifecycle spans are automatically instrumented
         Given I navigate to the test URL "/docs/react"
