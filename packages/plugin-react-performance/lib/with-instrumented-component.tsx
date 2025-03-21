@@ -32,11 +32,12 @@ class InstrumentedComponent extends React.Component<InstrumentedComponentProps> 
   async componentDidMount () {
     if (this.componentMountSpan && BugsnagPerformance.appState !== 'ready') {
       this.componentMountSpan.end()
+      this.componentMountSpan = undefined
     }
   }
 
-  public shouldComponentUpdate ({ includeComponentUpdates = true, componentProps }: InstrumentedComponentProps): boolean {
-    if (includeComponentUpdates && this.componentMountSpan && componentProps !== this.props.componentProps) {
+  public shouldComponentUpdate ({ includeComponentUpdates, componentProps }: InstrumentedComponentProps): boolean {
+    if (includeComponentUpdates && BugsnagPerformance.appState !== 'ready' && componentProps !== this.props.componentProps) {
       this.componentUpdateSpan = BugsnagPerformance.startSpan(`[ViewLoadPhase/Update]${this.props.name}`)
       const updatedProps = Object.keys(componentProps).filter(prop => componentProps[prop] !== this.props.componentProps[prop])
       this.componentUpdateSpan.setAttribute('bugsnag.component.update.props', updatedProps)
@@ -47,6 +48,7 @@ class InstrumentedComponent extends React.Component<InstrumentedComponentProps> 
   public componentDidUpdate () {
     if (this.componentUpdateSpan && BugsnagPerformance.appState !== 'ready') {
       this.componentUpdateSpan.end()
+      this.componentUpdateSpan = undefined
     }
   }
 
@@ -57,6 +59,7 @@ class InstrumentedComponent extends React.Component<InstrumentedComponentProps> 
     if (this.componentLifetimeSpan) {
       const endTime = BugsnagPerformance.appState === 'ready' ? DISCARD_END_TIME : undefined
       this.componentLifetimeSpan.end(endTime)
+      this.componentLifetimeSpan = undefined
     }
   }
 
