@@ -30,8 +30,9 @@ class InstrumentedComponent extends React.Component<InstrumentedComponentProps> 
   }
 
   async componentDidMount () {
-    if (this.componentMountSpan && BugsnagPerformance.appState !== 'ready') {
-      this.componentMountSpan.end()
+    if (this.componentMountSpan) {
+      const endTime = BugsnagPerformance.appState === 'ready' ? DISCARD_END_TIME : undefined
+      this.componentMountSpan.end(endTime)
       this.componentMountSpan = undefined
     }
   }
@@ -46,8 +47,9 @@ class InstrumentedComponent extends React.Component<InstrumentedComponentProps> 
   }
 
   public componentDidUpdate () {
-    if (this.componentUpdateSpan && BugsnagPerformance.appState !== 'ready') {
-      this.componentUpdateSpan.end()
+    if (this.componentUpdateSpan) {
+      const endTime = BugsnagPerformance.appState === 'ready' ? DISCARD_END_TIME : undefined
+      this.componentUpdateSpan.end(endTime)
       this.componentUpdateSpan = undefined
     }
   }
