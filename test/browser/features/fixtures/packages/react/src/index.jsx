@@ -43,13 +43,11 @@ const KeepAlive = () => {
 }
 
 const Root = () => {
-  const [show, setShow] = React.useState(false)
+  const [show, setShow] = React.useState(true)
   const [count, setCount] = React.useState(0)
 
   useEffect(() => {
     (async () => {
-      await new Promise(resolve => setTimeout(resolve, 100))
-      setShow(true)
       await new Promise(resolve => setTimeout(resolve, 100))
       setCount(n => n + 1)
       await new Promise(resolve => setTimeout(resolve, 100))
@@ -62,6 +60,8 @@ const Root = () => {
   return (
     <div>
      <KeepAlive />
+     <button onClick={() => { setCount(n => n + 1) }}>Update props</button>
+     <button onClick={() => { setShow(n => !n) }}>Hide component</button>
       {show && <WrappedComponent count={count} />}
     </div>
   )
