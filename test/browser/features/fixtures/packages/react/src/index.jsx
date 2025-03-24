@@ -57,12 +57,29 @@ const Root = () => {
     })()
   }, [])
 
+  useEffect(() => {
+    const consoleMethods = ['log', 'warn', 'error']
+    consoleMethods.forEach(method => {
+      const originalMethod = console[method]
+      console[method] = function (...args) {
+        const consoleDiv = document.getElementById('console')
+        const p = document.createElement('p')
+        p.textContent = args.join(' ')
+        consoleDiv.appendChild(p)
+        originalMethod.apply(console, args)
+      }
+    })
+  }, [])
+
   return (
     <div>
      <KeepAlive />
      <button onClick={() => { setCount(n => n + 1) }}>Update props</button>
      <button onClick={() => { setShow(n => !n) }}>Hide component</button>
       {show && <WrappedComponent count={count} />}
+      <pre id="console">
+        <p>console:</p>
+      </pre>
     </div>
   )
 }
