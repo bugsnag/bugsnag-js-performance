@@ -31,6 +31,7 @@ class InstrumentedComponent extends React.Component<InstrumentedComponentProps> 
 
   async componentDidMount () {
     if (this.componentMountSpan) {
+      console.log('ending componentMountSpan...', BugsnagPerformance.appState)
       const endTime = BugsnagPerformance.appState === 'ready' ? DISCARD_END_TIME : undefined
       this.componentMountSpan.end(endTime)
       this.componentMountSpan = undefined
@@ -48,6 +49,7 @@ class InstrumentedComponent extends React.Component<InstrumentedComponentProps> 
 
   public componentDidUpdate () {
     if (this.componentUpdateSpan) {
+      console.log('ending componentUpdate...', BugsnagPerformance.appState)
       const endTime = BugsnagPerformance.appState === 'ready' ? DISCARD_END_TIME : undefined
       this.componentUpdateSpan.end(endTime)
       this.componentUpdateSpan = undefined
@@ -59,6 +61,7 @@ class InstrumentedComponent extends React.Component<InstrumentedComponentProps> 
       BugsnagPerformance.startSpan(`[ViewLoadPhase/Unmount]${this.props.name}`).end()
     }
     if (this.componentLifetimeSpan) {
+      console.log('ending componentLifetimeSpan...', BugsnagPerformance.appState)
       const endTime = BugsnagPerformance.appState === 'ready' ? DISCARD_END_TIME : undefined
       this.componentLifetimeSpan.end(endTime)
       this.componentLifetimeSpan = undefined

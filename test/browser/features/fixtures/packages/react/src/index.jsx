@@ -58,7 +58,7 @@ const Root = () => {
   }, [])
 
   useEffect(() => {
-    const consoleMethods = ['log', 'warn', 'error']
+    const consoleMethods = ['info', 'log', 'warn', 'error']
     consoleMethods.forEach(method => {
       const originalMethod = console[method]
       console[method] = function (...args) {
@@ -76,7 +76,7 @@ const Root = () => {
      <KeepAlive />
      <button onClick={() => { setCount(n => n + 1) }}>Update props</button>
      <button onClick={() => { setShow(n => !n) }}>Hide component</button>
-      {show && <WrappedComponent count={count} />}
+      {show ? <WrappedComponent count={count} /> : null}
       <pre id="console">
         <p>console:</p>
       </pre>
