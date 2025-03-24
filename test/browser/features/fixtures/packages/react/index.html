@@ -12,5 +12,21 @@
   </head>
   <body>
     <div id="root"></div>
+    <pre id="console">
+      <p>console:</p>
+    </pre>
+    <script>
+      const consoleMethods = ['info', 'log', 'warn', 'error']
+      consoleMethods.forEach(method => {
+        const originalMethod = console[method]
+        console[method] = function (...args) {
+          const consoleDiv = document.getElementById('console')
+          const p = document.createElement('p')
+          p.textContent = args.join(' ')
+          consoleDiv.appendChild(p)
+          originalMethod.apply(console, args)
+        }
+      })
+    </script>
   </body>
 </html>
