@@ -28,6 +28,7 @@ const KeepAlive = () => {
     }, 50)
 
     return () => {
+      console.log('clearing timer')
       clearInterval(timerRef.current)
     }
   }, [])
@@ -46,22 +47,11 @@ const Root = () => {
   const [show, setShow] = React.useState(true)
   const [count, setCount] = React.useState(0)
 
-  useEffect(() => {
-    (async () => {
-      await new Promise(resolve => setTimeout(resolve, 100))
-      setCount(n => n + 1)
-      await new Promise(resolve => setTimeout(resolve, 100))
-      setShow(false)
-      await new Promise(resolve => setTimeout(resolve, 100))
-      document.getElementById("end-page-load").click()
-    })()
-  }, [])
-
   return (
     <div>
      <KeepAlive />
-     <button onClick={() => { setCount(n => n + 1) }}>Update props</button>
-     <button onClick={() => { setShow(n => !n) }}>Hide component</button>
+     <button id="update-props" onClick={() => { setCount(n => n + 1) }}>Update props</button>
+     <button id="hide-component" onClick={() => { setShow(n => !n) }}>Hide component</button>
       {show ? <WrappedComponent count={count} /> : null}
     </div>
   )
