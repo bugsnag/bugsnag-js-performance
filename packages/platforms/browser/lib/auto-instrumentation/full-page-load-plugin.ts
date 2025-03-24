@@ -94,7 +94,6 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
       this.webVitals.attachTo(span)
       this.spanFactory.endSpan(span, endTime)
       if (this.appState === 'starting') {
-        console.log('full page load plugin setting app state to ready')
         this.setAppState('ready')
       }
     })

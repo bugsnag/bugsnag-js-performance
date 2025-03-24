@@ -126,7 +126,6 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
 
           this.spanFactory.toPublicApi(span).end(options.endTime)
 
-          console.log('route change plugin setting app state to ready')
           this.setAppState('ready')
         }
 
