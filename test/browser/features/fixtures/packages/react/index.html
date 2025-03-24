@@ -12,9 +12,16 @@
   </head>
   <body>
     <div id="root"></div>
+
     <pre id="console">
       <p>console:</p>
     </pre>
+
+    <button id="stop-clock">Stop</button>
+    <pre id="clock"></pre>
+
+    <p>I'm here to make the layout shift when the clock ticks :)</p>
+
     <script>
       const consoleMethods = ['info', 'log', 'warn', 'error']
       consoleMethods.forEach(method => {
@@ -26,6 +33,26 @@
           consoleDiv.appendChild(p)
           originalMethod.apply(console, args)
         }
+      })
+    </script>
+
+    <script>
+      // stop the page from settling until the 'stop-clock' button is
+      // clicked, otherwise we can't reliably get a first input delay event
+
+      const node = document.getElementById("clock")
+      let time = 0
+
+      const interval = setInterval(() => {
+        node.innerText += `${time++}\n`
+      }, 50)
+
+      document.getElementById("stop-clock").addEventListener("click", () => {
+        document.title = "New title"
+
+        // delay stopping the clock for a bit so the performance observers
+        // have a chance to fire
+        setTimeout(() => { clearInterval(interval) }, 1000)
       })
     </script>
   </body>
