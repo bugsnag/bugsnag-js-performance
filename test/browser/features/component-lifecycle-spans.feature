@@ -2,6 +2,9 @@
 Feature: Component lifecycle spans
     Scenario: Component lifecycle spans are automatically instrumented
         Given I navigate to the test URL "/docs/react"
+        And I click the element "update-props"
+        And I click the element "hide-component"
+        And I click the element "stop-clock"
         When I wait to receive 1 trace
         Then a span name equals "[ViewLoad/Component]Component"
         And a span name equals "[ViewLoadPhase/Mount]Component"

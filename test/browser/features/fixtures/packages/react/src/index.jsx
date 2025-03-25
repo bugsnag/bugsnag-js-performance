@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState } from "react"
 import { createRoot } from "react-dom/client"
 import BugsnagPerformance from "@bugsnag/browser-performance"
 import { withInstrumentedComponent } from "@bugsnag/plugin-react-performance"
@@ -18,51 +18,15 @@ function Component({ count }) {
 
 const WrappedComponent = withInstrumentedComponent(Component)
 
-const KeepAlive = () => {
-  const [count, setCount] = useState(0)
-  const timerRef = useRef()
-
-  useEffect(() => {
-    timerRef.current = setInterval(() => {
-      setCount(prevCount => prevCount + 1)
-    }, 50)
-
-    return () => {
-      clearInterval(timerRef.current)
-    }
-  }, [])
-
-  return (
-    <div>
-      <p>I am here to keep the page load alive: {count}</p>
-      <button id="end-page-load" onClick={() => { clearInterval(timerRef.current) }}>
-        End page load
-      </button>
-    </div>
-  )
-}
-
 const Root = () => {
-  const [show, setShow] = React.useState(false)
-  const [count, setCount] = React.useState(0)
-
-  useEffect(() => {
-    (async () => {
-      await new Promise(resolve => setTimeout(resolve, 100))
-      setShow(true)
-      await new Promise(resolve => setTimeout(resolve, 100))
-      setCount(n => n + 1)
-      await new Promise(resolve => setTimeout(resolve, 100))
-      setShow(false)
-      await new Promise(resolve => setTimeout(resolve, 100))
-      document.getElementById("end-page-load").click()
-    })()
-  }, [])
+  const [show, setShow] = useState(true)
+  const [count, setCount] = useState(0)
 
   return (
     <div>
-     <KeepAlive />
-      {show && <WrappedComponent count={count} />}
+     <button id="update-props" onClick={() => { setCount(n => n + 1) }}>Update props</button>
+     <button id="hide-component" onClick={() => { setShow(n => !n) }}>Hide component</button>
+      {show ? <WrappedComponent count={count} /> : null}
     </div>
   )
 }
