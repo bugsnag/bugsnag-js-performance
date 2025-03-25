@@ -15,7 +15,7 @@ const cdnConfig = {
   // this stops rollup trying to resolve these modules as we don't run
   // 'npm install' when using the CDN build to avoid accidentally testing
   // against NPM packages
-  external: id => id !== 'src/index.jsx' && !id.endsWith('packages/react-router/src/index.jsx') && !id.endsWith('packages/plugin-react-performance/dist/lib/index.js'),
+  external: id => id !== 'src/index.jsx' && !id.endsWith('packages/react-router/src/index.jsx'),
   output: {
     ...baseConfig.output,
     globals: {
