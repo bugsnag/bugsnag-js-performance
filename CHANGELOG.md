@@ -1,12 +1,12 @@
 # Changelog
 
-## [Unreleased]
+## [v2.12.0] (2025-03-25)
 
 This release adds support for React Native 0.77 to `@bugsnag/react-native-performance`
 
 ### Added 
 
-- (plugin-react-performance) Added new react library and `withInstrumentedComponent` method to instrument component rendering spans [#584](https://github.com/bugsnag/bugsnag-js-performance/pull/584)
+- (plugin-react-performance) Added new react library with `withInstrumentedComponent` higher order component to instrument component rendering spans [#584](https://github.com/bugsnag/bugsnag-js-performance/pull/584)
 
 ### Fixed
 
