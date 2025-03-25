@@ -26,7 +26,11 @@ import { timeToNumber } from './time'
 
 interface Constructor<T> { new(): T, prototype: T }
 
+export type AppState = 'starting' | 'navigating' | 'settling' | 'ready'
+export type SetAppState = (appState: AppState) => void
+
 export interface Client<C extends Configuration> {
+  appState: AppState
   start: (config: C | string) => void
   startSpan: (name: string, options?: SpanOptions) => Span
   startNetworkSpan: (options: NetworkSpanOptions) => NetworkSpan
@@ -42,7 +46,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   resourceAttributesSource: ResourceAttributeSource<C>
   spanAttributesSource: SpanAttributesSource<C>
   schema: S
-  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => Array<Plugin<C>>
+  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage, setAppState: SetAppState, appState: AppState) => Array<Plugin<C>>
   persistence: Persistence
   retryQueueFactory: RetryQueueFactory
   spanContextStorage?: SpanContextStorage
@@ -56,6 +60,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
   const bufferingProcessor = new BufferingProcessor()
   const spanContextStorage = options.spanContextStorage || new DefaultSpanContextStorage(options.backgroundingListener)
   let logger = options.schema.logger.defaultValue
+  let appState: AppState = 'starting'
   const sampler = new Sampler(1.0)
 
   const SpanFactoryClass = options.spanFactory || SpanFactory
@@ -70,7 +75,10 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     logger,
     spanContextStorage
   )
-  const plugins = options.plugins(spanFactory, spanContextStorage)
+  const setAppState = (state: AppState) => {
+    appState = state
+  }
+  const plugins = options.plugins(spanFactory, spanContextStorage, setAppState, appState)
 
   return {
     start: (config: C | string) => {
@@ -143,7 +151,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       }
 
       for (const plugin of plugins) {
-        plugin.configure(configuration, spanFactory)
+        plugin.configure(configuration, spanFactory, setAppState, appState)
       }
     },
     startSpan: (name, spanOptions?: SpanOptions) => {
@@ -180,6 +188,9 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     },
     get currentSpanContext () {
       return spanContextStorage.current
+    },
+    get appState () {
+      return appState
     },
     ...(options.platformExtensions && options.platformExtensions(spanFactory, spanContextStorage))
   } as BugsnagPerformance<C, T>

@@ -33,8 +33,12 @@ export default {
   input: 'src/index.jsx',
   plugins: [
     nodeResolve({ browser: true, jail: path.resolve(`${__dirname}/../..`), extensions: ['.mjs', '.js', '.json', '.node', '.jsx'] }),
+    babel({ 
+      babelHelpers: 'bundled',
+      presets: ['@babel/preset-react'],
+      extensions: ['.js', '.jsx']
+    }),
     commonjs(),
-    babel({ babelHelpers: 'bundled' }),
     replace({
       preventAssignment: true,
       values: {

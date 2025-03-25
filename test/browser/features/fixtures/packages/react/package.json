@@ -1,0 +1,17 @@
+{
+  "name": "bugsnag-performance-react-fixture",
+  "private": true,
+  "scripts": {
+    "build": "rollup --config ./rollup.config.mjs",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "@babel/preset-react": "^7.22.5",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-replace": "^5.0.2"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
