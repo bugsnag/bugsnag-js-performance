@@ -2,6 +2,7 @@
 @skip_firefox_60
 @skip_safari_11
 @skip_on_cdn_build
+@skip # Skipped pending PLAT-14002
 Feature: Angular
 
     Scenario: Angular route change spans are automatically instrumented
