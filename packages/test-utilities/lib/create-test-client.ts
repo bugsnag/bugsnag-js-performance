@@ -15,6 +15,7 @@ import {
 
 } from '@bugsnag/core-performance'
 import type { BugsnagPerformance, ClientOptions, Configuration, CoreSchema, Delivery } from '@bugsnag/core-performance'
+import type { AppState } from '../../core/lib/core'
 
 const defaultOptions = () => ({
   backgroundingListener: new ControllableBackgroundingListener(),
@@ -25,8 +26,11 @@ const defaultOptions = () => ({
   spanAttributesSource,
   schema,
   plugins: () => [],
+  appState: 'starting',
+  setAppState: (appState: AppState) => appState,
   persistence: new InMemoryPersistence(),
-  retryQueueFactory: (delivery: Delivery, retryQueueMaxSize: number) => new InMemoryQueue(delivery, retryQueueMaxSize)
+  retryQueueFactory: (delivery: Delivery, retryQueueMaxSize: number) =>
+    new InMemoryQueue(delivery, retryQueueMaxSize)
 })
 
 function createTestClient <S extends CoreSchema, C extends Configuration, T = void> (optionOverrides: Partial<ClientOptions<S, C, T>> = {}): BugsnagPerformance<C, T> {

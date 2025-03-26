@@ -12,7 +12,8 @@ const paths = {
   '@bugsnag/vue-router-performance': ['./packages/vue-router/lib/index.ts'],
   '@bugsnag/angular-performance': ['./packages/angular/lib/index.ts'],
   '@bugsnag/plugin-react-native-navigation-performance': ['./packages/plugin-react-native-navigation/lib/index.ts'],
-  '@bugsnag/plugin-react-navigation-performance': ['./packages/plugin-react-navigation/lib/index.ts']
+  '@bugsnag/plugin-react-navigation-performance': ['./packages/plugin-react-navigation/lib/index.ts'],
+  '@bugsnag/plugin-react-performance': ['./packages/plugin-react-performance/lib/index.ts']
 }
 
 // convert the tsconfig "paths" option into Jest's "moduleNameMapper" option
@@ -67,6 +68,30 @@ module.exports = {
       displayName: 'react-router',
       testMatch: ['<rootDir>/packages/react-router/**/*.test.ts'],
       ...defaultModuleConfig
+    },
+    {
+      displayName: 'plugin-react-performance',
+      testEnvironment: 'jsdom',
+      setupFilesAfterEnv: ['<rootDir>/jest/setup/react.ts'],
+      testMatch: ['<rootDir>/packages/plugin-react-performance/**/*.test.tsx'],
+      moduleNameMapper,
+      transform: {
+        '^.+\\.jsx?$': [
+          'babel-jest',
+          {
+            presets: ['@babel/preset-react']
+          }
+        ],
+        '^.+\\.m?tsx?$': [
+          'ts-jest',
+          {
+            tsconfig: { paths },
+            babelConfig: {
+              presets: ['@babel/preset-react']
+            }
+          }
+        ]
+      }
     },
     {
       displayName: 'angular',

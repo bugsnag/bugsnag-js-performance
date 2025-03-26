@@ -5,9 +5,10 @@ import {
   createTestClient
 } from '@bugsnag/js-performance-test-utilities'
 import type { BackgroundingListener } from '../lib/backgrounding-listener'
+import type { AppState } from '../lib/core'
 import { createNoopClient } from '../lib/core'
-import { DefaultSpanContextStorage } from '../lib/span-context'
 import { InMemoryPersistence } from '../lib/persistence'
+import { DefaultSpanContextStorage } from '../lib/span-context'
 
 jest.useFakeTimers()
 
@@ -21,6 +22,7 @@ describe('Core', () => {
         startSpan: expect.any(Function),
         startNetworkSpan: expect.any(Function),
         currentSpanContext: undefined,
+        appState: 'starting',
         getPlugin: expect.any(Function)
       })
     })
@@ -370,6 +372,33 @@ describe('Core', () => {
           const spanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
           spanContextStorage.push(spanContext)
           expect(client.currentSpanContext).toBe(spanContext)
+        })
+      })
+
+      describe('appState', () => {
+        it('updates the current appState', () => {
+          class AppStatePlugin {
+            setAppState?: (appState: AppState) => void
+
+            configure (configuration: any, spanFactory: any, setAppState: (appState: AppState) => void) {
+              this.setAppState = setAppState
+            }
+
+            updateState (appState: AppState) {
+              if (this.setAppState) {
+                this.setAppState(appState)
+              }
+            }
+          }
+
+          const plugin = new AppStatePlugin()
+          const client = createTestClient()
+
+          client.start({ apiKey: VALID_API_KEY, plugins: [plugin] })
+          expect(client.appState).toBe('starting')
+
+          plugin.updateState('navigating')
+          expect(client.appState).toBe('navigating')
         })
       })
 

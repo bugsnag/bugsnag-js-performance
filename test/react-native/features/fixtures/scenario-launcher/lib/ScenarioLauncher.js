@@ -9,7 +9,7 @@ import { clearPersistedState, setDeviceId, setSamplingProbability } from './Pers
 import { ScenarioContext } from './ScenarioContext'
 import { NativeScenarioLauncher } from './native'
 
-const isTurboModuleEnabled = () => global.__turboModuleProxy != null
+const isTurboModuleEnabled = () => global.RN$Bridgeless || global.__turboModuleProxy != null
 
 async function loadReactNavigationScenario (scenario) {
   if (typeof scenario.registerScreens === 'function') {

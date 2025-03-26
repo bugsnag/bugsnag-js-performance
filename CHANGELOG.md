@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.12.0] (2025-03-26)
+
+This release adds support for React Native 0.77 to `@bugsnag/react-native-performance`
+
+### Added 
+
+- (plugin-react-performance) Added new react library with `withInstrumentedComponent` higher order component to instrument component rendering spans [#584](https://github.com/bugsnag/bugsnag-js-performance/pull/584)
+
+### Fixed
+
+- (react-native) Fix turbo module check in React Native 0.77 [#578](https://github.com/bugsnag/bugsnag-js-performance/pull/578)
+
 ## [v2.11.0] (2025-01-23)
 
 ### Added

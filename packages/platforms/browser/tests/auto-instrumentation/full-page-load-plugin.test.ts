@@ -49,7 +49,7 @@ describe('FullPageLoadPlugin', () => {
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -57,7 +57,9 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           new ControllableBackgroundingListener(),
-          performance
+          performance,
+          setAppState,
+          appState
         )
       ]
     })
@@ -84,11 +86,12 @@ describe('FullPageLoadPlugin', () => {
     document.title = 'Full page load'
 
     testClient.start({ apiKey: VALID_API_KEY })
-
+    expect(testClient.appState).toBe('starting')
     document.title = 'Updated title'
 
     await jest.runOnlyPendingTimersAsync()
 
+    expect(testClient.appState).toBe('ready')
     expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[FullPageLoad]/initial-route' }))
 
     const spans = delivery.requests[0].resourceSpans[0].scopeSpans[0].spans
@@ -119,7 +122,7 @@ describe('FullPageLoadPlugin', () => {
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -127,7 +130,9 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           new ControllableBackgroundingListener(),
-          performance
+          performance,
+          setAppState,
+          appState
         )
       ]
     })
@@ -153,7 +158,7 @@ describe('FullPageLoadPlugin', () => {
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -161,7 +166,9 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           backgroundingListener,
-          performance
+          performance,
+          setAppState,
+          appState
         )
       ]
     })
@@ -189,7 +196,7 @@ describe('FullPageLoadPlugin', () => {
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -197,7 +204,9 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           backgroundingListener,
-          performance
+          performance,
+          setAppState,
+          appState
         )
       ]
     })
@@ -228,7 +237,7 @@ describe('FullPageLoadPlugin', () => {
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -236,7 +245,9 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           backgroundingListener,
-          performance
+          performance,
+          setAppState,
+          appState
         )
       ]
     })
@@ -266,7 +277,7 @@ describe('FullPageLoadPlugin', () => {
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -274,7 +285,9 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           backgroundingListener,
-          performance
+          performance,
+          setAppState,
+          appState
         )
       ]
     })
@@ -305,7 +318,7 @@ describe('FullPageLoadPlugin', () => {
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -313,14 +326,20 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           backgroundingListener,
-          performance
+          performance,
+          setAppState,
+          appState
         )
       ]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
 
+    expect(testClient.appState).toBe('starting')
+
     await jest.runOnlyPendingTimersAsync()
+
+    expect(testClient.appState).toBe('ready')
 
     backgroundingListener.sendToBackground()
 
@@ -343,7 +362,7 @@ describe('FullPageLoadPlugin', () => {
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -351,7 +370,9 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           backgroundingListener,
-          performance
+          performance,
+          setAppState,
+          appState
         )
       ]
     })
@@ -392,7 +413,7 @@ describe('FullPageLoadPlugin', () => {
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -400,7 +421,9 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           backgroundingListener,
-          performance
+          performance,
+          setAppState,
+          appState
         )
       ]
     })
@@ -439,7 +462,7 @@ describe('FullPageLoadPlugin', () => {
       idGenerator: new IncrementingIdGenerator(),
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -447,7 +470,9 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           new ControllableBackgroundingListener(),
-          performance
+          performance,
+          setAppState,
+          appState
         )
       ]
     })
@@ -496,7 +521,7 @@ describe('FullPageLoadPlugin', () => {
       idGenerator: new IncrementingIdGenerator(),
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -504,7 +529,9 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           new ControllableBackgroundingListener(),
-          performance
+          performance,
+          setAppState,
+          appState
         )
       ]
     })
@@ -548,7 +575,7 @@ describe('FullPageLoadPlugin', () => {
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-      plugins: (spanFactory) => [
+      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -556,7 +583,9 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           new ControllableBackgroundingListener(),
-          performance
+          performance,
+          setAppState,
+          appState
         )
       ]
     })
@@ -593,7 +622,7 @@ describe('FullPageLoadPlugin', () => {
           clock,
           deliveryFactory: () => delivery,
           schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-          plugins: (spanFactory) => [
+          plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
             new FullPageLoadPlugin(
               document,
               window.location,
@@ -601,7 +630,9 @@ describe('FullPageLoadPlugin', () => {
               webVitals,
               onSettle,
               new ControllableBackgroundingListener(),
-              performance
+              performance,
+              setAppState,
+              appState
             )
           ]
         })
@@ -631,7 +662,6 @@ describe('FullPageLoadPlugin', () => {
       it('uses the latest lcp entry (multiple batches)', async () => {
         const manager = new PerformanceObserverManager()
         const performance = new PerformanceFake()
-
         const clock = new IncrementingClock('1970-01-01T00:00:00Z')
         const delivery = new InMemoryDelivery()
         const onSettle: OnSettle = (onSettleCallback) => { onSettleCallback(1234) }
@@ -640,7 +670,7 @@ describe('FullPageLoadPlugin', () => {
           clock,
           deliveryFactory: () => delivery,
           schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-          plugins: (spanFactory) => [
+          plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
             new FullPageLoadPlugin(
               document,
               window.location,
@@ -648,7 +678,9 @@ describe('FullPageLoadPlugin', () => {
               webVitals,
               onSettle,
               new ControllableBackgroundingListener(),
-              performance
+              performance,
+              setAppState,
+              appState
             )
           ]
         })
@@ -693,7 +725,7 @@ describe('FullPageLoadPlugin', () => {
           clock,
           deliveryFactory: () => delivery,
           schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-          plugins: (spanFactory) => [
+          plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
             new FullPageLoadPlugin(
               document,
               window.location,
@@ -701,7 +733,9 @@ describe('FullPageLoadPlugin', () => {
               webVitals,
               onSettle,
               new ControllableBackgroundingListener(),
-              performance
+              performance,
+              setAppState,
+              appState
             )
           ]
         })
@@ -735,7 +769,7 @@ describe('FullPageLoadPlugin', () => {
         clock,
         deliveryFactory: () => delivery,
         schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-        plugins: (spanFactory) => [
+        plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
           new FullPageLoadPlugin(
             document,
             window.location,
@@ -743,7 +777,9 @@ describe('FullPageLoadPlugin', () => {
             webVitals,
             onSettle,
             new ControllableBackgroundingListener(),
-            performance
+            performance,
+            setAppState,
+            appState
           )
         ]
       })
@@ -779,7 +815,7 @@ describe('FullPageLoadPlugin', () => {
         idGenerator: new IncrementingIdGenerator(),
         schema: createSchema(window.location.hostname, new MockRoutingProvider()),
         deliveryFactory: () => delivery,
-        plugins: (spanFactory) => [
+        plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
           new FullPageLoadPlugin(
             document,
             window.location,
@@ -787,7 +823,9 @@ describe('FullPageLoadPlugin', () => {
             webVitals,
             onSettle,
             new ControllableBackgroundingListener(),
-            performance
+            performance,
+            setAppState,
+            appState
           )
         ]
       })
@@ -839,7 +877,7 @@ describe('FullPageLoadPlugin', () => {
         idGenerator: new IncrementingIdGenerator(),
         schema: createSchema(window.location.hostname, new MockRoutingProvider()),
         deliveryFactory: () => delivery,
-        plugins: (spanFactory) => [
+        plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
           new FullPageLoadPlugin(
             document,
             window.location,
@@ -847,7 +885,9 @@ describe('FullPageLoadPlugin', () => {
             webVitals,
             onSettle,
             new ControllableBackgroundingListener(),
-            performance
+            performance,
+            setAppState,
+            appState
           )
         ]
       })

@@ -24,10 +24,12 @@ describe('DefaultRoutingProvider', () => {
       clock,
       deliveryFactory: () => delivery,
       schema: createSchema(window.location.hostname, routingProvier),
-      plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
+      plugins: (spanFactory, _spanContextStorage, setAppState) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
+
+    expect(testClient.appState).toBe('starting')
 
     history.pushState({}, '', '/new-route')
 
@@ -35,6 +37,7 @@ describe('DefaultRoutingProvider', () => {
 
     expect(routeResolverFn).toHaveBeenCalled()
     expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[RouteChange]/resolved-route' }))
+    expect(testClient.appState).toBe('ready')
   })
 
   describe('defaultRouteResolver', () => {
@@ -46,10 +49,12 @@ describe('DefaultRoutingProvider', () => {
         clock,
         deliveryFactory: () => delivery,
         schema: createSchema(window.location.hostname, routingProvier),
-        plugins: (spanFactory) => [new RouteChangePlugin(spanFactory, window.location, document)]
+        plugins: (spanFactory, _spanContextStorage, setAppState) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
       })
 
       testClient.start({ apiKey: VALID_API_KEY })
+
+      expect(testClient.appState).toBe('starting')
 
       const url = new URL('https://bugsnag.com/platforms/javascript?test=true#unit-test')
       history.pushState({}, '', url)
@@ -57,6 +62,7 @@ describe('DefaultRoutingProvider', () => {
       await jest.runOnlyPendingTimersAsync()
 
       expect(delivery).toHaveSentSpan(expect.objectContaining({ name: '[RouteChange]/platforms/javascript' }))
+      expect(testClient.appState).toBe('ready')
     })
   })
 })
