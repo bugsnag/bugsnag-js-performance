@@ -22,8 +22,6 @@ const cdnConfig = {
       ...baseConfig.output.globals,
       react: 'React',
       'react-dom/client': 'ReactDom',
-      'react-router-dom': 'ReactRouterDom',
-      '@bugsnag/react-router-performance': 'BugsnagReactRouterPerformance',
       '@bugsnag/plugin-react-performance': 'BugsnagPluginReactPerformance',
     },
   }
