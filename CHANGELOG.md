@@ -1,6 +1,6 @@
 # Changelog
 
-## [v2.12.0] (2025-03-25)
+## [v2.12.0] (2025-03-26)
 
 This release adds support for React Native 0.77 to `@bugsnag/react-native-performance`
 
