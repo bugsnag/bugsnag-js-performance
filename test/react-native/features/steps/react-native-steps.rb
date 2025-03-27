@@ -24,15 +24,16 @@ end
 When("I relaunch the app after shutdown") do
   max_attempts = 20
   attempts = 0
-  state = Maze.driver.app_state('com.bugsnag.fixtures.reactnative.performance')
+  manager = Maze::Api::Appium::AppManager.new
+  state = manager.state
   until (attempts >= max_attempts) || state == :not_running
     attempts += 1
-    state = Maze.driver.app_state('com.bugsnag.fixtures.reactnative.performance')
+    state = manager.state
     sleep 0.5
   end
   $logger.warn "App state #{state} instead of #{expected_state} after 10s" unless state == :not_running
 
-  Maze.driver.activate_app Maze.driver.app_id
+  manager.activate
 end
 
 def execute_command(action, scenario_name = '')
