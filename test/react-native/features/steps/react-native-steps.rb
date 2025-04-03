@@ -21,8 +21,17 @@ Then('the trace payload field {string} string attribute {string} equals the plat
   end
 end
 
-Then('the trace payload field {string} integer attribute {string} exists') do |field, attribute|
-  value = get_attribute_value field, attribute, 'intValue'
+Then('the {string} span has {word} attribute named {string}') do |span_name, attribute_type, attribute|
+  spans = spans_from_request_list(Maze::Server.list_for('traces'))
+  found_spans = spans.find_all { |span| span['name'].eql?(span_name) }
+  raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{span_name}" if found_spans.empty?
+  raise Test::Unit::AssertionFailedError.new "found #{found_spans.size} spans named #{span_name}, expected exactly one" unless found_spans.size == 1
+
+  attributes = found_spans.first['attributes']
+  attribute = attributes.find { |a| a['key'] == attribute }
+
+  value = attribute&.dig 'value', "#{attribute_type}Value"
+
   Maze.check.not_nil value
 end
 
