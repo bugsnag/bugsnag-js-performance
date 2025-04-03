@@ -68,3 +68,7 @@ Feature: Native Integration
         | 3.3 |
 
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer attribute "bugsnag.device.physical_device_memory" exists
+    # And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer attribute "bugsnag.system.memory.spaces.device.size" exists
+    # And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer attribute "bugsnag.system.memory.spaces.device.mean" exists
+    # And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer array attribute "bugsnag.system.memory.spaces.device.use" exists
+    # And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer array attribute "bugsnag.system.memory.timestamps" exists

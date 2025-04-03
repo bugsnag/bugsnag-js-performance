@@ -21,6 +21,11 @@ Then('the trace payload field {string} string attribute {string} equals the plat
   end
 end
 
+Then('the trace payload field {string} integer attribute {string} exists') do |field, attribute|
+  value = get_attribute_value field, attribute, 'intValue'
+  Maze.check.not_nil value
+end
+
 When("I relaunch the app after shutdown") do
   max_attempts = 20
   attempts = 0
