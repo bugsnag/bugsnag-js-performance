@@ -68,9 +68,7 @@ Feature: Native Integration
         | 3.3 |
 
     # Device metrics
-    Then I discard the oldest trace
     And the "Native child span" span has int attribute named "bugsnag.system.memory.spaces.device.size"
     And the "Native child span" span has int attribute named "bugsnag.system.memory.spaces.device.mean"
     And the "Native child span" span has array attribute named "bugsnag.system.memory.spaces.device.use"
     And the "Native child span" span has array attribute named "bugsnag.system.memory.timestamps"
-    
