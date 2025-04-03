@@ -66,3 +66,5 @@ Feature: Native Integration
         | 1.1 |
         | 2.2 |
         | 3.3 |
+
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" integer attribute "bugsnag.device.physical_device_memory" exists
