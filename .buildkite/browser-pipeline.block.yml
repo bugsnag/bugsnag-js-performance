@@ -6,5 +6,5 @@ steps:
     depends_on: "trigger-browser-pipeline"
     agents:
       queue: macos
-    timeout_in_minutes: 5
+    timeout_in_minutes: 2
     command: buildkite-agent pipeline upload .buildkite/basic/browser-pipeline.yml

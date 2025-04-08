@@ -1,0 +1,10 @@
+steps:
+  - block: "Trigger react native navigation pipeline"
+    key: "trigger-react-native-navigation-pipeline"
+
+  - label: ":pipeline_upload: React native navigation pipeline"
+    depends_on: "trigger-react-native-navigation-pipeline"
+    agents:
+      queue: macos
+    timeout_in_minutes: 2
+    command: buildkite-agent pipeline upload .buildkite/react-native-navigation-pipeline.yml
