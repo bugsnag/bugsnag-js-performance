@@ -1,0 +1,18 @@
+[
+    {
+        "pipeline": ".buildkite/browser-pipeline.yml",
+        "block": ".buildkite/browser-pipeline.block.yml",
+        "paths": [
+            "test/browser",
+            "packages/core",
+            "packages/platforms/browser",
+            "packages/delivery-fetch",
+            "packages/request-tracker"
+        ]
+    },
+    {
+        "pipeline": ".buildkite/browser-pipeline.full.yml",
+        "block": ".buildkite/browser-pipeline.full.block.yml",
+        "paths": []
+    }
+]

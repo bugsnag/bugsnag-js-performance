@@ -15,26 +15,10 @@ steps:
           run: license-finder
 
   #
-  # Upload each basic pipeline
+  # Detect changes and upload relevant pipelines
   #
-  - label: ":pipeline_upload: Basic browser pipeline"
-    timeout_in_minutes: 2
-    commands:
-      - buildkite-agent pipeline upload .buildkite/browser-pipeline.yml
-
-  - label: ":pipeline_upload: React Native pipeline"
-    timeout_in_minutes: 2
-    commands:
-      - buildkite-agent pipeline upload .buildkite/react-native-pipeline.yml
-
-  - label: ":pipeline_upload: React Native Navigation pipeline"
-    timeout_in_minutes: 2
-    commands:
-      - buildkite-agent pipeline upload .buildkite/react-native-navigation-pipeline.yml
-
-  #
-  # Conditionally trigger full pipeline
-  #
-  - label: 'Conditionally trigger full set of tests'
-    timeout_in_minutes: 2
-    command: sh -c .buildkite/pipeline_trigger.sh
+  - label: ":git: Detect changed packages"
+    agents:
+      queue: "macos-node-18"
+    timeout_in_minutes: 5
+    command: node .buildkite/scripts/pipeline-trigger.js
