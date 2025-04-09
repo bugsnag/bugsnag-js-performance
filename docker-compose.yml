@@ -18,6 +18,8 @@ x-common-environment: &common-environment
   MAZE_BUGSNAG_API_KEY:
   MAZE_APPIUM_BUGSNAG_API_KEY:
   MAZE_NO_FAIL_FAST:
+  NATIVE_INTEGRATION:
+  RCT_NEW_ARCH_ENABLED:
 
 services:
   license-finder:
@@ -102,9 +104,7 @@ services:
       <<: *common-environment
       BITBAR_USERNAME:
       BITBAR_ACCESS_KEY:
-      RCT_NEW_ARCH_ENABLED:
       REACT_NATIVE_NAVIGATION:
-      NATIVE_INTEGRATION:
       MAZE_REPEATER_API_KEY: "${MAZE_REPEATER_API_KEY_RN:-}"
     ports:
       - "9000-9499:9339"

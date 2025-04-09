@@ -17,10 +17,10 @@ steps:
   #
   # Upload each basic pipeline
   #
-  - label: ":pipeline_upload: Basic browser pipeline"
-    timeout_in_minutes: 2
-    commands:
-      - buildkite-agent pipeline upload .buildkite/browser-pipeline.yml
+  # - label: ":pipeline_upload: Basic browser pipeline"
+  #   timeout_in_minutes: 2
+  #   commands:
+  #     - buildkite-agent pipeline upload .buildkite/browser-pipeline.yml
 
   - label: ":pipeline_upload: React Native pipeline"
     timeout_in_minutes: 2

@@ -66,3 +66,9 @@ Feature: Native Integration
         | 1.1 |
         | 2.2 |
         | 3.3 |
+
+    # Device metrics
+    And the "Native child span" span has int attribute named "bugsnag.system.memory.spaces.device.size"
+    And the "Native child span" span has int attribute named "bugsnag.system.memory.spaces.device.mean"
+    And the "Native child span" span has array attribute named "bugsnag.system.memory.spaces.device.used"
+    And the "Native child span" span has array attribute named "bugsnag.system.memory.timestamps"
