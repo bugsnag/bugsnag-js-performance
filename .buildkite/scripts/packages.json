@@ -1,0 +1,56 @@
+[
+    {
+        "pipeline": ".buildkite/browser-pipeline.yml",
+        "block": ".buildkite/browser-pipeline.block.yml",
+        "paths": [
+            "test/browser",
+            "packages/core",
+            "packages/platforms/browser",
+            "packages/delivery-fetch",
+            "packages/request-tracker",
+            "packages/angular",
+            "packages/react-router",
+            "packages/vue",
+            "packages/plugin-react-performance"
+        ]
+    },
+    {
+        "pipeline": ".buildkite/browser-pipeline.full.yml",
+        "block": ".buildkite/browser-pipeline.full.block.yml",
+        "paths": []
+    },
+    {
+        "pipeline": ".buildkite/react-native-pipeline.yml",
+        "block": ".buildkite/react-native-pipeline.block.yml",
+        "paths": [
+            "test/react-native",
+            "packages/core",
+            "packages/platforms/react-native",
+            "packages/delivery-fetch",
+            "packages/request-tracker",
+            "packages/plugin-react-navigation"
+        ]
+    },
+    {
+        "pipeline": ".buildkite/react-native-pipeline.full.yml",
+        "block": ".buildkite/react-native-pipeline.full.block.yml",
+        "paths": []
+    },
+    {
+        "pipeline": ".buildkite/react-native-navigation-pipeline.yml",
+        "block": ".buildkite/react-native-navigation-pipeline.block.yml",
+        "paths": [
+            "test/react-native",
+            "packages/core",
+            "packages/platforms/react-native",
+            "packages/delivery-fetch",
+            "packages/request-tracker",
+            "packages/plugin-react-native-navigation"
+        ]
+    },
+    {
+        "pipeline": ".buildkite/react-native-navigation-pipeline.full.yml",
+        "block": ".buildkite/react-native-navigation-pipeline.full.block.yml",
+        "paths": []
+    }
+]
