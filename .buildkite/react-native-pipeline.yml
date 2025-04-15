@@ -231,6 +231,8 @@ steps:
             format: "junit"
             branch: "^main|next$$"
             api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
+        env:
+          RN_VERSION: "{{matrix}}"
         retry:
           manual:
             permit_on_passed: true
@@ -267,6 +269,7 @@ steps:
             api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         env:
           RCT_NEW_ARCH_ENABLED: "1"
+          RN_VERSION: "{{matrix}}"
         retry:
           manual:
             permit_on_passed: true
@@ -304,6 +307,7 @@ steps:
             api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         env:
           NATIVE_INTEGRATION: "1"
+          RN_VERSION: "{{matrix}}"
         retry:
           manual:
             permit_on_passed: true
@@ -342,6 +346,7 @@ steps:
         env:
           RCT_NEW_ARCH_ENABLED: "1"
           NATIVE_INTEGRATION: "1"
+          RN_VERSION: "{{matrix}}"
         retry:
           manual:
             permit_on_passed: true
@@ -376,6 +381,8 @@ steps:
             format: "junit"
             branch: "^main|next$$"
             api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
+        env:
+          RN_VERSION: "{{matrix}}"
         retry:
           manual:
             permit_on_passed: true
@@ -412,6 +419,7 @@ steps:
             api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         env:
           RCT_NEW_ARCH_ENABLED: "1"
+          RN_VERSION: "{{matrix}}"
         retry:
           manual:
             permit_on_passed: true
@@ -449,6 +457,7 @@ steps:
             api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         env:
           NATIVE_INTEGRATION: "1"
+          RN_VERSION: "{{matrix}}"
         retry:
           manual:
             permit_on_passed: true
@@ -487,6 +496,7 @@ steps:
         env:
           RCT_NEW_ARCH_ENABLED: "1"
           NATIVE_INTEGRATION: "1"
+          RN_VERSION: "{{matrix}}"
         retry:
           manual:
             permit_on_passed: true
