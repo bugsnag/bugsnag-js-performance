@@ -102,6 +102,7 @@ services:
       <<: *common-environment
       BITBAR_USERNAME:
       BITBAR_ACCESS_KEY:
+      RN_VERSION:
       RCT_NEW_ARCH_ENABLED:
       REACT_NATIVE_NAVIGATION:
       NATIVE_INTEGRATION:

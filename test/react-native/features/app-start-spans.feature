@@ -1,6 +1,8 @@
 @skip_react_native_navigation
 Feature: App Start spans
 
+  # Skipped on 0.79/Android/Old Arch - see PLAT-14095
+  @skip_android_old_arch_079
   Scenario: App starts are automatically instrumented
     When I run 'AppStartScenario'
     And I relaunch the app after shutdown
