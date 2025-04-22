@@ -32,7 +32,6 @@ services:
       context: .
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
-        MAZE_RUNNER_VERSION: latest-v9-cli
         USE_CDN_BUILD:
     environment:
       <<: *common-environment
@@ -58,7 +57,6 @@ services:
       context: .
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
-        MAZE_RUNNER_VERSION: latest-v9-cli
         USE_CDN_BUILD:
     environment: &browser-maze-runner-environment
       <<: *common-environment
