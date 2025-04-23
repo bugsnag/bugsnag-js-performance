@@ -153,7 +153,7 @@ if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
 
 // build iOS fixture
 if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
-  const easBuildArgs = ['build', '--local', '--platform', 'ios', '--profile', 'production', '--output', 'output.ipa', 'non-interactive']
+  const easBuildArgs = ['build', '--local', '--platform', 'ios', '--profile', 'production', '--output', 'output.ipa', '--non-interactive']
   execFileSync('eas', easBuildArgs, { cwd: `${fixtureDir}`, stdio: 'inherit', env: { ...process.env, EAS_LOCAL_BUILD_WORKINGDIR: easWorkingDir, EAS_LOCAL_BUILD_SKIP_CLEANUP: 1 } })
 }
 
