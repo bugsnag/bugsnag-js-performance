@@ -1,0 +1,30 @@
+agents:
+  queue: "opensource"
+
+steps:
+  - label:  ':android: Build expo APK'
+    key: "build-expo-apk"
+    timeout_in_minutes: 20
+    agents:
+      queue: "macos-14"
+    env:
+      JAVA_VERSION: "17"
+      EXPO_VERSION: "52"
+      BUILD_ANDROID: 1
+    artifact_paths: test/react-native/features/fixtures/generated/expo/52/test-fixture/output.apk
+    commands:
+      - bundle install
+      - ./bin/generate-expo-fixture
+  
+  - label:  ':mac: Build expo IPA'
+    key: "build-expo-ipa"
+    timeout_in_minutes: 20
+    agents:
+      queue: "macos-14"
+    env:
+      EXPO_VERSION: "52"
+      BUILD_IOS: 1
+    artifact_paths: test/react-native/features/fixtures/generated/expo/52/test-fixture/output.ipa
+    commands:
+      - bundle install
+      - ./bin/generate-expo-fixture
