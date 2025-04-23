@@ -9,13 +9,13 @@ if (!process.env.EXPO_VERSION) {
   process.exit(1)
 }
 
-if (!process.env.EXPO_PERFORMANCE_EAS_PROJECT_ID) {
-  console.error('EXPO_PERFORMANCE_EAS_PROJECT_ID is not set')
+if (!process.env.EXPO_EAS_PROJECT_ID) {
+  console.error('EXPO_EAS_PROJECT_ID is not set')
   process.exit(1)
 }
 
-if (!process.env.EXPO_PERFORMANCE_CREDENTIALS_DIR) {
-  console.error('EXPO_PERFORMANCE_CREDENTIALS_DIR is not set')
+if (!process.env.EXPO_CREDENTIALS_DIR) {
+  console.error('EXPO_CREDENTIALS_DIR is not set')
   process.exit(1)
 }
 
@@ -24,7 +24,7 @@ const ROOT_DIR = resolve(__dirname, '../')
 
 const buildDir = resolve(ROOT_DIR, `test/react-native/features/fixtures/generated/expo/${expoVersion}`)
 const easWorkingDir = `${buildDir}/build`
-const fixtureDir = `${buildDir}/performance-fixture`
+const fixtureDir = `${buildDir}/test-fixture`
 
 const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
@@ -70,7 +70,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   fs.mkdirSync(fixtureDir, { recursive: true })
 
   // create the test fixture
-  const expoInitArgs = ['create-expo-app', 'performance-fixture', '--no-install', '--template', `default@${expoVersion}`]
+  const expoInitArgs = ['create-expo-app', 'test-fixture', '--no-install', '--template', `default@${expoVersion}`]
   execFileSync('npx', expoInitArgs, { cwd: buildDir, stdio: 'inherit' })
 
   // install the required packages
@@ -80,7 +80,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   const appConfig = require(`${fixtureDir}/app.json`)
   appConfig.expo.ios = {
     ...appConfig.expo.ios,
-    bundleIdentifier: 'com.bugsnag.expo.performance.fixture',
+    bundleIdentifier: 'com.bugsnag.expo.fixture',
     buildNumber: '1',
     infoPlist: {
       NSAppTransportSecurity: {
@@ -93,7 +93,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   // look into using expo-build-properties plugin https://docs.expo.dev/versions/latest/sdk/build-properties/#pluginconfigtypeandroid
   appConfig.expo.android = {
     ...appConfig.expo.android,
-    package: 'com.bugsnag.expo.performance.fixture',
+    package: 'com.bugsnag.expo.fixture',
     versionCode: 1,
     permissions: ['INTERNET'],
     config: {
@@ -106,7 +106,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   fs.writeFileSync(`${fixtureDir}/app.json`, JSON.stringify(appConfig, null, 2))
 
   // eas init
-  const easInitArgs = ['eas-cli', 'init', '--id', `${process.env.EXPO_PERFORMANCE_EAS_PROJECT_ID}`]
+  const easInitArgs = ['eas-cli', 'init', '--id', `${process.env.EXPO_EAS_PROJECT_ID}`]
   execFileSync('npx', easInitArgs, { cwd: fixtureDir, stdio: 'inherit' })
   
   // eas build configure
@@ -130,11 +130,15 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   fs.writeFileSync(`${fixtureDir}/eas.json`, JSON.stringify(easConfig, null, 2))
 
+  // copy keystore to the fixture directory
+  const keyStorePath = resolve(ROOT_DIR, `test/react-native/features/fixtures/expo/fakekeys.jks`)
+  fs.copyFileSync(keyStorePath, resolve(fixtureDir, 'fakekeys.jks'))
+
   // copy credentials to the fixture directory
-  const credentialsFiles = fs.readdirSync(process.env.EXPO_PERFORMANCE_CREDENTIALS_DIR)
+  const credentialsFiles = fs.readdirSync(process.env.EXPO_CREDENTIALS_DIR)
 
   for (const file of credentialsFiles) {
-    fs.copyFileSync(resolve(process.env.EXPO_PERFORMANCE_CREDENTIALS_DIR, file), resolve(fixtureDir, file))
+    fs.copyFileSync(resolve(process.env.EXPO_CREDENTIALS_DIR, file), resolve(fixtureDir, file))
   }
 
   // initialising git in the fixture directory to stop eas from building in monorepo mode
