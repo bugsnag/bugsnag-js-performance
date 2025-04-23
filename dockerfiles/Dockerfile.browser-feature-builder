@@ -1,4 +1,4 @@
-FROM 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner:tms-click-element-fix-cli
+FROM 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v9-cli
 
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs
 
