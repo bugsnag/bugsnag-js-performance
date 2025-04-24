@@ -34,7 +34,6 @@ steps:
               - --https
               - --farm=bs
               - --browser={{ matrix.browser }}_{{ matrix.version }}
-              - features/navigation-changes.feature
           artifacts#v1.5.0:
             upload:
               - "./test/browser/maze_output/failed/**/*"
@@ -48,16 +47,4 @@ steps:
         matrix:
           setup:
             browser: [edge]
-            version: [80]
-          adjustments:
-            - with: { browser: edge, version: 80 }
-            - with: { browser: edge, version: 81 }
-            - with: { browser: edge, version: 82 }
-            - with: { browser: edge, version: 83 }
-            - with: { browser: edge, version: 84 }
-            - with: { browser: edge, version: 85 }
-            - with: { browser: edge, version: 86 }
-            - with: { browser: edge, version: 87 }
-            - with: { browser: edge, version: 88 }
-            - with: { browser: edge, version: 89 }
-
+            version: [80,81]
