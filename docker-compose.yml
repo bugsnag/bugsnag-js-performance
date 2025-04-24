@@ -32,7 +32,6 @@ services:
       context: .
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
-        MAZE_RUNNER_VERSION: latest-v9-cli
         USE_CDN_BUILD:
     environment:
       <<: *common-environment
@@ -58,7 +57,6 @@ services:
       context: .
       dockerfile: dockerfiles/Dockerfile.browser-feature-builder
       args:
-        MAZE_RUNNER_VERSION: latest-v9-cli
         USE_CDN_BUILD:
     environment: &browser-maze-runner-environment
       <<: *common-environment
@@ -66,27 +64,6 @@ services:
       BROWSER_STACK_ACCESS_KEY:
       HOST: "${HOST:-maze-runner}"
       API_HOST: "${API_HOST:-maze-runner}"
-      MAZE_REPEATER_API_KEY: "${MAZE_REPEATER_API_KEY_JS:-}"
-    networks:
-      default:
-        aliases:
-          - maze-runner
-    volumes:
-      - ./test/browser/maze_output:/app/test/browser/maze_output
-      - ./reports/:/app/test/browser/reports/
-
-  browser-maze-runner-legacy:
-    build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.browser-feature-builder
-      args:
-        MAZE_RUNNER_VERSION: latest-v9-cli-legacy
-        USE_CDN_BUILD:
-    environment:
-      <<: *common-environment
-      BROWSER_STACK_USERNAME:
-      BROWSER_STACK_ACCESS_KEY:
-      USE_LEGACY_DRIVER: 1
       MAZE_REPEATER_API_KEY: "${MAZE_REPEATER_API_KEY_JS:-}"
     networks:
       default:
