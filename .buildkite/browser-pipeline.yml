@@ -47,14 +47,17 @@ steps:
         concurrency_group: "browserstack"
         matrix:
           setup:
-            browser: [chrome]
-            version: [53, 72]
+            browser: [edge]
+            version: [80]
           adjustments:
-            - with: { browser: firefox, version: 78 }
-            - with: { browser: edge, version: 17 }
             - with: { browser: edge, version: 80 }
-            - with: { browser: edge, version: 90 }
-            - with: { browser: edge, version: 100 }
-            - with: { browser: edge, version: 110 }
-            - with: { browser: edge, version: latest }
+            - with: { browser: edge, version: 81 }
+            - with: { browser: edge, version: 82 }
+            - with: { browser: edge, version: 83 }
+            - with: { browser: edge, version: 84 }
+            - with: { browser: edge, version: 85 }
+            - with: { browser: edge, version: 86 }
+            - with: { browser: edge, version: 87 }
+            - with: { browser: edge, version: 88 }
+            - with: { browser: edge, version: 89 }
 
