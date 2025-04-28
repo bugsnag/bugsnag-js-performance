@@ -8,6 +8,7 @@ import { getCurrentCommand } from './CommandRunner'
 import { clearPersistedState, setDeviceId, setSamplingProbability } from './Persistence'
 import { ScenarioContext } from './ScenarioContext'
 import { NativeScenarioLauncher } from './native'
+import { wrapperComponentProvider } from '../scenarios/WrapperComponentProviderScenario'
 
 const isTurboModuleEnabled = () => global.RN$Bridgeless || global.__turboModuleProxy != null
 
@@ -141,4 +142,17 @@ export async function launchScenario (rootTag, clearPersistedData = true) {
     default:
       throw new Error(`Unknown action '${command.action}'`)
   }
+}
+
+export function checkForPreviousLaunch () {
+  let isRestart = false
+  const startupConfig = NativeScenarioLauncher.readStartupConfig()
+
+  if (startupConfig) {
+    startupConfig.wrapperComponentProvider = startupConfig.useWrapperComponentProvider ? wrapperComponentProvider : null
+    BugsnagPerformance.start(startupConfig)
+    isRestart = true
+  }
+
+  return isRestart
 }

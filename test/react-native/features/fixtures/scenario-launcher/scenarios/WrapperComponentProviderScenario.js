@@ -1,7 +1,8 @@
 import React from 'react'
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
+import { NativeScenarioLauncher } from '../lib/native'
 
-const wrapperComponentProvider = () =>  ({ children }) => {
+export const wrapperComponentProvider = () =>  ({ children }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.scenario}>
@@ -13,9 +14,17 @@ const wrapperComponentProvider = () =>  ({ children }) => {
 }
 
 export const initialise = async (config) => {
-  config.maximumBatchSize = 1
-  config.wrapperComponentProvider = wrapperComponentProvider
-  config.autoInstrumentAppStarts = true
+  const startupConfig = {
+    apiKey: config.apiKey,
+    endpoint: config.endpoint,
+    autoInstrumentAppStarts: true,
+    autoInstrumentNetworkRequests: false,
+    maximumBatchSize: 1,
+    useWrapperComponentProvider: true,
+  }
+
+  NativeScenarioLauncher.saveStartupConfig(startupConfig)
+  NativeScenarioLauncher.exitApp()
 }
 
 export const App = () => {

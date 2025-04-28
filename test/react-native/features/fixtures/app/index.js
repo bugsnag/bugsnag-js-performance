@@ -2,18 +2,15 @@ import { AppRegistry, SafeAreaView, StyleSheet, View, Text, RootTagContext, unst
 import React, { useContext, useEffect } from 'react'
 import { name as appName } from './app.json';
 import BugsnagPerformance from '@bugsnag/react-native-performance';
-import { launchScenario, NativeScenarioLauncher } from '@bugsnag/react-native-performance-scenarios'
+import { launchScenario, checkForPreviousLaunch } from '@bugsnag/react-native-performance-scenarios'
 
-const startupConfig = NativeScenarioLauncher.readStartupConfig()
-if (startupConfig) {
-  BugsnagPerformance.start(startupConfig)
-}
+const isRestart = checkForPreviousLaunch()
 
 const App = () => {
   const rootTag = useContext(RootTagContext || unstable_RootTagContext)
 
   useEffect(() => {
-    if (!startupConfig) launchScenario(rootTag)
+    if (!isRestart) launchScenario(rootTag)
   }, [rootTag])
 
   return (
