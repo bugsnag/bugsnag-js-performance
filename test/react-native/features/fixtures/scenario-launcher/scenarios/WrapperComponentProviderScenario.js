@@ -27,10 +27,6 @@ export const initialise = async (config) => {
   NativeScenarioLauncher.exitApp()
 }
 
-export const App = () => {
-  return (<Text accessibilityLabel='app-component' testID='app-component'>Wrapped App Component</Text>)
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1
