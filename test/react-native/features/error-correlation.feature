@@ -1,3 +1,4 @@
+@skip_expo
 Feature: Error correlation
 
   Scenario: Reported errors include the current trace and span id
