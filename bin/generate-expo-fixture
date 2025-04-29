@@ -48,12 +48,13 @@ const PACKAGE_DIRECTORIES = [
 const DEPENDENCIES = [
   `@bugsnag/react-native`,
   `@react-native-community/netinfo@11`,
-  `react-native-file-access@3`
+  `react-native-file-access@3`,
+  'expo-build-properties'
 ]
 
 if (!process.env.SKIP_BUILD_PACKAGES) {
-  // run npm install in the root directory
-  execFileSync('npm', ['install'], { cwd: ROOT_DIR, stdio: 'inherit' })
+  // run npm ci in the root directory
+  execFileSync('npm', ['ci', ['--no-audit']], { cwd: ROOT_DIR, stdio: 'inherit' })
 
   // build the packages
   const buildArgs = ['run', 'build', '--scope', PACKAGE_NAMES.join(' --scope ')]
@@ -92,8 +93,6 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     }
   }
 
-  // TODO: need to set usesCleartextTraffic to true for Android
-  // look into using expo-build-properties plugin https://docs.expo.dev/versions/latest/sdk/build-properties/#pluginconfigtypeandroid
   appConfig.expo.android = {
     ...appConfig.expo.android,
     package: 'com.bugsnag.expo.fixture',
@@ -105,6 +104,19 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
       }
     }
   }
+
+  const plugins = appConfig.expo.plugins || []
+  appConfig.expo.plugins = [
+    ...plugins,
+    [
+      'expo-build-properties',
+      {
+        android: {
+          usesCleartextTraffic: true
+        }
+      }
+    ]
+  ]
 
   fs.writeFileSync(`${fixtureDir}/app.json`, JSON.stringify(appConfig, null, 2))
 
@@ -176,5 +188,5 @@ function installFixtureDependencies() {
   const fixtureDependencyArgs = DEPENDENCIES.join(' ')
 
   // install test fixture dependencies and local packages
-  execSync(`npm install --save ${fixtureDependencyArgs} *.tgz`, { cwd: fixtureDir, stdio: 'inherit' })
+  execSync(`npm install ${fixtureDependencyArgs} *.tgz --save --no-audit --legacy-peer-deps`, { cwd: fixtureDir, stdio: 'inherit' })
 }
