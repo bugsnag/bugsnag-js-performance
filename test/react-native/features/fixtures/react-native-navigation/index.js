@@ -1,31 +1,27 @@
-import { launchScenario, NativeScenarioLauncher } from '@bugsnag/react-native-performance-scenarios'
-import { useContext, useEffect } from 'react'
-import { RootTagContext, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { launchScenario, launchFromStartupConfig, ScenarioContext } from '@bugsnag/react-native-performance-scenarios'
+import { useEffect, useState } from 'react'
+import { SafeAreaView, StyleSheet, Text } from 'react-native'
 import { Navigation } from 'react-native-navigation'
-import BugsnagPerformance from '@bugsnag/react-native-performance';
 
 console.reportErrorsAsExceptions = false
 
-const startupConfig = NativeScenarioLauncher.readStartupConfig()
-if (startupConfig) {
-  BugsnagPerformance.start(startupConfig)
-}
+const isStartupTest = launchFromStartupConfig()
 
 const App = () => {
-    const rootTag = useContext(RootTagContext)
-
+    const [currentScenario, setCurrentScenario] = useState(null)
     useEffect(() => {
-        if (!startupConfig) launchScenario(rootTag)
-    }, [rootTag])
+        if (!isStartupTest) launchScenario(setCurrentScenario)
+    }, [])
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View>
+        <ScenarioContext.Provider value={ currentScenario }>
+            <SafeAreaView style={styles.container}>
                 <Text>React Native Performance Test App</Text>
                 <Text>react-native-navigation</Text>
-            </View>
-        </SafeAreaView>
-    )
+                { currentScenario && <currentScenario.Component /> }
+            </SafeAreaView>
+        </ScenarioContext.Provider>
+      )
 }
 
 Navigation.registerComponent('App', () => App)
@@ -41,6 +37,9 @@ Navigation.events().registerAppLaunchedListener(async () => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: 100
     }
 })

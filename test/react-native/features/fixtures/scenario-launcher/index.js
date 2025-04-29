@@ -1,2 +1,3 @@
-export { launchScenario } from './lib/ScenarioLauncher'
+export { launchScenario, launchFromStartupConfig } from './lib/ScenarioLauncher'
 export { NativeScenarioLauncher } from './lib/native'
+export { ScenarioContext } from './lib/ScenarioContext'
