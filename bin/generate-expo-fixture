@@ -133,6 +133,10 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   fs.writeFileSync(`${fixtureDir}/eas.json`, JSON.stringify(easConfig, null, 2))
 
+  // copy the index.tsx file
+  const indexPath = resolve(ROOT_DIR, `test/react-native/features/fixtures/expo/index.tsx`)
+  fs.copyFileSync(indexPath, resolve(fixtureDir, 'app/(tabs)/index.tsx'))
+
   // copy keystore to the fixture directory
   const keyStorePath = resolve(ROOT_DIR, `test/react-native/features/fixtures/expo/fakekeys.jks`)
   fs.copyFileSync(keyStorePath, resolve(fixtureDir, 'fakekeys.jks'))
