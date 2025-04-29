@@ -57,5 +57,10 @@
         "pipeline": ".buildkite/expo-pipeline.yml",
         "block": ".buildkite/expo-pipeline.block.yml",
         "paths": []
+    },
+    {
+        "pipeline": ".buildkite/expo-pipeline.full.yml",
+        "block": ".buildkite/expo-pipeline.full.block.yml",
+        "paths": []
     }
 ]

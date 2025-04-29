@@ -8,7 +8,7 @@ steps:
       # Test fixtures
       #
       - label:  ':android: Build Expo {{matrix}} APK'
-        key: "build-expo-apk"
+        key: "build-expo-apk-full"
         timeout_in_minutes: 20
         agents:
           queue: "macos-14"
@@ -21,10 +21,11 @@ steps:
           - bundle install
           - ./bin/generate-expo-fixture
         matrix:
-          - "52"
+          - "51"
+          - "50"
 
       - label:  ':mac: Build Expo {{matrix}} IPA'
-        key: "build-expo-ipa"
+        key: "build-expo-ipa-full"
         timeout_in_minutes: 20
         agents:
           queue: "macos-14"
@@ -36,13 +37,14 @@ steps:
           - bundle install
           - ./bin/generate-expo-fixture
         matrix:
-          - "52"
+          - "51"
+          - "50"
 
       #
       # End-to-end tests
       #
       - label: ":bitbar: :android: Expo {{matrix}} Android 15 end-to-end tests"
-        depends_on: "build-expo-apk"
+        depends_on: "build-expo-apk-full"
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
@@ -57,7 +59,6 @@ steps:
               - --farm=bb
               - --device=ANDROID_15
               - --a11y-locator
-              - --fail-fast
               - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
@@ -75,10 +76,11 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "52"
+          - "51"
+          - "50"
 
       - label: ":bitbar: :mac: Expo {{matrix}} iOS 16 end-to-end tests"
-        depends_on: "build-expo-ipa"
+        depends_on: "build-expo-ipa-full"
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
@@ -93,7 +95,6 @@ steps:
               - --farm=bb
               - --device=IOS_16
               - --a11y-locator
-              - --fail-fast
               - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
@@ -111,4 +112,5 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "52"
+          - "51"
+          - "50"
