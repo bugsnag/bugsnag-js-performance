@@ -67,7 +67,6 @@ const netinfoVersion = parseFloat(reactNativeVersion) <= 0.64 ? '10.0.0' : '11.3
 const DEPENDENCIES = [
   `@bugsnag/react-native@${process.env.NOTIFIER_VERSION}`,
   `@react-native-community/netinfo@${netinfoVersion}`,
-  `react-native-dotenv`,
   `react-native-file-access@${reactNativeFileAccessVersion}`
 ]
 
@@ -306,14 +305,9 @@ function replaceGeneratedFixtureFiles() {
     resolve(fixtureDir, 'exportOptions.plist')
   )
 
-  fs.copyFileSync(
-    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/env'),
-    resolve(fixtureDir, '.env')
-  )
-
   const babelConfig = require(resolve(fixtureDir, 'babel.config.js'))
   if (!babelConfig.plugins) babelConfig.plugins = []
-  babelConfig.plugins.push('@babel/plugin-transform-export-namespace-from', 'module:react-native-dotenv')
+  babelConfig.plugins.push('@babel/plugin-transform-export-namespace-from')
   fs.writeFileSync(resolve(fixtureDir, 'babel.config.js'), `module.exports = ${util.inspect(babelConfig)}`)
 }
 

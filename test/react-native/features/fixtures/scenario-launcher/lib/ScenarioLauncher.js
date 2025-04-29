@@ -5,7 +5,6 @@ import { NativeScenarioLauncher } from './native'
 import { wrapperComponentProvider } from '../scenarios/WrapperComponentProviderScenario'
 import React from 'react'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
-import { REACT_APP_API_KEY, REACT_APP_ENDPOINT, REACT_APP_SCENARIO_NAME } from '@env'
 
 async function loadReactNavigationScenario (scenario) {
   if (typeof scenario.registerScreens === 'function') {
@@ -73,19 +72,7 @@ export async function launchScenario (setScenario, clearPersistedData = true) {
     await clearPersistedState()
   }
 
-  let command
-
-  if (REACT_APP_SCENARIO_NAME && REACT_APP_API_KEY) {
-    command = {
-      action: 'run-scenario',
-      scenario_name: REACT_APP_SCENARIO_NAME,
-      api_key: REACT_APP_API_KEY,
-      endpoint: REACT_APP_ENDPOINT
-    }
-  } else {
-    command = await getCurrentCommand()
-  }
-
+  const command = await getCurrentCommand()
   switch (command.action) {
     case 'run-scenario':
       return await runScenario(
