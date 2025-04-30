@@ -153,9 +153,8 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   const keyStorePath = resolve(ROOT_DIR, `test/react-native/features/fixtures/expo/fakekeys.jks`)
   fs.copyFileSync(keyStorePath, resolve(fixtureDir, 'fakekeys.jks'))
 
-  // copy npmrc
-  const npmrcPath = resolve(ROOT_DIR, `test/react-native/features/fixtures/expo/npmconfig`)
-  fs.copyFileSync(npmrcPath, resolve(fixtureDir, '.npmrc'))
+  // add .npmrc
+  fs.writeFileSync(resolve(fixtureDir, '.npmrc'), 'registry=https://registry.npmjs.org/\n')
 
   // copy credentials to the fixture directory
   const credentialsFiles = fs.readdirSync(process.env.EXPO_CREDENTIALS_DIR)
