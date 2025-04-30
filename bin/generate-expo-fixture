@@ -74,7 +74,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   fs.mkdirSync(fixtureDir, { recursive: true })
 
   // create the test fixture
-  const expoInitArgs = ['create-expo-app', 'test-fixture', '--no-install', '--template', `default@${expoVersion}`]
+  const expoInitArgs = ['create-expo-app', 'test-fixture', '--no-install', '--template', `tabs@${expoVersion}`]
   execFileSync('npx', expoInitArgs, { cwd: buildDir, stdio: 'inherit' })
 
   // install the required packages
