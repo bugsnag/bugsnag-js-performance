@@ -17,7 +17,7 @@ if (baseBranch) {
   execSync(`git --no-pager diff --name-only origin/${baseBranch}`, { stdio: 'inherit' });
 }
 
-packages.forEach(({ paths, block, pipeline }) => {
+packages.reverse().forEach(({ paths, block, pipeline }) => {
   let upload = false;
 
   if (commitMessage.includes("[full ci]") ||
