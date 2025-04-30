@@ -105,18 +105,23 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     }
   }
 
-  const plugins = appConfig.expo.plugins || []
-  appConfig.expo.plugins = [
-    ...plugins,
-    [
-      'expo-build-properties',
-      {
-        android: {
-          usesCleartextTraffic: true
-        }
+  // set usesCleartextTraffic to true for Android
+  appConfig.expo.plugins.push([
+    'expo-build-properties',
+    {
+      android: {
+        usesCleartextTraffic: true
       }
-    ]
-  ]
+    }
+  ])
+
+  // for SDK 50 and below we need to add a config plugin to remove the aps-environment entitlement for iOS
+  // TODO: remove this when we drop support for SDK 50
+  if (parseInt(expoVersion) < 51) {
+    const configPlugin = resolve(ROOT_DIR, `test/react-native/features/fixtures/expo/withRemoveiOSNotificationEntitlement.js`)
+    fs.copyFileSync(configPlugin, resolve(fixtureDir, 'withRemoveiOSNotificationEntitlement.js'))
+    appConfig.expo.plugins.push('./withRemoveiOSNotificationEntitlement')
+  }
 
   fs.writeFileSync(`${fixtureDir}/app.json`, JSON.stringify(appConfig, null, 2))
 
