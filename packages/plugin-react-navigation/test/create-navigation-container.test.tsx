@@ -8,6 +8,7 @@ import '@testing-library/jest-native/extend-expect'
 import { act, fireEvent, render, screen } from '@testing-library/react-native'
 import { Button, Text, View } from 'react-native'
 import { createNavigationContainer } from '../lib/create-navigation-container'
+import { NavigationTracker } from '../lib/navigation-tracker'
 
 beforeEach(() => {
   jest.useFakeTimers()
@@ -24,7 +25,8 @@ describe('createNavigationContainer', () => {
       appState = state
     })
     const spanFactory = new MockReactNativeSpanFactory()
-    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, spanFactory as unknown as ReactNativeSpanFactory, setAppState)
+    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
+    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, navigationTracker)
 
     render(
       <BugsnagNavigationContainer>
@@ -55,7 +57,8 @@ describe('createNavigationContainer', () => {
     })
     const navigationRef = createNavigationContainerRef()
     const spanFactory = new MockReactNativeSpanFactory()
-    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, spanFactory as unknown as ReactNativeSpanFactory, setAppState)
+    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
+    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, navigationTracker)
 
     render(
       <BugsnagNavigationContainer ref={navigationRef}>

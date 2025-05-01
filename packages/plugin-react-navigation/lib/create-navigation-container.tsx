@@ -1,17 +1,16 @@
-import type { SetAppState } from '@bugsnag/core-performance'
-import type { ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
 import type { NavigationContainerProps, NavigationContainerRefWithCurrent } from '@react-navigation/native'
 import { useNavigationContainerRef, NavigationContainer } from '@react-navigation/native'
 import React, { forwardRef, useRef } from 'react'
 import { NavigationContextProvider } from './navigation-context'
+import type { NavigationTracker } from './navigation-tracker'
 
 // Prevent rollup plugin from tree shaking NavigationContextProvider
 const Provider = NavigationContextProvider
 
-type CreateNavigationContainer = (NavigationContainerComponent: typeof NavigationContainer, spanFactory: ReactNativeSpanFactory, setAppState: SetAppState) => typeof NavigationContainer
+type CreateNavigationContainer = (NavigationContainerComponent: typeof NavigationContainer, navigationTracker: NavigationTracker) => typeof NavigationContainer
 type NavigationContainerRef = NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>
 
-export const createNavigationContainer: CreateNavigationContainer = (NavigationContainerComponent = NavigationContainer, spanFactory: ReactNativeSpanFactory, setAppState) => {
+export const createNavigationContainer: CreateNavigationContainer = (NavigationContainerComponent = NavigationContainer, navigationTracker: NavigationTracker) => {
   return forwardRef<NavigationContainerRef, NavigationContainerProps>((props, _ref) => {
     const { onStateChange, ...rest } = props
 
@@ -37,7 +36,7 @@ export const createNavigationContainer: CreateNavigationContainer = (NavigationC
     }
 
     return (
-      <Provider spanFactory={spanFactory} currentRoute={routeName} setAppState={setAppState}>
+      <Provider currentRoute={routeName} navigationTracker={navigationTracker}>
         <NavigationContainerComponent
           {...rest}
           onStateChange={wrappedOnStateChange}

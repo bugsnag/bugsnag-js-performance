@@ -1,10 +1,11 @@
-import type { AppState, SetAppState, SpanFactory } from '@bugsnag/core-performance'
+import type { AppState } from '@bugsnag/core-performance'
 import { MockReactNativeSpanFactory } from '@bugsnag/js-performance-test-utilities'
-import type { ReactNativeConfiguration, ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
+import type { ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import React, { useContext } from 'react'
 import { Button, View } from 'react-native'
 import { NavigationContext, NavigationContextProvider } from '../lib/navigation-context'
+import { NavigationTracker } from '../lib/navigation-tracker'
 
 beforeEach(() => {
   jest.useFakeTimers()
@@ -24,7 +25,8 @@ describe('NavigationContextProvider', () => {
       appState = state
     })
 
-    render(<App spanFactory={spanFactory} setAppState={setAppState}/>)
+    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
+    render(<App navigationTracker={navigationTracker} />)
 
     // Initial route should not create a span
     expect(spanFactory.startNavigationSpan).not.toHaveBeenCalled()
@@ -58,7 +60,8 @@ describe('NavigationContextProvider', () => {
     const setAppState = jest.fn((state: AppState) => {
       appState = state
     })
-    render(<App spanFactory={spanFactory} setAppState={setAppState}/>)
+    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
+    render(<App navigationTracker={navigationTracker} />)
 
     // Change to a new route but block the navigation span from ending
     fireEvent.press(screen.getByText('Change to route 1'))
@@ -100,7 +103,8 @@ describe('NavigationContextProvider', () => {
     const setAppState = jest.fn((state: AppState) => {
       appState = state
     })
-    render(<App spanFactory={spanFactory} setAppState={setAppState}/>)
+    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
+    render(<App navigationTracker={navigationTracker} />)
 
     // Start a navigation
     fireEvent.press(screen.getByText('Change to route 1'))
@@ -135,7 +139,8 @@ describe('NavigationContextProvider', () => {
     const setAppState = jest.fn((state: AppState) => {
       appState = state
     })
-    render(<App spanFactory={spanFactory} setAppState={setAppState}/>)
+    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
+    render(<App navigationTracker={navigationTracker} />)
 
     // Start a navigation
     fireEvent.press(screen.getByText('Change to route 1'))
@@ -170,7 +175,9 @@ describe('NavigationContextProvider', () => {
     const setAppState = jest.fn((state: AppState) => {
       appState = state
     })
-    render(<App spanFactory={spanFactory} setAppState={setAppState}/>)
+
+    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
+    render(<App navigationTracker={navigationTracker} />)
 
     // start navigation
     fireEvent.press(screen.getByText('Change to route 1'))
@@ -222,15 +229,14 @@ const Route = () => {
 }
 
 interface AppProps {
-  spanFactory: SpanFactory<ReactNativeConfiguration>
-  setAppState: SetAppState
+  navigationTracker: NavigationTracker
 }
 
-const App = ({ spanFactory, setAppState }: AppProps) => {
+const App = ({ navigationTracker }: AppProps) => {
   const [currentRoute, setCurrentRoute] = React.useState('initial-route')
 
   return (
-    <NavigationContextProvider spanFactory={spanFactory as unknown as ReactNativeSpanFactory} currentRoute={currentRoute} setAppState={setAppState} >
+    <NavigationContextProvider currentRoute={currentRoute} navigationTracker={navigationTracker} >
       <Route />
       <Button title='Change to route 1' onPress={() => { setCurrentRoute('route-1') }} />
       <Button title='Change to route 2' onPress={() => { setCurrentRoute('route-2') }} />
