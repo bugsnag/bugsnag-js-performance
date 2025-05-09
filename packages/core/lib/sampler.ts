@@ -3,7 +3,7 @@ import type { SpanEnded, ScaledProbability, SpanProbability } from './span'
 // sampling rates are stored as a number between 0 and 2^32 - 1 (i.e. they are
 // u32s) so we need to scale the probability value to match this range as they
 // are stored as values between 0 and 1
-function scaleProbabilityToMatchSamplingRate (probability: number): ScaledProbability {
+export function scaleProbabilityToMatchSamplingRate (probability: number): ScaledProbability {
   return Math.floor(probability * 0xffffffff) as ScaledProbability
 }
 

@@ -1,3 +1,4 @@
+import { isSpanContext, scaleProbabilityToMatchSamplingRate } from '@bugsnag/core-performance'
 import type { ParentContext } from './NativeBugsnagPerformance'
 
 const TRACE_PERENT_REGEX = /^00-([0-9a-f]{32})-([0-9a-f]{16})-[0-9]{2}$/
@@ -30,7 +31,13 @@ class RemoteParentContext implements ParentContext {
   }
 
   static toTraceParentString (context: ParentContext) {
-    return `00-${context.traceId}-${context.id}-01`
+    let sampled = true
+    if (isSpanContext(context)) {
+      const scaledProbability = scaleProbabilityToMatchSamplingRate(context.samplingProbability)
+      sampled = context.samplingRate <= scaledProbability
+    }
+
+    return `00-${context.traceId}-${context.id}-${sampled ? '01' : '00'}`
   }
 }
 
