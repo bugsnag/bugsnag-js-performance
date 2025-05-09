@@ -32,7 +32,7 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     const unixStartTimeNanos = (this.clock as ReactNativeClock).toUnixNanoseconds(safeStartTime)
     const nativeParentContext = options.parentContext ? { id: options.parentContext.id, traceId: options.parentContext.traceId } : undefined
     const nativeSpan = NativeBugsnagPerformance.startNativeSpan(name, { startTime: unixStartTimeNanos, parentContext: nativeParentContext })
-    return new NativeSpanInternal(nativeSpan.id, nativeSpan.traceId, name, safeStartTime, attributes, this.clock, nativeSpan.parentSpanId)
+    return new NativeSpanInternal(nativeSpan.id, nativeSpan.traceId, name, safeStartTime, attributes, this.clock, this.sampler.probability, nativeSpan.parentSpanId)
   }
 
   protected discardSpan (span: NativeSpanInternal) {

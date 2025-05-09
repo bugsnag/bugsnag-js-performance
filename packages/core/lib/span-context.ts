@@ -4,6 +4,7 @@ export interface SpanContext {
   readonly id: string // 64 bit random string
   readonly traceId: string // 128 bit random string
   readonly samplingRate: number
+  readonly samplingProbability: number
 
   // returns true if this is still considered a valid context
   readonly isValid: () => boolean

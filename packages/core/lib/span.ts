@@ -79,6 +79,9 @@ export function spanEndedToSpan (span: SpanEnded): Span {
     get samplingRate () {
       return span.samplingRate
     },
+    get samplingProbability () {
+      return span.samplingProbability.raw
+    },
     get name () {
       return span.name
     },
@@ -123,6 +126,7 @@ export class SpanInternal implements SpanContext {
   readonly traceId: string
   readonly parentSpanId?: string
   readonly samplingRate: number
+  readonly samplingProbability: number
   private readonly startTime: number
   private readonly kind = Kind.Client // TODO: How do we define the initial Kind?
   private readonly events = new SpanEvents()
@@ -131,7 +135,7 @@ export class SpanInternal implements SpanContext {
   name: string
   private endTime?: number
 
-  constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes, clock: Clock, parentSpanId?: string) {
+  constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes, clock: Clock, samplingProbability: number, parentSpanId?: string) {
     this.id = id
     this.traceId = traceId
     this.parentSpanId = parentSpanId
@@ -139,6 +143,7 @@ export class SpanInternal implements SpanContext {
     this.startTime = startTime
     this.attributes = attributes
     this.samplingRate = traceIdToSamplingRate(this.traceId)
+    this.samplingProbability = samplingProbability
     this.clock = clock
   }
 

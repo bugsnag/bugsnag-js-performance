@@ -56,6 +56,7 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
             name: '',
             traceId: '',
             samplingRate: 0,
+            samplingProbability: 0,
             isValid: () => false,
             setAttribute: () => {},
             end: () => {}
@@ -97,6 +98,9 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
         },
         get samplingRate () {
           return span.samplingRate
+        },
+        get samplingProbability () {
+          return span.samplingProbability
         },
         get name () {
           return span.name

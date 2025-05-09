@@ -234,6 +234,7 @@ describe('network span plugin', () => {
       id: 'abc123',
       traceId: 'xyz456',
       samplingRate: 0.1,
+      samplingProbability: 1,
       isValid: () => true
     })
 
@@ -316,6 +317,7 @@ describe('network span plugin', () => {
           id: 'abc123',
           traceId: 'xyz456',
           samplingRate: 0.1,
+          samplingProbability: 1,
           isValid: () => true
         })
         const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
@@ -354,6 +356,7 @@ describe('network span plugin', () => {
           id: 'abc123',
           traceId: 'xyz456',
           samplingRate: 0.1,
+          samplingProbability: 1,
           isValid: () => true
         })
         const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
@@ -379,6 +382,7 @@ describe('network span plugin', () => {
           id: 'abc123',
           traceId: 'xyz456',
           samplingRate: 0.1,
+          samplingProbability: 1,
           isValid: () => true
         })
         const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
