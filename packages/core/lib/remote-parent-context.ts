@@ -4,7 +4,7 @@ import { isSpanContext } from './validation'
 
 const TRACE_PERENT_REGEX = /^00-([0-9a-f]{32})-([0-9a-f]{16})-[0-9]{2}$/
 
-class RemoteParentContext implements ParentContext {
+export default class RemoteParentContext implements ParentContext {
   readonly id: string
   readonly traceId: string
 
@@ -41,5 +41,3 @@ class RemoteParentContext implements ParentContext {
     return `00-${context.traceId}-${context.id}-${sampled ? '01' : '00'}`
   }
 }
-
-export default RemoteParentContext
