@@ -180,9 +180,11 @@ describe('validation', () => {
     })
 
     const invalidSpanContexts: any[] = [
-      { id: 1234, traceId: '5678', isValid: () => true },
-      { id: '1234', traceId: 5678, isValid: () => true },
-      { id: '1234', traceId: '5678', isValid: true }
+      { id: 1234, traceId: '5678', isValid: () => true, samplingRate: 12345, samplingProbability: 1 },
+      { id: '1234', traceId: 5678, isValid: () => true, samplingRate: 12345, samplingProbability: 1 },
+      { id: '1234', traceId: '5678', isValid: true, samplingRate: 12345, samplingProbability: 1 },
+      { id: '1234', traceId: '5678', isValid: () => true, samplingRate: '12345' },
+      { id: '1234', traceId: '5678', isValid: true, samplingRate: 12345, samplingProbability: '1' }
     ]
 
     it.each(invalidSpanContexts)('fails validation with %s', (value) => {
@@ -193,6 +195,8 @@ describe('validation', () => {
       const spanContext = {
         id: '1234',
         traceId: '5678',
+        samplingRate: 12345,
+        samplingProbability: 1,
         isValid: () => true
       }
 

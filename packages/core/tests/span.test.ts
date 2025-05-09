@@ -308,7 +308,7 @@ describe('Span', () => {
 
           // start a new child span with an invalid parent context
           const childSpan = client.startSpan('child span', options)
-          expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid span options\n  - parentContext should be a SpanContext, got ${typeof options.parentContext}`)
+          expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid span options\n  - parentContext should be a ParentContext, got ${typeof options.parentContext}`)
 
           childSpan.end()
           await jest.runOnlyPendingTimersAsync()

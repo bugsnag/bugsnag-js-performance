@@ -7,7 +7,7 @@ import { SpanEvents } from './events'
 import type { SpanContext } from './span-context'
 import type { Time } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
-import { isBoolean, isSpanContext, isTime } from './validation'
+import { isBoolean, isParentContext, isTime } from './validation'
 
 const HOUR_IN_MILLISECONDS = 60 * 60 * 1000
 
@@ -223,9 +223,9 @@ export const coreSpanOptionSchema: SpanOptionSchema = {
     validate: isTime
   },
   parentContext: {
-    message: 'should be a SpanContext',
+    message: 'should be a ParentContext',
     getDefaultValue: () => undefined,
-    validate: (value): value is SpanContext => value === null || isSpanContext(value)
+    validate: (value): value is ParentContext => value === null || isParentContext(value)
   },
   makeCurrentContext: {
     message: 'should be true|false',

@@ -40,7 +40,9 @@ export const isSpanContext = (value: unknown): value is SpanContext =>
   isObject(value) &&
     typeof value.id === 'string' &&
     typeof value.traceId === 'string' &&
-    typeof value.isValid === 'function'
+    typeof value.isValid === 'function' &&
+    typeof value.samplingRate === 'number' &&
+    typeof value.samplingProbability === 'number'
 
 export const isParentContext = (value: unknown): value is ParentContext =>
   isObject(value) &&
