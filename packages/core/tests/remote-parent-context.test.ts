@@ -1,6 +1,7 @@
-import { traceIdToSamplingRate } from '@bugsnag/core-performance'
-import type { ParentContext, SpanContext } from '@bugsnag/core-performance'
+import traceIdToSamplingRate from '../lib/trace-id-to-sampling-rate'
 import RemoteParentContext from '../lib/remote-parent-context'
+import type { ParentContext } from '../lib/span'
+import type { SpanContext } from '../lib/span-context'
 
 describe('RemoteParentContext', () => {
   describe('constructor', () => {

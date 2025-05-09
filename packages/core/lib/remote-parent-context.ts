@@ -1,5 +1,6 @@
-import { isSpanContext, scaleProbabilityToMatchSamplingRate } from '@bugsnag/core-performance'
-import type { ParentContext } from './NativeBugsnagPerformance'
+import { scaleProbabilityToMatchSamplingRate } from './sampler'
+import type { ParentContext } from './span'
+import { isSpanContext } from './validation'
 
 const TRACE_PERENT_REGEX = /^00-([0-9a-f]{32})-([0-9a-f]{16})-[0-9]{2}$/
 
