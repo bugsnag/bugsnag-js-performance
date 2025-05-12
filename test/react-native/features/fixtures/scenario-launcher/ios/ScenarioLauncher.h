@@ -14,6 +14,8 @@
     - (NSDictionary *) readStartupConfig;
     - (id) exitApp;
     - (void) startNativePerformance:(NSDictionary *)configuration resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject;
+    - (void) sendNativeChildSpan:(NSString *)traceParent resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject;
+    - (void) getNativeTraceParent:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject;
 @end
 
 #ifdef RCT_NEW_ARCH_ENABLED

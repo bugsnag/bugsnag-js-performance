@@ -8,6 +8,8 @@ export interface Spec extends TurboModule {
   readStartupConfig(): UnsafeObject | null | undefined;
   exitApp(): void;
   startNativePerformance(configuration: UnsafeObject): Promise<void>;
+  sendNativeChildSpan(traceParent: string): Promise<void>;
+  getNativeTraceParent(): Promise<string>;
 }
 
 export default TurboModuleRegistry.get<Spec>("ScenarioLauncher") as Spec | null;
