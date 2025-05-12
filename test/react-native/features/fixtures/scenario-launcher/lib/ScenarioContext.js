@@ -1,7 +1,6 @@
 import React from 'react';
 
 export const ScenarioContext = React.createContext({
-  Component: null,
+  name: null,
   config: null,
-  reflectEndpoint: null,
 })

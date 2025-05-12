@@ -2,7 +2,7 @@ import { SafeAreaView, StyleSheet, Text } from 'react-native';
 import React, { useEffect, useState } from 'react'
 
 //@ts-expect-error no types
-import { launchScenario, ScenarioContext } from '@bugsnag/react-native-performance-scenarios'
+import { launchScenario, ScenarioContext, ScenarioComponent } from '@bugsnag/react-native-performance-scenarios'
 
 export default function HomeScreen() {
 
@@ -16,7 +16,7 @@ export default function HomeScreen() {
       <ScenarioContext.Provider value={ currentScenario }>
         <SafeAreaView style={styles.container}>
             <Text accessibilityLabel='app-component' testID='app-component'>Expo Performance Test App</Text>
-            { currentScenario && <currentScenario.Component /> }
+            <ScenarioComponent />
           </SafeAreaView>
       </ScenarioContext.Provider>
     )

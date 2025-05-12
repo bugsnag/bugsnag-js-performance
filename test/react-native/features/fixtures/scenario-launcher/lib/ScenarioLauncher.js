@@ -53,16 +53,9 @@ async function runScenario (setScenario, scenarioName, apiKey, endpoint) {
   if (process.env.REACT_NATIVE_NAVIGATION) {
     loadReactNavigationScenario(scenario)
   } else {
-
-    const reflectEndpoint = endpoint.replace('traces', 'reflect')
-    console.error(`[BugsnagPerformance] Reflect endpoint: ${reflectEndpoint}`)
-
-    const ScenarioComponent = scenario.withInstrumentedAppStarts ? BugsnagPerformance.withInstrumentedAppStarts(scenario.App) : scenario.App
-
     setScenario({
-      Component: ScenarioComponent,
-      config: scenarioConfig,
-      reflectEndpoint,      
+      name: scenarioName,
+      config: scenarioConfig
     })
   }
 }

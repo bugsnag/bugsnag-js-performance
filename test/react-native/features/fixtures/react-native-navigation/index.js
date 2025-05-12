@@ -1,4 +1,4 @@
-import { launchScenario, launchFromStartupConfig, ScenarioContext } from '@bugsnag/react-native-performance-scenarios'
+import { launchScenario, launchFromStartupConfig, ScenarioContext, ScenarioComponent } from '@bugsnag/react-native-performance-scenarios'
 import { useEffect, useState } from 'react'
 import { SafeAreaView, StyleSheet, Text } from 'react-native'
 import { Navigation } from 'react-native-navigation'
@@ -9,6 +9,7 @@ const isStartupTest = launchFromStartupConfig()
 
 const App = () => {
     const [currentScenario, setCurrentScenario] = useState(null)
+
     useEffect(() => {
         if (!isStartupTest) launchScenario(setCurrentScenario)
     }, [])
@@ -18,7 +19,7 @@ const App = () => {
             <SafeAreaView style={styles.container}>
                 <Text>React Native Performance Test App</Text>
                 <Text>react-native-navigation</Text>
-                { currentScenario && <currentScenario.Component /> }
+                <ScenarioComponent />
             </SafeAreaView>
         </ScenarioContext.Provider>
       )

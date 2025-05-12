@@ -66,10 +66,12 @@ const xhrWithHeaders = async (endpoint) => {
 }
 
 export const App = () => {
-  const { reflectEndpoint } = useContext(ScenarioContext)
+  const { config } = useContext(ScenarioContext)
 
   useEffect(() => {
     (async () => {
+        const reflectEndpoint = config.endpoint.replace('traces', 'reflect')
+
         await delay(250)
 
         await fetchWithObjectLiteralHeadersInOptions(reflectEndpoint)
