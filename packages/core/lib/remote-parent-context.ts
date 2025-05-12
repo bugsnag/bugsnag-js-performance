@@ -1,6 +1,6 @@
 import { scaleProbabilityToMatchSamplingRate } from './sampler'
 import type { ParentContext } from './span'
-import { isSpanContext } from './validation'
+import { isParentContext, isSpanContext } from './validation'
 
 const TRACE_PERENT_REGEX = /^00-([0-9a-f]{32})-([0-9a-f]{16})-[0-9]{2}$/
 
@@ -9,12 +9,12 @@ export default class RemoteParentContext implements ParentContext {
   readonly traceId: string
 
   constructor (maybeParentContext: ParentContext | string, traceId?: string) {
-    if (typeof maybeParentContext === 'string') {
-      this.id = maybeParentContext
-      this.traceId = traceId || ''
-    } else {
+    if (isParentContext(maybeParentContext)) {
       this.id = maybeParentContext.id
       this.traceId = maybeParentContext.traceId
+    } else {
+      this.id = maybeParentContext
+      this.traceId = traceId || ''
     }
   }
 
