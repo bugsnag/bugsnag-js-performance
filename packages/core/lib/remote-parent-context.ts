@@ -1,6 +1,6 @@
 import { scaleProbabilityToMatchSamplingRate } from './sampler'
 import type { ParentContext } from './span'
-import { isParentContext, isSpanContext } from './validation'
+import { isSpanContext } from './validation'
 
 const TRACE_PERENT_REGEX = /^00-([0-9a-f]{32})-([0-9a-f]{16})-[0-9]{2}$/
 
@@ -8,14 +8,9 @@ export default class RemoteParentContext implements ParentContext {
   readonly id: string
   readonly traceId: string
 
-  constructor (maybeParentContext: ParentContext | string, traceId?: string) {
-    if (isParentContext(maybeParentContext)) {
-      this.id = maybeParentContext.id
-      this.traceId = maybeParentContext.traceId
-    } else {
-      this.id = maybeParentContext
-      this.traceId = traceId || ''
-    }
+  constructor (parentContext: ParentContext) {
+    this.id = parentContext.id
+    this.traceId = parentContext.traceId
   }
 
   encodeAsTraceParent () {
@@ -23,12 +18,13 @@ export default class RemoteParentContext implements ParentContext {
   }
 
   static parseTraceParent (encodedString: string) {
-    if (!TRACE_PERENT_REGEX.test(encodedString)) {
+    const result = TRACE_PERENT_REGEX.exec(encodedString)
+    if (!result) {
       return undefined
     }
 
-    const [, traceId, spanId] = encodedString.split('-')
-    return new RemoteParentContext(spanId, traceId)
+    const [, traceId, id] = result
+    return new RemoteParentContext({ id, traceId })
   }
 
   static toTraceParentString (context: ParentContext) {

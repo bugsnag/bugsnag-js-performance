@@ -5,12 +5,6 @@ import type { SpanContext } from '../lib/span-context'
 
 describe('RemoteParentContext', () => {
   describe('constructor', () => {
-    it('should create instance from id and traceId strings', () => {
-      const context = new RemoteParentContext('1234567890123456', 'abcdef1234567890abcdef1234567890')
-      expect(context.id).toBe('1234567890123456')
-      expect(context.traceId).toBe('abcdef1234567890abcdef1234567890')
-    })
-
     it('should create instance from ParentContext object', () => {
       const parentContext: ParentContext = {
         id: '1234567890123456',
@@ -19,12 +13,6 @@ describe('RemoteParentContext', () => {
       const context = new RemoteParentContext(parentContext)
       expect(context.id).toBe('1234567890123456')
       expect(context.traceId).toBe('abcdef1234567890abcdef1234567890')
-    })
-
-    it('should use empty string as traceId when not provided', () => {
-      const context = new RemoteParentContext('1234567890123456')
-      expect(context.id).toBe('1234567890123456')
-      expect(context.traceId).toBe('')
     })
   })
 
@@ -54,7 +42,7 @@ describe('RemoteParentContext', () => {
 
   describe('encodeAsTraceParent', () => {
     it('should encode context as trace parent string', () => {
-      const context = new RemoteParentContext('1234567890123456', 'abcdef1234567890abcdef1234567890')
+      const context = new RemoteParentContext({ id: '1234567890123456', traceId: 'abcdef1234567890abcdef1234567890' })
       expect(context.encodeAsTraceParent()).toBe('00-abcdef1234567890abcdef1234567890-1234567890123456-01')
     })
   })
