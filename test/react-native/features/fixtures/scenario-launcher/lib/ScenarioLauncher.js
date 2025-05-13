@@ -5,24 +5,6 @@ import { NativeScenarioLauncher } from './native'
 import { wrapperComponentProvider } from '../scenarios/WrapperComponentProviderScenario'
 import React from 'react'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
-import { REACT_APP_API_KEY, REACT_APP_ENDPOINT, REACT_APP_SCENARIO_NAME } from '@env'
-
-async function loadReactNavigationScenario (scenario) {
-  if (typeof scenario.registerScreens === 'function') {
-    scenario.registerScreens()
-  } else {
-    import('react-native-navigation').then(({ Navigation }) => {
-      Navigation.registerComponent('Scenario', () => scenario.App)
-      Navigation.setRoot({
-        root: {
-          component: {
-            name: 'Scenario'
-          }
-        }
-      })
-    })
-  }
-}
 
 async function runScenario (setScenario, scenarioName, apiKey, endpoint) {
   console.error(`[BugsnagPerformance] Launching scenario: ${scenarioName}`)
@@ -51,21 +33,7 @@ async function runScenario (setScenario, scenarioName, apiKey, endpoint) {
     BugsnagPerformance.start(scenarioConfig)
   }
   
-  if (process.env.REACT_NATIVE_NAVIGATION) {
-    loadReactNavigationScenario(scenario)
-  } else {
-
-    const reflectEndpoint = endpoint.replace('traces', 'reflect')
-    console.error(`[BugsnagPerformance] Reflect endpoint: ${reflectEndpoint}`)
-
-    const ScenarioComponent = scenario.withInstrumentedAppStarts ? BugsnagPerformance.withInstrumentedAppStarts(scenario.App) : scenario.App
-
-    setScenario({
-      Component: ScenarioComponent,
-      config: scenarioConfig,
-      reflectEndpoint,      
-    })
-  }
+  setScenario({ name: scenarioName, config: scenarioConfig })
 }
 
 export async function launchScenario (setScenario, clearPersistedData = true) {
@@ -73,19 +41,7 @@ export async function launchScenario (setScenario, clearPersistedData = true) {
     await clearPersistedState()
   }
 
-  let command
-
-  if (REACT_APP_SCENARIO_NAME && REACT_APP_API_KEY) {
-    command = {
-      action: 'run-scenario',
-      scenario_name: REACT_APP_SCENARIO_NAME,
-      api_key: REACT_APP_API_KEY,
-      endpoint: REACT_APP_ENDPOINT
-    }
-  } else {
-    command = await getCurrentCommand()
-  }
-
+  const command = await getCurrentCommand()
   switch (command.action) {
     case 'run-scenario':
       return await runScenario(

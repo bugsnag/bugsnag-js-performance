@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'
 import { Dirs, FileSystem } from 'react-native-file-access'
 
 const PERSISTED_STATE_VERSION = 1

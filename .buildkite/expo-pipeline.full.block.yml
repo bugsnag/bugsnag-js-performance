@@ -1,0 +1,10 @@
+steps:
+  - block: "Trigger expo full pipeline"
+    key: "trigger-expo-full-pipeline"
+
+  - label: ":pipeline_upload: Full Expo pipeline"
+    depends_on: "trigger-expo-full-pipeline"
+    agents:
+      queue: macos
+    timeout_in_minutes: 2
+    command: buildkite-agent pipeline upload .buildkite/expo-pipeline.full.yml

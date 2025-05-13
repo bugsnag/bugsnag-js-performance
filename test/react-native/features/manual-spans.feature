@@ -43,7 +43,9 @@ Feature: Manual spans
     When I run 'ManualSpanScenario'
     And I wait to receive a sampling request
     And I wait for 1 span
-    Then the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "com.bugsnag.fixtures.reactnative.performance"
+    Then the trace payload field "resourceSpans.0.resource" string attribute "service.name" is one of:
+      | com.bugsnag.fixtures.reactnative.performance |
+      | com.bugsnag.expo.fixture                     |
     And the trace payload field "resourceSpans.0.resource" string attribute "host.arch" exists
     And the trace payload field "resourceSpans.0.resource" string attribute "device.model.identifier" exists
     And the trace payload field "resourceSpans.0.resource" string attribute "bugsnag.app.version_code" equals the platform-dependent string:
