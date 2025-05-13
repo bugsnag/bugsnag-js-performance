@@ -384,7 +384,7 @@ function installAndroidPerformance() {
   const appGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
   let appGradle = fs.readFileSync(appGradlePath, 'utf8')
 
-  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:1.+")'
+  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:1.14.0")'
   const dependenciesSection = 'dependencies {'
 
   appGradle = appGradle.replace(dependenciesSection, `${dependenciesSection}\n    ${performanceDependency}`)
