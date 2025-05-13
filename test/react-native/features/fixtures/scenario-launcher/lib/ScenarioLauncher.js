@@ -6,23 +6,6 @@ import { wrapperComponentProvider } from '../scenarios/WrapperComponentProviderS
 import React from 'react'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 
-async function loadReactNavigationScenario (scenario) {
-  if (typeof scenario.registerScreens === 'function') {
-    scenario.registerScreens()
-  } else {
-    import('react-native-navigation').then(({ Navigation }) => {
-      Navigation.registerComponent('Scenario', () => scenario.App)
-      Navigation.setRoot({
-        root: {
-          component: {
-            name: 'Scenario'
-          }
-        }
-      })
-    })
-  }
-}
-
 async function runScenario (setScenario, scenarioName, apiKey, endpoint) {
   console.error(`[BugsnagPerformance] Launching scenario: ${scenarioName}`)
   const scenario = Scenarios[scenarioName]
@@ -50,14 +33,7 @@ async function runScenario (setScenario, scenarioName, apiKey, endpoint) {
     BugsnagPerformance.start(scenarioConfig)
   }
   
-  if (process.env.REACT_NATIVE_NAVIGATION) {
-    loadReactNavigationScenario(scenario)
-  } else {
-    setScenario({
-      name: scenarioName,
-      config: scenarioConfig
-    })
-  }
+  setScenario({ name: scenarioName, config: scenarioConfig })
 }
 
 export async function launchScenario (setScenario, clearPersistedData = true) {
