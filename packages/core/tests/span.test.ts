@@ -116,7 +116,8 @@ describe('SpanInternal', () => {
         'name',
         1234,
         createSpanAttributes('name'),
-        clock
+        clock,
+        1
       )
 
       const endedSpan = span.end(5678, createSamplingProbability(probability))
@@ -133,7 +134,8 @@ describe('SpanInternal', () => {
         'name',
         1234,
         createSpanAttributes('name'),
-        clock
+        clock,
+        1
       )
 
       const endedSpan = span.end(5678, createSamplingProbability(probability))
@@ -157,7 +159,8 @@ describe('Span', () => {
         end: expect.any(Function),
         isValid: expect.any(Function),
         setAttribute: expect.any(Function),
-        samplingRate: 290
+        samplingRate: 290,
+        samplingProbability: 1
       })
     })
 
@@ -305,7 +308,7 @@ describe('Span', () => {
 
           // start a new child span with an invalid parent context
           const childSpan = client.startSpan('child span', options)
-          expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid span options\n  - parentContext should be a SpanContext, got ${typeof options.parentContext}`)
+          expect(jestLogger.warn).toHaveBeenCalledWith(`Invalid span options\n  - parentContext should be a ParentContext, got ${typeof options.parentContext}`)
 
           childSpan.end()
           await jest.runOnlyPendingTimersAsync()

@@ -1,11 +1,5 @@
-import type {
-  InternalConfiguration,
-  Logger,
-  Plugin,
-  SpanContextStorage,
-  SpanFactory,
-  SpanInternal
-} from '@bugsnag/core-performance'
+import { RemoteParentContext } from '@bugsnag/core-performance'
+import type { InternalConfiguration, Logger, Plugin, SpanContextStorage, SpanFactory } from '@bugsnag/core-performance'
 import type {
   NetworkRequestCallback,
   NetworkRequestInfo,
@@ -114,29 +108,12 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
     return this.tracePropagationUrls.some(regexp => regexp.test(url))
   }
 
-  private getExtraRequestHeaders (span?: SpanInternal): Record<string, string> {
+  private getExtraRequestHeaders (spanContext = this.spanContextStorage.current): Record<string, string> {
     const extraRequestHeaders: Record<string, string> = {}
-
-    if (span) {
-      const traceId = span.traceId
-      const parentSpanId = span.id
-      const sampled = this.spanFactory.sampler.shouldSample(span.samplingRate)
-
-      extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)
-    } else if (this.spanContextStorage.current) {
-      const currentSpanContext = this.spanContextStorage.current
-
-      const traceId = currentSpanContext.traceId
-      const parentSpanId = currentSpanContext.id
-      const sampled = this.spanFactory.sampler.shouldSample(currentSpanContext.samplingRate)
-
-      extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)
+    if (spanContext) {
+      extraRequestHeaders.traceparent = RemoteParentContext.toTraceParentString(spanContext)
     }
 
     return extraRequestHeaders
   }
-}
-
-function buildTraceparentHeader (traceId: string, parentSpanId: string, sampled: boolean): string {
-  return `00-${traceId}-${parentSpanId}-${sampled ? '01' : '00'}`
 }

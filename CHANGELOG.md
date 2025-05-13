@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- (core) Introduced `RemoteParentContext` to allow cross-layer parenting of spans, along with easy encoding of `traceparent` headers [#620](https://github.com/bugsnag/bugsnag-js-performance/pull/620)
+
 ## [v2.12.0] (2025-03-26)
 
 This release adds support for React Native 0.77 to `@bugsnag/react-native-performance`
