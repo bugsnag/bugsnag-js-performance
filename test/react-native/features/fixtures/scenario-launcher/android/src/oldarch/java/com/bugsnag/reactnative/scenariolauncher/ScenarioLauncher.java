@@ -52,4 +52,14 @@ public class ScenarioLauncher extends ReactContextBaseJavaModule {
   public void startNativePerformance(ReadableMap configuration, Promise promise) {
     impl.startNativePerformance(configuration, promise);
   }
+
+  @ReactMethod
+  public void sendNativeChildSpan(String traceParent, Promise promise) {
+    impl.sendNativeChildSpan(traceParent, promise);
+  }
+
+  @ReactMethod
+  public void getNativeTraceParent(Promise promise) {
+    impl.getNativeTraceParent(promise);
+  }
 }

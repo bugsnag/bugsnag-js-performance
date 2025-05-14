@@ -131,16 +131,46 @@ RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(
     config.autoInstrumentNetworkRequests = NO;
     config.autoInstrumentRendering = YES;
     config.internal.autoTriggerExportOnBatchSize = 1;
+    config.internal.clearPersistenceOnStart = YES;
 
     [BugsnagPerformance startWithConfiguration:config];
     resolve(nil);
   });    
 }
+
+RCT_EXPORT_METHOD(sendNativeChildSpan:(NSString *)traceParent resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  BugsnagPerformanceRemoteSpanContext *parentContext = [BugsnagPerformanceRemoteSpanContext contextWithTraceParentString:traceParent];
+  BugsnagPerformanceSpanOptions *options = [BugsnagPerformanceSpanOptions new];
+  options.parentContext = parentContext;
+
+  BugsnagPerformanceSpan *nativeSpan = [BugsnagPerformance startSpanWithName:@"Native child span" options:options];
+  [nativeSpan end];
+  resolve(nil);
+}
+
+RCT_EXPORT_METHOD(getNativeTraceParent:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  BugsnagPerformanceSpan *span = [BugsnagPerformance startSpanWithName:@"Native parent span"];
+  NSString *traceParent = [span encodedAsTraceParent];
+  resolve(traceParent);
+  [span end];
+}
+
 #else
 RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   NSLog(@"Native performance is not enabled in this build");
   resolve(nil);
 }
+
+RCT_EXPORT_METHOD(sendNativeChildSpan:(NSString *)traceParent resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  NSLog(@"Native performance is not enabled in this build");
+  resolve(nil);
+}
+
+RCT_EXPORT_METHOD(getNativeTraceParent:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  NSLog(@"Native performance is not enabled in this build");
+  resolve(nil);
+}
+
 #endif
 
 #ifdef RCT_NEW_ARCH_ENABLED
