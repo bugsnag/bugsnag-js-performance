@@ -1,41 +1,33 @@
 import type { AppState } from '@bugsnag/core-performance'
 import { MockReactNativeSpanFactory } from '@bugsnag/js-performance-test-utilities'
-import type { ReactNativeConfiguration, ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
+import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import type { ParamListBase } from '@react-navigation/native'
-import { NavigationContainer, createNavigationContainerRef, useNavigationContainerRef } from '@react-navigation/native'
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import '@testing-library/jest-native/extend-expect'
-import { act, fireEvent, render, screen } from '@testing-library/react-native'
+import { fireEvent, render, screen } from '@testing-library/react-native'
 import { Button, Text, View } from 'react-native'
-import { createNavigationContainer } from '../lib/create-navigation-container'
-import { NavigationTracker } from '../lib/navigation-tracker'
 import BugsnagPluginReactNavigationNativePerformance from '../lib/react-navigation-native-plugin'
 import { useEffect } from 'react'
 
-let appState: AppState = 'starting'
-let spanFactory = new MockReactNativeSpanFactory()
 let plugin = new BugsnagPluginReactNavigationNativePerformance()
-
-const setAppState = jest.fn((state: AppState) => {
-  appState = state
-})
 
 beforeEach(() => {
   jest.useFakeTimers()
-  appState = 'starting'
-  setAppState.mockReset()
-  spanFactory = new MockReactNativeSpanFactory()
-  plugin = new BugsnagPluginReactNavigationNativePerformance()
 })
 
 afterEach(() => {
   jest.useRealTimers()
+  plugin = new BugsnagPluginReactNavigationNativePerformance()
 })
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-
 describe('registerNavigationContainer', () => {
-  it('creates a navigation span when the route changes', async () => {
+  it('creates a navigation span when the route changes', () => {
+    let appState: AppState = 'starting'
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
+    const spanFactory = new MockReactNativeSpanFactory()
     plugin.configure({} as unknown as ReactNativeConfiguration, spanFactory, setAppState)
 
     render(
@@ -45,10 +37,6 @@ describe('registerNavigationContainer', () => {
     expect(screen.getByText('Route 1')).toBeOnTheScreen()
     fireEvent.press(screen.getByText('Go to route 2'))
     expect(screen.getByText('Route 2')).toBeOnTheScreen()
-
-    // await delay(500)
-
-    jest.advanceTimersByTime(200)
 
     expect(spanFactory.startNavigationSpan).toHaveBeenCalledTimes(1)
     expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('Route 2', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
@@ -100,7 +88,7 @@ function App () {
   }, [ref])
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={ref}>
       <RootNavigator />
     </NavigationContainer>
   )

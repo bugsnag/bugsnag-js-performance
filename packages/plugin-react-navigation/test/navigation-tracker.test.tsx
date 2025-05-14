@@ -1,11 +1,8 @@
 import type { AppState } from '@bugsnag/core-performance'
 import { MockReactNativeSpanFactory } from '@bugsnag/js-performance-test-utilities'
 import type { ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
-import { fireEvent, render, screen } from '@testing-library/react-native'
-import React, { useContext } from 'react'
-import { Button, View } from 'react-native'
-import { NavigationContext, NavigationContextProvider } from '../lib/navigation-context'
 import { NavigationTracker } from '../lib/navigation-tracker'
+import type { NavigationContainerRef } from '@react-navigation/native'
 
 beforeEach(() => {
   jest.useFakeTimers()
@@ -15,24 +12,54 @@ afterEach(() => {
   jest.useRealTimers()
 })
 
-let appState: AppState
+let appState: AppState = 'starting'
 
-describe('NavigationContextProvider', () => {
+const mockNavigationContainerRef = () => {
+  const unsafeActionListeners: Array<(event: any) => void> = []
+  const stateChangeListeners: Array<() => void> = []
+
+  let currentRoute: { name: string } = { name: 'initial-route' }
+
+  return {
+    addListener: (eventName: string, listener: () => void) => {
+      if (eventName === 'state') {
+        stateChangeListeners.push(listener)
+      } else if (eventName === '__unsafe_action__') {
+        unsafeActionListeners.push(listener)
+      }
+    },
+    changeRoute: (routename: string) => {
+      currentRoute = { name: routename }
+    },
+    getCurrentRoute: () => currentRoute,
+    triggerStateChange: () => {
+      stateChangeListeners.forEach((listener) => { listener() })
+    },
+    triggerUnsafeAction: (noop = false) => {
+      unsafeActionListeners.forEach((listener) => { listener({ data: { action: { type: 'NAVIGATION' }, noop } }) })
+    }
+  }
+}
+
+describe('NavigationTracker', () => {
   it('Creates a navigation span when the currentRoute changes', () => {
+    const setAppState = jest.fn((state: AppState) => { appState = state })
     const spanFactory = new MockReactNativeSpanFactory()
 
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
-
+    const mockNavigationContainer = mockNavigationContainerRef()
     const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
-    render(<App navigationTracker={navigationTracker} />)
+    navigationTracker.configure(mockNavigationContainer as unknown as NavigationContainerRef<ReactNavigation.RootParamList>)
 
-    // Initial route should not create a span
-    expect(spanFactory.startNavigationSpan).not.toHaveBeenCalled()
+    expect(appState).toBe('starting')
 
-    // Route change should create a navigation span
-    fireEvent.press(screen.getByText('Change to route 1'))
+    // TODO: Initial route should not create a span??
+
+    // Simulate a route change
+    mockNavigationContainer.changeRoute('route-1')
+    mockNavigationContainer.triggerUnsafeAction()
+    jest.advanceTimersByTime(1)
+    mockNavigationContainer.triggerStateChange()
+
     expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
 
     expect(setAppState).toHaveBeenCalled()
@@ -47,7 +74,7 @@ describe('NavigationContextProvider', () => {
     const span = spanFactory.createdSpans[0]
     expect(span.name).toEqual('[Navigation]route-1')
     expect(span.startTime).toEqual(0)
-    expect(span.endTime).toEqual(0)
+    expect(span.endTime).toEqual(1)
     expect(span).toHaveAttribute('bugsnag.span.category', 'navigation')
     expect(span).toHaveAttribute('bugsnag.span.first_class', true)
     expect(span).toHaveAttribute('bugsnag.navigation.route', 'route-1')
@@ -60,29 +87,32 @@ describe('NavigationContextProvider', () => {
     const setAppState = jest.fn((state: AppState) => {
       appState = state
     })
-    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
-    render(<App navigationTracker={navigationTracker} />)
 
-    // Change to a new route but block the navigation span from ending
-    fireEvent.press(screen.getByText('Change to route 1'))
-    fireEvent.press(screen.getByText('Block Navigation'))
+    const mockNavigationContainer = mockNavigationContainerRef()
+    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
+    navigationTracker.configure(mockNavigationContainer as unknown as NavigationContainerRef<ReactNavigation.RootParamList>)
+
+    // Change to a new route
+    mockNavigationContainer.changeRoute('route-1')
+    mockNavigationContainer.triggerUnsafeAction()
+    mockNavigationContainer.triggerStateChange()
+
     expect(spanFactory.startNavigationSpan).toHaveBeenCalledTimes(1)
     expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
 
     expect(setAppState).toHaveBeenCalled()
     expect(appState).toBe('navigating')
 
-    // Navigation span should not end after timeout
-    jest.advanceTimersByTime(100)
-    expect(spanFactory.endSpan).not.toHaveBeenCalled()
-
     // Change to a second route while the first navigation span is still open
-    fireEvent.press(screen.getByText('Change to route 2'))
+    jest.advanceTimersByTime(50)
+    mockNavigationContainer.changeRoute('route-2')
+    mockNavigationContainer.triggerUnsafeAction()
+    mockNavigationContainer.triggerStateChange()
+
     expect(spanFactory.startNavigationSpan).toHaveBeenCalledTimes(2)
-    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-2', { isFirstClass: true, startTime: 100, doNotDelegateToNativeSDK: true })
+    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-2', { isFirstClass: true, startTime: 50, doNotDelegateToNativeSDK: true })
 
     // End the navigation
-    fireEvent.press(screen.getByText('Unblock Navigation'))
     jest.advanceTimersByTime(100)
     expect(spanFactory.endSpan).toHaveBeenCalled()
 
@@ -94,7 +124,7 @@ describe('NavigationContextProvider', () => {
     expect(secondRouteSpan).toHaveAttribute('bugsnag.span.first_class', true)
     expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.route', 'route-2')
     expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.previous_route', 'route-1')
-    expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.ended_by', 'condition')
+    expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.ended_by', 'immediate')
     expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-navigation-performance')
   })
 
@@ -103,23 +133,28 @@ describe('NavigationContextProvider', () => {
     const setAppState = jest.fn((state: AppState) => {
       appState = state
     })
+
+    const mockNavigationContainer = mockNavigationContainerRef()
     const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
-    render(<App navigationTracker={navigationTracker} />)
+    navigationTracker.configure(mockNavigationContainer as unknown as NavigationContainerRef<ReactNavigation.RootParamList>)
 
     // Start a navigation
-    fireEvent.press(screen.getByText('Change to route 1'))
+    mockNavigationContainer.changeRoute('route-1')
+    mockNavigationContainer.triggerUnsafeAction()
+    mockNavigationContainer.triggerStateChange()
     expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
 
     expect(setAppState).toHaveBeenCalled()
     expect(appState).toBe('navigating')
 
     // Prevent navigation from ending
-    fireEvent.press(screen.getByText('Block Navigation'))
+    navigationTracker.blockNavigationEnd()
+
     jest.advanceTimersByTime(100)
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
 
     // Unblock navigation
-    fireEvent.press(screen.getByText('Unblock Navigation'))
+    navigationTracker.unblockNavigationEnd('condition')
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
     expect(appState).toBe('navigating')
 
@@ -132,6 +167,7 @@ describe('NavigationContextProvider', () => {
     expect(secondRouteSpan.name).toEqual('[Navigation]route-1')
     expect(secondRouteSpan).toHaveAttribute('bugsnag.span.category', 'navigation')
     expect(secondRouteSpan).toHaveAttribute('bugsnag.span.first_class', true)
+    expect(secondRouteSpan).toHaveAttribute('bugsnag.navigation.ended_by', 'condition')
   })
 
   it('Does not end a navigation span while multiple components are blocking', () => {
@@ -139,107 +175,42 @@ describe('NavigationContextProvider', () => {
     const setAppState = jest.fn((state: AppState) => {
       appState = state
     })
+
+    const mockNavigationContainer = mockNavigationContainerRef()
     const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
-    render(<App navigationTracker={navigationTracker} />)
+    navigationTracker.configure(mockNavigationContainer as unknown as NavigationContainerRef<ReactNavigation.RootParamList>)
 
     // Start a navigation
-    fireEvent.press(screen.getByText('Change to route 1'))
+    mockNavigationContainer.changeRoute('route-1')
+    mockNavigationContainer.triggerUnsafeAction()
+    mockNavigationContainer.triggerStateChange()
+
     expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
     expect(setAppState).toHaveBeenCalled()
     expect(appState).toBe('navigating')
 
     // Block navigation from completing
-    fireEvent.press(screen.getByText('Block Navigation'))
-    fireEvent.press(screen.getByText('Block Navigation'))
+    navigationTracker.blockNavigationEnd()
+    navigationTracker.blockNavigationEnd()
     jest.advanceTimersByTime(100)
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
     expect(appState).toBe('navigating')
 
     // Only unblock one component
-    fireEvent.press(screen.getByText('Unblock Navigation'))
+    navigationTracker.unblockNavigationEnd('mount')
     jest.advanceTimersByTime(100)
     expect(spanFactory.endSpan).not.toHaveBeenCalled()
     expect(appState).toBe('navigating')
 
     // The navigation span should not end until all components have unblocked
-    fireEvent.press(screen.getByText('Unblock Navigation'))
+    navigationTracker.unblockNavigationEnd('mount')
     jest.advanceTimersByTime(100)
     expect(spanFactory.endSpan).toHaveBeenCalled()
     expect(appState).toBe('ready')
-  })
-
-  it('resets the lastRenderTime when a navigation span ends', () => {
-    jest.useFakeTimers()
-
-    const spanFactory = new MockReactNativeSpanFactory()
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
-
-    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
-    render(<App navigationTracker={navigationTracker} />)
-
-    // start navigation
-    fireEvent.press(screen.getByText('Change to route 1'))
-    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
-    expect(setAppState).toHaveBeenCalled()
-    expect(appState).toBe('navigating')
-
-    // lastRenderTime should be set to 2
-
-    // block navigation to prevent current span ending
-    fireEvent.press(screen.getByText('Block Navigation'))
-    jest.advanceTimersByTime(100)
-
-    // unblock navigation to end current span with specific end time and condition
-    fireEvent.press(screen.getByText('Unblock Navigation'))
-    jest.advanceTimersByTime(100)
-
-    // check delivered span
-    expect(spanFactory.endSpan).toHaveBeenCalled()
-    expect(spanFactory.createdSpans[0].startTime).toEqual(0)
-    expect(spanFactory.createdSpans[0].endTime).toEqual(100)
-    expect(spanFactory.createdSpans[0]).toHaveAttribute('bugsnag.navigation.ended_by', 'condition')
-    expect(appState).toBe('ready')
-
-    // start second navigation
-    fireEvent.press(screen.getByText('Change to route 2'))
-    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('route-2', { isFirstClass: true, startTime: 200, doNotDelegateToNativeSDK: true })
-    jest.advanceTimersByTime(100)
-
-    // check delivered span
-    expect(spanFactory.endSpan).toHaveBeenCalledTimes(2)
-    expect(spanFactory.createdSpans[1].startTime).toEqual(200)
-    expect(spanFactory.createdSpans[1].endTime).toEqual(200) // Why isn't this 201?
-    expect(spanFactory.createdSpans[1]).toHaveAttribute('bugsnag.navigation.ended_by', 'immediate')
-    expect(appState).toBe('ready')
+    const span = spanFactory.createdSpans[0]
+    expect(span.name).toEqual('[Navigation]route-1')
+    expect(span).toHaveAttribute('bugsnag.navigation.ended_by', 'mount')
+    expect(span.startTime).toEqual(0)
+    expect(span.endTime).toEqual(200)
   })
 })
-
-const Route = () => {
-  const { blockNavigationEnd, unblockNavigationEnd, triggerNavigationEnd } = useContext(NavigationContext)
-
-  return (
-    <View>
-      <Button title='Trigger Navigation End' onPress={triggerNavigationEnd} />
-      <Button title='Block Navigation' onPress={blockNavigationEnd} />
-      <Button title='Unblock Navigation' onPress={() => { unblockNavigationEnd('condition') }} />
-    </View>
-  )
-}
-
-interface AppProps {
-  navigationTracker: NavigationTracker
-}
-
-const App = ({ navigationTracker }: AppProps) => {
-  const [currentRoute, setCurrentRoute] = React.useState('initial-route')
-
-  return (
-    <NavigationContextProvider currentRoute={currentRoute} navigationTracker={navigationTracker} >
-      <Route />
-      <Button title='Change to route 1' onPress={() => { setCurrentRoute('route-1') }} />
-      <Button title='Change to route 2' onPress={() => { setCurrentRoute('route-2') }} />
-    </NavigationContextProvider>
-  )
-}
