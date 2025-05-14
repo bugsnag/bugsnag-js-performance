@@ -20,6 +20,23 @@ function getNativeDeviceIdFilePath () {
     return nativeDeviceIdFilePath
 }
 
+async function clearDirectory(directory) {
+    if (await FileSystem.exists(directory)) {
+        console.error(`[BugsnagPerformance] Clearing persisted data at path: ${directory}`)
+        const files = await FileSystem.ls(directory)
+        for (const file of files) {
+            await FileSystem.unlink(`${directory}/${file}`)
+        }
+    }
+}
+
+async function deleteFile(filePath) {
+    if (await FileSystem.exists(filePath)) {
+        console.error(`[BugsnagPerformance] Clearing persisted data at path: ${filePath}`)
+        await FileSystem.unlink(filePath)
+    }
+}
+
 async function writePersistedStateFile(contents) {
     if (!await FileSystem.exists(RN_PERSISTED_STATE_DIRECTORY)) {
         console.error(`[BugsnagPerformance] creating persisted state directory: ${RN_PERSISTED_STATE_DIRECTORY}`)
@@ -48,34 +65,14 @@ export async function setDeviceId(deviceId) {
 
 export async function clearPersistedState() {
     // React Native Performance SDK persistence
-    if (await FileSystem.exists(RN_PERSISTED_STATE_PATH)) {
-        console.error(`[BugsnagPerformance] Clearing persisted data at path: ${RN_PERSISTED_STATE_PATH}`)
-        await FileSystem.unlink(RN_PERSISTED_STATE_PATH)
-    }
-    if (await FileSystem.exists(RN_RETRY_QUEUE_DIRECTORY)) {
-        console.error(`[BugsnagPerformance] Clearing persisted data at path: ${RN_RETRY_QUEUE_DIRECTORY}`)
-        const files = await FileSystem.ls(RN_RETRY_QUEUE_DIRECTORY)
-        for (const file of files) {
-            await FileSystem.unlink(`${RN_RETRY_QUEUE_DIRECTORY}/${file}`)
-        }
-    }
+    await deleteFile(RN_PERSISTED_STATE_PATH)
+    await clearDirectory(RN_RETRY_QUEUE_DIRECTORY)
 
     // Android Performance SDK persistence (For Cocoa Performance we set the clearPersistenceOnStart config option)
-    if (await FileSystem.exists(ANDROID_PERSISTED_STATE_PATH)) {
-        console.error(`[BugsnagPerformance] Clearing persisted data at path: ${ANDROID_PERSISTED_STATE_PATH}`)
-        await FileSystem.unlink(ANDROID_PERSISTED_STATE_PATH)
-    }
-    if (await FileSystem.exists(ANDROID_RETRY_QUEUE_DIRECTORY)) {
-        console.error(`[BugsnagPerformance] Clearing persisted data at path: ${ANDROID_RETRY_QUEUE_DIRECTORY}`)
-        const files = await FileSystem.ls(ANDROID_RETRY_QUEUE_DIRECTORY)
-        for (const file of files) {
-            await FileSystem.unlink(`${ANDROID_RETRY_QUEUE_DIRECTORY}/${file}`)
-        }
-    }
+    await deleteFile(ANDROID_PERSISTED_STATE_PATH)
+    await clearDirectory(ANDROID_RETRY_QUEUE_DIRECTORY)
 
     const nativeDeviceIdFilePath = getNativeDeviceIdFilePath()
-    if (await FileSystem.exists(nativeDeviceIdFilePath)) {
-        console.error(`[BugsnagPerformance] Clearing persisted data at path: ${nativeDeviceIdFilePath}`)
-        await FileSystem.unlink(nativeDeviceIdFilePath)
-    }
+    await deleteFile(nativeDeviceIdFilePath)
 }
+ 
