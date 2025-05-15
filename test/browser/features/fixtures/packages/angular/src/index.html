@@ -9,5 +9,22 @@
 </head>
 <body>
   <app-root>Loading...</app-root>
+
+  <pre id="console">
+    <p>console:</p>
+  </pre>
+  <script>
+    const consoleMethods = ['info', 'log', 'warn', 'error']
+    consoleMethods.forEach(method => {
+      const originalMethod = console[method]
+      console[method] = function (...args) {
+        const consoleDiv = document.getElementById('console')
+        const p = document.createElement('p')
+        p.textContent = args.join(' ')
+        consoleDiv.appendChild(p)
+        originalMethod.apply(console, args)
+      }
+    })
+  </script>
 </body>
 </html>

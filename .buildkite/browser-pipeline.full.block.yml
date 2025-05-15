@@ -1,0 +1,10 @@
+steps:
+  - block: "Trigger browser full pipeline"
+    key: "trigger-browser-full-pipeline"
+
+  - label: ":pipeline: Upload browser full pipeline"
+    depends_on: "trigger-browser-full-pipeline"
+    agents:
+      queue: macos
+    timeout_in_minutes: 2
+    command: buildkite-agent pipeline upload .buildkite/browser-pipeline.full.yml

@@ -17,7 +17,7 @@ describe('spanAttributesSource', () => {
     const browserConfiguration = createConfiguration<BrowserConfiguration>({ sendPageAttributes: { url: true, title: true } })
     const spanAttributes = createSpanAttributes('test.span')
     const clock = new IncrementingClock()
-    const span = new SpanInternal('id', 'traceId', 'test.span', 1234, spanAttributes, clock)
+    const span = new SpanInternal('id', 'traceId', 'test.span', 1234, spanAttributes, clock, 1)
 
     spanAttributesSource.requestAttributes(span)
 

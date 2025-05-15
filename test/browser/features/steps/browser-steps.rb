@@ -227,26 +227,6 @@ Then('a span named {string} does not contain the attribute {string}') do |span_n
   end
 end
 
-module Maze
-  module Driver
-    class Browser
-      def wait_for_element(id)
-        @driver.find_element(id: id)
-      end
-
-      def click_element(id)
-        element = @driver.find_element(id: id)
-
-        if $browser.mobile?
-          element.click
-        else
-          @driver.action.move_to(element).click.perform
-        end
-      end
-    end
-  end
-end
-
 def get_attribute_value_from_span(span, attribute, attr_type)
   attributes = span['attributes']
   attribute = attributes.find { |a| a['key'] == attribute }

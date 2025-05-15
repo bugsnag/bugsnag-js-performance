@@ -50,5 +50,15 @@ public class ScenarioLauncher extends NativeScenarioLauncherSpec {
   public void startNativePerformance(ReadableMap configuration, Promise promise) {
     impl.startNativePerformance(configuration, promise);
   }
+
+  @Override
+  public void sendNativeChildSpan(String traceParent, Promise promise) {
+    impl.sendNativeChildSpan(traceParent, promise);
+  }
+
+  @Override
+  public void getNativeTraceParent(Promise promise) {
+    impl.getNativeTraceParent(promise);
+  }
 }
 

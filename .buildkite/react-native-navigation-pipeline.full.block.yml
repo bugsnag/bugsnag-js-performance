@@ -1,0 +1,10 @@
+steps:
+  - block: "Trigger full react native navigation pipeline"
+    key: "trigger-full-react-native-navigation-pipeline"
+
+  - label: ":pipeline_upload: Full react native navigation pipeline"
+    depends_on: "trigger-full-react-native-navigation-pipeline"
+    agents:
+      queue: macos
+    timeout_in_minutes: 2
+    command: buildkite-agent pipeline upload .buildkite/react-native-navigation-pipeline.full.yml

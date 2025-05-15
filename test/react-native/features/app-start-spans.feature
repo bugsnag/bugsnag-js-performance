@@ -1,6 +1,8 @@
 @skip_react_native_navigation
 Feature: App Start spans
 
+  # Skipped on 0.79/Android/Old Arch - see PLAT-14095
+  @skip_android_old_arch_079 @skip_expo
   Scenario: App starts are automatically instrumented
     When I run 'AppStartScenario'
     And I relaunch the app after shutdown
@@ -20,9 +22,12 @@ Feature: App Start spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "app_start"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.app_start.type" equals "ReactNativeInit"
 
+  # Skipped on 0.79/Android/Old Arch - see PLAT-14095
+  @skip_android_old_arch_079 @skip_expo
   Scenario: A wrapper component provider can be provided as a config option
     When I run 'WrapperComponentProviderScenario'
-    Given the element "wrapper-component" is present within 60 seconds 
+    And I relaunch the app after shutdown
+    Then the element "wrapper-component" is present within 60 seconds 
     And the element "app-component" is present within 60 seconds 
 
     And I wait to receive a sampling request

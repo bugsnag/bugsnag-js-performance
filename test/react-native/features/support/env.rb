@@ -33,3 +33,12 @@ end
 Before('@native_integration') do |scenario|
   skip_this_scenario("Skipping scenario: Not running native integration fixture") unless ENV["NATIVE_INTEGRATION"]
 end
+
+Before('@skip_android_old_arch_079') do |scenario|
+  current_version = ENV['RN_VERSION'].nil? ? 0 : ENV['RN_VERSION'].to_f
+  skip_this_scenario("Skipping scenario") if Maze::Helper.get_current_platform == 'android' && !ENV['RCT_NEW_ARCH_ENABLED'].eql?('1') && current_version == 0.79
+end
+
+Before('@skip_expo') do |scenario|
+  skip_this_scenario("Skipping scenario: Not supported in Expo") if ENV["EXPO_VERSION"]
+end

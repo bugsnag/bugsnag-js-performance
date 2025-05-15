@@ -2,12 +2,10 @@
 @skip_firefox_60
 @skip_safari_11
 @skip_on_cdn_build
-@skip # Skipped pending PLAT-14002
 Feature: Angular
 
     Scenario: Angular route change spans are automatically instrumented
         Given I navigate to the test URL "/docs/angular/dist"
-        And the element "customers" is present
         And I click the element "customers"
         When I wait to receive 1 trace
 
@@ -27,7 +25,6 @@ Feature: Angular
 
     Scenario: Route with a custom URL matcher
         Given I navigate to the test URL "/docs/angular/dist"
-        And the element "customMatching" is present
         And I click the element "customMatching"
         When I wait to receive 1 trace
 

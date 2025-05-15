@@ -1,0 +1,10 @@
+steps:
+  - block: "Trigger react-native full pipeline"
+    key: "trigger-react-native-full-pipeline"
+
+  - label: ":pipeline_upload: Full react native pipeline"
+    depends_on: "trigger-react-native-full-pipeline"
+    agents:
+      queue: macos
+    timeout_in_minutes: 2
+    command: buildkite-agent pipeline upload .buildkite/react-native-pipeline.full.yml

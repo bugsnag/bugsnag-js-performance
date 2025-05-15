@@ -67,7 +67,6 @@ const netinfoVersion = parseFloat(reactNativeVersion) <= 0.64 ? '10.0.0' : '11.3
 const DEPENDENCIES = [
   `@bugsnag/react-native@${process.env.NOTIFIER_VERSION}`,
   `@react-native-community/netinfo@${netinfoVersion}`,
-  `react-native-dotenv`,
   `react-native-file-access@${reactNativeFileAccessVersion}`
 ]
 
@@ -80,7 +79,7 @@ let reactNativeSafeAreaContextVersion = '4.14.0'
 if (parseFloat(reactNativeVersion) >= 0.77) {
   reactNavigationVersion = '7.0.14'
   reactNavigationNativeStackVersion = '7.2.0'
-  reactNativeScreensVersion = '4.6.0'
+  reactNativeScreensVersion = '4.9.0'
   reactNativeSafeAreaContextVersion = '5.2.0'
 } else if (parseFloat(reactNativeVersion) <= 0.64) {
   reactNativeScreensVersion = '3.14.0'
@@ -306,14 +305,9 @@ function replaceGeneratedFixtureFiles() {
     resolve(fixtureDir, 'exportOptions.plist')
   )
 
-  fs.copyFileSync(
-    resolve(ROOT_DIR, 'test/react-native/features/fixtures/app/env'),
-    resolve(fixtureDir, '.env')
-  )
-
   const babelConfig = require(resolve(fixtureDir, 'babel.config.js'))
   if (!babelConfig.plugins) babelConfig.plugins = []
-  babelConfig.plugins.push('@babel/plugin-transform-export-namespace-from', 'module:react-native-dotenv')
+  babelConfig.plugins.push('@babel/plugin-transform-export-namespace-from')
   fs.writeFileSync(resolve(fixtureDir, 'babel.config.js'), `module.exports = ${util.inspect(babelConfig)}`)
 }
 
@@ -390,7 +384,7 @@ function installAndroidPerformance() {
   const appGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
   let appGradle = fs.readFileSync(appGradlePath, 'utf8')
 
-  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:1.+")'
+  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:1.14.0")'
   const dependenciesSection = 'dependencies {'
 
   appGradle = appGradle.replace(dependenciesSection, `${dependenciesSection}\n    ${performanceDependency}`)

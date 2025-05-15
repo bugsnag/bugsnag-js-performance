@@ -21,16 +21,16 @@ steps:
             - exit_status: "*"
               limit: 1
 
-      - label: ":docker: Build Legacy Maze Runner image${EXTRA_STEP_LABEL}"
-        key: "browser-maze-runner-legacy-${USE_CDN_BUILD}"
+      - label: ":docker: Build BrowserStack Maze Runner image${EXTRA_STEP_LABEL}"
+        key: "browser-maze-runner-bs-${USE_CDN_BUILD}"
         timeout_in_minutes: 20
         plugins:
           - docker-compose#v4.12.0:
-              build: browser-maze-runner-legacy
+              build: browser-maze-runner-bs
               image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
-              cache-from: browser-maze-runner-legacy:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
+              cache-from: browser-maze-runner-bs:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
           - docker-compose#v4.12.0:
-              push: browser-maze-runner-legacy:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
+              push: browser-maze-runner-bs:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
         env:
           USE_CDN_BUILD: "${USE_CDN_BUILD}"
         retry:
@@ -74,12 +74,12 @@ steps:
 
       # BrowserStack
       - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser tests${EXTRA_STEP_LABEL}"
-        depends_on: "browser-maze-runner-legacy-${USE_CDN_BUILD}"
+        depends_on: "browser-maze-runner-bs-${USE_CDN_BUILD}"
         timeout_in_minutes: 30
         plugins:
           docker-compose#v4.12.0:
-            pull: browser-maze-runner-legacy
-            run: browser-maze-runner-legacy
+            pull: browser-maze-runner-bs
+            run: browser-maze-runner-bs
             use-aliases: true
             command:
               - --https
@@ -106,12 +106,12 @@ steps:
 
       # BrowserStack non-https
       - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser non-https tests${EXTRA_STEP_LABEL}"
-        depends_on: "browser-maze-runner-legacy-${USE_CDN_BUILD}"
+        depends_on: "browser-maze-runner-bs-${USE_CDN_BUILD}"
         timeout_in_minutes: 30
         plugins:
           docker-compose#v4.12.0:
-            pull: browser-maze-runner-legacy
-            run: browser-maze-runner-legacy
+            pull: browser-maze-runner-bs
+            run: browser-maze-runner-bs
             use-aliases: true
             command:
               - --farm=bs

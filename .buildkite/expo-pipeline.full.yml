@@ -1,0 +1,116 @@
+agents:
+  queue: "opensource"
+
+steps:
+  - group: "Expo Tests"
+    steps:
+      #
+      # Test fixtures
+      #
+      - label:  ':android: Build Expo {{matrix}} APK'
+        key: "build-expo-apk-full"
+        timeout_in_minutes: 20
+        agents:
+          queue: "macos-14"
+        env:
+          JAVA_VERSION: "17"
+          EXPO_VERSION: "{{matrix}}"
+          BUILD_ANDROID: 1
+        artifact_paths: test/react-native/features/fixtures/generated/expo/**/test-fixture/output.apk
+        commands:
+          - bundle install
+          - ./bin/generate-expo-fixture
+        matrix:
+          - "51"
+          - "50"
+
+      - label:  ':mac: Build Expo {{matrix}} IPA'
+        key: "build-expo-ipa-full"
+        timeout_in_minutes: 20
+        agents:
+          queue: "macos-14"
+        env:
+          EXPO_VERSION: "{{matrix}}"
+          BUILD_IOS: 1
+        artifact_paths: test/react-native/features/fixtures/generated/expo/**/test-fixture/output.ipa
+        commands:
+          - bundle install
+          - ./bin/generate-expo-fixture
+        matrix:
+          - "51"
+          - "50"
+
+      #
+      # End-to-end tests
+      #
+      - label: ":bitbar: :android: Expo {{matrix}} Android 15 end-to-end tests"
+        depends_on: "build-expo-apk-full"
+        timeout_in_minutes: 20
+        plugins:
+          artifacts#v1.9.0:
+            download: "test/react-native/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.apk"
+            upload: ./test/react-native/maze_output/**/*
+          docker-compose#v4.7.0:
+            pull: react-native-maze-runner
+            run: react-native-maze-runner
+            service-ports: true
+            command:
+              - --app=/app/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.apk
+              - --farm=bb
+              - --device=ANDROID_15
+              - --a11y-locator
+              - --appium-version=1.22
+              - --no-tunnel
+              - --aws-public-ip
+          test-collector#v1.10.2:
+            files: "reports/TEST-*.xml"
+            format: "junit"
+            branch: "^main|next$$"
+            api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
+        env:
+          EXPO_VERSION: "{{matrix}}"
+        retry:
+          manual:
+            permit_on_passed: true
+        concurrency: 25
+        concurrency_group: "bitbar"
+        concurrency_method: eager
+        matrix:
+          - "51"
+          - "50"
+
+      - label: ":bitbar: :mac: Expo {{matrix}} iOS 16 end-to-end tests"
+        depends_on: "build-expo-ipa-full"
+        timeout_in_minutes: 20
+        plugins:
+          artifacts#v1.9.0:
+            download: "test/react-native/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.ipa"
+            upload: ./test/react-native/maze_output/**/*
+          docker-compose#v4.12.0:
+            pull: react-native-maze-runner
+            run: react-native-maze-runner
+            service-ports: true
+            command:
+              - --app=/app/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.ipa
+              - --farm=bb
+              - --device=IOS_16
+              - --a11y-locator
+              - --appium-version=1.22
+              - --no-tunnel
+              - --aws-public-ip
+          test-collector#v1.10.2:
+            files: "reports/TEST-*.xml"
+            format: "junit"
+            branch: "^main|next$$"
+            api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
+        env:
+          EXPO_VERSION: "{{matrix}}"
+        retry:
+          manual:
+            permit_on_passed: true
+        concurrency: 25
+        concurrency_group: "bitbar"
+        concurrency_method: eager
+        matrix:
+          - "51"
+          - "50"

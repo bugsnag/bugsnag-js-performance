@@ -12,7 +12,9 @@ import com.bugsnag.android.Logger;
 import com.bugsnag.android.performance.AutoInstrument;
 import com.bugsnag.android.performance.BugsnagPerformance;
 import com.bugsnag.android.performance.PerformanceConfiguration;
+import com.bugsnag.android.performance.RemoteSpanContext;
 import com.bugsnag.android.performance.Span;
+import com.bugsnag.android.performance.SpanOptions;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -120,6 +122,11 @@ class ScenarioLauncherImpl {
         editor.putInt("maximumBatchSize", configuration.getInt("maximumBatchSize"));
     }
 
+    if (configuration.hasKey("useWrapperComponentProvider")) {
+        editor.putBoolean("useWrapperComponentProvider", configuration.getBoolean("useWrapperComponentProvider"));
+    }
+
+
     editor.commit();
   }
 
@@ -136,6 +143,7 @@ class ScenarioLauncherImpl {
         startupConfig.putBoolean("autoInstrumentAppStarts", sharedPreferences.getBoolean("autoInstrumentAppStarts", false));
         startupConfig.putBoolean("autoInstrumentNetworkRequests", sharedPreferences.getBoolean("autoInstrumentNetworkRequests", false));
         startupConfig.putInt("maximumBatchSize", sharedPreferences.getInt("maximumBatchSize", 100));
+        startupConfig.putBoolean("useWrapperComponentProvider", sharedPreferences.getBoolean("useWrapperComponentProvider", false));
         return startupConfig;
     }
     finally {
@@ -147,6 +155,7 @@ class ScenarioLauncherImpl {
             .remove("autoInstrumentAppStarts")
             .remove("autoInstrumentNetworkRequests")
             .remove("maximumBatchSize")
+            .remove("useWrapperComponentProvider")
             .commit();
     }
   }
@@ -173,5 +182,19 @@ class ScenarioLauncherImpl {
         Log.d(MODULE_NAME, "Failed to start Android performance", e);
         promise.reject(e);
     }
+  }
+
+  public void sendNativeChildSpan(String traceParent, Promise promise) {
+    RemoteSpanContext remoteSpanContext = RemoteSpanContext.parseTraceParent(traceParent);
+    Span span = BugsnagPerformance.startSpan("Native child span", SpanOptions.createWithin(remoteSpanContext));
+    span.end();
+    promise.resolve(true);
+  }
+
+  public void getNativeTraceParent(Promise promise) {
+    Span span = BugsnagPerformance.startSpan("Native parent span");
+    String traceParent = RemoteSpanContext.encodeAsTraceParent(span);
+    promise.resolve(traceParent);
+    span.end();
   }
 }
