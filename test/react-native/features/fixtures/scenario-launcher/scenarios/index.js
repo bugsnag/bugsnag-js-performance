@@ -23,3 +23,6 @@ export * as ReactNavigationScenario from './ReactNavigationScenario'
 export * as NativeIntegrationScenario from './NativeIntegrationScenario'
 export * as RemoteParentContextNativeScenario from './RemoteParentContextNativeScenario'
 export * as RemoteParentContextJSScenario from './RemoteParentContextJSScenario'
+
+// Expo Router Scenarios
+export * as ExpoRouterScenario from './ExpoRouterScenario'

@@ -42,3 +42,7 @@ end
 Before('@skip_expo') do |scenario|
   skip_this_scenario("Skipping scenario: Not supported in Expo") if ENV["EXPO_VERSION"]
 end
+
+Before('@expo') do |scenario|
+  skip_this_scenario("Skipping scenario: Not running Expo fixture") unless ENV["EXPO_VERSION"]
+end

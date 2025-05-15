@@ -16,7 +16,8 @@
     "@react-navigation/native-stack": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-file-access": "*"
+    "react-native-file-access": "*",
+    "expo-router": "*"
   },
   "codegenConfig": {
     "name": "ScenarioLauncherSpec",
