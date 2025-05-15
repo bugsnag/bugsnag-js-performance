@@ -25,7 +25,7 @@ Feature: Navigation spans with Expo Router
       | bugsnag.navigation.route          | stringValue | three                                        |
       | bugsnag.navigation.previous_route | stringValue | two                                          |
       | bugsnag.navigation.triggered_by   | stringValue | @bugsnag/plugin-react-navigation-performance |
-      | bugsnag.navigation.ended_by       | stringValue | immediate                                    |
+      | bugsnag.navigation.ended_by       | stringValue | condition                                    |
 
     And a span named "[Navigation]four" contains the attributes:
       | attribute                         | type        | value                                        |
@@ -33,7 +33,7 @@ Feature: Navigation spans with Expo Router
       | bugsnag.navigation.route          | stringValue | four                                         |
       | bugsnag.navigation.previous_route | stringValue | three                                        |
       | bugsnag.navigation.triggered_by   | stringValue | @bugsnag/plugin-react-navigation-performance |
-      | bugsnag.navigation.ended_by       | stringValue | immediate                                    |
+      | bugsnag.navigation.ended_by       | stringValue | mount                                        |
 
     And a span named "[Navigation]five" contains the attributes:
       | attribute                         | type        | value                                        |
@@ -41,4 +41,4 @@ Feature: Navigation spans with Expo Router
       | bugsnag.navigation.route          | stringValue | five                                         |
       | bugsnag.navigation.previous_route | stringValue | four                                         |
       | bugsnag.navigation.triggered_by   | stringValue | @bugsnag/plugin-react-navigation-performance |
-      | bugsnag.navigation.ended_by       | stringValue | immediate                                    |
+      | bugsnag.navigation.ended_by       | stringValue | unmount                                      |

@@ -1,19 +1,27 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'expo-router'
 import { StyleSheet, Text, View } from 'react-native'
+import { CompleteNavigation } from '@bugsnag/plugin-react-navigation-performance'
 
 export default function TabFourScreen() {
   const router = useRouter();
 
+  const [loadingComplete, setLoadingComplete] = useState(false)
+
   useEffect(() => {
-    setTimeout(() => {
-      router.navigate('./five')
-    }, 250);
+      setTimeout(() => {
+          setLoadingComplete(true)
+      }, 50)
+
+      setTimeout(() => {
+          router.navigate('./five')
+      }, 250)
   }, [])
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Tab Four</Text>
+      {loadingComplete ? <CompleteNavigation on="mount" /> : null}
     </View>
   )
 }
