@@ -15,6 +15,8 @@ interface UnsafeActionEvent {
 const NAVIGATION_START_TIMEOUT = 1000
 const NAVIGATION_COMPLETE_TIMEOUT = 100
 
+export type NavigationContainerOrRef = NavigationContainerRef<ReactNavigation.RootParamList> | NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>
+
 export class NavigationTracker {
   private currentNavigationSpan?: SpanInternal
   private startTime?: number
@@ -77,7 +79,7 @@ export class NavigationTracker {
     }
   }
 
-  configure (navigationContainerRef: NavigationContainerRef<ReactNavigation.RootParamList> | NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>) {
+  configure (navigationContainerRef: NavigationContainerOrRef) {
     const navigationContainer = (navigationContainerRef as NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>).current || navigationContainerRef
 
     // set the initial route if it exists

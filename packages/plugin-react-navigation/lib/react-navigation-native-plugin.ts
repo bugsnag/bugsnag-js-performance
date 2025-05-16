@@ -1,11 +1,9 @@
 import type { Plugin, SetAppState, SpanFactory } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration, ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
+import type { NavigationContainerOrRef } from './navigation-tracker'
 import { NavigationContainer } from '@react-navigation/native'
-import type { NavigationContainerRef, NavigationContainerRefWithCurrent } from '@react-navigation/native'
 import { createNavigationContainer } from './create-navigation-container'
 import { NavigationTracker } from './navigation-tracker'
-
-type NavigationContainerOrRef = NavigationContainerRef<ReactNavigation.RootParamList> | NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>
 
 class BugsnagPluginReactNavigationNativePerformance implements Plugin<ReactNativeConfiguration> {
   private spanFactory?: ReactNativeSpanFactory
