@@ -1,6 +1,6 @@
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 import React, { useContext, useEffect } from 'react'
-import { ScenarioContext } from '../lib/ScenarioContext'
+import { ScenarioContext } from '../../lib/ScenarioContext'
 
 export const initialise = async (config) => {
   config.maximumBatchSize = 5

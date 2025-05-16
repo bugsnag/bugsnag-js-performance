@@ -4,20 +4,18 @@
   "description": "Performance scenarios for React Native",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepack": "node ./scripts/prepare-package.js",
+    "postpack": "node ./scripts/cleanup.js"
   },
   "author": "",
   "license": "MIT",
-  "optionalDependencies": {
-    "react-native-navigation": "*"
-  },
   "peerDependencies": {
     "@react-navigation/native": "*",
     "@react-navigation/native-stack": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-file-access": "*",
-    "expo-router": "*"
+    "react-native-file-access": "*"
   },
   "codegenConfig": {
     "name": "ScenarioLauncherSpec",
