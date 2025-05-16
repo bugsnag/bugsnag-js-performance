@@ -30,6 +30,7 @@
     "/ios",
     "/lib",
     "/scenarios/core",
-    "/scenarios/index.js"
+    "/scenarios/index.js",
+    "/ScenarioLauncher.podspec"
   ]
 }
