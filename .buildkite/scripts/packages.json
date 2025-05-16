@@ -56,7 +56,14 @@
     {
         "pipeline": ".buildkite/expo-pipeline.yml",
         "block": ".buildkite/expo-pipeline.block.yml",
-        "paths": []
+        "paths": [
+            "test/react-native",
+            "packages/core",
+            "packages/platforms/react-native",
+            "packages/delivery-fetch",
+            "packages/request-tracker",
+            "packages/plugin-react-navigation"
+        ]
     },
     {
         "pipeline": ".buildkite/expo-pipeline.full.yml",
