@@ -1,3 +1,2 @@
 // Expo Router Scenarios
-export * from '../core-scenarios'
-export * as ExpoRouterScenario from '../expo-senarios/ExpoRouterScenario'
+export * as ExpoRouterScenario from './ExpoRouterScenario'

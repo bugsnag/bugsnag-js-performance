@@ -24,5 +24,12 @@
     "android": {
       "javaPackageName": "com.bugsnag.reactnative.scenariolauncher"
     }
-  }
+  },
+  "files": [
+    "/android",
+    "/ios",
+    "/lib",
+    "/scenarios/core",
+    "/scenarios/index.js"
+  ]
 }
