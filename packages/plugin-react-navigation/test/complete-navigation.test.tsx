@@ -94,4 +94,17 @@ describe('CompleteNavigation', () => {
     fireEvent.press(screen.getByText('Finish loading'))
     expect(plugin.unblockNavigationEnd).toHaveBeenCalledWith('condition')
   })
+
+  it('handles missing plugin gracefully', () => {
+    jest.spyOn(BugsnagPerformance, 'getPlugin').mockReturnValue(undefined)
+
+    render(
+      <CompleteNavigation on="mount">
+        <View testID='view' />
+      </CompleteNavigation>
+    )
+
+    // Should not throw and should render children
+    expect(screen.getByTestId('view')).toBeTruthy()
+  })
 })

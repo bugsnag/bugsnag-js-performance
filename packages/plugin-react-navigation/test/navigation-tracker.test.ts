@@ -21,17 +21,18 @@ const mockNavigationContainerRef = () => {
   let currentRoute: { name: string } = { name: 'initial-route' }
 
   return {
-    addListener: (eventName: string, listener: () => void) => {
+    addListener: jest.fn((eventName: string, listener: () => void) => {
       if (eventName === 'state') {
         stateChangeListeners.push(listener)
       } else if (eventName === '__unsafe_action__') {
         unsafeActionListeners.push(listener)
       }
-    },
-    changeRoute: (routename: string) => {
+    }),
+    changeRoute: jest.fn((routename: string) => {
       currentRoute = { name: routename }
-    },
-    getCurrentRoute: () => currentRoute,
+    }),
+    getCurrentRoute: jest.fn(() => currentRoute),
+    isReady: jest.fn(() => true),
     triggerStateChange: () => {
       stateChangeListeners.forEach((listener) => { listener() })
     },
@@ -212,5 +213,54 @@ describe('NavigationTracker', () => {
     expect(span).toHaveAttribute('bugsnag.navigation.ended_by', 'mount')
     expect(span.startTime).toEqual(0)
     expect(span.endTime).toEqual(200)
+  })
+
+  it('handles noop navigation actions', () => {
+    const spanFactory = new MockReactNativeSpanFactory()
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
+
+    const mockNavigationContainer = mockNavigationContainerRef()
+    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
+    navigationTracker.configure(mockNavigationContainer as unknown as NavigationContainerRef<ReactNavigation.RootParamList>)
+
+    mockNavigationContainer.triggerUnsafeAction(true) // noop = true
+    mockNavigationContainer.triggerStateChange()
+
+    expect(spanFactory.startNavigationSpan).not.toHaveBeenCalled()
+  })
+
+  it('handles navigation timeout', () => {
+    const spanFactory = new MockReactNativeSpanFactory()
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
+
+    const mockNavigationContainer = mockNavigationContainerRef()
+    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
+    navigationTracker.configure(mockNavigationContainer as unknown as NavigationContainerRef<ReactNavigation.RootParamList>)
+
+    mockNavigationContainer.triggerUnsafeAction()
+    jest.advanceTimersByTime(1001) // Exceed NAVIGATION_START_TIMEOUT
+
+    expect(spanFactory.startNavigationSpan).not.toHaveBeenCalled()
+    expect(spanFactory.endSpan).not.toHaveBeenCalled()
+  })
+
+  it('handles unready navigation container', () => {
+    const spanFactory = new MockReactNativeSpanFactory()
+    const setAppState = jest.fn((state: AppState) => {
+      appState = state
+    })
+
+    const mockNavigationContainer = {
+      ...mockNavigationContainerRef(),
+      isReady: () => false
+    }
+    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
+    navigationTracker.configure(mockNavigationContainer as unknown as NavigationContainerRef<ReactNavigation.RootParamList>)
+
+    expect(mockNavigationContainer.getCurrentRoute).not.toHaveBeenCalled()
   })
 })
