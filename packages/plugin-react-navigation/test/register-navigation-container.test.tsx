@@ -1,14 +1,16 @@
 import type { AppState } from '@bugsnag/core-performance'
 import { MockReactNativeSpanFactory } from '@bugsnag/js-performance-test-utilities'
-import type { ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
+import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import type { ParamListBase } from '@react-navigation/native'
-import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native'
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import '@testing-library/jest-native/extend-expect'
-import { act, fireEvent, render, screen } from '@testing-library/react-native'
+import { fireEvent, render, screen } from '@testing-library/react-native'
 import { Button, Text, View } from 'react-native'
-import { createNavigationContainer } from '../lib/create-navigation-container'
-import { NavigationTracker } from '../lib/navigation-tracker'
+import BugsnagPluginReactNavigationNativePerformance from '../lib/react-navigation-native-plugin'
+import { useEffect } from 'react'
+
+let plugin = new BugsnagPluginReactNavigationNativePerformance()
 
 beforeEach(() => {
   jest.useFakeTimers()
@@ -16,24 +18,23 @@ beforeEach(() => {
 
 afterEach(() => {
   jest.useRealTimers()
+  plugin = new BugsnagPluginReactNavigationNativePerformance()
 })
 
-describe('createNavigationContainer', () => {
+describe('registerNavigationContainer', () => {
   it('creates a navigation span when the route changes', () => {
     let appState: AppState = 'starting'
     const setAppState = jest.fn((state: AppState) => {
       appState = state
     })
     const spanFactory = new MockReactNativeSpanFactory()
-    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
-    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, navigationTracker)
+    plugin.configure({} as unknown as ReactNativeConfiguration, spanFactory, setAppState)
 
     render(
-      <BugsnagNavigationContainer>
-        <RootNavigator />
-      </BugsnagNavigationContainer>
+        <App />
     )
 
+    expect(screen.getByText('Route 1')).toBeOnTheScreen()
     fireEvent.press(screen.getByText('Go to route 2'))
     expect(screen.getByText('Route 2')).toBeOnTheScreen()
 
@@ -48,33 +49,6 @@ describe('createNavigationContainer', () => {
     expect(spanFactory.startNavigationSpan).toHaveBeenCalledTimes(2)
     expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('Route 1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
     expect(setAppState).toHaveBeenCalledTimes(2)
-  })
-
-  it('forwards the provided ref to the NavigationContainer', () => {
-    let appState: AppState = 'starting'
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
-    const navigationRef = createNavigationContainerRef()
-    const spanFactory = new MockReactNativeSpanFactory()
-    const navigationTracker = new NavigationTracker(spanFactory as unknown as ReactNativeSpanFactory, setAppState)
-    const BugsnagNavigationContainer = createNavigationContainer(NavigationContainer, navigationTracker)
-
-    render(
-      <BugsnagNavigationContainer ref={navigationRef}>
-        <RootNavigator />
-      </BugsnagNavigationContainer>
-    )
-
-    act(() => {
-      // @ts-expect-error navigate method expects type 'never'
-      navigationRef.navigate('Route 2')
-    })
-
-    expect(spanFactory.startNavigationSpan).toHaveBeenCalledTimes(1)
-    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('Route 2', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
-    expect(setAppState).toHaveBeenCalledTimes(1)
-    expect(appState).toBe('navigating')
   })
 })
 
@@ -103,5 +77,19 @@ function RootNavigator () {
         )}
       </Stack.Screen>
     </Stack.Navigator>
+  )
+}
+
+function App () {
+  const ref = useNavigationContainerRef()
+
+  useEffect(() => {
+    plugin.registerNavigationContainerRef(ref)
+  }, [ref])
+
+  return (
+    <NavigationContainer ref={ref}>
+      <RootNavigator />
+    </NavigationContainer>
   )
 }

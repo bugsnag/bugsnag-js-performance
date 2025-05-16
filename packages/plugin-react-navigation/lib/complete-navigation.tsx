@@ -1,27 +1,41 @@
-import React, { useEffect } from 'react'
+import BugsnagPerformance from '@bugsnag/react-native-performance'
+import type React from 'react'
+import { useEffect, useRef } from 'react'
 import type { PropsWithChildren } from 'react'
-import { NavigationContext } from './navigation-context'
+import BugsnagPluginReactNavigationNativePerformance from './react-navigation-native-plugin'
 
 interface Props extends PropsWithChildren {
   on: 'mount' | 'unmount' | boolean
 }
 
 /** End the current navigation span when the component is mounted, unmounted or the `on` prop is `true` */
-export const CompleteNavigation: React.FC<Props> = ({ on, children }) => {
-  const context = React.useContext(NavigationContext)
+export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, on }) => {
+  const pluginRef = useRef<BugsnagPluginReactNavigationNativePerformance>()
+
+  function getPlugin () {
+    if (pluginRef.current) return pluginRef.current
+
+    pluginRef.current = BugsnagPerformance.getPlugin(BugsnagPluginReactNavigationNativePerformance)
+
+    return pluginRef.current
+  }
 
   useEffect(() => {
-    context.blockNavigationEnd()
+    const plugin = getPlugin()
 
-    if (on === 'mount') {
-      setTimeout(() => {
-        context.unblockNavigationEnd('mount')
-      })
-    }
+    if (plugin) {
+      plugin.blockNavigationEnd()
 
-    return () => {
+      if (on === 'mount') {
+        setTimeout(() => {
+          plugin.unblockNavigationEnd('mount')
+        }, 0)
+      }
+
       if (on === 'unmount') {
-        context.unblockNavigationEnd('unmount')
+        return () => {
+          plugin.unblockNavigationEnd('unmount')
+        }
       }
     }
   }, [])
@@ -29,10 +43,13 @@ export const CompleteNavigation: React.FC<Props> = ({ on, children }) => {
   useEffect(() => {
     if (typeof on === 'boolean') {
       if (on === true) {
-        context.unblockNavigationEnd('condition')
+        const plugin = getPlugin()
+        if (plugin) {
+          plugin.unblockNavigationEnd('condition')
+        }
       }
     }
   }, [on])
 
-  return <>{children}</>
+  return children
 }

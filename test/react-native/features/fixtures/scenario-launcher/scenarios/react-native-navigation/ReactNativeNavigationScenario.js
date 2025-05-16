@@ -2,7 +2,7 @@ import BugsnagPluginReactNativeNavigationPerformance, { CompleteNavigation } fro
 import React, { useEffect, useState } from 'react'
 import { Text, View } from 'react-native'
 import { Navigation } from 'react-native-navigation'
-import { getCurrentCommand } from '../lib/CommandRunner'
+import { getCurrentCommand } from '../../lib/CommandRunner'
 
 export const initialise = async (config) => {
     config.maximumBatchSize = 1

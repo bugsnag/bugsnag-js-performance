@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 //@ts-expect-error no types
 import { launchScenario, ScenarioContext, ScenarioComponent } from '@bugsnag/react-native-performance-scenarios'
 
-export default function HomeScreen() {
+export default function TabOneScreen() {
 
   const [currentScenario, setCurrentScenario] = useState<any>(null)
 
