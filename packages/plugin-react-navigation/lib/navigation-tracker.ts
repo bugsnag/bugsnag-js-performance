@@ -81,7 +81,9 @@ export class NavigationTracker {
     const navigationContainer = (navigationContainerRef as NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>).current || navigationContainerRef
 
     // set the initial route if it exists
-    this.previousRoute = navigationContainer.getCurrentRoute()?.name
+    if (navigationContainer.isReady()) {
+      this.previousRoute = navigationContainer.getCurrentRoute()?.name
+    }
 
     // Potential for a navigation to occur
     navigationContainer.addListener('__unsafe_action__', (event: UnsafeActionEvent) => {
