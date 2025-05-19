@@ -78,14 +78,14 @@ steps:
               - --aws-public-ip
               - --no-tunnel
           artifacts#v1.9.4:
-            - download: "test/browser/features/fixtures/packages"
-              compressed: "fixture-packages-${USE_CDN_BUILD}.zip"
-            - upload: "./test/browser/maze_output/failed/**/*"
+            download: "fixture-packages-${USE_CDN_BUILD}.zip"
+            upload: "./test/browser/maze_output/failed/**/*"
           test-collector#v1.10.2:
             files: "reports/TEST-*.xml"
             format: "junit"
             branch: "^main|next$$"
             api-token-env-name: "BROWSER_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
+        command: "unzip fixture-packages-${USE_CDN_BUILD}.zip"
         concurrency: 25
         concurrency_group: "bitbar"
         matrix:
