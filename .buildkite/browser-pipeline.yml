@@ -65,8 +65,11 @@ steps:
         depends_on: "build-browser-fixtures-${USE_CDN_BUILD}"
         timeout_in_minutes: 30
         plugins:
+          artifacts#v1.9.4:
+            download: "fixture-packages-${USE_CDN_BUILD}.zip"
+            upload: "./test/browser/maze_output/failed/**/*"
           improbable-eng/metahook:
-            pre-exit: "unzip fixture-packages-${USE_CDN_BUILD}.zip"
+            post-artifact: "unzip -o fixture-packages-${USE_CDN_BUILD}.zip"
           docker-compose#v4.12.0:
             pull: browser-maze-runner-bb
             run: browser-maze-runner-bb
@@ -79,10 +82,6 @@ steps:
               - --appium-version=1.22
               - --aws-public-ip
               - --no-tunnel
-          artifacts#v1.9.4:
-            download: "test/browser/features/fixtures/packages/**"
-            compressed: "fixture-packages-${USE_CDN_BUILD}.zip"
-#            upload: "./test/browser/maze_output/failed/**/*"
           test-collector#v1.10.2:
             files: "reports/TEST-*.xml"
             format: "junit"
