@@ -1,6 +1,5 @@
 import BugsnagPerformance from '@bugsnag/react-native-performance'
-import type React from 'react'
-import { useEffect, useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import type { PropsWithChildren } from 'react'
 import BugsnagPluginReactNavigationNativePerformance from './react-navigation-native-plugin'
 
@@ -51,5 +50,5 @@ export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, o
     }
   }, [on])
 
-  return children
+  return <>{children}</>
 }
