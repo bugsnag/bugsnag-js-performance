@@ -12,13 +12,16 @@ steps:
           queue: macos-14
         env:
           USE_CDN_BUILD: "${USE_CDN_BUILD}"
+          SKIP_FIXTURE_CLEANUP: "true"
         plugins:
           artifacts#v1.9.4:
             upload:
               - fixture-packages-${USE_CDN_BUILD}.zip
         commands:
           - cd ./test/browser
-          - SKIP_FIXTURE_CLEANUP=true ruby ./features/support/build-packages.rb
+          - npm ci
+          - ruby ./features/support/build-packages.rb
+          - cd ../..
           - zip -r fixture-packages-${USE_CDN_BUILD}.zip test/browser/features/fixtures/packages
         retry:
           automatic:
