@@ -78,7 +78,7 @@ steps:
               - --aws-public-ip
               - --no-tunnel
           artifacts#v1.9.4:
-            download: "test/browser/features/fixtures/packages"
+            download: "test/browser/features/fixtures/packages/**"
             compressed: "fixture-packages-${USE_CDN_BUILD}.zip"
 #            upload: "./test/browser/maze_output/failed/**/*"
           test-collector#v1.10.2:
