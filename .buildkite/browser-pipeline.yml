@@ -69,7 +69,7 @@ steps:
             download: "fixture-packages-${USE_CDN_BUILD}.zip"
             upload: "./test/browser/maze_output/failed/**/*"
           improbable-eng/metahook:
-            post-artifact: "unzip -o fixture-packages-${USE_CDN_BUILD}.zip"
+            command: "unzip -o fixture-packages-${USE_CDN_BUILD}.zip"
           docker-compose#v4.12.0:
             pull: browser-maze-runner-bb
             run: browser-maze-runner-bb

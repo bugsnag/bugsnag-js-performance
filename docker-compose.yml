@@ -44,9 +44,9 @@ services:
       - "9000-9499:9339"
       - "9000-9499:9340"
     volumes:
-      - ./test/browser/maze_output:/app/test/browser/maze_output
-      - ./test/browser/features:/app/test/browser/features
-      - ./reports/:/app/test/browser/reports/
+      - ./test/browser/maze_output:/app/maze_output
+      - ./test/browser/features:/app/features
+      - ./reports/:/app/reports/
       - /var/run/docker.sock:/var/run/docker.sock
 
   browser-maze-runner-bs:
