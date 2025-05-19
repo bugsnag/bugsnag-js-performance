@@ -22,3 +22,17 @@ steps:
       queue: "macos-node-18"
     timeout_in_minutes: 5
     command: node .buildkite/scripts/pipeline-trigger.js
+
+  - label: ":pipeline_upload: Basic browser pipeline with NPM build"
+    agents:
+      queue: "macos"
+    timeout_in_minutes: 2
+    commands:
+      - USE_CDN_BUILD=0 EXTRA_STEP_LABEL=" (CDN)" buildkite-agent pipeline upload .buildkite/browser-pipeline.yml
+
+  - label: ":pipeline_upload: Basic browser pipeline with CDN build"
+    agents:
+      queue: "macos"
+    timeout_in_minutes: 2
+    commands:
+      - USE_CDN_BUILD=1 EXTRA_STEP_LABEL=" (CDN)" buildkite-agent pipeline upload .buildkite/browser-pipeline.yml
