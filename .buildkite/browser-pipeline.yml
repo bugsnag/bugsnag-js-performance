@@ -15,14 +15,12 @@ steps:
           SKIP_FIXTURE_CLEANUP: "true"
         plugins:
           artifacts#v1.9.4:
-            upload:
-              - fixture-packages-${USE_CDN_BUILD}.zip
+            upload: "test/browser/features/fixtures/packages"
+            compressed: "fixture-packages-${USE_CDN_BUILD}.zip"
         commands:
           - cd ./test/browser
           - npm ci
           - ruby ./features/support/build-packages.rb
-          - cd ../..
-          - zip -r fixture-packages-${USE_CDN_BUILD}.zip test/browser/features/fixtures/packages
         retry:
           automatic:
             - exit_status: "*"
@@ -62,40 +60,41 @@ steps:
 #            - exit_status: "*"
 #              limit: 1
 #
-#      # BitBar
-#      - label: ":bitbar: :{{ matrix.browser }}: {{ matrix.version }} tests${EXTRA_STEP_LABEL}"
-#        depends_on: "browser-maze-runner-bb-${USE_CDN_BUILD}"
-#        timeout_in_minutes: 30
-#        plugins:
-#          docker-compose#v4.12.0:
-#            pull: browser-maze-runner-bb
-#            run: browser-maze-runner-bb
-#            use-aliases: true
-#            service-ports: true
-#            command:
-#              - --https
-#              - --farm=bb
-#              - --browser={{ matrix.browser }}_{{ matrix.version }}
-#              - --appium-version=1.22
-#              - --aws-public-ip
-#              - --no-tunnel
-#          artifacts#v1.5.0:
-#            upload:
-#              - "./test/browser/maze_output/failed/**/*"
-#          test-collector#v1.10.2:
-#            files: "reports/TEST-*.xml"
-#            format: "junit"
-#            branch: "^main|next$$"
-#            api-token-env-name: "BROWSER_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
-#        concurrency: 25
-#        concurrency_group: "bitbar"
-#        matrix:
-#          setup:
-#            browser: [chrome, firefox]
-#            version: [latest]
-#          adjustments:
-#            - with: { browser: safari, version: 18 }
-#
+      # BitBar
+      - label: ":bitbar: :{{ matrix.browser }}: {{ matrix.version }} tests${EXTRA_STEP_LABEL}"
+        depends_on: "build-browser-fixtures-${USE_CDN_BUILD}"
+        timeout_in_minutes: 30
+        plugins:
+          docker-compose#v4.12.0:
+            pull: browser-maze-runner-bb
+            run: browser-maze-runner-bb
+            use-aliases: true
+            service-ports: true
+            command:
+              - --https
+              - --farm=bb
+              - --browser={{ matrix.browser }}_{{ matrix.version }}
+              - --appium-version=1.22
+              - --aws-public-ip
+              - --no-tunnel
+          artifacts#v1.9.4:
+            - download: "test/browser/features/fixtures/packages"
+              compressed: "fixture-packages-${USE_CDN_BUILD}.zip"
+            - upload: "./test/browser/maze_output/failed/**/*"
+          test-collector#v1.10.2:
+            files: "reports/TEST-*.xml"
+            format: "junit"
+            branch: "^main|next$$"
+            api-token-env-name: "BROWSER_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
+        concurrency: 25
+        concurrency_group: "bitbar"
+        matrix:
+          setup:
+            browser: [chrome, firefox]
+            version: [latest]
+          adjustments:
+            - with: { browser: safari, version: 18 }
+
 #      # BrowserStack
 #      - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser tests${EXTRA_STEP_LABEL}"
 #        depends_on: "browser-maze-runner-bs-${USE_CDN_BUILD}"

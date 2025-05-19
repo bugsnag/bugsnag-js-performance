@@ -28,11 +28,7 @@ services:
       - .:/scan
 
   browser-maze-runner-bb:
-    build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.browser-feature-builder
-      args:
-        USE_CDN_BUILD:
+    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v9-cli
     environment:
       <<: *common-environment
       BITBAR_USERNAME:
@@ -49,8 +45,9 @@ services:
       - "9000-9499:9340"
     volumes:
       - ./test/browser/maze_output:/app/test/browser/maze_output
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ./test/browser/features:/app/test/browser/features
       - ./reports/:/app/test/browser/reports/
+      - /var/run/docker.sock:/var/run/docker.sock
 
   browser-maze-runner-bs:
     build:
