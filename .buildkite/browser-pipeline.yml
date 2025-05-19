@@ -15,12 +15,15 @@ steps:
           SKIP_FIXTURE_CLEANUP: "true"
         plugins:
           artifacts#v1.9.4:
-            upload: "test/browser/features/fixtures/packages"
-            compressed: "fixture-packages-${USE_CDN_BUILD}.zip"
+            upload:
+              - "fixture-packages-${USE_CDN_BUILD}.zip"
+              - "test/browser/features/fixtures/.bugsnag-browser-version"
         commands:
           - cd ./test/browser
           - npm ci
           - ruby ./features/support/build-packages.rb
+          - cd ../..
+          - zip -r fixture-packages-${USE_CDN_BUILD}.zip test/browser/features/fixtures/packages
         retry:
           automatic:
             - exit_status: "*"
@@ -66,7 +69,9 @@ steps:
         timeout_in_minutes: 30
         plugins:
           artifacts#v1.9.4:
-            download: "fixture-packages-${USE_CDN_BUILD}.zip"
+            download:
+              - "fixture-packages-${USE_CDN_BUILD}.zip"
+              - "test/browser/features/fixtures/.bugsnag-browser-version"
             upload: "./test/browser/maze_output/failed/**/*"
           improbable-eng/metahook:
             pre-command: "unzip -o fixture-packages-${USE_CDN_BUILD}.zip"
