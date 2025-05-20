@@ -7,4 +7,4 @@ steps:
     agents:
       queue: macos
     timeout_in_minutes: 2
-    command: buildkite-agent pipeline upload .buildkite/browser-pipeline.full.yml
+    command: BUILD_MODE=NPM buildkite-agent pipeline upload .buildkite/browser-pipeline.full.yml
