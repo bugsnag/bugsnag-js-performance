@@ -4,29 +4,12 @@ agents:
 steps:
   - group: "Browser Tests"
     steps:
-      - label: ":docker: Build BrowserStack Maze Runner image"
-        key: "browser-maze-runner-bs"
-        timeout_in_minutes: 20
-        plugins:
-          - docker-compose#v4.12.0:
-              build: browser-maze-runner-bs
-              image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
-              cache-from: browser-maze-runner-bs:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
-          - docker-compose#v4.12.0:
-              push: browser-maze-runner-bs:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
-        env:
-          USE_CDN_BUILD: "${USE_CDN_BUILD}"
-        retry:
-          automatic:
-            - exit_status: "*"
-              limit: 1
-
       - label: ":browserstack: {{ matrix }} Mobile Browser tests"
         matrix:
           - android_13
           - ios_13
           - ios_18
-        depends_on: "browser-maze-runner-bs"
+        depends_on: "build-browser-fixtures-NPM"
         timeout_in_minutes: 30
         plugins:
           docker-compose#v4.12.0:
@@ -52,4 +35,4 @@ steps:
           queue: "macos"
         timeout_in_minutes: 2
         commands:
-          - USE_CDN_BUILD=1 EXTRA_STEP_LABEL=" (CDN)" buildkite-agent pipeline upload .buildkite/browser-pipeline.yml
+          - BUILD_MODE=CDN buildkite-agent pipeline upload .buildkite/browser-pipeline.yml

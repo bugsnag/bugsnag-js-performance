@@ -65,8 +65,9 @@ services:
         aliases:
           - maze-runner
     volumes:
-      - ./test/browser/maze_output:/app/test/browser/maze_output
-      - ./reports/:/app/test/browser/reports/
+      - ./test/browser/maze_output:/app/maze_output
+      - ./test/browser/features:/app/features
+      - ./reports/:/app/reports/
 
   react-native-maze-runner:
     image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v9-cli
