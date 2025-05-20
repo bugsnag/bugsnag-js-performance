@@ -19,7 +19,11 @@ steps:
             command:
               - --farm=bs
               - --browser={{ matrix }}
-          artifacts#v1.5.0:
+          artifacts#v1.9.4:
+            download:
+              - "fixture-packages-NPM.zip"
+              - from: "test/browser/features/fixtures/.bugsnag-browser-version-NPM"
+                to: "test/browser/features/fixtures/.bugsnag-browser-version"
             upload:
               - "./test/browser/maze_output/failed/**/*"
           test-collector#v1.10.2:
