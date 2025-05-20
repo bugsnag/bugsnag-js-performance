@@ -5,7 +5,7 @@ steps:
   - group: "Browser Tests"
     steps:
 
-      - label: "Build browser fixtures${BUILD_MODE}"
+      - label: "Build browser fixtures - ${BUILD_MODE}"
         key: "build-browser-fixtures-${BUILD_MODE}"
         timeout_in_minutes: 20
         agents:
@@ -71,7 +71,7 @@ steps:
 
       # BrowserStack
       - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser tests - ${BUILD_MODE}"
-        depends_on: "browser-maze-runner-bs-${BUILD_MODE}"
+        depends_on: "build-browser-fixtures-${BUILD_MODE}"
         timeout_in_minutes: 30
         plugins:
           artifacts#v1.9.4:
@@ -108,7 +108,7 @@ steps:
 
       # BrowserStack non-https
       - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser non-https tests - ${BUILD_MODE}"
-        depends_on: "browser-maze-runner-bs-${BUILD_MODE}"
+        depends_on: "build-browser-fixtures-${BUILD_MODE}"
         timeout_in_minutes: 30
         plugins:
           artifacts#v1.9.4:
