@@ -62,6 +62,7 @@ steps:
             api-token-env-name: "BROWSER_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         concurrency: 25
         concurrency_group: "bitbar"
+        concurrency_method: eager
         matrix:
           setup:
             browser: [chrome, firefox]
@@ -97,6 +98,7 @@ steps:
             api-token-env-name: "BROWSER_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         concurrency: 2
         concurrency_group: "browserstack"
+        concurrency_method: eager
         matrix:
           setup:
             browser: [chrome]
@@ -133,6 +135,7 @@ steps:
             api-token-env-name: "BROWSER_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         concurrency: 2
         concurrency_group: "browserstack"
+        concurrency_method: eager
         matrix:
           setup:
             browser: [safari]
