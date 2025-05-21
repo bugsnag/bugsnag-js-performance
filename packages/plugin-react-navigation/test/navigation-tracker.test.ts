@@ -53,8 +53,6 @@ describe('NavigationTracker', () => {
 
     expect(appState).toBe('starting')
 
-    // TODO: Initial route should not create a span??
-
     // Simulate a route change
     mockNavigationContainer.changeRoute('route-1')
     mockNavigationContainer.triggerUnsafeAction()
