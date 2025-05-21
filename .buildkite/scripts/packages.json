@@ -1,6 +1,7 @@
 [
     {
         "pipeline": ".buildkite/browser-pipeline.yml",
+        "environment": "BUILD_MODE=NPM",
         "block": ".buildkite/browser-pipeline.block.yml",
         "paths": [
             "test/browser",
@@ -16,6 +17,7 @@
     },
     {
         "pipeline": ".buildkite/browser-pipeline.full.yml",
+        "environment": "BUILD_MODE=NPM",
         "block": ".buildkite/browser-pipeline.full.block.yml",
         "paths": []
     },

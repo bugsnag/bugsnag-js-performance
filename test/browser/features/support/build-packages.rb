@@ -18,7 +18,7 @@ $logger ||= Logger.new(STDOUT)
 ROOT = "#{__dir__}/../../../.."
 FIXTURES_DIRECTORY = "#{__dir__}/../fixtures"
 BUILD_MODE = ENV['BUILD_MODE']
-raise 'BUILD_NODE must be set to CDN or NPM' unless %w[cdn npm].include? BUILD_MODE.downcase
+raise 'BUILD_MODE must be set to CDN or NPM' unless %w[cdn npm].include? BUILD_MODE.downcase
 BUILD_MODE = BUILD_MODE.downcase.to_sym
 
 $logger.info("Building in #{BUILD_MODE} mode")
