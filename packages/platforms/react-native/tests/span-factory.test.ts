@@ -174,6 +174,21 @@ describe('ReactNativeSpanFactory', () => {
 
       expect(processor.spans.length).toBe(0)
     })
+
+    it('runs onSpanStart callbacks for native spans', async () => {
+      spanFactory.onAttach()
+
+      const onSpanStartCallback = jest.fn((span) => {
+        span.setAttribute('start_callback', true)
+      })
+
+      spanFactory.configure({ logger: jestLogger, onSpanStart: [onSpanStartCallback] } as unknown as InternalConfiguration<ReactNativeConfiguration>)
+      const startTime = clock.now()
+      const span = spanFactory.startSpan('native span', { startTime, isFirstClass: true })
+      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('native span', expect.objectContaining({ startTime: clock.toUnixNanoseconds(startTime) }))
+      // @ts-expect-error 'attributes' is private but very awkward to test otherwise
+      expect(span.attributes.attributes.get('start_callback')).toBe(true)
+    })
   })
 
   describe('discardSpan', () => {

@@ -1,4 +1,4 @@
-import type { Configuration, Logger, OnSpanEndCallback } from './config'
+import type { Configuration, Logger, OnSpanEndCallback, OnSpanStartCallback } from './config'
 import type { PersistedProbability } from './persistence'
 import type { Plugin } from './plugin'
 import type { ParentContext } from './span'
@@ -61,6 +61,6 @@ export function isPluginArray (value: unknown): value is Array<Plugin<unknown ex
   return Array.isArray(value) && value.every(plugin => isPlugin(plugin))
 }
 
-export function isOnSpanEndCallbacks (value: unknown): value is OnSpanEndCallback[] {
-  return Array.isArray(value) && value.every(method => typeof method === 'function')
+export function isCallbackArray (value: unknown): value is OnSpanStartCallback[] | OnSpanEndCallback[] {
+  return Array.isArray(value) && value.every(item => typeof item === 'function')
 }
