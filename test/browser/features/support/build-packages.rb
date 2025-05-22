@@ -17,7 +17,9 @@ $logger ||= Logger.new(STDOUT)
 
 ROOT = "#{__dir__}/../../../.."
 FIXTURES_DIRECTORY = "#{__dir__}/../fixtures"
-BUILD_MODE = environment_variable_enabled?("USE_CDN_BUILD") ? :cdn : :npm
+BUILD_MODE = ENV['BUILD_MODE']
+raise 'BUILD_MODE must be set to CDN or NPM' unless %w[cdn npm].include? BUILD_MODE.downcase
+BUILD_MODE = BUILD_MODE.downcase.to_sym
 
 $logger.info("Building in #{BUILD_MODE} mode")
 
@@ -101,7 +103,7 @@ begin
       run("npm install --no-package-lock --legacy-peer-deps *.tgz")
     else
       # in CDN mode we need to tell the JS build to also use CDN mode
-      build_command = "USE_CDN_BUILD=1 " + build_command
+      build_command = "BUILD_MODE=CDN " + build_command
     end
 
     run(install_command)

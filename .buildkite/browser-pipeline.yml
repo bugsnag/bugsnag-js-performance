@@ -4,45 +4,45 @@ agents:
 steps:
   - group: "Browser Tests"
     steps:
-      - label: ":docker: Build BitBar Maze Runner image${EXTRA_STEP_LABEL}"
-        key: "browser-maze-runner-bb-${USE_CDN_BUILD}"
-        timeout_in_minutes: 20
-        plugins:
-          - docker-compose#v4.12.0:
-              build: browser-maze-runner-bb
-              image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
-              cache-from: browser-maze-runner-bb:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
-          - docker-compose#v4.12.0:
-              push: browser-maze-runner-bb:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
-        env:
-          USE_CDN_BUILD: "${USE_CDN_BUILD}"
-        retry:
-          automatic:
-            - exit_status: "*"
-              limit: 1
 
-      - label: ":docker: Build BrowserStack Maze Runner image${EXTRA_STEP_LABEL}"
-        key: "browser-maze-runner-bs-${USE_CDN_BUILD}"
+      - label: "Build browser fixtures - ${BUILD_MODE}"
+        key: "build-browser-fixtures-${BUILD_MODE}"
         timeout_in_minutes: 20
-        plugins:
-          - docker-compose#v4.12.0:
-              build: browser-maze-runner-bs
-              image-repository: 855461928731.dkr.ecr.us-west-1.amazonaws.com/js
-              cache-from: browser-maze-runner-bs:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
-          - docker-compose#v4.12.0:
-              push: browser-maze-runner-bs:855461928731.dkr.ecr.us-west-1.amazonaws.com/js:performance-ci-browser-${BRANCH_NAME}-${USE_CDN_BUILD}
+        agents:
+          queue: macos-14
         env:
-          USE_CDN_BUILD: "${USE_CDN_BUILD}"
+          BUILD_MODE: "${BUILD_MODE}"
+          SKIP_FIXTURE_CLEANUP: "true"
+        plugins:
+          artifacts#v1.9.4:
+            upload:
+              - "fixture-packages-${BUILD_MODE}.zip"
+              - from: "test/browser/features/fixtures/.bugsnag-browser-version"
+                to: "test/browser/features/fixtures/.bugsnag-browser-version-${BUILD_MODE}"
+        commands:
+          - cd ./test/browser
+          - npm ci
+          - ruby ./features/support/build-packages.rb
+          - cd ../..
+          - zip -r fixture-packages-${BUILD_MODE}.zip test/browser/features/fixtures/packages
         retry:
           automatic:
             - exit_status: "*"
               limit: 1
 
       # BitBar
-      - label: ":bitbar: :{{ matrix.browser }}: {{ matrix.version }} tests${EXTRA_STEP_LABEL}"
-        depends_on: "browser-maze-runner-bb-${USE_CDN_BUILD}"
+      - label: ":bitbar: :{{ matrix.browser }}: {{ matrix.version }} tests - ${BUILD_MODE}"
+        depends_on: "build-browser-fixtures-${BUILD_MODE}"
         timeout_in_minutes: 30
         plugins:
+          artifacts#v1.9.4:
+            download:
+              - "fixture-packages-${BUILD_MODE}.zip"
+              - from: "test/browser/features/fixtures/.bugsnag-browser-version-${BUILD_MODE}"
+                to: "test/browser/features/fixtures/.bugsnag-browser-version"
+            upload: "./test/browser/maze_output/failed/**/*"
+          improbable-eng/metahook:
+            pre-command: "unzip -o fixture-packages-${BUILD_MODE}.zip"
           docker-compose#v4.12.0:
             pull: browser-maze-runner-bb
             run: browser-maze-runner-bb
@@ -55,9 +55,6 @@ steps:
               - --appium-version=1.22
               - --aws-public-ip
               - --no-tunnel
-          artifacts#v1.5.0:
-            upload:
-              - "./test/browser/maze_output/failed/**/*"
           test-collector#v1.10.2:
             files: "reports/TEST-*.xml"
             format: "junit"
@@ -65,6 +62,7 @@ steps:
             api-token-env-name: "BROWSER_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         concurrency: 25
         concurrency_group: "bitbar"
+        concurrency_method: eager
         matrix:
           setup:
             browser: [chrome, firefox]
@@ -73,10 +71,18 @@ steps:
             - with: { browser: safari, version: 18 }
 
       # BrowserStack
-      - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser tests${EXTRA_STEP_LABEL}"
-        depends_on: "browser-maze-runner-bs-${USE_CDN_BUILD}"
+      - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser tests - ${BUILD_MODE}"
+        depends_on: "build-browser-fixtures-${BUILD_MODE}"
         timeout_in_minutes: 30
         plugins:
+          artifacts#v1.9.4:
+            download:
+              - "fixture-packages-${BUILD_MODE}.zip"
+              - from: "test/browser/features/fixtures/.bugsnag-browser-version-${BUILD_MODE}"
+                to: "test/browser/features/fixtures/.bugsnag-browser-version"
+            upload: "./test/browser/maze_output/failed/**/*"
+          improbable-eng/metahook:
+            pre-command: "unzip -o fixture-packages-${BUILD_MODE}.zip"
           docker-compose#v4.12.0:
             pull: browser-maze-runner-bs
             run: browser-maze-runner-bs
@@ -85,9 +91,6 @@ steps:
               - --https
               - --farm=bs
               - --browser={{ matrix.browser }}_{{ matrix.version }}
-          artifacts#v1.5.0:
-            upload:
-              - "./test/browser/maze_output/failed/**/*"
           test-collector#v1.10.2:
             files: "reports/TEST-*.xml"
             format: "junit"
@@ -95,6 +98,7 @@ steps:
             api-token-env-name: "BROWSER_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         concurrency: 2
         concurrency_group: "browserstack"
+        concurrency_method: eager
         matrix:
           setup:
             browser: [chrome]
@@ -105,10 +109,18 @@ steps:
             - with: { browser: edge, version: latest }
 
       # BrowserStack non-https
-      - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser non-https tests${EXTRA_STEP_LABEL}"
-        depends_on: "browser-maze-runner-bs-${USE_CDN_BUILD}"
+      - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser non-https tests - ${BUILD_MODE}"
+        depends_on: "build-browser-fixtures-${BUILD_MODE}"
         timeout_in_minutes: 30
         plugins:
+          artifacts#v1.9.4:
+            download:
+              - "fixture-packages-${BUILD_MODE}.zip"
+              - from: "test/browser/features/fixtures/.bugsnag-browser-version-${BUILD_MODE}"
+                to: "test/browser/features/fixtures/.bugsnag-browser-version"
+            upload: "./test/browser/maze_output/failed/**/*"
+          improbable-eng/metahook:
+            pre-command: "unzip -o fixture-packages-${BUILD_MODE}.zip"
           docker-compose#v4.12.0:
             pull: browser-maze-runner-bs
             run: browser-maze-runner-bs
@@ -116,9 +128,6 @@ steps:
             command:
               - --farm=bs
               - --browser={{ matrix.browser }}_{{ matrix.version }}
-          artifacts#v1.5.0:
-            upload:
-              - "./test/browser/maze_output/failed/**/*"
           test-collector#v1.10.2:
             files: "reports/TEST-*.xml"
             format: "junit"
@@ -126,6 +135,7 @@ steps:
             api-token-env-name: "BROWSER_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         concurrency: 2
         concurrency_group: "browserstack"
+        concurrency_method: eager
         matrix:
           setup:
             browser: [safari]

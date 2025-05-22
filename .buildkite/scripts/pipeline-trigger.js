@@ -17,14 +17,16 @@ if (baseBranch) {
   execSync(`git --no-pager diff --name-only origin/${baseBranch}`, { stdio: 'inherit' });
 }
 
-packages.reverse().forEach(({ paths, block, pipeline }) => {
+packages.reverse().forEach(({ paths, block, pipeline, environment }) => {
   let upload = false;
+  const env = environment || "";
 
+  // Upload all pipelines if specified in the commit message
   if (commitMessage.includes("[full ci]") ||
     ["next", "main"].includes(currentBranch) ||
     ["main"].includes(baseBranch)) {
-    console.log(`Upload pipeline file: ${pipeline}`);
-    execSync(`buildkite-agent pipeline upload ${pipeline}`);
+    console.log(`Upload pipeline file: ${pipeline} with environment: '${env}'`);
+    execSync(`${env} buildkite-agent pipeline upload ${pipeline}`);
     return;
   }
 
@@ -54,8 +56,8 @@ packages.reverse().forEach(({ paths, block, pipeline }) => {
   }
 
   if (upload) {
-    console.log(`Upload pipeline file: ${pipeline}`);
-    execSync(`buildkite-agent pipeline upload ${pipeline}`);
+    console.log(`Upload pipeline file: ${pipeline} with environment: '${env}'`);
+    execSync(`${env} buildkite-agent pipeline upload ${pipeline}`);
   } else {
     console.log(`Upload blocker file: ${block}`);
     execSync(`buildkite-agent pipeline upload ${block}`);
