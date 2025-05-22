@@ -2,8 +2,8 @@ import BugsnagPerformance from '@bugsnag/react-native-performance'
 import Bugsnag from '@bugsnag/react-native'
 import React, { useEffect, useState, useRef } from 'react'
 import { Button, Text, View } from 'react-native'
-import { getCurrentCommand } from '../lib/CommandRunner'
-import { NativeScenarioLauncher } from '../lib/native'
+import { getCurrentCommand } from '../../lib/CommandRunner'
+import { NativeScenarioLauncher } from '../../lib/native'
 
 export const initialise = async (config) => {
   // set the performance config

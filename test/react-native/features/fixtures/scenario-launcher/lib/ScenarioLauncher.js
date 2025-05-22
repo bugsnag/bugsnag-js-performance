@@ -2,7 +2,7 @@ import * as Scenarios from '../scenarios'
 import { getCurrentCommand } from './CommandRunner'
 import { clearPersistedState, setDeviceId, setSamplingProbability } from './Persistence'
 import { NativeScenarioLauncher } from './native'
-import { wrapperComponentProvider } from '../scenarios/WrapperComponentProviderScenario'
+import { wrapperComponentProvider } from '../scenarios/core/WrapperComponentProviderScenario'
 import React from 'react'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 
