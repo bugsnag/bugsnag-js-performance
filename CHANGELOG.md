@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- (core) Added `onSpanStart` callbacks config option to allow spans to be inspected and modified on creation.
+
 ## [v2.13.0] (2025-05-15)
 
 ### Added
