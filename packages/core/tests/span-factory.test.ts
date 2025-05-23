@@ -1,4 +1,5 @@
 import { DefaultSpanContextStorage } from '@bugsnag/core-performance'
+// import type { InternalConfiguration } from '@bugsnag/core-performance'
 import {
   ControllableBackgroundingListener,
   InMemoryDelivery,
@@ -6,6 +7,7 @@ import {
   IncrementingIdGenerator,
   StableIdGenerator,
   VALID_API_KEY,
+  createConfiguration,
   createTestClient,
   spanAttributesSource
 } from '@bugsnag/js-performance-test-utilities'
@@ -15,7 +17,7 @@ import {
 
   spanContextEquals
 } from '../lib'
-import type { SpanEnded } from '../lib'
+import type { InternalConfiguration, Configuration, SpanEnded } from '../lib'
 import Sampler from '../lib/sampler'
 
 jest.useFakeTimers()
@@ -235,6 +237,88 @@ describe('SpanFactory', () => {
 
         // @ts-expect-error 'attributes' is private but very awkward to test otherwise
         expect(span.attributes.attributes.has('bugsnag.span.first_class')).toBe(false)
+      })
+    })
+
+    describe('onSpanStart callbacks', () => {
+      it('calls onSpanStart callbacks when a span is started', () => {
+        const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
+        const sampler = new Sampler(0.5)
+        const delivery = { send: jest.fn() }
+        const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+        const backgroundingListener = new ControllableBackgroundingListener()
+        const spanFactory = new SpanFactory(
+          processor,
+          sampler,
+          new StableIdGenerator(),
+          spanAttributesSource,
+          new IncrementingClock(),
+          backgroundingListener,
+          jestLogger,
+          new DefaultSpanContextStorage(backgroundingListener)
+        )
+
+        const firstCallback = jest.fn((span) => {
+          span.setAttribute('callback_1', true)
+        })
+
+        const secondCallback = jest.fn((span) => {
+          span.setAttribute('callback_2', true)
+        })
+
+        const config = createConfiguration({
+          logger: jestLogger,
+          onSpanStart: [firstCallback, secondCallback]
+        })
+
+        spanFactory.configure(config as unknown as InternalConfiguration<Configuration>)
+
+        const span = spanFactory.startSpan('name', {})
+
+        // @ts-expect-error 'attributes' is private but very awkward to test otherwise
+        expect(span.attributes.attributes.get('callback_1')).toBe(true)
+        // @ts-expect-error 'attributes' is private but very awkward to test otherwise
+        expect(span.attributes.attributes.get('callback_2')).toBe(true)
+      })
+
+      it('logs exceptions thrown in onSpanStart callbacks', () => {
+        const clock = new IncrementingClock('1970-01-01T00:00:00.000Z')
+        const sampler = new Sampler(0.5)
+        const delivery = { send: jest.fn() }
+        const processor = { add: (span: SpanEnded) => delivery.send(spanToJson(span, clock)) }
+        const backgroundingListener = new ControllableBackgroundingListener()
+        const spanFactory = new SpanFactory(
+          processor,
+          sampler,
+          new StableIdGenerator(),
+          spanAttributesSource,
+          new IncrementingClock(),
+          backgroundingListener,
+          jestLogger,
+          new DefaultSpanContextStorage(backgroundingListener)
+        )
+
+        const firstCallback = jest.fn((span) => {
+          span.setAttribute('callback_1', true)
+        })
+
+        const secondCallback = jest.fn((span) => {
+          throw new Error('Error in second callback')
+        })
+
+        const config = createConfiguration({
+          logger: jestLogger,
+          onSpanStart: [firstCallback, secondCallback]
+        })
+
+        spanFactory.configure(config as unknown as InternalConfiguration<Configuration>)
+
+        const span = spanFactory.startSpan('name', {})
+
+        // @ts-expect-error 'attributes' is private but very awkward to test otherwise
+        expect(span.attributes.attributes.get('callback_1')).toBe(true)
+
+        expect(jestLogger.error).toHaveBeenCalledWith('Error in onSpanStart callback: Error: Error in second callback')
       })
     })
   })
