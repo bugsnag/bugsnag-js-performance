@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- (svelte-kit-performance) Added new routing provider for instrumenting route change spans with [SvelteKit](https://svelte.dev/docs/kit/introduction)
+
 ## [v2.13.0] (2025-05-15)
 
 ### Added
