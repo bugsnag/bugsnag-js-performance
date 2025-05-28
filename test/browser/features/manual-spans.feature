@@ -22,6 +22,10 @@ Feature: Manual creation of spans
     And the trace payload field "resourceSpans.0.resource" string attribute "device.id" matches the regex "^c[0-9a-z]{20,32}$"
     And the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "manual-span"
 
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "custom"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" boolean attribute "added_on_start" is true
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" boolean attribute "added_on_end" is true
+
   Scenario: isFirstClass span option can be set to false
     Given I navigate to the test URL "/docs/manual-span?isFirstClass=false"
     And I wait to receive a sampling request

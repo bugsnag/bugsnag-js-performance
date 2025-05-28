@@ -12,6 +12,7 @@ export * as SpanTriggeredByCommandScenario from './SpanTriggeredByCommandScenari
 export * as WrapperComponentProviderScenario from './WrapperComponentProviderScenario'
 export * as TracePropagationScenario from './TracePropagationScenario'
 export * as FixedSamplingProbabilityScenario from './FixedSamplingProbabilityScenario'
+export * as SpanCallbacksScenario from './SpanCallbacksScenario'
 
 // React Navigation Scenarios
 export * as ReactNavigationScenario from './ReactNavigationScenario'

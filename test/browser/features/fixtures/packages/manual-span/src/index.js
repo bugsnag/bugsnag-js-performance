@@ -5,6 +5,15 @@ const apiKey = parameters.get('api_key')
 const endpoint = parameters.get('endpoint')
 const reflectEndpoint = '/reflect?status=200&delay_ms=0'
 
+const onSpanStart = (span) => { 
+  span.setAttribute('added_on_start', true)
+}
+
+const onSpanEnd = (span) => {
+  span.setAttribute('added_on_end', true)
+  return true
+}
+
 BugsnagPerformance.start({
   apiKey,
   endpoint,
@@ -12,7 +21,9 @@ BugsnagPerformance.start({
   autoInstrumentFullPageLoads: false,
   autoInstrumentNetworkRequests: false,
   autoInstrumentRouteChanges: false,
-  serviceName: 'manual-span'
+  serviceName: 'manual-span',
+  onSpanStart: [onSpanStart],
+  onSpanEnd: [onSpanEnd],
 })
 
 document.getElementById('send-span').onclick = () => {

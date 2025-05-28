@@ -2,7 +2,10 @@
 
 ## [Unreleased]
 
-- (svelte-kit-performance) Added new routing provider for instrumenting route change spans with [SvelteKit](https://svelte.dev/docs/kit/introduction)
+### Added
+
+- (core) Added `onSpanStart` callbacks config option to allow spans to be inspected and modified on creation. [#631](https://github.com/bugsnag/bugsnag-js-performance/pull/631)
+- (svelte-kit-performance) Added new routing provider for instrumenting route change spans with [SvelteKit](https://svelte.dev/docs/kit/introduction) [#632](https://github.com/bugsnag/bugsnag-js-performance/pull/632)
 
 ## [v2.13.0] (2025-05-15)
 

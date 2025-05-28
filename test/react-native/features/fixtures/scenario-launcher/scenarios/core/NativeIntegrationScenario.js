@@ -11,10 +11,15 @@ export const initialise = async (config) => {
     endpoint: config.endpoint
   }
 
-  const onSpanEnd = [
-    async (span) => {
+  const onSpanStart = [
+    (span) => {
       span.setAttribute('custom.string.attribute', 'test')
       span.setAttribute('custom.int.attribute', 12345)
+    }
+  ]
+
+  const onSpanEnd = [
+    async (span) => {
       span.setAttribute('custom.double.attribute', 123.45)
       span.setAttribute('custom.boolean.attribute', true)
       span.setAttribute('custom.stringarray.attribute', ['a', 'b', 'c'])
@@ -26,7 +31,7 @@ export const initialise = async (config) => {
 
   await NativeScenarioLauncher.startNativePerformance(nativeConfig)
 
-  BugsnagPerformance.attach({ onSpanEnd, maximumBatchSize: 1, autoInstrumentAppStarts: false, autoInstrumentNetworkRequests: false })
+  BugsnagPerformance.attach({ onSpanStart, onSpanEnd, maximumBatchSize: 1, autoInstrumentAppStarts: false, autoInstrumentNetworkRequests: false })
 }
 
 export const App = () => {
