@@ -1,0 +1,10 @@
+{
+    "extends": "../../tsconfig.json",
+    "include": ["lib/*"],
+    "exclude": [
+      "lib/NativeBugsnagRemoteSpans.ts"
+    ],
+    "compilerOptions": {
+      "target": "ES2020"
+    }
+  }
