@@ -11,7 +11,7 @@ describe('SvelteKitRoutingProvider', () => {
     it('invokes the provided callback on route change', () => {
       const beforeNavigate = jest.fn()
       const afterNavigate = jest.fn()
-      const routingProvider = new SvelteKitRoutingProvider(beforeNavigate, afterNavigate, 'http://bugnsag.com')
+      const routingProvider = new SvelteKitRoutingProvider(beforeNavigate, afterNavigate, 'https://bugsnag.com')
 
       const startRouteChangeSpan = jest.fn()
       routingProvider.listenForRouteChanges(startRouteChangeSpan)
@@ -20,8 +20,9 @@ describe('SvelteKitRoutingProvider', () => {
       history.pushState({}, '', '/contacts/1')
       beforeNavigate.mock.calls[0][0]({ type: 'link', to: { route: { id: '/contacts/[id]' } } })
 
-      const expectedUrl = new URL('http://bugsnag.com/contacts/[id]')
-      expect(startRouteChangeSpan.mock.calls).toEqual([[expectedUrl, 'link', { startTime: 0 }]])
+      // Comparing a URL object always returns true, so we directly check the string representation
+      expect(startRouteChangeSpan.mock.calls[0][0].toString()).toBe('https://bugsnag.com/contacts/[id]')
+      expect(startRouteChangeSpan.mock.calls[0]).toStrictEqual([new URL('https://bugsnag.com/contacts/[id]'), 'link', { startTime: 0 }])
     })
   })
 
