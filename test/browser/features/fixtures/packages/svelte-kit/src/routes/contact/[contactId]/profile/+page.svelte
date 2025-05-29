@@ -1,1 +1,1 @@
-<h1>Profile</h1>
+<h1>Profile page</h1>

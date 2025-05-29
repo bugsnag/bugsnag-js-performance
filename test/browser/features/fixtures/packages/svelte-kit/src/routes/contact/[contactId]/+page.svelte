@@ -1,5 +1,10 @@
+<script>
+    const { data } = $props()
+
+</script>
+
 <head>
-    <title>Contact</title>
+    <title>Contact {data.contactId}</title>
 </head>
 
 <h1>Contact</h1>
