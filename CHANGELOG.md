@@ -6,6 +6,8 @@
 
 - (core) Added `onSpanStart` callbacks config option to allow spans to be inspected and modified on creation. [#631](https://github.com/bugsnag/bugsnag-js-performance/pull/631)
 
+- (core) Introduced `SpanControlProvider` interface and `BugsnagPerformance.getSpanControls` method to allow access to a registered `SpanControlProvider`. [#634](https://github.com/bugsnag/bugsnag-js-performance/pull/634)
+
 ## [v2.13.0] (2025-05-15)
 
 ### Added
