@@ -20,6 +20,8 @@ import Sampler from './sampler'
 import type { Span, SpanOptions } from './span'
 import type { SpanContext, SpanContextStorage } from './span-context'
 import { DefaultSpanContextStorage } from './span-context'
+import { CompositeSpanControlProvider } from './span-control-provider'
+import type { SpanQuery } from './span-control-provider'
 import { SpanFactory } from './span-factory'
 import type { SpanFactoryConstructor } from './span-factory'
 import { timeToNumber } from './time'
@@ -36,6 +38,7 @@ export interface Client<C extends Configuration> {
   startNetworkSpan: (options: NetworkSpanOptions) => NetworkSpan
   readonly currentSpanContext: SpanContext | undefined
   getPlugin: <T extends Plugin<C>> (Constructor: Constructor<T>) => T | undefined
+  getSpanControls: <S>(query: SpanQuery<S>) => S | null
 }
 
 export interface ClientOptions<S extends CoreSchema, C extends Configuration, T> {
@@ -81,6 +84,8 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     appState = state
   }
   const plugins = options.plugins(spanFactory, spanContextStorage, setAppState, appState)
+
+  const spanControlProvider = new CompositeSpanControlProvider()
 
   return {
     start: (config: C | string) => {
@@ -194,6 +199,9 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
           return plugin
         }
       }
+    },
+    getSpanControls: (query: SpanQuery<S>) => {
+      return spanControlProvider.getSpanControls(query)
     },
     get currentSpanContext () {
       return spanContextStorage.current

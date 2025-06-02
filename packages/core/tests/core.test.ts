@@ -23,7 +23,8 @@ describe('Core', () => {
         startNetworkSpan: expect.any(Function),
         currentSpanContext: undefined,
         appState: 'starting',
-        getPlugin: expect.any(Function)
+        getPlugin: expect.any(Function),
+        getSpanControls: expect.any(Function)
       })
     })
 
