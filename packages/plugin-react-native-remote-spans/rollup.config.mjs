@@ -19,7 +19,6 @@ function reactNativeSpecPlugin() {
 const config = createRollupConfig({
   external: [
     '@bugsnag/react-native-performance',
-    'react-native-navigation',
     'react-native',
     'react'
   ]
