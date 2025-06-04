@@ -14,7 +14,7 @@
     BugsnagPerformance.start({
       apiKey,
       endpoint,
-      maximumBatchSize: 3,
+      maximumBatchSize: 5,
       batchInactivityTimeoutMs: 5000,
       autoInstrumentFullPageLoads: false,
       autoInstrumentNetworkRequests: false,
