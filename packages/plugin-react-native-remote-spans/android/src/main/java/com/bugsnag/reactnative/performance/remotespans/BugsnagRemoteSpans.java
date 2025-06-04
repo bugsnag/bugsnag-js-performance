@@ -23,16 +23,12 @@ import com.facebook.react.bridge.WritableMap;
 
 public class BugsnagRemoteSpans extends NativeBugsnagRemoteSpansSpec {
 
-    // Date-related constants
-    private static final DateFormat ISO_DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-
     // Attribute keys
     private static final String ATTRIBUTES = "attributes";
     private static final String ATTR_NAME = "name";
     private static final String ATTR_VALUE = "value";
 
     // Span properties
-    private static final String END_DATETIME = "endDatetime";
     private static final String END_TIMESTAMP = "endTimestamp";
     private static final String IS_ENDED = "isEnded";
     private static final String SPAN_ID = "spanId";
@@ -101,18 +97,6 @@ public class BugsnagRemoteSpans extends NativeBugsnagRemoteSpansSpec {
                 span.end(BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime(endTimestamp));
             } catch (NumberFormatException nfe) {
                 // ignore these, the span will be ended "now" instead
-            }
-        } else {
-            String datetime = updates.getString(END_DATETIME);
-            if (datetime != null) {
-                try {
-                    synchronized (ISO_DATEFORMAT) {
-                        Date endDate = ISO_DATEFORMAT.parse(datetime);
-                        span.end(BugsnagClock.INSTANCE.fromDate(endDate));
-                    }
-                } catch (ParseException e) {
-                    // ignore these, the span will be ended "now" instead
-                }
             }
         }
 
