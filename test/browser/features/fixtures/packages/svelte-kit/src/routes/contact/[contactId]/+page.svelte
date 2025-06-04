@@ -1,10 +1,11 @@
 <script>
-    const { data } = $props()
+    import { page } from '$app/state';
 
+    const title = `Contact ${page.data.contactId}`;
 </script>
 
-<head>
-    <title>Contact {data.contactId}</title>
-</head>
+<svelte:head>
+	<title>{title}</title>
+</svelte:head>
 
-<h1>Contact</h1>
+<h1>{title}</h1>

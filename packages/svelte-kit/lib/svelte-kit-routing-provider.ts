@@ -5,12 +5,14 @@ import type { AfterNavigate, BeforeNavigate } from '@sveltejs/kit'
 type NavigateCallback<T> = (callback: (navigation: T) => void) => void
 
 export class SvelteKitRoutingProvider implements RoutingProvider {
+  private currentRoute = '/'
+
   constructor (private beforeNavigate: NavigateCallback<BeforeNavigate>, private afterNavigate: NavigateCallback<AfterNavigate>, private base = window.location.origin) {}
 
-  // SvelteKit exposes the route as a URL in the beforeNavigate hook
-  // so we can use it directly by converting to a string.
-  resolveRoute (url: URL) {
-    return url.toString()
+  // resolveRoute is only ever used to get the current route in SvelteKit
+  // so we just return the current route and ignore the parameter
+  resolveRoute (urlOrRoute: URL | string) {
+    return this.currentRoute
   }
 
   listenForRouteChanges (startRouteChangeSpan: StartRouteChangeCallback) {
@@ -18,12 +20,14 @@ export class SvelteKitRoutingProvider implements RoutingProvider {
 
     this.beforeNavigate(({ to, type }) => {
       const startTime = performance.now()
-      const route = to?.route.id ?? 'unknown'
-      const url = new URL(route, this.base)
+      this.currentRoute = to?.route.id ?? '/'
+      const url = to?.url || '/'
       currentSpan = startRouteChangeSpan(url, type, { startTime })
     })
 
-    this.afterNavigate(() => {
+    this.afterNavigate(({ to }) => {
+      this.currentRoute = to?.route.id ?? '/'
+
       onSettle((endTime) => {
         if (currentSpan) {
           currentSpan.end(endTime)
