@@ -1,8 +1,7 @@
 import { TurboModuleRegistry } from 'react-native'
-import { SpanQuery } from '@bugsnag/core-performance/lib/span-control-provider'
+import { SpanQuery } from '@bugsnag/core-performance'
 import type { SpanUpdateTransaction, Spec } from './NativeBugsnagRemoteSpans'
-import type { ParentContext, SpanAttribute, Time } from '@bugsnag/core-performance'
-import type { SpanControlProvider } from '@bugsnag/core-performance/lib/span-control-provider'
+import type { ParentContext, SpanAttribute, SpanControlProvider, Time } from '@bugsnag/core-performance'
 
 export class NativeSpanQuery extends SpanQuery<NativeSpanControl> {
   constructor (public readonly name: string) {
