@@ -30,16 +30,13 @@ class NativeSpanControlImpl implements NativeSpanControl {
     const transaction: SpanUpdateTransaction = {
       attributes: [],
       isEnded: false,
-      endTimestamp: undefined,
-      endDatetime: undefined
+      endTimestamp: undefined
     }
 
     update({
       end: (endTime?: Time) => {
-        if (endTime instanceof Date) {
-          transaction.endDatetime = endTime.toISOString()
-        } else {
-          // FIXME: This needs to be clock.toUnixTimestampNanoseconds(endTime)
+        if (endTime !== undefined && endTime !== null) {
+          // TODO: This needs to be timeToNumber(clock, endTime)
           transaction.endTimestamp = endTime?.toString()
         }
 
