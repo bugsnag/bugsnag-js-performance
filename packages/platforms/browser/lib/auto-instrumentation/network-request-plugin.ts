@@ -32,13 +32,17 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   ) {}
 
   install (context: PluginContext<BrowserConfiguration>) {
-    this.logger = context.configuration.logger
-
-    if (context.configuration.autoInstrumentNetworkRequests) {
-      this.configEndpoint = context.configuration.endpoint
-      this.networkRequestCallback = context.configuration.networkRequestCallback
-      this.enabled = true
+    if (!context.configuration.autoInstrumentNetworkRequests) {
+      return
     }
+
+    const { endpoint, logger, networkRequestCallback } = context.configuration
+
+    if (logger) this.logger = logger
+    if (endpoint) this.configEndpoint = endpoint
+    if (networkRequestCallback) this.networkRequestCallback = networkRequestCallback
+
+    this.enabled = true
   }
 
   start () {

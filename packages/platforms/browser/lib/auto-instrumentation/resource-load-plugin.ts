@@ -50,8 +50,11 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
   install (context: PluginContext<BrowserConfiguration>) {
     if (!resourceLoadSupported(this.PerformanceObserverClass)) return
 
-    this.logger = context.configuration.logger
-    this.networkRequestCallback = context.configuration.networkRequestCallback
+    const { logger, networkRequestCallback } = context.configuration
+
+    if (logger) this.logger = logger
+    if (networkRequestCallback) this.networkRequestCallback = networkRequestCallback
+
     this.enabled = true
   }
 

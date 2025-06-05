@@ -1,5 +1,5 @@
 import type { Clock } from './clock'
-import type { Configuration, InternalConfiguration, OnSpanEndCallback, OnSpanStartCallback } from './config'
+import type { Configuration, OnSpanEndCallback, OnSpanStartCallback } from './config'
 import PrioritizedSet from './prioritized-set'
 import type { SpanControlProvider } from './span-control-provider'
 
@@ -13,12 +13,14 @@ export interface Plugin<C extends Configuration> {
 }
 
 export class PluginContext<C extends Configuration> {
-  constructor (
-    public readonly configuration: InternalConfiguration<C>, public readonly clock: Clock) {}
-
   private readonly onSpanStartCallbacks = new PrioritizedSet<OnSpanStartCallback>()
   private readonly onSpanEndCallbacks = new PrioritizedSet<OnSpanEndCallback>()
   private readonly spanControlProviders = new PrioritizedSet<SpanControlProvider<unknown>>()
+
+  constructor (
+    public readonly configuration: C,
+    public readonly clock: Clock
+  ) {}
 
   addOnSpanStartCallback (callback: OnSpanStartCallback, priority = NORMAL_PRIORITY): void {
     this.onSpanStartCallbacks.add(callback, priority)

@@ -82,9 +82,17 @@ export default function createOnSettle (
   }
 
   onSettlePlugin.install = function (context: PluginContext<BrowserConfiguration>): void {
-    const settleIgnoreUrls = context.configuration.settleIgnoreUrls.map(
-      (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
-    ).concat(RegExp(context.configuration.endpoint))
+    const settleIgnoreUrls = []
+
+    if (context.configuration.endpoint) {
+      settleIgnoreUrls.push(RegExp(context.configuration.endpoint))
+    }
+
+    if (context.configuration.settleIgnoreUrls) {
+      settleIgnoreUrls.push(...context.configuration.settleIgnoreUrls.map(
+        (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
+      ))
+    }
 
     fetchRequestSettler.setUrlsToIgnore(settleIgnoreUrls)
     xhrRequestSettler.setUrlsToIgnore(settleIgnoreUrls)

@@ -5,7 +5,6 @@ import React, { useState } from 'react'
 import { Button, View } from 'react-native'
 import { CompleteNavigation } from '../lib/complete-navigation'
 import BugsnagPluginReactNavigationNativePerformance from '../lib/react-navigation-native-plugin'
-import type { Configuration, Plugin } from '@bugsnag/core-performance'
 
 beforeEach(() => {
   jest.useFakeTimers()
@@ -19,12 +18,11 @@ afterEach(() => {
 describe('CompleteNavigation', () => {
   describe('getPlugin', () => {
     it('gets the plugin instance from BugsnagPerformance', () => {
-      // const getPluginSpy = jest.spyOn(BugsnagPerformance, 'getPlugin')
       const plugin = new BugsnagPluginReactNavigationNativePerformance()
 
       BugsnagPerformance.start({
         apiKey: VALID_API_KEY,
-        plugins: [plugin as unknown as Plugin<Configuration>]
+        plugins: [plugin]
       })
 
       render(
