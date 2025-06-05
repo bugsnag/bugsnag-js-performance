@@ -1,5 +1,5 @@
 import { RemoteParentContext } from '@bugsnag/core-performance'
-import type { InternalConfiguration, Logger, Plugin, SpanContextStorage, SpanFactory } from '@bugsnag/core-performance'
+import type { Logger, Plugin, PluginContext, SpanContextStorage, SpanFactory } from '@bugsnag/core-performance'
 import type {
   NetworkRequestCallback,
   NetworkRequestInfo,
@@ -26,6 +26,7 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
   private tracePropagationUrls: RegExp[] = []
   private networkRequestCallback: NetworkRequestCallback<ReactNativeNetworkRequestInfo> = defaultNetworkRequestCallback
   private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
+  private enabled: boolean = false
 
   constructor (
     private spanFactory: SpanFactory<ReactNativeConfiguration>,
@@ -33,16 +34,22 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
     private xhrTracker: RequestTracker
   ) {}
 
-  configure (configuration: InternalConfiguration<ReactNativeConfiguration>) {
-    this.logger = configuration.logger
+  install (context: PluginContext<ReactNativeConfiguration>) {
+    this.logger = context.configuration.logger
 
-    if (configuration.autoInstrumentNetworkRequests) {
-      this.ignoredUrls.push(configuration.endpoint)
-      this.xhrTracker.onStart(this.trackRequest)
-      this.networkRequestCallback = configuration.networkRequestCallback
-      this.tracePropagationUrls = configuration.tracePropagationUrls.map(
+    if (context.configuration.autoInstrumentNetworkRequests) {
+      this.enabled = true
+      this.ignoredUrls.push(context.configuration.endpoint)
+      this.networkRequestCallback = context.configuration.networkRequestCallback
+      this.tracePropagationUrls = context.configuration.tracePropagationUrls.map(
         (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
       )
+    }
+  }
+
+  start () {
+    if (this.enabled) {
+      this.xhrTracker.onStart(this.trackRequest)
     }
   }
 

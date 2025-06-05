@@ -62,8 +62,9 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
   }
 
   startNavigationSpan (routeName: string, spanOptions: ReactNativeSpanOptions) {
-    // Navigation spans are always first class
+    // Navigation spans are always first class, but are not delegated to the native SDK
     spanOptions.isFirstClass = true
+    spanOptions.doNotDelegateToNativeSDK = true
 
     const spanName = '[Navigation]' + routeName
     const span = this.startSpan(spanName, spanOptions)
