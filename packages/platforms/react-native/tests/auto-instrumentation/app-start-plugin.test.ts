@@ -24,7 +24,7 @@ describe('app start plugin', () => {
     const appStartTime = 1234
     const plugin = new AppStartPlugin(appStartTime, spanFactory as unknown as ReactNativeSpanFactory, clock, appRegistry)
 
-    const context = new PluginContext(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: true }))
+    const context = new PluginContext(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: true }), clock)
     plugin.install(context)
     plugin.start()
 
@@ -40,7 +40,7 @@ describe('app start plugin', () => {
   it('does not start an app start span when autoInstrumentAppStarts is false', () => {
     const plugin = new AppStartPlugin(1234, spanFactory as unknown as ReactNativeSpanFactory, clock, appRegistry)
 
-    const context = new PluginContext(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: false }))
+    const context = new PluginContext(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: false }), clock)
     plugin.install(context)
     plugin.start()
 

@@ -36,10 +36,12 @@ describe('network span plugin', () => {
 
   it('tracks requests when autoInstrumentNetworkRequests = true', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+    // @ts-expect-error clock is protected
+    const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
-    }))
+    }), clock)
 
     plugin.install(context)
     plugin.start()
@@ -55,11 +57,12 @@ describe('network span plugin', () => {
 
   it('starts a span on request start', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-
+    // @ts-expect-error clock is protected
+    const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
-    }))
+    }), clock)
 
     plugin.install(context)
     plugin.start()
@@ -80,10 +83,12 @@ describe('network span plugin', () => {
 
   it('ends a span on request end', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+    // @ts-expect-error clock is protected
+    const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
-    }))
+    }), clock)
 
     plugin.install(context)
     plugin.start()
@@ -108,10 +113,12 @@ describe('network span plugin', () => {
 
   it('does not track requests when autoInstrumentNetworkRequests = false', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+    // @ts-expect-error clock is protected
+    const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: false
-    }))
+    }), clock)
 
     plugin.install(context)
     plugin.start()
@@ -122,11 +129,12 @@ describe('network span plugin', () => {
 
   it('does not track requests to the configured traces endpoint', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-
+// @ts-expect-error clock is protected
+    const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
-    }))
+    }), clock)
 
     plugin.install(context)
     plugin.start()
@@ -146,10 +154,12 @@ describe('network span plugin', () => {
 
   it.each(expectedProtocols)('tracks requests over all expected protocols', (url) => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+    // @ts-expect-error clock is protected
+    const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
-    }))
+    }), clock)
 
     plugin.install(context)
     plugin.start()
@@ -172,10 +182,12 @@ describe('network span plugin', () => {
 
   it.each(unexpectedProtocols)('does not track requests over unexpected protocols', (url) => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+    // @ts-expect-error clock is protected
+    const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
-    }))
+    }), clock)
 
     plugin.install(context)
     plugin.start()
@@ -186,11 +198,12 @@ describe('network span plugin', () => {
 
   it('discards the span if the status is 0', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-
+// @ts-expect-error clock is protected
+    const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
-    }))
+    }), clock)
 
     plugin.install(context)
     plugin.start()
@@ -204,11 +217,12 @@ describe('network span plugin', () => {
 
   it('discards the span if there is an error', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-
+    // @ts-expect-error clock is protected
+    const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
-    }))
+    }), clock)
 
     plugin.install(context)
     plugin.start()
@@ -236,11 +250,13 @@ describe('network span plugin', () => {
 
   it('prevents creating a span when networkRequestCallback returns null', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+    // @ts-expect-error clock is protected
+    const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true,
       networkRequestCallback: (networkRequestInfo) => networkRequestInfo.url === 'no-delivery' ? null : networkRequestInfo
-    }))
+    }), clock)
 
     plugin.install(context)
     plugin.start()
@@ -264,11 +280,13 @@ describe('network span plugin', () => {
     })
 
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+    // @ts-expect-error clock is protected
+    const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true,
       networkRequestCallback: (networkRequestInfo) => ({ ...networkRequestInfo, url: null })
-    }))
+    }), clock)
 
     plugin.install(context)
     plugin.start()
@@ -280,11 +298,13 @@ describe('network span plugin', () => {
 
   it('prevents adding trace propagation headers when networkRequestCallback returns { propagateTraceContext: false }', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+    // @ts-expect-error clock is protected
+    const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true,
       networkRequestCallback: (networkRequestInfo) => ({ ...networkRequestInfo, propagateTraceContext: false })
-    }))
+    }), clock)
 
     plugin.install(context)
     plugin.start()
@@ -296,11 +316,13 @@ describe('network span plugin', () => {
 
   it('adds trace propagation headers when networkRequestCallback returns { propagateTraceContext: true }', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+    // @ts-expect-error clock is protected
+    const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true,
       networkRequestCallback: (networkRequestInfo) => ({ ...networkRequestInfo, propagateTraceContext: true })
-    }))
+    }), clock)
 
     plugin.install(context)
     plugin.start()
@@ -318,6 +340,8 @@ describe('network span plugin', () => {
 
   it('uses a modified url from networkRequestCallback', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+    // @ts-expect-error clock is protected
+    const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true,
@@ -325,7 +349,7 @@ describe('network span plugin', () => {
         type: networkRequestInfo.type,
         url: 'modified-url'
       })
-    }))
+    }), clock)
 
     plugin.install(context)
     plugin.start()
@@ -358,6 +382,8 @@ describe('network span plugin', () => {
           isValid: () => true
         })
         const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+        // @ts-expect-error clock is protected
+        const clock = spanFactory.clock
         const context = new PluginContext(createConfiguration<BrowserConfiguration>({
           endpoint: ENDPOINT,
           autoInstrumentNetworkRequests: true,
@@ -365,7 +391,7 @@ describe('network span plugin', () => {
             requestInfo.propagateTraceContext = true
             return requestInfo
           }
-        }))
+        }), clock)
 
         plugin.install(context)
         plugin.start()
@@ -399,6 +425,8 @@ describe('network span plugin', () => {
           isValid: () => true
         })
         const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+        // @ts-expect-error clock is protected
+        const clock = spanFactory.clock
         const context = new PluginContext(createConfiguration<BrowserConfiguration>({
           endpoint: ENDPOINT,
           autoInstrumentNetworkRequests: true,
@@ -406,7 +434,7 @@ describe('network span plugin', () => {
             requestInfo.propagateTraceContext = false
             return requestInfo
           }
-        }))
+        }), clock)
 
         plugin.install(context)
         plugin.start()
@@ -427,6 +455,8 @@ describe('network span plugin', () => {
           isValid: () => true
         })
         const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
+        // @ts-expect-error clock is protected
+        const clock = spanFactory.clock
         const context = new PluginContext(createConfiguration<BrowserConfiguration>({
           endpoint: ENDPOINT,
           autoInstrumentNetworkRequests: true,
@@ -435,7 +465,7 @@ describe('network span plugin', () => {
             requestInfo.url = null
             return requestInfo
           }
-        }))
+        }), clock)
 
         plugin.install(context)
         plugin.start()

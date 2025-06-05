@@ -152,7 +152,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         plugins.push(plugin as unknown as Plugin<C>)
       }
 
-      const pluginContext = new PluginContext(configuration)
+      const pluginContext = new PluginContext(configuration, options.clock)
 
       for (const plugin of plugins) {
         plugin.install(pluginContext)

@@ -16,19 +16,21 @@ class MockRequestTracker extends RequestTracker {
   })
 }
 
-const createContext = (overrides: Partial<ReactNativeConfiguration> = {}) => {
+describe('network span plugin', () => {
+  let xhrTracker: MockRequestTracker
+  let spanFactory: MockSpanFactory<ReactNativeConfiguration>
+  let spanContextStorage: SpanContextStorage
+
+  const createContext = (overrides: Partial<ReactNativeConfiguration> = {}) => {
+    // @ts-expect-error clock is protected
+    const clock = spanFactory.clock
   return new PluginContext(createConfiguration<ReactNativeConfiguration>({
     endpoint: ENDPOINT,
     autoInstrumentNetworkRequests: true,
     tracePropagationUrls: [],
     ...overrides
-  }))
+  }), clock)
 }
-
-describe('network span plugin', () => {
-  let xhrTracker: MockRequestTracker
-  let spanFactory: MockSpanFactory<ReactNativeConfiguration>
-  let spanContextStorage: SpanContextStorage
 
   beforeEach(() => {
     xhrTracker = new MockRequestTracker()
