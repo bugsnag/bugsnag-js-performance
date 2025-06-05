@@ -1,6 +1,6 @@
 import { PluginContext } from '@bugsnag/core-performance'
 import * as AppState from '@bugsnag/core-performance/lib/app-state'
-import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
+import { createConfiguration, IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import type { ParamListBase } from '@react-navigation/native'
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native'
@@ -29,7 +29,7 @@ afterEach(() => {
 
 describe('registerNavigationContainer', () => {
   it('creates a navigation span when the route changes', () => {
-    plugin.install(new PluginContext(createConfiguration<ReactNativeConfiguration>()))
+    plugin.install(new PluginContext(createConfiguration<ReactNativeConfiguration>(), new IncrementingClock()))
     plugin.start()
 
     render(

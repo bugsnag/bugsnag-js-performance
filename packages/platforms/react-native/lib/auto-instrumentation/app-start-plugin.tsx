@@ -38,7 +38,10 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
   install (context: PluginContext<ReactNativeConfiguration>) {
     if (!context.configuration.autoInstrumentAppStarts) return
 
-    this.wrapperComponentProvider = context.configuration.wrapperComponentProvider
+    if (context.configuration.wrapperComponentProvider) {
+      this.wrapperComponentProvider = context.configuration.wrapperComponentProvider
+    }
+
     this.enabled = true
   }
 

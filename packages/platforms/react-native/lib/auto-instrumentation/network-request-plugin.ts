@@ -35,16 +35,23 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
   ) {}
 
   install (context: PluginContext<ReactNativeConfiguration>) {
-    this.logger = context.configuration.logger
+    if (!context.configuration.autoInstrumentNetworkRequests) {
+      return
+    }
 
-    if (context.configuration.autoInstrumentNetworkRequests) {
-      this.enabled = true
-      this.ignoredUrls.push(context.configuration.endpoint)
-      this.networkRequestCallback = context.configuration.networkRequestCallback
-      this.tracePropagationUrls = context.configuration.tracePropagationUrls.map(
+    const { endpoint, logger, networkRequestCallback, tracePropagationUrls } = context.configuration
+
+    if (logger) this.logger = logger
+    if (endpoint) this.ignoredUrls.push(endpoint)
+    if (networkRequestCallback) this.networkRequestCallback = networkRequestCallback
+
+    if (tracePropagationUrls) {
+      this.tracePropagationUrls = tracePropagationUrls.map(
         (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
       )
     }
+
+    this.enabled = true
   }
 
   start () {

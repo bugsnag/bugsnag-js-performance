@@ -56,13 +56,9 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
       return
     }
 
-    if (context.configuration.routingProvider) {
-      this.routeResolver = context.configuration.routingProvider.resolveRoute
-    }
-
-    if (context.configuration.sendPageAttributes) {
-      this.sendPageAttributes = context.configuration.sendPageAttributes
-    }
+    const { routingProvider, sendPageAttributes } = context.configuration
+    if (routingProvider) this.routeResolver = routingProvider.resolveRoute
+    if (sendPageAttributes) this.sendPageAttributes = sendPageAttributes
 
     this.enabled = true
   }

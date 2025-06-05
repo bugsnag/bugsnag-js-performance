@@ -39,9 +39,11 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
   install (context: PluginContext<BrowserConfiguration>) {
     if (!context.configuration.autoInstrumentRouteChanges) return
 
-    this.routingProvider = context.configuration.routingProvider
-    this.sendPageAttributes = context.configuration.sendPageAttributes
-    this.logger = context.configuration.logger
+    const { logger, routingProvider, sendPageAttributes } = context.configuration
+    if (logger) this.logger = logger
+    if (routingProvider) this.routingProvider = routingProvider
+    if (sendPageAttributes) this.sendPageAttributes = sendPageAttributes
+
     this.enabled = true
   }
 

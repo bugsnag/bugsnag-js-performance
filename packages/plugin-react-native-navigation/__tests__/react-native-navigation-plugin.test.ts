@@ -1,4 +1,4 @@
-import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
+import { createConfiguration, IncrementingClock } from '@bugsnag/js-performance-test-utilities'
 import type { MockReactNativeSpanFactory } from '@bugsnag/js-performance-test-utilities'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import { PluginContext } from '@bugsnag/core-performance'
@@ -27,7 +27,7 @@ afterEach(() => {
 describe('ReactNativeNavigationPlugin', () => {
   it('creates a navigation span when the route changes', () => {
     const plugin = new ReactNativeNavigationPlugin(Navigation)
-    const context = new PluginContext(createConfiguration<ReactNativeConfiguration>())
+    const context = new PluginContext(createConfiguration<ReactNativeConfiguration>(), new IncrementingClock())
 
     plugin.install(context)
     plugin.start()
@@ -70,7 +70,7 @@ describe('ReactNativeNavigationPlugin', () => {
 
   it('does not end the current navigation while there are components waiting', () => {
     const plugin = new ReactNativeNavigationPlugin(Navigation)
-    const context = new PluginContext(createConfiguration<ReactNativeConfiguration>())
+    const context = new PluginContext(createConfiguration<ReactNativeConfiguration>(), new IncrementingClock())
     // @ts-expect-error spanFactory only exists in the mock
     const spanFactory = BugsnagPerformance.spanFactory as MockReactNativeSpanFactory
     plugin.install(context)
@@ -129,7 +129,7 @@ describe('ReactNativeNavigationPlugin', () => {
 
   it('discards the active navigation span when the route changes', () => {
     const plugin = new ReactNativeNavigationPlugin(Navigation)
-    const context = new PluginContext(createConfiguration<ReactNativeConfiguration>())
+    const context = new PluginContext(createConfiguration<ReactNativeConfiguration>(), new IncrementingClock())
 
     plugin.install(context)
     plugin.start()

@@ -6,7 +6,6 @@ import { Button, View } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 import { CompleteNavigation } from '../lib/CompleteNavigation'
 import ReactNativeNavigationPlugin from '../lib/react-native-navigation-plugin'
-import type { Configuration, Plugin } from '@bugsnag/core-performance'
 
 jest.mock('react-native-navigation')
 
@@ -26,7 +25,7 @@ describe('CompleteNavigation', () => {
 
       BugsnagPerformance.start({
         apiKey: VALID_API_KEY,
-        plugins: [plugin as unknown as Plugin<Configuration>]
+        plugins: [plugin]
       })
 
       render(
