@@ -433,7 +433,7 @@ describe('createNoopOnSettle', () => {
     expect(() => {
       const noopOnSettle = createNoopOnSettle()
       noopOnSettle(() => {})
-      noopOnSettle.install(new PluginContext(createConfiguration()))
+      noopOnSettle.install(new PluginContext(createConfiguration(), new IncrementingClock()))
       noopOnSettle.start()
     }).not.toThrow()
   })
