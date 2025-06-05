@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { DefaultSpanContextStorage, spanContextEquals } from '@bugsnag/core-performance'
+import { DefaultSpanContextStorage, PluginContext, spanContextEquals } from '@bugsnag/core-performance'
 import type { SpanContextStorage } from '@bugsnag/core-performance'
 import { ControllableBackgroundingListener, MockSpanFactory, createConfiguration, createTestClient } from '@bugsnag/js-performance-test-utilities'
 import type { BrowserSchema, BrowserConfiguration } from '../../lib/config'
@@ -36,11 +36,13 @@ describe('network span plugin', () => {
 
   it('tracks requests when autoInstrumentNetworkRequests = true', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-
-    plugin.configure(createConfiguration<BrowserConfiguration>({
+    const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
     }))
+
+    plugin.install(context)
+    plugin.start()
 
     const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: SAME_ORIGIN_TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
@@ -54,10 +56,13 @@ describe('network span plugin', () => {
   it('starts a span on request start', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
 
-    plugin.configure(createConfiguration<BrowserConfiguration>({
+    const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
     }))
+
+    plugin.install(context)
+    plugin.start()
 
     const res1 = fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
@@ -75,11 +80,13 @@ describe('network span plugin', () => {
 
   it('ends a span on request end', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-
-    plugin.configure(createConfiguration<BrowserConfiguration>({
+    const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
     }))
+
+    plugin.install(context)
+    plugin.start()
 
     const { onRequestEnd: endRequest } = fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
@@ -101,11 +108,13 @@ describe('network span plugin', () => {
 
   it('does not track requests when autoInstrumentNetworkRequests = false', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-
-    plugin.configure(createConfiguration<BrowserConfiguration>({
+    const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: false
     }))
+
+    plugin.install(context)
+    plugin.start()
 
     expect(xhrTracker.onStart).not.toHaveBeenCalled()
     expect(fetchTracker.onStart).not.toHaveBeenCalled()
@@ -114,10 +123,13 @@ describe('network span plugin', () => {
   it('does not track requests to the configured traces endpoint', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
 
-    plugin.configure(createConfiguration<BrowserConfiguration>({
+    const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
     }))
+
+    plugin.install(context)
+    plugin.start()
 
     fetchTracker.start({ type: 'fetch', method: 'GET', url: `${ENDPOINT}`, startTime: 1 })
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
@@ -134,11 +146,13 @@ describe('network span plugin', () => {
 
   it.each(expectedProtocols)('tracks requests over all expected protocols', (url) => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-
-    plugin.configure(createConfiguration<BrowserConfiguration>({
+    const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
     }))
+
+    plugin.install(context)
+    plugin.start()
 
     fetchTracker.start({ type: 'fetch', method: 'GET', url, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalled()
@@ -158,11 +172,13 @@ describe('network span plugin', () => {
 
   it.each(unexpectedProtocols)('does not track requests over unexpected protocols', (url) => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-
-    plugin.configure(createConfiguration<BrowserConfiguration>({
+    const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
     }))
+
+    plugin.install(context)
+    plugin.start()
 
     fetchTracker.start({ type: 'fetch', method: 'GET', url, startTime: 1 })
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
@@ -171,10 +187,13 @@ describe('network span plugin', () => {
   it('discards the span if the status is 0', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
 
-    plugin.configure(createConfiguration<BrowserConfiguration>({
+    const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
     }))
+
+    plugin.install(context)
+    plugin.start()
 
     const { onRequestEnd: endRequest } = xhrTracker.start({ type: 'xmlhttprequest', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
@@ -186,10 +205,13 @@ describe('network span plugin', () => {
   it('discards the span if there is an error', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
 
-    plugin.configure(createConfiguration<BrowserConfiguration>({
+    const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true
     }))
+
+    plugin.install(context)
+    plugin.start()
 
     const { onRequestEnd: endRequest } = fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
@@ -214,11 +236,14 @@ describe('network span plugin', () => {
 
   it('prevents creating a span when networkRequestCallback returns null', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-    plugin.configure(createConfiguration<BrowserConfiguration>({
+    const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true,
       networkRequestCallback: (networkRequestInfo) => networkRequestInfo.url === 'no-delivery' ? null : networkRequestInfo
     }))
+
+    plugin.install(context)
+    plugin.start()
 
     fetchTracker.start({ type: 'fetch', method: 'GET', url: 'no-delivery', startTime: 1 })
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
@@ -239,11 +264,14 @@ describe('network span plugin', () => {
     })
 
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-    plugin.configure(createConfiguration<BrowserConfiguration>({
+    const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true,
       networkRequestCallback: (networkRequestInfo) => ({ ...networkRequestInfo, url: null })
     }))
+
+    plugin.install(context)
+    plugin.start()
 
     const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: SAME_ORIGIN_TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).not.toHaveBeenCalled()
@@ -252,11 +280,14 @@ describe('network span plugin', () => {
 
   it('prevents adding trace propagation headers when networkRequestCallback returns { propagateTraceContext: false }', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-    plugin.configure(createConfiguration<BrowserConfiguration>({
+    const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true,
       networkRequestCallback: (networkRequestInfo) => ({ ...networkRequestInfo, propagateTraceContext: false })
     }))
+
+    plugin.install(context)
+    plugin.start()
 
     const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: SAME_ORIGIN_TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
@@ -265,11 +296,14 @@ describe('network span plugin', () => {
 
   it('adds trace propagation headers when networkRequestCallback returns { propagateTraceContext: true }', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-    plugin.configure(createConfiguration<BrowserConfiguration>({
+    const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true,
       networkRequestCallback: (networkRequestInfo) => ({ ...networkRequestInfo, propagateTraceContext: true })
     }))
+
+    plugin.install(context)
+    plugin.start()
 
     // by default when the origin is different trace propagation headers are not added, unless the networkRequestCallback returns { propagateTraceContext: true }
     const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
@@ -284,7 +318,7 @@ describe('network span plugin', () => {
 
   it('uses a modified url from networkRequestCallback', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-    plugin.configure(createConfiguration<BrowserConfiguration>({
+    const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
       autoInstrumentNetworkRequests: true,
       networkRequestCallback: (networkRequestInfo) => ({
@@ -292,6 +326,9 @@ describe('network span plugin', () => {
         url: 'modified-url'
       })
     }))
+
+    plugin.install(context)
+    plugin.start()
 
     const { onRequestEnd: endRequest } = fetchTracker.start({ type: 'fetch', method: 'GET', url: TEST_URL, startTime: 1 })
     expect(spanFactory.startSpan).toHaveBeenCalledWith('[HTTP/GET]', { startTime: 1, makeCurrentContext: false })
@@ -321,8 +358,7 @@ describe('network span plugin', () => {
           isValid: () => true
         })
         const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-
-        plugin.configure(createConfiguration<BrowserConfiguration>({
+        const context = new PluginContext(createConfiguration<BrowserConfiguration>({
           endpoint: ENDPOINT,
           autoInstrumentNetworkRequests: true,
           networkRequestCallback: (requestInfo) => {
@@ -330,6 +366,9 @@ describe('network span plugin', () => {
             return requestInfo
           }
         }))
+
+        plugin.install(context)
+        plugin.start()
 
         const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: 'https://my-api.com/users', startTime: 1 })
 
@@ -360,8 +399,7 @@ describe('network span plugin', () => {
           isValid: () => true
         })
         const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-
-        plugin.configure(createConfiguration<BrowserConfiguration>({
+        const context = new PluginContext(createConfiguration<BrowserConfiguration>({
           endpoint: ENDPOINT,
           autoInstrumentNetworkRequests: true,
           networkRequestCallback: (requestInfo) => {
@@ -369,6 +407,9 @@ describe('network span plugin', () => {
             return requestInfo
           }
         }))
+
+        plugin.install(context)
+        plugin.start()
 
         const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: 'https://not-my-api.com/users', startTime: 1 })
 
@@ -386,8 +427,7 @@ describe('network span plugin', () => {
           isValid: () => true
         })
         const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-
-        plugin.configure(createConfiguration<BrowserConfiguration>({
+        const context = new PluginContext(createConfiguration<BrowserConfiguration>({
           endpoint: ENDPOINT,
           autoInstrumentNetworkRequests: true,
           networkRequestCallback: (requestInfo) => {
@@ -396,6 +436,9 @@ describe('network span plugin', () => {
             return requestInfo
           }
         }))
+
+        plugin.install(context)
+        plugin.start()
 
         const res = fetchTracker.start({ type: 'fetch', method: 'GET', url: 'https://my-api.com/users', startTime: 1 })
 

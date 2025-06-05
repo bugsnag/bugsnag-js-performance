@@ -1,11 +1,14 @@
-import type { ParentContext, BackgroundingListener, InternalConfiguration, Plugin, SpanFactory, AppState, SetAppState } from '@bugsnag/core-performance'
+import { getAppState, setAppState } from '@bugsnag/core-performance'
+import type { ParentContext, BackgroundingListener, Plugin, SpanFactory, PluginContext } from '@bugsnag/core-performance'
 import type { BrowserConfiguration } from '../config'
 import type { OnSettle } from '../on-settle'
 import type { PerformanceWithTiming } from '../on-settle/load-event-end-settler'
-import { getPermittedAttributes } from '../send-page-attributes'
+import { defaultSendPageAttributes, getPermittedAttributes } from '../send-page-attributes'
+import type { SendPageAttributes } from '../send-page-attributes'
 import type { WebVitals } from '../web-vitals'
 import { instrumentPageLoadPhaseSpans } from './page-load-phase-spans'
 import { defaultRouteResolver } from '../default-routing-provider'
+import type { RouteResolver } from '../routing-provider'
 
 export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   private readonly spanFactory: SpanFactory<BrowserConfiguration>
@@ -14,12 +17,14 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
   private readonly onSettle: OnSettle
   private readonly webVitals: WebVitals
   private readonly performance: PerformanceWithTiming
-  private readonly setAppState: SetAppState
-  private readonly appState: AppState
 
   // if the page was backgrounded at any point in the loading process a page
   // load span is invalidated as the browser will deprioritise the page
   private wasBackgrounded: boolean = false
+
+  private enabled: boolean = false
+  private routeResolver: RouteResolver = defaultRouteResolver
+  private sendPageAttributes: SendPageAttributes = defaultSendPageAttributes
 
   constructor (
     document: Document,
@@ -28,9 +33,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     webVitals: WebVitals,
     onSettle: OnSettle,
     backgroundingListener: BackgroundingListener,
-    performance: PerformanceWithTiming,
-    setAppState: SetAppState,
-    appState: AppState
+    performance: PerformanceWithTiming
   ) {
     this.document = document
     this.location = location
@@ -38,8 +41,6 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     this.webVitals = webVitals
     this.onSettle = onSettle
     this.performance = performance
-    this.setAppState = setAppState
-    this.appState = appState
 
     backgroundingListener.onStateChange(state => {
       if (!this.wasBackgrounded && state === 'in-background') {
@@ -48,12 +49,26 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     })
   }
 
-  configure (configuration: InternalConfiguration<BrowserConfiguration>) {
+  install (context: PluginContext<BrowserConfiguration>) {
     // don't report a page load span if the option is turned off or the page was
     // backgrounded at any point in the loading process
-    if (!configuration.autoInstrumentFullPageLoads || this.wasBackgrounded) {
+    if (!context.configuration.autoInstrumentFullPageLoads || this.wasBackgrounded) {
       return
     }
+
+    if (context.configuration.routingProvider) {
+      this.routeResolver = context.configuration.routingProvider.resolveRoute
+    }
+
+    if (context.configuration.sendPageAttributes) {
+      this.sendPageAttributes = context.configuration.sendPageAttributes
+    }
+
+    this.enabled = true
+  }
+
+  start () {
+    if (!this.enabled) return
 
     let parentContext: ParentContext | null = null
 
@@ -70,7 +85,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
     }
 
     const span = this.spanFactory.startSpan('[FullPageLoad]', { startTime: 0, parentContext })
-    const permittedAttributes = getPermittedAttributes(configuration.sendPageAttributes)
+    const permittedAttributes = getPermittedAttributes(this.sendPageAttributes || defaultSendPageAttributes)
     const url = new URL(this.location.href)
 
     this.onSettle((endTime: number) => {
@@ -79,7 +94,7 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
       // ensure there's always a route on this span by falling back to the
       // default route resolver - the pipeline will ignore page load spans that
       // don't have a route
-      const route = configuration.routingProvider.resolveRoute(url) || defaultRouteResolver(url)
+      const route = this.routeResolver(url) || defaultRouteResolver(url)
       span.name += route
 
       instrumentPageLoadPhaseSpans(this.spanFactory, this.performance, route, span)
@@ -93,8 +108,8 @@ export class FullPageLoadPlugin implements Plugin<BrowserConfiguration> {
 
       this.webVitals.attachTo(span)
       this.spanFactory.endSpan(span, endTime)
-      if (this.appState === 'starting') {
-        this.setAppState('ready')
+      if (getAppState() === 'starting') {
+        setAppState('ready')
       }
     })
   }
