@@ -1,6 +1,5 @@
-import type { SpanOptionSchema, SpanOptions } from './span'
+import type { Span, SpanOptionSchema, SpanOptions } from './span'
 import { coreSpanOptionSchema } from './span'
-import type { SpanContext } from './span-context'
 import type { Time } from './time'
 import { isStringWithLength } from './validation'
 
@@ -14,7 +13,7 @@ export interface NetworkSpanEndOptions {
   endTime?: Time
 }
 
-export interface NetworkSpan extends SpanContext {
+export interface NetworkSpan extends Omit<Span, 'end'> {
   end: (endOptions: NetworkSpanEndOptions) => void
 }
 
