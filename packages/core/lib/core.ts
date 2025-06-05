@@ -11,6 +11,7 @@ import FixedProbabilityManager from './fixed-probability-manager'
 import type { IdGenerator } from './id-generator'
 import type { NetworkSpan, NetworkSpanEndOptions, NetworkSpanOptions } from './network-span'
 import type { Persistence } from './persistence'
+import { PluginContext } from './plugin'
 import type { Plugin } from './plugin'
 import ProbabilityFetcher from './probability-fetcher'
 import ProbabilityManager from './probability-manager'
@@ -25,11 +26,10 @@ import type { SpanQuery } from './span-control-provider'
 import { SpanFactory } from './span-factory'
 import type { SpanFactoryConstructor } from './span-factory'
 import { timeToNumber } from './time'
+import { getAppState, setAppState } from './app-state'
+import type { AppState } from './app-state'
 
 interface Constructor<T> { new(): T, prototype: T }
-
-export type AppState = 'starting' | 'navigating' | 'settling' | 'ready'
-export type SetAppState = (appState: AppState) => void
 
 export interface Client<C extends Configuration> {
   appState: AppState
@@ -49,7 +49,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   resourceAttributesSource: ResourceAttributeSource<C>
   spanAttributesSource: SpanAttributesSource<C>
   schema: S
-  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage, setAppState: SetAppState, appState: AppState) => Array<Plugin<C>>
+  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => Array<Plugin<C>>
   persistence: Persistence
   retryQueueFactory: RetryQueueFactory
   spanContextStorage?: SpanContextStorage
@@ -63,7 +63,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
   const bufferingProcessor = new BufferingProcessor()
   const spanContextStorage = options.spanContextStorage || new DefaultSpanContextStorage(options.backgroundingListener)
   let logger = options.schema.logger.defaultValue
-  let appState: AppState = 'starting'
+  setAppState('starting')
   const sampler = new Sampler(1.0)
 
   const SpanFactoryClass = options.spanFactory || SpanFactory
@@ -78,10 +78,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     logger,
     spanContextStorage
   )
-  const setAppState = (state: AppState) => {
-    appState = state
-  }
-  const plugins = options.plugins(spanFactory, spanContextStorage, setAppState, appState)
+  const plugins = options.plugins(spanFactory, spanContextStorage)
 
   const spanControlProvider = new CompositeSpanControlProvider()
 
@@ -155,8 +152,11 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         plugins.push(plugin as unknown as Plugin<C>)
       }
 
+      const pluginContext = new PluginContext(configuration)
+
       for (const plugin of plugins) {
-        plugin.configure(configuration, spanFactory, setAppState, appState)
+        plugin.install(pluginContext)
+        plugin.start()
       }
     },
     startSpan: (name, spanOptions?: SpanOptions) => {
@@ -198,7 +198,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       return spanContextStorage.current
     },
     get appState () {
-      return appState
+      return getAppState()
     },
     ...(options.platformExtensions && options.platformExtensions(spanFactory, spanContextStorage))
   } as BugsnagPerformance<C, T>
