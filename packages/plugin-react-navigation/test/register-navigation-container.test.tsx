@@ -1,5 +1,6 @@
-import type { AppState } from '@bugsnag/core-performance'
-import { MockReactNativeSpanFactory } from '@bugsnag/js-performance-test-utilities'
+import { PluginContext } from '@bugsnag/core-performance'
+import * as AppState from '@bugsnag/core-performance/lib/app-state'
+import { createConfiguration } from '@bugsnag/js-performance-test-utilities'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import type { ParamListBase } from '@react-navigation/native'
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native'
@@ -9,26 +10,27 @@ import { fireEvent, render, screen } from '@testing-library/react-native'
 import { Button, Text, View } from 'react-native'
 import BugsnagPluginReactNavigationNativePerformance from '../lib/react-navigation-native-plugin'
 import { useEffect } from 'react'
+import BugsnagPerformance from '@bugsnag/react-native-performance'
 
 let plugin = new BugsnagPluginReactNavigationNativePerformance()
+
+jest.spyOn(AppState, 'setAppState')
 
 beforeEach(() => {
   jest.useFakeTimers()
 })
 
 afterEach(() => {
-  jest.useRealTimers()
   plugin = new BugsnagPluginReactNavigationNativePerformance()
+  AppState.setAppState('starting')
+  jest.clearAllMocks()
+  jest.useRealTimers()
 })
 
 describe('registerNavigationContainer', () => {
   it('creates a navigation span when the route changes', () => {
-    let appState: AppState = 'starting'
-    const setAppState = jest.fn((state: AppState) => {
-      appState = state
-    })
-    const spanFactory = new MockReactNativeSpanFactory()
-    plugin.configure({} as unknown as ReactNativeConfiguration, spanFactory, setAppState)
+    plugin.install(new PluginContext(createConfiguration<ReactNativeConfiguration>()))
+    plugin.start()
 
     render(
         <App />
@@ -38,17 +40,17 @@ describe('registerNavigationContainer', () => {
     fireEvent.press(screen.getByText('Go to route 2'))
     expect(screen.getByText('Route 2')).toBeOnTheScreen()
 
-    expect(spanFactory.startNavigationSpan).toHaveBeenCalledTimes(1)
-    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('Route 2', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
-    expect(setAppState).toHaveBeenCalled()
-    expect(appState).toBe('navigating')
+    expect(BugsnagPerformance.startNavigationSpan).toHaveBeenCalledTimes(1)
+    expect(BugsnagPerformance.startNavigationSpan).toHaveBeenCalledWith('Route 2', { startTime: 0 })
+    expect(AppState.setAppState).toHaveBeenCalled()
+    expect(AppState.getAppState()).toBe('navigating')
 
     fireEvent.press(screen.getByText('Go back'))
     expect(screen.getByText('Route 1')).toBeOnTheScreen()
 
-    expect(spanFactory.startNavigationSpan).toHaveBeenCalledTimes(2)
-    expect(spanFactory.startNavigationSpan).toHaveBeenCalledWith('Route 1', { isFirstClass: true, startTime: 0, doNotDelegateToNativeSDK: true })
-    expect(setAppState).toHaveBeenCalledTimes(2)
+    expect(BugsnagPerformance.startNavigationSpan).toHaveBeenCalledTimes(2)
+    expect(BugsnagPerformance.startNavigationSpan).toHaveBeenCalledWith('Route 1', { startTime: 0 })
+    expect(AppState.setAppState).toHaveBeenCalledTimes(2)
   })
 })
 
