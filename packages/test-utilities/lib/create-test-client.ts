@@ -15,7 +15,7 @@ import {
 
 } from '@bugsnag/core-performance'
 import type { BugsnagPerformance, ClientOptions, Configuration, CoreSchema, Delivery } from '@bugsnag/core-performance'
-import type { AppState } from '../../core/lib/core'
+import type { AppState } from '../../core/lib/app-state'
 
 const defaultOptions = () => ({
   backgroundingListener: new ControllableBackgroundingListener(),

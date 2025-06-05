@@ -1,6 +1,6 @@
-import { DISCARD_END_TIME } from '@bugsnag/core-performance'
-import type { SetAppState, SpanInternal } from '@bugsnag/core-performance'
-import type { ReactNativeSpanFactory } from '@bugsnag/react-native-performance'
+import { DISCARD_END_TIME, setAppState } from '@bugsnag/core-performance'
+import type { Span } from '@bugsnag/core-performance'
+import BugsnagPerformance from '@bugsnag/react-native-performance'
 import type { NavigationAction, NavigationContainerRef, NavigationContainerRefWithCurrent } from '@react-navigation/native'
 
 type Reason = 'condition' | 'mount' | 'unmount' | 'immediate'
@@ -18,24 +18,19 @@ const NAVIGATION_COMPLETE_TIMEOUT = 100
 export type NavigationContainerOrRef = NavigationContainerRef<ReactNavigation.RootParamList> | NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>
 
 export class NavigationTracker {
-  private currentNavigationSpan?: SpanInternal
+  private currentNavigationSpan?: Span
   private startTime?: number
   private startTimeout?: NodeJS.Timeout
   private endTimeout?: NodeJS.Timeout
   private componentsWaiting = 0
   private previousRoute?: string
 
-  constructor (
-    private readonly spanFactory: ReactNativeSpanFactory,
-    private readonly setAppState: SetAppState
-  ) {}
-
   private clearActiveSpan () {
     clearTimeout(this.startTimeout)
     clearTimeout(this.endTimeout)
     this.startTime = undefined
     if (this.currentNavigationSpan?.isValid()) {
-      this.spanFactory.endSpan(this.currentNavigationSpan, DISCARD_END_TIME)
+      this.currentNavigationSpan.end(DISCARD_END_TIME)
     }
     this.currentNavigationSpan = undefined
   }
@@ -43,11 +38,9 @@ export class NavigationTracker {
   private endActiveSpan (endTime: number, endedBy: Reason) {
     if (this.componentsWaiting === 0 && this.currentNavigationSpan) {
       this.currentNavigationSpan.setAttribute('bugsnag.navigation.ended_by', endedBy)
-      this.spanFactory.endSpan(this.currentNavigationSpan, endTime)
+      this.currentNavigationSpan.end(endTime)
       this.clearActiveSpan()
-      if (this.setAppState) {
-        this.setAppState('ready')
-      }
+      setAppState('ready')
     }
   }
 
@@ -111,12 +104,9 @@ export class NavigationTracker {
       const currentRoute = navigationContainer.getCurrentRoute()
       if (currentRoute && currentRoute.name !== this.previousRoute) {
         clearTimeout(this.startTimeout)
-        this.setAppState('navigating')
+        setAppState('navigating')
 
-        const navigationSpan = this.spanFactory.startNavigationSpan(currentRoute.name, {
-          startTime: this.startTime,
-          doNotDelegateToNativeSDK: true
-        })
+        const navigationSpan = BugsnagPerformance.startNavigationSpan(currentRoute.name, { startTime: this.startTime })
 
         navigationSpan.setAttribute('bugsnag.navigation.triggered_by', '@bugsnag/plugin-react-navigation-performance')
 
