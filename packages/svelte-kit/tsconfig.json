@@ -1,0 +1,9 @@
+{
+    "extends": "../../tsconfig.json",
+    "include": ["lib/*"],
+    "compilerOptions": {
+      "target": "ES2020",
+      "types": ["svelte", "@sveltejs/kit"],
+    }
+  }
+  

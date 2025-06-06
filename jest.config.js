@@ -70,6 +70,11 @@ module.exports = {
       ...defaultModuleConfig
     },
     {
+      displayName: 'svelte-kit',
+      testMatch: ['<rootDir>/packages/svelte-kit/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
+    {
       displayName: 'plugin-react-performance',
       testEnvironment: 'jsdom',
       setupFilesAfterEnv: ['<rootDir>/jest/setup/react.ts'],
