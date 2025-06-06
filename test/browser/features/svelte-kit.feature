@@ -1,3 +1,4 @@
+@skip_safari_11 @skip_chrome_61 @skip_firefox_60 @skip_edge_80
 Feature: SvelteKit router
 
     Scenario: SvelteKit route change spans are automatically instrumented
