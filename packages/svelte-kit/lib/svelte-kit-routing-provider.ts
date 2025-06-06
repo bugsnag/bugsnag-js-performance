@@ -7,7 +7,7 @@ type NavigateCallback<T> = (callback: (navigation: T) => void) => void
 export class SvelteKitRoutingProvider implements RoutingProvider {
   private currentRoute = '/'
 
-  constructor (private beforeNavigate: NavigateCallback<BeforeNavigate>, private afterNavigate: NavigateCallback<AfterNavigate>, private base = window.location.origin) {}
+  constructor (private beforeNavigate: NavigateCallback<BeforeNavigate>, private afterNavigate: NavigateCallback<AfterNavigate>) {}
 
   // resolveRoute is only ever used to get the current route in SvelteKit
   // so we just return the current route and ignore the parameter
