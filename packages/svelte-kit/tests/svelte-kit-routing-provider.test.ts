@@ -30,7 +30,7 @@ describe('SvelteKitRoutingProvider', () => {
   })
 
   describe('resolveRoute', () => {
-    // Expected behavior for this plugin ignored the expected behaviour
+    // Expected behavior for this plugin ignores the standard URL to string conversion
     // and returns the current route
     it('always returns the current route', () => {
       const beforeNavigate = jest.fn()
