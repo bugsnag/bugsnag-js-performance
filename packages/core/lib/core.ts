@@ -11,7 +11,7 @@ import FixedProbabilityManager from './fixed-probability-manager'
 import type { IdGenerator } from './id-generator'
 import type { NetworkSpan, NetworkSpanEndOptions, NetworkSpanOptions } from './network-span'
 import type { Persistence } from './persistence'
-import { PluginContext, PluginManager } from './plugin'
+import { PluginManager } from './plugin'
 import type { Plugin } from './plugin'
 import ProbabilityFetcher from './probability-fetcher'
 import ProbabilityManager from './probability-manager'
@@ -109,8 +109,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
 
       // add any external plugins and install
       pluginManager.addPlugins(configuration.plugins)
-      const pluginContext = new PluginContext(configuration, options.clock)
-      pluginManager.installPlugins(pluginContext)
+      const pluginContext = pluginManager.installPlugins(configuration, options.clock)
 
       // add span control providers from plugins
       spanControlProvider.addProviders(pluginContext.spanControlProviders)

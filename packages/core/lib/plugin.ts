@@ -30,34 +30,46 @@ export class PluginContext<C extends Configuration> {
   addSpanControlProvider (provider: SpanControlProvider<unknown>, priority = Priority.NORMAL): void {
     this.spanControlProviders.push({ item: provider, priority })
   }
+
+  mergeFrom (context: PluginContext<C>): void {
+    this.onSpanStartCallbacks.push(...context.onSpanStartCallbacks)
+    this.onSpanEndCallbacks.push(...context.onSpanEndCallbacks)
+    this.spanControlProviders.push(...context.spanControlProviders)
+  }
 }
 
 interface Constructor<T> { new(): T, prototype: T }
 
 export class PluginManager<C extends Configuration> {
   private readonly plugins: Array<Plugin<C>> = []
-  private readonly installedPlugins: Array<Plugin<C>> = []
+  private readonly installedPlugins = new Set<Plugin<C>>()
   private logger?: Logger
 
   addPlugins (plugins: Array<Plugin<C>>) {
     this.plugins.push(...plugins)
   }
 
-  installPlugins (context: PluginContext<C>): void {
-    this.logger = context.configuration.logger
+  installPlugins (configuration: C, clock: Clock): PluginContext<C> {
+    this.logger = configuration.logger
+    const mergedContext = new PluginContext(configuration, clock)
 
     for (const plugin of this.plugins) {
-      if (this.installedPlugins.includes(plugin)) {
+      if (this.installedPlugins.has(plugin)) {
         continue
       }
 
       try {
+        const context = new PluginContext(configuration, clock)
         plugin.install(context)
-        this.installedPlugins.push(plugin)
+
+        mergedContext.mergeFrom(context)
+        this.installedPlugins.add(plugin)
       } catch (err) {
         if (this.logger) this.logger.error(`Plugin ${plugin.constructor.name} failed to install: ${err}`)
       }
     }
+
+    return mergedContext
   }
 
   startPlugins (): void {
