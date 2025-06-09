@@ -1,1 +1,5 @@
-export const prerender = false;
+export const entries = () => {
+    return [
+        { contactId: '1' }
+    ];
+};
