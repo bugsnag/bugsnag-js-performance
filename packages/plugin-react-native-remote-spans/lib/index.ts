@@ -1,7 +1,8 @@
 import { TurboModuleRegistry } from 'react-native'
-import { SpanQuery } from '@bugsnag/core-performance'
+import { SpanQuery, timeToNumber } from '@bugsnag/core-performance'
 import type { SpanUpdateTransaction, Spec } from './NativeBugsnagRemoteSpans'
-import type { ParentContext, SpanAttribute, SpanControlProvider, Time } from '@bugsnag/core-performance'
+import type { Clock, ParentContext, Plugin, PluginContext, SpanAttribute, SpanControlProvider, Time } from '@bugsnag/core-performance'
+import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 
 export class NativeSpanQuery extends SpanQuery<NativeSpanControl> {
   constructor (public readonly name: string) {
@@ -23,23 +24,21 @@ const NativeRemoteSpansModule = TurboModuleRegistry.get<Spec>('BugsnagRemoteSpan
 class NativeSpanControlImpl implements NativeSpanControl {
   constructor (
     public readonly id: string,
-    public readonly traceId: string) {
+    public readonly traceId: string,
+    private readonly clock: Clock) {
   }
 
   updateSpan (update: (mutator: NativeSpanMutator) => void): Promise<boolean> {
     const transaction: SpanUpdateTransaction = {
       attributes: [],
       isEnded: false,
-      endTimestamp: undefined
+      endTime: undefined
     }
 
     update({
       end: (endTime?: Time) => {
-        if (endTime !== undefined && endTime !== null) {
-          // TODO: This needs to be timeToNumber(clock, endTime)
-          transaction.endTimestamp = endTime?.toString()
-        }
-
+        const safeEndTime = timeToNumber(this.clock, endTime)
+        transaction.endTime = this.clock.toUnixNanoseconds(safeEndTime)
         transaction.isEnded = true
       },
       setAttribute: (name: string, value: SpanAttribute) => {
@@ -53,14 +52,25 @@ class NativeSpanControlImpl implements NativeSpanControl {
 }
 
 export class NativeSpanControlProvider implements SpanControlProvider<NativeSpanControl> {
+  constructor (private readonly clock: Clock) {}
+
   getSpanControls<Q> (query: Q): NativeSpanControl | null {
     if (query instanceof NativeSpanQuery && NativeRemoteSpansModule) {
       const spanId = NativeRemoteSpansModule.getSpanIdByName(query.name)
       if (spanId) {
-        return new NativeSpanControlImpl(spanId.spanId, spanId.traceId)
+        return new NativeSpanControlImpl(spanId.spanId, spanId.traceId, this.clock)
       }
     }
 
     return null
   }
+}
+
+export class BugsnagRemoteSpansPlugin implements Plugin<ReactNativeConfiguration> {
+  install (context: PluginContext<ReactNativeConfiguration>) {
+    const spanControlProvider = new NativeSpanControlProvider(context.clock)
+    context.addSpanControlProvider(spanControlProvider)
+  }
+
+  start () {}
 }
