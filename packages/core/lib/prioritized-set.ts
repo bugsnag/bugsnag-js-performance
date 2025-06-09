@@ -1,7 +1,18 @@
-export default class PrioritizedSet<T> {
-  private items: Array<{ item: T, priority: number }> = []
+export interface Prioritized<T> {
+  item: T
+  priority: number
+}
 
-  constructor (initialItems?: Array<{ item: T, priority: number }>) {
+export const Priority = {
+  LOW: 0,
+  NORMAL: 10_000,
+  HIGH: 100_000
+}
+
+export default class PrioritizedSet<T> {
+  private items: Array<Prioritized<T>> = []
+
+  constructor (initialItems?: Array<Prioritized<T>>) {
     if (initialItems) {
       this.items = initialItems
       this.sort()
@@ -18,11 +29,11 @@ export default class PrioritizedSet<T> {
     return true
   }
 
-  addAll (items: T[], priority: number): boolean {
+  addAll (items: Array<Prioritized<T>>): boolean {
     let added = false
     for (const item of items) {
-      if (!this.items.some(i => i.item === item)) {
-        this.items.push({ item, priority })
+      if (!this.items.some(i => i.item === item.item)) {
+        this.items.push(item)
         added = true
       }
     }

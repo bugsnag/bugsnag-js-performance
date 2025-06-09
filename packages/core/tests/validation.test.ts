@@ -1,4 +1,3 @@
-import { start } from 'repl'
 import type { Span } from '../lib'
 import * as validation from '../lib/validation'
 

@@ -129,7 +129,7 @@ describe('network span plugin', () => {
 
   it('does not track requests to the configured traces endpoint', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-// @ts-expect-error clock is protected
+    // @ts-expect-error clock is protected
     const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,
@@ -198,7 +198,7 @@ describe('network span plugin', () => {
 
   it('discards the span if the status is 0', () => {
     const plugin = new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchTracker, xhrTracker)
-// @ts-expect-error clock is protected
+    // @ts-expect-error clock is protected
     const clock = spanFactory.clock
     const context = new PluginContext(createConfiguration<BrowserConfiguration>({
       endpoint: ENDPOINT,

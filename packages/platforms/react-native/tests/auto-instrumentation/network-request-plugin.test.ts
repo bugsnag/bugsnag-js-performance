@@ -24,13 +24,13 @@ describe('network span plugin', () => {
   const createContext = (overrides: Partial<ReactNativeConfiguration> = {}) => {
     // @ts-expect-error clock is protected
     const clock = spanFactory.clock
-  return new PluginContext(createConfiguration<ReactNativeConfiguration>({
-    endpoint: ENDPOINT,
-    autoInstrumentNetworkRequests: true,
-    tracePropagationUrls: [],
-    ...overrides
-  }), clock)
-}
+    return new PluginContext(createConfiguration<ReactNativeConfiguration>({
+      endpoint: ENDPOINT,
+      autoInstrumentNetworkRequests: true,
+      tracePropagationUrls: [],
+      ...overrides
+    }), clock)
+  }
 
   beforeEach(() => {
     xhrTracker = new MockRequestTracker()
