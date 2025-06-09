@@ -1,6 +1,4 @@
-@skip_safari_11 @skip_chrome_61 @skip_firefox_60 @skip_edge_80
 Feature: SvelteKit router
-
     Scenario: SvelteKit route change spans are automatically instrumented
         Given I navigate to the test URL "/docs/svelte-kit/build"
         And I wait for 1 second
@@ -15,7 +13,6 @@ Feature: SvelteKit router
             | bugsnag.browser.page.route                | stringValue  | /contact/[contactId]           |
             | bugsnag.browser.page.previous_route       | stringValue  | /                              |
             | bugsnag.browser.page.route_change.trigger | stringValue  | link                           |
-            # | bugsnag.browser.page.url                  | stringValue  | /contact/1                    |
             | bugsnag.browser.page.title                | stringValue  | Contact 1                      |
             | bugsnag.sampling.p                        | doubleValue  | 1                              |
 
@@ -25,6 +22,5 @@ Feature: SvelteKit router
             | bugsnag.browser.page.route                | stringValue  | /contact/[contactId]/profile   |
             | bugsnag.browser.page.previous_route       | stringValue  | /contact/[contactId]           |
             | bugsnag.browser.page.route_change.trigger | stringValue  | link                           |
-            # | bugsnag.browser.page.url                  | stringValue  | /contact/1/profile            |
             | bugsnag.browser.page.title                | stringValue  | Profile                        |
             | bugsnag.sampling.p                        | doubleValue  | 1                              |
