@@ -6,6 +6,8 @@ type NavigateCallback<T> = (callback: (navigation: T) => void) => void
 
 export class SvelteKitRoutingProvider implements RoutingProvider {
   private currentRoute: string | undefined
+  private previousRoute: string | undefined
+  private currentSpan: RouteChangeSpan | undefined
 
   constructor (private beforeNavigate: NavigateCallback<BeforeNavigate>, private afterNavigate: NavigateCallback<AfterNavigate>) {}
 
@@ -15,27 +17,28 @@ export class SvelteKitRoutingProvider implements RoutingProvider {
     return this.currentRoute || defaultRouteResolver(url)
   }
 
-  listenForRouteChanges (startRouteChangeSpan: StartRouteChangeCallback) {
-    let currentSpan: RouteChangeSpan | undefined
+  getPreviousRoute () {
+    return this.previousRoute
+  }
 
-    this.beforeNavigate(({ to, type }) => {
+  listenForRouteChanges (startRouteChangeSpan: StartRouteChangeCallback) {
+    this.beforeNavigate(({ to, type, from }) => {
       const startTime = performance.now()
+      if (from && from.route.id) {
+        this.previousRoute = from.route.id
+      }
       if (to && to.route.id) {
         this.currentRoute = to.route.id
       }
       const url = to ? to.url : new URL(window.location.href)
-      currentSpan = startRouteChangeSpan(url, type, { startTime })
+      this.currentSpan = startRouteChangeSpan(url, type, { startTime })
     })
 
-    this.afterNavigate(({ to }) => {
-      if (to && to.route.id) {
-        this.currentRoute = to.route.id
-      }
-
+    this.afterNavigate(() => {
       onSettle((endTime) => {
-        if (currentSpan) {
-          currentSpan.end(endTime)
-          currentSpan = undefined
+        if (this.currentSpan) {
+          this.currentSpan.end(endTime)
+          this.currentSpan = undefined
         }
       })
     })

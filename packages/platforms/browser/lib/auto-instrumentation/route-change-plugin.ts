@@ -77,6 +77,9 @@ export class RouteChangePlugin implements Plugin<BrowserConfiguration> {
       )
 
       const route = configuration.routingProvider.resolveRoute(absoluteUrl) || defaultRouteResolver(absoluteUrl)
+      if (typeof configuration.routingProvider.getPreviousRoute === 'function') {
+        previousRoute = configuration.routingProvider.getPreviousRoute() || previousRoute
+      }
 
       // update the span name using the validated route
       cleanOptions.name += route
