@@ -7,6 +7,12 @@
   import BugsnagPerformance from '@bugsnag/browser-performance';
   import { onMount } from 'svelte';
   
+  const discardResourceLoadSpans = (span) => {
+    if (span.name.includes('[ResourceLoad]')) {
+      return null
+    }
+  }
+
   onMount(() => {
     const apiKey = data.url.searchParams.get('api_key')
     const endpoint = data.url.searchParams.get('endpoint')
@@ -18,7 +24,8 @@
       batchInactivityTimeoutMs: 5000,
       autoInstrumentFullPageLoads: false,
       autoInstrumentNetworkRequests: false,
-      routingProvider: new SvelteKitRoutingProvider(beforeNavigate, afterNavigate)
+      routingProvider: new SvelteKitRoutingProvider(beforeNavigate, afterNavigate),
+      onSpanStart: [discardResourceLoadSpans]
     })
   })
 </script>
