@@ -29,7 +29,7 @@ public class BugsnagRemoteSpans extends NativeBugsnagRemoteSpansSpec {
     private static final String ATTR_VALUE = "value";
 
     // Span properties
-    private static final String END_TIMESTAMP = "endTimestamp";
+    private static final String END_TIME = "endTime";
     private static final String IS_ENDED = "isEnded";
     private static final String SPAN_ID = "spanId";
     private static final String TRACE_ID = "traceId";
@@ -90,18 +90,12 @@ public class BugsnagRemoteSpans extends NativeBugsnagRemoteSpansSpec {
     }
 
     private static void endSpan(ReadableMap updates, Span span) {
-        String timestampString = updates.getString(END_TIMESTAMP);
-        if (timestampString != null) {
-            try {
-                long endTimestamp = Long.parseLong(timestampString);
-                span.end(BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime(endTimestamp));
-            } catch (NumberFormatException nfe) {
-                // ignore these, the span will be ended "now" instead
-            }
+        if (updates.hasKey(END_TIME)) {
+            double endTime = updates.getDouble(END_TIME);
+            span.end(BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)endTime));
+        } else {
+            span.end();
         }
-
-        // ending an ended span is a no-op, so we make certain the span is ended if it's been flagged for ending
-        span.end();
     }
 
     private static void updateSpanAttributes(ReadableArray attributeUpdates, Span span) {

@@ -16,7 +16,7 @@ type SpanAttribute = {
 export type SpanUpdateTransaction = {
   attributes: SpanAttribute[]
   isEnded: boolean
-  endTimestamp: string | undefined
+  endTime: number | undefined
 }
 
 export interface Spec extends TurboModule {

@@ -5,11 +5,7 @@ interface Performance {
   now: () => number
 }
 
-export interface ReactNativeClock extends Clock {
-  toUnixNanoseconds: (time: number) => number
-}
-
-const createClock = (performance: Performance): ReactNativeClock => {
+const createClock = (performance: Performance): Clock => {
   // Measurable "monotonic" time
   // In React Native, `performance.now` often returns some very high values, but does not expose the `timeOrigin` it uses to calculate what "now" is.
   // by storing the value of `performance.now` when the app starts, we can remove that value from any further `.now` calculations, and add it to the current "wall time" to get a useful timestamp.

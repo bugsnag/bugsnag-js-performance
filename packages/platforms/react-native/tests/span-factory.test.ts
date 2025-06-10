@@ -2,12 +2,11 @@ import { ReactNativeSpanFactory } from '../lib/span-factory'
 import NativeBugsnagPerformance from '../lib/native'
 import { ControllableBackgroundingListener, InMemoryProcessor, spanAttributesSource, StableIdGenerator } from '@bugsnag/js-performance-test-utilities'
 import { DefaultSpanContextStorage, Sampler, DISCARD_END_TIME } from '@bugsnag/core-performance'
-import type { InternalConfiguration } from '@bugsnag/core-performance'
+import type { Clock, InternalConfiguration } from '@bugsnag/core-performance'
 import createClock from '../lib/clock'
-import type { ReactNativeClock } from '../lib/clock'
 import type { ReactNativeConfiguration } from '../lib/config'
 
-let clock: ReactNativeClock
+let clock: Clock
 let spanFactory: ReactNativeSpanFactory
 let processor: InMemoryProcessor
 let contextStorage: DefaultSpanContextStorage
