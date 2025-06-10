@@ -2,7 +2,9 @@
 Feature: SvelteKit router
     Scenario: SvelteKit route change spans are automatically instrumented
         Given I navigate to the test URL "/docs/svelte-kit/build"
+        And I wait for 1 second
         And I click the element "contact"
+        And I wait for 1 second
         And I click the element "profile"
         And I wait to receive 2 spans
 
