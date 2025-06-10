@@ -132,11 +132,14 @@ export class SpanFactory<C extends Configuration> {
 
   configure (configuration: InternalConfiguration<C>) {
     this.logger = configuration.logger
+    this.spanAttributesSource.configure(configuration)
+
     this.spanAttributeLimits = {
       attributeArrayLengthLimit: configuration.attributeArrayLengthLimit,
       attributeCountLimit: configuration.attributeCountLimit,
       attributeStringValueLimit: configuration.attributeStringValueLimit
     }
+
     this.onSpanStartCallbacks = configuration.onSpanStart
     this.onSpanEndCallbacks = configuration.onSpanEnd
   }

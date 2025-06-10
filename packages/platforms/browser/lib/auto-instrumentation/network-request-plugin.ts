@@ -1,5 +1,5 @@
 import { RemoteParentContext, traceIdToSamplingRate } from '@bugsnag/core-performance'
-import type { InternalConfiguration, Logger, Plugin, SpanContextStorage, SpanFactory } from '@bugsnag/core-performance'
+import type { Logger, Plugin, PluginContext, SpanContextStorage, SpanFactory } from '@bugsnag/core-performance'
 import {
   defaultNetworkRequestCallback
 
@@ -22,6 +22,7 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
   private configEndpoint: string = ''
   private networkRequestCallback: NetworkRequestCallback<BrowserNetworkRequestInfo> = defaultNetworkRequestCallback
   private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
+  private enabled: boolean = false
 
   constructor (
     private spanFactory: SpanFactory<BrowserConfiguration>,
@@ -30,14 +31,24 @@ export class NetworkRequestPlugin implements Plugin<BrowserConfiguration> {
     private xhrTracker: RequestTracker
   ) {}
 
-  configure (configuration: InternalConfiguration<BrowserConfiguration>) {
-    this.logger = configuration.logger
+  install (context: PluginContext<BrowserConfiguration>) {
+    if (!context.configuration.autoInstrumentNetworkRequests) {
+      return
+    }
 
-    if (configuration.autoInstrumentNetworkRequests) {
-      this.configEndpoint = configuration.endpoint
+    const { endpoint, logger, networkRequestCallback } = context.configuration
+
+    if (logger) this.logger = logger
+    if (endpoint) this.configEndpoint = endpoint
+    if (networkRequestCallback) this.networkRequestCallback = networkRequestCallback
+
+    this.enabled = true
+  }
+
+  start () {
+    if (this.enabled) {
       this.xhrTracker.onStart(this.trackRequest)
       this.fetchTracker.onStart(this.trackRequest)
-      this.networkRequestCallback = configuration.networkRequestCallback
     }
   }
 

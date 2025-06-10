@@ -1,4 +1,5 @@
 import PrioritizedSet from './prioritized-set'
+import type { Prioritized } from './prioritized-set'
 
 // base class for classes that can be used with SpanControlProvider, where S represents
 // the type of span control that the query will retrieve. Using an abstract class
@@ -20,6 +21,10 @@ export class CompositeSpanControlProvider implements SpanControlProvider<any> {
 
   addProvider (provider: SpanControlProvider<any>, priority: number): void {
     this.providers.add(provider, priority)
+  }
+
+  addProviders (providers: Array<Prioritized<SpanControlProvider<any>>>): void {
+    this.providers.addAll(providers)
   }
 
   getSpanControls<S> (query: SpanQuery<S>): S | null {

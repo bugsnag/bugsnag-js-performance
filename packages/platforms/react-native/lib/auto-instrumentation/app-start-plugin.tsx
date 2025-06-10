@@ -1,10 +1,5 @@
-import type {
-  AppState,
-  Clock,
-  InternalConfiguration,
-  Plugin,
-  SetAppState
-} from '@bugsnag/core-performance'
+import { getAppState, setAppState } from '@bugsnag/core-performance'
+import type { Clock, Plugin, PluginContext } from '@bugsnag/core-performance'
 import type { ReactNode } from 'react'
 import React from 'react'
 import type { AppRegistry, WrapperComponentProvider } from 'react-native'
@@ -24,27 +19,34 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
   private readonly spanFactory: ReactNativeSpanFactory
   private readonly clock: Clock
   private readonly appRegistry: typeof AppRegistry
-  private readonly setAppState: SetAppState
-  private readonly appState: AppState
+
+  private wrapperComponentProvider: WrapperComponentProvider | null = null
+  private enabled: boolean = false
 
   constructor (
     appStartTime: number,
     spanFactory: ReactNativeSpanFactory,
     clock: Clock,
-    appRegistry: typeof AppRegistry,
-    setAppState: SetAppState,
-    appState: AppState
+    appRegistry: typeof AppRegistry
   ) {
     this.appStartTime = appStartTime
     this.spanFactory = spanFactory
     this.clock = clock
     this.appRegistry = appRegistry
-    this.setAppState = setAppState
-    this.appState = appState
   }
 
-  configure (configuration: InternalConfiguration<ReactNativeConfiguration>) {
-    if (!configuration.autoInstrumentAppStarts) return
+  install (context: PluginContext<ReactNativeConfiguration>) {
+    if (!context.configuration.autoInstrumentAppStarts) return
+
+    if (context.configuration.wrapperComponentProvider) {
+      this.wrapperComponentProvider = context.configuration.wrapperComponentProvider
+    }
+
+    this.enabled = true
+  }
+
+  start () {
+    if (!this.enabled) return
 
     const appStartSpan = createAppStartSpan(this.spanFactory, this.appStartTime)
 
@@ -52,8 +54,8 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
       React.useEffect(() => {
         if (appStartSpan.isValid()) {
           this.spanFactory.endSpan(appStartSpan, this.clock.now())
-          if (this.appState === 'starting') {
-            this.setAppState('ready')
+          if (getAppState() === 'starting') {
+            setAppState('ready')
           }
         }
       }, [])
@@ -62,8 +64,8 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
     }
 
     const instrumentedComponentProvider: WrapperComponentProvider = (appParams) => ({ children }) => {
-      if (configuration.wrapperComponentProvider) {
-        const WrapperComponent = configuration.wrapperComponentProvider(appParams)
+      if (this.wrapperComponentProvider) {
+        const WrapperComponent = this.wrapperComponentProvider(appParams)
 
         return (
           <AppStartWrapper>

@@ -80,6 +80,20 @@ class MockReactNativeSpanFactory extends ReactNativeSpanFactory {
   startNavigationSpan = jest.fn((name: string, options: SpanOptions) => {
     return super.startNavigationSpan(name, options)
   })
+
+  reset () {
+    this.startSpan.mockClear()
+    this.endSpan.mockClear()
+    this.startNavigationSpan.mockClear()
+
+    const processor = new InMemoryProcessor()
+    this.createdSpans = processor.spans
+    // @ts-expect-error processor is private
+    this.processor = processor
+
+    // @ts-expect-error spanContextStorage is private
+    this.spanContextStorage.contextStack.length = 0
+  }
 }
 
 export { MockSpanFactory, MockReactNativeSpanFactory }

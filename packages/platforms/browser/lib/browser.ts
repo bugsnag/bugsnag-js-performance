@@ -50,7 +50,7 @@ if (typeof window === 'undefined' || typeof document === 'undefined') {
     deliveryFactory: createFetchDeliveryFactory(window.fetch, clock, backgroundingListener),
     idGenerator,
     schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-    plugins: (spanFactory, spanContextStorage, setAppState, appState) => [
+    plugins: (spanFactory, spanContextStorage) => [
       onSettle,
       new FullPageLoadPlugin(
         document,
@@ -59,15 +59,13 @@ if (typeof window === 'undefined' || typeof document === 'undefined') {
         webVitals,
         onSettle,
         backgroundingListener,
-        performance,
-        setAppState,
-        appState
+        performance
       ),
       // ResourceLoadPlugin should always come after FullPageLoad plugin, as it should use that
       // span context as the parent of it's spans
       new ResourceLoadPlugin(spanFactory, spanContextStorage, window.PerformanceObserver),
       new NetworkRequestPlugin(spanFactory, spanContextStorage, fetchRequestTracker, xhrRequestTracker),
-      new RouteChangePlugin(spanFactory, window.location, document, setAppState)
+      new RouteChangePlugin(spanFactory, window.location, document)
     ],
     persistence,
     retryQueueFactory: (delivery, retryQueueMaxSize) => new InMemoryQueue(delivery, retryQueueMaxSize)

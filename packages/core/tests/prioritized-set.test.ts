@@ -57,7 +57,7 @@ describe('PrioritizedSet', () => {
       const set = new PrioritizedSet<string>()
 
       set.add('highest', 3)
-      set.addAll(['low1', 'low2', 'low3'], 1)
+      set.addAll([{ item: 'low1', priority: 1 }, { item: 'low2', priority: 1 }, { item: 'low3', priority: 1 }])
       set.add('medium', 2)
 
       expect(Array.from(set)).toEqual(['highest', 'medium', 'low1', 'low2', 'low3'])
@@ -68,7 +68,7 @@ describe('PrioritizedSet', () => {
 
       set.add('existing', 2)
 
-      const result = set.addAll(['new', 'existing', 'another'], 1)
+      const result = set.addAll([{ item: 'new', priority: 1 }, { item: 'existing', priority: 1 }, { item: 'another', priority: 1 }])
       expect(result).toBe(true)
 
       expect(Array.from(set)).toEqual(['existing', 'new', 'another'])
@@ -77,9 +77,9 @@ describe('PrioritizedSet', () => {
     it('returns false when no items were added', () => {
       const set = new PrioritizedSet<string>()
 
-      set.add('existing', 1)
+      set.add('existing', 2)
 
-      const result = set.addAll(['existing'], 1)
+      const result = set.addAll([{ item: 'existing', priority: 1 }])
       expect(result).toBe(false)
       expect(Array.from(set)).toEqual(['existing'])
     })

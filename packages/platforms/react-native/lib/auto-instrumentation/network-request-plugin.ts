@@ -1,5 +1,5 @@
 import { RemoteParentContext } from '@bugsnag/core-performance'
-import type { InternalConfiguration, Logger, Plugin, SpanContextStorage, SpanFactory } from '@bugsnag/core-performance'
+import type { Logger, Plugin, PluginContext, SpanContextStorage, SpanFactory } from '@bugsnag/core-performance'
 import type {
   NetworkRequestCallback,
   NetworkRequestInfo,
@@ -26,6 +26,7 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
   private tracePropagationUrls: RegExp[] = []
   private networkRequestCallback: NetworkRequestCallback<ReactNativeNetworkRequestInfo> = defaultNetworkRequestCallback
   private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
+  private enabled: boolean = false
 
   constructor (
     private spanFactory: SpanFactory<ReactNativeConfiguration>,
@@ -33,16 +34,29 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
     private xhrTracker: RequestTracker
   ) {}
 
-  configure (configuration: InternalConfiguration<ReactNativeConfiguration>) {
-    this.logger = configuration.logger
+  install (context: PluginContext<ReactNativeConfiguration>) {
+    if (!context.configuration.autoInstrumentNetworkRequests) {
+      return
+    }
 
-    if (configuration.autoInstrumentNetworkRequests) {
-      this.ignoredUrls.push(configuration.endpoint)
-      this.xhrTracker.onStart(this.trackRequest)
-      this.networkRequestCallback = configuration.networkRequestCallback
-      this.tracePropagationUrls = configuration.tracePropagationUrls.map(
+    const { endpoint, logger, networkRequestCallback, tracePropagationUrls } = context.configuration
+
+    if (logger) this.logger = logger
+    if (endpoint) this.ignoredUrls.push(endpoint)
+    if (networkRequestCallback) this.networkRequestCallback = networkRequestCallback
+
+    if (tracePropagationUrls) {
+      this.tracePropagationUrls = tracePropagationUrls.map(
         (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
       )
+    }
+
+    this.enabled = true
+  }
+
+  start () {
+    if (this.enabled) {
+      this.xhrTracker.onStart(this.trackRequest)
     }
   }
 

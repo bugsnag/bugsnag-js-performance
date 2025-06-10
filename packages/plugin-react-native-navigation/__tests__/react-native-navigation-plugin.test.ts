@@ -1,31 +1,38 @@
-import { MockReactNativeSpanFactory, createConfiguration } from '@bugsnag/js-performance-test-utilities'
+import { createConfiguration, IncrementingClock } from '@bugsnag/js-performance-test-utilities'
+import type { MockReactNativeSpanFactory } from '@bugsnag/js-performance-test-utilities'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
-import type { AppState } from '@bugsnag/core-performance'
+import { PluginContext } from '@bugsnag/core-performance'
+import * as AppState from '@bugsnag/core-performance/lib/app-state'
 import { Navigation } from 'react-native-navigation'
 import ReactNativeNavigationPlugin from '../lib/react-native-navigation-plugin'
+import BugsnagPerformance from '@bugsnag/react-native-performance'
 
 jest.mock('react-native-navigation')
 
-let appState: AppState = 'starting'
+jest.spyOn(AppState, 'setAppState')
 
 beforeEach(() => {
   jest.useFakeTimers()
-  appState = 'starting'
 })
 
 afterEach(() => {
+  // @ts-expect-error spanFactory only exists in the mock
+  BugsnagPerformance.spanFactory.reset()
+  AppState.setAppState('starting')
+
+  jest.clearAllMocks()
   jest.useRealTimers()
 })
 
 describe('ReactNativeNavigationPlugin', () => {
   it('creates a navigation span when the route changes', () => {
-    const setAppState = jest.fn((state: AppState) => { appState = state })
     const plugin = new ReactNativeNavigationPlugin(Navigation)
-    const configuration = createConfiguration<ReactNativeConfiguration>()
-    const spanFactory = new MockReactNativeSpanFactory()
-    plugin.configure(configuration, spanFactory, setAppState)
+    const context = new PluginContext(createConfiguration<ReactNativeConfiguration>(), new IncrementingClock())
 
-    expect(appState).toBe('starting')
+    plugin.install(context)
+    plugin.start()
+
+    expect(AppState.getAppState()).toBe('starting')
 
     // Simulate a route change
     jest.mocked(Navigation.events().registerCommandListener).mock.calls[0][0]('push', {
@@ -39,15 +46,18 @@ describe('ReactNativeNavigationPlugin', () => {
       componentType: 'Component'
     })
 
-    expect(setAppState).toHaveBeenCalled()
-    expect(appState).toBe('navigating')
+    expect(AppState.setAppState).toHaveBeenCalled()
+    expect(AppState.getAppState()).toBe('navigating')
 
     jest.advanceTimersByTime(100)
+
+    // @ts-expect-error spanFactory only exists in the mock
+    const spanFactory = BugsnagPerformance.spanFactory as MockReactNativeSpanFactory
 
     expect(spanFactory.endSpan).toHaveBeenCalledTimes(1)
     expect(spanFactory.createdSpans).toHaveLength(1)
 
-    expect(appState).toBe('ready')
+    expect(AppState.getAppState()).toBe('ready')
 
     const span = spanFactory.createdSpans[0]
     expect(span.name).toEqual('[Navigation]TestScreen')
@@ -59,21 +69,22 @@ describe('ReactNativeNavigationPlugin', () => {
   })
 
   it('does not end the current navigation while there are components waiting', () => {
-    const setAppState = jest.fn((state: AppState) => { appState = state })
     const plugin = new ReactNativeNavigationPlugin(Navigation)
-    const configuration = createConfiguration<ReactNativeConfiguration>()
-    const spanFactory = new MockReactNativeSpanFactory()
-    plugin.configure(configuration, spanFactory, setAppState)
+    const context = new PluginContext(createConfiguration<ReactNativeConfiguration>(), new IncrementingClock())
+    // @ts-expect-error spanFactory only exists in the mock
+    const spanFactory = BugsnagPerformance.spanFactory as MockReactNativeSpanFactory
+    plugin.install(context)
+    plugin.start()
 
-    expect(appState).toBe('starting')
+    expect(AppState.getAppState()).toBe('starting')
 
     // Simulate a route change
-    jest.mocked(Navigation.events().registerCommandListener).mock.calls[1][0]('push', {
+    jest.mocked(Navigation.events().registerCommandListener).mock.calls[0][0]('push', {
       commandId: '1',
       componentId: '123'
     })
 
-    jest.mocked(Navigation.events().registerComponentWillAppearListener).mock.calls[1][0]({
+    jest.mocked(Navigation.events().registerComponentWillAppearListener).mock.calls[0][0]({
       componentId: '123',
       componentName: 'TestScreen',
       componentType: 'Component'
@@ -81,8 +92,8 @@ describe('ReactNativeNavigationPlugin', () => {
 
     expect(spanFactory.startSpan).toHaveBeenCalledTimes(1)
 
-    expect(setAppState).toHaveBeenCalled()
-    expect(appState).toBe('navigating')
+    expect(AppState.setAppState).toHaveBeenCalled()
+    expect(AppState.getAppState()).toBe('navigating')
 
     plugin.blockNavigationEnd()
     plugin.blockNavigationEnd()
@@ -104,8 +115,8 @@ describe('ReactNativeNavigationPlugin', () => {
     jest.advanceTimersByTime(100)
     expect(spanFactory.endSpan).toHaveBeenCalled()
 
-    expect(setAppState).toHaveBeenCalled()
-    expect(appState).toBe('ready')
+    expect(AppState.setAppState).toHaveBeenCalled()
+    expect(AppState.getAppState()).toBe('ready')
 
     const span = spanFactory.createdSpans[0]
     expect(span.name).toEqual('[Navigation]TestScreen')
@@ -117,52 +128,54 @@ describe('ReactNativeNavigationPlugin', () => {
   })
 
   it('discards the active navigation span when the route changes', () => {
-    const setAppState = jest.fn((state: AppState) => { appState = state })
     const plugin = new ReactNativeNavigationPlugin(Navigation)
-    const configuration = createConfiguration<ReactNativeConfiguration>()
-    const spanFactory = new MockReactNativeSpanFactory()
-    plugin.configure(configuration, spanFactory, setAppState)
+    const context = new PluginContext(createConfiguration<ReactNativeConfiguration>(), new IncrementingClock())
 
-    expect(appState).toBe('starting')
+    plugin.install(context)
+    plugin.start()
+
+    expect(AppState.getAppState()).toBe('starting')
 
     // Simulate a route change
-    jest.mocked(Navigation.events().registerCommandListener).mock.calls[2][0]('push', {
+    jest.mocked(Navigation.events().registerCommandListener).mock.calls[0][0]('push', {
       commandId: '1',
       componentId: '1'
     })
 
-    jest.mocked(Navigation.events().registerComponentWillAppearListener).mock.calls[2][0]({
+    jest.mocked(Navigation.events().registerComponentWillAppearListener).mock.calls[0][0]({
       componentId: '1',
       componentName: 'FirstScreen',
       componentType: 'Component'
     })
 
-    expect(appState).toBe('navigating')
+    expect(AppState.getAppState()).toBe('navigating')
 
     jest.advanceTimersByTime(50)
 
     // Simulate a second route change
-    jest.mocked(Navigation.events().registerCommandListener).mock.calls[2][0]('push', {
+    jest.mocked(Navigation.events().registerCommandListener).mock.calls[0][0]('push', {
       commandId: '2',
       componentId: '2'
     })
 
-    jest.mocked(Navigation.events().registerComponentWillAppearListener).mock.calls[2][0]({
+    jest.mocked(Navigation.events().registerComponentWillAppearListener).mock.calls[0][0]({
       componentId: '2',
       componentName: 'SecondScreen',
       componentType: 'Component'
     })
 
-    expect(appState).toBe('navigating')
+    expect(AppState.getAppState()).toBe('navigating')
 
     jest.advanceTimersByTime(100)
 
-    expect(spanFactory.startSpan).toHaveBeenCalledTimes(2)
+    // @ts-expect-error spanFactory only exists in the mock
+    const spanFactory = BugsnagPerformance.spanFactory as MockReactNativeSpanFactory
+    expect(BugsnagPerformance.startNavigationSpan).toHaveBeenCalledTimes(2)
     expect(spanFactory.endSpan).toHaveBeenCalledTimes(1)
     expect(spanFactory.createdSpans).toHaveLength(1)
 
-    expect(setAppState).toHaveBeenCalledTimes(3)
-    expect(appState).toBe('ready')
+    expect(AppState.setAppState).toHaveBeenCalledTimes(3)
+    expect(AppState.getAppState()).toBe('ready')
 
     const span = spanFactory.createdSpans[0]
     expect(span.name).toEqual('[Navigation]SecondScreen')
