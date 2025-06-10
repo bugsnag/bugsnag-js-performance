@@ -1,15 +1,20 @@
 import type { RouteChangeSpan, RoutingProvider, StartRouteChangeCallback } from '@bugsnag/browser-performance'
-import { onSettle, defaultRouteResolver } from '@bugsnag/browser-performance'
+import { defaultRouteResolver, onSettle } from '@bugsnag/browser-performance'
 import type { AfterNavigate, BeforeNavigate } from '@sveltejs/kit'
 
 type NavigateCallback<T> = (callback: (navigation: T) => void) => void
 
 export class SvelteKitRoutingProvider implements RoutingProvider {
   private currentRoute: string | undefined
-  private previousRoute: string | undefined
   private currentSpan: RouteChangeSpan | undefined
 
-  constructor (private beforeNavigate: NavigateCallback<BeforeNavigate>, private afterNavigate: NavigateCallback<AfterNavigate>) {}
+  constructor (
+    private beforeNavigate: NavigateCallback<BeforeNavigate>,
+    private afterNavigate: NavigateCallback<AfterNavigate>,
+    initialRoute?: string
+  ) {
+    this.currentRoute = initialRoute
+  }
 
   // resolveRoute is only ever used to get the current route in SvelteKit
   // so we just return the current route and ignore the parameter
@@ -17,20 +22,11 @@ export class SvelteKitRoutingProvider implements RoutingProvider {
     return this.currentRoute || defaultRouteResolver(url)
   }
 
-  getPreviousRoute () {
-    return this.previousRoute
-  }
-
   listenForRouteChanges (startRouteChangeSpan: StartRouteChangeCallback) {
-    this.beforeNavigate(({ to, type, from }) => {
+    this.beforeNavigate(({ to, type }) => {
       const startTime = performance.now()
-      if (from && from.route.id) {
-        this.previousRoute = from.route.id
-      }
-      if (to && to.route.id) {
-        this.currentRoute = to.route.id
-      }
       const url = to ? to.url : new URL(window.location.href)
+      this.currentRoute = to?.route.id ?? this.currentRoute
       this.currentSpan = startRouteChangeSpan(url, type, { startTime })
     })
 

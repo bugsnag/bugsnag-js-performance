@@ -15,7 +15,6 @@ export interface RouteChangeSpan extends Span {
 
 export interface RoutingProvider {
   resolveRoute: (url: URL) => string
-  getPreviousRoute?: () => string | undefined
   listenForRouteChanges: (startRouteChangeSpan: StartRouteChangeCallback) => void
 }
 

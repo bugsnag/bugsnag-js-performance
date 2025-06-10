@@ -3,15 +3,12 @@
   
   import { afterNavigate, beforeNavigate } from '$app/navigation';
   import { base } from '$app/paths';
+  import { page } from '$app/state';
   import { SvelteKitRoutingProvider } from '@bugsnag/svelte-kit-performance';
   import BugsnagPerformance from '@bugsnag/browser-performance';
   import { onMount } from 'svelte';
-  
-  const discardResourceLoadSpans = (span) => {
-    if (span.name.includes('[ResourceLoad]')) {
-      return null
-    }
-  }
+
+  const discardResourceLoadSpans = (span) => !span.name.includes('[ResourceLoad]')
 
   onMount(() => {
     const apiKey = data.url.searchParams.get('api_key')
@@ -20,12 +17,12 @@
     BugsnagPerformance.start({
       apiKey,
       endpoint,
-      maximumBatchSize: 5,
+      maximumBatchSize: 2,
       batchInactivityTimeoutMs: 5000,
       autoInstrumentFullPageLoads: false,
       autoInstrumentNetworkRequests: false,
-      routingProvider: new SvelteKitRoutingProvider(beforeNavigate, afterNavigate),
-      onSpanStart: [discardResourceLoadSpans]
+      routingProvider: new SvelteKitRoutingProvider(beforeNavigate, afterNavigate, page.route.id),
+      onSpanEnd: [discardResourceLoadSpans]
     })
   })
 </script>

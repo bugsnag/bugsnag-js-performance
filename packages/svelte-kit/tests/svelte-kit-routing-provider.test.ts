@@ -21,7 +21,7 @@ describe('SvelteKitRoutingProvider', () => {
         type: 'link',
         to: {
           url: 'https://bugsnag.com/contacts/1234',
-          route: { id: '/contacts/[id]' }
+          route: { id: '/contacts/[contactId]' }
         }
       })
 
@@ -32,16 +32,13 @@ describe('SvelteKitRoutingProvider', () => {
   describe('resolveRoute', () => {
     // Expected behavior for this plugin ignores the standard URL to string conversion
     // and returns the current route
-    it('always returns the current route', () => {
+    it('returns the current route', () => {
       const beforeNavigate = jest.fn()
       const afterNavigate = jest.fn()
-      const routingProvider = new SvelteKitRoutingProvider(beforeNavigate, afterNavigate)
+      const routingProvider = new SvelteKitRoutingProvider(beforeNavigate, afterNavigate, '/initial-route')
 
       const startRouteChangeSpan = jest.fn()
       routingProvider.listenForRouteChanges(startRouteChangeSpan)
-
-      // Set the current route
-      afterNavigate.mock.calls[0][0]({ to: { route: { id: '/initial-route' } } })
 
       const url = new URL('/contacts/[contactId]', 'https://bugsnag.com')
       expect(routingProvider.resolveRoute(url)).toBe('/initial-route')
