@@ -5,8 +5,8 @@ import {
   createTestClient
 } from '@bugsnag/js-performance-test-utilities'
 import type { BackgroundingListener } from '../lib/backgrounding-listener'
-import type { AppState } from '../lib/core'
 import { createNoopClient } from '../lib/core'
+import { setAppState } from '../lib/app-state'
 import { InMemoryPersistence } from '../lib/persistence'
 import { DefaultSpanContextStorage } from '../lib/span-context'
 
@@ -378,27 +378,12 @@ describe('Core', () => {
 
       describe('appState', () => {
         it('updates the current appState', () => {
-          class AppStatePlugin {
-            setAppState?: (appState: AppState) => void
-
-            configure (configuration: any, spanFactory: any, setAppState: (appState: AppState) => void) {
-              this.setAppState = setAppState
-            }
-
-            updateState (appState: AppState) {
-              if (this.setAppState) {
-                this.setAppState(appState)
-              }
-            }
-          }
-
-          const plugin = new AppStatePlugin()
           const client = createTestClient()
 
-          client.start({ apiKey: VALID_API_KEY, plugins: [plugin] })
+          client.start({ apiKey: VALID_API_KEY })
           expect(client.appState).toBe('starting')
 
-          plugin.updateState('navigating')
+          setAppState('navigating')
           expect(client.appState).toBe('navigating')
         })
       })
@@ -408,7 +393,9 @@ describe('Core', () => {
           const listener = jest.fn()
 
           class TestPlugin {
-            configure () {}
+            install () {}
+
+            start () {}
 
             test () {
               listener()
@@ -432,11 +419,13 @@ describe('Core', () => {
 
         it('does not return a plugin if it has not been provided', () => {
           class TestPlugin {
-            configure () {}
+            install () {}
+            start () {}
           }
 
           class AnotherPlugin {
-            configure () {}
+            install () {}
+            start () {}
           }
 
           const client = createTestClient()
@@ -485,13 +474,15 @@ describe('Core', () => {
     })
 
     it('creates and configures a given plugin', () => {
-      const plugin = { configure: jest.fn() }
+      const plugin = { install: jest.fn(), start: jest.fn() }
       const createPlugins = jest.fn(() => [plugin])
       const client = createTestClient({ plugins: createPlugins })
       expect(createPlugins).toHaveBeenCalled()
-      expect(plugin.configure).not.toHaveBeenCalled()
+      expect(plugin.install).not.toHaveBeenCalled()
+      expect(plugin.start).not.toHaveBeenCalled()
       client.start(VALID_API_KEY)
-      expect(plugin.configure).toHaveBeenCalled()
+      expect(plugin.install).toHaveBeenCalled()
+      expect(plugin.start).toHaveBeenCalled()
     })
   })
 

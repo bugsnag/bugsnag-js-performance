@@ -291,6 +291,8 @@ describe('Schema validation', () => {
       })
 
       it('replaces invalid callbacks with undefined', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
         const config = {
           apiKey: VALID_API_KEY,
           onSpanStart: [() => {}, 'not a function']
@@ -314,6 +316,8 @@ describe('Schema validation', () => {
       })
 
       it('replaces invalid callbacks with undefined', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
         const config = {
           apiKey: VALID_API_KEY,
           onSpanEnd: [() => true, 'not a function']

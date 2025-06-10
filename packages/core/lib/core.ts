@@ -11,6 +11,7 @@ import FixedProbabilityManager from './fixed-probability-manager'
 import type { IdGenerator } from './id-generator'
 import type { NetworkSpan, NetworkSpanEndOptions, NetworkSpanOptions } from './network-span'
 import type { Persistence } from './persistence'
+import { PluginManager } from './plugin'
 import type { Plugin } from './plugin'
 import ProbabilityFetcher from './probability-fetcher'
 import ProbabilityManager from './probability-manager'
@@ -25,11 +26,11 @@ import type { SpanQuery } from './span-control-provider'
 import { SpanFactory } from './span-factory'
 import type { SpanFactoryConstructor } from './span-factory'
 import { timeToNumber } from './time'
+import { getAppState, setAppState } from './app-state'
+import type { AppState } from './app-state'
+import PrioritizedSet, { Priority } from './prioritized-set'
 
 interface Constructor<T> { new(): T, prototype: T }
-
-export type AppState = 'starting' | 'navigating' | 'settling' | 'ready'
-export type SetAppState = (appState: AppState) => void
 
 export interface Client<C extends Configuration> {
   appState: AppState
@@ -49,7 +50,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   resourceAttributesSource: ResourceAttributeSource<C>
   spanAttributesSource: SpanAttributesSource<C>
   schema: S
-  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage, setAppState: SetAppState, appState: AppState) => Array<Plugin<C>>
+  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => Array<Plugin<C>>
   persistence: Persistence
   retryQueueFactory: RetryQueueFactory
   spanContextStorage?: SpanContextStorage
@@ -63,7 +64,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
   const bufferingProcessor = new BufferingProcessor()
   const spanContextStorage = options.spanContextStorage || new DefaultSpanContextStorage(options.backgroundingListener)
   let logger = options.schema.logger.defaultValue
-  let appState: AppState = 'starting'
+  setAppState('starting')
   const sampler = new Sampler(1.0)
 
   const SpanFactoryClass = options.spanFactory || SpanFactory
@@ -78,12 +79,10 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     logger,
     spanContextStorage
   )
-  const setAppState = (state: AppState) => {
-    appState = state
-  }
-  const plugins = options.plugins(spanFactory, spanContextStorage, setAppState, appState)
 
   const spanControlProvider = new CompositeSpanControlProvider()
+  const pluginManager = new PluginManager<C>()
+  pluginManager.addPlugins(options.plugins(spanFactory, spanContextStorage))
 
   return {
     start: (config: C | string) => {
@@ -108,12 +107,31 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         }
       }
 
-      const delivery = options.deliveryFactory(configuration.endpoint)
+      // add any external plugins and install
+      pluginManager.addPlugins(configuration.plugins)
+      const pluginContext = pluginManager.installPlugins(configuration, options.clock)
 
-      options.spanAttributesSource.configure(configuration)
+      // add span control providers from plugins
+      spanControlProvider.addProviders(pluginContext.spanControlProviders)
+
+      // create a prioritized set of callbacks for onSpanStart and onSpanEnd
+      const spanStartCallbacks = new PrioritizedSet(pluginContext.onSpanStartCallbacks)
+      const spanEndCallbacks = new PrioritizedSet(pluginContext.onSpanEndCallbacks)
+
+      // user-defined callbacks have normal priority
+      if (configuration.onSpanStart) {
+        spanStartCallbacks.addAll(configuration.onSpanStart.map(callback => ({ item: callback, priority: Priority.NORMAL })))
+      }
+      if (configuration.onSpanEnd) {
+        spanEndCallbacks.addAll(configuration.onSpanEnd.map(callback => ({ item: callback, priority: Priority.NORMAL })))
+      }
+
+      configuration.onSpanStart = Array.from(spanStartCallbacks)
+      configuration.onSpanEnd = Array.from(spanEndCallbacks)
 
       spanFactory.configure(configuration)
 
+      const delivery = options.deliveryFactory(configuration.endpoint)
       const probabilityManagerPromise = configuration.samplingProbability === undefined
         ? ProbabilityManager.create(
           options.persistence,
@@ -151,13 +169,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         logger = configuration.logger
       })
 
-      for (const plugin of configuration.plugins) {
-        plugins.push(plugin as unknown as Plugin<C>)
-      }
-
-      for (const plugin of plugins) {
-        plugin.configure(configuration, spanFactory, setAppState, appState)
-      }
+      pluginManager.startPlugins()
     },
     startSpan: (name, spanOptions?: SpanOptions) => {
       const cleanOptions = spanFactory.validateSpanOptions(name, spanOptions)
@@ -185,11 +197,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       return networkSpan
     },
     getPlugin: (Constructor) => {
-      for (const plugin of plugins) {
-        if (plugin instanceof Constructor) {
-          return plugin
-        }
-      }
+      return pluginManager.getPlugin(Constructor)
     },
     getSpanControls: (query: SpanQuery<S>) => {
       return spanControlProvider.getSpanControls(query)
@@ -198,7 +206,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       return spanContextStorage.current
     },
     get appState () {
-      return appState
+      return getAppState()
     },
     ...(options.platformExtensions && options.platformExtensions(spanFactory, spanContextStorage))
   } as BugsnagPerformance<C, T>
