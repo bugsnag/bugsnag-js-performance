@@ -9,10 +9,11 @@ We recommend initializing BugSnag in a shared `+layout.svelte` component at the 
 ```
 import BugsnagPerformance from '@bugsnag/browser-performance'
 import { SvelteKitRoutingProvider } from '@bugsnag/svelte-kit-performance'
-import { beforeNavigate, afterNavigate } from '$app/navigation';
+import { beforeNavigate, afterNavigate } from '$app/navigation'
+import { page } from '$app/state'
 
 BugsnagPerformance.start({
     apiKey,
-    routingProvider: new SvelteKitRoutingProvider(beforeNavigate, afterNavigate)
+    routingProvider: new SvelteKitRoutingProvider(beforeNavigate, afterNavigate, page.route.id)
 })
 ```
