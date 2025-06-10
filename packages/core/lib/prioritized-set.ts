@@ -5,7 +5,7 @@ export interface Prioritized<T> {
 
 export const Priority = {
   LOW: 0,
-  NORMAL: 10_000,
+  NORMAL: 50_000,
   HIGH: 100_000
 }
 
