@@ -12,7 +12,8 @@
             "packages/angular",
             "packages/react-router",
             "packages/vue",
-            "packages/plugin-react-performance"
+            "packages/plugin-react-performance",
+            "packages/svelte-kit"
         ]
     },
     {
