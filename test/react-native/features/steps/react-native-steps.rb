@@ -31,7 +31,7 @@ When("I relaunch the app after shutdown") do
     state = manager.state
     sleep 0.5
   end
-  $logger.warn "App state #{state} instead of #{expected_state} after 10s" unless state == :not_running
+  $logger.warn "App state #{state} instead of not_running after 10s" unless state == :not_running
 
   manager.activate
 end
