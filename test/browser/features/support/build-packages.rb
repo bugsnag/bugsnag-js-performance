@@ -32,6 +32,7 @@ PACKAGE_NAMES = [
   "@bugsnag/delivery-fetch-performance",
   "@bugsnag/request-tracker-performance",
   "@bugsnag/plugin-react-performance",
+  "@bugsnag/svelte-kit-performance",
 ]
 
 PACKAGE_DIRECTORIES = [
@@ -43,6 +44,7 @@ PACKAGE_DIRECTORIES = [
   "#{ROOT}/packages/delivery-fetch",
   "#{ROOT}/packages/request-tracker",
   "#{ROOT}/packages/plugin-react-performance",
+  "#{ROOT}/packages/svelte-kit",
 ]
 
 def run(command)
