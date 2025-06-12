@@ -9,7 +9,17 @@
 
 @implementation ScenarioLauncher
 
+NSMutableDictionary *openSpans;
+
 RCT_EXPORT_MODULE()
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        openSpans = [NSMutableDictionary new];
+    }
+    return self;
+}
 
 RCT_EXPORT_METHOD(startBugsnag:(NSDictionary *)configuration resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   NSLog(@"Starting Bugsnag with configuration: %@\n", configuration);
@@ -138,21 +148,29 @@ RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(
   });    
 }
 
-RCT_EXPORT_METHOD(sendNativeChildSpan:(NSString *)traceParent resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-  BugsnagPerformanceRemoteSpanContext *parentContext = [BugsnagPerformanceRemoteSpanContext contextWithTraceParentString:traceParent];
-  BugsnagPerformanceSpanOptions *options = [BugsnagPerformanceSpanOptions new];
-  options.parentContext = parentContext;
+RCT_EXPORT_METHOD(startNativeSpan:(NSDictionary *)options resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  BugsnagPerformanceRemoteSpanContext *parentContext = [BugsnagPerformanceRemoteSpanContext contextWithTraceParentString:options[@"traceParent"]];
+  BugsnagPerformanceSpanOptions *spanOptions = [BugsnagPerformanceSpanOptions new];
+  if (options[@"traceParent"]) {
+    BugsnagPerformanceRemoteSpanContext *parentContext = [BugsnagPerformanceRemoteSpanContext contextWithTraceParentString:options[@"traceParent"]];
+    spanOptions.parentContext = parentContext;
+  }
 
-  BugsnagPerformanceSpan *nativeSpan = [BugsnagPerformance startSpanWithName:@"Native child span" options:options];
-  [nativeSpan end];
-  resolve(nil);
+  BugsnagPerformanceSpan *span = [BugsnagPerformance startSpanWithName:options[@"name"] options:spanOptions];
+  NSString *traceParent = [span encodedAsTraceParent];
+  [openSpans setObject:span forKey:traceParent];
+  resolve(traceParent);
 }
 
-RCT_EXPORT_METHOD(getNativeTraceParent:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-  BugsnagPerformanceSpan *span = [BugsnagPerformance startSpanWithName:@"Native parent span"];
-  NSString *traceParent = [span encodedAsTraceParent];
-  resolve(traceParent);
-  [span end];
+RCT_EXPORT_METHOD(endNativeSpan:(NSString *)traceParent resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  BugsnagPerformanceSpan *span = [openSpans objectForKey:traceParent];
+  if (span) {
+    [span end];
+    [openSpans removeObjectForKey:traceParent];
+    resolve(YES);
+  } else {
+    resolve(NO);
+  }
 }
 
 #else
@@ -161,14 +179,14 @@ RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(
   resolve(nil);
 }
 
-RCT_EXPORT_METHOD(sendNativeChildSpan:(NSString *)traceParent resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(startNativeSpan:(NSDictionary *)options resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   NSLog(@"Native performance is not enabled in this build");
   resolve(nil);
 }
 
-RCT_EXPORT_METHOD(getNativeTraceParent:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+RCT_EXPORT_METHOD(endNativeSpan:(NSString *)traceParent resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   NSLog(@"Native performance is not enabled in this build");
-  resolve(nil);
+  resolve(false);
 }
 
 #endif

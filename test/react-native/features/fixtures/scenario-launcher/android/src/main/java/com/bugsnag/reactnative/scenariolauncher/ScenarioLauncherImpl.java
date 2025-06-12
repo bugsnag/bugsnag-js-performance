@@ -16,6 +16,8 @@ import com.bugsnag.android.performance.RemoteSpanContext;
 import com.bugsnag.android.performance.Span;
 import com.bugsnag.android.performance.SpanOptions;
 
+import com.bugsnag.reactnative.performance.remotespans.NativeSpanAccessPlugin;
+
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -24,12 +26,15 @@ import com.facebook.react.bridge.WritableMap;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 class ScenarioLauncherImpl {
   
   static final String MODULE_NAME = "ScenarioLauncher";
   
   private final ReactApplicationContext reactContext;
+
+  private final HashMap<String, Span> openSpans = new HashMap<>();
 
   public ScenarioLauncherImpl(ReactApplicationContext reactContext) {
     this.reactContext = reactContext;
@@ -172,6 +177,7 @@ class ScenarioLauncherImpl {
         config.setAutoInstrumentAppStarts(false);
         config.setAutoInstrumentActivities(AutoInstrument.OFF);
         config.setAutoInstrumentRendering(true);
+        config.addPlugin(new NativeSpanAccessPlugin());
 
         BugsnagPerformance.start(config);
         Log.d(MODULE_NAME, "Started Android performance");
@@ -184,17 +190,32 @@ class ScenarioLauncherImpl {
     }
   }
 
-  public void sendNativeChildSpan(String traceParent, Promise promise) {
-    RemoteSpanContext remoteSpanContext = RemoteSpanContext.parseTraceParent(traceParent);
-    Span span = BugsnagPerformance.startSpan("Native child span", SpanOptions.createWithin(remoteSpanContext));
-    span.end();
-    promise.resolve(true);
+  public void startNativeSpan(ReadableMap options, Promise promise) {
+    try {
+        SpanOptions spanOptions = SpanOptions.DEFAULTS;
+        if (options.hasKey("traceParent")) {
+            RemoteSpanContext remoteSpanContext = RemoteSpanContext.parseTraceParent(options.getString("traceParent"));
+            spanOptions = spanOptions.createWithin(remoteSpanContext);
+        }
+
+        Span span = BugsnagPerformance.startSpan(options.getString("name"), spanOptions);
+        String traceParent = RemoteSpanContext.encodeAsTraceParent(span);
+        openSpans.put(traceParent, span);
+        promise.resolve(traceParent);
+    } catch (Exception e) {
+        Log.d(MODULE_NAME, "Failed to start native span", e);
+        promise.reject(e);
+    }
   }
 
-  public void getNativeTraceParent(Promise promise) {
-    Span span = BugsnagPerformance.startSpan("Native parent span");
-    String traceParent = RemoteSpanContext.encodeAsTraceParent(span);
-    promise.resolve(traceParent);
-    span.end();
+  public void endNativeSpan(String traceParent, Promise promise) {
+    Span span = openSpans.remove(traceParent);
+    if (span != null) {
+        span.end();
+        promise.resolve(true);
+    } else {
+        Log.d(MODULE_NAME, "No open span found for traceParent: " + traceParent);
+        promise.resolve(false);
+    }
   }
 }

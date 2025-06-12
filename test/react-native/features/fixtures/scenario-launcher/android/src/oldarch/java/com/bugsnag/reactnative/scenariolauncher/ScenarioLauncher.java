@@ -54,12 +54,12 @@ public class ScenarioLauncher extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void sendNativeChildSpan(String traceParent, Promise promise) {
-    impl.sendNativeChildSpan(traceParent, promise);
+  public void startNativeSpan(ReadableMap options, Promise promise) {
+    impl.startNativeSpan(options, promise);
   }
-
+  
   @ReactMethod
-  public void getNativeTraceParent(Promise promise) {
-    impl.getNativeTraceParent(promise);
+  public void endNativeSpan(String traceParent, Promise promise) {
+    impl.endNativeSpan(traceParent, promise);
   }
 }
