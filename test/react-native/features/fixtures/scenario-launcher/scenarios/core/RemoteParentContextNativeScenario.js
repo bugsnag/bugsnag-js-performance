@@ -21,10 +21,11 @@ export const App = () => {
 
     useEffect(() => {
     (async () => {
-      const traceParentString = await NativeScenarioLauncher.getNativeTraceParent()
-      const remoteParentContext = RemoteParentContext.parseTraceParent(traceParentString)
+      const nativeTraceParent = await NativeScenarioLauncher.startNativeSpan({ name: 'Native parent span' })
+      const remoteParentContext = RemoteParentContext.parseTraceParent(nativeTraceParent)
       const span = BugsnagPerformance.startSpan('JS child span', { parentContext: remoteParentContext })
       span.end()
+      await NativeScenarioLauncher.endNativeSpan(nativeTraceParent)
     })()
   }, [])
 
