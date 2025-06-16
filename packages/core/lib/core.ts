@@ -54,9 +54,11 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   platformExtensions?: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => T
 }
 
-export type BugsnagPerformance <C extends Configuration, T> = Client<C> & T
+export type BugsnagPerformance<C extends Configuration, T> = Client<C> & T
 
 export function createClient<S extends CoreSchema, C extends Configuration, T> (options: ClientOptions<S, C, T>): BugsnagPerformance<C, T> {
+  const HUB_PREFIX = '00000'
+  const HUB_ENDPOINT = 'https://otlp.insighthub.smartbear.com/v1/traces'
   const bufferingProcessor = new BufferingProcessor()
   const spanContextStorage = options.spanContextStorage || new DefaultSpanContextStorage(options.backgroundingListener)
   let logger = options.schema.logger.defaultValue
@@ -87,7 +89,14 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       // if using the default endpoint add the API key as a subdomain
       // e.g. convert URL https://otlp.bugsnag.com/v1/traces to URL https://<project_api_key>.otlp.bugsnag.com/v1/traces
       if (configuration.endpoint === schema.endpoint.defaultValue) {
-        configuration.endpoint = configuration.endpoint.replace('https://', `https://${configuration.apiKey}.`)
+        //     …switch to InsightHub when the apiKey starts with 00000
+        if (configuration.apiKey.startsWith(HUB_PREFIX)) {
+          configuration.endpoint = HUB_ENDPOINT
+        } else {
+          // otherwise keep the default Bugsnag domain, but prefix with the apiKey
+          configuration.endpoint = configuration.endpoint
+            .replace('https://', `https://${configuration.apiKey}.`)
+        }
       }
 
       // Correlate errors with span by monkey patching _notify on the error client
@@ -197,7 +206,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
 }
 
 export function createNoopClient<C extends Configuration, T> (): BugsnagPerformance<C, T> {
-  const noop = () => {}
+  const noop = () => { }
 
   return {
     start: noop,
