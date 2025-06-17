@@ -1,5 +1,5 @@
 import { PluginContext } from '@bugsnag/core-performance'
-import { createConfiguration, MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
+import { createConfiguration, IncrementingIdGenerator, MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
 import type { Configuration } from '@bugsnag/core-performance'
 import { BugsnagNamedSpansPlugin, NamedSpanQuery } from '../lib'
 import type { IncrementingClock } from '@bugsnag/js-performance-test-utilities'
@@ -55,11 +55,30 @@ describe('BugsnagNamedSpansPlugin', () => {
     // Call onSpanStart with the mock span
     plugin.onSpanStart(mockSpan as any)
 
-    // Verify the span was added to the spanControls map by using getSpanControls
-    const retrievedSpanControl = plugin.getSpanControls(new NamedSpanQuery('testSpan'))
+    // Verify the span was added to the spansByName map by using getSpanControls
+    const retrievedSpan = plugin.getSpanControls(new NamedSpanQuery('testSpan'))
 
-    // @ts-expect-error span is private
-    expect(retrievedSpanControl?.span).toBe(mockSpan)
+    expect(retrievedSpan).toBe(mockSpan)
+  })
+
+  it('should only track the latest span for a given span name', () => {
+    const spanFactory = new MockSpanFactory()
+    const firstSpan = spanFactory.toPublicApi(spanFactory.startSpan('testSpan', {}))
+
+    // Notify the plugin of the first span
+    plugin.onSpanStart(firstSpan)
+
+    // Verify span is tracked
+    let retrievedSpan = plugin.getSpanControls(new NamedSpanQuery('testSpan'))
+    expect(retrievedSpan).toBe(firstSpan)
+
+    // Add a second span with the same name
+    const secondSpan = spanFactory.toPublicApi(spanFactory.startSpan('testSpan', {}))
+    plugin.onSpanStart(secondSpan)
+
+    // Verify that the second span is now tracked
+    retrievedSpan = plugin.getSpanControls(new NamedSpanQuery('testSpan'))
+    expect(retrievedSpan).toBe(secondSpan)
   })
 
   it('should remove spans when onSpanEnd is called', () => {
@@ -77,10 +96,9 @@ describe('BugsnagNamedSpansPlugin', () => {
     plugin.onSpanStart(mockSpan as any)
 
     // Verify span is tracked
-    const retrievedSpanControl = plugin.getSpanControls(new NamedSpanQuery('testSpan'))
+    const retrievedSpan = plugin.getSpanControls(new NamedSpanQuery('testSpan'))
 
-    // @ts-expect-error span is private
-    expect(retrievedSpanControl?.span).toBe(mockSpan)
+    expect(retrievedSpan).toBe(mockSpan)
 
     // Call onSpanEnd to remove the span
     const result = plugin.onSpanEnd(mockSpan as any)
@@ -88,6 +106,30 @@ describe('BugsnagNamedSpansPlugin', () => {
     // Verify span is removed
     expect(plugin.getSpanControls(new NamedSpanQuery('testSpan'))).toBeNull()
     expect(result).toBe(true)
+  })
+
+  it('should only remove ended spans if they are currently being tracked', () => {
+    const spanFactory = new MockSpanFactory({ idGenerator: new IncrementingIdGenerator() })
+    const firstSpan = spanFactory.toPublicApi(spanFactory.startSpan('testSpan', {}))
+
+    // Notify the plugin of the first span
+    plugin.onSpanStart(firstSpan)
+
+    // Verify span is tracked
+    let retrievedSpan = plugin.getSpanControls(new NamedSpanQuery('testSpan'))
+    expect(retrievedSpan).toBe(firstSpan)
+
+    // Add a second span with the same name
+    const secondSpan = spanFactory.toPublicApi(spanFactory.startSpan('testSpan', {}))
+    plugin.onSpanStart(secondSpan)
+
+    // End the first span
+    firstSpan.end()
+    plugin.onSpanEnd(firstSpan)
+
+    // Verify that the second span is still tracked
+    retrievedSpan = plugin.getSpanControls(new NamedSpanQuery('testSpan'))
+    expect(retrievedSpan).toBe(secondSpan)
   })
 
   it('should return null for spans that do not exist', () => {
@@ -107,47 +149,31 @@ describe('BugsnagNamedSpansPlugin', () => {
 
   it('should clean up invalid spans on start', () => {
     // Create mock spans - one valid and one invalid
-    const validSpan = {
-      name: 'validSpan',
-      isValid: jest.fn(() => true),
-      end: jest.fn(),
-      id: '123',
-      traceId: '456',
-      setAttribute: jest.fn()
-    }
-
-    const invalidSpan = {
-      name: 'invalidSpan',
-      isValid: jest.fn(() => false),
-      end: jest.fn(),
-      id: '789',
-      traceId: '012',
-      setAttribute: jest.fn()
-    }
+    const spanFactory = new MockSpanFactory()
+    const validSpan = spanFactory.toPublicApi(spanFactory.startSpan('validSpan', {}))
+    const invalidSpan = spanFactory.toPublicApi(spanFactory.startSpan('invalidSpan', {}))
 
     // Add spans to tracking
-    plugin.onSpanStart(validSpan as any)
-    plugin.onSpanStart(invalidSpan as any)
+    plugin.onSpanStart(validSpan)
+    plugin.onSpanStart(invalidSpan)
 
     // Verify both spans are tracked initially
-    let validSpanControl = plugin.getSpanControls(new NamedSpanQuery('validSpan'))
-    let invalidSpanControl = plugin.getSpanControls(new NamedSpanQuery('invalidSpan'))
+    let retrievedValidSpan = plugin.getSpanControls(new NamedSpanQuery('validSpan'))
+    let retrievedInvalidSpan = plugin.getSpanControls(new NamedSpanQuery('invalidSpan'))
 
-    // @ts-expect-error span is private
-    expect(validSpanControl?.span).toBe(validSpan)
-    // @ts-expect-error span is private
-    expect(invalidSpanControl?.span).toBe(invalidSpan)
+    expect(retrievedValidSpan).toBe(validSpan)
+    expect(retrievedInvalidSpan).toBe(invalidSpan)
 
-    // Call start to trigger the cleanup (which calls cleanup)
+    // Invalidate the span and call start to trigger the cleanup (which calls cleanup)
+    invalidSpan.end()
     plugin.start()
 
     // Only valid spans should remain
-    validSpanControl = plugin.getSpanControls(new NamedSpanQuery('validSpan'))
-    invalidSpanControl = plugin.getSpanControls(new NamedSpanQuery('invalidSpan'))
+    retrievedValidSpan = plugin.getSpanControls(new NamedSpanQuery('validSpan'))
+    retrievedInvalidSpan = plugin.getSpanControls(new NamedSpanQuery('invalidSpan'))
 
-    // @ts-expect-error span is private
-    expect(validSpanControl?.span).toBe(validSpan)
-    expect(invalidSpanControl).toBeNull()
+    expect(retrievedValidSpan).toBe(validSpan)
+    expect(retrievedInvalidSpan).toBeNull()
   })
 
   it('should clean up invalid spans every hour', () => {

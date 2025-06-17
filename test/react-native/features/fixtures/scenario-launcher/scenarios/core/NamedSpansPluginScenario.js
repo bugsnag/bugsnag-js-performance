@@ -11,9 +11,9 @@ export const initialise = async (config) => {
 export const App = () => {
   useEffect(() => {
     BugsnagPerformance.startSpan('NamedSpansPluginScenario')
-    const spanControls = BugsnagPerformance.getSpanControls(new NamedSpanQuery('NamedSpansPluginScenario'))
-    spanControls.setAttribute('custom_attribute', true)
-    spanControls.end()
+    const span = BugsnagPerformance.getSpanControls(new NamedSpanQuery('NamedSpansPluginScenario'))
+    span.setAttribute('custom_attribute', true)
+    span.end()
   }, [])
 
   return (
