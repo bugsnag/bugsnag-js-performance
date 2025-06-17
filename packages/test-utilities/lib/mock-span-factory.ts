@@ -18,25 +18,39 @@ const jestLogger = {
   warn: jest.fn()
 }
 
+const defaultOptions = () => {
+  const backgroundingListener = new ControllableBackgroundingListener()
+
+  return {
+    processor: new InMemoryProcessor(),
+    sampler: new Sampler(1.0),
+    idGenerator: new StableIdGenerator(),
+    spanAttributesSource,
+    clock: new IncrementingClock(),
+    backgroundingListener,
+    logger: jestLogger,
+    spanContextStorage: new DefaultSpanContextStorage(backgroundingListener)
+  }
+}
+
 class MockSpanFactory <C extends Configuration> extends SpanFactory<C> {
   public createdSpans: SpanEnded[]
 
-  constructor () {
-    const processor = new InMemoryProcessor()
-    const backgroundingListener = new ControllableBackgroundingListener()
+  constructor (overrides: Partial<ReturnType<typeof defaultOptions>> = {}) {
+    const options = { ...defaultOptions(), ...overrides }
 
     super(
-      processor,
-      new Sampler(1.0),
-      new StableIdGenerator(),
-      spanAttributesSource,
-      new IncrementingClock(),
-      backgroundingListener,
-      jestLogger,
-      new DefaultSpanContextStorage(backgroundingListener)
+      options.processor,
+      options.sampler,
+      options.idGenerator,
+      options.spanAttributesSource,
+      options.clock,
+      options.backgroundingListener,
+      options.logger,
+      options.spanContextStorage
     )
 
-    this.createdSpans = processor.spans
+    this.createdSpans = options.processor.spans
   }
 
   startSpan = jest.fn((name: string, options: SpanOptions) => {

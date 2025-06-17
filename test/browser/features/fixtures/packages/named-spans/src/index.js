@@ -18,6 +18,6 @@ BugsnagPerformance.start({
 
 BugsnagPerformance.startSpan('Span 1')
 
-const spanControls = BugsnagPerformance.getSpanControls(new NamedSpanQuery('Span 1'))
-spanControls.setAttribute('custom_attribute', true)
-spanControls.end()
+const span = BugsnagPerformance.getSpanControls(new NamedSpanQuery('Span 1'))
+span.setAttribute('custom_attribute', true)
+span.end()
