@@ -1,6 +1,6 @@
 import { TurboModuleRegistry } from 'react-native'
 import { SpanQuery, timeToNumber } from '@bugsnag/core-performance'
-import type { SpanUpdateTransaction, Spec } from './NativeBugsnagRemoteSpans'
+import type { Spec } from './NativeBugsnagRemoteSpans'
 import type { Clock, ParentContext, Plugin, PluginContext, SpanAttribute, SpanControlProvider, Time } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 
@@ -21,6 +21,17 @@ export interface NativeSpanControl extends ParentContext {
 
 const NativeRemoteSpansModule = TurboModuleRegistry.get<Spec>('BugsnagRemoteSpans')
 
+interface SpanTransaction {
+  attributes: Array<{ name: string, value: SpanAttribute }>
+  isEnded: boolean
+  endTimestamp?: string
+}
+
+interface SpanId {
+  spanId: string
+  traceId: string
+}
+
 class NativeSpanControlImpl implements NativeSpanControl {
   constructor (
     public readonly id: string,
@@ -29,10 +40,9 @@ class NativeSpanControlImpl implements NativeSpanControl {
   }
 
   updateSpan (update: (mutator: NativeSpanMutator) => void): Promise<boolean> {
-    const transaction: SpanUpdateTransaction = {
+    const transaction: SpanTransaction = {
       attributes: [],
-      isEnded: false,
-      endTime: undefined
+      isEnded: false
     }
 
     update({
@@ -56,7 +66,10 @@ export class NativeSpanControlProvider implements SpanControlProvider<NativeSpan
 
   getSpanControls<Q> (query: Q): NativeSpanControl | null {
     if (query instanceof NativeSpanQuery && NativeRemoteSpansModule) {
-      const spanId = NativeRemoteSpansModule.getSpanIdByName(query.name)
+      const spanId: SpanId | undefined =
+          NativeRemoteSpansModule.getSpanIdByName(query.name) as
+              unknown as SpanId | undefined
+
       if (spanId) {
         return new NativeSpanControlImpl(spanId.spanId, spanId.traceId, this.clock)
       }

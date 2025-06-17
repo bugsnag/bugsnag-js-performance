@@ -4,10 +4,9 @@
 #import <BugsnagRemoteSpansSpec/BugsnagRemoteSpansSpec.h>
 #endif
 
-
 NS_ASSUME_NONNULL_BEGIN
 
-@interface BugsnagRemoteSpans: NSObject <RCTBridgeModule>
+@interface BugsnagRemoteSpans : NSObject <RCTBridgeModule>
 
 @end
 

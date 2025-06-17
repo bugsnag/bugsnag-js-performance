@@ -15,6 +15,8 @@ Pod::Spec.new do |s|
 
   s.source_files    = "ios/**/*.{h,m,mm,swift}"
 
+  s.dependency 'BugsnagPerformance'
+
   if ENV["RCT_NEW_ARCH_ENABLED"] == "1"
     install_modules_dependencies(s)
   else
