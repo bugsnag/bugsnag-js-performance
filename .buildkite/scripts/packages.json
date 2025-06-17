@@ -12,7 +12,8 @@
             "packages/angular",
             "packages/react-router",
             "packages/vue",
-            "packages/plugin-react-performance"
+            "packages/plugin-react-performance",
+            "packages/plugin-named-spans"
         ]
     },
     {
@@ -30,7 +31,8 @@
             "packages/platforms/react-native",
             "packages/delivery-fetch",
             "packages/request-tracker",
-            "packages/plugin-react-navigation"
+            "packages/plugin-react-navigation",
+            "packages/plugin-named-spans"
         ]
     },
     {

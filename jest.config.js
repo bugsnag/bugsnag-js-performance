@@ -13,7 +13,8 @@ const paths = {
   '@bugsnag/angular-performance': ['./packages/angular/lib/index.ts'],
   '@bugsnag/plugin-react-native-navigation-performance': ['./packages/plugin-react-native-navigation/lib/index.ts'],
   '@bugsnag/plugin-react-navigation-performance': ['./packages/plugin-react-navigation/lib/index.ts'],
-  '@bugsnag/plugin-react-performance': ['./packages/plugin-react-performance/lib/index.ts']
+  '@bugsnag/plugin-react-performance': ['./packages/plugin-react-performance/lib/index.ts'],
+  '@bugsnag/plugin-named-spans-performance': ['./packages/plugin-named-spans/lib/index.ts']
 }
 
 // convert the tsconfig "paths" option into Jest's "moduleNameMapper" option
@@ -124,6 +125,11 @@ module.exports = {
           }
         ]
       }
+    },
+    {
+      displayName: 'plugin-named-spans',
+      testMatch: ['<rootDir>/packages/plugin-named-spans/**/*.test.ts'],
+      ...defaultModuleConfig
     },
     '<rootDir>/jest/config/react-navigation.js',
     '<rootDir>/jest/config/react-native-navigation.js'
