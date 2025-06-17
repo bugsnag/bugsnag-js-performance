@@ -3,7 +3,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface BugsnagRemoteSpans: NSObject <NativeRemoteSpansSpec>
+@interface BugsnagRemoteSpans: NSObject <NativeBugsnagRemoteSpansSpec>
 
 @end
 
