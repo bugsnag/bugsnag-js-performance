@@ -22,7 +22,7 @@ export type SpanUpdateTransaction = {
 export interface Spec extends TurboModule {
   getSpanIdByName: (spanName: string) => SpanId | undefined
 
-  updateSpan: (spanId: SpanId, updates: SpanUpdateTransaction) => Promise<boolean>
+  updateSpan: (spanId: UnsafeObject, updates: UnsafeObject) => Promise<boolean>
 }
 
 export default TurboModuleRegistry.get<Spec>(
