@@ -17,9 +17,14 @@ if (baseBranch) {
   execSync(`git --no-pager diff --name-only origin/${baseBranch}`, { stdio: 'inherit' });
 }
 
-packages.reverse().forEach(({ paths, block, pipeline, environment }) => {
+packages.reverse().forEach(({ paths, block, pipeline, environment, skip }) => {
   let upload = false;
   const env = environment || "";
+
+  if (skip) {
+    console.log(`Skipping pipeline ${pipeline} as per configuration.`);
+    return;
+  }
 
   // Upload all pipelines if specified in the commit message
   if (commitMessage.includes("[full ci]") ||
