@@ -15,11 +15,16 @@ fs.copyFileSync(scenarioIndexPath, `${scenarioIndexPath}.backup`)
 if (process.env.EXPO_VERSION) {
   pkg.files.push('/scenarios/expo')
   scenarioExports += "\nexport * from './expo'"
-} 
+}
 
 if (process.env.REACT_NATIVE_NAVIGATION) {
   pkg.files.push('/scenarios/react-native-navigation')
   scenarioExports += "\nexport * from './react-native-navigation'"
+}
+
+if (process.env.NATIVE_INTEGRATION) {
+  pkg.files.push('/scenarios/native-integration')
+  scenarioExports += "\nexport * from './native-integration'"
 }
 
 // Update package.json
