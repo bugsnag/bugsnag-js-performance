@@ -12,7 +12,6 @@ import com.bugsnag.android.performance.Span;
 import com.bugsnag.android.performance.internal.BugsnagClock;
 import com.bugsnag.android.performance.internal.EncodingUtils;
 import com.bugsnag.reactnative.performance.ReactNativeSpanAttributes;
-import com.bugsnag.reactnative.performance.remotespans.NativeBugsnagRemoteSpansSpec;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -21,7 +20,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
 
-public class BugsnagRemoteSpans extends NativeBugsnagRemoteSpansSpec {
+class BugsnagRemoteSpans {
 
     // Attribute keys
     private static final String ATTRIBUTES = "attributes";
@@ -36,12 +35,14 @@ public class BugsnagRemoteSpans extends NativeBugsnagRemoteSpansSpec {
 
     static final String MODULE_NAME = "BugsnagRemoteSpans";
 
+    private final ReactApplicationContext reactContext;
+
     public BugsnagRemoteSpans(ReactApplicationContext reactContext) {
-        super(reactContext);
+        this.reactContext = reactContext;
     }
 
-    @Override
-    public @Nullable WritableMap getSpanIdByName(String spanName) {
+    @Nullable
+    public WritableMap getSpanIdByName(String spanName) {
         NativeSpanAccessPlugin nativeSpanAccessPlugin = NativeSpanAccessPlugin.getInstance();
 
         if (nativeSpanAccessPlugin == null) {
@@ -60,7 +61,6 @@ public class BugsnagRemoteSpans extends NativeBugsnagRemoteSpansSpec {
         return map;
     }
 
-    @Override
     public void updateSpan(ReadableMap spanId, ReadableMap updates, Promise promise) {
         NativeSpanAccessPlugin nativeSpanAccessPlugin = NativeSpanAccessPlugin.getInstance();
 
