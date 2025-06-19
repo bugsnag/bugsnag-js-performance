@@ -13,7 +13,7 @@
 RCT_EXPORT_MODULE()
 
 static void endSpan(NSDictionary *updates, BugsnagPerformanceSpan *span) {
-    NSString *timestampString = updates[@"endTimestamp"];
+    NSNumber *timestampString = updates[@"endTime"];
     if (timestampString) {
         double endTimestampValue = [timestampString doubleValue];
         NSDate *endTimestamp = [NSDate dateWithTimeIntervalSince1970:(endTimestampValue / NSEC_PER_SEC)];
