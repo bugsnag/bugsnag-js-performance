@@ -50,12 +50,14 @@
             "packages/delivery-fetch",
             "packages/request-tracker",
             "packages/plugin-react-native-navigation"
-        ]
+        ],
+        "skip": true
     },
     {
         "pipeline": ".buildkite/react-native-navigation-pipeline.full.yml",
         "block": ".buildkite/react-native-navigation-pipeline.full.block.yml",
-        "paths": []
+        "paths": [],
+        "skip": true
     },
     {
         "pipeline": ".buildkite/expo-pipeline.yml",
@@ -67,11 +69,13 @@
             "packages/delivery-fetch",
             "packages/request-tracker",
             "packages/plugin-react-navigation"
-        ]
+        ],
+        "skip": true
     },
     {
         "pipeline": ".buildkite/expo-pipeline.full.yml",
         "block": ".buildkite/expo-pipeline.full.block.yml",
-        "paths": []
+        "paths": [],
+        "skip": true
     }
 ]

@@ -1,6 +1,5 @@
 import { TurboModule, TurboModuleRegistry } from "react-native";
 import type { UnsafeObject } from 'react-native/Libraries/Types/CodegenTypes'
-
 export interface Spec extends TurboModule {
   startBugsnag(configuration: UnsafeObject): Promise<void>;
   clearPersistentData(): void;
@@ -8,8 +7,8 @@ export interface Spec extends TurboModule {
   readStartupConfig(): UnsafeObject | null | undefined;
   exitApp(): void;
   startNativePerformance(configuration: UnsafeObject): Promise<void>;
-  sendNativeChildSpan(traceParent: string): Promise<void>;
-  getNativeTraceParent(): Promise<string>;
+  startNativeSpan(options: UnsafeObject): Promise<string>;
+  endNativeSpan(traceParent: string): Promise<boolean>;
 }
 
 export default TurboModuleRegistry.get<Spec>("ScenarioLauncher") as Spec | null;

@@ -46,6 +46,7 @@ const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
   '@bugsnag/delivery-fetch-performance',
   '@bugsnag/plugin-react-native-navigation-performance',
+  '@bugsnag/plugin-react-native-remote-spans',
   '@bugsnag/plugin-react-navigation-performance',
   '@bugsnag/react-native-performance',
   '@bugsnag/request-tracker-performance',
@@ -57,6 +58,7 @@ const PACKAGE_DIRECTORIES = [
   `${ROOT_DIR}/packages/delivery-fetch`,
   `${ROOT_DIR}/packages/platforms/react-native`,
   `${ROOT_DIR}/packages/plugin-react-native-navigation`,
+  `${ROOT_DIR}/packages/plugin-react-native-remote-spans`,
   `${ROOT_DIR}/packages/plugin-react-navigation`,
   `${ROOT_DIR}/packages/request-tracker`,
   `${ROOT_DIR}/packages/plugin-named-spans`,
@@ -152,6 +154,12 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
 // generate Android Fixture
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
+  // build and publish bugsnag-android-performance to local maven repo
+  // this is required even if we're not building the native integration fixture because
+  // @bugsnag/react-native-performance has a compileOnly dependency on bugsnag-android-performance
+  // TODO: remove this once changes have been released in bugsnag-android-performance
+  publishLocalAndroidPerformance()
+
   execFileSync('./gradlew', ['assembleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
   fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
 }
@@ -386,7 +394,7 @@ function installAndroidPerformance() {
   const appGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
   let appGradle = fs.readFileSync(appGradlePath, 'utf8')
 
-  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:1.14.0")'
+  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:9.9.9")'
   const dependenciesSection = 'dependencies {'
 
   appGradle = appGradle.replace(dependenciesSection, `${dependenciesSection}\n    ${performanceDependency}`)
@@ -445,4 +453,26 @@ class MainActivity : ReactActivity() {
   let mainActivityContents = fs.readFileSync(mainActivityPath, 'utf8')
   mainActivityContents = mainActivityContents.replace(mainActivityPattern, mainActivityReplacement)
   fs.writeFileSync(mainActivityPath, mainActivityContents)
+}
+
+function publishLocalAndroidPerformance() {
+  // add bugsnag-android-performance as a git submodule
+  execSync(`git submodule add -b integration/appstart-type https://github.com/bugsnag/bugsnag-android-performance`, { cwd: fixtureDir, stdio: 'inherit' })
+
+  // build and publish bugsnag-android-performance to maven local
+  execSync(`./gradlew -PVERSION_NAME=9.9.9 clean publishToMavenLocal`, { cwd: `${fixtureDir}/bugsnag-android-performance`, stdio: 'inherit' })
+
+  // add mavenLocal() to the repositories section in the android/build.gradle file
+  const buildGradlePath = resolve(fixtureDir, 'android/build.gradle')
+  let buildGradle = fs.readFileSync(buildGradlePath, 'utf8')
+  const repositoriesBlock = `allprojects {
+  repositories {
+    mavenLocal()
+    mavenCentral()
+    google()
+  }
+}`
+
+  buildGradle = `${repositoriesBlock}\n${buildGradle}`
+  fs.writeFileSync(buildGradlePath, buildGradle)
 }
