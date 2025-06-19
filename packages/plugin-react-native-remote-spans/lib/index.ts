@@ -24,7 +24,7 @@ const NativeRemoteSpansModule = TurboModuleRegistry.get<Spec>('BugsnagRemoteSpan
 interface SpanTransaction {
   attributes: Array<{ name: string, value: SpanAttribute }>
   isEnded: boolean
-  endTimestamp?: string
+  endTime?: number
 }
 
 interface SpanId {
