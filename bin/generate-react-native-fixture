@@ -46,7 +46,7 @@ const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
   '@bugsnag/delivery-fetch-performance',
   '@bugsnag/plugin-react-native-navigation-performance',
-  '@bugsnag/plugin-react-native-remote-spans',
+  '@bugsnag/plugin-react-native-span-access',
   '@bugsnag/plugin-react-navigation-performance',
   '@bugsnag/react-native-performance',
   '@bugsnag/request-tracker-performance',
@@ -58,7 +58,7 @@ const PACKAGE_DIRECTORIES = [
   `${ROOT_DIR}/packages/delivery-fetch`,
   `${ROOT_DIR}/packages/platforms/react-native`,
   `${ROOT_DIR}/packages/plugin-react-native-navigation`,
-  `${ROOT_DIR}/packages/plugin-react-native-remote-spans`,
+  `${ROOT_DIR}/packages/plugin-react-native-span-access`,
   `${ROOT_DIR}/packages/plugin-react-navigation`,
   `${ROOT_DIR}/packages/request-tracker`,
   `${ROOT_DIR}/packages/plugin-named-spans`,
@@ -210,12 +210,12 @@ function configureRN064Fixture(fixtureDir) {
   // Android
   const gradlePath = resolve(fixtureDir, 'android/build.gradle')
   let gradle = fs.readFileSync(gradlePath, 'utf8')
-  
+
   // add kotlinVersion = "1.4.10" to the buildscript ext block
   const buildscriptExt = 'ext {'
   const kotlinVersion = 'kotlinVersion = "1.4.10"'
   gradle = gradle.replace(buildscriptExt, `${buildscriptExt}\n        ${kotlinVersion}`)
-  
+
   // bump android sdk version to 30
   gradle = gradle.replace(/compileSdkVersion = 29/, 'compileSdkVersion = 30').replace(/targetSdkVersion = 29/, 'targetSdkVersion = 30')
 
@@ -334,7 +334,7 @@ function configureIOSProject() {
   if (parseFloat(reactNativeVersion) < 0.73) {
     podfileContents = podfileContents.replace(/platform\s*:ios,\s*(?:'[\d.]+'|min_ios_version_supported)/, "platform :ios, '13.0'")
   }
-  
+
   fs.writeFileSync(`${fixtureDir}/ios/Podfile`, podfileContents)
 
   // pin xcodeproj version to < 1.26.0

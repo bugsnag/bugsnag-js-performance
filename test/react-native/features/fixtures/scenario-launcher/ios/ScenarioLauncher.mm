@@ -5,6 +5,7 @@
 #ifdef NATIVE_INTEGRATION
 #import <BugsnagPerformance/BugsnagPerformance.h>
 #import <BugsnagPerformance/BugsnagPerformanceConfiguration+Private.h>
+#import "BugsnagNativeSpansPlugin.h"
 #endif
 
 @implementation ScenarioLauncher {
@@ -143,9 +144,11 @@ RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(
     config.internal.autoTriggerExportOnBatchSize = 1;
     config.internal.clearPersistenceOnStart = YES;
 
+    [config addPlugin:[BugsnagNativeSpansPlugin new]];
+
     [BugsnagPerformance startWithConfiguration:config];
     resolve(nil);
-  });    
+  });
 }
 
 RCT_EXPORT_METHOD(startNativeSpan:(NSDictionary *)options resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
