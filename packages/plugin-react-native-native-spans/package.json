@@ -1,0 +1,51 @@
+{
+  "name": "@bugsnag/plugin-react-native-native-spans",
+  "version": "2.13.0",
+  "description": "BugSnag performance monitoring for react-native",
+  "homepage": "https://www.bugsnag.com/",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rollup --config rollup.config.mjs",
+    "clean": "rm -rf dist/*"
+  },
+  "bugs": {
+    "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
+  },
+  "peerDependencies": {
+    "@bugsnag/core-performance": "*",
+    "@bugsnag/react-native-performance": "^2.10.0"
+  },
+  "devDependencies": {
+    "@bugsnag/core-performance": "^2.13.0",
+    "@bugsnag/react-native-performance": "^2.13.0",
+    "@react-native/babel-preset": "^0.74.0",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^12.4.1"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "android",
+    "ios",
+    "BugsnagNativeSpans.podspec",
+    "!android/build",
+    "!ios/build"
+  ],
+  "codegenConfig": {
+    "name": "BugsnagNativeSpansSpec",
+    "type": "modules",
+    "jsSrcsDir": "dist",
+    "android": {
+      "javaPackageName": "com.bugsnag.reactnative.performance.nativespans"
+    }
+  }
+}
