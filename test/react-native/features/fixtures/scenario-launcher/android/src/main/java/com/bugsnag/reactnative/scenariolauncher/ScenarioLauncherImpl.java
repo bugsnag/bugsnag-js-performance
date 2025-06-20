@@ -16,7 +16,7 @@ import com.bugsnag.android.performance.RemoteSpanContext;
 import com.bugsnag.android.performance.Span;
 import com.bugsnag.android.performance.SpanOptions;
 
-import com.bugsnag.reactnative.performance.nativespans.NativeSpanAccessPlugin;
+import com.bugsnag.reactnative.performance.nativespans.BugsnagNativeSpansPlugin;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -177,7 +177,7 @@ class ScenarioLauncherImpl {
         config.setAutoInstrumentAppStarts(false);
         config.setAutoInstrumentActivities(AutoInstrument.OFF);
         config.setAutoInstrumentRendering(true);
-        config.addPlugin(new NativeSpanAccessPlugin());
+        config.addPlugin(new BugsnagNativeSpansPlugin());
 
         BugsnagPerformance.start(config);
         Log.d(MODULE_NAME, "Started Android performance");

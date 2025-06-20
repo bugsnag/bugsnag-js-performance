@@ -18,13 +18,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class NativeSpanAccessPlugin implements Plugin {
+public class BugsnagNativeSpansPlugin implements Plugin {
     /**
      * Default 10 minute validity time
      */
     private static final long DEFAULT_VALIDITY_TIME = 10 * 60 * 1000;
 
-    private static NativeSpanAccessPlugin INSTANCE;
+    private static BugsnagNativeSpansPlugin INSTANCE;
 
     private final ConcurrentMap<String, Span> spansByName = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, Span> spansById = new ConcurrentHashMap<>();
@@ -79,7 +79,7 @@ public class NativeSpanAccessPlugin implements Plugin {
         return spansById.get(traceIdHex + ':' + spanIdHex);
     }
 
-    static NativeSpanAccessPlugin getInstance() {
+    static BugsnagNativeSpansPlugin getInstance() {
         return INSTANCE;
     }
 
