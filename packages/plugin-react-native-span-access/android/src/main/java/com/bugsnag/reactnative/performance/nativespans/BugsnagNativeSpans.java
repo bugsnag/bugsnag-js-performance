@@ -44,7 +44,7 @@ class BugsnagNativeSpans {
 
     @Nullable
     public WritableMap getSpanIdByName(String spanName) {
-        NativeSpanAccessPlugin nativeSpanAccessPlugin = NativeSpanAccessPlugin.getInstance();
+        BugsnagNativeSpansPlugin nativeSpanAccessPlugin = BugsnagNativeSpansPlugin.getInstance();
 
         if (nativeSpanAccessPlugin == null) {
             return null;
@@ -63,7 +63,7 @@ class BugsnagNativeSpans {
     }
 
     public void updateSpan(ReadableMap spanId, ReadableMap updates, Promise promise) {
-        NativeSpanAccessPlugin nativeSpanAccessPlugin = NativeSpanAccessPlugin.getInstance();
+        BugsnagNativeSpansPlugin nativeSpanAccessPlugin = BugsnagNativeSpansPlugin.getInstance();
 
         if (nativeSpanAccessPlugin == null) {
             promise.resolve(false);

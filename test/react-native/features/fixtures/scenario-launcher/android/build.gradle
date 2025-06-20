@@ -38,5 +38,5 @@ dependencies {
   compileOnly "com.bugsnag:bugsnag-android:6.+"
   compileOnly("com.bugsnag:bugsnag-android-performance:9.9.9")
   implementation 'com.facebook.react:react-native'
-  implementation project(':bugsnag_plugin-react-native-native-spans')
+  implementation project(':bugsnag_plugin-react-native-span-access')
 }

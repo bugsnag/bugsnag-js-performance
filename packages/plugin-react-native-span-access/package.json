@@ -1,5 +1,5 @@
 {
-  "name": "@bugsnag/plugin-react-native-native-spans",
+  "name": "@bugsnag/plugin-react-native-span-access",
   "version": "2.13.0",
   "description": "BugSnag performance monitoring for react-native",
   "homepage": "https://www.bugsnag.com/",

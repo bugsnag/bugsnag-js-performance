@@ -32,7 +32,7 @@
             "packages/delivery-fetch",
             "packages/request-tracker",
             "packages/plugin-react-navigation",
-            "packages/plugin-react-native-remote-spans",
+            "packages/plugin-react-native-span-access",
             "packages/plugin-named-spans"
         ]
     },
@@ -51,7 +51,7 @@
             "packages/delivery-fetch",
             "packages/request-tracker",
             "packages/plugin-react-native-navigation",
-            "packages/plugin-react-native-remote-spans"
+            "packages/plugin-react-native-span-access"
         ],
         "skip": true
     },
@@ -71,7 +71,7 @@
             "packages/delivery-fetch",
             "packages/request-tracker",
             "packages/plugin-react-navigation",
-            "packages/plugin-react-native-remote-spans"
+            "packages/plugin-react-native-span-access"
         ],
         "skip": true
     },
