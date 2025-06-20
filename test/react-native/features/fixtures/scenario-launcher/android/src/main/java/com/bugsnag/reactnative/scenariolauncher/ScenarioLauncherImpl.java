@@ -16,7 +16,7 @@ import com.bugsnag.android.performance.RemoteSpanContext;
 import com.bugsnag.android.performance.Span;
 import com.bugsnag.android.performance.SpanOptions;
 
-import com.bugsnag.reactnative.performance.remotespans.NativeSpanAccessPlugin;
+import com.bugsnag.reactnative.performance.nativespans.NativeSpanAccessPlugin;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
@@ -29,9 +29,9 @@ import java.io.IOException;
 import java.util.HashMap;
 
 class ScenarioLauncherImpl {
-  
+
   static final String MODULE_NAME = "ScenarioLauncher";
-  
+
   private final ReactApplicationContext reactContext;
 
   private final HashMap<String, Span> openSpans = new HashMap<>();
@@ -141,7 +141,7 @@ class ScenarioLauncherImpl {
         if (!sharedPreferences.getBoolean("configured", false)) {
             return null;
         }
-        
+
         WritableMap startupConfig = Arguments.createMap();
         startupConfig.putString("apiKey", sharedPreferences.getString("apiKey", ""));
         startupConfig.putString("endpoint", sharedPreferences.getString("endpoint", ""));
@@ -181,7 +181,7 @@ class ScenarioLauncherImpl {
 
         BugsnagPerformance.start(config);
         Log.d(MODULE_NAME, "Started Android performance");
-    
+
         promise.resolve(true);
 
     } catch (Exception e) {
