@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 import { NativeScenarioLauncher } from '../../lib/native'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
-import { NativeSpanQuery, BugsnagRemoteSpansPlugin } from '@bugsnag/plugin-react-native-remote-spans'
+import { NativeSpanQuery, BugsnagNativeSpansPlugin } from '@bugsnag/plugin-react-native-span-access'
 
 export const doNotStartBugsnagPerformance = true
 
@@ -18,7 +18,7 @@ export const initialise = async (config) => {
     maximumBatchSize: 1,
     autoInstrumentAppStarts: false,
     autoInstrumentNetworkRequests: false,
-    plugins: [new BugsnagRemoteSpansPlugin()]
+    plugins: [new BugsnagNativeSpansPlugin()]
   })
 }
 

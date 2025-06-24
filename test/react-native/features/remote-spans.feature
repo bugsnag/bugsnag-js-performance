@@ -1,4 +1,4 @@
-@native_integration @android_only @skip_old_arch
+@native_integration
 Feature: Remote spans plugin
 
 Scenario: Native spans can be modified and ended from JS
@@ -8,7 +8,7 @@ Scenario: Native spans can be modified and ended from JS
 
   # JS trace
   And the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "com.bugsnag.fixtures.reactnative.performance"
-  And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.name" equals "bugsnag.performance.reactnative"  
+  And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.name" equals "bugsnag.performance.reactnative"
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "RemoteSpansScenarioChild"
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" double attribute "bugsnag.sampling.p" equals 1.0
   And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "custom"

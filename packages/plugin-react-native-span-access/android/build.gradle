@@ -6,6 +6,12 @@ def safeExtGet(prop, fallback) {
   rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
 }
 
+repositories {
+  mavenLocal()
+  mavenCentral()
+  google()
+}
+
 apply plugin: 'com.android.library'
 if (isNewArchitectureEnabled()) {
   apply plugin: 'com.facebook.react'
@@ -15,7 +21,7 @@ android {
   compileSdkVersion safeExtGet('compileSdkVersion', 29)
 
   if (android.hasProperty('namespace')) {
-    namespace 'com.bugsnag.reactnative.scenariolauncher'
+    namespace 'com.bugsnag.reactnative.performance.nativespans'
   }
 
   sourceSets {
@@ -29,14 +35,8 @@ android {
   }
 }
 
-repositories {
-  mavenCentral()
-  google()
-}
-
 dependencies {
-  compileOnly "com.bugsnag:bugsnag-android:6.+"
-  compileOnly("com.bugsnag:bugsnag-android-performance:9.9.9")
   implementation 'com.facebook.react:react-native'
-  implementation project(':bugsnag_plugin-react-native-span-access')
+  implementation project(':bugsnag_react-native-performance')
+  api 'com.bugsnag:bugsnag-android-performance:9.9.9'
 }
