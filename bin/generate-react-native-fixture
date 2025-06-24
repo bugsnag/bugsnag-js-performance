@@ -149,6 +149,12 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   // link react-native-navigation using rnn-link tool
   if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
     execSync('npx rnn-link', { cwd: fixtureDir, stdio: 'inherit' })
+
+    // update the kotlin version to 1.8.0 in the android build.gradle file (required for Android Performance)
+    const gradlePath = resolve(fixtureDir, 'android/build.gradle')
+    let gradle = fs.readFileSync(gradlePath, 'utf8')
+    gradle = gradle.replace(/RNNKotlinVersion = "[^"]+"/, 'RNNKotlinVersion = "1.8.0"')
+    fs.writeFileSync(gradlePath, gradle)
   }
 }
 
