@@ -1,5 +1,6 @@
 package com.bugsnag.reactnative.performance.nativespans;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -15,6 +16,12 @@ public class BugsnagNativeSpansModule extends NativeBugsnagNativeSpansSpec {
     public BugsnagNativeSpansModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.delegate = new BugsnagNativeSpans(reactContext);
+    }
+
+    @NonNull
+    @Override
+    public String getName() {
+        return BugsnagNativeSpans.MODULE_NAME;
     }
 
     @Override
