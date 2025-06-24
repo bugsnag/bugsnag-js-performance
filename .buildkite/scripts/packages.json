@@ -53,14 +53,12 @@
             "packages/request-tracker",
             "packages/plugin-react-native-navigation",
             "packages/plugin-react-native-span-access"
-        ],
-        "skip": true
+        ]
     },
     {
         "pipeline": ".buildkite/react-native-navigation-pipeline.full.yml",
         "block": ".buildkite/react-native-navigation-pipeline.full.block.yml",
-        "paths": [],
-        "skip": true
+        "paths": []
     },
     {
         "pipeline": ".buildkite/expo-pipeline.yml",
@@ -73,13 +71,11 @@
             "packages/request-tracker",
             "packages/plugin-react-navigation",
             "packages/plugin-react-native-span-access"
-        ],
-        "skip": true
+        ]
     },
     {
         "pipeline": ".buildkite/expo-pipeline.full.yml",
         "block": ".buildkite/expo-pipeline.full.block.yml",
-        "paths": [],
-        "skip": true
+        "paths": []
     }
 ]
