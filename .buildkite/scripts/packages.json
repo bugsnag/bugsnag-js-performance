@@ -13,7 +13,8 @@
             "packages/react-router",
             "packages/vue",
             "packages/plugin-react-performance",
-            "packages/svelte-kit"
+            "packages/svelte-kit",
+            "packages/plugin-named-spans"
         ]
     },
     {
@@ -31,7 +32,9 @@
             "packages/platforms/react-native",
             "packages/delivery-fetch",
             "packages/request-tracker",
-            "packages/plugin-react-navigation"
+            "packages/plugin-react-navigation",
+            "packages/plugin-react-native-span-access",
+            "packages/plugin-named-spans"
         ]
     },
     {
@@ -48,7 +51,8 @@
             "packages/platforms/react-native",
             "packages/delivery-fetch",
             "packages/request-tracker",
-            "packages/plugin-react-native-navigation"
+            "packages/plugin-react-native-navigation",
+            "packages/plugin-react-native-span-access"
         ]
     },
     {
@@ -65,7 +69,8 @@
             "packages/platforms/react-native",
             "packages/delivery-fetch",
             "packages/request-tracker",
-            "packages/plugin-react-navigation"
+            "packages/plugin-react-navigation",
+            "packages/plugin-react-native-span-access"
         ]
     },
     {

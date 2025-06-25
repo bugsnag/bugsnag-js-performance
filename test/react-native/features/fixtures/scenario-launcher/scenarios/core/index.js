@@ -13,11 +13,7 @@ export * as WrapperComponentProviderScenario from './WrapperComponentProviderSce
 export * as TracePropagationScenario from './TracePropagationScenario'
 export * as FixedSamplingProbabilityScenario from './FixedSamplingProbabilityScenario'
 export * as SpanCallbacksScenario from './SpanCallbacksScenario'
+export * as NamedSpansPluginScenario from './NamedSpansPluginScenario'
 
 // React Navigation Scenarios
 export * as ReactNavigationScenario from './ReactNavigationScenario'
-
-// Native Integration Scenarios
-export * as NativeIntegrationScenario from './NativeIntegrationScenario'
-export * as RemoteParentContextNativeScenario from './RemoteParentContextNativeScenario'
-export * as RemoteParentContextJSScenario from './RemoteParentContextJSScenario'

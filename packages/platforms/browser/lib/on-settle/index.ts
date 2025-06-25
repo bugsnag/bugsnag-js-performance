@@ -5,7 +5,7 @@ import RequestSettler from './request-settler'
 import SettlerAggregate from './settler-aggregate'
 import type { BrowserConfiguration } from '../config'
 import type { RequestTracker } from '@bugsnag/request-tracker-performance'
-import type { Clock, InternalConfiguration, Plugin } from '@bugsnag/core-performance'
+import type { Clock, Plugin, PluginContext } from '@bugsnag/core-performance'
 
 export type OnSettle = (callback: OnSettleCallback) => void
 export type OnSettleCallback = (settledTime: number) => void
@@ -15,7 +15,8 @@ const TIMEOUT_MILLISECONDS = 60 * 1000
 
 export function createNoopOnSettle (): OnSettlePlugin {
   const noop = () => {}
-  noop.configure = () => {}
+  noop.install = () => {}
+  noop.start = () => {}
   return noop as OnSettlePlugin
 }
 
@@ -80,14 +81,24 @@ export default function createOnSettle (
     }, cooldown)
   }
 
-  onSettlePlugin.configure = function (configuration: InternalConfiguration<BrowserConfiguration>): void {
-    const settleIgnoreUrls = configuration.settleIgnoreUrls.map(
-      (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
-    ).concat(RegExp(configuration.endpoint))
+  onSettlePlugin.install = function (context: PluginContext<BrowserConfiguration>): void {
+    const settleIgnoreUrls = []
+
+    if (context.configuration.endpoint) {
+      settleIgnoreUrls.push(RegExp(context.configuration.endpoint))
+    }
+
+    if (context.configuration.settleIgnoreUrls) {
+      settleIgnoreUrls.push(...context.configuration.settleIgnoreUrls.map(
+        (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
+      ))
+    }
 
     fetchRequestSettler.setUrlsToIgnore(settleIgnoreUrls)
     xhrRequestSettler.setUrlsToIgnore(settleIgnoreUrls)
   }
+
+  onSettlePlugin.start = function (): void {}
 
   return onSettlePlugin
 }

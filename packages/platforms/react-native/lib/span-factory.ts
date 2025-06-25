@@ -2,7 +2,6 @@ import { runSpanEndCallbacks, SpanFactory, SpanInternal, timeToNumber } from '@b
 import type { SpanAttributes, SpanOptions } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from './config'
 import NativeBugsnagPerformance from './native'
-import type { ReactNativeClock } from './clock'
 
 class NativeSpanInternal extends SpanInternal {
   public readonly isNativeSpan: boolean = true
@@ -29,7 +28,7 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     }
 
     const safeStartTime = timeToNumber(this.clock, options.startTime)
-    const unixStartTimeNanos = (this.clock as ReactNativeClock).toUnixNanoseconds(safeStartTime)
+    const unixStartTimeNanos = this.clock.toUnixNanoseconds(safeStartTime)
     const nativeParentContext = options.parentContext ? { id: options.parentContext.id, traceId: options.parentContext.traceId } : undefined
     const nativeSpan = NativeBugsnagPerformance.startNativeSpan(name, { startTime: unixStartTimeNanos, parentContext: nativeParentContext })
     return new NativeSpanInternal(nativeSpan.id, nativeSpan.traceId, name, safeStartTime, attributes, this.clock, this.sampler.probability, nativeSpan.parentSpanId)
@@ -52,7 +51,7 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     const shouldSend = await runSpanEndCallbacks(spanEnded, this.logger, this.onSpanEndCallbacks)
 
     if (shouldSend) {
-      const unixEndTimeNanos = (this.clock as ReactNativeClock).toUnixNanoseconds(endTime)
+      const unixEndTimeNanos = this.clock.toUnixNanoseconds(endTime)
       const attributes = spanEnded.attributes.toObject()
       delete attributes['bugsnag.sampling.p']
       NativeBugsnagPerformance.endNativeSpan(spanEnded.id, spanEnded.traceId, unixEndTimeNanos, attributes)
@@ -62,8 +61,9 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
   }
 
   startNavigationSpan (routeName: string, spanOptions: ReactNativeSpanOptions) {
-    // Navigation spans are always first class
+    // Navigation spans are always first class, but are not delegated to the native SDK
     spanOptions.isFirstClass = true
+    spanOptions.doNotDelegateToNativeSDK = true
 
     const spanName = '[Navigation]' + routeName
     const span = this.startSpan(spanName, spanOptions)

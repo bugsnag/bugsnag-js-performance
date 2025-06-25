@@ -1,0 +1,33 @@
+{
+  "name": "@bugsnag/plugin-named-spans",
+  "version": "2.13.0",
+  "description": "BugSnag performance plugin for tracking spans by name",
+  "homepage": "https://www.bugsnag.com/",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rollup --config rollup.config.mjs",
+    "clean": "rm -rf dist/*"
+  },
+  "bugs": {
+    "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
+  },
+  "peerDependencies": {
+    "@bugsnag/core-performance": "*"
+  },
+  "devDependencies": {
+    "@bugsnag/core-performance": "^2.13.0"
+  },
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ]
+}

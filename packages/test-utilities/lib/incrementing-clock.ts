@@ -30,8 +30,12 @@ class IncrementingClock implements Clock {
     return date.getTime() - this.timeOrigin
   }
 
+  toUnixNanoseconds (time: number) {
+    return ((this.timeOrigin + time) * 1_000_000)
+  }
+
   toUnixTimestampNanoseconds (time: number) {
-    return ((this.timeOrigin + time) * 1_000_000).toString()
+    return this.toUnixNanoseconds(time).toString()
   }
 }
 

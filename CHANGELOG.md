@@ -6,6 +6,9 @@
 - Set default endpoints based on API key [#643](https://github.com/bugsnag/bugsnag-js-performance/pull/643)
 - (core) Added `onSpanStart` callbacks config option to allow spans to be inspected and modified on creation. [#631](https://github.com/bugsnag/bugsnag-js-performance/pull/631)
 - (svelte-kit-performance) Added new routing provider for instrumenting route change spans with [SvelteKit](https://svelte.dev/docs/kit/introduction) [#632](https://github.com/bugsnag/bugsnag-js-performance/pull/632)
+- (core) Introduced `SpanControlProvider` interface and `BugsnagPerformance.getSpanControls` method to allow access to a registered `SpanControlProvider`. [#634](https://github.com/bugsnag/bugsnag-js-performance/pull/634)
+- (browser, react-native) Added `@bugsnag/plugin-named-spans` package for tracking and accessing open spans by name [#644](https://github.com/bugsnag/bugsnag-js-performance/pull/644)
+- (react-native) Added `@bugsnag/plugin-react-native-span-access` package for accessing native spans from Javascript [#633](https://github.com/bugsnag/bugsnag-js-performance/pull/633) [#636](https://github.com/bugsnag/bugsnag-js-performance/pull/636) [#639](https://github.com/bugsnag/bugsnag-js-performance/pull/639) [#645](https://github.com/bugsnag/bugsnag-js-performance/pull/645)
 
 ## [v2.13.0] (2025-05-15)
 

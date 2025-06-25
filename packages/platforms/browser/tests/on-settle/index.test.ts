@@ -6,8 +6,7 @@ import {
   IncrementingClock,
   VALID_API_KEY,
   createTestClient,
-  createConfiguration,
-  MockSpanFactory
+  createConfiguration
 } from '@bugsnag/js-performance-test-utilities'
 import { createSchema } from '../../lib/config'
 import type { BrowserConfiguration, BrowserSchema } from '../../lib/config'
@@ -22,6 +21,7 @@ import {
   createPerformanceNavigationTimingFake
 } from '../utilities'
 import MockRoutingProvider from '../utilities/mock-routing-provider'
+import { PluginContext } from '@bugsnag/core-performance'
 
 const START_CONTEXT: RequestStartContext = {
   type: 'fetch',
@@ -432,10 +432,9 @@ describe('createNoopOnSettle', () => {
   it('implements the expected API', () => {
     expect(() => {
       const noopOnSettle = createNoopOnSettle()
-      const spanFactory = new MockSpanFactory()
-      const setAppState = jest.fn()
       noopOnSettle(() => {})
-      noopOnSettle.configure(createConfiguration(), spanFactory, setAppState)
+      noopOnSettle.install(new PluginContext(createConfiguration(), new IncrementingClock()))
+      noopOnSettle.start()
     }).not.toThrow()
   })
 })
