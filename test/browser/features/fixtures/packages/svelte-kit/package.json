@@ -7,7 +7,8 @@
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
-		"prepare": "svelte-kit sync || echo ''"
+		"prepare": "svelte-kit sync || echo ''",
+		"clean": "rm -rf build"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^3.0.8",
