@@ -11,6 +11,7 @@ import FixedProbabilityManager from './fixed-probability-manager'
 import type { IdGenerator } from './id-generator'
 import type { NetworkSpan, NetworkSpanEndOptions, NetworkSpanOptions } from './network-span'
 import type { Persistence } from './persistence'
+import { PluginManager } from './plugin'
 import type { Plugin } from './plugin'
 import ProbabilityFetcher from './probability-fetcher'
 import ProbabilityManager from './probability-manager'
@@ -20,14 +21,16 @@ import Sampler from './sampler'
 import type { Span, SpanOptions } from './span'
 import type { SpanContext, SpanContextStorage } from './span-context'
 import { DefaultSpanContextStorage } from './span-context'
+import { CompositeSpanControlProvider } from './span-control-provider'
+import type { SpanQuery } from './span-control-provider'
 import { SpanFactory } from './span-factory'
 import type { SpanFactoryConstructor } from './span-factory'
 import { timeToNumber } from './time'
+import { getAppState, setAppState } from './app-state'
+import type { AppState } from './app-state'
+import PrioritizedSet, { Priority } from './prioritized-set'
 
 interface Constructor<T> { new(): T, prototype: T }
-
-export type AppState = 'starting' | 'navigating' | 'settling' | 'ready'
-export type SetAppState = (appState: AppState) => void
 
 export interface Client<C extends Configuration> {
   appState: AppState
@@ -36,6 +39,7 @@ export interface Client<C extends Configuration> {
   startNetworkSpan: (options: NetworkSpanOptions) => NetworkSpan
   readonly currentSpanContext: SpanContext | undefined
   getPlugin: <T extends Plugin<C>> (Constructor: Constructor<T>) => T | undefined
+  getSpanControls: <S>(query: SpanQuery<S>) => S | null
 }
 
 export interface ClientOptions<S extends CoreSchema, C extends Configuration, T> {
@@ -46,7 +50,7 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   resourceAttributesSource: ResourceAttributeSource<C>
   spanAttributesSource: SpanAttributesSource<C>
   schema: S
-  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage, setAppState: SetAppState, appState: AppState) => Array<Plugin<C>>
+  plugins: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => Array<Plugin<C>>
   persistence: Persistence
   retryQueueFactory: RetryQueueFactory
   spanContextStorage?: SpanContextStorage
@@ -54,13 +58,15 @@ export interface ClientOptions<S extends CoreSchema, C extends Configuration, T>
   platformExtensions?: (spanFactory: SpanFactory<C>, spanContextStorage: SpanContextStorage) => T
 }
 
-export type BugsnagPerformance <C extends Configuration, T> = Client<C> & T
+export type BugsnagPerformance<C extends Configuration, T> = Client<C> & T
 
 export function createClient<S extends CoreSchema, C extends Configuration, T> (options: ClientOptions<S, C, T>): BugsnagPerformance<C, T> {
+  const HUB_PREFIX = '00000'
+  const HUB_ENDPOINT = 'https://otlp.insighthub.smartbear.com/v1/traces'
   const bufferingProcessor = new BufferingProcessor()
   const spanContextStorage = options.spanContextStorage || new DefaultSpanContextStorage(options.backgroundingListener)
   let logger = options.schema.logger.defaultValue
-  let appState: AppState = 'starting'
+  setAppState('starting')
   const sampler = new Sampler(1.0)
 
   const SpanFactoryClass = options.spanFactory || SpanFactory
@@ -75,10 +81,10 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
     logger,
     spanContextStorage
   )
-  const setAppState = (state: AppState) => {
-    appState = state
-  }
-  const plugins = options.plugins(spanFactory, spanContextStorage, setAppState, appState)
+
+  const spanControlProvider = new CompositeSpanControlProvider()
+  const pluginManager = new PluginManager<C>()
+  pluginManager.addPlugins(options.plugins(spanFactory, spanContextStorage))
 
   return {
     start: (config: C | string) => {
@@ -87,7 +93,14 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       // if using the default endpoint add the API key as a subdomain
       // e.g. convert URL https://otlp.bugsnag.com/v1/traces to URL https://<project_api_key>.otlp.bugsnag.com/v1/traces
       if (configuration.endpoint === schema.endpoint.defaultValue) {
-        configuration.endpoint = configuration.endpoint.replace('https://', `https://${configuration.apiKey}.`)
+        //     …switch to InsightHub when the apiKey starts with 00000
+        if (configuration.apiKey.startsWith(HUB_PREFIX)) {
+          configuration.endpoint = HUB_ENDPOINT
+        } else {
+          // otherwise keep the default Bugsnag domain, but prefix with the apiKey
+          configuration.endpoint = configuration.endpoint
+            .replace('https://', `https://${configuration.apiKey}.`)
+        }
       }
 
       // Correlate errors with span by monkey patching _notify on the error client
@@ -103,12 +116,31 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         }
       }
 
-      const delivery = options.deliveryFactory(configuration.endpoint)
+      // add any external plugins and install
+      pluginManager.addPlugins(configuration.plugins)
+      const pluginContext = pluginManager.installPlugins(configuration, options.clock)
 
-      options.spanAttributesSource.configure(configuration)
+      // add span control providers from plugins
+      spanControlProvider.addProviders(pluginContext.spanControlProviders)
+
+      // create a prioritized set of callbacks for onSpanStart and onSpanEnd
+      const spanStartCallbacks = new PrioritizedSet(pluginContext.onSpanStartCallbacks)
+      const spanEndCallbacks = new PrioritizedSet(pluginContext.onSpanEndCallbacks)
+
+      // user-defined callbacks have normal priority
+      if (configuration.onSpanStart) {
+        spanStartCallbacks.addAll(configuration.onSpanStart.map(callback => ({ item: callback, priority: Priority.NORMAL })))
+      }
+      if (configuration.onSpanEnd) {
+        spanEndCallbacks.addAll(configuration.onSpanEnd.map(callback => ({ item: callback, priority: Priority.NORMAL })))
+      }
+
+      configuration.onSpanStart = Array.from(spanStartCallbacks)
+      configuration.onSpanEnd = Array.from(spanEndCallbacks)
 
       spanFactory.configure(configuration)
 
+      const delivery = options.deliveryFactory(configuration.endpoint)
       const probabilityManagerPromise = configuration.samplingProbability === undefined
         ? ProbabilityManager.create(
           options.persistence,
@@ -146,13 +178,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
         logger = configuration.logger
       })
 
-      for (const plugin of configuration.plugins) {
-        plugins.push(plugin as unknown as Plugin<C>)
-      }
-
-      for (const plugin of plugins) {
-        plugin.configure(configuration, spanFactory, setAppState, appState)
-      }
+      pluginManager.startPlugins()
     },
     startSpan: (name, spanOptions?: SpanOptions) => {
       const cleanOptions = spanFactory.validateSpanOptions(name, spanOptions)
@@ -180,24 +206,23 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
       return networkSpan
     },
     getPlugin: (Constructor) => {
-      for (const plugin of plugins) {
-        if (plugin instanceof Constructor) {
-          return plugin
-        }
-      }
+      return pluginManager.getPlugin(Constructor)
+    },
+    getSpanControls: (query: SpanQuery<S>) => {
+      return spanControlProvider.getSpanControls(query)
     },
     get currentSpanContext () {
       return spanContextStorage.current
     },
     get appState () {
-      return appState
+      return getAppState()
     },
     ...(options.platformExtensions && options.platformExtensions(spanFactory, spanContextStorage))
   } as BugsnagPerformance<C, T>
 }
 
 export function createNoopClient<C extends Configuration, T> (): BugsnagPerformance<C, T> {
-  const noop = () => {}
+  const noop = () => { }
 
   return {
     start: noop,

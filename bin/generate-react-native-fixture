@@ -46,9 +46,11 @@ const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
   '@bugsnag/delivery-fetch-performance',
   '@bugsnag/plugin-react-native-navigation-performance',
+  '@bugsnag/plugin-react-native-span-access',
   '@bugsnag/plugin-react-navigation-performance',
   '@bugsnag/react-native-performance',
-  '@bugsnag/request-tracker-performance'
+  '@bugsnag/request-tracker-performance',
+  '@bugsnag/plugin-named-spans',
 ]
 
 const PACKAGE_DIRECTORIES = [
@@ -56,8 +58,10 @@ const PACKAGE_DIRECTORIES = [
   `${ROOT_DIR}/packages/delivery-fetch`,
   `${ROOT_DIR}/packages/platforms/react-native`,
   `${ROOT_DIR}/packages/plugin-react-native-navigation`,
+  `${ROOT_DIR}/packages/plugin-react-native-span-access`,
   `${ROOT_DIR}/packages/plugin-react-navigation`,
   `${ROOT_DIR}/packages/request-tracker`,
+  `${ROOT_DIR}/packages/plugin-named-spans`,
   `${ROOT_DIR}/test/react-native/features/fixtures/scenario-launcher`
 ]
 
@@ -145,6 +149,12 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   // link react-native-navigation using rnn-link tool
   if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
     execSync('npx rnn-link', { cwd: fixtureDir, stdio: 'inherit' })
+
+    // update the kotlin version to 1.8.0 in the android build.gradle file (required for Android Performance)
+    const gradlePath = resolve(fixtureDir, 'android/build.gradle')
+    let gradle = fs.readFileSync(gradlePath, 'utf8')
+    gradle = gradle.replace(/RNNKotlinVersion = "[^"]+"/, 'RNNKotlinVersion = "1.8.0"')
+    fs.writeFileSync(gradlePath, gradle)
   }
 }
 
@@ -200,12 +210,12 @@ function configureRN064Fixture(fixtureDir) {
   // Android
   const gradlePath = resolve(fixtureDir, 'android/build.gradle')
   let gradle = fs.readFileSync(gradlePath, 'utf8')
-  
+
   // add kotlinVersion = "1.4.10" to the buildscript ext block
   const buildscriptExt = 'ext {'
   const kotlinVersion = 'kotlinVersion = "1.4.10"'
   gradle = gradle.replace(buildscriptExt, `${buildscriptExt}\n        ${kotlinVersion}`)
-  
+
   // bump android sdk version to 30
   gradle = gradle.replace(/compileSdkVersion = 29/, 'compileSdkVersion = 30').replace(/targetSdkVersion = 29/, 'targetSdkVersion = 30')
 
@@ -324,7 +334,7 @@ function configureIOSProject() {
   if (parseFloat(reactNativeVersion) < 0.73) {
     podfileContents = podfileContents.replace(/platform\s*:ios,\s*(?:'[\d.]+'|min_ios_version_supported)/, "platform :ios, '13.0'")
   }
-  
+
   fs.writeFileSync(`${fixtureDir}/ios/Podfile`, podfileContents)
 
   // pin xcodeproj version to < 1.26.0
@@ -384,7 +394,7 @@ function installAndroidPerformance() {
   const appGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
   let appGradle = fs.readFileSync(appGradlePath, 'utf8')
 
-  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:1.14.0")'
+  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:1.16.0")'
   const dependenciesSection = 'dependencies {'
 
   appGradle = appGradle.replace(dependenciesSection, `${dependenciesSection}\n    ${performanceDependency}`)
@@ -444,3 +454,4 @@ class MainActivity : ReactActivity() {
   mainActivityContents = mainActivityContents.replace(mainActivityPattern, mainActivityReplacement)
   fs.writeFileSync(mainActivityPath, mainActivityContents)
 }
+

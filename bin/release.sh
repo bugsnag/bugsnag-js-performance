@@ -33,7 +33,8 @@ BROWSER_PACKAGE_CHANGED=$(npx lerna changed --parseable | grep -c packages/platf
 
 # increment package version numbers
 if [ -z "${RETRY_PUBLISH:-}" ]; then
-  npx lerna version "$VERSION"  --no-push --no-private
+  # ensure we don't use legacy peer deps when bumping versions (https://github.com/nrwl/nx/issues/22066)
+  npm_config_legacy_peer_deps=false npx lerna version "$VERSION"  --no-push --no-private
 fi
 
 # build packages

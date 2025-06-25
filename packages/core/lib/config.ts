@@ -8,7 +8,7 @@ import {
 } from './custom-attribute-limits'
 import type { Plugin } from './plugin'
 import type { Span } from './span'
-import { isLogger, isNumber, isObject, isOnSpanEndCallbacks, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
+import { isLogger, isNumber, isObject, isCallbackArray, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
 
 type SetTraceCorrelation = (traceId: string, spanId: string) => void
 
@@ -42,6 +42,9 @@ export interface Logger {
 export type OnSpanEndCallback = (span: Span) => boolean | Promise<boolean>
 export type OnSpanEndCallbacks = OnSpanEndCallback[]
 
+export type OnSpanStartCallback = (span: Span) => void
+export type OnSpanStartCallbacks = OnSpanStartCallback[]
+
 export interface Configuration {
   apiKey: string
   endpoint?: string
@@ -52,6 +55,7 @@ export interface Configuration {
   plugins?: Array<Plugin<Configuration>>
   bugsnag?: BugsnagErrorStatic
   samplingProbability?: number
+  onSpanStart?: OnSpanStartCallbacks
   onSpanEnd?: OnSpanEndCallbacks
   attributeStringValueLimit?: number
   attributeArrayLengthLimit?: number
@@ -137,10 +141,15 @@ export const schema: CoreSchema = {
     message: 'should be a number between 0 and 1',
     validate: (value: unknown): value is number | undefined => value === undefined || (isNumber(value) && value >= 0 && value <= 1)
   },
+  onSpanStart: {
+    defaultValue: undefined,
+    message: 'should be an array of functions',
+    validate: isCallbackArray
+  },
   onSpanEnd: {
     defaultValue: undefined,
     message: 'should be an array of functions',
-    validate: isOnSpanEndCallbacks
+    validate: isCallbackArray
   },
   attributeStringValueLimit: {
     defaultValue: ATTRIBUTE_STRING_VALUE_LIMIT_DEFAULT,

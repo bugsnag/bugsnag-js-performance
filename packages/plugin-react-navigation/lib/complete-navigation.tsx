@@ -1,35 +1,51 @@
-import React, { useEffect } from 'react'
+import BugsnagPerformance from '@bugsnag/react-native-performance'
+import React from 'react'
 import type { PropsWithChildren } from 'react'
-import { NavigationContext } from './navigation-context'
+import BugsnagPluginReactNavigationNativePerformance from './react-navigation-native-plugin'
 
 interface Props extends PropsWithChildren {
   on: 'mount' | 'unmount' | boolean
 }
 
 /** End the current navigation span when the component is mounted, unmounted or the `on` prop is `true` */
-export const CompleteNavigation: React.FC<Props> = ({ on, children }) => {
-  const context = React.useContext(NavigationContext)
+export const CompleteNavigation: React.FunctionComponent<Props> = ({ children, on }) => {
+  const pluginRef = React.useRef<BugsnagPluginReactNavigationNativePerformance>()
 
-  useEffect(() => {
-    context.blockNavigationEnd()
+  function getPlugin () {
+    if (pluginRef.current) return pluginRef.current
 
-    if (on === 'mount') {
-      setTimeout(() => {
-        context.unblockNavigationEnd('mount')
-      })
-    }
+    pluginRef.current = BugsnagPerformance.getPlugin(BugsnagPluginReactNavigationNativePerformance)
 
-    return () => {
+    return pluginRef.current
+  }
+
+  React.useEffect(() => {
+    const plugin = getPlugin()
+
+    if (plugin) {
+      plugin.blockNavigationEnd()
+
+      if (on === 'mount') {
+        setTimeout(() => {
+          plugin.unblockNavigationEnd('mount')
+        }, 0)
+      }
+
       if (on === 'unmount') {
-        context.unblockNavigationEnd('unmount')
+        return () => {
+          plugin.unblockNavigationEnd('unmount')
+        }
       }
     }
   }, [])
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (typeof on === 'boolean') {
       if (on === true) {
-        context.unblockNavigationEnd('condition')
+        const plugin = getPlugin()
+        if (plugin) {
+          plugin.unblockNavigationEnd('condition')
+        }
       }
     }
   }, [on])

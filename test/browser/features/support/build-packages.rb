@@ -17,7 +17,9 @@ $logger ||= Logger.new(STDOUT)
 
 ROOT = "#{__dir__}/../../../.."
 FIXTURES_DIRECTORY = "#{__dir__}/../fixtures"
-BUILD_MODE = environment_variable_enabled?("USE_CDN_BUILD") ? :cdn : :npm
+BUILD_MODE = ENV['BUILD_MODE']
+raise 'BUILD_MODE must be set to CDN or NPM' unless %w[cdn npm].include? BUILD_MODE.downcase
+BUILD_MODE = BUILD_MODE.downcase.to_sym
 
 $logger.info("Building in #{BUILD_MODE} mode")
 
@@ -30,6 +32,8 @@ PACKAGE_NAMES = [
   "@bugsnag/delivery-fetch-performance",
   "@bugsnag/request-tracker-performance",
   "@bugsnag/plugin-react-performance",
+  "@bugsnag/svelte-kit-performance",
+  "@bugsnag/plugin-named-spans"
 ]
 
 PACKAGE_DIRECTORIES = [
@@ -41,6 +45,8 @@ PACKAGE_DIRECTORIES = [
   "#{ROOT}/packages/delivery-fetch",
   "#{ROOT}/packages/request-tracker",
   "#{ROOT}/packages/plugin-react-performance",
+  "#{ROOT}/packages/svelte-kit",
+  "#{ROOT}/packages/plugin-named-spans",
 ]
 
 def run(command)
@@ -101,7 +107,7 @@ begin
       run("npm install --no-package-lock --legacy-peer-deps *.tgz")
     else
       # in CDN mode we need to tell the JS build to also use CDN mode
-      build_command = "USE_CDN_BUILD=1 " + build_command
+      build_command = "BUILD_MODE=CDN " + build_command
     end
 
     run(install_command)

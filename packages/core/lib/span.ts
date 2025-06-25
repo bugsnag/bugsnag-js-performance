@@ -92,7 +92,7 @@ export function spanEndedToSpan (span: SpanEnded): Span {
 }
 
 export async function runSpanEndCallbacks (spanEnded: SpanEnded, logger: Logger, callbacks?: OnSpanEndCallbacks) {
-  if (!callbacks) return true
+  if (!callbacks || callbacks.length === 0) return true
 
   const span = spanEndedToSpan(spanEnded)
   const callbackStartTime = performance.now()

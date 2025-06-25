@@ -22,6 +22,10 @@ Before('@skip_new_arch') do |scenario|
   skip_this_scenario("Skipping scenario: Not supported with new architecture") if ENV["RCT_NEW_ARCH_ENABLED"]
 end
 
+Before('@skip_old_arch') do |scenario|
+  skip_this_scenario("Skipping scenario: Not supported with new architecture") unless ENV["RCT_NEW_ARCH_ENABLED"]
+end
+
 Before('@react_native_navigation') do |scenario|
   skip_this_scenario("Skipping scenario: Not running react-native-navigation fixture") unless ENV["REACT_NATIVE_NAVIGATION"]
 end
@@ -41,4 +45,16 @@ end
 
 Before('@skip_expo') do |scenario|
   skip_this_scenario("Skipping scenario: Not supported in Expo") if ENV["EXPO_VERSION"]
+end
+
+Before('@expo') do |scenario|
+  skip_this_scenario("Skipping scenario: Not running Expo fixture") unless ENV["EXPO_VERSION"]
+end
+
+Before('@ios_only') do |scenario|
+  skip_this_scenario("Skipping scenario") unless Maze::Helper.get_current_platform == 'ios'
+end
+
+Before('@android_only') do |scenario|
+  skip_this_scenario("Skipping scenario") unless Maze::Helper.get_current_platform == 'android'
 end

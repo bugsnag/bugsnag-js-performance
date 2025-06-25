@@ -1,6 +1,7 @@
 [
     {
         "pipeline": ".buildkite/browser-pipeline.yml",
+        "environment": "BUILD_MODE=NPM",
         "block": ".buildkite/browser-pipeline.block.yml",
         "paths": [
             "test/browser",
@@ -11,11 +12,14 @@
             "packages/angular",
             "packages/react-router",
             "packages/vue",
-            "packages/plugin-react-performance"
+            "packages/plugin-react-performance",
+            "packages/svelte-kit",
+            "packages/plugin-named-spans"
         ]
     },
     {
         "pipeline": ".buildkite/browser-pipeline.full.yml",
+        "environment": "BUILD_MODE=NPM",
         "block": ".buildkite/browser-pipeline.full.block.yml",
         "paths": []
     },
@@ -28,7 +32,9 @@
             "packages/platforms/react-native",
             "packages/delivery-fetch",
             "packages/request-tracker",
-            "packages/plugin-react-navigation"
+            "packages/plugin-react-navigation",
+            "packages/plugin-react-native-span-access",
+            "packages/plugin-named-spans"
         ]
     },
     {
@@ -45,7 +51,8 @@
             "packages/platforms/react-native",
             "packages/delivery-fetch",
             "packages/request-tracker",
-            "packages/plugin-react-native-navigation"
+            "packages/plugin-react-native-navigation",
+            "packages/plugin-react-native-span-access"
         ]
     },
     {
@@ -56,7 +63,15 @@
     {
         "pipeline": ".buildkite/expo-pipeline.yml",
         "block": ".buildkite/expo-pipeline.block.yml",
-        "paths": []
+        "paths": [
+            "test/react-native",
+            "packages/core",
+            "packages/platforms/react-native",
+            "packages/delivery-fetch",
+            "packages/request-tracker",
+            "packages/plugin-react-navigation",
+            "packages/plugin-react-native-span-access"
+        ]
     },
     {
         "pipeline": ".buildkite/expo-pipeline.full.yml",

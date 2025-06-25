@@ -1,3 +1,4 @@
+import type { Span } from '../lib'
 import * as validation from '../lib/validation'
 
 describe('validation', () => {
@@ -244,8 +245,8 @@ describe('validation', () => {
 
   describe('isPlugin', () => {
     const validPlugins = [
-      { configure: jest.fn() },
-      { configure: jest.fn(), additional: jest.fn() }
+      { install: jest.fn(), start: jest.fn() },
+      { install: jest.fn(), start: jest.fn(), additional: jest.fn() }
     ]
 
     it.each(validPlugins)('passes validation with %s', (value) => {
@@ -254,6 +255,34 @@ describe('validation', () => {
 
     it.each(nonObjects)('fails validation with %s', (value) => {
       expect(validation.isPlugin(value)).toBe(false)
+    })
+  })
+
+  describe('isCallbackArray', () => {
+    const validCallbacks: any[] = [
+      [[]],
+      [[() => {}]],
+      [[() => {}, () => {}]],
+      [[(span: Span) => { console.log(span) }]]
+    ]
+
+    it.each(validCallbacks)('passes validation with array of callbacks', (value) => {
+      expect(validation.isCallbackArray(value)).toBe(true)
+    })
+
+    const invalidCallbacks = [
+      ...nonObjects,
+      { callback: () => {} },
+      [1, 2, 3],
+      ['string'],
+      [() => {}, 'not a function'],
+      [null],
+      [undefined],
+      [{}]
+    ]
+
+    it.each(invalidCallbacks)('fails validation with %s', (value) => {
+      expect(validation.isCallbackArray(value)).toBe(false)
     })
   })
 })

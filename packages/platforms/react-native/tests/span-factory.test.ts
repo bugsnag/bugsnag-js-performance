@@ -2,12 +2,11 @@ import { ReactNativeSpanFactory } from '../lib/span-factory'
 import NativeBugsnagPerformance from '../lib/native'
 import { ControllableBackgroundingListener, InMemoryProcessor, spanAttributesSource, StableIdGenerator } from '@bugsnag/js-performance-test-utilities'
 import { DefaultSpanContextStorage, Sampler, DISCARD_END_TIME } from '@bugsnag/core-performance'
-import type { InternalConfiguration } from '@bugsnag/core-performance'
+import type { Clock, InternalConfiguration } from '@bugsnag/core-performance'
 import createClock from '../lib/clock'
-import type { ReactNativeClock } from '../lib/clock'
 import type { ReactNativeConfiguration } from '../lib/config'
 
-let clock: ReactNativeClock
+let clock: Clock
 let spanFactory: ReactNativeSpanFactory
 let processor: InMemoryProcessor
 let contextStorage: DefaultSpanContextStorage
@@ -173,6 +172,21 @@ describe('ReactNativeSpanFactory', () => {
       expect(NativeBugsnagPerformance.discardNativeSpan).toHaveBeenCalledTimes(1)
 
       expect(processor.spans.length).toBe(0)
+    })
+
+    it('runs onSpanStart callbacks for native spans', async () => {
+      spanFactory.onAttach()
+
+      const onSpanStartCallback = jest.fn((span) => {
+        span.setAttribute('start_callback', true)
+      })
+
+      spanFactory.configure({ logger: jestLogger, onSpanStart: [onSpanStartCallback] } as unknown as InternalConfiguration<ReactNativeConfiguration>)
+      const startTime = clock.now()
+      const span = spanFactory.startSpan('native span', { startTime, isFirstClass: true })
+      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('native span', expect.objectContaining({ startTime: clock.toUnixNanoseconds(startTime) }))
+      // @ts-expect-error 'attributes' is private but very awkward to test otherwise
+      expect(span.attributes.attributes.get('start_callback')).toBe(true)
     })
   })
 
