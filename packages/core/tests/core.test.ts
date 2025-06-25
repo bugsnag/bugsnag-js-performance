@@ -77,7 +77,7 @@ describe('Core', () => {
         const invalidParameters = [
           { type: 'bigint', value: BigInt(9007199254740991) },
           { type: 'boolean', value: true },
-          { type: 'function', value: () => {} },
+          { type: 'function', value: () => { } },
           { type: 'number', value: 12345 },
           { type: 'object', value: { property: 'test' } },
           { type: 'object', value: [] },
@@ -162,7 +162,7 @@ describe('Core', () => {
 
         it.each([
           { type: 'a bigint', config: BigInt(9007199254740991) },
-          { type: 'a function', config: () => {} },
+          { type: 'a function', config: () => { } },
           { type: 'a number', config: 12345 },
           { type: 'a date', config: new Date() },
           { type: 'boolean (true)', config: true },
@@ -407,7 +407,7 @@ describe('Core', () => {
           const listener = jest.fn()
 
           class TestPlugin {
-            configure () {}
+            configure () { }
 
             test () {
               listener()
@@ -431,11 +431,11 @@ describe('Core', () => {
 
         it('does not return a plugin if it has not been provided', () => {
           class TestPlugin {
-            configure () {}
+            configure () { }
           }
 
           class AnotherPlugin {
-            configure () {}
+            configure () { }
           }
 
           const client = createTestClient()
@@ -517,6 +517,57 @@ describe('Core', () => {
         const span = client.startSpan('name', { startTime: new Date() })
         span.end()
       }).not.toThrow()
+    })
+  })
+
+  describe('endpoint', () => {
+    const HUB_PREFIX = '00000'
+    const HUB_ENDPOINT = 'https://otlp.insighthub.smartbear.com/v1/traces'
+    const BUGSNAG_ENDPOINT = 'https://otlp.bugsnag.com/v1/traces'
+
+    const HUB_KEY = `${HUB_PREFIX}abcdefabcdefabcdefabcdefabcd`
+    const BS_KEY = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6'
+
+    describe('automatic InsightHub switch', () => {
+      it('swaps to InsightHub when apiKey starts with 00000', async () => {
+        const delivery = new InMemoryDelivery()
+        const deliveryFactory = jest.fn(() => delivery)
+        const client = createTestClient({ deliveryFactory })
+
+        client.start(HUB_KEY)
+
+        // allow async configuration to complete
+        await jest.runOnlyPendingTimersAsync()
+
+        expect(deliveryFactory).toHaveBeenCalledWith(HUB_ENDPOINT)
+      })
+
+      it('keeps Bugsnag host + apiKey sub-domain for a normal key', async () => {
+        const delivery = new InMemoryDelivery()
+        const deliveryFactory = jest.fn(() => delivery)
+        const client = createTestClient({ deliveryFactory })
+
+        client.start(BS_KEY)
+
+        await jest.runOnlyPendingTimersAsync()
+
+        expect(deliveryFactory).toHaveBeenCalledWith(
+          `https://${BS_KEY}.${BUGSNAG_ENDPOINT.slice('https://'.length)}`
+        )
+      })
+
+      it('does NOT override a custom endpoint, even for a Hub key', async () => {
+        const CUSTOM_ENDPOINT = 'https://my-otel-proxy.example.com/traces'
+        const delivery = new InMemoryDelivery()
+        const deliveryFactory = jest.fn(() => delivery)
+        const client = createTestClient({ deliveryFactory })
+
+        client.start({ apiKey: HUB_KEY, endpoint: CUSTOM_ENDPOINT })
+
+        await jest.runOnlyPendingTimersAsync()
+
+        expect(deliveryFactory).toHaveBeenCalledWith(CUSTOM_ENDPOINT)
+      })
     })
   })
 })
