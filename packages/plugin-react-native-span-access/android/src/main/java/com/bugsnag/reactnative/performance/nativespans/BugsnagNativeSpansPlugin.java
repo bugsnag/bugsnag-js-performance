@@ -35,8 +35,19 @@ public class BugsnagNativeSpansPlugin implements Plugin {
             INSTANCE = this;
         }
 
-        ctx.addOnSpanStartCallback(PluginContext.NORM_PRIORITY + 1, this::onSpanStart);
-        ctx.addOnSpanEndCallback(PluginContext.NORM_PRIORITY - 1, this::onSpanEnd);
+        ctx.addOnSpanStartCallback(PluginContext.NORM_PRIORITY + 1, new OnSpanStartCallback() {
+            @Override
+            public void onSpanStart(Span span) {
+              BugsnagNativeSpansPlugin.this.onSpanStart(span);
+            }
+        });
+
+        ctx.addOnSpanEndCallback(PluginContext.NORM_PRIORITY - 1, new OnSpanEndCallback() {
+            @Override
+            public boolean onSpanEnd(Span span) {
+                return BugsnagNativeSpansPlugin.this.onSpanEnd(span);
+            }
+        });
     }
 
     private void onSpanStart(Span span) {
