@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/delivery-fetch-performance",
-  "version": "2.13.0",
+  "version": "2.14.0",
   "description": "BugSnag performance monitoring delivery mechanism using the fetch API",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "dependencies": {
-    "@bugsnag/core-performance": "^2.13.0"
+    "@bugsnag/core-performance": "^2.14.0"
   },
   "type": "module",
   "main": "dist/delivery.js",
