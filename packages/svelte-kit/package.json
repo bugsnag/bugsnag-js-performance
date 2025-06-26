@@ -1,6 +1,16 @@
 {
 	"name": "@bugsnag/svelte-kit-performance",
 	"version": "2.14.0",
+	"description": "BugSnag performance monitoring for SvelteKit",
+  "homepage": "https://www.bugsnag.com/",
+	"license": "MIT",
+	"repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
 	"scripts": {
 		"build": "rollup --config rollup.config.mjs",
 		"clean": "rm -rf dist/*"
