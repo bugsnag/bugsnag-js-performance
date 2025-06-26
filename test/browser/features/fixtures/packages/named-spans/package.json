@@ -2,7 +2,7 @@
     "name": "named-spans",
     "private": true,
     "scripts": {
-        "build": "rollup --config ../rollup.config.mjs",
+        "build": "rollup --config ./rollup.config.mjs",
         "clean": "rm -rf dist"
     }
 }

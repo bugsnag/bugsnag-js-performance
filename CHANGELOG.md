@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [v2.14.0] (2025-06-25)
 
 ### Added
 - Set default endpoints based on API key [#643](https://github.com/bugsnag/bugsnag-js-performance/pull/643)

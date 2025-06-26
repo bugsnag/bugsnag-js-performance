@@ -1,9 +1,19 @@
 {
 	"name": "@bugsnag/svelte-kit-performance",
-	"version": "0.0.1",
+	"version": "2.14.0",
+	"description": "BugSnag performance monitoring for SvelteKit",
+  "homepage": "https://www.bugsnag.com/",
+	"license": "MIT",
+	"repository": {
+    "type": "git",
+    "url": "git+https://github.com/bugsnag/bugsnag-js-performance.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
 	"scripts": {
 		"build": "rollup --config rollup.config.mjs",
-        "clean": "rm -rf dist/*"
+		"clean": "rm -rf dist/*"
 	},
 	"files": [
 		"dist",
@@ -27,7 +37,7 @@
 		"svelte": "^5.0.0"
 	},
 	"devDependencies": {
-		"@bugsnag/browser-performance": "^2.13.0",
+		"@bugsnag/browser-performance": "^2.14.0",
 		"@sveltejs/adapter-auto": "^6.0.0",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/package": "^2.0.0",
