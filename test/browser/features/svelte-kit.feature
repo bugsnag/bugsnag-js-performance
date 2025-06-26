@@ -1,4 +1,4 @@
-@skip_chrome_61 @skip_safari_11 @skip_edge_80 @skip_firefox_60
+@skip_chrome_61 @skip_safari_11 @skip_safari_13 @skip_edge_80 @skip_firefox_60
 Feature: SvelteKit router
     Scenario: SvelteKit route change spans are automatically instrumented
         Given I navigate to the test URL "/docs/svelte-kit/build"
