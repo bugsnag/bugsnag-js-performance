@@ -127,3 +127,7 @@ test/react-native/features/fixtures/generated/
 
 # MacOS system files
 .DS_Store
+
+# IDE files
+.idea/
+*.iml
