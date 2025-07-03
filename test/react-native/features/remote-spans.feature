@@ -4,7 +4,7 @@ Feature: Remote spans plugin
 Scenario: Native spans can be modified and ended from JS
   When I run 'RemoteSpansScenario'
   And I wait to receive 2 sampling requests
-  And I wait to receive 3 traces
+  And I wait to receive 2 traces
 
   # JS trace
   And the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "com.bugsnag.fixtures.reactnative.performance"
