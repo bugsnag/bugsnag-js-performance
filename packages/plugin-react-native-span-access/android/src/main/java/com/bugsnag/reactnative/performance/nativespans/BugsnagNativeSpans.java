@@ -92,6 +92,13 @@ class BugsnagNativeSpans {
         }
 
         promise.resolve(true);
+
+        if (updates.getBoolean(IS_ENDED)) {
+            WritableMap event = Arguments.createMap();
+            event.putString(SPAN_ID, EncodingUtils.toHexString(span.getSpanId()));
+            event.putString(TRACE_ID, EncodingUtils.toHexString(span.getTraceId()));
+            this.eventEmitter.emit("SpanEnded", event);
+        }
     }
 
     private static void endSpan(ReadableMap updates, Span span) {

@@ -1,8 +1,10 @@
-import { TurboModuleRegistry } from 'react-native'
+import { TurboModuleRegistry, NativeEventEmitter } from 'react-native'
+import type { NativeModule } from 'react-native'
 import { SpanQuery, timeToNumber } from '@bugsnag/core-performance'
 import type { Spec } from './NativeBugsnagNativeSpans'
 import type { Clock, ParentContext, Plugin, PluginContext, SpanAttribute, SpanControlProvider, Time } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import BugsnagPerformance from '@bugsnag/react-native-performance'
 
 export class NativeSpanQuery extends SpanQuery<NativeSpanControl> {
   constructor (public readonly name: string) {
@@ -82,6 +84,17 @@ export class BugsnagNativeSpansPlugin implements Plugin<ReactNativeConfiguration
   install (context: PluginContext<ReactNativeConfiguration>) {
     const spanControlProvider = new NativeSpanControlProvider(context.clock)
     context.addSpanControlProvider(spanControlProvider)
+
+    if (NativeNativeSpansModule) {
+      const eventEmitter = new NativeEventEmitter(NativeNativeSpansModule)
+
+      eventEmitter.addListener('SpanEnded', (span: SpanId) => {
+        const eventSpan = BugsnagPerformance.startSpan('SpanEndedEvent')
+        eventSpan.setAttribute('eventSpanId', span.spanId)
+        eventSpan.setAttribute('eventTraceId', span.traceId)
+        eventSpan.end()
+      })
+    }
   }
 
   start () {}

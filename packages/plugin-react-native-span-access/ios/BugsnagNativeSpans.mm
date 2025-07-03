@@ -14,7 +14,7 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[];
+  return @[ @"SpanEnded" ];
 }
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getSpanIdByName:(NSString *)spanName) {
@@ -80,6 +80,13 @@ RCT_EXPORT_METHOD(updateSpan:(NSDictionary *)spanId
     }
 
     resolve(@YES);
+
+    NSDictionary *event = @{
+        @"spanId": [NSString stringWithFormat:@"%016llx", span.spanId],
+        @"traceId": [NSString stringWithFormat:@"%016llx%016llx", span.traceIdHi, span.traceIdLo]
+    };
+
+    [self sendEventWithName:@"SpanEnded" body:event];
 }
 
 - (void)endSpan:(NSDictionary *)updates span:(BugsnagPerformanceSpan *)span {
