@@ -20,6 +20,7 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 class BugsnagNativeSpans {
 
@@ -38,8 +39,11 @@ class BugsnagNativeSpans {
 
     private final ReactApplicationContext reactContext;
 
+    private final DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter;
+
     public BugsnagNativeSpans(ReactApplicationContext reactContext) {
         this.reactContext = reactContext;
+        this.eventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
     }
 
     @Nullable

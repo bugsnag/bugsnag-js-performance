@@ -12,6 +12,11 @@
 
 RCT_EXPORT_MODULE()
 
+- (NSArray<NSString *> *)supportedEvents
+{
+  return @[];
+}
+
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getSpanIdByName:(NSString *)spanName) {
     BugsnagNativeSpansPlugin *plugin = [BugsnagNativeSpansPlugin singleton];
     if (!plugin) {

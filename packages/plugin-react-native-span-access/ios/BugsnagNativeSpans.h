@@ -1,4 +1,5 @@
 #import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import <BugsnagNativeSpansSpec/BugsnagNativeSpansSpec.h>
@@ -6,7 +7,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface BugsnagNativeSpans : NSObject <RCTBridgeModule>
+@interface BugsnagNativeSpans : RCTEventEmitter <RCTBridgeModule>
 
 @end
 
