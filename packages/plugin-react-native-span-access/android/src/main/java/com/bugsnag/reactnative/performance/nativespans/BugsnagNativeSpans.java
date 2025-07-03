@@ -39,11 +39,8 @@ class BugsnagNativeSpans {
 
     private final ReactApplicationContext reactContext;
 
-    private final DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter;
-
     public BugsnagNativeSpans(ReactApplicationContext reactContext) {
         this.reactContext = reactContext;
-        this.eventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
     }
 
     @Nullable
@@ -94,10 +91,11 @@ class BugsnagNativeSpans {
         promise.resolve(true);
 
         if (updates.getBoolean(IS_ENDED)) {
+            DeviceEventManagerModule.RCTDeviceEventEmitter eventEmitter = reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class);
             WritableMap event = Arguments.createMap();
             event.putString(SPAN_ID, EncodingUtils.toHexString(span.getSpanId()));
             event.putString(TRACE_ID, EncodingUtils.toHexString(span.getTraceId()));
-            this.eventEmitter.emit("SpanEnded", event);
+            eventEmitter.emit("SpanEnded", event);
         }
     }
 
