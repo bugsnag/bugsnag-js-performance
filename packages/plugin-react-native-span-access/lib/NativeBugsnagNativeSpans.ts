@@ -10,6 +10,8 @@ export interface Spec extends TurboModule {
   addListener: (eventType: string) => void
 
   removeListeners: (count: number) => void
+
+  reportSpanUpdateResult: (eventId: number, result: boolean) => Promise<void>
 }
 
 export default TurboModuleRegistry.get<Spec>(

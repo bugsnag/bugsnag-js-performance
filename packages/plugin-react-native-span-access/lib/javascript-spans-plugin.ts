@@ -1,0 +1,81 @@
+import { TurboModuleRegistry, NativeEventEmitter } from 'react-native'
+import type { Spec } from './NativeBugsnagNativeSpans'
+import type { Plugin, PluginContext, Span, SpanAttribute } from '@bugsnag/core-performance'
+import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+
+const HOUR_IN_MILLISECONDS = 60 * 60 * 1000
+
+interface SpanUpdateEvent {
+  id: number
+  name: string
+  attributes: Array<{ name: string, value: SpanAttribute }>
+  isEnded: boolean
+  endTime?: number
+}
+
+const NativeNativeSpansModule = TurboModuleRegistry.get<Spec>('BugsnagNativeSpans')
+
+export class BugsnagJavascriptSpansPlugin implements Plugin<ReactNativeConfiguration> {
+  private spansByName = new Map<string, Span>()
+  private timeout: ReturnType<typeof setTimeout> | null = null
+
+  install (context: PluginContext<ReactNativeConfiguration>) {
+    if (!NativeNativeSpansModule) {
+      context.configuration.logger?.warn('BugsnagJavascriptSpansPlugin failed to install: native module not found.')
+      return
+    }
+
+    context.addOnSpanStartCallback(this.onSpanStart.bind(this))
+    context.addOnSpanEndCallback(this.onSpanEnd.bind(this))
+    const eventEmitter = new NativeEventEmitter(NativeNativeSpansModule)
+    eventEmitter.addListener('JavascriptSpanUpdate', this.onNativeSpanUpdate.bind(this))
+  }
+
+  start () {
+    this.cleanup()
+  }
+
+  private onSpanStart (span: Span) {
+    this.spansByName.set(span.name, span)
+  }
+
+  private onSpanEnd (span: Span) {
+    const trackedSpan = this.spansByName.get(span.name)
+    if (trackedSpan && trackedSpan.id === span.id && trackedSpan.traceId === span.traceId) {
+      this.spansByName.delete(span.name)
+    }
+
+    return true
+  }
+
+  private onNativeSpanUpdate (event: SpanUpdateEvent) {
+    const span = this.spansByName.get(event.name)
+    if (!span) {
+      NativeNativeSpansModule?.reportSpanUpdateResult(event.id, false)
+      return
+    }
+
+    if (event.attributes && event.attributes.length > 0) {
+      for (const { name, value } of event.attributes) {
+        span.setAttribute(name, value)
+      }
+    }
+
+    if (event.isEnded) {
+      span.end(event.endTime)
+    }
+
+    NativeNativeSpansModule?.reportSpanUpdateResult(event.id, true)
+  }
+
+  private cleanup () {
+    for (const [name, span] of this.spansByName.entries()) {
+      if (!span.isValid()) {
+        this.spansByName.delete(name)
+      }
+    }
+
+    if (this.timeout) clearTimeout(this.timeout)
+    this.timeout = setTimeout(this.cleanup.bind(this), HOUR_IN_MILLISECONDS)
+  }
+}

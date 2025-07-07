@@ -82,6 +82,15 @@ RCT_EXPORT_METHOD(updateSpan:(NSDictionary *)spanId
     resolve(@YES);
 }
 
+RCT_EXPORT_METHOD(reportSpanUpdateResult:(NSNumber *)eventId
+                  result:(BOOL)result
+                  resolve:(RCTPromiseResolveBlock)resolve
+                   reject:(RCTPromiseRejectBlock)reject)
+{
+    // TODO: retrieve callback and invoke with the result
+    resolve(nil);
+}
+
 - (void)endSpan:(NSDictionary *)updates span:(BugsnagPerformanceSpan *)span {
     NSNumber *timestampString = updates[@"endTime"];
     if (timestampString) {
