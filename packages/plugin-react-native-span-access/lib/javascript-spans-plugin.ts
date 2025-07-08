@@ -49,23 +49,28 @@ export class BugsnagJavascriptSpansPlugin implements Plugin<ReactNativeConfigura
   }
 
   private onNativeSpanUpdate (event: SpanUpdateEvent) {
-    const span = this.spansByName.get(event.name)
-    if (!span) {
-      NativeNativeSpansModule?.reportSpanUpdateResult(event.id, false)
-      return
-    }
+    let result = false
 
-    if (event.attributes && event.attributes.length > 0) {
-      for (const { name, value } of event.attributes) {
-        span.setAttribute(name, value)
+    try {
+      const span = this.spansByName.get(event.name)
+      if (!span) {
+        return
       }
-    }
 
-    if (event.isEnded) {
-      span.end(event.endTime)
-    }
+      if (event.attributes && event.attributes.length > 0) {
+        for (const { name, value } of event.attributes) {
+          span.setAttribute(name, value)
+        }
+      }
 
-    NativeNativeSpansModule?.reportSpanUpdateResult(event.id, true)
+      if (event.isEnded) {
+        span.end(event.endTime)
+      }
+
+      result = true
+    } finally {
+      NativeNativeSpansModule?.reportSpanUpdateResult(event.id, result)
+    }
   }
 
   private cleanup () {
