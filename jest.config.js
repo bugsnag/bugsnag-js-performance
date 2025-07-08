@@ -14,7 +14,8 @@ const paths = {
   '@bugsnag/plugin-react-native-navigation-performance': ['./packages/plugin-react-native-navigation/lib/index.ts'],
   '@bugsnag/plugin-react-navigation-performance': ['./packages/plugin-react-navigation/lib/index.ts'],
   '@bugsnag/plugin-react-performance': ['./packages/plugin-react-performance/lib/index.ts'],
-  '@bugsnag/plugin-named-spans-performance': ['./packages/plugin-named-spans/lib/index.ts']
+  '@bugsnag/plugin-named-spans-performance': ['./packages/plugin-named-spans/lib/index.ts'],
+  '@bugsnag/plugin-react-native-span-access': ['./packages/plugin-react-native-span-access/lib/index.ts']
 }
 
 // convert the tsconfig "paths" option into Jest's "moduleNameMapper" option
@@ -135,6 +136,30 @@ module.exports = {
       displayName: 'plugin-named-spans',
       testMatch: ['<rootDir>/packages/plugin-named-spans/**/*.test.ts'],
       ...defaultModuleConfig
+    },
+    {
+      displayName: 'plugin-react-native-span-access',
+      preset: 'react-native',
+      testMatch: ['<rootDir>/packages/plugin-react-native-span-access/tests/**/*.test.ts'],
+      coveragePathIgnorePatterns: ['<rootDir>/packages/core'],
+      moduleNameMapper,
+      transform: {
+        '^.+\\.jsx?$': [
+          'babel-jest',
+          {
+            presets: ['module:metro-react-native-babel-preset']
+          }
+        ],
+        '^.+\\.m?tsx?$': [
+          'ts-jest',
+          {
+            tsconfig: { paths },
+            babelConfig: {
+              presets: ['module:metro-react-native-babel-preset']
+            }
+          }
+        ]
+      }
     },
     '<rootDir>/jest/config/react-navigation.js',
     '<rootDir>/jest/config/react-native-navigation.js'
