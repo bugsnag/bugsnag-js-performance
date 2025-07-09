@@ -160,7 +160,8 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
 // generate Android Fixture
 if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
-  execFileSync('./gradlew', ['assembleRelease'], { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
+  const buildArgs = isNewArchEnabled ? ['generateCodegenArtifactsFromSchema', 'assembleRelease'] : ['assembleRelease']
+  execFileSync('./gradlew', buildArgs, { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
   fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
 }
 
