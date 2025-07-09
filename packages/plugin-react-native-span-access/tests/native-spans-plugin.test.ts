@@ -39,7 +39,7 @@ describe('BugsnagNativeSpansPlugin', () => {
       expect(addSpanControlProviderSpy).toHaveBeenCalledWith(expect.any(NativeSpanControlProvider))
     })
 
-    it('should install successfully even when native module is not available', () => {
+    it('should throw an error when native module is not available', () => {
       jest.isolateModules(() => {
         jest.mock('react-native', () => {
           return {
@@ -54,12 +54,10 @@ describe('BugsnagNativeSpansPlugin', () => {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const { BugsnagNativeSpansPlugin } = require('../lib/native-spans-plugin')
         const testPlugin = new BugsnagNativeSpansPlugin()
-
         const addSpanControlProviderSpy = jest.spyOn(context, 'addSpanControlProvider')
 
-        testPlugin.install(context)
-
-        expect(addSpanControlProviderSpy).toHaveBeenCalledTimes(1)
+        expect(() => { testPlugin.install(context) }).toThrow('BugsnagNativeSpans module is not available. Ensure the native module is linked correctly.')
+        expect(addSpanControlProviderSpy).not.toHaveBeenCalled()
       })
     })
   })

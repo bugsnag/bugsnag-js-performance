@@ -21,8 +21,7 @@ export class BugsnagJavascriptSpansPlugin implements Plugin<ReactNativeConfigura
 
   install (context: PluginContext<ReactNativeConfiguration>) {
     if (!NativeNativeSpansModule) {
-      context.configuration.logger?.warn('BugsnagJavascriptSpansPlugin failed to install: native module not found.')
-      return
+      throw new Error('BugsnagNativeSpans module is not available. Ensure the native module is linked correctly.')
     }
 
     context.addOnSpanStartCallback(this.onSpanStart.bind(this))

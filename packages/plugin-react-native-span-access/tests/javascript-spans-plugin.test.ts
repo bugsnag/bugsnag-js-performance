@@ -47,7 +47,7 @@ describe('BugsnagJavascriptSpansPlugin', () => {
       )
     })
 
-    it('should log warning and not add callbacks when native module is not available', () => {
+    it('throws an error when native module is not available', () => {
       jest.isolateModules(() => {
         jest.mock('react-native', () => {
           return {
@@ -64,13 +64,9 @@ describe('BugsnagJavascriptSpansPlugin', () => {
         const { BugsnagJavascriptSpansPlugin } = require('../lib/javascript-spans-plugin')
         const testPlugin = new BugsnagJavascriptSpansPlugin()
 
-        testPlugin.install(context)
-
+        expect(() => { testPlugin.install(context) }).toThrow('BugsnagNativeSpans module is not available. Ensure the native module is linked correctly.')
         expect(context.onSpanStartCallbacks.length).toBe(0)
         expect(context.onSpanEndCallbacks.length).toBe(0)
-        expect(context.configuration.logger?.warn).toHaveBeenCalledWith(
-          'BugsnagJavascriptSpansPlugin failed to install: native module not found.'
-        )
       })
     })
   })

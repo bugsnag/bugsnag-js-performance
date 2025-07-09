@@ -80,6 +80,10 @@ export class NativeSpanControlProvider implements SpanControlProvider<NativeSpan
 
 export class BugsnagNativeSpansPlugin implements Plugin<ReactNativeConfiguration> {
   install (context: PluginContext<ReactNativeConfiguration>) {
+    if (!NativeNativeSpansModule) {
+      throw new Error('BugsnagNativeSpans module is not available. Ensure the native module is linked correctly.')
+    }
+
     const spanControlProvider = new NativeSpanControlProvider(context.clock)
     context.addSpanControlProvider(spanControlProvider)
   }
