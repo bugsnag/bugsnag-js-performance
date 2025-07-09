@@ -35,6 +35,11 @@ public class BugsnagNativeSpansModule extends NativeBugsnagNativeSpansSpec {
     }
 
     @Override
+    public void reportSpanUpdateResult(double eventId, boolean result, Promise promise) {
+        delegate.reportSpanUpdateResult(eventId, result, promise);
+    }
+
+    @Override
     public void addListener(String eventType) {
         // noop - required for EventEmitter support
     }

@@ -35,6 +35,11 @@ public class BugsnagNativeSpansModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
+    public void reportSpanUpdateResult(double eventId, boolean result, Promise promise) {
+        delegate.reportSpanUpdateResult(eventId, result, promise);
+    }
+
+    @ReactMethod
     public void addListener(String eventType) {
         // noop - required for EventEmitter support
     }
