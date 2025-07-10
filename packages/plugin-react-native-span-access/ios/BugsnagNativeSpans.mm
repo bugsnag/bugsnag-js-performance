@@ -1,12 +1,11 @@
 #import <BugsnagPerformance/BugsnagPerformanceSpan.h>
-
+#import "BugsnagNativeSpansPlugin+Private.h"
+#import "BugsnagJavascriptSpansPlugin+Private.h"
 #import "BugsnagNativeSpans.h"
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import "BugsnagNativeSpansSpec.h"
 #endif
-
-#import "BugsnagNativeSpansPlugin+Private.h"
 
 @implementation BugsnagNativeSpans
 
@@ -14,7 +13,25 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[];
+  return @[@"bugsnag:spanUpdate"];
+}
+
+- (void)startObserving
+{
+  // Register this instance with the BugsnagJavascriptSpansPlugin
+  BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
+  if (plugin) {
+      [plugin setEventEmitter:self];
+  }
+}
+
+- (void)stopObserving
+{
+  // Unregister this instance from the BugsnagJavascriptSpansPlugin
+  BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
+  if (plugin) {
+    [plugin setEventEmitter:nil];
+  }
 }
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getSpanIdByName:(NSString *)spanName) {
@@ -82,7 +99,7 @@ RCT_EXPORT_METHOD(updateSpan:(NSDictionary *)spanId
     resolve(@YES);
 }
 
-RCT_EXPORT_METHOD(reportSpanUpdateResult:(NSNumber *)eventId
+RCT_EXPORT_METHOD(reportSpanUpdateResult:(double)eventId
                   result:(BOOL)result
                   resolve:(RCTPromiseResolveBlock)resolve
                    reject:(RCTPromiseRejectBlock)reject)
