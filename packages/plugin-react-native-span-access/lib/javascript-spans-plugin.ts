@@ -1,6 +1,6 @@
 import { TurboModuleRegistry, NativeEventEmitter } from 'react-native'
 import type { Spec } from './NativeBugsnagNativeSpans'
-import type { Plugin, PluginContext, Span, SpanAttribute } from '@bugsnag/core-performance'
+import type { Clock, Plugin, PluginContext, Span, SpanAttribute } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 
 const HOUR_IN_MILLISECONDS = 60 * 60 * 1000
@@ -18,16 +18,18 @@ const NativeNativeSpansModule = TurboModuleRegistry.get<Spec>('BugsnagNativeSpan
 export class BugsnagJavascriptSpansPlugin implements Plugin<ReactNativeConfiguration> {
   private spansByName = new Map<string, Span>()
   private timeout: ReturnType<typeof setTimeout> | null = null
+  private clock?: Clock
 
   install (context: PluginContext<ReactNativeConfiguration>) {
     if (!NativeNativeSpansModule) {
       throw new Error('BugsnagNativeSpans module is not available. Ensure the native module is linked correctly.')
     }
 
+    this.clock = context.clock
     context.addOnSpanStartCallback(this.onSpanStart.bind(this))
     context.addOnSpanEndCallback(this.onSpanEnd.bind(this))
     const eventEmitter = new NativeEventEmitter(NativeNativeSpansModule)
-    eventEmitter.addListener('JavascriptSpanUpdate', this.onNativeSpanUpdate.bind(this))
+    eventEmitter.addListener('bugsnag:spanUpdate', this.onNativeSpanUpdate.bind(this))
   }
 
   start () {
@@ -63,7 +65,8 @@ export class BugsnagJavascriptSpansPlugin implements Plugin<ReactNativeConfigura
       }
 
       if (event.isEnded) {
-        span.end(event.endTime)
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        span.end(event.endTime ? this.clock!.fromUnixNanoseconds(event.endTime) : undefined)
       }
 
       result = true
