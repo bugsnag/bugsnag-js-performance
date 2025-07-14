@@ -18,9 +18,9 @@ static BugsnagJavascriptSpansPlugin *_sharedInstance = nil;
 }
 
 - (void)installWithContext:(BugsnagPerformancePluginContext *)context {
-  _sharedInstance = self;
-  BugsnagJavascriptSpanControlProvider *spanControlProvider = [BugsnagJavascriptSpanControlProvider new];
-  [context addSpanControlProvider:spanControlProvider];
+    _sharedInstance = self;
+    BugsnagJavascriptSpanControlProvider *spanControlProvider = [BugsnagJavascriptSpanControlProvider new];
+    [context addSpanControlProvider:spanControlProvider];
 }
 
 - (void)start {
@@ -31,8 +31,10 @@ static BugsnagJavascriptSpansPlugin *_sharedInstance = nil;
 }
 
 - (void)sendSpanUpdateEvent:(NSDictionary *)event {
-    if (_eventEmitter) {
-        [_eventEmitter sendEventWithName:@"bugsnag:spanUpdate" body:event];
+    @synchronized (self) {
+      if (_eventEmitter) {
+          [_eventEmitter sendEventWithName:@"bugsnag:spanUpdate" body:event];
+      }
     }
 }
 

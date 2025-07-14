@@ -2,11 +2,14 @@
 #import "BugsnagJavascriptSpansPlugin+Private.h"
 #import <stdlib.h>
 
-@interface BugsnagJavascriptSpanMutator ()
+typedef void (^OnCommitBlock)(void);
+
+@interface BugsnagJavascriptSpanTransaction ()
 
 @property (nonatomic, strong, readonly) NSMutableDictionary *transaction;
+@property (nonatomic, copy) void (^onCommit)(void);
 
-- (instancetype)initWithTransaction:(NSMutableDictionary *)transaction;
+- (instancetype)initWithDictionary:(NSMutableDictionary *)dictionary onCommit:(OnCommitBlock)onCommit;
 
 @end
 
@@ -18,12 +21,13 @@ static NSString * const attributesTransactionKey = @"attributes";
 static NSString * const attributeNameKey = @"name";
 static NSString * const attributeValueKey = @"value";
 
-@implementation BugsnagJavascriptSpanMutator
+@implementation BugsnagJavascriptSpanTransaction
 
-- (instancetype)initWithTransaction:(NSMutableDictionary *)transaction {
+- (instancetype)initWithDictionary:(NSMutableDictionary *)dictionary onCommit:(OnCommitBlock)onCommit {
     self = [super init];
     if (self) {
-        _transaction = transaction;
+        _transaction = dictionary;
+        _onCommit = onCommit;
     }
     return self;
 }
@@ -38,6 +42,11 @@ static NSString * const attributeValueKey = @"value";
     NSNumber *unixNanos = @((double)(currentTime * NSEC_PER_SEC));
     self.transaction[endTimeTransactionKey] = unixNanos;
     self.transaction[isEndedTransactionKey] = @YES;
+    
+    // Call the onCommit block if it exists
+    if (self.onCommit) {
+        self.onCommit();
+    }
 }
 
 - (void)setAttribute:(NSString *)attributeName withValue:(_Nullable id)value {
@@ -52,6 +61,13 @@ static NSString * const attributeValueKey = @"value";
       attributeValueKey: value ?: [NSNull null]
     };
     [attributes addObject:attribute];
+}
+
+- (void)commit {
+    // Call the onCommit block if it exists
+    if (self.onCommit) {
+        self.onCommit();
+    }
 }
 
 @end
@@ -71,27 +87,25 @@ NSString *spanName;
     return self;
 }
 
-- (void)updateSpanWithUpdate:(BugsnagJavascriptSpanUpdateBlock)updateBlock {
+- (BugsnagJavascriptSpanTransaction *)createUpdateTransaction {
     // Create transaction dictionary to accumulate changes
     uint32_t result;
     arc4random_buf(&result, sizeof(result));
     NSNumber *eventId = @(result);
   
-    NSMutableDictionary *transaction = [NSMutableDictionary dictionaryWithDictionary:@{
+    NSMutableDictionary *updateEvent = [NSMutableDictionary dictionaryWithDictionary:@{
         idTransactionKey: eventId,
         nameTransactionKey: spanName,
         isEndedTransactionKey: @NO
     }];
     
-    // Create mutator and let the update block modify the transaction
-    BugsnagJavascriptSpanMutator *mutator = [[BugsnagJavascriptSpanMutator alloc] initWithTransaction:transaction];
-    updateBlock(mutator);
-        
-    // Emit the update event via the plugin instance
-    BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
-    if (plugin) {
-      [plugin sendSpanUpdateEvent:transaction];
-    }
+    BugsnagJavascriptSpanTransaction *transaction = [[BugsnagJavascriptSpanTransaction alloc] initWithDictionary:updateEvent onCommit:^{
+        BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
+        if (plugin) {
+            [plugin sendSpanUpdateEvent:updateEvent];
+        }
+    }];
+    
+    return transaction;
 }
-
 @end

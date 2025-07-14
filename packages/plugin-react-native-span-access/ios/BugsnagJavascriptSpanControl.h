@@ -3,7 +3,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface BugsnagJavascriptSpanMutator : NSObject
+@interface BugsnagJavascriptSpanTransaction : NSObject
 
 - (void)end;
 
@@ -11,13 +11,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setAttribute:(NSString *)attributeName withValue:(_Nullable id)value;
 
-@end
+- (void)commit;
 
-typedef void (^BugsnagJavascriptSpanUpdateBlock)(BugsnagJavascriptSpanMutator *mutator);
+@end
 
 @interface BugsnagJavascriptSpanControl : NSObject<BugsnagPerformanceSpanControl>
 
-- (void)updateSpanWithUpdate:(BugsnagJavascriptSpanUpdateBlock)updateBlock;
+- (BugsnagJavascriptSpanTransaction *)createUpdateTransaction;
 
 @end
 
