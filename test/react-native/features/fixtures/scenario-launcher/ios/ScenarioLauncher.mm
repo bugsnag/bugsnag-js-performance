@@ -182,22 +182,21 @@ RCT_EXPORT_METHOD(endNativeSpan:(NSString *)traceParent resolve:(RCTPromiseResol
 RCT_EXPORT_METHOD(updateJavascriptSpan:(NSString *)spanName attributes:(NSArray<NSDictionary *> *)attributes resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   BugsnagJavascriptSpanQuery *spanQuery = [BugsnagJavascriptSpanQuery queryWithName:spanName];
   BugsnagJavascriptSpanControl *spanControl = [BugsnagPerformance getSpanControlsWithQuery:spanQuery];
+  BugsnagJavascriptSpanTransaction *transaction = [spanControl createUpdateTransaction];
   NSDate *endTime = [NSDate date];
   
-  [spanControl updateSpanWithUpdate:^(BugsnagJavascriptSpanMutator *mutator) {
-    // Set some attributes
-    for (NSDictionary *attribute in attributes) {
-      NSString *name = attribute[@"name"];
-      id value = attribute[@"value"];
-      if (name) {
-        [mutator setAttribute:name withValue:value];
-      }
+  // Set some attributes
+  for (NSDictionary *attribute in attributes) {
+    NSString *name = attribute[@"name"];
+    id value = attribute[@"value"];
+    if (name) {
+      [transaction setAttribute:name withValue:value];
     }
-    
-    // End the span with a specific end time
-    [mutator endWithEndTime:endTime];
-  }];
+  }
 
+  // End the span with a specific end time and commit the transaction
+  [transaction endWithEndTime:endTime];
+  [transaction commit];
 
   resolve(nil);
 }
