@@ -9,6 +9,7 @@ export interface Spec extends TurboModule {
   startNativePerformance(configuration: UnsafeObject): Promise<void>;
   startNativeSpan(options: UnsafeObject): Promise<string>;
   endNativeSpan(traceParent: string): Promise<boolean>;
+  updateJavascriptSpan(spanName: string, attributes: Array<{ [key: string]: any }>): Promise<void>;
 }
 
 export default TurboModuleRegistry.get<Spec>("ScenarioLauncher") as Spec | null;

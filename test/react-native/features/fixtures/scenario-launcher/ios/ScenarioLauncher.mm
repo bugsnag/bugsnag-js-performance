@@ -6,6 +6,9 @@
 #import <BugsnagPerformance/BugsnagPerformance.h>
 #import <BugsnagPerformance/BugsnagPerformanceConfiguration+Private.h>
 #import "BugsnagNativeSpansPlugin.h"
+#import "BugsnagJavascriptSpansPlugin.h"
+#import "BugsnagJavascriptSpanQuery.h"
+#import "BugsnagjavascriptSpanControl.h"
 #endif
 
 @implementation ScenarioLauncher {
@@ -145,6 +148,7 @@ RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(
     config.internal.clearPersistenceOnStart = YES;
 
     [config addPlugin:[BugsnagNativeSpansPlugin new]];
+    [config addPlugin:[BugsnagJavascriptSpansPlugin new]];
 
     [BugsnagPerformance startWithConfiguration:config];
     resolve(nil);
@@ -175,6 +179,29 @@ RCT_EXPORT_METHOD(endNativeSpan:(NSString *)traceParent resolve:(RCTPromiseResol
   }
 }
 
+RCT_EXPORT_METHOD(updateJavascriptSpan:(NSString *)spanName attributes:(NSArray<NSDictionary *> *)attributes resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  BugsnagJavascriptSpanQuery *spanQuery = [BugsnagJavascriptSpanQuery queryWithName:spanName];
+  BugsnagJavascriptSpanControl *spanControl = [BugsnagPerformance getSpanControlsWithQuery:spanQuery];
+  NSDate *endTime = [NSDate date];
+  
+  [spanControl updateSpanWithUpdate:^(BugsnagJavascriptSpanMutator *mutator) {
+    // Set some attributes
+    for (NSDictionary *attribute in attributes) {
+      NSString *name = attribute[@"name"];
+      id value = attribute[@"value"];
+      if (name) {
+        [mutator setAttribute:name withValue:value];
+      }
+    }
+    
+    // End the span with a specific end time
+    [mutator endWithEndTime:endTime];
+  }];
+
+
+  resolve(nil);
+}
+
 #else
 RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   NSLog(@"Native performance is not enabled in this build");
@@ -189,6 +216,11 @@ RCT_EXPORT_METHOD(startNativeSpan:(NSDictionary *)options resolve:(RCTPromiseRes
 RCT_EXPORT_METHOD(endNativeSpan:(NSString *)traceParent resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   NSLog(@"Native performance is not enabled in this build");
   reject(@"end_native_span", @"Native performance is not enabled in this build", nil);
+}
+
+RCT_EXPORT_METHOD(updateJavascriptSpan:(NSString *)spanName attributes:(NSArray<NSDictionary *> *)attributes resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  NSLog(@"Native performance is not enabled in this build");
+  reject(@"update_javascript_span", @"Native performance is not enabled in this build", nil);
 }
 
 #endif
