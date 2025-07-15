@@ -72,9 +72,6 @@ static NSString * const attributeValueKey = @"value";
 
 @end
 
-@interface BugsnagJavascriptSpanControl ()
-@end
-
 @implementation BugsnagJavascriptSpanControl
 
 NSString *spanName;
