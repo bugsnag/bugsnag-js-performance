@@ -23,6 +23,8 @@ static NSString * const attributeValueKey = @"value";
 
 @implementation BugsnagJavascriptSpanTransaction
 
+BOOL isOpen = YES;
+
 - (instancetype)initWithDictionary:(NSMutableDictionary *)dictionary onCommit:(OnCommitBlock)onCommit {
     self = [super init];
     if (self) {
@@ -33,29 +35,35 @@ static NSString * const attributeValueKey = @"value";
 }
 
 - (void)end {
+    if(!isOpen) {
+        return;
+    }
+
     [self endWithEndTime:[NSDate date]];
 }
-    
 
 - (void)endWithEndTime:(NSDate *)endTime {
+    if(!isOpen) {
+        return;
+    }
+
     NSTimeInterval currentTime = [endTime timeIntervalSince1970];
     NSNumber *unixNanos = @((double)(currentTime * NSEC_PER_SEC));
     self.transaction[endTimeTransactionKey] = unixNanos;
     self.transaction[isEndedTransactionKey] = @YES;
-    
-    // Call the onCommit block if it exists
-    if (self.onCommit) {
-        self.onCommit();
-    }
 }
 
 - (void)setAttribute:(NSString *)attributeName withValue:(_Nullable id)value {
+    if(!isOpen) {
+        return;
+    }
+
     NSMutableArray *attributes = self.transaction[attributesTransactionKey];
     if (!attributes) {
         attributes = [NSMutableArray array];
         self.transaction[attributesTransactionKey] = attributes;
     }
-    
+
     NSDictionary *attribute = @{
       attributeNameKey: attributeName,
       attributeValueKey: value ?: [NSNull null]
@@ -64,10 +72,12 @@ static NSString * const attributeValueKey = @"value";
 }
 
 - (void)commit {
-    // Call the onCommit block if it exists
-    if (self.onCommit) {
-        self.onCommit();
+    if(!isOpen) {
+        return;
     }
+
+    isOpen = NO;
+    self.onCommit();
 }
 
 @end
