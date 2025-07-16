@@ -30,7 +30,7 @@ class BugsnagNativeSpans {
   private static final String SPAN_ID = "spanId";
   private static final String TRACE_ID = "traceId";
 
-  private static final String SPAN_UPDATE_EVENT_TYPE = "JavascriptSpanUpdate";
+  private static final String SPAN_UPDATE_EVENT_TYPE = "bugsnag:spanUpdate";
 
   private static volatile BugsnagNativeSpans INSTANCE;
 
@@ -102,13 +102,11 @@ class BugsnagNativeSpans {
   }
 
   public void reportSpanUpdateResult(double eventId, boolean result, Promise promise) {
-    android.util.Log.d(MODULE_NAME, "Reporting span update result: " + result + " for eventId: " + eventId);
     onRemoteSpanUpdated((int) eventId, result);
     promise.resolve(null);
   }
 
   void emitSpanUpdateEvent(ReadableMap updates) {
-    android.util.Log.d(MODULE_NAME, "Emitting span update event: " + updates);
     eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, updates);
   }
 
