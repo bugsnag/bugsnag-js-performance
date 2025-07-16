@@ -60,7 +60,8 @@ class JavascriptSpanTransactionImpl implements JavascriptSpanTransaction {
       return this;
     }
 
-    attributes.putLast(key, value);
+    attributes.remove(key); // Remove any existing attribute, moving the value to the end
+    attributes.put(key, value);
     return this;
   }
 
@@ -94,8 +95,6 @@ class JavascriptSpanTransactionImpl implements JavascriptSpanTransaction {
           attributeMap.putString(VALUE, (String) value);
         } else if (value instanceof Integer) {
           attributeMap.putInt(VALUE, (Integer) value);
-        } else if (value instanceof Long) {
-          attributeMap.putLong(VALUE, (Long) value);
         } else if (value instanceof Number) {
           attributeMap.putDouble(VALUE, ((Number) value).doubleValue());
         } else if (value instanceof Boolean) {
