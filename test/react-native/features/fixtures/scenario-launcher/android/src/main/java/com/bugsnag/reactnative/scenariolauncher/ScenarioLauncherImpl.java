@@ -16,9 +16,14 @@ import com.bugsnag.android.performance.RemoteSpanContext;
 import com.bugsnag.android.performance.Span;
 import com.bugsnag.android.performance.SpanOptions;
 
+import com.bugsnag.reactnative.performance.nativespans.BugsnagJavascriptSpansPlugin;
 import com.bugsnag.reactnative.performance.nativespans.BugsnagNativeSpansPlugin;
+import com.bugsnag.reactnative.performance.nativespans.JavascriptSpanByName;
+import com.bugsnag.reactnative.performance.nativespans.JavascriptSpanControl;
+import com.bugsnag.reactnative.performance.nativespans.JavascriptSpanTransaction;
 
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.Dynamic;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableArray;
@@ -179,6 +184,7 @@ class ScenarioLauncherImpl {
         config.setAutoInstrumentActivities(AutoInstrument.OFF);
         config.setAutoInstrumentRendering(true);
         config.addPlugin(new BugsnagNativeSpansPlugin());
+        config.addPlugin(new BugsnagJavascriptSpansPlugin());
 
         BugsnagPerformance.start(config);
         Log.d(MODULE_NAME, "Started Android performance");
@@ -221,6 +227,41 @@ class ScenarioLauncherImpl {
   }
 
   public void updateJavascriptSpan(String spanName, ReadableArray attributes, Promise promise) {
+    JavascriptSpanControl spanControl = BugsnagPerformance.getSpanControls(new JavascriptSpanByName(spanName));
+    JavascriptSpanTransaction transaction = spanControl.createUpdateTransaction();
+
+    for (int i = 0; i < attributes.size(); i++) {
+      ReadableMap attribute = attributes.getMap(i);
+      if (attribute != null) {
+        String name = attribute.getString("name");
+        if (name != null) {
+          Dynamic value = attribute.getDynamic("value");
+
+          switch (value.getType()) {
+            case Null:
+              transaction.setAttribute(name, null);
+              break;
+            case Boolean:
+              transaction.setAttribute(name, value.asBoolean());
+              break;
+            case Number:
+              transaction.setAttribute(name, value.asDouble());
+              break;
+            case String:
+              transaction.setAttribute(name, value.asString());
+              break;
+            case Array:
+              transaction.setAttribute(name, value.asArray().toArrayList());
+              break;
+          }
+        }
+      }
+    }
+
+    transaction
+      .end()
+      .commit(null);
+
     promise.resolve(null);
   }
 }
