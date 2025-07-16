@@ -196,7 +196,9 @@ RCT_EXPORT_METHOD(updateJavascriptSpan:(NSString *)spanName attributes:(NSArray<
 
   // End the span with a specific end time and commit the transaction
   [transaction endWithEndTime:endTime];
-  [transaction commit];
+  [transaction commit:^(BOOL result) {
+    NSLog(@"Span update result: %@", result ? @"YES" : @"NO");
+  }];
 
   resolve(nil);
 }
