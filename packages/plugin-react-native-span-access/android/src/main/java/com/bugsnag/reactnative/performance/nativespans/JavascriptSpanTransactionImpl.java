@@ -143,6 +143,9 @@ class JavascriptSpanTransactionImpl implements JavascriptSpanTransaction {
       updateTransaction.putInt(ID, callbackId);
     }
 
-    spans.emitSpanUpdateEvent(updateTransaction);
+    if (!spans.emitSpanUpdateEvent(updateTransaction) && callback != null) {
+      // If the event could not be emitted, notify the callback with a failure
+      callback.onRemoteSpanUpdated(false);
+    }
   }
 }
