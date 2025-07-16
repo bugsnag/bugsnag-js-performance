@@ -53,7 +53,7 @@ BOOL isOpen = YES;
 }
 
 - (void)setAttribute:(NSString *)attributeName withValue:(_Nullable id)value {
-    if (!isOpen) {
+    if (!isOpen || attributeName == nil || ![self isValidAttribute:value]) {
         return;
     }
 
@@ -86,6 +86,28 @@ BOOL isOpen = YES;
     int eventId = [plugin registerSpanUpdateCallback:callback];
     updateEvent[idTransactionKey] = @(eventId);
     [plugin sendSpanUpdateEvent:updateEvent];
+}
+
+- (BOOL)isValidAttribute:(_Nullable id)value {
+  if (value == nil || [value isKindOfClass:[NSString class]] || [value isKindOfClass:[NSNumber class]]) {
+    return YES;
+  }
+  
+  if ([value isKindOfClass:[NSArray class]]) {
+    NSUInteger idx = [value indexOfObjectPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
+      if ([obj isKindOfClass:[NSString class]] || [obj isKindOfClass:[NSNumber class]]) {
+        return NO;
+      }
+      
+      // stop the iteration if we find an invalid object
+      *stop = YES;
+      return YES;
+    }];
+    
+    return idx == NSNotFound; // means all objects are valid
+  }
+  
+  return NO;
 }
 
 @end
