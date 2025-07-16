@@ -102,7 +102,6 @@ class BugsnagNativeSpans {
   }
 
   public void reportSpanUpdateResult(double eventId, boolean result, Promise promise) {
-    android.util.Log.d("BugsnagNativeSpans", "reportSpanUpdateResult: eventId=" + eventId + ", result=" + result);
     onRemoteSpanUpdated((int) eventId, result);
     promise.resolve(null);
   }
