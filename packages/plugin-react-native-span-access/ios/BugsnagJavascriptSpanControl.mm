@@ -2,12 +2,12 @@
 #import "BugsnagJavascriptSpansPlugin+Private.h"
 #import <stdlib.h>
 
-typedef void (^OnCommitBlock)(void);
+typedef void (^OnCommitBlock)(OnSpanUpdatedCallback callback);
 
 @interface BugsnagJavascriptSpanTransaction ()
 
 @property (nonatomic, strong, readonly) NSMutableDictionary *transaction;
-@property (nonatomic, copy) void (^onCommit)(void);
+@property (nonatomic, copy) OnCommitBlock onCommit;
 
 - (instancetype)initWithDictionary:(NSMutableDictionary *)dictionary onCommit:(OnCommitBlock)onCommit;
 
@@ -71,13 +71,14 @@ BOOL isOpen = YES;
     [attributes addObject:attribute];
 }
 
-- (void)commit {
+- (void)commit:(OnSpanUpdatedCallback)callback {
     if(!isOpen) {
+        callback(NO);
         return;
     }
 
     isOpen = NO;
-    self.onCommit();
+    self.onCommit(callback);
 }
 
 @end
@@ -95,21 +96,19 @@ NSString *spanName;
 }
 
 - (BugsnagJavascriptSpanTransaction *)createUpdateTransaction {
-    // Create transaction dictionary to accumulate changes
-    uint32_t result;
-    arc4random_buf(&result, sizeof(result));
-    NSNumber *eventId = @(result);
-  
     NSMutableDictionary *updateEvent = [NSMutableDictionary dictionaryWithDictionary:@{
-        idTransactionKey: eventId,
         nameTransactionKey: spanName,
         isEndedTransactionKey: @NO
     }];
     
-    BugsnagJavascriptSpanTransaction *transaction = [[BugsnagJavascriptSpanTransaction alloc] initWithDictionary:updateEvent onCommit:^{
+    BugsnagJavascriptSpanTransaction *transaction = [[BugsnagJavascriptSpanTransaction alloc] initWithDictionary:updateEvent onCommit:^(OnSpanUpdatedCallback callback) {
         BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
         if (plugin) {
+            int eventId = [plugin registerSpanUpdateCallback:callback];
+            updateEvent[idTransactionKey] = @(eventId);
             [plugin sendSpanUpdateEvent:updateEvent];
+        } else {
+            callback(NO);
         }
     }];
     

@@ -104,7 +104,10 @@ RCT_EXPORT_METHOD(reportSpanUpdateResult:(double)eventId
                   resolve:(RCTPromiseResolveBlock)resolve
                    reject:(RCTPromiseRejectBlock)reject)
 {
-    // TODO: retrieve callback and invoke with the result
+    BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
+    if (plugin) {
+        [plugin onRemoteSpanUpdated:(int)eventId withResult:result];
+    }
     resolve(nil);
 }
 
