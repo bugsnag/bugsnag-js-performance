@@ -124,7 +124,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(requestEntropy) {
 }
 
 RCT_EXPORT_METHOD(requestEntropyAsync:(RCTPromiseResolveBlock)resolve
-                   rejecter:(RCTPromiseRejectBlock)reject) {
+                   reject:(RCTPromiseRejectBlock)reject) {
     NSString *hexStr = getRandomBytes();
     resolve(hexStr);
 }
