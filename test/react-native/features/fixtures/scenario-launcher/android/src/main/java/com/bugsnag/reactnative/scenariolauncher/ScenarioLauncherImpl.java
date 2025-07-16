@@ -21,6 +21,7 @@ import com.bugsnag.reactnative.performance.nativespans.BugsnagNativeSpansPlugin;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
@@ -217,5 +218,9 @@ class ScenarioLauncherImpl {
         Log.d(MODULE_NAME, "No open span found for traceParent: " + traceParent);
         promise.resolve(false);
     }
+  }
+
+  public void updateJavascriptSpan(String spanName, ReadableArray attributes, Promise promise) {
+    promise.resolve(null);
   }
 }

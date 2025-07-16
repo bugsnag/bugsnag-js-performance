@@ -25,10 +25,10 @@ export const initialise = async (config) => {
 export const App = () => {
   useEffect(() => {
     (async () => {
-      await NativeScenarioLauncher.startNativeSpan({ name: 'RemoteSpansScenarioParent' })
-      const nativeSpanControl = BugsnagPerformance.getSpanControls(new NativeSpanQuery('RemoteSpansScenarioParent'))
+      await NativeScenarioLauncher.startNativeSpan({ name: 'NativeSpansPluginScenarioParent' })
+      const nativeSpanControl = BugsnagPerformance.getSpanControls(new NativeSpanQuery('NativeSpansPluginScenarioParent'))
 
-      const childSpan = BugsnagPerformance.startSpan('RemoteSpansScenarioChild', { isFirstClass: false, parentContext: nativeSpanControl })
+      const childSpan = BugsnagPerformance.startSpan('NativeSpansPluginScenarioChild', { isFirstClass: false, parentContext: nativeSpanControl })
       childSpan.end()
 
       await nativeSpanControl.updateSpan(span => {
@@ -47,7 +47,7 @@ export const App = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.scenario}>
-        <Text>Remote Spans Scenario</Text>
+        <Text>Native Spans Plugin Scenario</Text>
       </View>
     </SafeAreaView>
   )

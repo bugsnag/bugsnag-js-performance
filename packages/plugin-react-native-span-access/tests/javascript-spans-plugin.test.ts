@@ -4,21 +4,24 @@ import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance
 import { BugsnagJavascriptSpansPlugin } from '../lib/javascript-spans-plugin'
 import { TurboModuleRegistry, NativeEventEmitter } from 'react-native'
 
+const SPAN_UPDATE_EVENT_TYPE = 'bugsnag:spanUpdate'
+
 describe('BugsnagJavascriptSpansPlugin', () => {
   let plugin: BugsnagJavascriptSpansPlugin
   let context: PluginContext<ReactNativeConfiguration>
   let mockNativeModule: any
+  let clock: IncrementingClock
 
   beforeEach(() => {
     jest.useFakeTimers()
 
     // Get the mocked native module
     mockNativeModule = TurboModuleRegistry.get('BugsnagNativeSpans')
-
+    clock = new IncrementingClock('2025-01-01T00:00:00.000Z')
     plugin = new BugsnagJavascriptSpansPlugin()
     context = new PluginContext<ReactNativeConfiguration>(
       createConfiguration<ReactNativeConfiguration>(),
-      new IncrementingClock()
+      clock
     )
 
     // Clear all mock calls before each test
@@ -42,7 +45,7 @@ describe('BugsnagJavascriptSpansPlugin', () => {
       // Get the created event emitter instance
       const eventEmitter = jest.mocked(NativeEventEmitter).mock.results[0].value
       expect(eventEmitter.addListener).toHaveBeenCalledWith(
-        'JavascriptSpanUpdate',
+        SPAN_UPDATE_EVENT_TYPE,
         expect.any(Function)
       )
     })
@@ -105,7 +108,7 @@ describe('BugsnagJavascriptSpansPlugin', () => {
         isEnded: false
       }
 
-      eventEmitter.emit('JavascriptSpanUpdate', updateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, updateEvent)
 
       // Verify success was reported to native
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenCalledWith(123, true)
@@ -130,7 +133,7 @@ describe('BugsnagJavascriptSpansPlugin', () => {
         isEnded: false
       }
 
-      eventEmitter.emit('JavascriptSpanUpdate', updateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, updateEvent)
 
       // Should report success since the second span is being tracked
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenCalledWith(123, true)
@@ -158,7 +161,7 @@ describe('BugsnagJavascriptSpansPlugin', () => {
         isEnded: false
       }
 
-      eventEmitter.emit('JavascriptSpanUpdate', updateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, updateEvent)
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenCalledTimes(1)
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenCalledWith(123, true)
 
@@ -170,7 +173,7 @@ describe('BugsnagJavascriptSpansPlugin', () => {
       mockNativeModule.reportSpanUpdateResult.mockClear()
 
       // Try to update the span again - should still work since span end doesn't remove from tracking
-      eventEmitter.emit('JavascriptSpanUpdate', updateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, updateEvent)
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenCalledTimes(1)
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenCalledWith(123, false)
     })
@@ -198,7 +201,7 @@ describe('BugsnagJavascriptSpansPlugin', () => {
         isEnded: false
       }
 
-      eventEmitter.emit('JavascriptSpanUpdate', updateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, updateEvent)
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenCalledWith(123, true)
     })
   })
@@ -229,7 +232,7 @@ describe('BugsnagJavascriptSpansPlugin', () => {
         isEnded: false
       }
 
-      eventEmitter.emit('JavascriptSpanUpdate', updateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, updateEvent)
 
       // Verify attributes were set on the span
       expect(span).toHaveAttribute('attr1', 'value1')
@@ -241,25 +244,26 @@ describe('BugsnagJavascriptSpansPlugin', () => {
     })
 
     it('should handle span end from native events', () => {
-      const spanFactory = new MockSpanFactory()
+      const spanFactory = new MockSpanFactory({ clock })
       const span = spanFactory.startSpan('testSpan', {})
 
       const onSpanStartCallback = context.onSpanStartCallbacks[0].item
       onSpanStartCallback(spanFactory.toPublicApi(span))
 
       // Simulate a native span end event
+      const endTime = new Date('2025-01-01T00:00:00.500Z').getTime() // 500ms later
       const updateEvent = {
         id: 123,
         name: 'testSpan',
         attributes: [],
         isEnded: true,
-        endTime: 5000
+        endTime: endTime * 1000000 // Convert to nanoseconds
       }
 
-      eventEmitter.emit('JavascriptSpanUpdate', updateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, updateEvent)
 
       // @ts-expect-error endTime is private
-      expect(span.endTime).toBe(5000)
+      expect(span.endTime).toBe(500)
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenCalledWith(123, true)
     })
 
@@ -272,7 +276,7 @@ describe('BugsnagJavascriptSpansPlugin', () => {
         isEnded: false
       }
 
-      eventEmitter.emit('JavascriptSpanUpdate', updateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, updateEvent)
 
       // Verify failure was reported to native
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenCalledWith(123, false)
@@ -294,7 +298,7 @@ describe('BugsnagJavascriptSpansPlugin', () => {
         isEnded: false
       }
 
-      eventEmitter.emit('JavascriptSpanUpdate', updateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, updateEvent)
 
       // Verify no attributes were set but success was still reported
       expect(setAttributeSpy).not.toHaveBeenCalled()
@@ -316,7 +320,7 @@ describe('BugsnagJavascriptSpansPlugin', () => {
         isEnded: false
       }
 
-      eventEmitter.emit('JavascriptSpanUpdate', updateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, updateEvent)
 
       // Verify no attributes were set but success was still reported
       expect(setAttributeSpy).not.toHaveBeenCalled()
@@ -378,8 +382,8 @@ describe('BugsnagJavascriptSpansPlugin', () => {
         name: 'invalidSpan'
       }
 
-      eventEmitter.emit('JavascriptSpanUpdate', validSpanUpdateEvent)
-      eventEmitter.emit('JavascriptSpanUpdate', invalidSpanUpdateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, validSpanUpdateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, invalidSpanUpdateEvent)
 
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenCalledTimes(2)
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenNthCalledWith(1, 123, true)
@@ -391,8 +395,8 @@ describe('BugsnagJavascriptSpansPlugin', () => {
       // Start the plugin to trigger cleanup
       plugin.start()
 
-      eventEmitter.emit('JavascriptSpanUpdate', validSpanUpdateEvent)
-      eventEmitter.emit('JavascriptSpanUpdate', invalidSpanUpdateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, validSpanUpdateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, invalidSpanUpdateEvent)
 
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenCalledTimes(4)
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenNthCalledWith(3, 123, true)
@@ -422,8 +426,8 @@ describe('BugsnagJavascriptSpansPlugin', () => {
         name: 'invalidSpan'
       }
 
-      eventEmitter.emit('JavascriptSpanUpdate', validSpanUpdateEvent)
-      eventEmitter.emit('JavascriptSpanUpdate', invalidSpanUpdateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, validSpanUpdateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, invalidSpanUpdateEvent)
 
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenCalledTimes(2)
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenNthCalledWith(1, 123, true)
@@ -435,8 +439,8 @@ describe('BugsnagJavascriptSpansPlugin', () => {
       // Advance time to trigger cleanup
       jest.advanceTimersByTime(60 * 60 * 1000)
 
-      eventEmitter.emit('JavascriptSpanUpdate', validSpanUpdateEvent)
-      eventEmitter.emit('JavascriptSpanUpdate', invalidSpanUpdateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, validSpanUpdateEvent)
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, invalidSpanUpdateEvent)
 
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenCalledTimes(4)
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenNthCalledWith(3, 123, true)
