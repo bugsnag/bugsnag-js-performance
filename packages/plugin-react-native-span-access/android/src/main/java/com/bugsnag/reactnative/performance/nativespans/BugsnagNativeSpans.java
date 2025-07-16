@@ -37,14 +37,12 @@ class BugsnagNativeSpans {
   static final String MODULE_NAME = "BugsnagNativeSpans";
 
   private final ReactApplicationContext reactContext;
-  private final RCTDeviceEventEmitter eventEmitter;
 
   private final SparseArray<OnRemoteSpanUpdatedCallback> updateCallbacks = new SparseArray<>(4);
   private int nextCallbackId = 0;
 
   public BugsnagNativeSpans(ReactApplicationContext reactContext) {
     this.reactContext = reactContext;
-    this.eventEmitter = reactContext.getJSModule(RCTDeviceEventEmitter.class);
 
     INSTANCE = this;
   }
@@ -107,12 +105,21 @@ class BugsnagNativeSpans {
   }
 
   public void reportSpanContextResult(double eventId, String result, Promise promise) {
-      // TODO: retrieve callback and invoke with the result
-      promise.resolve(null);
+    // TODO: retrieve callback and invoke with the result
+    promise.resolve(null);
   }
 
-  void emitSpanUpdateEvent(ReadableMap updates) {
-    eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, updates);
+  boolean emitSpanUpdateEvent(ReadableMap updates) {
+    try {
+      RCTDeviceEventEmitter eventEmitter = reactContext.getJSModule(RCTDeviceEventEmitter.class);
+      if (eventEmitter == null) {
+        return false;
+      }
+      eventEmitter.emit(SPAN_UPDATE_EVENT_TYPE, updates);
+      return true;
+    } catch (IllegalStateException ise) {
+      return false; // This can happen if the React context is not active
+    }
   }
 
   private void onRemoteSpanUpdated(int callbackId, boolean updateResult) {
