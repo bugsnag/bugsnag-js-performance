@@ -2,17 +2,6 @@
 #import "BugsnagJavascriptSpansPlugin+Private.h"
 #import <stdlib.h>
 
-typedef void (^OnCommitBlock)(OnSpanUpdatedCallback callback);
-
-@interface BugsnagJavascriptSpanTransaction ()
-
-@property (nonatomic, strong, readonly) NSMutableDictionary *transaction;
-@property (nonatomic, copy) OnCommitBlock onCommit;
-
-- (instancetype)initWithDictionary:(NSMutableDictionary *)dictionary onCommit:(OnCommitBlock)onCommit;
-
-@end
-
 static NSString * const idTransactionKey = @"id";
 static NSString * const nameTransactionKey = @"name";
 static NSString * const endTimeTransactionKey = @"endTime";
@@ -21,15 +10,25 @@ static NSString * const attributesTransactionKey = @"attributes";
 static NSString * const attributeNameKey = @"name";
 static NSString * const attributeValueKey = @"value";
 
+@interface BugsnagJavascriptSpanTransaction ()
+
+- (instancetype)initWithSpanName:(NSString *)spanName;
+
+@end
+
 @implementation BugsnagJavascriptSpanTransaction
+
+NSMutableDictionary *updateEvent;
 
 BOOL isOpen = YES;
 
-- (instancetype)initWithDictionary:(NSMutableDictionary *)dictionary onCommit:(OnCommitBlock)onCommit {
+- (instancetype)initWithSpanName:(NSString *)spanName; {
     self = [super init];
     if (self) {
-        _transaction = dictionary;
-        _onCommit = onCommit;
+        updateEvent = [NSMutableDictionary dictionaryWithDictionary:@{
+            nameTransactionKey: spanName,
+            isEndedTransactionKey: @NO
+        }];
     }
     return self;
 }
@@ -43,25 +42,25 @@ BOOL isOpen = YES;
 }
 
 - (void)endWithEndTime:(NSDate *)endTime {
-    if(!isOpen) {
+    if (!isOpen) {
         return;
     }
 
     NSTimeInterval currentTime = [endTime timeIntervalSince1970];
     NSNumber *unixNanos = @((double)(currentTime * NSEC_PER_SEC));
-    self.transaction[endTimeTransactionKey] = unixNanos;
-    self.transaction[isEndedTransactionKey] = @YES;
+    updateEvent[endTimeTransactionKey] = unixNanos;
+    updateEvent[isEndedTransactionKey] = @YES;
 }
 
 - (void)setAttribute:(NSString *)attributeName withValue:(_Nullable id)value {
-    if(!isOpen) {
+    if (!isOpen) {
         return;
     }
 
-    NSMutableArray *attributes = self.transaction[attributesTransactionKey];
+    NSMutableArray *attributes = updateEvent[attributesTransactionKey];
     if (!attributes) {
         attributes = [NSMutableArray array];
-        self.transaction[attributesTransactionKey] = attributes;
+        updateEvent[attributesTransactionKey] = attributes;
     }
 
     NSDictionary *attribute = @{
@@ -72,13 +71,21 @@ BOOL isOpen = YES;
 }
 
 - (void)commit:(OnSpanUpdatedCallback)callback {
-    if(!isOpen) {
+    if (!isOpen) {
         callback(NO);
         return;
     }
 
     isOpen = NO;
-    self.onCommit(callback);
+    BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
+    if (!plugin) {
+        callback(NO);
+        return;
+    }
+  
+    int eventId = [plugin registerSpanUpdateCallback:callback];
+    updateEvent[idTransactionKey] = @(eventId);
+    [plugin sendSpanUpdateEvent:updateEvent];
 }
 
 @end
@@ -96,22 +103,6 @@ NSString *spanName;
 }
 
 - (BugsnagJavascriptSpanTransaction *)createUpdateTransaction {
-    NSMutableDictionary *updateEvent = [NSMutableDictionary dictionaryWithDictionary:@{
-        nameTransactionKey: spanName,
-        isEndedTransactionKey: @NO
-    }];
-    
-    BugsnagJavascriptSpanTransaction *transaction = [[BugsnagJavascriptSpanTransaction alloc] initWithDictionary:updateEvent onCommit:^(OnSpanUpdatedCallback callback) {
-        BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
-        if (plugin) {
-            int eventId = [plugin registerSpanUpdateCallback:callback];
-            updateEvent[idTransactionKey] = @(eventId);
-            [plugin sendSpanUpdateEvent:updateEvent];
-        } else {
-            callback(NO);
-        }
-    }];
-    
-    return transaction;
+    return [[BugsnagJavascriptSpanTransaction alloc] initWithSpanName:spanName];
 }
 @end
