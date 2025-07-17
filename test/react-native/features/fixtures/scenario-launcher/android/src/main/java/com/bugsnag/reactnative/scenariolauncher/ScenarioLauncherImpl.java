@@ -223,4 +223,8 @@ class ScenarioLauncherImpl {
   public void updateJavascriptSpan(String spanName, ReadableArray attributes, Promise promise) {
     promise.resolve(null);
   }
+
+  public void sendNativeSpanWithJsParent(String spanName, Promise promise) {
+    promise.resolve(null);
+  }
 }

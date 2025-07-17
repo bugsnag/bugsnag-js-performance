@@ -68,4 +68,9 @@ public class ScenarioLauncher extends ReactContextBaseJavaModule {
   public void updateJavascriptSpan(String spanName, ReadableArray attributes, Promise promise) {
     impl.updateJavascriptSpan(spanName, attributes, promise);
   }
+
+  @ReactMethod
+  public void sendNativeSpanWithJsParent(String spanName, Promise promise) {
+    impl.sendNativeSpanWithJsParent(spanName, promise);
+  }
 }

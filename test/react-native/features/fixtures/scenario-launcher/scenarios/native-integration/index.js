@@ -4,3 +4,4 @@ export * as RemoteParentContextNativeScenario from './RemoteParentContextNativeS
 export * as RemoteParentContextJSScenario from './RemoteParentContextJSScenario'
 export * as NativeSpansPluginScenario from './NativeSpansPluginScenario'
 export * as JavascriptSpansPluginScenario from './JavascriptSpansPluginScenario'
+export * as JavascriptSpansContextScenario from './JavascriptSpansContextScenario'
