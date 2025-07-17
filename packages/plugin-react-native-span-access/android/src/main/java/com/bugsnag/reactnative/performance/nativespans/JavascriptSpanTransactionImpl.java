@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.bugsnag.android.performance.internal.BugsnagClock;
+
 class JavascriptSpanTransactionImpl implements JavascriptSpanTransaction {
 
   private static final String ID = "id";
@@ -34,13 +36,7 @@ class JavascriptSpanTransactionImpl implements JavascriptSpanTransaction {
 
   @Override
   public JavascriptSpanTransaction end() {
-    if (!isOpen) {
-      return this;
-    }
-
-    this.isEnded = true;
-    this.endTime = -1L;
-    return this;
+    return end(-1L);
   }
 
   @Override
@@ -50,7 +46,9 @@ class JavascriptSpanTransactionImpl implements JavascriptSpanTransaction {
     }
 
     this.isEnded = true;
-    this.endTime = endTime;
+    this.endTime = endTime >= 0
+            ? BugsnagClock.INSTANCE.elapsedNanosToUnixTime(endTime)
+            : BugsnagClock.INSTANCE.currentUnixNanoTime();
     return this;
   }
 
@@ -131,9 +129,7 @@ class JavascriptSpanTransactionImpl implements JavascriptSpanTransaction {
     updateTransaction.putArray(ATTRIBUTES, attributesArray);
 
     if (isEnded) {
-      if (endTime >= 0) {
-        updateTransaction.putDouble(END_TIME, endTime);
-      }
+      updateTransaction.putDouble(END_TIME, endTime);
       updateTransaction.putBoolean(IS_ENDED, true);
     }
 
