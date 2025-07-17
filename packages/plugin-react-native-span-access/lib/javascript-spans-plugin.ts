@@ -1,5 +1,6 @@
 import { TurboModuleRegistry, NativeEventEmitter } from 'react-native'
 import type { Spec } from './NativeBugsnagNativeSpans'
+import { RemoteParentContext } from '@bugsnag/core-performance'
 import type { Clock, Plugin, PluginContext, Span, SpanAttribute } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 
@@ -11,6 +12,11 @@ interface SpanUpdateEvent {
   attributes: Array<{ name: string, value: SpanAttribute }>
   isEnded: boolean
   endTime?: number
+}
+
+interface SpanContextEvent {
+  id: number
+  name: string
 }
 
 const NativeNativeSpansModule = TurboModuleRegistry.get<Spec>('BugsnagNativeSpans')
@@ -30,6 +36,7 @@ export class BugsnagJavascriptSpansPlugin implements Plugin<ReactNativeConfigura
     context.addOnSpanEndCallback(this.onSpanEnd.bind(this))
     const eventEmitter = new NativeEventEmitter(NativeNativeSpansModule)
     eventEmitter.addListener('bugsnag:spanUpdate', this.onNativeSpanUpdate.bind(this))
+    eventEmitter.addListener('bugsnag:spanContext', this.onSpanContextEvent.bind(this))
   }
 
   start () {
@@ -72,6 +79,18 @@ export class BugsnagJavascriptSpansPlugin implements Plugin<ReactNativeConfigura
       result = true
     } finally {
       NativeNativeSpansModule?.reportSpanUpdateResult(event.id, result)
+    }
+  }
+
+  private onSpanContextEvent (event: SpanContextEvent) {
+    let result = null
+    try {
+      const span = this.spansByName.get(event.name)
+      if (span) {
+        result = RemoteParentContext.toTraceParentString(span)
+      }
+    } finally {
+      NativeNativeSpansModule?.reportSpanContextResult(event.id, result)
     }
   }
 
