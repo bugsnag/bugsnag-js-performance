@@ -138,7 +138,7 @@ class BugsnagNativeSpans {
   }
 
   @Nullable
-  private OnRemoteSpanUpdatedCallback takeUpdateCallback(int callbackId) {
+  OnRemoteSpanUpdatedCallback takeUpdateCallback(int callbackId) {
     synchronized (updateCallbacks) {
       int index = updateCallbacks.indexOfKey(callbackId);
       if (index < 0) {
