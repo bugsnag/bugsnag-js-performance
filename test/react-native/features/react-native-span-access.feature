@@ -72,3 +72,9 @@ Scenario: Javascript spans can be modified and ended from native
       | 1.1 |
       | 2.2 |
       | 3.3 |
+
+@ios_only
+Scenario: Native spans can be started with a JS parent
+  When I run 'JavascriptSpanContextScenario'
+  And I wait to receive 2 spans
+  Then a span named 'NativeSpansPluginScenarioChild' has a parent named 'JavascriptSpanContextScenario'
