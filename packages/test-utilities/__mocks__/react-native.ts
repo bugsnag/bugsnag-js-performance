@@ -192,7 +192,8 @@ const BugsnagNativeSpans = {
   updateSpan: jest.fn((spanId, updates) => {
     return Promise.resolve(false)
   }),
-  reportSpanUpdateResult: jest.fn()
+  reportSpanUpdateResult: jest.fn(),
+  reportSpanContextResult: jest.fn()
 }
 
 export const TurboModuleRegistry = {

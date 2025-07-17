@@ -1,10 +1,11 @@
-import { PluginContext } from '@bugsnag/core-performance'
+import { PluginContext, RemoteParentContext } from '@bugsnag/core-performance'
 import { createConfiguration, IncrementingClock, IncrementingIdGenerator, MockSpanFactory } from '@bugsnag/js-performance-test-utilities'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
 import { BugsnagJavascriptSpansPlugin } from '../lib/javascript-spans-plugin'
 import { TurboModuleRegistry, NativeEventEmitter } from 'react-native'
 
 const SPAN_UPDATE_EVENT_TYPE = 'bugsnag:spanUpdate'
+const SPAN_CONTEXT_EVENT_TYPE = 'bugsnag:spanContext'
 
 describe('BugsnagJavascriptSpansPlugin', () => {
   let plugin: BugsnagJavascriptSpansPlugin
@@ -46,6 +47,10 @@ describe('BugsnagJavascriptSpansPlugin', () => {
       const eventEmitter = jest.mocked(NativeEventEmitter).mock.results[0].value
       expect(eventEmitter.addListener).toHaveBeenCalledWith(
         SPAN_UPDATE_EVENT_TYPE,
+        expect.any(Function)
+      )
+      expect(eventEmitter.addListener).toHaveBeenCalledWith(
+        SPAN_CONTEXT_EVENT_TYPE,
         expect.any(Function)
       )
     })
@@ -325,6 +330,74 @@ describe('BugsnagJavascriptSpansPlugin', () => {
       // Verify no attributes were set but success was still reported
       expect(setAttributeSpy).not.toHaveBeenCalled()
       expect(mockNativeModule.reportSpanUpdateResult).toHaveBeenCalledWith(123, true)
+    })
+  })
+
+  describe('span context events', () => {
+    let eventEmitter: NativeEventEmitter
+
+    beforeEach(() => {
+      plugin.install(context)
+      eventEmitter = jest.mocked(NativeEventEmitter).mock.results[0].value
+    })
+
+    it('should return trace parent string when span is found', () => {
+      const spanFactory = new MockSpanFactory()
+      const span = spanFactory.toPublicApi(spanFactory.startSpan('testSpan', {}))
+
+      const onSpanStartCallback = context.onSpanStartCallbacks[0].item
+      onSpanStartCallback(span)
+
+      // Simulate a span context event
+      const contextEvent = {
+        id: 123,
+        name: 'testSpan'
+      }
+
+      eventEmitter.emit(SPAN_CONTEXT_EVENT_TYPE, contextEvent)
+
+      // Verify trace parent string was reported to native
+      expect(mockNativeModule.reportSpanContextResult).toHaveBeenCalledWith(
+        123,
+        RemoteParentContext.toTraceParentString(span)
+      )
+    })
+
+    it('should return null when span is not found', () => {
+      // Simulate a context event for a span that doesn't exist
+      const contextEvent = {
+        id: 123,
+        name: 'nonExistentSpan'
+      }
+
+      eventEmitter.emit(SPAN_CONTEXT_EVENT_TYPE, contextEvent)
+
+      // Verify null was reported to native
+      expect(mockNativeModule.reportSpanContextResult).toHaveBeenCalledWith(123, null)
+    })
+
+    it('should return null for an ended span', () => {
+      const spanFactory = new MockSpanFactory()
+      const span = spanFactory.toPublicApi(spanFactory.startSpan('testSpan', {}))
+
+      const onSpanStartCallback = context.onSpanStartCallbacks[0].item
+      const onSpanEndCallback = context.onSpanEndCallbacks[0].item
+
+      onSpanStartCallback(span)
+
+      // End the span
+      onSpanEndCallback(span)
+
+      // Simulate a context event for the ended span
+      const contextEvent = {
+        id: 123,
+        name: 'testSpan'
+      }
+
+      eventEmitter.emit(SPAN_CONTEXT_EVENT_TYPE, contextEvent)
+
+      // Verify null was reported since span was removed from tracking
+      expect(mockNativeModule.reportSpanContextResult).toHaveBeenCalledWith(123, null)
     })
   })
 
