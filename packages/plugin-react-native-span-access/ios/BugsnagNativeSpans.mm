@@ -13,7 +13,7 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"bugsnag:spanUpdate"];
+  return @[@"bugsnag:spanUpdate", @"bugsnag:spanContext"];
 }
 
 - (void)startObserving
@@ -107,6 +107,18 @@ RCT_EXPORT_METHOD(reportSpanUpdateResult:(double)eventId
     BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
     if (plugin) {
         [plugin onRemoteSpanUpdated:(int)eventId withResult:result];
+    }
+    resolve(nil);
+}
+
+RCT_EXPORT_METHOD(reportSpanContextResult:(double)eventId
+                  result:(NSString *)result
+                  resolve:(RCTPromiseResolveBlock)resolve
+                   reject:(RCTPromiseRejectBlock)reject)
+{
+    BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
+    if (plugin) {
+        [plugin onRemoteSpanContextReceived:(int)eventId withContext:result];
     }
     resolve(nil);
 }

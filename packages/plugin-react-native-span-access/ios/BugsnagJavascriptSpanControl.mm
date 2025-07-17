@@ -127,4 +127,22 @@ NSString *spanName;
 - (BugsnagJavascriptSpanTransaction *)createUpdateTransaction {
     return [[BugsnagJavascriptSpanTransaction alloc] initWithSpanName:spanName];
 }
+
+- (void)getSpanContext:(RemoteSpanContextCallback)callback {
+    BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
+    if (!plugin) {
+        callback(nil);
+        return;
+    }
+
+    int eventId = [plugin registerSpanContextCallback:callback];
+  
+    NSDictionary *contextEvent = @{
+      idTransactionKey: @(eventId),
+      nameTransactionKey: spanName,
+    };
+  
+    [plugin sendSpanContextEvent:contextEvent];
+}
+
 @end
