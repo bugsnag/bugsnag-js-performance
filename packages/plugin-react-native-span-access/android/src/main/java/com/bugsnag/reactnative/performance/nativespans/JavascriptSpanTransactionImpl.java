@@ -137,15 +137,21 @@ class JavascriptSpanTransactionImpl implements JavascriptSpanTransaction {
       updateTransaction.putBoolean(IS_ENDED, true);
     }
 
+    int callbackId = -1;
     if (callback != null) {
       // register the callback *last* to avoid memory leaks from earlier exceptions
-      final int callbackId = spans.registerUpdateCallback(callback);
+      callbackId = spans.registerUpdateCallback(callback);
       updateTransaction.putInt(ID, callbackId);
     }
 
     if (!spans.emitSpanUpdateEvent(updateTransaction) && callback != null) {
       // If the event could not be emitted, notify the callback with a failure
       callback.onRemoteSpanUpdated(false);
+
+      if (callbackId >= 0) {
+        // If we registered a callback, unregister it
+        spans.takeUpdateCallback(callbackId);
+      }
     }
   }
 }
