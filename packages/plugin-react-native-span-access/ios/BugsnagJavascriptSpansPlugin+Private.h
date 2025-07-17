@@ -14,4 +14,11 @@
 - (void)sendSpanUpdateEvent:(NSDictionary *)event;
 
 - (void)onRemoteSpanUpdated:(int)eventId withResult:(BOOL)result;
+
+- (int)registerSpanContextCallback:(RemoteSpanContextCallback)callback;
+
+- (void)sendSpanContextEvent:(NSDictionary *)event;
+
+- (void)onRemoteSpanContextReceived:(int)eventId withContext:(NSString *)context;
+
 @end
