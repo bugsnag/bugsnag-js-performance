@@ -49,7 +49,6 @@ Scenario: Native spans can be modified and ended from JS
       | 2.2 |
       | 3.3 |
 
-@ios_only
 Scenario: Javascript spans can be modified and ended from native
   When I run 'JavascriptSpansPluginScenario'
   And I wait to receive 1 span
