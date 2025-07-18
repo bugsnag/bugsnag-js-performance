@@ -10,7 +10,7 @@ import com.facebook.react.bridge.WritableMap;
 import java.util.Map;
 
 public class BugsnagReactNativePerformance extends ReactContextBaseJavaModule {
-  
+
   private final NativeBugsnagPerformanceImpl impl;
 
   public BugsnagReactNativePerformance(ReactApplicationContext reactContext) {
@@ -94,12 +94,12 @@ public class BugsnagReactNativePerformance extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void endNativeSpan(String spanId, String traceId, double endTime, ReadableMap attributes, Promise promise) {
-    impl.endNativeSpan(spanId, traceId, endTime, attributes,  promise);
+  public void endNativeSpan(String spanId, String traceId, String endTime, ReadableMap attributes, Promise promise) {
+    impl.endNativeSpan(spanId, traceId, endTime, attributes, promise);
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
-  public void markNativeSpanEndTime(String spanId, String traceId, double endTime) {
+  public void markNativeSpanEndTime(String spanId, String traceId, String endTime) {
     impl.markNativeSpanEndTime(spanId, traceId, endTime);
   }
 
