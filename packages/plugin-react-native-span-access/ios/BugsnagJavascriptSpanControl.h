@@ -3,6 +3,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void (^OnSpanUpdatedCallback)(BOOL result);
+
 @interface BugsnagJavascriptSpanTransaction : NSObject
 
 - (void)end;
@@ -11,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setAttribute:(NSString *)attributeName withValue:(_Nullable id)value;
 
-- (void)commit;
+- (void)commit:(OnSpanUpdatedCallback)callback;
 
 @end
 
