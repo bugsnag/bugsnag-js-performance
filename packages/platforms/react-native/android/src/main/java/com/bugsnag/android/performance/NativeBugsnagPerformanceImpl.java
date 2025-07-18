@@ -149,7 +149,7 @@ class NativeBugsnagPerformanceImpl {
       mainHandler.postDelayed(spanCleanupTask, TimeUnit.HOURS.toMillis(1));
       isCleanupTaskScheduled = true;
     }
-    
+
     WritableMap result = Arguments.createMap();
     result.putString("apiKey", nativeConfig.getApiKey());
     result.putString("endpoint", nativeConfig.getEndpoint());
@@ -211,7 +211,7 @@ class NativeBugsnagPerformanceImpl {
     }
   }
 
-  void endNativeSpan(String spanId, String traceId, double endTime, ReadableMap jsAttributes, Promise promise) {
+  void endNativeSpan(String spanId, String traceId, String endTime, ReadableMap jsAttributes, Promise promise) {
     SpanImpl nativeSpan = openSpans.remove(spanId + traceId);
     if (nativeSpan == null) {
       promise.resolve(null);
@@ -219,7 +219,7 @@ class NativeBugsnagPerformanceImpl {
     }
 
     ReactNativeSpanAttributes.setAttributesFromReadableMap(nativeSpan.getAttributes(), jsAttributes);
-    long nativeEndTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)endTime);
+    long nativeEndTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime(Long.parseLong(endTime));
     if (nativeEndTime > nativeSpan.getEndTime$internal()) {
       nativeSpan.markEndTime$internal(nativeEndTime);
     }
@@ -244,7 +244,7 @@ class NativeBugsnagPerformanceImpl {
     span.putString("traceId", EncodingUtils.toHexString(nativeSpan.getTraceId()));
 
     long unixNanoStartTime = BugsnagClock.INSTANCE.elapsedNanosToUnixTime(nativeSpan.getStartTime$internal());
-    span.putDouble("startTime", (double)unixNanoStartTime);
+    span.putString("startTime", Long.toString(unixNanoStartTime));
 
     long parentSpanId = nativeSpan.getParentSpanId();
     if (parentSpanId != 0L) {

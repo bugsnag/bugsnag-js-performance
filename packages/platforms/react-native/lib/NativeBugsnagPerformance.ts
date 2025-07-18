@@ -57,7 +57,7 @@ export interface Spec extends TurboModule {
   isNativePerformanceAvailable: () => boolean
   attachToNativeSDK: () => NativeConfiguration | null
   startNativeSpan: (name: string, options: UnsafeObject) => NativeSpan
-  endNativeSpan: (spanId: string, traceId: string, endTime: number, attributes: UnsafeObject) => Promise<void>
+  endNativeSpan: (spanId: string, traceId: string, endTime: string, attributes: UnsafeObject) => Promise<void>
   markNativeSpanEndTime: (spanId: string, traceId: string, endTime: number) => void
   discardNativeSpan: (spanId: string, traceId: string) => Promise<void>
 }
