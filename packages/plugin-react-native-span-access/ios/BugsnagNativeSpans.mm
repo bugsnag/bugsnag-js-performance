@@ -124,10 +124,13 @@ RCT_EXPORT_METHOD(reportSpanContextResult:(double)eventId
 }
 
 - (void)endSpan:(NSDictionary *)updates span:(BugsnagPerformanceSpan *)span {
-    NSNumber *timestampString = updates[@"endTime"];
+    NSString *timestampString = updates[@"endTime"];
     if (timestampString) {
-        double endTimestampValue = [timestampString doubleValue];
-        NSDate *endTimestamp = [NSDate dateWithTimeIntervalSince1970:(endTimestampValue / NSEC_PER_SEC)];
+        NSDecimalNumber *endTimeDecimal = [NSDecimalNumber decimalNumberWithString:timestampString];
+        NSDecimalNumber *nsecPerSecDecimal = [NSDecimalNumber decimalNumberWithMantissa:1 exponent:9 isNegative:NO];
+        NSDecimalNumber *endTimeSecondsDecimal = [endTimeDecimal decimalNumberByDividingBy:nsecPerSecDecimal];
+        NSTimeInterval endTimeInterval = [endTimeSecondsDecimal doubleValue];
+        NSDate *endTimestamp = [NSDate dateWithTimeIntervalSince1970:endTimeInterval];
         [span endWithEndTime:endTimestamp];
     } else {
         [span end];

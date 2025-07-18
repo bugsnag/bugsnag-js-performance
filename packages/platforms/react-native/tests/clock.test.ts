@@ -96,6 +96,21 @@ describe('React Native Clock', () => {
 
       expect(unixTimeStamp).toBe('69000000')
     })
+
+    it('converts extreme time values into a valid timestamp', () => {
+      // 18446744073709ms * 1000000(nanos) is near uInt64.MAX_VALUE and well over Number.MAX_SAFE_INTEGER
+      const timeOrigin = new Date(18446744073709)
+      jest.setSystemTime(timeOrigin)
+
+      const clock = createClock(performance)
+
+      jest.advanceTimersByTime(0.55)
+
+      const startTime = clock.now()
+      const unixTimeStamp = clock.toUnixTimestampNanoseconds(startTime)
+
+      expect(unixTimeStamp).toBe('18446744073709550000')
+    })
   })
 
   describe('clock.toUnixNanoseconds()', () => {

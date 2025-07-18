@@ -178,8 +178,8 @@ class BugsnagNativeSpans {
 
   private static void endSpan(ReadableMap updates, Span span) {
     if (updates.hasKey(END_TIME)) {
-      double endTime = updates.getDouble(END_TIME);
-      span.end(BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long) endTime));
+      String endTimeTimestamp = updates.getString(END_TIME);
+      span.end(BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime(Long.parseLong(endTimeTimestamp)));
     } else {
       span.end();
     }
