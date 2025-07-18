@@ -26,9 +26,9 @@ const NativeBugsnagPerformance = NativeBsgModule || {
   writeFile: async (path: string, data: string, encoding: string) => { },
   isNativePerformanceAvailable: () => false,
   attachToNativeSDK: () => null,
-  startNativeSpan: (name: string, options: object) => ({ name, id: '', traceId: '', startTime: 0, parentSpanId: '' }),
-  endNativeSpan: async (spanId: string, traceId: string, endTime: number, attributes: object) => { },
-  markNativeSpanEndTime: (spanId: string, traceId: string, endTime: number) => { },
+  startNativeSpan: (name: string, options: object) => ({ name, id: '', traceId: '', startTime: '0', parentSpanId: '' }),
+  endNativeSpan: async (spanId: string, traceId: string, endTime: string, attributes: object) => { },
+  markNativeSpanEndTime: (spanId: string, traceId: string, endTime: string) => { },
   discardNativeSpan: async (spanId: string, traceId: string) => { }
 }
 

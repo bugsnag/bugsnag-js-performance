@@ -47,7 +47,7 @@ describe('ReactNativeSpanFactory', () => {
 
       const startTime = clock.now()
       const nativeSpan = spanFactory.startSpan('native span', { startTime, isFirstClass: true })
-      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('native span', expect.objectContaining({ startTime: clock.toUnixNanoseconds(startTime) }))
+      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('native span', expect.objectContaining({ startTime: clock.toUnixTimestampNanoseconds(startTime) }))
       expect(contextStorage.current).toBe(nativeSpan)
     })
 
@@ -107,7 +107,7 @@ describe('ReactNativeSpanFactory', () => {
 
       const startTime = clock.now()
       const nativeSpan = spanFactory.startSpan('native span', { startTime, isFirstClass: true })
-      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('native span', expect.objectContaining({ startTime: clock.toUnixNanoseconds(startTime) }))
+      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('native span', expect.objectContaining({ startTime: clock.toUnixTimestampNanoseconds(startTime) }))
       expect(contextStorage.current).toBe(nativeSpan)
 
       const endTime = clock.now()
@@ -119,7 +119,7 @@ describe('ReactNativeSpanFactory', () => {
       expect(NativeBugsnagPerformance.endNativeSpan).toHaveBeenCalledWith(
         nativeSpan.id,
         nativeSpan.traceId,
-        clock.toUnixNanoseconds(endTime),
+        clock.toUnixTimestampNanoseconds(endTime),
         { 'bugsnag.span.first_class': true, 'additional.attribute': 'test' })
     })
 
@@ -149,11 +149,11 @@ describe('ReactNativeSpanFactory', () => {
       spanFactory.configure({ logger: jestLogger, onSpanEnd: [onSpanEndCallback] } as unknown as InternalConfiguration<ReactNativeConfiguration>)
       const startTime = clock.now()
       const validSpan = spanFactory.startSpan('should send', { startTime, isFirstClass: true })
-      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('should send', expect.objectContaining({ startTime: clock.toUnixNanoseconds(startTime) }))
+      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('should send', expect.objectContaining({ startTime: clock.toUnixTimestampNanoseconds(startTime) }))
       expect(contextStorage.current).toBe(validSpan)
 
       const invalidSpan = spanFactory.startSpan('should discard', { startTime, isFirstClass: true })
-      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('should discard', expect.objectContaining({ startTime: clock.toUnixNanoseconds(startTime) }))
+      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('should discard', expect.objectContaining({ startTime: clock.toUnixTimestampNanoseconds(startTime) }))
       expect(contextStorage.current).toBe(invalidSpan)
 
       const endTime = clock.now()
@@ -184,7 +184,7 @@ describe('ReactNativeSpanFactory', () => {
       spanFactory.configure({ logger: jestLogger, onSpanStart: [onSpanStartCallback] } as unknown as InternalConfiguration<ReactNativeConfiguration>)
       const startTime = clock.now()
       const span = spanFactory.startSpan('native span', { startTime, isFirstClass: true })
-      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('native span', expect.objectContaining({ startTime: clock.toUnixNanoseconds(startTime) }))
+      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('native span', expect.objectContaining({ startTime: clock.toUnixTimestampNanoseconds(startTime) }))
       // @ts-expect-error 'attributes' is private but very awkward to test otherwise
       expect(span.attributes.attributes.get('start_callback')).toBe(true)
     })
@@ -196,7 +196,7 @@ describe('ReactNativeSpanFactory', () => {
 
       const startTime = clock.now()
       const nativeSpan = spanFactory.startSpan('native span', { startTime, isFirstClass: true })
-      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('native span', expect.objectContaining({ startTime: clock.toUnixNanoseconds(startTime) }))
+      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('native span', expect.objectContaining({ startTime: clock.toUnixTimestampNanoseconds(startTime) }))
 
       spanFactory.endSpan(nativeSpan, DISCARD_END_TIME)
       expect(NativeBugsnagPerformance.endNativeSpan).not.toHaveBeenCalled()
