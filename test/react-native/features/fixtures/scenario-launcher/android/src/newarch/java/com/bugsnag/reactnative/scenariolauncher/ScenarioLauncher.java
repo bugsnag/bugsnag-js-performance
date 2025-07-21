@@ -66,5 +66,10 @@ public class ScenarioLauncher extends NativeScenarioLauncherSpec {
   public void updateJavascriptSpan(String spanName, ReadableArray attributes, Promise promise) {
     impl.updateJavascriptSpan(spanName, attributes, promise);
   }
+
+  @Override
+  public void sendNativeSpanWithJsParent(String spanName, Promise promise) {
+    impl.sendNativeSpanWithJsParent(spanName, promise);
+  }
 }
 

@@ -1,9 +1,12 @@
 #import <Foundation/Foundation.h>
 #import <BugsnagPerformance/BugsnagPerformanceSpanControl.h>
+#import <BugsnagPerformance/BugsnagPerformanceSpanContext.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^OnSpanUpdatedCallback)(BOOL result);
+
+typedef void (^RemoteSpanContextCallback)(BugsnagPerformanceSpanContext * _Nullable context);
 
 @interface BugsnagJavascriptSpanTransaction : NSObject
 
@@ -20,6 +23,8 @@ typedef void (^OnSpanUpdatedCallback)(BOOL result);
 @interface BugsnagJavascriptSpanControl : NSObject<BugsnagPerformanceSpanControl>
 
 - (BugsnagJavascriptSpanTransaction *)createUpdateTransaction;
+
+- (void)retrieveSpanContext:(RemoteSpanContextCallback)callback;
 
 @end
 

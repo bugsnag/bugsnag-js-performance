@@ -5,6 +5,7 @@
 #ifdef NATIVE_INTEGRATION
 #import <BugsnagPerformance/BugsnagPerformance.h>
 #import <BugsnagPerformance/BugsnagPerformanceConfiguration+Private.h>
+#import <BugsnagPerformance/BugsnagPerformanceSpanContext.h>
 #import "BugsnagNativeSpansPlugin.h"
 #import "BugsnagJavascriptSpansPlugin.h"
 #import "BugsnagJavascriptSpanQuery.h"
@@ -203,6 +204,23 @@ RCT_EXPORT_METHOD(updateJavascriptSpan:(NSString *)spanName attributes:(NSArray<
   resolve(nil);
 }
 
+RCT_EXPORT_METHOD(sendNativeSpanWithJsParent:(NSString *)spanName resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  BugsnagJavascriptSpanQuery *spanQuery = [BugsnagJavascriptSpanQuery queryWithName:spanName];
+  BugsnagJavascriptSpanControl *spanControl = [BugsnagPerformance getSpanControlsWithQuery:spanQuery];
+
+  [spanControl retrieveSpanContext:^(BugsnagPerformanceSpanContext * _Nullable context) {
+    if (context) {
+      BugsnagPerformanceSpanOptions *options = [BugsnagPerformanceSpanOptions new];
+      options.parentContext = context;
+      BugsnagPerformanceSpan *childSpan = [BugsnagPerformance startSpanWithName:@"Native Child Span" options:options];
+      [childSpan end];
+      resolve(nil);
+    } else {
+      reject(@"send_native_span_with_js_parent", @"Failed to get JS span context", nil);
+    }
+  }];
+}
+
 #else
 RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   NSLog(@"Native performance is not enabled in this build");
@@ -222,6 +240,11 @@ RCT_EXPORT_METHOD(endNativeSpan:(NSString *)traceParent resolve:(RCTPromiseResol
 RCT_EXPORT_METHOD(updateJavascriptSpan:(NSString *)spanName attributes:(NSArray<NSDictionary *> *)attributes resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
   NSLog(@"Native performance is not enabled in this build");
   reject(@"update_javascript_span", @"Native performance is not enabled in this build", nil);
+}
+
+RCT_EXPORT_METHOD(sendNativeSpanWithJsParent:(NSString *)spanName resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+  NSLog(@"Native performance is not enabled in this build");
+  reject(@"send_native_span_with_js_parent", @"Native performance is not enabled in this build", nil);
 }
 
 #endif
