@@ -24,6 +24,10 @@
     "@angular/router": "*",
     "@bugsnag/browser-performance": "*"
   },
+  "devDependencies": {
+    "@angular/platform-browser-dynamic": "^18.1.0",
+    "jest-preset-angular": "^14.1.1"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
