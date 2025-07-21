@@ -95,6 +95,11 @@ class BugsnagNativeSpans {
         promise.resolve(null);
     }
 
+    public void reportSpanContextResult(double eventId, String result, Promise promise) {
+        // TODO: retrieve callback and invoke with the result
+        promise.resolve(null);
+    }
+
     private static void endSpan(ReadableMap updates, Span span) {
         if (updates.hasKey(END_TIME)) {
             double endTime = updates.getDouble(END_TIME);
