@@ -15,12 +15,12 @@ import com.bugsnag.android.performance.internal.BugsnagClock;
 
 class JavascriptSpanTransactionImpl implements JavascriptSpanTransaction {
 
-  private static final String ID = "id";
-  private static final String NAME = "name";
-  private static final String VALUE = "value";
-  private static final String ATTRIBUTES = "attributes";
-  private static final String END_TIME = "endTime";
-  private static final String IS_ENDED = "isEnded";
+  static final String ID = "id";
+  static final String NAME = "name";
+  static final String VALUE = "value";
+  static final String ATTRIBUTES = "attributes";
+  static final String END_TIME = "endTime";
+  static final String IS_ENDED = "isEnded";
 
   private final String spanName;
 
