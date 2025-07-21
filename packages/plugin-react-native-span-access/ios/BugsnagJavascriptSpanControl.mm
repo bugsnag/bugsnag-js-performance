@@ -128,7 +128,7 @@ NSString *spanName;
     return [[BugsnagJavascriptSpanTransaction alloc] initWithSpanName:spanName];
 }
 
-- (void)getSpanContext:(RemoteSpanContextCallback)callback {
+- (void)retrieveSpanContext:(RemoteSpanContextCallback)callback {
     BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
     if (!plugin) {
         callback(nil);

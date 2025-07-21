@@ -208,7 +208,7 @@ RCT_EXPORT_METHOD(sendNativeSpanWithJsParent:(NSString *)spanName resolve:(RCTPr
   BugsnagJavascriptSpanQuery *spanQuery = [BugsnagJavascriptSpanQuery queryWithName:spanName];
   BugsnagJavascriptSpanControl *spanControl = [BugsnagPerformance getSpanControlsWithQuery:spanQuery];
 
-  [spanControl getSpanContext:^(BugsnagPerformanceSpanContext * _Nullable context) {
+  [spanControl retrieveSpanContext:^(BugsnagPerformanceSpanContext * _Nullable context) {
     if (context) {
       BugsnagPerformanceSpanOptions *options = [BugsnagPerformanceSpanOptions new];
       options.parentContext = context;

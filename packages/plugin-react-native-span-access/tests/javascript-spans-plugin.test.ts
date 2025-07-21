@@ -5,7 +5,7 @@ import { BugsnagJavascriptSpansPlugin } from '../lib/javascript-spans-plugin'
 import { TurboModuleRegistry, NativeEventEmitter } from 'react-native'
 
 const SPAN_UPDATE_EVENT_TYPE = 'bugsnag:spanUpdate'
-const SPAN_CONTEXT_EVENT_TYPE = 'bugsnag:spanContext'
+const SPAN_CONTEXT_EVENT_TYPE = 'bugsnag:retrieveSpanContext'
 
 describe('BugsnagJavascriptSpansPlugin', () => {
   let plugin: BugsnagJavascriptSpansPlugin

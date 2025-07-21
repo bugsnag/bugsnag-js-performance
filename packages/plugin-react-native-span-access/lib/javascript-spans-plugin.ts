@@ -36,7 +36,7 @@ export class BugsnagJavascriptSpansPlugin implements Plugin<ReactNativeConfigura
     context.addOnSpanEndCallback(this.onSpanEnd.bind(this))
     const eventEmitter = new NativeEventEmitter(NativeNativeSpansModule)
     eventEmitter.addListener('bugsnag:spanUpdate', this.onNativeSpanUpdate.bind(this))
-    eventEmitter.addListener('bugsnag:spanContext', this.onSpanContextEvent.bind(this))
+    eventEmitter.addListener('bugsnag:retrieveSpanContext', this.onSpanContextEvent.bind(this))
   }
 
   start () {

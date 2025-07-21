@@ -24,7 +24,7 @@ typedef void (^RemoteSpanContextCallback)(BugsnagPerformanceSpanContext * _Nulla
 
 - (BugsnagJavascriptSpanTransaction *)createUpdateTransaction;
 
-- (void)getSpanContext:(RemoteSpanContextCallback)callback;
+- (void)retrieveSpanContext:(RemoteSpanContextCallback)callback;
 
 @end
 

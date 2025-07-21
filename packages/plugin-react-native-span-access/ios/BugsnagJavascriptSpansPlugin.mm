@@ -102,7 +102,7 @@ CallbackRegistry *_spanContextCallbacks;
 - (void)sendSpanContextEvent:(NSDictionary *)event {
     @synchronized (self) {
       if (_eventEmitter) {
-          [_eventEmitter sendEventWithName:@"bugsnag:spanContext" body:event];
+          [_eventEmitter sendEventWithName:@"bugsnag:retrieveSpanContext" body:event];
       }
     }
 }

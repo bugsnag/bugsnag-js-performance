@@ -13,7 +13,7 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"bugsnag:spanUpdate", @"bugsnag:spanContext"];
+  return @[@"bugsnag:spanUpdate", @"bugsnag:retrieveSpanContext"];
 }
 
 - (void)startObserving
