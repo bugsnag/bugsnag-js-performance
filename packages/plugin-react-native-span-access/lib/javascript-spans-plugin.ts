@@ -78,7 +78,9 @@ export class BugsnagJavascriptSpansPlugin implements Plugin<ReactNativeConfigura
 
       result = true
     } finally {
-      NativeNativeSpansModule?.reportSpanUpdateResult(event.id, result)
+      if (event.id !== undefined) {
+        NativeNativeSpansModule?.reportSpanUpdateResult(event.id, result)
+      }
     }
   }
 
