@@ -5,6 +5,7 @@
 ### Fixed
 
 - (react-native) Added a short debounce during app start to allow backgrounded apps to come to the foreground [#665](https://github.com/bugsnag/bugsnag-js-performance/pull/665)
+- (react-native) Fix a crash when refreshing the entropy pool on iOS [#667](https://github.com/bugsnag/bugsnag-js-performance/pull/667)
 
 ## [v2.14.0] (2025-06-25)
 
