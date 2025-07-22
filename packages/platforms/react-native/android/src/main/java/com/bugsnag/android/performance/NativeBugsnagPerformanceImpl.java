@@ -75,8 +75,7 @@ class NativeBugsnagPerformanceImpl {
     try {
       BugsnagPerformance.INSTANCE.getInstrumentedAppState$internal().getConfig$internal();
       isNativePerformanceAvailable = true;
-    }
-    catch (LinkageError e) {
+    } catch (LinkageError e) {
       // do nothing, Android Performance SDK is not installed or is incompatible
     }
   }
@@ -116,12 +115,12 @@ class NativeBugsnagPerformanceImpl {
     random.nextBytes(bytes);
 
     StringBuilder hex = new StringBuilder(bytes.length * 2);
-    for(byte b : bytes) {
-        int byteValue = ((int)b & 0xff);
-        if(byteValue < 16) {
-            hex.append('0');
-        }
-        hex.append(Integer.toHexString(byteValue));
+    for (byte b : bytes) {
+      int byteValue = ((int) b & 0xff);
+      if (byteValue < 16) {
+        hex.append('0');
+      }
+      hex.append(Integer.toHexString(byteValue));
     }
     return hex.toString();
   }
@@ -149,7 +148,7 @@ class NativeBugsnagPerformanceImpl {
       mainHandler.postDelayed(spanCleanupTask, TimeUnit.HOURS.toMillis(1));
       isCleanupTaskScheduled = true;
     }
-    
+
     WritableMap result = Arguments.createMap();
     result.putString("apiKey", nativeConfig.getApiKey());
     result.putString("endpoint", nativeConfig.getEndpoint());
@@ -203,15 +202,15 @@ class NativeBugsnagPerformanceImpl {
     return nativeSpanToJsSpan(nativeSpan);
   }
 
-  void markNativeSpanEndTime(String spanId, String traceId, double endTime) {
+  void markNativeSpanEndTime(String spanId, String traceId, String endTime) {
     SpanImpl nativeSpan = openSpans.get(spanId + traceId);
     if (nativeSpan != null) {
-      long nativeEndTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)endTime);
+      long nativeEndTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime(Long.parseLong(endTime));
       nativeSpan.markEndTime$internal(nativeEndTime);
     }
   }
 
-  void endNativeSpan(String spanId, String traceId, double endTime, ReadableMap jsAttributes, Promise promise) {
+  void endNativeSpan(String spanId, String traceId, String endTime, ReadableMap jsAttributes, Promise promise) {
     SpanImpl nativeSpan = openSpans.remove(spanId + traceId);
     if (nativeSpan == null) {
       promise.resolve(null);
@@ -219,7 +218,7 @@ class NativeBugsnagPerformanceImpl {
     }
 
     ReactNativeSpanAttributes.setAttributesFromReadableMap(nativeSpan.getAttributes(), jsAttributes);
-    long nativeEndTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)endTime);
+    long nativeEndTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime(Long.parseLong(endTime));
     if (nativeEndTime > nativeSpan.getEndTime$internal()) {
       nativeSpan.markEndTime$internal(nativeEndTime);
     }
@@ -244,7 +243,7 @@ class NativeBugsnagPerformanceImpl {
     span.putString("traceId", EncodingUtils.toHexString(nativeSpan.getTraceId()));
 
     long unixNanoStartTime = BugsnagClock.INSTANCE.elapsedNanosToUnixTime(nativeSpan.getStartTime$internal());
-    span.putDouble("startTime", (double)unixNanoStartTime);
+    span.putString("startTime", Long.toString(unixNanoStartTime));
 
     long parentSpanId = nativeSpan.getParentSpanId();
     if (parentSpanId != 0L) {
@@ -261,8 +260,8 @@ class NativeBugsnagPerformanceImpl {
       .within(null);
 
     if (jsOptions.hasKey("startTime")) {
-      double startTime = jsOptions.getDouble("startTime");
-      long nativeStartTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)startTime);
+      String startTime = jsOptions.getString("startTime");
+      long nativeStartTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime(Long.parseLong(startTime));
       spanOptions = spanOptions.startTime(nativeStartTime);
     }
 
@@ -304,7 +303,7 @@ class NativeBugsnagPerformanceImpl {
     try {
       boolean result = new File(path).exists();
       promise.resolve(result);
-    } catch(Exception e) {
+    } catch (Exception e) {
       promise.reject(e);
     }
   }
@@ -313,7 +312,7 @@ class NativeBugsnagPerformanceImpl {
     try {
       boolean result = new File(path).isDirectory();
       promise.resolve(result);
-    } catch(Exception e) {
+    } catch (Exception e) {
       promise.reject(e);
     }
   }
@@ -327,7 +326,7 @@ class NativeBugsnagPerformanceImpl {
       }
 
       promise.resolve(resultArray);
-    } catch(Exception e) {
+    } catch (Exception e) {
       promise.reject(e);
     }
   }
@@ -346,7 +345,7 @@ class NativeBugsnagPerformanceImpl {
       } else {
         promise.reject("EPERM", new Exception("Failed to create directory"));
       }
-    } catch(Exception e) {
+    } catch (Exception e) {
       promise.reject(e);
     }
   }
@@ -354,7 +353,7 @@ class NativeBugsnagPerformanceImpl {
   void readFile(String path, String encoding, Promise promise) {
     File file = new File(path);
     StringBuilder fileContent = new StringBuilder((int) file.length());
-    try(
+    try (
       FileInputStream fin = new FileInputStream(file);
       InputStreamReader isr = new InputStreamReader(fin, encoding);
     ) {
@@ -377,13 +376,13 @@ class NativeBugsnagPerformanceImpl {
       } else {
         promise.reject(new Exception("Failed to delete file/directory"));
       }
-    } catch(Exception e) {
+    } catch (Exception e) {
       promise.reject(e);
     }
   }
 
   void writeFile(String path, String data, String encoding, Promise promise) {
-    try(
+    try (
       FileOutputStream fout = new FileOutputStream(path);
       Writer w = new OutputStreamWriter(fout, encoding);
     ) {
