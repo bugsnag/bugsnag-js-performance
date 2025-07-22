@@ -15,6 +15,7 @@ import com.bugsnag.android.performance.PerformanceConfiguration;
 import com.bugsnag.android.performance.RemoteSpanContext;
 import com.bugsnag.android.performance.Span;
 import com.bugsnag.android.performance.SpanOptions;
+import com.bugsnag.android.performance.SpanContext;
 
 import com.bugsnag.reactnative.performance.nativespans.BugsnagJavascriptSpansPlugin;
 import com.bugsnag.reactnative.performance.nativespans.BugsnagNativeSpansPlugin;
@@ -22,6 +23,7 @@ import com.bugsnag.reactnative.performance.nativespans.JavascriptSpanByName;
 import com.bugsnag.reactnative.performance.nativespans.JavascriptSpanControl;
 import com.bugsnag.reactnative.performance.nativespans.JavascriptSpanTransaction;
 import com.bugsnag.reactnative.performance.nativespans.OnRemoteSpanUpdatedCallback;
+import com.bugsnag.reactnative.performance.nativespans.OnSpanContextRetrievedCallback;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Dynamic;
@@ -275,7 +277,18 @@ class ScenarioLauncherImpl {
       });
   }
 
-  public void sendNativeSpanWithJsParent(String spanName, Promise promise) {
-    promise.resolve(null);
+  public void sendNativeSpanWithJsParent(String spanName, final Promise promise) {
+    Log.d(MODULE_NAME, "Sending Native span as child of: " + spanName);
+    JavascriptSpanControl spanControl = BugsnagPerformance.getSpanControls(new JavascriptSpanByName(spanName));
+    spanControl.retrieveSpanContext(new OnSpanContextRetrievedCallback() {
+      public void onSpanContextRetrieved(SpanContext remoteSpanContext) {
+        if (remoteSpanContext != null) {
+          BugsnagPerformance.startSpan("Native Child Span", SpanOptions.createWithin(remoteSpanContext)).end();
+          promise.resolve(null);
+        } else {
+          promise.reject(new NullPointerException("Failed to get JS span context"));
+        }
+      }
+    });
   }
 }

@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import android.util.SparseArray;
 
 import com.bugsnag.android.performance.Span;
+import com.bugsnag.android.performance.RemoteSpanContext;
 import com.bugsnag.android.performance.internal.BugsnagClock;
 import com.bugsnag.android.performance.internal.EncodingUtils;
 import com.bugsnag.reactnative.performance.ReactNativeSpanAttributes;
@@ -31,6 +32,7 @@ class BugsnagNativeSpans {
   private static final String TRACE_ID = "traceId";
 
   private static final String SPAN_UPDATE_EVENT_TYPE = "bugsnag:spanUpdate";
+  private static final String RETRIEVE_SPAN_CONTEXT_EVENT_TYPE = "bugsnag:retrieveSpanContext";
 
   private static volatile BugsnagNativeSpans INSTANCE;
 
@@ -38,8 +40,8 @@ class BugsnagNativeSpans {
 
   private final ReactApplicationContext reactContext;
 
-  private final SparseArray<OnRemoteSpanUpdatedCallback> updateCallbacks = new SparseArray<>(4);
-  private int nextCallbackId = 0;
+  private final CallbackState<OnRemoteSpanUpdatedCallback> updateCallbacks = new CallbackState<>();
+  private final CallbackState<OnSpanContextRetrievedCallback> spanContextCallbacks = new CallbackState<>();
 
   public BugsnagNativeSpans(ReactApplicationContext reactContext) {
     this.reactContext = reactContext;
@@ -100,13 +102,19 @@ class BugsnagNativeSpans {
   }
 
   public void reportSpanUpdateResult(double eventId, boolean result, Promise promise) {
-    onRemoteSpanUpdated((int) eventId, result);
-    promise.resolve(null);
+    try {
+      onRemoteSpanUpdated((int) eventId, result);
+    } finally {
+      promise.resolve(null);
+    }
   }
 
   public void reportSpanContextResult(double eventId, String result, Promise promise) {
-    // TODO: retrieve callback and invoke with the result
-    promise.resolve(null);
+    try {
+      onRemoteSpanContextRetrieved((int) eventId, result);
+    } finally {
+      promise.resolve(null);
+    }
   }
 
   boolean emitSpanUpdateEvent(ReadableMap updates) {
@@ -122,6 +130,19 @@ class BugsnagNativeSpans {
     }
   }
 
+  boolean emitRetrieveSpanContextEvent(ReadableMap request) {
+    try {
+      RCTDeviceEventEmitter eventEmitter = reactContext.getJSModule(RCTDeviceEventEmitter.class);
+      if (eventEmitter == null) {
+        return false;
+      }
+      eventEmitter.emit(RETRIEVE_SPAN_CONTEXT_EVENT_TYPE, request);
+      return true;
+    } catch (IllegalStateException ise) {
+      return false; // This can happen if the React context is not active
+    }
+  }
+
   private void onRemoteSpanUpdated(int callbackId, boolean updateResult) {
     OnRemoteSpanUpdatedCallback callback = takeUpdateCallback(callbackId);
     if (callback != null) {
@@ -129,26 +150,30 @@ class BugsnagNativeSpans {
     }
   }
 
-  int registerUpdateCallback(OnRemoteSpanUpdatedCallback callback) {
-    synchronized (updateCallbacks) {
-      int callbackId = nextCallbackId++;
-      updateCallbacks.put(callbackId, callback);
-      return callbackId;
+  private void onRemoteSpanContextRetrieved(int callbackId, String result) {
+    OnSpanContextRetrievedCallback callback = takeSpanContextCallback(callbackId);
+    if (callback != null) {
+      RemoteSpanContext remoteSpanContext = RemoteSpanContext.parseTraceParentOrNull(result);
+      callback.onSpanContextRetrieved(remoteSpanContext);
     }
+  }
+
+  int registerUpdateCallback(OnRemoteSpanUpdatedCallback callback) {
+    return updateCallbacks.registerCallback(callback);
+  }
+
+  int registerSpanContextCallback(OnSpanContextRetrievedCallback callback) {
+    return spanContextCallbacks.registerCallback(callback);
   }
 
   @Nullable
   OnRemoteSpanUpdatedCallback takeUpdateCallback(int callbackId) {
-    synchronized (updateCallbacks) {
-      int index = updateCallbacks.indexOfKey(callbackId);
-      if (index < 0) {
-        return null;
-      }
+    return updateCallbacks.takeCallback(callbackId);
+  }
 
-      OnRemoteSpanUpdatedCallback callback = updateCallbacks.valueAt(index);
-      updateCallbacks.removeAt(index);
-      return callback;
-    }
+  @Nullable
+  OnSpanContextRetrievedCallback takeSpanContextCallback(int callbackId) {
+    return spanContextCallbacks.takeCallback(callbackId);
   }
 
   private static void endSpan(ReadableMap updates, Span span) {
