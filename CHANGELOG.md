@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Reduce batch time when `releaseStage` is set to `'development'` [#673](https://github.com/bugsnag/bugsnag-js-performance/pull/673)
+
 ### Fixed
 
 - (react-native) Added a short debounce during app start to allow backgrounded apps to come to the foreground [#665](https://github.com/bugsnag/bugsnag-js-performance/pull/665)

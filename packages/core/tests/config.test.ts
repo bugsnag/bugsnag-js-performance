@@ -327,5 +327,17 @@ describe('Schema validation', () => {
         expect(validConfig.onSpanEnd).toBe(undefined)
       })
     })
+
+    describe('releaseStage', () => {
+      it('reduces the batch time in development environments', () => {
+        const config = {
+          apiKey: VALID_API_KEY,
+          releaseStage: 'development'
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.batchInactivityTimeoutMs).toBe(5000)
+      })
+    })
   })
 })
