@@ -43,6 +43,10 @@ export type ReactNativeAttachConfiguration = Omit<ReactNativeConfiguration,
 function createSchema (): ReactNativeSchema {
   return {
     ...schema,
+    releaseStage: {
+      ...schema.releaseStage,
+      defaultValue: __DEV__ ? 'development' : 'production'
+    },
     codeBundleId: {
       defaultValue: '',
       message: 'should be a string',
