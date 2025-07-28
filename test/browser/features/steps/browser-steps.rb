@@ -234,11 +234,6 @@ def get_attribute_value_from_span(span, attribute, attr_type)
   attr_type == 'intValue' && value.is_a?(String) ? value.to_i : value
 end
 
-Given("I record the current time as {string}") do |time_marker|
-  current_time_ns = Time.now.to_f * 1_000_000_000  # Convert to nanoseconds
-  Maze::Store.values[time_marker] = current_time_ns.to_i
-end
-
 Then("the span named {string} was delivered approximately {int} seconds after ending") do |span_name, expected_seconds|
   # Get all spans to find the target span
   spans = spans_from_request_list(Maze::Server.list_for('traces'))
