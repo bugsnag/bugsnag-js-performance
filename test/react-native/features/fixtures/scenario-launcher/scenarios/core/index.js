@@ -1,4 +1,5 @@
 export * as AppStartScenario from './AppStartScenario'
+export * as BatchTimingScenario from './BatchTimingScenario'
 export * as WithInstrumentedAppStartsScenario from './WithInstrumentedAppStartsScenario'
 export * as BackgroundSpanScenario from './BackgroundSpanScenario'
 export * as ErrorCorrelationScenario from './ErrorCorrelationScenario'
