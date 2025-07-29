@@ -76,6 +76,8 @@ class Browser
     case @name
     when "chrome"
       @version >= 73
+    when "edge"
+      @version >= 79  # Edge 79+ has Chromium base with resource timing support
     when "safari", "ios"
       @version >= 13
     when "firefox"
