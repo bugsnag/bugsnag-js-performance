@@ -40,12 +40,12 @@ export type ReactNativeAttachConfiguration = Omit<ReactNativeConfiguration,
 'attributeArrayLengthLimit'
 >
 
-function createSchema (): ReactNativeSchema {
+function createSchema (isDevelopment = false): ReactNativeSchema {
   return {
     ...schema,
     releaseStage: {
       ...schema.releaseStage,
-      defaultValue: __DEV__ ? 'development' : 'production'
+      defaultValue: isDevelopment ? 'development' : 'production'
     },
     codeBundleId: {
       defaultValue: '',

@@ -331,11 +331,10 @@ describe('Schema validation', () => {
     describe('releaseStage', () => {
       it('reduces the batch time in development environments', () => {
         const config = {
-          apiKey: VALID_API_KEY,
-          releaseStage: 'development'
+          apiKey: VALID_API_KEY
         }
 
-        const validConfig = validateConfig(config, coreSchema)
+        const validConfig = validateConfig(config, coreSchema, true)
         expect(validConfig.batchInactivityTimeoutMs).toBe(5000)
       })
     })

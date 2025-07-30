@@ -43,7 +43,7 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
+      schema: createSchema(new DefaultRoutingProvider()),
       plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
     })
 
@@ -88,7 +88,7 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
+      schema: createSchema(new DefaultRoutingProvider()),
       plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
     })
 
@@ -153,7 +153,7 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
+      schema: createSchema(new DefaultRoutingProvider()),
       plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
     })
 
@@ -175,7 +175,7 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
+      schema: createSchema(new DefaultRoutingProvider()),
       plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
     })
 
@@ -215,7 +215,7 @@ describe('RouteChangePlugin', () => {
       const delivery = new InMemoryDelivery()
       const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         deliveryFactory: () => delivery,
-        schema: createSchema(window.location.hostname, routingProvider),
+        schema: createSchema(routingProvider),
         plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
       })
 
@@ -261,7 +261,7 @@ describe('RouteChangePlugin', () => {
       const delivery = new InMemoryDelivery()
       const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         deliveryFactory: () => delivery,
-        schema: createSchema(window.location.hostname, routingProvider),
+        schema: createSchema(routingProvider),
         plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
       })
 
@@ -299,7 +299,7 @@ describe('RouteChangePlugin', () => {
     const delivery = new InMemoryDelivery()
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, routingProvider),
+      schema: createSchema(routingProvider),
       plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
     })
 
@@ -334,7 +334,7 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
+      schema: createSchema(new DefaultRoutingProvider()),
       plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
     })
 

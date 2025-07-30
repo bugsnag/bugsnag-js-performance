@@ -37,12 +37,12 @@ export interface BrowserConfiguration extends Configuration {
   serviceName?: string
 }
 
-export function createSchema (hostname: string, defaultRoutingProvider: RoutingProvider): BrowserSchema {
+export function createSchema (defaultRoutingProvider: RoutingProvider, isDevelopment = false): BrowserSchema {
   return {
     ...schema,
     releaseStage: {
       ...schema.releaseStage,
-      defaultValue: hostname === 'localhost' ? 'development' : 'production'
+      defaultValue: isDevelopment ? 'development' : 'production'
     },
     autoInstrumentFullPageLoads: {
       defaultValue: true,
