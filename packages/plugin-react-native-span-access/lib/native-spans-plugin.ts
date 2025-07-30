@@ -24,7 +24,7 @@ const NativeNativeSpansModule = TurboModuleRegistry.get<Spec>('BugsnagNativeSpan
 interface SpanTransaction {
   attributes: Array<{ name: string, value?: SpanAttribute | null }>
   isEnded: boolean
-  endTime?: number
+  endTime?: string
 }
 
 interface SpanId {
@@ -48,7 +48,7 @@ class NativeSpanControlImpl implements NativeSpanControl {
     update({
       end: (endTime?: Time) => {
         const safeEndTime = timeToNumber(this.clock, endTime)
-        transaction.endTime = this.clock.toUnixNanoseconds(safeEndTime)
+        transaction.endTime = this.clock.toUnixTimestampNanoseconds(safeEndTime)
         transaction.isEnded = true
       },
       setAttribute: (name: string, value?: SpanAttribute | null) => {

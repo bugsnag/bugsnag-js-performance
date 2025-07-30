@@ -177,7 +177,7 @@ describe('BugsnagNativeSpansPlugin', () => {
       it('should handle end time correctly', async () => {
         mockNativeModule.updateSpan.mockResolvedValue(true)
         clock.now = jest.fn(() => 1234567)
-        clock.toUnixNanoseconds = jest.fn(() => 1234567000000000)
+        clock.toUnixTimestampNanoseconds = jest.fn(() => '1234567000000000')
 
         const result = await spanControl.updateSpan((mutator: any) => {
           mutator.end()
@@ -189,7 +189,7 @@ describe('BugsnagNativeSpansPlugin', () => {
           {
             attributes: [],
             isEnded: true,
-            endTime: 1234567000000000
+            endTime: '1234567000000000'
           }
         )
       })
@@ -197,7 +197,7 @@ describe('BugsnagNativeSpansPlugin', () => {
       it('should handle end time with custom time', async () => {
         mockNativeModule.updateSpan.mockResolvedValue(true)
         clock.now = jest.fn(() => 1234567)
-        clock.toUnixNanoseconds = jest.fn(() => 9876543000000000)
+        clock.toUnixTimestampNanoseconds = jest.fn(() => '9876543000000000')
 
         const customTime = 9876543
         const result = await spanControl.updateSpan((mutator: any) => {
@@ -210,7 +210,7 @@ describe('BugsnagNativeSpansPlugin', () => {
           {
             attributes: [],
             isEnded: true,
-            endTime: 9876543000000000
+            endTime: '9876543000000000'
           }
         )
       })
@@ -243,7 +243,7 @@ describe('BugsnagNativeSpansPlugin', () => {
       it('should handle both attributes and end time', async () => {
         mockNativeModule.updateSpan.mockResolvedValue(true)
         clock.now = jest.fn(() => 1234567)
-        clock.toUnixNanoseconds = jest.fn(() => 1234567000000000)
+        clock.toUnixTimestampNanoseconds = jest.fn(() => '1234567000000000')
 
         const result = await spanControl.updateSpan((mutator: any) => {
           mutator.setAttribute('finalAttribute', 'finalValue')
@@ -256,7 +256,7 @@ describe('BugsnagNativeSpansPlugin', () => {
           {
             attributes: [{ name: 'finalAttribute', value: 'finalValue' }],
             isEnded: true,
-            endTime: 1234567000000000
+            endTime: '1234567000000000'
           }
         )
       })

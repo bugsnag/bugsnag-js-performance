@@ -113,52 +113,42 @@ describe('React Native Clock', () => {
     })
   })
 
-  describe('clock.toUnixNanoseconds()', () => {
-    it('converts performance time to unix nanoseconds', () => {
-      const timeOrigin = new Date('2023-01-02T00:00:00.000Z')
+  describe('clock.fromUnixNanosecondsTimestamp()', () => {
+    it('converts a timestamp to a valid time', () => {
+      const timeOrigin = new Date('1970-01-01T00:00:00.000Z')
       jest.setSystemTime(timeOrigin)
 
       const clock = createClock(performance)
 
-      jest.advanceTimersByTime(250)
+      // Set up initial time
+      jest.advanceTimersByTime(69)
 
-      const performanceTime = clock.now()
-      const unixNanoseconds = clock.toUnixNanoseconds(performanceTime)
+      // Convert to nanosecond timestamp string and back
+      const startTime = clock.now()
+      const unixTimeStamp = clock.toUnixTimestampNanoseconds(startTime)
+      const convertedTime = clock.fromUnixNanosecondsTimestamp(unixTimeStamp)
 
-      // Expected: timeOrigin + 250ms in nanoseconds
-      const expectedNanoseconds = (timeOrigin.getTime() + 250) * 1000000
-      expect(unixNanoseconds).toBe(expectedNanoseconds)
-    })
-  })
-
-  describe('clock.fromUnixNanoseconds()', () => {
-    it('converts unix nanoseconds back to performance time', () => {
-      const timeOrigin = new Date('2023-01-02T00:00:00.000Z')
-      jest.setSystemTime(timeOrigin)
-
-      const clock = createClock(performance)
-
-      // Test with a specific unix nanoseconds value 123ms after timeOrigin
-      const unixNanoseconds = 1672617600123000000 // 2023-01-02T00:00:00.123Z in nanoseconds
-      const performanceTime = clock.fromUnixNanoseconds(unixNanoseconds)
-
-      expect(typeof performanceTime).toBe('number')
-      expect(performanceTime).toEqual(123) // 123ms after timeOrigin
+      // The converted time should match the original time
+      expect(convertedTime).toBe(startTime)
     })
 
-    it('is the inverse of toUnixNanoseconds', () => {
-      const timeOrigin = new Date('2023-01-02T00:00:00.000Z')
+    it('converts extreme timestamps into valid time values', () => {
+      // Use a large timestamp value
+      const timeOrigin = new Date(18446744073709)
       jest.setSystemTime(timeOrigin)
 
       const clock = createClock(performance)
 
-      jest.advanceTimersByTime(123)
+      // Add a fractional time value
+      jest.advanceTimersByTime(0.55)
 
-      const originalTime = clock.now()
-      const unixNanoseconds = clock.toUnixNanoseconds(originalTime)
-      const roundTripTime = clock.fromUnixNanoseconds(unixNanoseconds)
+      // Convert to nanosecond timestamp string and back
+      const startTime = clock.now()
+      const unixTimeStamp = clock.toUnixTimestampNanoseconds(startTime)
+      const convertedTime = clock.fromUnixNanosecondsTimestamp(unixTimeStamp)
 
-      expect(roundTripTime).toBe(originalTime)
+      // The converted time should match the original time
+      expect(convertedTime).toBe(startTime)
     })
   })
 })
