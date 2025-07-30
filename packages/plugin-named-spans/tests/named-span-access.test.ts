@@ -13,7 +13,7 @@ describe('BugsnagNamedSpansPlugin', () => {
     plugin = new BugsnagNamedSpansPlugin()
     context = new PluginContext<Configuration>(
       createConfiguration<Configuration>(),
-      { now: jest.fn(() => 1000), toUnixNanoseconds: jest.fn(() => 1000000000) } as unknown as IncrementingClock
+      { now: jest.fn(() => 1000), toUnixTimestampNanoseconds: jest.fn(() => '1000000000') } as unknown as IncrementingClock
     )
 
     // Install the plugin to the context

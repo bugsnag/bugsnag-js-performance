@@ -129,7 +129,7 @@ class JavascriptSpanTransactionImpl implements JavascriptSpanTransaction {
     updateTransaction.putArray(ATTRIBUTES, attributesArray);
 
     if (isEnded) {
-      updateTransaction.putDouble(END_TIME, endTime);
+      updateTransaction.putString(END_TIME, Long.toString(endTime));
       updateTransaction.putBoolean(IS_ENDED, true);
     }
 

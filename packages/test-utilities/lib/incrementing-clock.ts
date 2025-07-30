@@ -32,16 +32,17 @@ class IncrementingClock implements Clock {
     return date.getTime() - this.timeOrigin
   }
 
-  toUnixNanoseconds (time: number) {
+  private _toUnixNanoseconds (time: number) {
     return ((this.timeOrigin + time) * NANOSECONDS_IN_MILLISECONDS)
   }
 
-  fromUnixNanoseconds (time: number) {
-    return (time / NANOSECONDS_IN_MILLISECONDS) - this.timeOrigin
+  toUnixTimestampNanoseconds (time: number) {
+    return this._toUnixNanoseconds(time).toString()
   }
 
-  toUnixTimestampNanoseconds (time: number) {
-    return this.toUnixNanoseconds(time).toString()
+  fromUnixNanosecondsTimestamp (timestamp: string) {
+    const nanos = parseInt(timestamp, 10)
+    return (nanos / NANOSECONDS_IN_MILLISECONDS) - this.timeOrigin
   }
 }
 
