@@ -36,8 +36,8 @@ class Browser
       @version >= 66
 
     when "edge"
-      # support added in Edge 15
-      @version >= 15
+      # On Edge 80 keepalive doesn't work for cross-origin preflight requests 
+      @version >= 81
 
     else
       raise "Unable to determine fetch keepalive support for browser: #{@name}"
