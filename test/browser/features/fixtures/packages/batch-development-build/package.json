@@ -1,8 +1,0 @@
-{
-    "name": "batch-develoopment-build",
-    "private": true,
-    "scripts": {
-        "build": "rollup --config ../rollup.config.mjs",
-        "clean": "rm -rf dist"
-    }
-}
