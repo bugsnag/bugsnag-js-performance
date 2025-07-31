@@ -28,7 +28,7 @@ type Attribute = string | number | boolean
 // Array values should always be of the same type, although the trace server will accept mixed types
 type ArrayAttribute = string[] | number[] | boolean[]
 
-export type SpanAttribute = Attribute | ArrayAttribute
+export type SpanAttribute = Attribute | ArrayAttribute | null
 
 export interface SpanAttributesSource <C extends Configuration> {
   configure: (configuration: InternalConfiguration<C>) => void
@@ -67,7 +67,7 @@ export class SpanAttributes {
     this.logger = logger
   }
 
-  private validateAttribute (name: string, value: SpanAttribute) {
+  private truncateAttribute (name: string, value: SpanAttribute) {
     if (typeof value === 'string' && value.length > this.spanAttributeLimits.attributeStringValueLimit) {
       this.attributes.set(name, truncateString(value, this.spanAttributeLimits.attributeStringValueLimit))
       this.logger.warn(`Span attribute ${name} in span ${this.spanName} was truncated as the string exceeds the ${this.spanAttributeLimits.attributeStringValueLimit} character limit set by attributeStringValueLimit.`)
@@ -80,29 +80,48 @@ export class SpanAttributes {
     }
   }
 
+  private isValidAttributeValue (value: SpanAttribute): boolean {
+    return value === null || typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value)
+  }
+
+  private isValidAttributeName (name: string): boolean {
+    return typeof name === 'string' && name.length > 0
+  }
+
+  // Used to set internal attributes
   set (name: string, value: SpanAttribute) {
-    if (typeof name === 'string' && (typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value))) {
-      this.attributes.set(name, value)
+    if (!this.isValidAttributeName(name) || !this.isValidAttributeValue(value)) return
+
+    if (value === null) {
+      this.remove(name)
+      return
     }
+
+    this.attributes.set(name, value)
   }
 
   // Used by the public API to set custom attributes
   setCustom (name: string, value: SpanAttribute) {
-    if (typeof name === 'string' && (typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value))) {
-      if (!this.attributes.has(name) && this.attributes.size >= this.spanAttributeLimits.attributeCountLimit) {
-        this._droppedAttributesCount++
-        this.logger.warn(`Span attribute ${name} in span ${this.spanName} was dropped as the number of attributes exceeds the ${this.spanAttributeLimits.attributeCountLimit} attribute limit set by attributeCountLimit.`)
-        return
-      }
+    if (!this.isValidAttributeName(name) || !this.isValidAttributeValue(value)) return
 
-      if (name.length > ATTRIBUTE_KEY_LENGTH_LIMIT) {
-        this._droppedAttributesCount++
-        this.logger.warn(`Span attribute ${name} in span ${this.spanName} was dropped as the key length exceeds the ${ATTRIBUTE_KEY_LENGTH_LIMIT} character fixed limit.`)
-        return
-      }
-
-      this.attributes.set(name, value)
+    if (value === null) {
+      this.remove(name)
+      return
     }
+
+    if (!this.attributes.has(name) && this.attributes.size >= this.spanAttributeLimits.attributeCountLimit) {
+      this._droppedAttributesCount++
+      this.logger.warn(`Span attribute ${name} in span ${this.spanName} was dropped as the number of attributes exceeds the ${this.spanAttributeLimits.attributeCountLimit} attribute limit set by attributeCountLimit.`)
+      return
+    }
+
+    if (name.length > ATTRIBUTE_KEY_LENGTH_LIMIT) {
+      this._droppedAttributesCount++
+      this.logger.warn(`Span attribute ${name} in span ${this.spanName} was dropped as the key length exceeds the ${ATTRIBUTE_KEY_LENGTH_LIMIT} character fixed limit.`)
+      return
+    }
+
+    this.attributes.set(name, value)
   }
 
   remove (name: string) {
@@ -110,8 +129,10 @@ export class SpanAttributes {
   }
 
   toJson () {
-    Array.from(this.attributes).forEach(([key, value]) => { this.validateAttribute(key, value) })
-    return Array.from(this.attributes).map(([key, value]) => attributeToJson(key, value))
+    Array.from(this.attributes).forEach(([key, value]) => { this.truncateAttribute(key, value) })
+    return Array.from(this.attributes)
+      .map(([key, value]) => attributeToJson(key, value))
+      .filter(attr => attr !== undefined)
   }
 
   toObject () {
