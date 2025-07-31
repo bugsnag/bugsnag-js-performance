@@ -4,7 +4,7 @@
 
 ### Changed
 
-- Reduce batch time when `releaseStage` is set to `'development'` [#673](https://github.com/bugsnag/bugsnag-js-performance/pull/673)
+- Reduce batch time in development environment [#673](https://github.com/bugsnag/bugsnag-js-performance/pull/673)
 
 ### Fixed
 
