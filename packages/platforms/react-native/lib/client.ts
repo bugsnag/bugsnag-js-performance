@@ -25,6 +25,7 @@ import { ReactNativeSpanFactory } from './span-factory'
 const isDebuggingRemotely = !global.nativeCallSyncHook && !global.RN$Bridgeless
 
 const clock = createClock(performance)
+const isDevelopment = __DEV__
 const appStartTime = clock.now()
 const deliveryFactory = createFetchDeliveryFactory(fetch, clock)
 const spanAttributesSource = createSpanAttributesSource()
@@ -38,6 +39,7 @@ const xhrRequestTracker = createXmlHttpRequestTracker(XMLHttpRequest, clock)
 
 const idGenerator = createIdGenerator(isDebuggingRemotely)
 const BugsnagPerformance = createClient({
+  isDevelopment,
   backgroundingListener,
   clock,
   deliveryFactory,
@@ -48,7 +50,7 @@ const BugsnagPerformance = createClient({
     new NetworkRequestPlugin(spanFactory, spanContextStorage, xhrRequestTracker)
   ],
   resourceAttributesSource,
-  schema: createSchema(),
+  schema: createSchema(isDevelopment),
   spanAttributesSource,
   retryQueueFactory: createRetryQueueFactory(FileSystem),
   spanFactory: ReactNativeSpanFactory,

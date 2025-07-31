@@ -20,7 +20,7 @@ const xhrRequestTracker = new RequestTracker()
 
 const onSettle = createOnSettle(new IncrementingClock(), window, fetchRequestTracker, xhrRequestTracker, performance)
 const DefaultRoutingProvider = createDefaultRoutingProvider(onSettle, window.location)
-const schema = createSchema(window.location.hostname, new DefaultRoutingProvider())
+const schema = createSchema(new DefaultRoutingProvider())
 
 describe('ResourceLoadPlugin', () => {
   it('automatically creates a ResourceLoad span for a custom span', async () => {

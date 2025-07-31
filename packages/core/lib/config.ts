@@ -199,7 +199,7 @@ if (typeof __ENABLE_BUGSNAG_TEST_CONFIGURATION__ !== 'undefined' && __ENABLE_BUG
   }
 }
 
-export function validateConfig<S extends CoreSchema, C extends Configuration> (config: unknown, schema: S): InternalConfiguration<C> {
+export function validateConfig<S extends CoreSchema, C extends Configuration> (config: unknown, schema: S, isDevelopment = false): InternalConfiguration<C> {
   if (typeof config === 'string') { config = { apiKey: config } }
 
   if (!isObject(config) || !isString(config.apiKey) || config.apiKey.length === 0) {
@@ -222,10 +222,13 @@ export function validateConfig<S extends CoreSchema, C extends Configuration> (c
     }
   }
 
+  // Set default batch time based on release stage
+  const defaultBatchTime = isDevelopment ? 5 * 1000 : 30 * 1000
+
   // If apiKey is set but not valid we should still use it, despite the validation warning.
   cleanConfiguration.apiKey = config.apiKey
   cleanConfiguration.maximumBatchSize = config.maximumBatchSize || 100
-  cleanConfiguration.batchInactivityTimeoutMs = config.batchInactivityTimeoutMs || 30 * 1000
+  cleanConfiguration.batchInactivityTimeoutMs = config.batchInactivityTimeoutMs || defaultBatchTime
 
   if (warnings.length > 0) {
     (cleanConfiguration as unknown as InternalConfiguration<Configuration>).logger.warn(`Invalid configuration${warnings}`)

@@ -23,7 +23,7 @@ describe('DefaultRoutingProvider', () => {
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, routingProvier),
+      schema: createSchema(routingProvier),
       plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
     })
 
@@ -48,7 +48,7 @@ describe('DefaultRoutingProvider', () => {
       const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         clock,
         deliveryFactory: () => delivery,
-        schema: createSchema(window.location.hostname, routingProvier),
+        schema: createSchema(routingProvier),
         plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
       })
 
