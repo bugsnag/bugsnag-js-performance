@@ -7,68 +7,68 @@ steps:
       #
       # Test fixtures
       #
-#      - label: ':android: Build RN {{matrix.reactnative}} test fixture APK (Old Arch)'
-#        key: "build-react-native-android-fixture-old-arch-full"
-#        timeout_in_minutes: 15
-#        agents:
-#          queue: macos-14
-#        env:
-#          JAVA_VERSION: "{{matrix.java}}"
-#          NODE_VERSION: "18"
-#          RN_VERSION: "{{matrix.reactnative}}"
-#          NOTIFIER_VERSION: '8.0.0'
-#          RCT_NEW_ARCH_ENABLED: "0"
-#          BUILD_ANDROID: "true"
-#        artifact_paths:
-#          - "test/react-native/features/fixtures/generated/old-arch/**/reactnative.apk"
-#        commands:
-#          - ./bin/generate-react-native-fixture
-#        matrix:
-#          setup:
-#            reactnative:
-#              - "0.72"
-#              - "0.74"
-#              - "0.76"
-#              - "0.77"
-#              - "0.78"
-#            java:
-#              - "17"
-#          adjustments:
-#            - with:
-#                reactnative: "0.64"
-#                java: "11"
-#        retry:
-#          automatic:
-#            - exit_status: "*"
-#              limit: 1
-#
-#      - label: ':android: Build RN {{matrix}} test fixture APK (New Arch)'
-#        key: "build-react-native-android-fixture-new-arch-full"
-#        timeout_in_minutes: 15
-#        agents:
-#          queue: macos-14
-#        env:
-#          JAVA_VERSION: "17"
-#          NODE_VERSION: "18"
-#          RN_VERSION: "{{matrix}}"
-#          NOTIFIER_VERSION: '8.0.0'
-#          RCT_NEW_ARCH_ENABLED: "1"
-#          BUILD_ANDROID: "true"
-#        artifact_paths:
-#          - "test/react-native/features/fixtures/generated/new-arch/**/reactnative.apk"
-#        commands:
-#          - ./bin/generate-react-native-fixture
-#        matrix:
-#              - "0.72"
-#              - "0.74"
-#              - "0.76"
-#              - "0.77"
-#              - "0.78"
-#        retry:
-#          automatic:
-#            - exit_status: "*"
-#              limit: 1
-#
+      - label: ':android: Build RN {{matrix.reactnative}} test fixture APK (Old Arch)'
+        key: "build-react-native-android-fixture-old-arch-full"
+        timeout_in_minutes: 15
+        agents:
+          queue: macos-15
+        env:
+          JAVA_VERSION: "{{matrix.java}}"
+          NODE_VERSION: "18"
+          RN_VERSION: "{{matrix.reactnative}}"
+          NOTIFIER_VERSION: '8.0.0'
+          RCT_NEW_ARCH_ENABLED: "0"
+          BUILD_ANDROID: "true"
+        artifact_paths:
+          - "test/react-native/features/fixtures/generated/old-arch/**/reactnative.apk"
+        commands:
+          - ./bin/generate-react-native-fixture
+        matrix:
+          setup:
+            reactnative:
+              - "0.72"
+              - "0.74"
+              - "0.76"
+              - "0.77"
+              - "0.78"
+            java:
+              - "17"
+          adjustments:
+            - with:
+                reactnative: "0.64"
+                java: "11"
+        retry:
+          automatic:
+            - exit_status: "*"
+              limit: 1
+
+      - label: ':android: Build RN {{matrix}} test fixture APK (New Arch)'
+        key: "build-react-native-android-fixture-new-arch-full"
+        timeout_in_minutes: 15
+        agents:
+          queue: macos-15
+        env:
+          JAVA_VERSION: "17"
+          NODE_VERSION: "18"
+          RN_VERSION: "{{matrix}}"
+          NOTIFIER_VERSION: '8.0.0'
+          RCT_NEW_ARCH_ENABLED: "1"
+          BUILD_ANDROID: "true"
+        artifact_paths:
+          - "test/react-native/features/fixtures/generated/new-arch/**/reactnative.apk"
+        commands:
+          - ./bin/generate-react-native-fixture
+        matrix:
+              - "0.72"
+              - "0.74"
+              - "0.76"
+              - "0.77"
+              - "0.78"
+        retry:
+          automatic:
+            - exit_status: "*"
+              limit: 1
+
       - label: ':android: Build RN {{matrix.reactnative}} native integration test fixture APK (Old Arch)'
         key: "build-react-native-android-fixture-native-integration-old-arch-full"
         timeout_in_minutes: 30
