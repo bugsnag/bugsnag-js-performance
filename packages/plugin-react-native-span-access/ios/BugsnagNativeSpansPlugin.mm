@@ -73,6 +73,12 @@ static BugsnagNativeSpansPlugin *_sharedInstance = nil;
         NSString *spanId = createNativeSpanId(span);
 
         @synchronized (blockSelf) {
+            BugsnagPerformanceSpan *existingSpan = blockSelf.spansByName[span.name];
+            if (existingSpan) {
+                // If a span with the same name already exists, remove it from the cache and clean up its timer
+                [blockSelf endNativeSpan:existingSpan];
+            }
+
             blockSelf.spansByName[span.name] = span;
             blockSelf.spansById[spanId] = span;
 
