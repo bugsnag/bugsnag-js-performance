@@ -14,7 +14,7 @@ const HOUR_IN_MILLISECONDS = 60 * 60 * 1000
 export interface Span extends SpanContext {
   readonly name: string
   end: (endTime?: Time) => void
-  setAttribute: (name: string, value: SpanAttribute) => void
+  setAttribute: (name: string, value: SpanAttribute | null | undefined) => void
 }
 
 export const enum Kind {
@@ -151,11 +151,11 @@ export class SpanInternal implements SpanContext {
     this.events.add(name, time)
   }
 
-  setAttribute (name: string, value: SpanAttribute) {
+  setAttribute (name: string, value: SpanAttribute | null | undefined) {
     this.attributes.set(name, value)
   }
 
-  setCustomAttribute (name: string, value: SpanAttribute) {
+  setCustomAttribute (name: string, value: SpanAttribute | null | undefined) {
     this.attributes.setCustom(name, value)
   }
 

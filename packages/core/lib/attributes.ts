@@ -28,7 +28,7 @@ type Attribute = string | number | boolean
 // Array values should always be of the same type, although the trace server will accept mixed types
 type ArrayAttribute = string[] | number[] | boolean[]
 
-export type SpanAttribute = Attribute | ArrayAttribute | null | undefined
+export type SpanAttribute = Attribute | ArrayAttribute
 
 export interface SpanAttributesSource <C extends Configuration> {
   configure: (configuration: InternalConfiguration<C>) => void
@@ -80,8 +80,8 @@ export class SpanAttributes {
     }
   }
 
-  private isValidAttributeValue (value: SpanAttribute): boolean {
-    return value === null || value === undefined || typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value)
+  private isValidAttributeValue (value: unknown): boolean {
+    return typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value)
   }
 
   private isValidAttributeName (name: string): boolean {
@@ -89,39 +89,43 @@ export class SpanAttributes {
   }
 
   // Used to set internal attributes
-  set (name: string, value: SpanAttribute) {
-    if (!this.isValidAttributeName(name) || !this.isValidAttributeValue(value)) return
+  set (name: string, value: SpanAttribute | null | undefined) {
+    if (!this.isValidAttributeName(name)) return
 
     if (value === null || value === undefined) {
       this.remove(name)
       return
     }
 
-    this.attributes.set(name, value)
+    if (this.isValidAttributeValue(value)) {
+      this.attributes.set(name, value)
+    }
   }
 
   // Used by the public API to set custom attributes
-  setCustom (name: string, value: SpanAttribute) {
-    if (!this.isValidAttributeName(name) || !this.isValidAttributeValue(value)) return
+  setCustom (name: string, value: SpanAttribute | null | undefined) {
+    if (!this.isValidAttributeName(name)) return
 
     if (value === null || value === undefined) {
       this.remove(name)
       return
     }
 
-    if (!this.attributes.has(name) && this.attributes.size >= this.spanAttributeLimits.attributeCountLimit) {
-      this._droppedAttributesCount++
-      this.logger.warn(`Span attribute ${name} in span ${this.spanName} was dropped as the number of attributes exceeds the ${this.spanAttributeLimits.attributeCountLimit} attribute limit set by attributeCountLimit.`)
-      return
-    }
+    if (this.isValidAttributeValue(value)) {
+      if (!this.attributes.has(name) && this.attributes.size >= this.spanAttributeLimits.attributeCountLimit) {
+        this._droppedAttributesCount++
+        this.logger.warn(`Span attribute ${name} in span ${this.spanName} was dropped as the number of attributes exceeds the ${this.spanAttributeLimits.attributeCountLimit} attribute limit set by attributeCountLimit.`)
+        return
+      }
 
-    if (name.length > ATTRIBUTE_KEY_LENGTH_LIMIT) {
-      this._droppedAttributesCount++
-      this.logger.warn(`Span attribute ${name} in span ${this.spanName} was dropped as the key length exceeds the ${ATTRIBUTE_KEY_LENGTH_LIMIT} character fixed limit.`)
-      return
-    }
+      if (name.length > ATTRIBUTE_KEY_LENGTH_LIMIT) {
+        this._droppedAttributesCount++
+        this.logger.warn(`Span attribute ${name} in span ${this.spanName} was dropped as the key length exceeds the ${ATTRIBUTE_KEY_LENGTH_LIMIT} character fixed limit.`)
+        return
+      }
 
-    this.attributes.set(name, value)
+      this.attributes.set(name, value)
+    }
   }
 
   remove (name: string) {
