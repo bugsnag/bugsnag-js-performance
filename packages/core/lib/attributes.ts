@@ -28,7 +28,7 @@ type Attribute = string | number | boolean
 // Array values should always be of the same type, although the trace server will accept mixed types
 type ArrayAttribute = string[] | number[] | boolean[]
 
-export type SpanAttribute = Attribute | ArrayAttribute | null
+export type SpanAttribute = Attribute | ArrayAttribute | null | undefined
 
 export interface SpanAttributesSource <C extends Configuration> {
   configure: (configuration: InternalConfiguration<C>) => void
@@ -81,7 +81,7 @@ export class SpanAttributes {
   }
 
   private isValidAttributeValue (value: SpanAttribute): boolean {
-    return value === null || typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value)
+    return value === null || value === undefined || typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value)
   }
 
   private isValidAttributeName (name: string): boolean {
@@ -92,7 +92,7 @@ export class SpanAttributes {
   set (name: string, value: SpanAttribute) {
     if (!this.isValidAttributeName(name) || !this.isValidAttributeValue(value)) return
 
-    if (value === null) {
+    if (value === null || value === undefined) {
       this.remove(name)
       return
     }
@@ -104,7 +104,7 @@ export class SpanAttributes {
   setCustom (name: string, value: SpanAttribute) {
     if (!this.isValidAttributeName(name) || !this.isValidAttributeValue(value)) return
 
-    if (value === null) {
+    if (value === null || value === undefined) {
       this.remove(name)
       return
     }

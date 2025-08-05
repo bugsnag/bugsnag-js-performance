@@ -5,12 +5,12 @@
 ### Changed
 
 - Reduce batch time in development environment [#673](https://github.com/bugsnag/bugsnag-js-performance/pull/673)
+- Calling `setAttribute` with a `null` or `undefined` attribute value now clears the attribute from the span [#679](https://github.com/bugsnag/bugsnag-js-performance/pull/679)
 
 ### Fixed
 
 - (react-native) Added a short debounce during app start to allow backgrounded apps to come to the foreground [#665](https://github.com/bugsnag/bugsnag-js-performance/pull/665)
 - (react-native) Fix a crash when refreshing the entropy pool on iOS [#667](https://github.com/bugsnag/bugsnag-js-performance/pull/667)
-- (core) Calling `setAttribute` with `null` now clears the attribute from the span [#679](https://github.com/bugsnag/bugsnag-js-performance/pull/679)
 
 ## [v2.14.0] (2025-06-25)
 

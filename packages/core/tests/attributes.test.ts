@@ -43,14 +43,16 @@ describe('SpanAttributes', () => {
       expect(attributes.toObject()).not.toHaveProperty('test.key')
     })
 
-    it('ignores setting an attribute with an empty key', () => {
-      attributes.set('', 'value')
-      expect(attributes.toJson()).toStrictEqual([])
+    it('removes the attribute when value is undefined', () => {
+      attributes.set('test.undefined', 'initial-value')
+      expect(attributes.toObject()['test.undefined']).toBe('initial-value')
+
+      attributes.set('test.undefined', undefined)
+      expect(attributes.toObject()).not.toHaveProperty('test.undefined')
     })
 
-    it('ignores setting an attribute with an undefined value', () => {
-      // @ts-expect-error Testing undefined value
-      attributes.set('test.undefined', undefined)
+    it('ignores setting an attribute with an empty key', () => {
+      attributes.set('', 'value')
       expect(attributes.toJson()).toStrictEqual([])
     })
 
@@ -161,21 +163,23 @@ describe('SpanAttributes', () => {
     })
 
     it('removes the attribute when value is null', () => {
-      attributes.setCustom('test.key', 'initial-value')
-      expect(attributes.toObject()['test.key']).toBe('initial-value')
+      attributes.setCustom('test.null', 'initial-value')
+      expect(attributes.toObject()['test.null']).toBe('initial-value')
 
-      attributes.setCustom('test.key', null)
-      expect(attributes.toObject()).not.toHaveProperty('test.key')
+      attributes.setCustom('test.null', null)
+      expect(attributes.toObject()).not.toHaveProperty('test.null')
+    })
+
+    it('removes the attribute when value is undefined', () => {
+      attributes.setCustom('test.undefined', 'initial-value')
+      expect(attributes.toObject()['test.undefined']).toBe('initial-value')
+
+      attributes.setCustom('test.undefined', undefined)
+      expect(attributes.toObject()).not.toHaveProperty('test.undefined')
     })
 
     it('ignores setting an attribute with an empty key', () => {
       attributes.setCustom('', 'value')
-      expect(attributes.toJson()).toStrictEqual([])
-    })
-
-    it('ignores setting an attribute with an undefined value', () => {
-      // @ts-expect-error Testing undefined value
-      attributes.setCustom('test.undefined', undefined)
       expect(attributes.toJson()).toStrictEqual([])
     })
   })
