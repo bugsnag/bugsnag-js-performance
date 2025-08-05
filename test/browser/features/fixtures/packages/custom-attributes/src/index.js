@@ -18,6 +18,10 @@ BugsnagPerformance.start({
 setTimeout(() => {
   const span = BugsnagPerformance.startSpan('Custom/CustomAttributesScenario')
 
+  // Calling setAttribute with null should remove the attribute
+  span.setAttribute('custom.removed', 'This attribute should be removed')
+  span.setAttribute('custom.removed', null)
+
   // 10 custom attributes
   span.setAttribute('custom.string', 'custom attribute')
   span.setAttribute('custom.int', 12345)

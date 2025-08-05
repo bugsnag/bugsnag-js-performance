@@ -5,6 +5,7 @@
 ### Changed
 
 - Reduce batch time in development environment [#673](https://github.com/bugsnag/bugsnag-js-performance/pull/673)
+- Calling `setAttribute` with a `null` or `undefined` attribute value now clears the attribute from the span [#679](https://github.com/bugsnag/bugsnag-js-performance/pull/679)
 
 ### Fixed
 
