@@ -33,6 +33,8 @@ Feature: Custom attributes
             | false  |
             | true   |
 
+        And a span named "Custom/CustomAttributesScenario" does not contain the attribute "custom.removed"
+        And a span named "Custom/CustomAttributesScenario" does not contain the attribute "custom.array.dropped"
         And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.droppedAttributesCount" equals 1
 
         # These attributes exceed the limit, but should not be dropped as they are set by us

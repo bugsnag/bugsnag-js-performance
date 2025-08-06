@@ -25,6 +25,7 @@ if (typeof window === 'undefined' || typeof document === 'undefined') {
   DefaultRoutingProvider = createNoopRoutingProvider()
   BugsnagPerformance = createNoopClient()
 } else {
+  const isDevelopment = window.location.hostname === 'localhost'
   const backgroundingListener = createBrowserBackgroundingListener(window)
   const spanAttributesSource = createSpanAttributesSource(document)
   const clock = createClock(performance, backgroundingListener)
@@ -43,13 +44,14 @@ if (typeof window === 'undefined' || typeof document === 'undefined') {
   DefaultRoutingProvider = createDefaultRoutingProvider(onSettle, window.location)
 
   BugsnagPerformance = createClient({
+    isDevelopment,
     backgroundingListener,
     clock,
     resourceAttributesSource,
     spanAttributesSource,
     deliveryFactory: createFetchDeliveryFactory(window.fetch, clock, backgroundingListener),
     idGenerator,
-    schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
+    schema: createSchema(new DefaultRoutingProvider(), isDevelopment),
     plugins: (spanFactory, spanContextStorage) => [
       onSettle,
       new FullPageLoadPlugin(

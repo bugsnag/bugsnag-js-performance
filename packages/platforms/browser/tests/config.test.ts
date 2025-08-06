@@ -6,19 +6,9 @@ import { createSchema } from '../lib/config'
 import MockRoutingProvider from './utilities/mock-routing-provider'
 
 describe('createSchema', () => {
-  it('sets releaseStage.defaultValue to development on localhost', () => {
-    const schema = createSchema('localhost', new MockRoutingProvider())
-    expect(schema.releaseStage.defaultValue).toStrictEqual('development')
-  })
-
-  it('sets releaseStage.defaultValue to production on another host', () => {
-    const schema = createSchema('bugsnag.com', new MockRoutingProvider())
-    expect(schema.releaseStage.defaultValue).toStrictEqual('production')
-  })
-
   describe('settleIgnoreUrls', () => {
     it('defaults to an empty array', () => {
-      const schema = createSchema('', new MockRoutingProvider())
+      const schema = createSchema(new MockRoutingProvider())
 
       expect(schema.settleIgnoreUrls.defaultValue).toStrictEqual([])
     })
@@ -44,7 +34,7 @@ describe('createSchema', () => {
       [true, [/a/, /b/, /c/]],
       [true, ['a', /b/, 'c']]
     ])('returns %s from validation for the value %p', (expected, value) => {
-      const schema = createSchema('', new MockRoutingProvider())
+      const schema = createSchema(new MockRoutingProvider())
       const validate = schema.settleIgnoreUrls.validate
 
       expect(validate(value)).toBe(expected)
@@ -53,7 +43,7 @@ describe('createSchema', () => {
 
   describe('serviceName', () => {
     it('defaults to unknown_service', () => {
-      const schema = createSchema('', new MockRoutingProvider())
+      const schema = createSchema(new MockRoutingProvider())
       expect(schema.serviceName.defaultValue).toBe('unknown_service')
     })
   })

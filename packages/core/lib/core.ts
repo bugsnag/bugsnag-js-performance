@@ -43,6 +43,7 @@ export interface Client<C extends Configuration> {
 }
 
 export interface ClientOptions<S extends CoreSchema, C extends Configuration, T> {
+  isDevelopment: boolean
   clock: Clock
   idGenerator: IdGenerator
   deliveryFactory: DeliveryFactory
@@ -88,7 +89,7 @@ export function createClient<S extends CoreSchema, C extends Configuration, T> (
 
   return {
     start: (config: C | string) => {
-      const configuration = validateConfig<S, C>(config, options.schema)
+      const configuration = validateConfig<S, C>(config, options.schema, options.isDevelopment)
 
       // if using the default endpoint add the API key as a subdomain
       // e.g. convert URL https://otlp.bugsnag.com/v1/traces to URL https://<project_api_key>.otlp.bugsnag.com/v1/traces
