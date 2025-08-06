@@ -185,12 +185,25 @@ const BugsnagReactNativePerformance = {
   writeFile: jest.fn()
 }
 
+const BugsnagNativeSpans = {
+  getSpanIdByName: jest.fn((spanName: string) => {
+    return undefined
+  }),
+  updateSpan: jest.fn((spanId, updates) => {
+    return Promise.resolve(false)
+  }),
+  reportSpanUpdateResult: jest.fn(),
+  reportSpanContextResult: jest.fn()
+}
+
 export const TurboModuleRegistry = {
-  get (name: string): typeof BugsnagReactNativePerformance | null {
+  get<T> (name: string): T | null {
     switch (name) {
       case 'BugsnagReactNativePerformance':
-        return BugsnagReactNativePerformance
+        return BugsnagReactNativePerformance as T
 
+      case 'BugsnagNativeSpans':
+        return BugsnagNativeSpans as T
       default:
         return null
     }
@@ -198,7 +211,8 @@ export const TurboModuleRegistry = {
 }
 
 export const NativeModules = {
-  BugsnagReactNativePerformance
+  BugsnagReactNativePerformance,
+  BugsnagNativeSpans
 }
 
 export type AppStateStatus = 'active' | 'inactive' | 'background'
@@ -228,3 +242,31 @@ export const AppState = new class {
 export const AppRegistry = {
   setWrapperComponentProvider: jest.fn()
 }
+
+export const NativeEventEmitter = jest.fn().mockImplementation(() => {
+  const listeners = new Map<string, Array<(...args: any[]) => void>>()
+
+  return {
+    listeners,
+    addListener: jest.fn((eventType: string, listener: (event: any) => void): void => {
+      if (!listeners.has(eventType)) {
+        listeners.set(eventType, [])
+      }
+      const eventListeners = listeners.get(eventType)
+      if (eventListeners) {
+        eventListeners.push(listener)
+      }
+    }),
+    removeAllListeners: jest.fn((eventType: string): void => {
+      listeners.delete(eventType)
+    }),
+    emit: jest.fn((eventType: string, event: any): void => {
+      const eventListeners = listeners.get(eventType)
+      if (eventListeners) {
+        eventListeners.forEach(listener => {
+          listener(event)
+        })
+      }
+    })
+  }
+})
