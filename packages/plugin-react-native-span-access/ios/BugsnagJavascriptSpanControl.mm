@@ -47,7 +47,12 @@ BOOL isOpen = YES;
     }
 
     NSTimeInterval currentTime = [endTime timeIntervalSince1970];
-    NSNumber *unixNanos = @((double)(currentTime * NSEC_PER_SEC));
+    // Calculate seconds and nanoseconds separately to maintain precision
+    uint64_t seconds = (uint64_t)currentTime;
+    uint64_t nanos = (uint64_t)round((currentTime - seconds) * NSEC_PER_SEC);
+    uint64_t nanoseconds = seconds * NSEC_PER_SEC + nanos;
+    // Convert to string for JS
+    NSString *unixNanos = [NSString stringWithFormat:@"%llu", nanoseconds];
     updateEvent[endTimeTransactionKey] = unixNanos;
     updateEvent[isEndedTransactionKey] = @YES;
 }
@@ -82,7 +87,7 @@ BOOL isOpen = YES;
         callback(NO);
         return;
     }
-  
+
     int eventId = [plugin registerSpanUpdateCallback:callback];
     updateEvent[idTransactionKey] = @(eventId);
     [plugin sendSpanUpdateEvent:updateEvent];
@@ -92,21 +97,21 @@ BOOL isOpen = YES;
   if (value == nil || [value isKindOfClass:[NSString class]] || [value isKindOfClass:[NSNumber class]]) {
     return YES;
   }
-  
+
   if ([value isKindOfClass:[NSArray class]]) {
     NSUInteger idx = [value indexOfObjectPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
       if ([obj isKindOfClass:[NSString class]] || [obj isKindOfClass:[NSNumber class]]) {
         return NO;
       }
-      
+
       // stop the iteration if we find an invalid object
       *stop = YES;
       return YES;
     }];
-    
+
     return idx == NSNotFound; // means all objects are valid
   }
-  
+
   return NO;
 }
 
@@ -136,12 +141,12 @@ NSString *spanName;
     }
 
     int eventId = [plugin registerSpanContextCallback:callback];
-  
+
     NSDictionary *contextEvent = @{
       idTransactionKey: @(eventId),
       nameTransactionKey: spanName,
     };
-  
+
     [plugin sendSpanContextEvent:contextEvent];
 }
 

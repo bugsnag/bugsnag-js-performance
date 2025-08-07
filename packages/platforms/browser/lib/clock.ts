@@ -45,17 +45,16 @@ function createClock (performance: PerformanceWithOptionalTimeOrigin, background
   })
 
   const toUnixNanoseconds = (time: number) => millisecondsToNanoseconds(calculatedTimeOrigin + time)
+  const fromUnixNanoseconds = (time: number) => nanosecondsToMilliseconds(time) - calculatedTimeOrigin
 
   return {
     now: () => performance.now(),
     date: () => new Date(calculatedTimeOrigin + performance.now()),
     convert: (date) => date.getTime() - calculatedTimeOrigin,
-    // convert milliseconds since timeOrigin to unix time in nanoseconds
-    toUnixNanoseconds,
     // convert milliseconds since timeOrigin to full timestamp
     toUnixTimestampNanoseconds: (time: number) => toUnixNanoseconds(time).toString(),
-    // convert unix time in nanoseconds back to milliseconds since timeOrigin
-    fromUnixNanoseconds: (time: number) => nanosecondsToMilliseconds(time) - calculatedTimeOrigin
+    // convert a unix timestamp in nanoseconds back to milliseconds since timeOrigin
+    fromUnixNanosecondsTimestamp: (timestamp: string) => fromUnixNanoseconds(parseInt(timestamp))
   }
 }
 

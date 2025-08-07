@@ -11,7 +11,7 @@ interface SpanUpdateEvent {
   name: string
   attributes: Array<{ name: string, value: SpanAttribute }>
   isEnded: boolean
-  endTime?: number
+  endTime?: string
 }
 
 interface SpanContextEvent {
@@ -73,7 +73,7 @@ export class BugsnagJavascriptSpansPlugin implements Plugin<ReactNativeConfigura
 
       if (event.isEnded) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        span.end(event.endTime ? this.clock!.fromUnixNanoseconds(event.endTime) : undefined)
+        span.end(event.endTime ? this.clock!.fromUnixNanosecondsTimestamp(event.endTime) : undefined)
       }
 
       result = true
