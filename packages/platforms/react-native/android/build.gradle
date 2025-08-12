@@ -36,6 +36,5 @@ repositories {
 
 dependencies {
   implementation 'com.facebook.react:react-native'
-  compileOnly("com.bugsnag:bugsnag-android-performance:2.0.0")
-  compileOnly("com.bugsnag:bugsnag-android-performance-impl:2.0.0")
+  compileOnly("com.bugsnag:bugsnag-android-performance:1.16.0")
 }

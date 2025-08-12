@@ -9,10 +9,6 @@
 /* Begin PBXBuildFile section */
 		DA3192AA2E0AE8B7009B1271 /* BugsnagNativeSpans.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA3192A62E0AE8B7009B1271 /* BugsnagNativeSpans.mm */; };
 		DA3192AB2E0AE8B7009B1271 /* BugsnagNativeSpansPlugin.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA3192A82E0AE8B7009B1271 /* BugsnagNativeSpansPlugin.mm */; };
-		DAADC7312E1EBBFC0085E633 /* BugsnagJavascriptSpansPlugin.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAADC7302E1EBBFC0085E633 /* BugsnagJavascriptSpansPlugin.mm */; };
-		DAADC7352E1EBE750085E633 /* BugsnagJavascriptSpanControlProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAADC7342E1EBE750085E633 /* BugsnagJavascriptSpanControlProvider.mm */; };
-		DAADC73A2E1F2E080085E633 /* BugsnagJavascriptSpanControl.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAADC7392E1F2E080085E633 /* BugsnagJavascriptSpanControl.mm */; };
-		DAADC73C2E1F2E3B0085E633 /* BugsnagJavascriptSpanQuery.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAADC73B2E1F2E3B0085E633 /* BugsnagJavascriptSpanQuery.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,16 +30,6 @@
 		DA3192A72E0AE8B7009B1271 /* BugsnagNativeSpansPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagNativeSpansPlugin.h; sourceTree = "<group>"; };
 		DA3192A82E0AE8B7009B1271 /* BugsnagNativeSpansPlugin.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BugsnagNativeSpansPlugin.mm; sourceTree = "<group>"; };
 		DA3192A92E0AE8B7009B1271 /* BugsnagNativeSpansPlugin+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BugsnagNativeSpansPlugin+Private.h"; sourceTree = "<group>"; };
-		DAADC72F2E1EBB9D0085E633 /* BugsnagJavascriptSpansPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagJavascriptSpansPlugin.h; sourceTree = "<group>"; };
-		DAADC7302E1EBBFC0085E633 /* BugsnagJavascriptSpansPlugin.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BugsnagJavascriptSpansPlugin.mm; sourceTree = "<group>"; };
-		DAADC7322E1EBCA00085E633 /* BugsnagJavascriptSpansPlugin+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BugsnagJavascriptSpansPlugin+Private.h"; sourceTree = "<group>"; };
-		DAADC7332E1EBE5B0085E633 /* BugsnagJavascriptSpanControlProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagJavascriptSpanControlProvider.h; sourceTree = "<group>"; };
-		DAADC7342E1EBE750085E633 /* BugsnagJavascriptSpanControlProvider.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BugsnagJavascriptSpanControlProvider.mm; sourceTree = "<group>"; };
-		DAADC7372E1F2AD40085E633 /* BugsnagJavascriptSpanControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagJavascriptSpanControl.h; sourceTree = "<group>"; };
-		DAADC7382E1F2AE80085E633 /* BugsnagJavascriptSpanQuery.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagJavascriptSpanQuery.h; sourceTree = "<group>"; };
-		DAADC7392E1F2E080085E633 /* BugsnagJavascriptSpanControl.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BugsnagJavascriptSpanControl.mm; sourceTree = "<group>"; };
-		DAADC73B2E1F2E3B0085E633 /* BugsnagJavascriptSpanQuery.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BugsnagJavascriptSpanQuery.mm; sourceTree = "<group>"; };
-		DAADC73E2E1FF0040085E633 /* BugsnagJavascriptSpanControl+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BugsnagJavascriptSpanControl+Private.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,21 +46,11 @@
 		DA31928B2E0AE7D4009B1271 = {
 			isa = PBXGroup;
 			children = (
-				DAADC73E2E1FF0040085E633 /* BugsnagJavascriptSpanControl+Private.h */,
-				DAADC7372E1F2AD40085E633 /* BugsnagJavascriptSpanControl.h */,
-				DAADC7332E1EBE5B0085E633 /* BugsnagJavascriptSpanControlProvider.h */,
-				DAADC7382E1F2AE80085E633 /* BugsnagJavascriptSpanQuery.h */,
-				DAADC72F2E1EBB9D0085E633 /* BugsnagJavascriptSpansPlugin.h */,
-				DAADC7322E1EBCA00085E633 /* BugsnagJavascriptSpansPlugin+Private.h */,
 				DA3192A52E0AE8B7009B1271 /* BugsnagNativeSpans.h */,
-				DA3192A72E0AE8B7009B1271 /* BugsnagNativeSpansPlugin.h */,
-				DA3192A92E0AE8B7009B1271 /* BugsnagNativeSpansPlugin+Private.h */,
-				DAADC7392E1F2E080085E633 /* BugsnagJavascriptSpanControl.mm */,
-				DAADC7342E1EBE750085E633 /* BugsnagJavascriptSpanControlProvider.mm */,
-				DAADC73B2E1F2E3B0085E633 /* BugsnagJavascriptSpanQuery.mm */,
-				DAADC7302E1EBBFC0085E633 /* BugsnagJavascriptSpansPlugin.mm */,
 				DA3192A62E0AE8B7009B1271 /* BugsnagNativeSpans.mm */,
+				DA3192A72E0AE8B7009B1271 /* BugsnagNativeSpansPlugin.h */,
 				DA3192A82E0AE8B7009B1271 /* BugsnagNativeSpansPlugin.mm */,
+				DA3192A92E0AE8B7009B1271 /* BugsnagNativeSpansPlugin+Private.h */,
 				DA3192952E0AE7D4009B1271 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -147,10 +123,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DAADC73A2E1F2E080085E633 /* BugsnagJavascriptSpanControl.mm in Sources */,
-				DAADC7312E1EBBFC0085E633 /* BugsnagJavascriptSpansPlugin.mm in Sources */,
-				DAADC7352E1EBE750085E633 /* BugsnagJavascriptSpanControlProvider.mm in Sources */,
-				DAADC73C2E1F2E3B0085E633 /* BugsnagJavascriptSpanQuery.mm in Sources */,
 				DA3192AA2E0AE8B7009B1271 /* BugsnagNativeSpans.mm in Sources */,
 				DA3192AB2E0AE8B7009B1271 /* BugsnagNativeSpansPlugin.mm in Sources */,
 			);
