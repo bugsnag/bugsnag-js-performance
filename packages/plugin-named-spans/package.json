@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/plugin-named-spans",
-  "version": "2.14.0",
+  "version": "2.15.0",
   "description": "BugSnag performance plugin for tracking spans by name",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
@@ -22,7 +22,7 @@
     "@bugsnag/core-performance": "*"
   },
   "devDependencies": {
-    "@bugsnag/core-performance": "^2.14.0"
+    "@bugsnag/core-performance": "^2.15.0"
   },
   "type": "module",
   "main": "dist/index.js",
