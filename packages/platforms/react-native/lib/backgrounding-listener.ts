@@ -7,8 +7,17 @@ import type { AppStateStatic, AppStateStatus } from 'react-native'
 
 export default function createBrowserBackgroundingListener (appState: AppStateStatic) {
   const callbacks: BackgroundingListenerCallback[] = []
-  let state: BackgroundingListenerState =
-    appState.currentState === 'background' ? 'in-background' : 'in-foreground'
+  let state: BackgroundingListenerState = 'in-foreground'
+  let appStartInitialStateTimeout: ReturnType<typeof setTimeout> | null = null
+
+  if (appState.currentState === 'background') {
+    // if the app is in the background on startup, we add a small delay before we consider it to be "in the
+    // background" to allow the app to finish starting up and come into the foreground.
+    appStartInitialStateTimeout = setTimeout(() => {
+      backgroundStateChanged('in-background')
+      appStartInitialStateTimeout = null
+    }, 700)
+  }
 
   const backgroundingListener: BackgroundingListener = {
     onStateChange (backgroundingListenerCallback: BackgroundingListenerCallback): void {
@@ -31,6 +40,11 @@ export default function createBrowserBackgroundingListener (appState: AppStateSt
   }
 
   appState.addEventListener('change', (state: AppStateStatus) => {
+    if (appStartInitialStateTimeout !== null) {
+      clearTimeout(appStartInitialStateTimeout)
+      appStartInitialStateTimeout = null
+    }
+
     const newState = state === 'active' || appState.currentState === 'unknown'
       ? 'in-foreground'
       : 'in-background'

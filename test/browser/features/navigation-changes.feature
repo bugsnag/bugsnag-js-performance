@@ -1,5 +1,3 @@
-# Skipped on Edge 80 pending PLAT-14141
-@skip_edge_80
 @requires_fetch_keepalive
 Feature: Navigation changes
     @skip_span_time_validation

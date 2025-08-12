@@ -8,6 +8,7 @@ const ignoredFiles = ["README.md", "LICENSE.txt", ".gitignore", "TESTING.md", "o
 const baseBranch = process.env.BUILDKITE_PULL_REQUEST_BASE_BRANCH;
 const currentBranch = process.env.BUILDKITE_BRANCH;
 const commitMessage = process.env.BUILDKITE_MESSAGE || "";
+const isFullBuild = process.env.FULL_SCHEDULED_BUILD === "1";
 
 if (baseBranch) {
   console.log(`Fetching latest changes from ${baseBranch}`);
@@ -28,8 +29,9 @@ packages.reverse().forEach(({ paths, block, pipeline, environment, skip }) => {
 
   // Upload all pipelines if specified in the commit message
   if (commitMessage.includes("[full ci]") ||
-    ["next", "main"].includes(currentBranch) ||
-    ["main"].includes(baseBranch)) {
+    isFullBuild ||
+    currentBranch === "main" ||
+    baseBranch === "main") {
     console.log(`Upload pipeline file: ${pipeline} with environment: '${env}'`);
     execSync(`${env} buildkite-agent pipeline upload ${pipeline}`);
     return;

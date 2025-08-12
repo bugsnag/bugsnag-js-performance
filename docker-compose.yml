@@ -36,6 +36,7 @@ services:
       HOST: "${HOST:-maze-runner}"
       API_HOST: "${API_HOST:-maze-runner}"
       MAZE_REPEATER_API_KEY: "${MAZE_REPEATER_API_KEY_JS:-}"
+      MAZE_HUB_REPEATER_API_KEY: "${MAZE_HUB_REPEATER_API_KEY_JS:-}"
       SKIP_BUILD_PACKAGES: 1
     networks:
       default:
@@ -59,6 +60,7 @@ services:
       HOST: "${HOST:-maze-runner}"
       API_HOST: "${API_HOST:-maze-runner}"
       MAZE_REPEATER_API_KEY: "${MAZE_REPEATER_API_KEY_JS:-}"
+      MAZE_HUB_REPEATER_API_KEY: "${MAZE_HUB_REPEATER_API_KEY_JS:-}"
       SKIP_BUILD_PACKAGES: 1
     networks:
       default:
@@ -81,6 +83,7 @@ services:
       REACT_NATIVE_NAVIGATION:
       NATIVE_INTEGRATION:
       MAZE_REPEATER_API_KEY: "${MAZE_REPEATER_API_KEY_RN:-}"
+      MAZE_HUB_REPEATER_API_KEY: "${MAZE_HUB_REPEATER_API_KEY_RN:-}"
     ports:
       - "9000-9499:9339"
     networks:

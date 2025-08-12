@@ -45,7 +45,7 @@ export const App = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.scenario}>
-        <Text>Native Integration Scenario</Text>
+        <Text>Native Integration JS Parent Scenario</Text>
       </View>
     </SafeAreaView>
   )

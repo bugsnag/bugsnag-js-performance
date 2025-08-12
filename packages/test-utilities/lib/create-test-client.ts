@@ -18,6 +18,7 @@ import type { BugsnagPerformance, ClientOptions, Configuration, CoreSchema, Deli
 import type { AppState } from '../../core/lib/app-state'
 
 const defaultOptions = () => ({
+  isDevelopment: true,
   backgroundingListener: new ControllableBackgroundingListener(),
   deliveryFactory: () => new InMemoryDelivery(),
   idGenerator: new StableIdGenerator(),

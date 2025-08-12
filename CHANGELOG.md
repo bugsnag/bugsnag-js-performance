@@ -1,5 +1,18 @@
 # Changelog
 
+## [v2.15.0] (2025-08-12)
+
+### Changed
+
+- Reduce batch time in development environment [#673](https://github.com/bugsnag/bugsnag-js-performance/pull/673)
+- Calling `setAttribute` with a `null` or `undefined` attribute value now clears the attribute from the span [#679](https://github.com/bugsnag/bugsnag-js-performance/pull/679)
+
+### Fixed
+
+- (react-native) Added a short debounce during app start to allow backgrounded apps to come to the foreground [#665](https://github.com/bugsnag/bugsnag-js-performance/pull/665)
+- (react-native) Fix a crash when refreshing the entropy pool on iOS [#667](https://github.com/bugsnag/bugsnag-js-performance/pull/667)
+- (ract-native) Fix span and trace ID encoding in the iOS native integration [#683](https://github.com/bugsnag/bugsnag-js-performance/pull/683)
+
 ## [v2.14.0] (2025-06-25)
 
 ### Added
@@ -20,7 +33,7 @@
 
 This release adds support for React Native 0.77 to `@bugsnag/react-native-performance`
 
-### Added 
+### Added
 
 - (plugin-react-performance) Added new react library with `withInstrumentedComponent` higher order component to instrument component rendering spans [#584](https://github.com/bugsnag/bugsnag-js-performance/pull/584)
 
@@ -162,7 +175,7 @@ This release adds support for React Native 0.77 to `@bugsnag/react-native-perfor
 
 This release adds support for instrumenting navigation spans when using the [react-native-navigation](https://github.com/wix/react-native-navigation) library
 
-### Added 
+### Added
 
 - (react-native-navigation) Added `@bugsnag/react-native-navigation-performance` package [#404](https://github.com/bugsnag/bugsnag-js-performance/pull/404)
 
