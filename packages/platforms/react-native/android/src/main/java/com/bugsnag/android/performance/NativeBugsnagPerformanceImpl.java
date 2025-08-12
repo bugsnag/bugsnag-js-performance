@@ -37,7 +37,6 @@ import com.bugsnag.android.performance.internal.BugsnagClock;
 import com.bugsnag.android.performance.internal.EncodingUtils;
 import com.bugsnag.android.performance.internal.SpanFactory;
 import com.bugsnag.android.performance.internal.SpanImpl;
-import com.bugsnag.android.performance.internal.BugsnagPerformanceImpl;
 import com.bugsnag.android.performance.internal.processing.ImmutableConfig;
 
 @SuppressLint("RestrictedApi")
@@ -74,7 +73,7 @@ class NativeBugsnagPerformanceImpl {
     this.reactContext = reactContext;
 
     try {
-      BugsnagPerformanceImpl.INSTANCE.getInstrumentedAppState().getConfig$internal();
+      BugsnagPerformance.INSTANCE.getInstrumentedAppState$internal().getConfig$internal();
       isNativePerformanceAvailable = true;
     }
     catch (LinkageError e) {
@@ -141,7 +140,7 @@ class NativeBugsnagPerformanceImpl {
       return null;
     }
 
-    ImmutableConfig nativeConfig = BugsnagPerformanceImpl.INSTANCE.getInstrumentedAppState().getConfig$internal();
+    ImmutableConfig nativeConfig = BugsnagPerformance.INSTANCE.getInstrumentedAppState$internal().getConfig$internal();
     if (nativeConfig == null) {
       return null;
     }
@@ -150,7 +149,7 @@ class NativeBugsnagPerformanceImpl {
       mainHandler.postDelayed(spanCleanupTask, TimeUnit.HOURS.toMillis(1));
       isCleanupTaskScheduled = true;
     }
-
+    
     WritableMap result = Arguments.createMap();
     result.putString("apiKey", nativeConfig.getApiKey());
     result.putString("endpoint", nativeConfig.getEndpoint());
@@ -185,12 +184,12 @@ class NativeBugsnagPerformanceImpl {
     }
 
     SpanOptions spanOptions = readableMapToSpanOptions(options);
-    SpanFactory spanFactory = BugsnagPerformanceImpl.INSTANCE.getSpanFactory();
+    SpanFactory spanFactory = BugsnagPerformance.INSTANCE.getInstrumentedAppState$internal().getSpanFactory();
     SpanImpl nativeSpan = spanFactory.createCustomSpan(name, spanOptions);
 
     // all span attributes are set from JS, with the exception of the bugsnag.sampling.p attribute
     // this needs to be preserved as it may not be re-populated when the span is processed
-    Iterator<Map.Entry<String, Object>> entries = nativeSpan.getAttributes().getEntries().iterator();
+    Iterator<Map.Entry<String, Object>> entries = nativeSpan.getAttributes().getEntries$internal().iterator();
     while (entries.hasNext()) {
       Map.Entry<String, Object> entry = entries.next();
       if (!entry.getKey().equals("bugsnag.sampling.p")) {

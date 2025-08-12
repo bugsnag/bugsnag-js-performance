@@ -5,8 +5,6 @@ interface ClockOptions {
   currentTime?: number
 }
 
-const NANOSECONDS_IN_MILLISECONDS = 1_000_000
-
 class IncrementingClock implements Clock {
   public readonly timeOrigin: number
   private currentTime: number
@@ -33,11 +31,7 @@ class IncrementingClock implements Clock {
   }
 
   toUnixNanoseconds (time: number) {
-    return ((this.timeOrigin + time) * NANOSECONDS_IN_MILLISECONDS)
-  }
-
-  fromUnixNanoseconds (time: number) {
-    return (time / NANOSECONDS_IN_MILLISECONDS) - this.timeOrigin
+    return ((this.timeOrigin + time) * 1_000_000)
   }
 
   toUnixTimestampNanoseconds (time: number) {

@@ -4,7 +4,6 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 
@@ -62,15 +61,5 @@ public class ScenarioLauncher extends ReactContextBaseJavaModule {
   @ReactMethod
   public void endNativeSpan(String traceParent, Promise promise) {
     impl.endNativeSpan(traceParent, promise);
-  }
-
-  @ReactMethod
-  public void updateJavascriptSpan(String spanName, ReadableArray attributes, Promise promise) {
-    impl.updateJavascriptSpan(spanName, attributes, promise);
-  }
-
-  @ReactMethod
-  public void sendNativeSpanWithJsParent(String spanName, Promise promise) {
-    impl.sendNativeSpanWithJsParent(spanName, promise);
   }
 }
