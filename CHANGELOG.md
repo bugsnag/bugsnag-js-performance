@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [v3.0.0] (2025-08-13)
 
 *Breaking change*: For React Native apps integrating with the native Android/iOS Performance SDKs, the minimum required versions are now: 
 - Bugsnag Android Performance [v2.0.0](https://github.com/bugsnag/bugsnag-android-performance/releases/tag/v2.0.0) 
