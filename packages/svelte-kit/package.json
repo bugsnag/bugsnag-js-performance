@@ -1,6 +1,6 @@
 {
 	"name": "@bugsnag/svelte-kit-performance",
-	"version": "2.15.0",
+	"version": "3.0.0",
 	"description": "BugSnag performance monitoring for SvelteKit",
 	"homepage": "https://www.bugsnag.com/",
 	"license": "MIT",
@@ -37,7 +37,7 @@
 		"svelte": "^5.0.0"
 	},
 	"devDependencies": {
-		"@bugsnag/browser-performance": "^2.15.0",
+		"@bugsnag/browser-performance": "^3.0.0",
 		"@sveltejs/adapter-auto": "^6.0.0",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/package": "^2.0.0",
