@@ -6,6 +6,14 @@ export interface Spec extends TurboModule {
   getSpanIdByName: (spanName: string) => UnsafeObject | undefined
 
   updateSpan: (spanId: UnsafeObject, updates: UnsafeObject) => Promise<boolean>
+
+  addListener: (eventType: string) => void
+
+  removeListeners: (count: number) => void
+
+  reportSpanUpdateResult: (eventId: number, result: boolean) => Promise<void>
+
+  reportSpanContextResult: (eventId: number, result: string | null) => Promise<void>
 }
 
 export default TurboModuleRegistry.get<Spec>(

@@ -1,16 +1,38 @@
 #import <BugsnagPerformance/BugsnagPerformanceSpan.h>
-
+#import "BugsnagNativeSpansPlugin+Private.h"
+#import "BugsnagJavascriptSpansPlugin+Private.h"
 #import "BugsnagNativeSpans.h"
 
 #ifdef RCT_NEW_ARCH_ENABLED
 #import "BugsnagNativeSpansSpec.h"
 #endif
 
-#import "BugsnagNativeSpansPlugin+Private.h"
-
 @implementation BugsnagNativeSpans
 
 RCT_EXPORT_MODULE()
+
+- (NSArray<NSString *> *)supportedEvents
+{
+  return @[@"bugsnag:spanUpdate", @"bugsnag:retrieveSpanContext"];
+}
+
+- (void)startObserving
+{
+  // Register this instance with the BugsnagJavascriptSpansPlugin
+  BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
+  if (plugin) {
+      [plugin setEventEmitter:self];
+  }
+}
+
+- (void)stopObserving
+{
+  // Unregister this instance from the BugsnagJavascriptSpansPlugin
+  BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
+  if (plugin) {
+    [plugin setEventEmitter:nil];
+  }
+}
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getSpanIdByName:(NSString *)spanName) {
     BugsnagNativeSpansPlugin *plugin = [BugsnagNativeSpansPlugin singleton];
@@ -75,6 +97,30 @@ RCT_EXPORT_METHOD(updateSpan:(NSDictionary *)spanId
     }
 
     resolve(@YES);
+}
+
+RCT_EXPORT_METHOD(reportSpanUpdateResult:(double)eventId
+                  result:(BOOL)result
+                  resolve:(RCTPromiseResolveBlock)resolve
+                   reject:(RCTPromiseRejectBlock)reject)
+{
+    BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
+    if (plugin) {
+        [plugin onRemoteSpanUpdated:(int)eventId withResult:result];
+    }
+    resolve(nil);
+}
+
+RCT_EXPORT_METHOD(reportSpanContextResult:(double)eventId
+                  result:(NSString *)result
+                  resolve:(RCTPromiseResolveBlock)resolve
+                   reject:(RCTPromiseRejectBlock)reject)
+{
+    BugsnagJavascriptSpansPlugin *plugin = [BugsnagJavascriptSpansPlugin singleton];
+    if (plugin) {
+        [plugin onRemoteSpanContextReceived:(int)eventId withContext:result];
+    }
+    resolve(nil);
 }
 
 - (void)endSpan:(NSDictionary *)updates span:(BugsnagPerformanceSpan *)span {
