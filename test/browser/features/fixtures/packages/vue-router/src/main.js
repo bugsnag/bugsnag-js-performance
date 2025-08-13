@@ -11,22 +11,26 @@ const endpoint = parameters.get('endpoint')
 
 const base = '/docs/vue-router'
 
+/** @typedef {import('vue-router').Router} Router */
 const router = createRouter({
   history: createWebHistory(base),
   routes: [
     {
       path: '/',
       name: 'home',
+      meta: { title: 'Home' },
       component: HomeView
     },
     {
       path: '/contacts/:contactId()',
       name: 'contact',
+      meta: { title: (route) => `Contact ${route.params.contactId}` },
       component: () => import('./views/ContactView.vue'),
       children: [
         {
           path: 'profile',
           name: 'profile', 
+          meta: { title: 'Contact Profile' },
           component: () => import('./views/ContactProfile.vue')
         }
       ]
@@ -34,6 +38,13 @@ const router = createRouter({
   ]
 })
 
+router.beforeEach((to, from, next) => {
+  const title = typeof to.meta.title === 'function' 
+    ? to.meta.title(to) 
+    : to.meta.title
+  document.title = title || 'Default Title'
+  next()
+})
 
 BugsnagPerformance.start({
     apiKey,

@@ -1,8 +1,5 @@
 <script setup>
-import { onMounted } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
-
-onMounted(() => { document.title = 'Contact 1'; })
 </script>
 
 <template>
