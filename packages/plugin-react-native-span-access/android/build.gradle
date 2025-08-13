@@ -38,5 +38,6 @@ android {
 dependencies {
   implementation 'com.facebook.react:react-native'
   implementation project(':bugsnag_react-native-performance')
-  api 'com.bugsnag:bugsnag-android-performance:1.16.0'
+  api 'com.bugsnag:bugsnag-android-performance:2.0.0'
+  implementation 'com.bugsnag:bugsnag-android-performance-impl:2.0.0'
 }

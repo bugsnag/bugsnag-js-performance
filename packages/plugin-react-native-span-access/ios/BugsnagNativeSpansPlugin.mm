@@ -10,7 +10,7 @@ static NSString *createNativeSpanId(BugsnagPerformanceSpan *span);
 
 @implementation BugsnagNativeSpansPlugin {
     // Private instance variable for span timeout timers
-    std::map<void *, NSTimer *> _spanTimeoutTimers;
+    std::map<void *, dispatch_source_t> _spanTimeoutTimers;
 }
 
 static BugsnagNativeSpansPlugin *_sharedInstance = nil;
@@ -20,11 +20,23 @@ static BugsnagNativeSpansPlugin *_sharedInstance = nil;
 }
 
 // Create a timeout timer for a span
-- (NSTimer *)createSpanTimeoutTimer:(BugsnagPerformanceSpan *)span {
+- (dispatch_source_t)createSpanTimeoutTimer:(BugsnagPerformanceSpan *)span {
     __weak BugsnagNativeSpansPlugin *weakSelf = self;
-    return [NSTimer scheduledTimerWithTimeInterval:kSpanTimeoutInterval repeats:NO block:^(NSTimer * _Nonnull timer) {
+
+    dispatch_source_t timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0,
+                                                     dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0));
+    
+    dispatch_source_set_timer(timer,
+                             dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kSpanTimeoutInterval * NSEC_PER_SEC)),
+                             DISPATCH_TIME_FOREVER,
+                             0);
+    
+    dispatch_source_set_event_handler(timer, ^{
         [weakSelf endNativeSpan:span];
-    }];
+    });
+    
+    dispatch_resume(timer);
+    return timer;
 }
 
 // remove the spans from the caches and clean up timer
@@ -43,7 +55,7 @@ static BugsnagNativeSpansPlugin *_sharedInstance = nil;
         auto& timerMap = _spanTimeoutTimers;
         auto it = timerMap.find(key);
         if (it != timerMap.end()) {
-            [it->second invalidate];
+            dispatch_source_cancel(it->second);
             timerMap.erase(it);
         }
     }
@@ -61,12 +73,18 @@ static BugsnagNativeSpansPlugin *_sharedInstance = nil;
         NSString *spanId = createNativeSpanId(span);
 
         @synchronized (blockSelf) {
+            BugsnagPerformanceSpan *existingSpan = blockSelf.spansByName[span.name];
+            if (existingSpan) {
+                // If a span with the same name already exists, remove it from the cache and clean up its timer
+                [blockSelf endNativeSpan:existingSpan];
+            }
+
             blockSelf.spansByName[span.name] = span;
             blockSelf.spansById[spanId] = span;
 
             // Add a 10 minute timeout to remove the span from caches if not ended
             void *key = (__bridge void *)span;
-            NSTimer *timer = [blockSelf createSpanTimeoutTimer:span];
+            dispatch_source_t timer = [blockSelf createSpanTimeoutTimer:span];
             blockSelf->_spanTimeoutTimers[key] = timer;
         }
     };

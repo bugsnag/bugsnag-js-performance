@@ -3,4 +3,6 @@ export * as NativeIntegrationJsParentScenario from './NativeIntegrationJsParentS
 export * as NativeIntegrationNativeParentScenario from './NativeIntegrationNativeParentScenario'
 export * as RemoteParentContextNativeScenario from './RemoteParentContextNativeScenario'
 export * as RemoteParentContextJSScenario from './RemoteParentContextJSScenario'
-export * as RemoteSpansScenario from './RemoteSpansScenario'
+export * as NativeSpansPluginScenario from './NativeSpansPluginScenario'
+export * as JavascriptSpansPluginScenario from './JavascriptSpansPluginScenario'
+export * as JavascriptSpansContextScenario from './JavascriptSpansContextScenario'

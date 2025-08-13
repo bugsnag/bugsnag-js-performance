@@ -1,4 +1,4 @@
-import { millisecondsToNanoseconds } from '@bugsnag/core-performance'
+import { millisecondsToNanoseconds, nanosecondsToMilliseconds } from '@bugsnag/core-performance'
 import type { BackgroundingListener, Clock } from '@bugsnag/core-performance'
 
 // a cut-down PerformanceTiming interface, since we don't care about most of
@@ -53,7 +53,9 @@ function createClock (performance: PerformanceWithOptionalTimeOrigin, background
     // convert milliseconds since timeOrigin to unix time in nanoseconds
     toUnixNanoseconds,
     // convert milliseconds since timeOrigin to full timestamp
-    toUnixTimestampNanoseconds: (time: number) => toUnixNanoseconds(time).toString()
+    toUnixTimestampNanoseconds: (time: number) => toUnixNanoseconds(time).toString(),
+    // convert unix time in nanoseconds back to milliseconds since timeOrigin
+    fromUnixNanoseconds: (time: number) => nanosecondsToMilliseconds(time) - calculatedTimeOrigin
   }
 }
 
