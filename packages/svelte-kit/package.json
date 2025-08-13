@@ -33,7 +33,7 @@
 		}
 	},
 	"peerDependencies": {
-		"@bugsnag/browser-performance": "^2.13.0",
+		"@bugsnag/browser-performance": "^3.0.0",
 		"svelte": "^5.0.0"
 	},
 	"devDependencies": {
