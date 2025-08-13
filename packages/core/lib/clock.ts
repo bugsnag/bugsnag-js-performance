@@ -4,6 +4,10 @@ export function millisecondsToNanoseconds (milliseconds: number): number {
   return Math.round(milliseconds * NANOSECONDS_IN_MILLISECONDS)
 }
 
+export function nanosecondsToMilliseconds (nanoseconds: number): number {
+  return Math.round(nanoseconds / NANOSECONDS_IN_MILLISECONDS)
+}
+
 export interface Clock {
   // returns a platform-specific value representing the current time
   // this could be an absolute timestamp, a time relative to a "time origin"
@@ -19,6 +23,9 @@ export interface Clock {
 
   // convert the format returned by 'now' to a unix time in nanoseconds
   toUnixNanoseconds: (time: number) => number
+
+  // convert a unix time in nanoseconds to the format returned by 'now'
+  fromUnixNanoseconds: (time: number) => number
 
   // convert the format returned by 'now' into a unix timestamp in nanoseconds
   toUnixTimestampNanoseconds: (time: number) => string
