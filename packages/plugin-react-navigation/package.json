@@ -31,7 +31,7 @@
     },
     "peerDependencies": {
         "@bugsnag/core-performance": "*",
-        "@bugsnag/react-native-performance": "^2.10.0",
+        "@bugsnag/react-native-performance": "^3.0.0",
         "@react-navigation/native": "*",
         "react": "*"
     },
