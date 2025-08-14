@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/plugin-react-native-span-access",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "BugSnag performance monitoring for react-native",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",

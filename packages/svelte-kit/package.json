@@ -1,6 +1,6 @@
 {
 	"name": "@bugsnag/svelte-kit-performance",
-	"version": "3.0.0",
+	"version": "3.0.1",
 	"description": "BugSnag performance monitoring for SvelteKit",
 	"homepage": "https://www.bugsnag.com/",
 	"license": "MIT",
