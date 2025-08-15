@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/plugin-react-performance",
-  "version": "2.15.0",
+  "version": "3.0.1",
   "description": "BugSnag performance monitoring",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
@@ -19,14 +19,14 @@
     "url": "https://github.com/bugsnag/bugsnag-js-performance/issues"
   },
   "devDependencies": {
-    "@bugsnag/browser-performance": "^2.15.0",
+    "@bugsnag/browser-performance": "^3.0.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },
   "peerDependencies": {
-    "@bugsnag/browser-performance": "^2.10.1",
+    "@bugsnag/browser-performance": "^3.0.0",
     "react": "*"
   },
   "type": "module",

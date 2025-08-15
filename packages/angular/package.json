@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/angular-performance",
-  "version": "2.15.0",
+  "version": "3.0.0",
   "description": "BugSnag performance monitoring for angular applications",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
