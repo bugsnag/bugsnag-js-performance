@@ -11,6 +11,7 @@ import com.bugsnag.android.Logger;
 
 import com.bugsnag.android.performance.AutoInstrument;
 import com.bugsnag.android.performance.BugsnagPerformance;
+import com.bugsnag.android.performance.EnabledMetrics;
 import com.bugsnag.android.performance.PerformanceConfiguration;
 import com.bugsnag.android.performance.RemoteSpanContext;
 import com.bugsnag.android.performance.Span;
@@ -186,8 +187,28 @@ class ScenarioLauncherImpl {
       config.setAutoInstrumentAppStarts(false);
       config.setAutoInstrumentActivities(AutoInstrument.OFF);
       config.setAutoInstrumentRendering(true);
-      config.addPlugin(new BugsnagNativeSpansPlugin());
-      config.addPlugin(new BugsnagJavascriptSpansPlugin());
+
+      if (configuration.hasKey("samplingProbability")) {
+        config.setSamplingProbability(configuration.getDouble("samplingProbability"));
+      }
+
+      if (configuration.hasKey("enabledMetrics")) {
+        ReadableMap metricsConfig = configuration.getMap("enabledMetrics");
+        EnabledMetrics enabledMetrics = new EnabledMetrics(
+          metricsConfig.getBoolean("rendering", false),
+          metricsConfig.getBoolean("cpu", false),
+          metricsConfig.getBoolean("memory", false)
+        );
+
+        config.setEnabledMetrics(enabledMetrics);
+      }
+
+      if (configuration.getBoolean("nativeSpans", true)) {
+        config.addPlugin(new BugsnagNativeSpansPlugin());
+      }
+      if (configuration.getBoolean("jsSpans", true)) {
+        config.addPlugin(new BugsnagJavascriptSpansPlugin());
+      }
 
       BugsnagPerformance.start(config);
       Log.d(MODULE_NAME, "Started Android performance");
