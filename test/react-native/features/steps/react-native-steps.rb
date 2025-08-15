@@ -1,5 +1,12 @@
 When('I run {string}') do |scenario_name|
-  execute_command 'run-scenario', scenario_name
+  run_scenario scenario_name
+end
+
+When('I run benchmark {string} with config {string}') do |benchmark_name, config|
+  execute_command 'run-benchmark', {
+    benchmark_name: benchmark_name,
+    config: config
+  }
 end
 
 When('I execute the command {string}') do |command|
@@ -40,9 +47,9 @@ When("the span named {string} was delivered approximately {int} seconds after en
   # Get all spans to find the target span
   spans = spans_from_request_list(Maze::Server.list_for('traces'))
   target_span = spans.find { |span| span['name'].eql?(span_name) }
-  
+
   raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{span_name}" if target_span.nil?
-  
+
   # Find the request that contains the span by iterating through remaining requests
   target_request = nil
   Maze::Server.list_for('traces').remaining.each do |request|
@@ -54,43 +61,43 @@ When("the span named {string} was delivered approximately {int} seconds after en
           scope_span['spans']&.any? { |span| span['name'].eql?(span_name) }
         end
       end
-      
+
       if has_target_span
         target_request = request
         break
       end
     end
   end
-  
+
   raise Test::Unit::AssertionFailedError.new "No requests found containing span #{span_name}" if target_request.nil?
-  
+
   # Get the bugsnag-sent-at header from the request
   sent_at_header = target_request[:request]['bugsnag-sent-at']
   raise Test::Unit::AssertionFailedError.new "bugsnag-sent-at header not found in request" if sent_at_header.nil?
-  
+
   # Parse the sent-at time (ISO format) and convert to nanoseconds
   delivery_time = Time.parse(sent_at_header)
   delivery_time_ns = (delivery_time.to_f * 1_000_000_000).to_i
-  
+
   # Get the span's end time
   span_end_time = Integer(target_span["endTimeUnixNano"])
-  
+
   # Calculate the time difference between sent-at and span end
   time_difference_ns = delivery_time_ns - span_end_time
   time_difference_seconds = time_difference_ns / 1_000_000_000.0
-  
+
   # Check if the difference is approximately the expected number of seconds (±1 second tolerance)
   tolerance = 1.0
   expected_min = expected_seconds - tolerance
   expected_max = expected_seconds + tolerance
-  
+
   Maze.check.operator(
     time_difference_seconds,
     :>=,
     expected_min,
     "Span '#{span_name}' was delivered #{time_difference_seconds.round(2)} seconds after its end time (based on bugsnag-sent-at), expected at least #{expected_min} seconds"
   )
-  
+
   Maze.check.operator(
     time_difference_seconds,
     :<=,
@@ -99,7 +106,14 @@ When("the span named {string} was delivered approximately {int} seconds after en
   )
 end
 
-def execute_command(action, scenario_name = '')
+def run_scenario(scenario_name = '')
+  execute_command 'run-scenario', {
+    scenario_name: scenario_name,
+    payload: scenario_name
+  }
+end
+
+def execute_command(action, command_hash = nil)
   address = if Maze.config.farm == :bb
               if Maze.config.aws_public_ip
                 Maze.public_address
@@ -108,20 +122,22 @@ def execute_command(action, scenario_name = '')
               end
             else
               case Maze::Helper.get_current_platform
-                when 'android'
-                  'localhost:9339'
-                else
-                  'bs-local.com:9339'
+              when 'android'
+                'localhost:9339'
+              else
+                'bs-local.com:9339'
               end
             end
 
   command = {
     action: action,
-    scenario_name: scenario_name,
-    payload: scenario_name,
     endpoint: "http://#{address}/traces",
     api_key: $api_key,
   }
+
+  unless command_hash.nil?
+    command.merge! command_hash
+  end
 
   $logger.debug("Queuing command: #{command}")
   Maze::Server.commands.add command
