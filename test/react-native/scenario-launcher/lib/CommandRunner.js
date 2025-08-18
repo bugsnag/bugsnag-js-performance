@@ -1,4 +1,4 @@
-import { getMazeRunnerAddress } from './ConfigFileReader'
+import { getMazeRunnerAddress as readMazeRunnerAddress } from './ConfigFileReader'
 
 const DEFAULT_RETRY_COUNT = 20
 const INTERVAL = 500
@@ -7,6 +7,13 @@ let mazeAddress
 let lastCommandUuid
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+export const getMazeRunnerAddress = async () => {
+  if (!mazeAddress) {
+    mazeAddress = await readMazeRunnerAddress()
+  }
+  return mazeAddress
+}
 
 export async function getCurrentCommand (allowedRetries = DEFAULT_RETRY_COUNT) {
   if (allowedRetries <= 0) {
