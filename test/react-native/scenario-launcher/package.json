@@ -29,6 +29,7 @@
     "/android",
     "/ios",
     "/lib",
+    "/benchmarks",
     "/scenarios/core",
     "/scenarios/index.js",
     "/ScenarioLauncher.podspec"
