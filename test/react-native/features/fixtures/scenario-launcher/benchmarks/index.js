@@ -1,7 +1,7 @@
 import { NativeScenarioLauncher } from '../lib/native'
 import { createBenchmarkRunner } from './BenchmarkRunner'
 import * as Benchmarks from './core'
-import BugsnagPerformance from "@bugsnag/react-native-performance/lib";
+import BugsnagPerformance from '@bugsnag/react-native-performance';
 
 const reportBenchmarkResults = async (results, mazeAddress) => {
   const url = `http://${mazeAddress}/metrics`

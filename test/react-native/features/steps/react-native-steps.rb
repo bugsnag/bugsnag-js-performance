@@ -2,7 +2,7 @@ When('I run {string}') do |scenario_name|
   run_scenario scenario_name
 end
 
-When('I run benchmark {string} with config {string}') do |benchmark_name, config|
+When('I run benchmark {string} configured as {string}') do |benchmark_name, config|
   execute_command 'run-benchmark', {
     benchmark_name: benchmark_name,
     config: config
