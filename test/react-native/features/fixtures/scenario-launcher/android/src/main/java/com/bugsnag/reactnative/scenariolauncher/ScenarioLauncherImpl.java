@@ -147,7 +147,7 @@ class ScenarioLauncherImpl {
 
   public WritableMap readStartupConfig() {
     SharedPreferences sharedPreferences = this.reactContext.getApplicationContext().getSharedPreferences("StartupConfig", Context.MODE_PRIVATE);
-    ;
+
     try {
       if (!sharedPreferences.getBoolean("configured", false)) {
         return null;
@@ -195,18 +195,18 @@ class ScenarioLauncherImpl {
       if (configuration.hasKey("enabledMetrics")) {
         ReadableMap metricsConfig = configuration.getMap("enabledMetrics");
         EnabledMetrics enabledMetrics = new EnabledMetrics(
-          metricsConfig.getBoolean("rendering", false),
-          metricsConfig.getBoolean("cpu", false),
-          metricsConfig.getBoolean("memory", false)
+          metricsConfig.getBoolean("rendering"),
+          metricsConfig.getBoolean("cpu"),
+          metricsConfig.getBoolean("memory")
         );
 
         config.setEnabledMetrics(enabledMetrics);
       }
 
-      if (configuration.getBoolean("nativeSpans", true)) {
+      if (!configuration.hasKey("nativeSpans") || configuration.getBoolean("nativeSpans")) {
         config.addPlugin(new BugsnagNativeSpansPlugin());
       }
-      if (configuration.getBoolean("jsSpans", true)) {
+      if (!configuration.hasKey("jsSpans") || configuration.getBoolean("jsSpans")) {
         config.addPlugin(new BugsnagJavascriptSpansPlugin());
       }
 

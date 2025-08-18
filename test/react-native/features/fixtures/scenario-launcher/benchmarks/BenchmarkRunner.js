@@ -126,12 +126,13 @@ export const createBenchmarkRunner = (config = {}) => {
       await cleanup()
     }
 
+    console.error(`Reporting results for benchmark: ${benchmark.name}`)
     return createBenchmarkResult(benchmark.name, runResults, configFlags)
   }
 
   // Run async benchmark
   const runAsyncBenchmark = async (benchmark) => {
-    console.log(`Running async benchmark: ${benchmark.name}`)
+    console.error(`Running async benchmark: ${benchmark.name}`)
 
     // Warmup
     const warmupTracker = createAsyncTracker(warmupIterations)
@@ -161,6 +162,7 @@ export const createBenchmarkRunner = (config = {}) => {
       await cleanup()
     }
 
+    console.error(`Reporting results for async benchmark: ${benchmark.name}`)
     return createBenchmarkResult(benchmark.name, runResults, configFlags)
   }
 
