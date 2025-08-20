@@ -1,6 +1,6 @@
 import { PluginContext } from '@bugsnag/core-performance'
 import type { Clock } from '@bugsnag/core-performance'
-import { MockSpanFactory, createConfiguration } from '@bugsnag/js-performance-test-utilities'
+import { MockReactNativeSpanFactory, createConfiguration } from '@bugsnag/js-performance-test-utilities'
 import type { AppRegistry } from 'react-native'
 import { AppStartPlugin } from '../../lib/auto-instrumentation/app-start-plugin'
 import createClock from '../../lib/clock'
@@ -8,12 +8,12 @@ import type { ReactNativeConfiguration } from '../../lib/config'
 import type { ReactNativeSpanFactory } from '../../lib/span-factory'
 
 describe('app start plugin', () => {
-  let spanFactory: MockSpanFactory<ReactNativeConfiguration>
+  let spanFactory: MockReactNativeSpanFactory
   let clock: Clock
   let appRegistry: typeof AppRegistry
 
   beforeEach(() => {
-    spanFactory = new MockSpanFactory()
+    spanFactory = new MockReactNativeSpanFactory()
     clock = createClock(performance)
     appRegistry = {
       setWrapperComponentProvider: jest.fn()
@@ -22,7 +22,7 @@ describe('app start plugin', () => {
 
   it('starts an app start span when autoInstrumentAppStarts is true', () => {
     const appStartTime = 1234
-    const plugin = new AppStartPlugin(appStartTime, spanFactory as unknown as ReactNativeSpanFactory, clock, appRegistry)
+    const plugin = new AppStartPlugin(appStartTime, spanFactory, clock, appRegistry)
 
     const context = new PluginContext(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: true }), clock)
     plugin.install(context)
@@ -38,7 +38,7 @@ describe('app start plugin', () => {
   })
 
   it('does not start an app start span when autoInstrumentAppStarts is false', () => {
-    const plugin = new AppStartPlugin(1234, spanFactory as unknown as ReactNativeSpanFactory, clock, appRegistry)
+    const plugin = new AppStartPlugin(1234, spanFactory, clock, appRegistry)
 
     const context = new PluginContext(createConfiguration<ReactNativeConfiguration>({ autoInstrumentAppStarts: false }), clock)
     plugin.install(context)

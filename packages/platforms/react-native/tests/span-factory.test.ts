@@ -246,4 +246,40 @@ describe('ReactNativeSpanFactory', () => {
       expect(endedSpan.attributes.toJson()).toContainEqual({ key: 'bugsnag.navigation.route', value: { stringValue: 'testRoute' } })
     })
   })
+
+  describe('startAppStartSpan', () => {
+    it('creates an app start span with the supplied start time', () => {
+      const appStartSpan = spanFactory.startAppStartSpan(12345)
+      const appStartSpanEnded = appStartSpan.end(12345, spanFactory.sampler.spanProbability)
+
+      expect(appStartSpanEnded.name).toBe('[AppStart/ReactNativeInit]')
+      expect(appStartSpanEnded.startTime).toBe(12345)
+    })
+
+    it('sets the parent context to null', () => {
+      spanFactory.startSpan('should not become parent', { startTime: 12345 })
+
+      const appStartSpan = spanFactory.startAppStartSpan(12345)
+      const appStartSpanEnded = appStartSpan.end(54321, spanFactory.sampler.spanProbability)
+
+      expect(appStartSpanEnded.parentSpanId).toBeUndefined()
+    })
+
+    it('sets the required attributes', () => {
+      const appStartSpan = spanFactory.startAppStartSpan(12345)
+      const appStartSpanEnded = appStartSpan.end(12345, spanFactory.sampler.spanProbability)
+
+      expect(appStartSpanEnded.attributes.toJson()).toStrictEqual([
+        { key: 'bugsnag.span.category', value: { stringValue: 'app_start' } },
+        { key: 'bugsnag.app_start.type', value: { stringValue: 'ReactNativeInit' } },
+        { key: 'bugsnag.sampling.p', value: { doubleValue: 1 } }
+      ])
+    })
+
+    it('prevents multiple app start spans from being created', () => {
+      const appStartSpan1 = spanFactory.startAppStartSpan(12345)
+      const appStartSpan2 = spanFactory.startAppStartSpan(12345)
+      expect(appStartSpan1).toBe(appStartSpan2)
+    })
+  })
 })

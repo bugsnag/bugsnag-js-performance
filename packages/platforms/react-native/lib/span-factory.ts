@@ -13,6 +13,7 @@ interface ReactNativeSpanOptions extends SpanOptions {
 
 export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration> {
   private attachedToNative = false
+  private appStartSpan?: SpanInternal
 
   onAttach () {
     this.attachedToNative = true
@@ -73,5 +74,17 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     span.setAttribute('bugsnag.navigation.route', routeName)
 
     return span
+  }
+
+  startAppStartSpan (appStartTime: number) {
+    if (this.appStartSpan) {
+      return this.appStartSpan
+    }
+
+    this.appStartSpan = this.startSpan('[AppStart/ReactNativeInit]', { startTime: appStartTime, parentContext: null })
+    this.appStartSpan.setAttribute('bugsnag.span.category', 'app_start')
+    this.appStartSpan.setAttribute('bugsnag.app_start.type', 'ReactNativeInit')
+
+    return this.appStartSpan
   }
 }
