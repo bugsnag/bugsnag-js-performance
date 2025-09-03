@@ -282,4 +282,17 @@ describe('ReactNativeSpanFactory', () => {
       expect(appStartSpan1).toBe(appStartSpan2)
     })
   })
+
+  describe('endAppStartSpan', () => {
+    it('ends the app start span with the supplied end time', () => {
+      const endSpanSpy = jest.spyOn(spanFactory, 'endSpan')
+
+      const span = spanFactory.startAppStartSpan(12345)
+      expect(spanFactory.appStartSpan?.isValid()).toBe(true)
+
+      spanFactory.endAppStartSpan(54321)
+      expect(endSpanSpy).toHaveBeenCalledWith(span, 54321)
+      expect(spanFactory.appStartSpan).toBeUndefined()
+    })
+  })
 })

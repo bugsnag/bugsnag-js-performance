@@ -47,15 +47,13 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
   start () {
     if (!this.enabled) return
 
-    const appStartSpan = this.spanFactory.startAppStartSpan(this.appStartTime)
+    this.spanFactory.startAppStartSpan(this.appStartTime)
 
     const AppStartWrapper = ({ children }: WrapperProps) => {
       React.useEffect(() => {
-        if (appStartSpan.isValid()) {
-          this.spanFactory.endSpan(appStartSpan, this.clock.now())
-          if (getAppState() === 'starting') {
-            setAppState('ready')
-          }
+        this.spanFactory.endAppStartSpan(this.clock.now())
+        if (getAppState() === 'starting') {
+          setAppState('ready')
         }
       }, [])
 

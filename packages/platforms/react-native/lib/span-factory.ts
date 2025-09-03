@@ -77,14 +77,19 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
   }
 
   startAppStartSpan (appStartTime: number) {
-    if (this.appStartSpan) {
-      return this.appStartSpan
+    if (!this.appStartSpan) {
+      this.appStartSpan = this.startSpan('[AppStart/ReactNativeInit]', { startTime: appStartTime, parentContext: null })
+      this.appStartSpan.setAttribute('bugsnag.span.category', 'app_start')
+      this.appStartSpan.setAttribute('bugsnag.app_start.type', 'ReactNativeInit')
     }
 
-    this.appStartSpan = this.startSpan('[AppStart/ReactNativeInit]', { startTime: appStartTime, parentContext: null })
-    this.appStartSpan.setAttribute('bugsnag.span.category', 'app_start')
-    this.appStartSpan.setAttribute('bugsnag.app_start.type', 'ReactNativeInit')
-
     return this.appStartSpan
+  }
+
+  endAppStartSpan (endTime: number) {
+    if (this.appStartSpan?.isValid()) {
+      this.endSpan(this.appStartSpan, endTime)
+      this.appStartSpan = undefined
+    }
   }
 }

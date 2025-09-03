@@ -14,13 +14,11 @@ export const platformExtensions = (appStartTime: number, clock: Clock, spanFacto
     return spanFactory.toPublicApi(span)
   },
   withInstrumentedAppStarts: function (App: React.FC) {
-    const appStartSpan = spanFactory.startAppStartSpan(appStartTime)
+    spanFactory.startAppStartSpan(appStartTime)
 
     return () => {
       React.useEffect(() => {
-        if (appStartSpan.isValid()) {
-          spanFactory.endSpan(appStartSpan, clock.now())
-        }
+        spanFactory.endAppStartSpan(clock.now())
       }, [])
 
       return <App />
