@@ -4,14 +4,18 @@ import { name as appName } from './app.json';
 import { launchScenario, launchFromStartupConfig, ScenarioContext, ScenarioComponent } from '@bugsnag/react-native-performance-scenarios'
 import BugsnagPerformance from '@bugsnag/react-native-performance';
 
-const isStartupTest = launchFromStartupConfig()
+const startupConfig = launchFromStartupConfig()
+
+const startupScenario = startupConfig?.startupScenario ? { name: startupConfig.startupScenario } : null
 
 const App = () => {
 
-  const [currentScenario, setCurrentScenario] = useState(null)
+  const [currentScenario, setCurrentScenario] = useState(startupScenario)
 
   useEffect(() => {
-    if (!isStartupTest) launchScenario(setCurrentScenario)
+    if (!startupConfig) {
+      launchScenario(setCurrentScenario)
+    }
   }, [])
 
   return (

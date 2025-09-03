@@ -1,4 +1,6 @@
 export * as AppStartScenario from './AppStartScenario'
+export * as AppStartCustomizationScenario from './AppStartCustomizationScenario'
+export * as AppStartSpanControlScenario from './AppStartSpanControlScenario'
 export * as WithInstrumentedAppStartsScenario from './WithInstrumentedAppStartsScenario'
 export * as BackgroundSpanScenario from './BackgroundSpanScenario'
 export * as ErrorCorrelationScenario from './ErrorCorrelationScenario'

@@ -86,14 +86,12 @@ export async function launchScenario (setScenario, clearPersistedData = true) {
 }
 
 export function launchFromStartupConfig () {
-  let started = false
   const startupConfig = NativeScenarioLauncher.readStartupConfig()
 
   if (startupConfig) {
     startupConfig.wrapperComponentProvider = startupConfig.useWrapperComponentProvider ? wrapperComponentProvider : null
     BugsnagPerformance.start(startupConfig)
-    started = true
   }
 
-  return started
+  return startupConfig
 }
