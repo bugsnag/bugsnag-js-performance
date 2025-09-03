@@ -11,9 +11,12 @@ interface ReactNativeSpanOptions extends SpanOptions {
   doNotDelegateToNativeSDK?: boolean
 }
 
+export const APP_START_BASE_NAME = '[AppStart/ReactNativeInit]'
+const NAVIGATION_BASE_NAME = '[Navigation]'
+
 export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration> {
   private attachedToNative = false
-  private appStartSpan?: SpanInternal
+  appStartSpan?: SpanInternal
 
   onAttach () {
     this.attachedToNative = true
@@ -66,7 +69,7 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     spanOptions.isFirstClass = true
     spanOptions.doNotDelegateToNativeSDK = true
 
-    const spanName = '[Navigation]' + routeName
+    const spanName = NAVIGATION_BASE_NAME + routeName
     const span = this.startSpan(spanName, spanOptions)
 
     // Default navigation span attributes
@@ -78,7 +81,7 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
 
   startAppStartSpan (appStartTime: number) {
     if (!this.appStartSpan) {
-      this.appStartSpan = this.startSpan('[AppStart/ReactNativeInit]', { startTime: appStartTime, parentContext: null })
+      this.appStartSpan = this.startSpan(APP_START_BASE_NAME, { startTime: appStartTime, parentContext: null })
       this.appStartSpan.setAttribute('bugsnag.span.category', 'app_start')
       this.appStartSpan.setAttribute('bugsnag.app_start.type', 'ReactNativeInit')
     }

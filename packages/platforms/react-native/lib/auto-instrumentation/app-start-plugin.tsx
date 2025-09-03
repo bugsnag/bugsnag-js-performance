@@ -1,9 +1,10 @@
-import { getAppState, setAppState } from '@bugsnag/core-performance'
-import type { Clock, Plugin, PluginContext } from '@bugsnag/core-performance'
+import { getAppState, setAppState, SpanQuery } from '@bugsnag/core-performance'
+import type { Clock, Plugin, PluginContext, SpanControlProvider } from '@bugsnag/core-performance'
 import type { ReactNode } from 'react'
 import React from 'react'
 import type { AppRegistry, WrapperComponentProvider } from 'react-native'
 import type { ReactNativeConfiguration } from '../config'
+import { APP_START_BASE_NAME } from '../span-factory'
 import type { ReactNativeSpanFactory } from '../span-factory'
 
 interface WrapperProps {
@@ -13,7 +14,14 @@ interface WrapperProps {
 export const isWrapperComponentProvider = (value: unknown): value is WrapperComponentProvider | null =>
   value === null || typeof value === 'function'
 
-export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
+export interface AppStartSpanControl {
+  setType: (appStartType?: string | null) => void
+  clearType: () => void
+}
+
+export class AppStartSpanQuery extends SpanQuery<AppStartSpanControl> {}
+
+export class AppStartPlugin implements Plugin<ReactNativeConfiguration>, SpanControlProvider<AppStartSpanControl> {
   private readonly appStartTime: number
   private readonly spanFactory: ReactNativeSpanFactory
   private readonly clock: Clock
@@ -35,6 +43,8 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
   }
 
   install (context: PluginContext<ReactNativeConfiguration>) {
+    context.addSpanControlProvider(this)
+
     if (!context.configuration.autoInstrumentAppStarts) return
 
     if (context.configuration.wrapperComponentProvider) {
@@ -75,5 +85,39 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration> {
     }
 
     this.appRegistry.setWrapperComponentProvider(instrumentedComponentProvider)
+  }
+
+  getSpanControls<Q> (query: Q): AppStartSpanControl | null {
+    if (query !== AppStartSpanQuery && !(query instanceof AppStartSpanQuery)) {
+      return null
+    }
+
+    if (!this.spanFactory.appStartSpan?.isValid()) {
+      return null
+    }
+
+    return {
+      setType: (appStartType) => {
+        this.setAppStartType(appStartType)
+      },
+      clearType: () => {
+        this.setAppStartType(null)
+      }
+    }
+  }
+
+  private setAppStartType (name?: string | null) {
+    if (!this.spanFactory.appStartSpan?.isValid()) return
+
+    if (name === null || name === undefined) {
+      this.spanFactory.appStartSpan.name = APP_START_BASE_NAME
+      this.spanFactory.appStartSpan.setAttribute('bugsnag.app_start.name', null)
+      return
+    }
+
+    if (typeof name !== 'string') return
+
+    this.spanFactory.appStartSpan.name = `${APP_START_BASE_NAME}${name}`
+    this.spanFactory.appStartSpan.setAttribute('bugsnag.app_start.name', name)
   }
 }
