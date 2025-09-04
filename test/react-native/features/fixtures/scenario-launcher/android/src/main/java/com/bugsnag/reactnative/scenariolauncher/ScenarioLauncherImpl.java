@@ -140,8 +140,8 @@ class ScenarioLauncherImpl {
       editor.putBoolean("useWrapperComponentProvider", configuration.getBoolean("useWrapperComponentProvider"));
     }
 
-    if (configuration.hasKey("startupScenario")) {
-      editor.putString("startupScenario", configuration.getString("startupScenario"));
+    if (configuration.hasKey("scenario")) {
+      editor.putString("scenario", configuration.getString("scenario"));
     }
 
     editor.commit();
@@ -162,7 +162,7 @@ class ScenarioLauncherImpl {
       startupConfig.putBoolean("autoInstrumentNetworkRequests", sharedPreferences.getBoolean("autoInstrumentNetworkRequests", false));
       startupConfig.putInt("maximumBatchSize", sharedPreferences.getInt("maximumBatchSize", 100));
       startupConfig.putBoolean("useWrapperComponentProvider", sharedPreferences.getBoolean("useWrapperComponentProvider", false));
-      startupConfig.putString("startupScenario", sharedPreferences.getString("startupScenario", ""));
+      startupConfig.putString("scenario", sharedPreferences.getString("scenario", ""));
       return startupConfig;
     } finally {
       // make sure we don't leave this config around for the next startup
@@ -174,7 +174,7 @@ class ScenarioLauncherImpl {
         .remove("autoInstrumentNetworkRequests")
         .remove("maximumBatchSize")
         .remove("useWrapperComponentProvider")
-        .remove("startupScenario")
+        .remove("scenario")
         .commit();
     }
   }

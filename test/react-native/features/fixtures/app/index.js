@@ -5,11 +5,11 @@ import { launchScenario, launchFromStartupConfig, ScenarioContext, ScenarioCompo
 
 const startupConfig = launchFromStartupConfig()
 
-const startupScenario = startupConfig?.startupScenario ? { name: startupConfig.startupScenario } : null
+const initialScenario = startupConfig?.scenario ? { name: startupConfig.scenario } : null
 
 const App = () => {
 
-  const [currentScenario, setCurrentScenario] = useState(startupScenario)
+  const [currentScenario, setCurrentScenario] = useState(initialScenario)
 
   useEffect(() => {
     if (!startupConfig) {

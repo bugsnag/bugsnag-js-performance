@@ -9,7 +9,7 @@ export const initialise = async (config) => {
     autoInstrumentAppStarts: true,
     autoInstrumentNetworkRequests: false,
     maximumBatchSize: 1,
-    startupScenario: 'AppStartSpanControlScenario'
+    scenario: 'AppStartSpanControlScenario'
   }
 
   NativeScenarioLauncher.saveStartupConfig(startupConfig)
