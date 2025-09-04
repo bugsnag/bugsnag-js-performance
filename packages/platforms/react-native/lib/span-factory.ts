@@ -17,6 +17,7 @@ const NAVIGATION_BASE_NAME = '[Navigation]'
 export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration> {
   private attachedToNative = false
   appStartSpan?: SpanInternal
+  private appStartSpanCreated = false
 
   onAttach () {
     this.attachedToNative = true
@@ -80,13 +81,13 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
   }
 
   startAppStartSpan (appStartTime: number) {
-    if (!this.appStartSpan) {
+    // Ensure we only ever create one app start span
+    if (!this.appStartSpan && !this.appStartSpanCreated) {
       this.appStartSpan = this.startSpan(APP_START_BASE_NAME, { startTime: appStartTime, parentContext: null })
       this.appStartSpan.setAttribute('bugsnag.span.category', 'app_start')
       this.appStartSpan.setAttribute('bugsnag.app_start.type', 'ReactNativeInit')
+      this.appStartSpanCreated = true
     }
-
-    return this.appStartSpan
   }
 
   endAppStartSpan (endTime: number) {

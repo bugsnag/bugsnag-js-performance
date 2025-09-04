@@ -96,7 +96,7 @@ class MockReactNativeSpanFactory extends ReactNativeSpanFactory {
   })
 
   startAppStartSpan = jest.fn((startTime: number) => {
-    return super.startAppStartSpan(startTime)
+    super.startAppStartSpan(startTime)
   })
 
   endAppStartSpan = jest.fn((endTime: number) => {
