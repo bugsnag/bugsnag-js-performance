@@ -63,7 +63,8 @@ Feature: App Start spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.endTimeUnixNano" matches the regex "^[0-9]+$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "app_start"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.app_start.type" equals "ReactNativeInit"
-    
+
+  @skip_expo  
   Scenario: Automatic app start spans can be customized
     When I run 'AutomaticCustomAppStartScenario'
     And I relaunch the app after shutdown
