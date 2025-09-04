@@ -20,7 +20,7 @@ export const App = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.scenario}>
-        <Text>AppStartCustomizationScenario</Text>
+        <Text>AutomaticCustomAppStartScenario</Text>
       </View>
     </SafeAreaView>
   )

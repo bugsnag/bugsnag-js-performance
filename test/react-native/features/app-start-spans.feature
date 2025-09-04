@@ -64,9 +64,28 @@ Feature: App Start spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "app_start"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.app_start.type" equals "ReactNativeInit"
     
-  Scenario: App start spans can be customized
-    When I run 'AppStartCustomizationScenario'
+  Scenario: Automatic app start spans can be customized
+    When I run 'AutomaticCustomAppStartScenario'
     And I relaunch the app after shutdown
+    And I wait to receive a sampling request
+    And I wait for 1 span
+
+    # Check the initial probability request
+    Then the sampling request "Bugsnag-Span-Sampling" header equals "1.0:0"
+
+    And the trace "Bugsnag-Span-Sampling" header equals "1:1"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.name" equals "[AppStart/ReactNativeInit]AppStartSpanControlScenario"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.kind" equals 3
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.spanId" matches the regex "^[A-Fa-f0-9]{16}$"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.traceId" matches the regex "^[A-Fa-f0-9]{32}$"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.startTimeUnixNano" matches the regex "^[0-9]+$"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.endTimeUnixNano" matches the regex "^[0-9]+$"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "app_start"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.app_start.type" equals "ReactNativeInit"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.app_start.name" equals "AppStartSpanControlScenario"
+
+  Scenario: Manual app start spans can be customized
+    When I run 'ManualCustomAppStartScenario'
     And I wait to receive a sampling request
     And I wait for 1 span
 

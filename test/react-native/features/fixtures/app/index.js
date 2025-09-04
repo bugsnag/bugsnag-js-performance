@@ -2,7 +2,6 @@ import { AppRegistry, SafeAreaView, StyleSheet, Text } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { name as appName } from './app.json';
 import { launchScenario, launchFromStartupConfig, ScenarioContext, ScenarioComponent } from '@bugsnag/react-native-performance-scenarios'
-import BugsnagPerformance from '@bugsnag/react-native-performance';
 
 const startupConfig = launchFromStartupConfig()
 
@@ -21,9 +20,9 @@ const App = () => {
   return (
     <ScenarioContext.Provider value={ currentScenario }>
       <SafeAreaView style={styles.container}>
-          <Text accessibilityLabel='app-component' testID='app-component'>React Native Performance Test App</Text>
-          <ScenarioComponent />
-        </SafeAreaView>
+        <Text accessibilityLabel='app-component' testID='app-component'>React Native Performance Test App</Text>
+        <ScenarioComponent />
+      </SafeAreaView>
     </ScenarioContext.Provider>
   )
 }
