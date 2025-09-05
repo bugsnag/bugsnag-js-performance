@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- (react-native) Added `AppStartSpanControl` and `AppStartSpanQuery` to allow custom categorization of app start spans [#700](https://github.com/bugsnag/bugsnag-js-performance/pull/700)
+
 ## [v3.0.1] (2025-08-14)
 
 ### Fixed
