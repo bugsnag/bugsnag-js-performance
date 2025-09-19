@@ -170,6 +170,9 @@ const BugsnagReactNativePerformance = {
   discardNativeSpan: jest.fn(() => {
     return Promise.resolve()
   }),
+  endNativeAppStart: jest.fn(() => {
+    return Promise.resolve()
+  }),
   getNativeConstants () {
     return {
       CacheDir: '/mock/CacheDir',

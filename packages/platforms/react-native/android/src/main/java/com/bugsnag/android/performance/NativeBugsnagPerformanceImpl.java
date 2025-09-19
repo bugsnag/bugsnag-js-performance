@@ -30,9 +30,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-import com.bugsnag.android.performance.BugsnagPerformance;
 import com.bugsnag.android.performance.SpanOptions;
-
 import com.bugsnag.android.performance.internal.BugsnagClock;
 import com.bugsnag.android.performance.internal.EncodingUtils;
 import com.bugsnag.android.performance.internal.SpanFactory;
@@ -175,6 +173,14 @@ class NativeBugsnagPerformanceImpl {
       result.putArray("enabledReleaseStages", Arguments.fromArray(enabledReleaseStages.toArray(new String[0])));
     }
 
+    ReactNativeAppStartPlugin appStartPlugin = ReactNativeAppStartPlugin.getInstance();
+    if (appStartPlugin != null) {
+      String appStartParent = appStartPlugin.getAppStartParent();
+      if (appStartParent != null) {
+        result.putString("appStartParentContext", appStartParent);
+      }
+    }
+
     return result;
   }
 
@@ -235,6 +241,13 @@ class NativeBugsnagPerformanceImpl {
       nativeSpan.discard();
     }
 
+    promise.resolve(null);
+  }
+
+  void endNativeAppStart(double endTime, Promise promise) {
+    long nativeEndTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)endTime);
+    ReactNativeAppStartPlugin appStartPlugin = ReactNativeAppStartPlugin.getInstance();
+    appStartPlugin.endAppStart(nativeEndTime);
     promise.resolve(null);
   }
 
