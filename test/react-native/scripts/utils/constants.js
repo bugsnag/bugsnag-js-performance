@@ -1,6 +1,6 @@
 const { resolve } = require('path')
 
-const ROOT_DIR = resolve(__dirname, '../../')
+const ROOT_DIR = resolve(__dirname, '../../../../')
 
 const PACKAGE_NAMES = [
   '@bugsnag/core-performance',

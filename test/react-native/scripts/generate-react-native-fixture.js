@@ -1,20 +1,18 @@
-#!/usr/bin/env node
-
 const { execFileSync } = require('child_process')
 const { resolve } = require('path')
 const fs = require('fs')
 
 // Import utilities
-const { ROOT_DIR } = require('./fixtures/constants')
-const { validateEnvironment, isTruthy, isBooleanString } = require('./fixtures/env-validation')
-const { buildPackages } = require('./fixtures/build-utils')
-const { cleanDirectory } = require('./fixtures/file-utils')
+const { ROOT_DIR } = require('./utils/constants')
+const { validateEnvironment, isTruthy, isBooleanString } = require('./utils/env-validation')
+const { buildPackages } = require('./utils/build-utils')
+const { cleanDirectory } = require('./utils/file-utils')
 const { 
   installFixtureDependencies, 
   getReactNativeDependencies, 
   getReactNavigationDependencies,
   getReactNativeNavigationDependencies 
-} = require('./fixtures/dependency-utils')
+} = require('./utils/dependency-utils')
 const {
   replaceGeneratedFixtureFiles,
   configureIOSProject,
@@ -22,9 +20,9 @@ const {
   installAndroidPerformance,
   installCocoaPerformance,
   configureReactNativeNavigation
-} = require('./fixtures/react-native-config')
-const { configureRN064Fixture } = require('./fixtures/rn-064-config')
-const { buildAndroidFixture, buildIOSFixture } = require('./fixtures/platform-builds')
+} = require('./utils/react-native-config')
+const { configureRN064Fixture } = require('./utils/rn-064-config')
+const { buildAndroidFixture, buildIOSFixture } = require('./utils/platform-builds')
 
 // Validate environment variables
 validateEnvironment({
@@ -123,6 +121,3 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 // Build platform fixtures
 buildAndroidFixture(fixtureDir, isNewArchEnabled)
 buildIOSFixture(fixtureDir)
-
-
-

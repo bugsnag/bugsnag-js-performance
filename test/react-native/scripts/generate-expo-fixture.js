@@ -1,16 +1,14 @@
-#!/usr/bin/env node
-
 const { execFileSync } = require('child_process')
 const { resolve } = require('path')
 const fs = require('fs')
 
 // Import utilities
-const { ROOT_DIR } = require('./fixtures/constants')
-const { validateEnvironment } = require('./fixtures/env-validation')
-const { buildPackagesForExpo } = require('./fixtures/build-utils')
-const { cleanDirectory, ensureDirectory } = require('./fixtures/file-utils')
-const { installFixtureDependencies, getExpoDependencies } = require('./fixtures/dependency-utils')
-const { buildExpoAndroidFixture, buildExpoIOSFixture } = require('./fixtures/platform-builds')
+const { ROOT_DIR } = require('./utils/constants')
+const { validateEnvironment } = require('./utils/env-validation')
+const { buildPackagesForExpo } = require('./utils/build-utils')
+const { cleanDirectory, ensureDirectory } = require('./utils/file-utils')
+const { installFixtureDependencies, getExpoDependencies } = require('./utils/dependency-utils')
+const { buildExpoAndroidFixture, buildExpoIOSFixture } = require('./utils/platform-builds')
 
 // Validate environment variables
 validateEnvironment({

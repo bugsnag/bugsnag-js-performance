@@ -19,7 +19,7 @@ steps:
         artifact_paths: test/react-native/features/fixtures/generated/expo/**/test-fixture/output.apk
         commands:
           - bundle install
-          - ./bin/generate-expo-fixture
+          - node test/react-native/scripts/generate-expo-fixture.js
         matrix:
           - "51"
           - "50"
@@ -36,7 +36,7 @@ steps:
         artifact_paths: test/react-native/features/fixtures/generated/expo/**/test-fixture/output.ipa
         commands:
           - bundle install
-          - ./bin/generate-expo-fixture
+          - node test/react-native/scripts/generate-expo-fixture.js
         matrix:
           - "51"
           - "50"

@@ -23,7 +23,7 @@ steps:
           - "test/react-native/features/fixtures/generated/old-arch/**/reactnative.apk"
         commands:
           - bundle install
-          - ./bin/generate-react-native-fixture
+          - node test/react-native/scripts/generate-react-native-fixture.js
         matrix:
           - "0.80"
         retry:
@@ -47,7 +47,7 @@ steps:
           - "test/react-native/features/fixtures/generated/new-arch/**/reactnative.apk"
         commands:
           - bundle install
-          - ./bin/generate-react-native-fixture
+          - node test/react-native/scripts/generate-react-native-fixture.js
         matrix:
           - "0.80"
         retry:
@@ -72,7 +72,7 @@ steps:
           - "test/react-native/features/fixtures/generated/native-integration/old-arch/**/reactnative.apk"
         commands:
           - bundle install
-          - ./bin/generate-react-native-fixture
+          - node test/react-native/scripts/generate-react-native-fixture.js
         matrix:
           - "0.80"
         retry:
@@ -97,7 +97,7 @@ steps:
           - "test/react-native/features/fixtures/generated/native-integration/new-arch/**/reactnative.apk"
         commands:
           - bundle install
-          - ./bin/generate-react-native-fixture
+          - node test/react-native/scripts/generate-react-native-fixture.js
         matrix:
           - "0.80"
         retry:
@@ -121,7 +121,7 @@ steps:
           - "test/react-native/features/fixtures/generated/old-arch/**/output/reactnative.ipa"
         commands:
           - bundle install
-          - ./bin/generate-react-native-fixture
+          - node test/react-native/scripts/generate-react-native-fixture.js
         matrix:
           - "0.80"
         retry:
@@ -145,7 +145,7 @@ steps:
           - "test/react-native/features/fixtures/generated/new-arch/**/output/reactnative.ipa"
         commands:
           - bundle install
-          - ./bin/generate-react-native-fixture
+          - node test/react-native/scripts/generate-react-native-fixture.js
         matrix:
           - "0.80"
         retry:
@@ -170,7 +170,7 @@ steps:
           - "test/react-native/features/fixtures/generated/native-integration/old-arch/**/output/reactnative.ipa"
         commands:
           - bundle install
-          - ./bin/generate-react-native-fixture
+          - node test/react-native/scripts/generate-react-native-fixture.js
         matrix:
           - "0.80"
         retry:
@@ -195,7 +195,7 @@ steps:
           - "test/react-native/features/fixtures/generated/native-integration/new-arch/**/output/reactnative.ipa"
         commands:
           - bundle install
-          - ./bin/generate-react-native-fixture
+          - node test/react-native/scripts/generate-react-native-fixture.js
         matrix:
           - "0.80"
         retry:
