@@ -11,8 +11,13 @@ interface ReactNativeSpanOptions extends SpanOptions {
   doNotDelegateToNativeSDK?: boolean
 }
 
+export const APP_START_BASE_NAME = '[AppStart/ReactNativeInit]'
+const NAVIGATION_BASE_NAME = '[Navigation]'
+
 export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration> {
   private attachedToNative = false
+  appStartSpan?: SpanInternal
+  private appStartSpanCreated = false
 
   onAttach () {
     this.attachedToNative = true
@@ -65,7 +70,7 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     spanOptions.isFirstClass = true
     spanOptions.doNotDelegateToNativeSDK = true
 
-    const spanName = '[Navigation]' + routeName
+    const spanName = NAVIGATION_BASE_NAME + routeName
     const span = this.startSpan(spanName, spanOptions)
 
     // Default navigation span attributes
@@ -73,5 +78,22 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     span.setAttribute('bugsnag.navigation.route', routeName)
 
     return span
+  }
+
+  startAppStartSpan (appStartTime: number) {
+    // Ensure we only ever create one app start span
+    if (!this.appStartSpan && !this.appStartSpanCreated) {
+      this.appStartSpan = this.startSpan(APP_START_BASE_NAME, { startTime: appStartTime, parentContext: null })
+      this.appStartSpan.setAttribute('bugsnag.span.category', 'app_start')
+      this.appStartSpan.setAttribute('bugsnag.app_start.type', 'ReactNativeInit')
+      this.appStartSpanCreated = true
+    }
+  }
+
+  endAppStartSpan (endTime: number) {
+    if (this.appStartSpan?.isValid()) {
+      this.endSpan(this.appStartSpan, endTime)
+      this.appStartSpan = undefined
+    }
   }
 }

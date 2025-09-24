@@ -95,10 +95,20 @@ class MockReactNativeSpanFactory extends ReactNativeSpanFactory {
     return super.startNavigationSpan(name, options)
   })
 
+  startAppStartSpan = jest.fn((startTime: number) => {
+    super.startAppStartSpan(startTime)
+  })
+
+  endAppStartSpan = jest.fn((endTime: number) => {
+    super.endAppStartSpan(endTime)
+  })
+
   reset () {
     this.startSpan.mockClear()
     this.endSpan.mockClear()
     this.startNavigationSpan.mockClear()
+    this.startAppStartSpan.mockClear()
+    this.endAppStartSpan.mockClear()
 
     const processor = new InMemoryProcessor()
     this.createdSpans = processor.spans

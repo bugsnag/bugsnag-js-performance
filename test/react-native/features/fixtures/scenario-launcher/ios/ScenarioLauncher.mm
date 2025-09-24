@@ -83,8 +83,12 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(saveStartupConfig:(NSDictionary *)config)
     [defaults setInteger:[config[@"maximumBatchSize"] integerValue] forKey:@"maximumBatchSize"];
   }
 
-    if (config[@"useWrapperComponentProvider"]) {
+  if (config[@"useWrapperComponentProvider"]) {
     [defaults setBool:[config[@"useWrapperComponentProvider"] boolValue] forKey:@"useWrapperComponentProvider"];
+  }
+
+  if (config[@"scenario"]) {
+    [defaults setObject:config[@"scenario"] forKey:@"scenario"];
   }
 
   [defaults synchronize];
@@ -107,6 +111,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(readStartupConfig) {
   config[@"autoInstrumentNetworkRequests"] = [NSNumber numberWithBool:[defaults boolForKey:@"autoInstrumentNetworkRequests"]];
   config[@"maximumBatchSize"] = [NSNumber numberWithInteger:[defaults integerForKey:@"maximumBatchSize"]];
   config[@"useWrapperComponentProvider"] = [NSNumber numberWithBool:[defaults boolForKey:@"useWrapperComponentProvider"]];
+  config[@"scenario"] = [defaults objectForKey:@"scenario"] ? [defaults stringForKey:@"scenario"] : @"";
 
   // make sure we don't leave this config around for the next startup
   [defaults setBool:NO forKey:@"configured"];
@@ -116,6 +121,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(readStartupConfig) {
   [defaults removeObjectForKey:@"autoInstrumentNetworkRequests"];
   [defaults removeObjectForKey:@"maximumBatchSize"];
   [defaults removeObjectForKey:@"useWrapperComponentProvider"];
+  [defaults removeObjectForKey:@"scenario"];
 
   [defaults synchronize];
 
