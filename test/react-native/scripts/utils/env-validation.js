@@ -1,18 +1,20 @@
 /**
  * Validates that required environment variables are set
- * @param {Object} requirements - Object mapping env var names to error messages
- * @param {Object} additionalValidators - Object mapping env var names to validation functions
+ * @param {Object} config - Object mapping env var names to configuration objects
+ *   Each config can have: { message: string, validator?: function }
  */
-function validateEnvironment (requirements, additionalValidators = {}) {
-  for (const [envVar, errorMessage] of Object.entries(requirements)) {
-    if (!process.env[envVar]) {
-      console.error(errorMessage)
+function validateEnvironment (config) {
+  for (const [envVar, envConfig] of Object.entries(config)) {
+    const value = process.env[envVar]
+    
+    // Check if environment variable is set
+    if (!value) {
+      console.error(envConfig.message || `${envVar} is required`)
       process.exit(1)
     }
-  }
-
-  for (const [envVar, validator] of Object.entries(additionalValidators)) {
-    if (!validator(process.env[envVar])) {
+    
+    // Run additional validation if provided
+    if (envConfig.validate && !envConfig.validate(value)) {
       console.error(`Invalid value for ${envVar}`)
       process.exit(1)
     }

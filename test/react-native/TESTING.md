@@ -53,7 +53,7 @@ End-to-end tests in CI run on both Android and iOS, for both old and new archite
 
 ## Expo testing
 
-To generate an Expo test fixture, from the root directory run the `./bin/generate-expo-fixture` script. You will need to make sure the following environment variables are set:
+To generate an Expo test fixture, from the root directory run the `test/react-native/scripts/generate-react-native-fixture.js` script. You will need to make sure the following environment variables are set:
 
 __Note: only SmartBear employees can build the Expo test fixture.__ The build requires private credentials which can't be shared outside of the organisation.
 

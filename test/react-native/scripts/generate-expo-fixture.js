@@ -5,16 +5,22 @@ const fs = require('fs')
 // Import utilities
 const { ROOT_DIR } = require('./utils/constants')
 const { validateEnvironment } = require('./utils/env-validation')
-const { buildPackagesForExpo } = require('./utils/build-utils')
+const { buildPackages } = require('./utils/build-utils')
 const { cleanDirectory, ensureDirectory } = require('./utils/file-utils')
 const { installFixtureDependencies, getExpoDependencies } = require('./utils/dependency-utils')
 const { buildExpoAndroidFixture, buildExpoIOSFixture } = require('./utils/platform-builds')
 
 // Validate environment variables
 validateEnvironment({
-  EXPO_VERSION: 'Please provide an Expo version',
-  EXPO_EAS_PROJECT_ID: 'EXPO_EAS_PROJECT_ID is not set',
-  EXPO_CREDENTIALS_DIR: 'EXPO_CREDENTIALS_DIR is not set'
+  EXPO_VERSION: {
+    message: 'Please provide an Expo version'
+  },
+  EXPO_EAS_PROJECT_ID: {
+    message: 'EXPO_EAS_PROJECT_ID is not set'
+  },
+  EXPO_CREDENTIALS_DIR: {
+    message: 'EXPO_CREDENTIALS_DIR is not set'
+  }
 })
 
 // Configuration
@@ -24,10 +30,10 @@ const easWorkingDir = `${buildDir}/build`
 const fixtureDir = `${buildDir}/test-fixture`
 
 // Dependencies
-const DEPENDENCIES = getExpoDependencies()
+const fixtureDeps = getExpoDependencies()
 
 // Build packages
-buildPackagesForExpo()
+buildPackages()
 
 // Generate fixture
 if (!process.env.SKIP_GENERATE_FIXTURE) {
@@ -41,7 +47,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   execFileSync('npx', expoInitArgs, { cwd: buildDir, stdio: 'inherit' })
 
   // install the required packages
-  installFixtureDependencies(fixtureDir, DEPENDENCIES, 'npm install --save --no-audit --legacy-peer-deps')
+  installFixtureDependencies(fixtureDir, fixtureDeps, ['--legacy-peer-deps'])
 
   // modify the app.json file
   const appConfig = require(`${fixtureDir}/app.json`)

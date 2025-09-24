@@ -1,23 +1,26 @@
-const { execFileSync, execSync } = require('child_process')
-const { PACKAGE_DIRECTORIES } = require('./constants')
+const { execFileSync } = require('child_process')
+const { readdirSync } = require('fs')
+const { PACKAGE_DIRECTORIES, ROOT_DIR } = require('./constants')
 
 /**
  * Packs and installs local packages and dependencies
  * @param {string} fixtureDir - Directory where the fixture is located
- * @param {Array} dependencies - Array of dependency strings
- * @param {string} installCommand - npm install command (defaults for RN, can be customized for Expo)
+ * @param {Array} additionalDependencies - Array of dependency strings
+ * @param {Array} additionalInstallArgs - Array of additional npm install arguments
  */
-function installFixtureDependencies (fixtureDir, dependencies, installCommand = 'npm install --save') {
+function installFixtureDependencies (fixtureDir, additionalDependencies, additionalInstallArgs = []) {
   // pack the required packages into the fixture directory
   for (const packageDir of PACKAGE_DIRECTORIES) {
     const libraryPackArgs = ['pack', packageDir, '--pack-destination', fixtureDir]
-    execFileSync('npm', libraryPackArgs, { cwd: require('./constants').ROOT_DIR, stdio: 'inherit' })
+    execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
   }
 
-  const dependencyArgs = dependencies.join(' ')
+  // build the npm install command args
+  const tarballs = readdirSync(fixtureDir).filter(file => file.endsWith('.tgz'))
+  const installArgs = ['install', '--save', '--no-audit', ...additionalInstallArgs, ...additionalDependencies, ...tarballs]
 
   // install test fixture dependencies and local packages
-  execSync(`${installCommand} ${dependencyArgs} *.tgz`, { cwd: fixtureDir, stdio: 'inherit' })
+  execFileSync('npm', installArgs, { cwd: fixtureDir, stdio: 'inherit' })
 }
 
 /**
@@ -27,13 +30,11 @@ function getReactNativeDependencies (reactNativeVersion, notifierVersion) {
   const reactNativeFileAccessVersion = parseFloat(reactNativeVersion) <= 0.64 ? '1.7.1' : '3.1.1'
   const netinfoVersion = parseFloat(reactNativeVersion) <= 0.64 ? '10.0.0' : '11.3.2'
 
-  const baseDependencies = [
+  return [
     `@bugsnag/react-native@${notifierVersion}`,
     `@react-native-community/netinfo@${netinfoVersion}`,
     `react-native-file-access@${reactNativeFileAccessVersion}`
   ]
-
-  return { baseDependencies, reactNativeFileAccessVersion, netinfoVersion }
 }
 
 /**

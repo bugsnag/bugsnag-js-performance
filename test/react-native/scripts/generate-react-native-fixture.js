@@ -26,11 +26,16 @@ const { buildAndroidFixture, buildIOSFixture } = require('./utils/platform-build
 
 // Validate environment variables
 validateEnvironment({
-  RN_VERSION: 'Please provide a React Native version',
-  NOTIFIER_VERSION: 'Please provide a Notifier version',
-  RCT_NEW_ARCH_ENABLED: 'RCT_NEW_ARCH_ENABLED must be set to 1 or 0'
-}, {
-  RCT_NEW_ARCH_ENABLED: isBooleanString
+  RN_VERSION: {
+    message: 'Please provide a React Native version'
+  },
+  NOTIFIER_VERSION: {
+    message: 'Please provide a Notifier version'
+  },
+  RCT_NEW_ARCH_ENABLED: {
+    message: 'RCT_NEW_ARCH_ENABLED must be set to 1 or 0',
+    validate: isBooleanString
+  }
 })
 
 // Configuration
@@ -58,14 +63,13 @@ if (isNewArchEnabled) {
 const fixtureDir = resolve(ROOT_DIR, fixturePath, reactNativeVersion)
 
 // Build dependencies
-const { baseDependencies } = getReactNativeDependencies(reactNativeVersion, process.env.NOTIFIER_VERSION)
-const DEPENDENCIES = [...baseDependencies]
+const fixtureDeps = getReactNativeDependencies(reactNativeVersion, process.env.NOTIFIER_VERSION)
 
 // Add navigation dependencies
 if (isReactNativeNavigation) {
-  DEPENDENCIES.push(...getReactNativeNavigationDependencies())
+  fixtureDeps.push(...getReactNativeNavigationDependencies())
 } else if (!isNewArchEnabled) {
-  DEPENDENCIES.push(...getReactNavigationDependencies(reactNativeVersion))
+  fixtureDeps.push(...getReactNavigationDependencies(reactNativeVersion))
 }
 
 // Build packages
@@ -99,7 +103,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   configureIOSProject(fixtureDir, reactNativeVersion)
 
   // Install dependencies
-  installFixtureDependencies(fixtureDir, DEPENDENCIES)
+  installFixtureDependencies(fixtureDir, fixtureDeps)
 
   // Apply RN 0.64 specific configuration
   if (parseFloat(reactNativeVersion) === 0.64) {
