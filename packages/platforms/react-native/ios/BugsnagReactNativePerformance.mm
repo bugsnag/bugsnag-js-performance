@@ -400,6 +400,12 @@ RCT_EXPORT_METHOD(discardNativeSpan:(NSString *)spanId
     resolve(nil);
 }
 
+RCT_EXPORT_METHOD(endNativeAppStart:(double)endTime
+                resolve:(RCTPromiseResolveBlock)resolve
+                reject:(RCTPromiseRejectBlock)reject) {
+    resolve(nil);
+}
+
 - (void)discardLongRunningSpans {
     NSDate *oneHourAgo = [NSDate dateWithTimeIntervalSinceNow:-hourInSeconds];
     NSMutableArray *keysToRemove = [NSMutableArray new];

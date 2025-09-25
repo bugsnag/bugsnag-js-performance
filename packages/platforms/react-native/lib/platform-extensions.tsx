@@ -41,7 +41,7 @@ export const platformExtensions = (appStartTime: number, clock: Clock, spanFacto
       ...nativeConfig
     }
 
-    spanFactory.onAttach()
+    spanFactory.onAttach(nativeConfig.nativeParentContext)
     const client = this as unknown as Client<ReactNativeConfiguration>
     client.start(finalConfig)
   }
