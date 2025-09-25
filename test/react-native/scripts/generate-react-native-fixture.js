@@ -19,7 +19,9 @@ const {
   configureAndroidProject,
   installAndroidPerformance,
   installCocoaPerformance,
-  configureReactNativeNavigation
+  configureReactNativeNavigation,
+  installNativeTestUtilsAndroid,
+  installNativeTestUtilsIOS
 } = require('./utils/react-native-config')
 const { configureRN064Fixture } = require('./utils/rn-064-config')
 const { buildAndroidFixture, buildIOSFixture } = require('./utils/platform-builds')
@@ -101,6 +103,10 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   replaceGeneratedFixtureFiles(fixtureDir, isReactNativeNavigation)
   configureAndroidProject(fixtureDir, isNewArchEnabled, reactNativeVersion)
   configureIOSProject(fixtureDir, reactNativeVersion)
+
+  // install native test utils
+  installNativeTestUtilsAndroid(fixtureDir)
+  installNativeTestUtilsIOS(fixtureDir)
 
   // Install dependencies
   installFixtureDependencies(fixtureDir, fixtureDeps)

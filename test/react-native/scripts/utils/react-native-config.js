@@ -158,6 +158,28 @@ function installAndroidPerformance (fixtureDir) {
   replaceInFile(appGradlePath, dependenciesSection, `${dependenciesSection}\n    ${performanceDependency}`)
 }
 
+function installNativeTestUtilsAndroid(fixtureDir) {
+  const appGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
+  const testUtilsDependency = 'implementation project(":bugsnag-test-utils")'
+  const dependenciesSection = 'dependencies {'
+
+  replaceInFile(appGradlePath, dependenciesSection, `${dependenciesSection}\n    ${testUtilsDependency}`)
+
+  const settingsGradlePath = resolve(fixtureDir, 'android/settings.gradle')
+  const includeDependency = 'include("bugsnag-test-utils")'
+  const dependencyPath = `project(":bugsnag-test-utils").projectDir = file("${resolve(ROOT_DIR, 'test/react-native/native-test-utils/android')}")`
+
+  appendToFileIfNotExists(settingsGradlePath, `\n${includeDependency}\n${dependencyPath}`, 'bugsnag-test-utils')
+}
+
+function installNativeTestUtilsIOS(fixtureDir) {
+  const podfilePath = resolve(fixtureDir, 'ios/Podfile')
+  const testUtilsPod = `pod 'BugsnagTestUtils', :path => '${resolve(ROOT_DIR, 'test/react-native/native-test-utils/ios/BugsnagTestUtils.podspec')}'`
+  const targetSection = 'target \'reactnative\' do'
+  
+  replaceInFile(podfilePath, targetSection, `${targetSection}\n  ${testUtilsPod}`)
+}
+
 /**
  * Install Cocoa Performance dependency
  */
@@ -187,5 +209,7 @@ module.exports = {
   configureReactNavigationAndroid,
   installAndroidPerformance,
   installCocoaPerformance,
-  configureReactNativeNavigation
+  configureReactNativeNavigation,
+  installNativeTestUtilsAndroid,
+  installNativeTestUtilsIOS
 }

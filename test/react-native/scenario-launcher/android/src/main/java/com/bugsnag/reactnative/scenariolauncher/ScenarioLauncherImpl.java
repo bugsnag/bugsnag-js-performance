@@ -2,7 +2,6 @@ package com.bugsnag.reactnative.scenariolauncher;
 
 import android.util.Log;
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import com.bugsnag.android.Bugsnag;
 import com.bugsnag.android.Configuration;
@@ -11,14 +10,12 @@ import com.bugsnag.android.Logger;
 
 import com.bugsnag.android.performance.AutoInstrument;
 import com.bugsnag.android.performance.BugsnagPerformance;
-import com.bugsnag.android.performance.PerformanceConfiguration;
+
 import com.bugsnag.android.performance.RemoteSpanContext;
 import com.bugsnag.android.performance.Span;
 import com.bugsnag.android.performance.SpanOptions;
 import com.bugsnag.android.performance.SpanContext;
 
-import com.bugsnag.reactnative.performance.nativespans.BugsnagJavascriptSpansPlugin;
-import com.bugsnag.reactnative.performance.nativespans.BugsnagNativeSpansPlugin;
 import com.bugsnag.reactnative.performance.nativespans.JavascriptSpanByName;
 import com.bugsnag.reactnative.performance.nativespans.JavascriptSpanControl;
 import com.bugsnag.reactnative.performance.nativespans.JavascriptSpanTransaction;
@@ -36,6 +33,9 @@ import com.facebook.react.bridge.WritableMap;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
+
+import com.bugsnag.test.utils.BugsnagTestUtils;
 
 class ScenarioLauncherImpl {
 
@@ -112,70 +112,30 @@ class ScenarioLauncherImpl {
   }
 
   public void saveStartupConfig(ReadableMap configuration) {
-    SharedPreferences sharedPreferences = this.reactContext.getApplicationContext().getSharedPreferences("StartupConfig", Context.MODE_PRIVATE);
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.putBoolean("configured", true);
-
-    if (configuration.hasKey("apiKey")) {
-      editor.putString("apiKey", configuration.getString("apiKey"));
-    }
-
-    if (configuration.hasKey("endpoint")) {
-      editor.putString("endpoint", configuration.getString("endpoint"));
-    }
-
-    if (configuration.hasKey("autoInstrumentAppStarts")) {
-      editor.putBoolean("autoInstrumentAppStarts", configuration.getBoolean("autoInstrumentAppStarts"));
-    }
-
-    if (configuration.hasKey("autoInstrumentNetworkRequests")) {
-      editor.putBoolean("autoInstrumentNetworkRequests", configuration.getBoolean("autoInstrumentNetworkRequests"));
-    }
-
-    if (configuration.hasKey("maximumBatchSize")) {
-      editor.putInt("maximumBatchSize", configuration.getInt("maximumBatchSize"));
-    }
-
-    if (configuration.hasKey("useWrapperComponentProvider")) {
-      editor.putBoolean("useWrapperComponentProvider", configuration.getBoolean("useWrapperComponentProvider"));
-    }
-
-    if (configuration.hasKey("scenario")) {
-      editor.putString("scenario", configuration.getString("scenario"));
-    }
-
-    editor.commit();
+    BugsnagTestUtils.saveStartupConfig(this.reactContext.getApplicationContext(), configuration.toHashMap());
   }
 
   public WritableMap readStartupConfig() {
-    SharedPreferences sharedPreferences = this.reactContext.getApplicationContext().getSharedPreferences("StartupConfig", Context.MODE_PRIVATE);
-    ;
     try {
-      if (!sharedPreferences.getBoolean("configured", false)) {
+      Map<String, Object> config = BugsnagTestUtils.readStartupConfig(this.reactContext.getApplicationContext());
+
+      if (config == null) {
         return null;
       }
 
       WritableMap startupConfig = Arguments.createMap();
-      startupConfig.putString("apiKey", sharedPreferences.getString("apiKey", ""));
-      startupConfig.putString("endpoint", sharedPreferences.getString("endpoint", ""));
-      startupConfig.putBoolean("autoInstrumentAppStarts", sharedPreferences.getBoolean("autoInstrumentAppStarts", false));
-      startupConfig.putBoolean("autoInstrumentNetworkRequests", sharedPreferences.getBoolean("autoInstrumentNetworkRequests", false));
-      startupConfig.putInt("maximumBatchSize", sharedPreferences.getInt("maximumBatchSize", 100));
-      startupConfig.putBoolean("useWrapperComponentProvider", sharedPreferences.getBoolean("useWrapperComponentProvider", false));
-      startupConfig.putString("scenario", sharedPreferences.getString("scenario", ""));
+      startupConfig.putString("apiKey", (String) config.getOrDefault("apiKey", ""));
+      startupConfig.putString("endpoint", (String) config.getOrDefault("endpoint", ""));
+      startupConfig.putBoolean("autoInstrumentAppStarts", (Boolean) config.getOrDefault("autoInstrumentAppStarts", false));
+      startupConfig.putBoolean("autoInstrumentNetworkRequests", (Boolean) config.getOrDefault("autoInstrumentNetworkRequests", false));
+      startupConfig.putInt("maximumBatchSize", (Integer) config.getOrDefault("maximumBatchSize", 100));
+      startupConfig.putBoolean("useWrapperComponentProvider", (Boolean) config.getOrDefault("useWrapperComponentProvider", false));
+      startupConfig.putString("scenario", (String) config.getOrDefault("scenario", ""));
+      startupConfig.putBoolean("attach", (Boolean) config.getOrDefault("attach", false));
       return startupConfig;
     } finally {
       // make sure we don't leave this config around for the next startup
-      sharedPreferences.edit()
-        .putBoolean("configured", false)
-        .remove("apiKey")
-        .remove("endpoint")
-        .remove("autoInstrumentAppStarts")
-        .remove("autoInstrumentNetworkRequests")
-        .remove("maximumBatchSize")
-        .remove("useWrapperComponentProvider")
-        .remove("scenario")
-        .commit();
+      BugsnagTestUtils.clearStartupConfig(this.reactContext.getApplicationContext());
     }
   }
 
@@ -185,20 +145,11 @@ class ScenarioLauncherImpl {
 
   public void startNativePerformance(ReadableMap configuration, Promise promise) {
     try {
-      PerformanceConfiguration config = PerformanceConfiguration.load(reactContext);
-      config.setApiKey(configuration.getString("apiKey"));
-      config.setEndpoint(configuration.getString("endpoint"));
-      config.setAutoInstrumentAppStarts(false);
-      config.setAutoInstrumentActivities(AutoInstrument.OFF);
-      config.setAutoInstrumentRendering(true);
-      config.addPlugin(new BugsnagNativeSpansPlugin());
-      config.addPlugin(new BugsnagJavascriptSpansPlugin());
-
-      BugsnagPerformance.start(config);
-      Log.d(MODULE_NAME, "Started Android performance");
-
-      promise.resolve(true);
-
+      if (BugsnagTestUtils.startNativePerformance(reactContext.getApplicationContext(), configuration.toHashMap())) {
+        promise.resolve(true);
+      } else {
+        promise.reject(new IllegalStateException("Failed to start native performance, check logs for details"));
+      }
     } catch (Exception e) {
       Log.d(MODULE_NAME, "Failed to start Android performance", e);
       promise.reject(e);

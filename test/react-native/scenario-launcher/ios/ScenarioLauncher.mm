@@ -1,6 +1,7 @@
 #import <Foundation/Foundation.h>
 #import "Bugsnag.h"
 #import "ScenarioLauncher.h"
+#import "BugsnagTestUtils.h"
 
 #ifdef NATIVE_INTEGRATION
 #import <BugsnagPerformance/BugsnagPerformance.h>
@@ -9,7 +10,7 @@
 #import "BugsnagNativeSpansPlugin.h"
 #import "BugsnagJavascriptSpansPlugin.h"
 #import "BugsnagJavascriptSpanQuery.h"
-#import "BugsnagjavascriptSpanControl.h"
+#import "BugsnagJavascriptSpanControl.h"
 #endif
 
 @implementation ScenarioLauncher {
@@ -59,73 +60,17 @@ RCT_EXPORT_METHOD(clearPersistentData) {
 }
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(saveStartupConfig:(NSDictionary *)config) {
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
-  [defaults setBool:YES forKey:@"configured"];
-
-  if (config[@"apiKey"]) {
-    [defaults setObject:config[@"apiKey"] forKey:@"apiKey"];
-  }
-
-  if (config[@"endpoint"]) {
-    [defaults setObject:config[@"endpoint"] forKey:@"endpoint"];
-  }
-
-  if (config[@"autoInstrumentAppStarts"]) {
-    [defaults setBool:[config[@"autoInstrumentAppStarts"] boolValue] forKey:@"autoInstrumentAppStarts"];
-  }
-
-  if (config[@"autoInstrumentNetworkRequests"]) {
-    [defaults setBool:[config[@"autoInstrumentNetworkRequests"] boolValue] forKey:@"autoInstrumentNetworkRequests"];
-  }
-
-  if (config[@"maximumBatchSize"]) {
-    [defaults setInteger:[config[@"maximumBatchSize"] integerValue] forKey:@"maximumBatchSize"];
-  }
-
-  if (config[@"useWrapperComponentProvider"]) {
-    [defaults setBool:[config[@"useWrapperComponentProvider"] boolValue] forKey:@"useWrapperComponentProvider"];
-  }
-
-  if (config[@"scenario"]) {
-    [defaults setObject:config[@"scenario"] forKey:@"scenario"];
-  }
-
-  [defaults synchronize];
-
+  [BugsnagTestUtils saveStartupConfig:config];
   return nil;
 }
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(readStartupConfig) {
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
-  BOOL configured = [defaults boolForKey:@"configured"];
-  if (!configured) {
-    return nil;
+  @try {
+    return [BugsnagTestUtils readStartupConfig];
   }
-
-  NSMutableDictionary *config = [NSMutableDictionary new];
-  config[@"apiKey"] = [defaults objectForKey:@"apiKey"] ? [defaults stringForKey:@"apiKey"] : @"";
-  config[@"endpoint"] = [defaults objectForKey:@"apiKey"] ? [defaults stringForKey:@"endpoint"] : @"";
-  config[@"autoInstrumentAppStarts"] = [NSNumber numberWithBool:[defaults boolForKey:@"autoInstrumentAppStarts"]];
-  config[@"autoInstrumentNetworkRequests"] = [NSNumber numberWithBool:[defaults boolForKey:@"autoInstrumentNetworkRequests"]];
-  config[@"maximumBatchSize"] = [NSNumber numberWithInteger:[defaults integerForKey:@"maximumBatchSize"]];
-  config[@"useWrapperComponentProvider"] = [NSNumber numberWithBool:[defaults boolForKey:@"useWrapperComponentProvider"]];
-  config[@"scenario"] = [defaults objectForKey:@"scenario"] ? [defaults stringForKey:@"scenario"] : @"";
-
-  // make sure we don't leave this config around for the next startup
-  [defaults setBool:NO forKey:@"configured"];
-  [defaults removeObjectForKey:@"apiKey"];
-  [defaults removeObjectForKey:@"endpoint"];
-  [defaults removeObjectForKey:@"autoInstrumentAppStarts"];
-  [defaults removeObjectForKey:@"autoInstrumentNetworkRequests"];
-  [defaults removeObjectForKey:@"maximumBatchSize"];
-  [defaults removeObjectForKey:@"useWrapperComponentProvider"];
-  [defaults removeObjectForKey:@"scenario"];
-
-  [defaults synchronize];
-
-  return config;
+  @finally {
+    [BugsnagTestUtils clearStartupConfig];
+  }
 }
 
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(exitApp) {
@@ -138,26 +83,8 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(exitApp) {
 
 #ifdef NATIVE_INTEGRATION
 RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-  NSLog(@"Starting Cocoa Performance with configuration: %@\n", configuration);
-
-  NSString *apiKey = configuration[@"apiKey"];
-  NSString *endpoint = configuration[@"endpoint"];
-
   dispatch_async(dispatch_get_main_queue(), ^{
-    BugsnagPerformanceConfiguration *config = [BugsnagPerformanceConfiguration loadConfig];
-    config.apiKey = apiKey;
-    config.endpoint = [[NSURL alloc] initWithString: endpoint];
-    config.autoInstrumentAppStarts = NO;
-    config.autoInstrumentViewControllers = NO;
-    config.autoInstrumentNetworkRequests = NO;
-    config.autoInstrumentRendering = YES;
-    config.internal.autoTriggerExportOnBatchSize = 1;
-    config.internal.clearPersistenceOnStart = YES;
-
-    [config addPlugin:[BugsnagNativeSpansPlugin new]];
-    [config addPlugin:[BugsnagJavascriptSpansPlugin new]];
-
-    [BugsnagPerformance startWithConfiguration:config];
+    [BugsnagTestUtils startNativePerformanceWithConfiguration:configuration];
     resolve(nil);
   });
 }
