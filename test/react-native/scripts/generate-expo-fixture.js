@@ -1,88 +1,53 @@
-#!/usr/bin/env node
-
-const { execFileSync, execSync } = require('child_process')
+const { execFileSync } = require('child_process')
 const { resolve } = require('path')
 const fs = require('fs')
 
-if (!process.env.EXPO_VERSION) {
-  console.error('Please provide an Expo version')
-  process.exit(1)
-}
+// Import utilities
+const { ROOT_DIR } = require('./utils/constants')
+const { validateEnvironment } = require('./utils/env-validation')
+const { buildPackages } = require('./utils/build-utils')
+const { cleanDirectory, ensureDirectory } = require('./utils/file-utils')
+const { installFixtureDependencies, getExpoDependencies } = require('./utils/dependency-utils')
+const { buildExpoAndroidFixture, buildExpoIOSFixture } = require('./utils/platform-builds')
 
-if (!process.env.EXPO_EAS_PROJECT_ID) {
-  console.error('EXPO_EAS_PROJECT_ID is not set')
-  process.exit(1)
-}
+// Validate environment variables
+validateEnvironment({
+  EXPO_VERSION: {
+    message: 'Please provide an Expo version'
+  },
+  EXPO_EAS_PROJECT_ID: {
+    message: 'EXPO_EAS_PROJECT_ID is not set'
+  },
+  EXPO_CREDENTIALS_DIR: {
+    message: 'EXPO_CREDENTIALS_DIR is not set'
+  }
+})
 
-if (!process.env.EXPO_CREDENTIALS_DIR) {
-  console.error('EXPO_CREDENTIALS_DIR is not set')
-  process.exit(1)
-}
-
+// Configuration
 const expoVersion = process.env.EXPO_VERSION
-const ROOT_DIR = resolve(__dirname, '../')
-
 const buildDir = resolve(ROOT_DIR, `test/react-native/features/fixtures/generated/expo/${expoVersion}`)
 const easWorkingDir = `${buildDir}/build`
 const fixtureDir = `${buildDir}/test-fixture`
 
-const PACKAGE_NAMES = [
-  '@bugsnag/core-performance',
-  '@bugsnag/delivery-fetch-performance',
-  '@bugsnag/plugin-react-native-navigation-performance',
-  '@bugsnag/plugin-react-navigation-performance',
-  '@bugsnag/react-native-performance',
-  '@bugsnag/request-tracker-performance',
-  '@bugsnag/plugin-named-spans',
-  '@bugsnag/plugin-react-native-span-access',
-]
+// Dependencies
+const fixtureDeps = getExpoDependencies()
 
-const PACKAGE_DIRECTORIES = [
-  `${ROOT_DIR}/packages/core`,
-  `${ROOT_DIR}/packages/delivery-fetch`,
-  `${ROOT_DIR}/packages/platforms/react-native`,
-  `${ROOT_DIR}/packages/plugin-react-native-navigation`,
-  `${ROOT_DIR}/packages/plugin-react-navigation`,
-  `${ROOT_DIR}/packages/request-tracker`,
-  `${ROOT_DIR}/packages/plugin-named-spans`,
-  `${ROOT_DIR}/packages/plugin-react-native-span-access`,
-  `${ROOT_DIR}/test/react-native/features/fixtures/scenario-launcher`
-]
+// Build packages
+buildPackages()
 
-const DEPENDENCIES = [
-  `@bugsnag/react-native`,
-  `@react-native-community/netinfo@11`,
-  `react-native-file-access@3`,
-  'expo-build-properties'
-]
-
-if (!process.env.SKIP_BUILD_PACKAGES) {
-  // run npm ci in the root directory
-  execFileSync('npm', ['ci', ['--no-audit']], { cwd: ROOT_DIR, stdio: 'inherit' })
-
-  // build the packages
-  const buildArgs = ['run', 'build', '--scope', PACKAGE_NAMES.join(' --scope ')]
-  execFileSync('npm', buildArgs, { cwd: ROOT_DIR, stdio: 'inherit', env: { ...process.env, ENABLE_TEST_CONFIGURATION: 1 } })
-}
-
+// Generate fixture
 if (!process.env.SKIP_GENERATE_FIXTURE) {
-  // remove the fixture directory if it already exists
-  if (fs.existsSync(fixtureDir)) {
-    fs.rmSync(fixtureDir, { recursive: true, force: true })
-  }
-
-  if (fs.existsSync(easWorkingDir)) {
-    fs.rmSync(easWorkingDir, { recursive: true, force: true })
-  }
-
-  fs.mkdirSync(fixtureDir, { recursive: true })
+  // Clean directories
+  cleanDirectory(fixtureDir)
+  cleanDirectory(easWorkingDir)
+  ensureDirectory(fixtureDir)
 
   // create the test fixture
   const expoInitArgs = ['create-expo-app', 'test-fixture', '--no-install', '--template', `tabs@${expoVersion}`]
   execFileSync('npx', expoInitArgs, { cwd: buildDir, stdio: 'inherit' })
 
   // install the required packages
-  installFixtureDependencies()
+  installFixtureDependencies(fixtureDir, fixtureDeps, ['--legacy-peer-deps'])
 
   // modify the app.json file
   const appConfig = require(`${fixtureDir}/app.json`)
@@ -178,28 +143,8 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   }
 }
 
-// build Android fixture
-if (process.env.BUILD_ANDROID === 'true' || process.env.BUILD_ANDROID === '1') {
-  const easBuildArgs = ['eas-cli@latest', 'build', '--local', '--platform', 'android', '--profile', 'production', '--output', 'output.apk']
-  execFileSync('npx', easBuildArgs, { cwd: `${fixtureDir}`, stdio: 'inherit', env: { ...process.env, EAS_LOCAL_BUILD_WORKINGDIR: easWorkingDir, EAS_LOCAL_BUILD_SKIP_CLEANUP: 1, EAS_NO_VCS: 1, EAS_PROJECT_ROOT: fixtureDir } })
-}
+// Build platform fixtures
+buildExpoAndroidFixture(fixtureDir, easWorkingDir)
+buildExpoIOSFixture(fixtureDir, easWorkingDir)
 
-// build iOS fixture
-if (process.env.BUILD_IOS === 'true' || process.env.BUILD_IOS === '1') {
-  const easBuildArgs = ['eas-cli@latest', 'build', '--local', '--platform', 'ios', '--profile', 'production', '--output', 'output.ipa', '--non-interactive']
-  execFileSync('npx', easBuildArgs, { cwd: `${fixtureDir}`, stdio: 'inherit', env: { ...process.env, EAS_LOCAL_BUILD_WORKINGDIR: easWorkingDir, EAS_LOCAL_BUILD_SKIP_CLEANUP: 1, EAS_NO_VCS: 1, EAS_PROJECT_ROOT: fixtureDir } })
-}
 
-/** Pack and install local packages from this repo */
-function installFixtureDependencies() {
-  // pack the required packages into the fixture directory
-  for (const package of PACKAGE_DIRECTORIES) {
-    const libraryPackArgs = ['pack', package, '--pack-destination', fixtureDir]
-    execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
-  }
-
-  const fixtureDependencyArgs = DEPENDENCIES.join(' ')
-
-  // install test fixture dependencies and local packages
-  execSync(`npm install ${fixtureDependencyArgs} *.tgz --save --no-audit --legacy-peer-deps`, { cwd: fixtureDir, stdio: 'inherit' })
-}
