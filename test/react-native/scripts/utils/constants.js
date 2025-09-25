@@ -11,7 +11,7 @@ const PACKAGE_DIRECTORIES = [
   `${ROOT_DIR}/packages/plugin-react-navigation`,
   `${ROOT_DIR}/packages/request-tracker`,
   `${ROOT_DIR}/packages/plugin-named-spans`,
-  `${ROOT_DIR}/test/react-native/features/fixtures/scenario-launcher`
+  `${ROOT_DIR}/test/react-native/scenario-launcher`
 ]
 
 module.exports = {
