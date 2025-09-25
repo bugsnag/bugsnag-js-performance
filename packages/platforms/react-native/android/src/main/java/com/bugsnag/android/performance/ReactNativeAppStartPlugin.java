@@ -33,7 +33,7 @@ public class ReactNativeAppStartPlugin implements Plugin {
   private static ReactNativeAppStartPlugin INSTANCE;
 
   private final AtomicReference<ViewLoadCondition> viewLoadCondition = new AtomicReference<>(null);
-  private final AtomicBoolean appStartComplete = new AtomicBoolean(false);
+  private volatile boolean appStartComplete = false;
 
   static ReactNativeAppStartPlugin getInstance() {
     return INSTANCE;
@@ -61,7 +61,7 @@ public class ReactNativeAppStartPlugin implements Plugin {
   }
 
   @Override
-  public  void start() {}
+  public void start() {}
 
   public String getAppStartParent() {
     ViewLoadCondition currentCondition = viewLoadCondition.get();
@@ -81,11 +81,11 @@ public class ReactNativeAppStartPlugin implements Plugin {
       currentCondition.condition.close(endTime);
     }
 
-    appStartComplete.set(true);
+    appStartComplete = true;
   }
 
   private void onSpanStart(Span span) {
-    if (appStartComplete.get()) {
+    if (appStartComplete) {
       return;
     }
 
