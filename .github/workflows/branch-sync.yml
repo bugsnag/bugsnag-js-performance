@@ -21,7 +21,6 @@ jobs:
           source-branch: main
           target-branch: next
           labels: automation
-          draft: true
           reviewers: ${{ secrets.AUTOMATION_REVIEWERS }}
           team-reviewers: ${{ secrets.AUTOMATION_TEAM_REVIEWERS }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
