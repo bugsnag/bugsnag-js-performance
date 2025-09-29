@@ -74,15 +74,28 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     }
   }
 
-  // set usesCleartextTraffic to true for Android
+  // set usesCleartextTraffic to true for Android and install ios test utils pod
   appConfig.expo.plugins.push([
     'expo-build-properties',
     {
       android: {
         usesCleartextTraffic: true
+      },
+      ios: {
+        extraPods: [
+          {
+            name: 'BugsnagTestUtils',
+            path: `${resolve(ROOT_DIR, 'test/react-native/native-test-utils/ios/BugsnagTestUtils.podspec')}`
+          }
+        ]
       }
     }
   ])
+
+  // install android test utils module
+  const configPlugin = resolve(ROOT_DIR, `test/react-native/features/fixtures/expo/withNativeTestUtilsAndroid.js`)
+  fs.copyFileSync(configPlugin, resolve(fixtureDir, 'withNativeTestUtilsAndroid.js'))
+  appConfig.expo.plugins.push('./withNativeTestUtilsAndroid')
 
   // for SDK 50 and below we need to add a config plugin to remove the aps-environment entitlement for iOS
   // TODO: remove this when we drop support for SDK 50
@@ -141,6 +154,10 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   for (const file of credentialsFiles) {
     fs.copyFileSync(resolve(process.env.EXPO_CREDENTIALS_DIR, file), resolve(fixtureDir, file))
   }
+
+  // copy the native test utils into the test fixture directory so EAS can pick them up
+  const nativeTestUtilsDest = resolve(fixtureDir, 'native-test-utils')
+  fs.cpSync(resolve(ROOT_DIR, 'test/react-native/native-test-utils'), nativeTestUtilsDest, { recursive: true })
 }
 
 // Build platform fixtures
