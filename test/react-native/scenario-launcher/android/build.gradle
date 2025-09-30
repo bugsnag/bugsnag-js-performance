@@ -39,4 +39,5 @@ dependencies {
   compileOnly("com.bugsnag:bugsnag-android-performance:1.16.0")
   implementation 'com.facebook.react:react-native'
   implementation project(':bugsnag_plugin-react-native-span-access')
+  implementation project(':bugsnag-test-utils')
 }
