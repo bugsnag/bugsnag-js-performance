@@ -8,7 +8,7 @@ const withNativeTestUtilsAndroid = (config) => {
 
     // assumes native-test-utils has been copied into the fixture directory
     const dependencyPath = 'project(":bugsnag-test-utils").projectDir = file("../native-test-utils/android")';
-    config.modResults.contents = `${settingsGradleContent}\n${includeDependency}\n${dependencyPath}`;
+
     // Check if the module is already included to avoid duplicates
     if (!settingsGradleContent.includes('bugsnag-test-utils')) {
       config.modResults.contents = `${settingsGradleContent}\n${includeDependency}\n${dependencyPath}`;
