@@ -5,6 +5,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface BugsnagTestUtils : NSObject
 
 /**
+ * Starts native performance if a startup configuration has been saved.
+ * This method reads the saved configuration and starts native performance if one exists.
+ */
++ (void)startNativePerformanceIfConfigured;
+
+/**
  * Get the startup configuration from a previous launch.
  * 
  * @return NSDictionary containing the startup configuration, or nil if no configuration is saved

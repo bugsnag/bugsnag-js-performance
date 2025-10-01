@@ -23,6 +23,15 @@ public class BugsnagTestUtils {
     private static final String TAG = "BugsnagTestUtils";
     private static final String PREFS_NAME = "StartupConfig";
 
+    public static void startNativePerformanceIfConfigured(Context context) {
+        Map<String, Object> config = readStartupConfig(context);
+        if (config != null) {
+            startNativePerformance(context, config);
+        } else {
+            Log.d(TAG, "No startup configuration found, skipping native performance start");
+        }
+    }
+
     /**
      * Reads the startup configuration that was previously saved by the ScenarioLauncher.
      * 

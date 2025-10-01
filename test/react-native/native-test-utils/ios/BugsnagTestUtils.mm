@@ -10,6 +10,15 @@
 
 @implementation BugsnagTestUtils
 
++ (void)startNativePerformanceIfConfigured {
+    NSDictionary *config = [self readStartupConfig];
+    if (config) {
+        [self startNativePerformanceWithConfiguration:config];
+    } else {
+        NSLog(@"[BugsnagTestUtils] No startup configuration found, skipping native performance start");
+    }
+}
+
 + (nullable NSDictionary *)readStartupConfig {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     

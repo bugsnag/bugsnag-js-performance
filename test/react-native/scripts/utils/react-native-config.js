@@ -194,12 +194,134 @@ function installCocoaPerformance (fixtureDir) {
 /**
  * Configure React Native Navigation (Wix)
  */
-function configureReactNativeNavigation (fixtureDir) {
-  execSync('npx rnn-link', { cwd: fixtureDir, stdio: 'inherit' })
+function configureReactNativeNavigation (fixtureDir) {/* Lines 198-203 omitted */}
 
-  // update the kotlin version to 1.8.0 in the android build.gradle file (required for Android Performance)
-  const gradlePath = resolve(fixtureDir, 'android/build.gradle')
-  replaceInFile(gradlePath, /RNNKotlinVersion = "[^"]+"/, 'RNNKotlinVersion = "1.8.0"')
+/**
+ * Configure MainApplication to import BugsnagTestUtils and call startNativePerformance
+ */
+function configureMainApplicationForTestUtils (fixtureDir, reactNativeVersion) {
+  const fileExtension = parseFloat(reactNativeVersion) < 0.73 ? 'java' : 'kt'
+  const mainApplicationPath = `${fixtureDir}/android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainApplication.${fileExtension}`
+  
+  if (!fs.existsSync(mainApplicationPath)) {
+    console.warn(`MainApplication file not found at ${mainApplicationPath}`)
+    return
+  }
+  
+  let fileContents = fs.readFileSync(mainApplicationPath, 'utf8')
+  
+  if (fileExtension === 'java') {
+    // Add import for Java files
+    const importStatement = 'import com.bugsnag.testutils.BugsnagTestUtils;'
+    if (!fileContents.includes(importStatement)) {
+      // Find the last import statement and add our import after it
+      const lastImportMatch = fileContents.match(/import\s+[^;]+;/g)
+      if (lastImportMatch) {
+        const lastImport = lastImportMatch[lastImportMatch.length - 1]
+        fileContents = fileContents.replace(lastImport, `${lastImport}\n${importStatement}`)
+      }
+    }
+    
+    // Add BugsnagTestUtils.startNativePerformanceIfConfigured() call after super.onCreate()
+    const methodCallPattern = /super\.onCreate\(\);/
+    const methodCall = 'BugsnagTestUtils.startNativePerformanceIfConfigured();'
+    if (methodCallPattern.test(fileContents) && !fileContents.includes(methodCall)) {
+      fileContents = fileContents.replace(methodCallPattern, `super.onCreate();\n    ${methodCall}`)
+    }
+  } else {
+    // Add import for Kotlin files
+    const importStatement = 'import com.bugsnag.testutils.BugsnagTestUtils'
+    if (!fileContents.includes(importStatement)) {
+      // Find the last import statement and add our import after it
+      const lastImportMatch = fileContents.match(/import\s+[^\n]+/g)
+      if (lastImportMatch) {
+        const lastImport = lastImportMatch[lastImportMatch.length - 1]
+        fileContents = fileContents.replace(lastImport, `${lastImport}\n${importStatement}`)
+      }
+    }
+    
+    // Add BugsnagTestUtils.startNativePerformanceIfConfigured() call after super.onCreate()
+    const methodCallPattern = /super\.onCreate\(\)/
+    const methodCall = 'BugsnagTestUtils.startNativePerformanceIfConfigured()'
+    if (methodCallPattern.test(fileContents) && !fileContents.includes(methodCall)) {
+      fileContents = fileContents.replace(methodCallPattern, `super.onCreate()\n    ${methodCall}`)
+    }
+  }
+  
+  fs.writeFileSync(mainApplicationPath, fileContents)
+}
+
+/**
+ * Configure AppDelegate to import BugsnagTestUtils and call startNativePerformance
+ */
+function configureAppDelegateForTestUtils (fixtureDir, reactNativeVersion) {
+  // Determine file type based on React Native version
+  const isSwift = parseFloat(reactNativeVersion) >= 0.78
+  const fileExtension = isSwift ? 'swift' : (parseFloat(reactNativeVersion) >= 0.72 ? 'mm' : 'm')
+  const appDelegatePath = `${fixtureDir}/ios/reactnative/AppDelegate.${fileExtension}`
+  
+  if (!fs.existsSync(appDelegatePath)) {
+    console.warn(`AppDelegate file not found at ${appDelegatePath}`)
+    return
+  }
+  
+  let fileContents = fs.readFileSync(appDelegatePath, 'utf8')
+  
+  if (isSwift) {
+    // Add import for Swift files
+    const importStatement = 'import BugsnagTestUtils'
+    if (!fileContents.includes(importStatement)) {
+      // Find the last import statement and add our import after it
+      const lastImportMatch = fileContents.match(/import\s+[^\n]+/g)
+      if (lastImportMatch) {
+        const lastImport = lastImportMatch[lastImportMatch.length - 1]
+        fileContents = fileContents.replace(lastImport, `${lastImport}\n${importStatement}`)
+      }
+    }
+    
+    // Add BugsnagTestUtils.startNativePerformanceIfConfigured() call in didFinishLaunchingWithOptions
+    const methodCall = 'BugsnagTestUtils.startNativePerformanceIfConfigured()'
+    if (!fileContents.includes(methodCall)) {
+      // For 0.78 pattern: find after self.initialProps = [:]
+      if (fileContents.includes('self.initialProps = [:]')) {
+        const pattern = /self\.initialProps = \[:]/
+        fileContents = fileContents.replace(pattern, `self.initialProps = [:]\n\n    ${methodCall}`)
+      }
+      // For 0.79+ pattern: find after delegate.dependencyProvider = RCTAppDependencyProvider()
+      else if (fileContents.includes('delegate.dependencyProvider = RCTAppDependencyProvider()')) {
+        const pattern = /delegate\.dependencyProvider = RCTAppDependencyProvider\(\)/
+        fileContents = fileContents.replace(pattern, `delegate.dependencyProvider = RCTAppDependencyProvider()\n\n    ${methodCall}`)
+      }
+    }
+  } else {
+    // Add import for Objective-C files
+    const importStatement = '#import <BugsnagTestUtils/BugsnagTestUtils.h>'
+    if (!fileContents.includes(importStatement)) {
+      // Find the last #import statement and add our import after it
+      const lastImportMatch = fileContents.match(/#import\s+[^\n]+/g)
+      if (lastImportMatch) {
+        const lastImport = lastImportMatch[lastImportMatch.length - 1]
+        fileContents = fileContents.replace(lastImport, `${lastImport}\n${importStatement}`)
+      }
+    }
+    
+    // Add [BugsnagTestUtils startNativePerformanceIfConfigured] call in didFinishLaunchingWithOptions
+    const methodCall = '[BugsnagTestUtils startNativePerformanceIfConfigured];'
+    if (!fileContents.includes(methodCall)) {
+      // For .m files: find after #ifdef FB_SONARKIT_ENABLED block
+      if (fileContents.includes('#ifdef FB_SONARKIT_ENABLED')) {
+        const pattern = /(#ifdef FB_SONARKIT_ENABLED\s+InitializeFlipper\(application\);\s+#endif)/
+        fileContents = fileContents.replace(pattern, `$1\n\n  ${methodCall}`)
+      }
+      // For .mm files: find after self.initialProps = @{};
+      else if (fileContents.includes('self.initialProps = @{};')) {
+        const pattern = /self\.initialProps = @\{\};/
+        fileContents = fileContents.replace(pattern, `self.initialProps = @{};\n\n  ${methodCall}`)
+      }
+    }
+  }
+  
+  fs.writeFileSync(appDelegatePath, fileContents)
 }
 
 module.exports = {
@@ -211,5 +333,7 @@ module.exports = {
   installCocoaPerformance,
   configureReactNativeNavigation,
   installNativeTestUtilsAndroid,
-  installNativeTestUtilsIOS
+  installNativeTestUtilsIOS,
+  configureMainApplicationForTestUtils,
+  configureAppDelegateForTestUtils
 }
