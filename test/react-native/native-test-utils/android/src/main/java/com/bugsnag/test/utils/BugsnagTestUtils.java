@@ -4,6 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Iterator;
+
 import com.bugsnag.android.performance.AutoInstrument;
 import com.bugsnag.android.performance.BugsnagPerformance;
 import com.bugsnag.android.performance.PerformanceConfiguration;
@@ -46,14 +51,17 @@ public class BugsnagTestUtils {
             return null;
         }
 
-        Map<String, Object> startupConfig = new HashMap<>();
-        startupConfig.put("apiKey", sharedPreferences.getString("apiKey", ""));
-        startupConfig.put("endpoint", sharedPreferences.getString("endpoint", ""));
-        startupConfig.put("autoInstrumentAppStarts", sharedPreferences.getBoolean("autoInstrumentAppStarts", false));
-        startupConfig.put("autoInstrumentNetworkRequests", sharedPreferences.getBoolean("autoInstrumentNetworkRequests", false));
-        startupConfig.put("maximumBatchSize", sharedPreferences.getInt("maximumBatchSize", 100));
-        startupConfig.put("useWrapperComponentProvider", sharedPreferences.getBoolean("useWrapperComponentProvider", false));
-        startupConfig.put("scenario", sharedPreferences.getString("scenario", ""));
+        String configJson = sharedPreferences.getString("startupConfig", null);
+        if (configJson == null) {
+            Log.d(TAG, "Configuration flag set but no configuration JSON found");
+            return null;
+        }
+
+        Map<String, Object> startupConfig = jsonToMap(configJson);
+        if (startupConfig == null) {
+            Log.e(TAG, "Failed to parse configuration JSON");
+            return null;
+        }
 
         Log.d(TAG, "Read startup configuration: " + startupConfig);
         
@@ -69,51 +77,18 @@ public class BugsnagTestUtils {
     public static void saveStartupConfig(Context context, Map<String, Object> configuration) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("configured", true);
-
-        if (configuration.containsKey("apiKey")) {
-            Object value = configuration.get("apiKey");
-            if (value instanceof String) {
-                editor.putString("apiKey", (String) value);
-            }
+        
+        String configJson = mapToJson(configuration);
+        if (configJson != null) {
+            editor.putBoolean("configured", true);
+            editor.putString("startupConfig", configJson);
+            editor.commit();
+            Log.d(TAG, "Saved startup configuration: " + configuration);
+        } else {
+            Log.e(TAG, "Failed to serialize configuration to JSON");
         }
-
-        if (configuration.containsKey("endpoint")) {
-            Object value = configuration.get("endpoint");
-            if (value instanceof String) {
-                editor.putString("endpoint", (String) value);
-            }
-        }
-
-        if (configuration.containsKey("autoInstrumentAppStarts")) {
-            Boolean value = getBooleanValue(configuration, "autoInstrumentAppStarts", false);
-            editor.putBoolean("autoInstrumentAppStarts", value);
-        }
-
-        if (configuration.containsKey("autoInstrumentNetworkRequests")) {
-            Boolean value = getBooleanValue(configuration, "autoInstrumentNetworkRequests", false);
-            editor.putBoolean("autoInstrumentNetworkRequests", value);
-        }
-
-        if (configuration.containsKey("maximumBatchSize")) {
-            Integer value = getIntegerValue(configuration, "maximumBatchSize", 100);
-            editor.putInt("maximumBatchSize", value);
-        }
-
-        if (configuration.containsKey("useWrapperComponentProvider")) {
-            Boolean value = getBooleanValue(configuration, "useWrapperComponentProvider", false);
-            editor.putBoolean("useWrapperComponentProvider", value);
-        }
-
-        if (configuration.containsKey("scenario")) {
-            Object value = configuration.get("scenario");
-            if (value instanceof String) {
-                editor.putString("scenario", (String) value);
-            }
-        }
-
-        editor.commit();
     }
+
 
     /**
      * Starts the native Bugsnag Performance SDK with the provided configuration.
@@ -153,33 +128,71 @@ public class BugsnagTestUtils {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("configured", false)
-              .remove("apiKey")
-              .remove("endpoint")
-              .remove("autoInstrumentAppStarts")
-              .remove("autoInstrumentNetworkRequests")
-              .remove("maximumBatchSize")
-              .remove("useWrapperComponentProvider")
-              .remove("scenario")
-              .remove("attach")
+              .remove("startupConfig")
               .commit();
     }
 
-    private static Boolean getBooleanValue(Map<String, Object> config, String key, Boolean defaultValue) {
-        Object value = config.get(key);
-        if (value instanceof Boolean) {
-            return (Boolean) value;
+    /**
+     * Converts a Map to JSON string for storage in SharedPreferences.
+     */
+    private static String mapToJson(Map<String, Object> map) {
+        try {
+            JSONObject jsonObject = convertMapToJSONObject(map);
+            return jsonObject.toString();
+        } catch (JSONException e) {
+            Log.e(TAG, "Error converting map to JSON", e);
+            return null;
         }
-        return defaultValue;
     }
 
-    private static Integer getIntegerValue(Map<String, Object> config, String key, Integer defaultValue) {
-        Object value = config.get(key);
-        if (value instanceof Integer) {
-            return (Integer) value;
+    /**
+     * Recursively converts a Map to a JSONObject, handling nested Maps properly.
+     */
+    private static JSONObject convertMapToJSONObject(Map<String, Object> map) throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Map) {
+                // Recursively convert nested Maps to JSONObjects
+                value = convertMapToJSONObject((Map<String, Object>) value);
+            }
+            jsonObject.put(entry.getKey(), value);
         }
-        if (value instanceof Number) {
-            return ((Number) value).intValue();
+        return jsonObject;
+    }
+
+    /**
+     * Converts a JSON string back to a Map.
+     */
+    private static Map<String, Object> jsonToMap(String jsonString) {
+        try {
+            JSONObject jsonObject = new JSONObject(jsonString);
+            return convertJSONObjectToMap(jsonObject);
+        } catch (JSONException e) {
+            Log.e(TAG, "Error converting JSON to map", e);
+            return null;
         }
-        return defaultValue;
+    }
+
+    /**
+     * Recursively converts a JSONObject to a Map, handling nested JSONObjects properly.
+     */
+    private static Map<String, Object> convertJSONObjectToMap(JSONObject jsonObject) throws JSONException {
+        Map<String, Object> map = new HashMap<>();
+        
+        Iterator<String> keys = jsonObject.keys();
+        while (keys.hasNext()) {
+            String key = keys.next();
+            Object value = jsonObject.get(key);
+            
+            // Handle nested JSONObjects by converting them to Maps
+            if (value instanceof JSONObject) {
+                value = convertJSONObjectToMap((JSONObject) value);
+            }
+            
+            map.put(key, value);
+        }
+        
+        return map;
     }
 }

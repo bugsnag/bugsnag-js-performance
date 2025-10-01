@@ -28,67 +28,29 @@
         return nil;
     }
     
-    NSMutableDictionary *config = [NSMutableDictionary new];
-    config[@"apiKey"] = [defaults objectForKey:@"apiKey"] ? [defaults stringForKey:@"apiKey"] : @"";
-    config[@"endpoint"] = [defaults objectForKey:@"endpoint"] ? [defaults stringForKey:@"endpoint"] : @"";
-    config[@"autoInstrumentAppStarts"] = @([defaults boolForKey:@"autoInstrumentAppStarts"]);
-    config[@"autoInstrumentNetworkRequests"] = @([defaults boolForKey:@"autoInstrumentNetworkRequests"]);
-    config[@"maximumBatchSize"] = @([defaults integerForKey:@"maximumBatchSize"]);
-    config[@"useWrapperComponentProvider"] = @([defaults boolForKey:@"useWrapperComponentProvider"]);
-    config[@"scenario"] = [defaults objectForKey:@"scenario"] ? [defaults stringForKey:@"scenario"] : @"";
-    config[@"attach"] = @([defaults boolForKey:@"attach"]);
+    NSDictionary *config = [defaults dictionaryForKey:@"startupConfig"];
+    if (!config) {
+        NSLog(@"[BugsnagTestUtils] Configuration flag set but no configuration dictionary found");
+        return nil;
+    }
     
     NSLog(@"[BugsnagTestUtils] Read startup configuration: %@", config);
 
-    return [config copy];
+    return config;
 }
 
 + (void)saveStartupConfig:(NSDictionary *)configuration {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
     [defaults setBool:YES forKey:@"configured"];
-
-    if (configuration[@"apiKey"]) {
-      [defaults setObject:configuration[@"apiKey"] forKey:@"apiKey"];
-    }
-
-    if (configuration[@"endpoint"]) {
-      [defaults setObject:configuration[@"endpoint"] forKey:@"endpoint"];
-    }
-
-    if (configuration[@"autoInstrumentAppStarts"]) {
-      [defaults setBool:[configuration[@"autoInstrumentAppStarts"] boolValue] forKey:@"autoInstrumentAppStarts"];
-    }
-
-    if (configuration[@"autoInstrumentNetworkRequests"]) {
-      [defaults setBool:[configuration[@"autoInstrumentNetworkRequests"] boolValue] forKey:@"autoInstrumentNetworkRequests"];
-    }
-
-    if (configuration[@"maximumBatchSize"]) {
-      [defaults setInteger:[configuration[@"maximumBatchSize"] integerValue] forKey:@"maximumBatchSize"];
-    }
-
-    if (configuration[@"useWrapperComponentProvider"]) {
-      [defaults setBool:[configuration[@"useWrapperComponentProvider"] boolValue] forKey:@"useWrapperComponentProvider"];
-    }
-
-    if (configuration[@"scenario"]) {
-      [defaults setObject:configuration[@"scenario"] forKey:@"scenario"];
-    }
-
+    [defaults setObject:configuration forKey:@"startupConfig"];
     [defaults synchronize];
 }
 
 + (void)clearStartupConfig {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setBool:NO forKey:@"configured"];
-    [defaults removeObjectForKey:@"apiKey"];
-    [defaults removeObjectForKey:@"endpoint"];
-    [defaults removeObjectForKey:@"autoInstrumentAppStarts"];
-    [defaults removeObjectForKey:@"autoInstrumentNetworkRequests"];
-    [defaults removeObjectForKey:@"maximumBatchSize"];
-    [defaults removeObjectForKey:@"useWrapperComponentProvider"];
-    [defaults removeObjectForKey:@"scenario"];
+    [defaults removeObjectForKey:@"startupConfig"];
     [defaults synchronize];
 }
 
