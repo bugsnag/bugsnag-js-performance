@@ -345,7 +345,7 @@ describe('ReactNativeSpanFactory', () => {
 
       spanFactory.startAppStartSpan(123)
       spanFactory.endAppStartSpan(321)
-      expect(NativeBugsnagPerformance.endNativeAppStart).toHaveBeenCalledWith(321)
+      expect(NativeBugsnagPerformance.endNativeAppStart).toHaveBeenCalledWith(clock.toUnixNanoseconds(321))
     })
 
     it('does not call endNativeAppStart when native context is undefined', () => {
