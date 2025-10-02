@@ -14,6 +14,10 @@ Pod::Spec.new do |spec|
   spec.source_files = "*.{h,m,mm}"
   spec.public_header_files = "*.h"
 
+  spec.pod_target_xcconfig = {
+    "DEFINES_MODULE" => "YES"
+  }
+
   if ENV["NATIVE_INTEGRATION"] == "1"
     spec.compiler_flags = "$(inherited)", "-DNATIVE_INTEGRATION=1"
   end
