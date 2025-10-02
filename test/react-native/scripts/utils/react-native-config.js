@@ -303,12 +303,8 @@ function configureAppDelegateForTestUtils (fixtureDir, reactNativeVersion) {
     // Add import for Objective-C files
     const importStatement = '#import <BugsnagTestUtils/BugsnagTestUtils.h>'
     if (!fileContents.includes(importStatement)) {
-      // Find the last #import statement and add our import after it
-      const lastImportMatch = fileContents.match(/#import\s+[^\n]+/g)
-      if (lastImportMatch) {
-        const lastImport = lastImportMatch[lastImportMatch.length - 1]
-        fileContents = fileContents.replace(lastImport, `${lastImport}\n${importStatement}`)
-      }
+      // Add the import statement at the top of the file
+      fileContents = `${importStatement}\n${fileContents}`
     }
     
     // Add [BugsnagTestUtils startNativePerformanceIfConfigured] call in didFinishLaunchingWithOptions
