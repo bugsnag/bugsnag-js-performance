@@ -90,7 +90,12 @@ export function launchFromStartupConfig () {
 
   if (startupConfig) {
     startupConfig.wrapperComponentProvider = startupConfig.useWrapperComponentProvider ? wrapperComponentProvider : null
-    BugsnagPerformance.start(startupConfig)
+
+    if (startupConfig.attach) {
+      BugsnagPerformance.attach(startupConfig)
+    } else {
+      BugsnagPerformance.start(startupConfig)
+    }
   }
 
   return startupConfig

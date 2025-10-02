@@ -12,11 +12,18 @@
 
 + (void)startNativePerformanceIfConfigured {
     NSDictionary *config = [self readStartupConfig];
-    if (config) {
-        [self startNativePerformanceWithConfiguration:config];
-    } else {
+    if (!config) {
         NSLog(@"[BugsnagTestUtils] No startup configuration found, skipping native performance start");
+        return;
     }
+    
+    NSDictionary *nativeConfig = config[@"native"];
+    if (![nativeConfig isKindOfClass:[NSDictionary class]]) {
+        NSLog(@"[BugsnagTestUtils] No native configuration found, skipping native performance start");
+        return;
+    }
+    
+    [self startNativePerformanceWithConfiguration:nativeConfig];
 }
 
 + (nullable NSDictionary *)readStartupConfig {
@@ -64,10 +71,14 @@
             NSString *apiKey = configuration[@"apiKey"];
             NSString *endpoint = configuration[@"endpoint"];
 
+            // get autoInstrumentAppStarts boolean value from configuration dictionary
+            BOOL autoInstrumentAppStarts = [configuration[@"autoInstrumentAppStarts"] boolValue];
+            BOOL autoInstrumentViewLoads = [configuration[@"autoInstrumentViewLoads"] boolValue];
+
             config.apiKey = apiKey;
             config.endpoint = [[NSURL alloc] initWithString:endpoint];
-            config.autoInstrumentAppStarts = NO;
-            config.autoInstrumentViewControllers = NO;
+            config.autoInstrumentAppStarts = autoInstrumentAppStarts;
+            config.autoInstrumentViewControllers = autoInstrumentViewLoads;
             config.autoInstrumentNetworkRequests = NO;
             config.autoInstrumentRendering = YES;
             config.internal.autoTriggerExportOnBatchSize = 1;
@@ -75,6 +86,7 @@
 
             [config addPlugin:[BugsnagNativeSpansPlugin new]];
             [config addPlugin:[BugsnagJavascriptSpansPlugin new]];
+            // [config addPlugin:[ReactNativeAppStartPlugin new]];
 
             [BugsnagPerformance startWithConfiguration:config];
             

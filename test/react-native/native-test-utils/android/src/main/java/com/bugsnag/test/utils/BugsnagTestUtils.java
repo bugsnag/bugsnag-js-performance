@@ -30,11 +30,19 @@ public class BugsnagTestUtils {
 
     public static void startNativePerformanceIfConfigured(Context context) {
         Map<String, Object> config = readStartupConfig(context);
-        if (config != null) {
-            startNativePerformance(context, config);
-        } else {
+        if (config == null) {
             Log.d(TAG, "No startup configuration found, skipping native performance start");
+            return;
         }
+
+        Object nativeConfigObj = config.get("native");
+        if (!(nativeConfigObj instanceof Map)) {
+            Log.d(TAG, "No native configuration found, skipping native performance start");
+            return;
+        }
+
+        Map<String, Object> nativeConfig = (Map<String, Object>) nativeConfigObj;
+        startNativePerformance(context, nativeConfig);
     }
 
     /**
@@ -105,14 +113,16 @@ public class BugsnagTestUtils {
 
             String apiKey = (String)configuration.get("apiKey");
             String endpoint = (String)configuration.get("endpoint");
-            
+            Boolean autoInstrumentAppStarts = (Boolean)configuration.getOrDefault("autoInstrumentAppStarts", false);
+            Boolean autoInstrumentViewLoads = (Boolean)configuration.getOrDefault("autoInstrumentViewLoads", false);
             config.setApiKey(apiKey);
             config.setEndpoint(endpoint);
-            config.setAutoInstrumentAppStarts(false);
-            config.setAutoInstrumentActivities(AutoInstrument.OFF);
+            config.setAutoInstrumentAppStarts(autoInstrumentAppStarts);
+            config.setAutoInstrumentActivities(autoInstrumentViewLoads ? AutoInstrument.FULL : AutoInstrument.OFF);
             config.setAutoInstrumentRendering(true);
             config.addPlugin(new BugsnagNativeSpansPlugin());
             config.addPlugin(new BugsnagJavascriptSpansPlugin());
+            config.addPlugin(new ReactNativeAppStartPlugin());
 
             BugsnagPerformance.start(config);
             Log.d(TAG, "Native performance started successfully");

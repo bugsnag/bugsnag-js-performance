@@ -194,7 +194,13 @@ function installCocoaPerformance (fixtureDir) {
 /**
  * Configure React Native Navigation (Wix)
  */
-function configureReactNativeNavigation (fixtureDir) {/* Lines 198-203 omitted */}
+function configureReactNativeNavigation (fixtureDir) {
+  execSync('npx rnn-link', { cwd: fixtureDir, stdio: 'inherit' })
+
+  // update the kotlin version to 1.8.0 in the android build.gradle file (required for Android Performance)
+  const gradlePath = resolve(fixtureDir, 'android/build.gradle')
+  replaceInFile(gradlePath, /RNNKotlinVersion = "[^"]+"/, 'RNNKotlinVersion = "1.8.0"')
+}
 
 /**
  * Configure MainApplication to import BugsnagTestUtils and call startNativePerformance
@@ -212,7 +218,7 @@ function configureMainApplicationForTestUtils (fixtureDir, reactNativeVersion) {
   
   if (fileExtension === 'java') {
     // Add import for Java files
-    const importStatement = 'import com.bugsnag.testutils.BugsnagTestUtils;'
+    const importStatement = 'import com.bugsnag.test.utils.BugsnagTestUtils;'
     if (!fileContents.includes(importStatement)) {
       // Find the last import statement and add our import after it
       const lastImportMatch = fileContents.match(/import\s+[^;]+;/g)
@@ -224,13 +230,13 @@ function configureMainApplicationForTestUtils (fixtureDir, reactNativeVersion) {
     
     // Add BugsnagTestUtils.startNativePerformanceIfConfigured() call after super.onCreate()
     const methodCallPattern = /super\.onCreate\(\);/
-    const methodCall = 'BugsnagTestUtils.startNativePerformanceIfConfigured();'
+    const methodCall = 'BugsnagTestUtils.startNativePerformanceIfConfigured(this);'
     if (methodCallPattern.test(fileContents) && !fileContents.includes(methodCall)) {
       fileContents = fileContents.replace(methodCallPattern, `super.onCreate();\n    ${methodCall}`)
     }
   } else {
     // Add import for Kotlin files
-    const importStatement = 'import com.bugsnag.testutils.BugsnagTestUtils'
+    const importStatement = 'import com.bugsnag.test.utils.BugsnagTestUtils'
     if (!fileContents.includes(importStatement)) {
       // Find the last import statement and add our import after it
       const lastImportMatch = fileContents.match(/import\s+[^\n]+/g)
@@ -242,7 +248,7 @@ function configureMainApplicationForTestUtils (fixtureDir, reactNativeVersion) {
     
     // Add BugsnagTestUtils.startNativePerformanceIfConfigured() call after super.onCreate()
     const methodCallPattern = /super\.onCreate\(\)/
-    const methodCall = 'BugsnagTestUtils.startNativePerformanceIfConfigured()'
+    const methodCall = 'BugsnagTestUtils.startNativePerformanceIfConfigured(this)'
     if (methodCallPattern.test(fileContents) && !fileContents.includes(methodCall)) {
       fileContents = fileContents.replace(methodCallPattern, `super.onCreate()\n    ${methodCall}`)
     }
