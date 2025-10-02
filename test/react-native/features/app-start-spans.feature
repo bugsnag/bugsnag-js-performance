@@ -103,8 +103,17 @@ Feature: App Start spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.app_start.name" equals "AppStartSpanControlScenario"
 
   @native_integration @android_only
-  Scenario: App start spans are children of native view load spans
+  Scenario: Automatic app start spans can be nested under native view load spans
     When I run 'NativeAppStartScenario'
+    And I relaunch the app after shutdown
+
+    And I wait to receive 2 sampling requests
+    And I wait to receive 2 traces
+    And a span named '[AppStart/ReactNativeInit]' has a parent named '[ViewLoad/Activity]MainActivity'
+
+  @native_integration @android_only
+  Scenario: Manual app start spans can be nested under native view load spans
+    When I run 'NativeManualAppStartScenario'
     And I relaunch the app after shutdown
 
     And I wait to receive 2 sampling requests
