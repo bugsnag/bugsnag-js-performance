@@ -27,7 +27,7 @@ export type NativeConfiguration = {
   attributeCountLimit: number
   attributeStringValueLimit: number
   attributeArrayLengthLimit: number
-  nativeParentContext: string | undefined
+  appStartParentContext: string | undefined
 }
 
 export type ParentContext = {
