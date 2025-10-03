@@ -62,7 +62,7 @@ function installNativeTestUtilsIOS(fixtureDir) {
  */
 function installCocoaPerformance (fixtureDir) {
   const podfilePath = resolve(fixtureDir, 'ios/Podfile')
-  const performancePod = "pod 'BugsnagPerformance'"
+  const performancePod = "pod 'BugsnagPerformance', :git => 'https://github.com/bugsnag/bugsnag-cocoa-performance.git', :branch => 'integration/v2'"
   const targetSection = 'target \'reactnative\' do'
 
   replaceInFile(podfilePath, targetSection, `${targetSection}\n  ${performancePod}`)
