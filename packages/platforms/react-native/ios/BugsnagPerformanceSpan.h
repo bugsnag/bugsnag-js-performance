@@ -1,5 +1,6 @@
 // Copied from BugsnagPerformanceSpan.h in bugsnag-cocoa-performance
 #import "BugsnagPerformanceSpanContext.h"
+#import "BugsnagPerformanceSpanCondition.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -25,6 +26,8 @@ OBJC_EXPORT
 - (void)endWithEndTime:(NSDate *)endTime NS_SWIFT_NAME(end(endTime:));
 
 - (void)setAttribute:(NSString *)attributeName withValue:(_Nullable id)value;
+
+- (BugsnagPerformanceSpanCondition *_Nullable)blockWithTimeout:(NSTimeInterval)timeout NS_SWIFT_NAME(block(timeout:));
 
 #pragma mark Private APIs (BugsnagPerformanceSpan+Private.h)
 

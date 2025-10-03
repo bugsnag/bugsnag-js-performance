@@ -1,3 +1,4 @@
+#import "BugsnagReactNativeAppStartPlugin+Private.h"
 #import "BugsnagReactNativePerformance.h"
 #import "BugsnagReactNativePerformanceCrossTalkAPIClient.h"
 #import "ReactNativeSpanAttributes.h"
@@ -286,6 +287,14 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(attachToNativeSDK) {
         config[@"enabledReleaseStages"] = [nativeConfig.enabledReleaseStages allObjects];
     }
 
+    BugsnagReactNativeAppStartPlugin *plugin = [BugsnagReactNativeAppStartPlugin singleton];
+    if (plugin != nil) {
+        NSString *appStartParent = [plugin getAppStartParent];
+        if (appStartParent != nil) {
+            config[@"appStartParentContext"] = appStartParent;
+        }
+    }
+
     return config;
 }
 
@@ -403,6 +412,11 @@ RCT_EXPORT_METHOD(discardNativeSpan:(NSString *)spanId
 RCT_EXPORT_METHOD(endNativeAppStart:(double)endTime
                 resolve:(RCTPromiseResolveBlock)resolve
                 reject:(RCTPromiseRejectBlock)reject) {
+    BugsnagReactNativeAppStartPlugin *plugin = [BugsnagReactNativeAppStartPlugin singleton];
+    if (plugin != nil) {
+        NSDate *nativeEndTime = [NSDate dateWithTimeIntervalSince1970: endTime / NSEC_PER_SEC];
+        [plugin endAppStart:nativeEndTime];
+    }
     resolve(nil);
 }
 
