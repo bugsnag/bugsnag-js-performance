@@ -12,6 +12,8 @@ const buildUtils = require('./build-utils')
 const fileUtils = require('./file-utils')
 const dependencyUtils = require('./dependency-utils')
 const reactNativeConfig = require('./react-native-config')
+const androidUtils = require('./android-utils')
+const iosUtils = require('./ios-utils')
 const rn064Config = require('./rn-064-config')
 const platformBuilds = require('./platform-builds')
 
@@ -22,6 +24,8 @@ module.exports = {
   ...fileUtils,
   ...dependencyUtils,
   ...reactNativeConfig,
+  ...androidUtils,
+  ...iosUtils,
   ...rn064Config,
   ...platformBuilds
 }
