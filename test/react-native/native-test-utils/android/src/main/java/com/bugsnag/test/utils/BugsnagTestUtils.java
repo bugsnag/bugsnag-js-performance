@@ -113,8 +113,8 @@ public class BugsnagTestUtils {
 
             String apiKey = (String)configuration.get("apiKey");
             String endpoint = (String)configuration.get("endpoint");
-            Boolean autoInstrumentAppStarts = (Boolean)configuration.getOrDefault("autoInstrumentAppStarts", false);
-            Boolean autoInstrumentViewLoads = (Boolean)configuration.getOrDefault("autoInstrumentViewLoads", false);
+            boolean autoInstrumentAppStarts = Boolean.TRUE.equals(configuration.get("autoInstrumentAppStarts"));
+            boolean autoInstrumentViewLoads = Boolean.TRUE.equals(configuration.get("autoInstrumentViewLoads"));
             config.setApiKey(apiKey);
             config.setEndpoint(endpoint);
             config.setAutoInstrumentAppStarts(autoInstrumentAppStarts);
