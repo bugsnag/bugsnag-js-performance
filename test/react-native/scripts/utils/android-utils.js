@@ -102,46 +102,23 @@ function configureMainApplicationForTestUtils (fixtureDir, reactNativeVersion) {
   }
   
   let fileContents = fs.readFileSync(mainApplicationPath, 'utf8')
-  
-  if (fileExtension === 'java') {
-    // Add import for Java files
-    const importStatement = 'import com.bugsnag.test.utils.BugsnagTestUtils;'
-    if (!fileContents.includes(importStatement)) {
-      // Find the last import statement and add our import after it
-      const lastImportMatch = fileContents.match(/import\s+[^;]+;/g)
-      if (lastImportMatch) {
-        const lastImport = lastImportMatch[lastImportMatch.length - 1]
-        fileContents = fileContents.replace(lastImport, `${lastImport}\n${importStatement}`)
-      }
-    }
-    
-    // Add BugsnagTestUtils.startNativePerformanceIfConfigured() call after super.onCreate()
-    const methodCallPattern = /super\.onCreate\(\);/
-    const methodCall = 'BugsnagTestUtils.startNativePerformanceIfConfigured(this);'
-    if (methodCallPattern.test(fileContents) && !fileContents.includes(methodCall)) {
-      fileContents = fileContents.replace(methodCallPattern, `super.onCreate();\n    ${methodCall}`)
-    }
-  } else {
-    // Add import for Kotlin files
-    const importStatement = 'import com.bugsnag.test.utils.BugsnagTestUtils'
-    if (!fileContents.includes(importStatement)) {
-      // Find the last import statement and add our import after it
-      const lastImportMatch = fileContents.match(/import\s+[^\n]+/g)
-      if (lastImportMatch) {
-        const lastImport = lastImportMatch[lastImportMatch.length - 1]
-        fileContents = fileContents.replace(lastImport, `${lastImport}\n${importStatement}`)
-      }
-    }
-    
-    // Add BugsnagTestUtils.startNativePerformanceIfConfigured() call after super.onCreate()
-    const methodCallPattern = /super\.onCreate\(\)/
-    const methodCall = 'BugsnagTestUtils.startNativePerformanceIfConfigured(this)'
-    if (methodCallPattern.test(fileContents) && !fileContents.includes(methodCall)) {
-      fileContents = fileContents.replace(methodCallPattern, `super.onCreate()\n    ${methodCall}`)
-    }
+
+  const importStatement = fileExtension === 'java' ? 'import com.bugsnag.test.utils.BugsnagTestUtils;' : 'import com.bugsnag.test.utils.BugsnagTestUtils'
+  const lastImportMatch = fileExtension === 'java' ? fileContents.match(/import\s+[^;]+;/g) : fileContents.match(/import\s+[^\n]+/g)
+
+  const superOnCreateMatch = fileExtension === 'java' ? fileContents.match(/super\.onCreate\(\);/) : fileContents.match(/super\.onCreate\(\)/)
+  const methodCall = fileExtension === 'java' ? 'BugsnagTestUtils.startNativePerformanceIfConfigured(this);' : 'BugsnagTestUtils.startNativePerformanceIfConfigured(this)'
+
+  if (lastImportMatch && !fileContents.includes(importStatement)) {
+    // Find the last import statement and add our import after it
+    const lastImport = lastImportMatch[lastImportMatch.length - 1]
+    replaceInFile(mainApplicationPath, lastImport, `${lastImport}\n${importStatement}`)
   }
-  
-  fs.writeFileSync(mainApplicationPath, fileContents)
+
+  if (superOnCreateMatch && !fileContents.includes(methodCall)) {
+    const superOnCreateCall = superOnCreateMatch[0]
+    replaceInFile(mainApplicationPath, superOnCreateCall, `${superOnCreateCall}\n    ${methodCall}`)
+  }
 }
 
 module.exports = {
