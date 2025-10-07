@@ -65,15 +65,15 @@ public class BugsnagTestUtils {
             return null;
         }
 
-        Map<String, Object> startupConfig = jsonToMap(configJson);
-        if (startupConfig == null) {
-            Log.e(TAG, "Failed to parse configuration JSON");
+        try {
+            JSONObject configObject = new JSONObject(configJson);
+            Map<String, Object> configMap = convertJSONObjectToMap(configObject);
+            Log.d(TAG, "Read startup configuration: " + configMap);
+            return configMap;
+        } catch (JSONException e) {
+            Log.e(TAG, "Error converting JSON to map", e);
             return null;
         }
-
-        Log.d(TAG, "Read startup configuration: " + startupConfig);
-        
-        return startupConfig;
     }
 
     /**
@@ -86,14 +86,18 @@ public class BugsnagTestUtils {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         
-        String configJson = mapToJson(configuration);
-        if (configJson != null) {
+        try {
+            JSONObject configJsonObject = new JSONObject(configuration);
+            String jsonString = configJsonObject.toString();
+
             editor.putBoolean("configured", true);
-            editor.putString("startupConfig", configJson);
+            editor.putString("startupConfig", jsonString);
             editor.commit();
-            Log.d(TAG, "Saved startup configuration: " + configuration);
-        } else {
-            Log.e(TAG, "Failed to serialize configuration to JSON");
+    
+            Log.d(TAG, "Saved startup configuration: " + jsonString);
+        }
+        catch (Exception e) {
+            Log.e(TAG, "Error during saving startup configuration", e);
         }
     }
 
@@ -140,48 +144,6 @@ public class BugsnagTestUtils {
         editor.putBoolean("configured", false)
               .remove("startupConfig")
               .commit();
-    }
-
-    /**
-     * Converts a Map to JSON string for storage in SharedPreferences.
-     */
-    private static String mapToJson(Map<String, Object> map) {
-        try {
-            JSONObject jsonObject = convertMapToJSONObject(map);
-            return jsonObject.toString();
-        } catch (JSONException e) {
-            Log.e(TAG, "Error converting map to JSON", e);
-            return null;
-        }
-    }
-
-    /**
-     * Recursively converts a Map to a JSONObject, handling nested Maps properly.
-     */
-    private static JSONObject convertMapToJSONObject(Map<String, Object> map) throws JSONException {
-        JSONObject jsonObject = new JSONObject();
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            Object value = entry.getValue();
-            if (value instanceof Map) {
-                // Recursively convert nested Maps to JSONObjects
-                value = convertMapToJSONObject((Map<String, Object>) value);
-            }
-            jsonObject.put(entry.getKey(), value);
-        }
-        return jsonObject;
-    }
-
-    /**
-     * Converts a JSON string back to a Map.
-     */
-    private static Map<String, Object> jsonToMap(String jsonString) {
-        try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            return convertJSONObjectToMap(jsonObject);
-        } catch (JSONException e) {
-            Log.e(TAG, "Error converting JSON to map", e);
-            return null;
-        }
     }
 
     /**
