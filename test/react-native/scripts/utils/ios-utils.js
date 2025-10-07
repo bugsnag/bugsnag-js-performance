@@ -253,8 +253,9 @@ function applyObjectiveCViewControllerChanges (fileContents, appDelegatePath, ve
     )
   }
   
-  if (version >= 0.72) {
-    // For 0.72-0.76: RCTAppDelegate pattern - add methods after existing methods
+  // Skip 0.72 as it doesn't expose a setRootView method for us to override.
+  if (version >= 0.74) {
+    // For 0.74-0.76: RCTAppDelegate pattern - add methods after existing methods
     if (!fileContents.includes('- (UIViewController *)createRootViewController')) {
       const viewControllerMethods = `
 - (UIViewController *)createRootViewController

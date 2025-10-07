@@ -102,7 +102,7 @@ Feature: App Start spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.app_start.type" equals "ReactNativeInit"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.app_start.name" equals "AppStartSpanControlScenario"
 
-  @native_integration @android_only
+  @native_integration @native_app_starts  @android_only
   Scenario: Automatic app start spans can be nested under native view load spans
     When I run 'NativeAppStartScenario'
     And I relaunch the app after shutdown
@@ -111,7 +111,7 @@ Feature: App Start spans
     And I wait to receive 2 traces
     And a span named '[AppStart/ReactNativeInit]' has a parent named '[ViewLoad/Activity]MainActivity'
 
-  @native_integration @android_only
+  @native_integration @native_app_starts  @android_only
   Scenario: Manual app start spans can be nested under native view load spans
     When I run 'NativeManualAppStartScenario'
     And I relaunch the app after shutdown
@@ -120,7 +120,7 @@ Feature: App Start spans
     And I wait to receive 2 traces
     And a span named '[AppStart/ReactNativeInit]' has a parent named '[ViewLoad/Activity]MainActivity'
 
-  @native_integration @ios_only
+  @native_integration @native_app_starts  @ios_only
   Scenario: Automatic app start spans can be nested under native view load spans
     When I run 'NativeAppStartScenario'
     And I relaunch the app after shutdown
@@ -129,7 +129,7 @@ Feature: App Start spans
     And I wait to receive 2 traces
     And a span named '[AppStart/ReactNativeInit]' has a parent named '[ViewLoad/UIKit]/BSGViewController'
 
-  @native_integration @ios_only
+  @native_integration @native_app_starts  @ios_only
   Scenario: Manual app start spans can be nested under native view load spans
     When I run 'NativeManualAppStartScenario'
     And I relaunch the app after shutdown
