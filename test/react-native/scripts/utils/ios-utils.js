@@ -165,7 +165,8 @@ function applySwiftViewControllerChanges (appDelegatePath, fileContents) {
   
   for (const anchor of anchors) {
     if (fileContents.includes(anchor)) {
-      const match = fileContents.match(new RegExp(`(\n\\s*${anchor.replace(/[()]/g, '\\$&')})`, 'm'))
+      const escapedAnchor = anchor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const match = fileContents.match(new RegExp(`(\n\\s*${escapedAnchor})`, 'm'))
       if (match) {
         replaceInFile(appDelegatePath, match[0], `${viewControllerMethods}${match[0]}`)
         return
