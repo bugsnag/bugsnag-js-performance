@@ -114,35 +114,33 @@ function applyViewControllerChanges (fixtureDir, reactNativeVersion) {
     return
   }
   
-  let fileContents = fs.readFileSync(appDelegatePath, 'utf8')
+  const fileContents = fs.readFileSync(appDelegatePath, 'utf8')
+  
+  // Add import for BSGViewController
+  const importStatement = isSwift ? 'import BugsnagTestUtils' : '#import <BugsnagTestUtils/BSGViewController.h>'
+  if (!fileContents.includes(importStatement)) {
+    prependToFileIfNotExists(appDelegatePath, `${importStatement}\n`)
+  }
   
   if (isSwift) {
-    // For Swift files (0.78+)
-    applySwiftViewControllerChanges(fileContents, appDelegatePath, version)
-  } else {
-    // For Objective-C files (0.64-0.76)
-    applyObjectiveCViewControllerChanges(fileContents, appDelegatePath, version)
+    applySwiftViewControllerChanges(appDelegatePath, fileContents)
+  } else if (version >= 0.74) {
+    applyObjectiveCModernViewControllerChanges(appDelegatePath, fileContents)
+  } else if (version < 0.72) {
+    applyObjectiveCLegacyViewControllerChanges(appDelegatePath, fileContents)
   }
+  // Skip 0.72-0.73 as they don't expose a setRootView method for us to override
 }
 
 /**
  * Apply view controller changes for Swift AppDelegate files (0.78+)
  */
-function applySwiftViewControllerChanges (fileContents, appDelegatePath, version) {
-  // Add import for BugsnagTestUtils to access BSGViewController
-  if (!fileContents.includes('import BugsnagTestUtils')) {
-    // Find the last import statement and add our import after it
-    const lastImportMatch = fileContents.match(/import\s+[^\n]+/g)
-    if (lastImportMatch) {
-      const lastImport = lastImportMatch[lastImportMatch.length - 1]
-      fileContents = fileContents.replace(lastImport, `${lastImport}\nimport BugsnagTestUtils`)
-    }
+function applySwiftViewControllerChanges (appDelegatePath, fileContents) {
+  if (fileContents.includes('override func createRootViewController()')) {
+    return // Already configured
   }
   
-  if (version >= 0.79) {
-    // For 0.79+: ReactNativeDelegate pattern
-    if (!fileContents.includes('override func createRootViewController()')) {
-      const createRootViewControllerMethod = `
+  const viewControllerMethods = `
   override func createRootViewController() -> UIViewController {
     return BSGViewController() // Custom view controller for view load instrumentation
   }
@@ -155,71 +153,36 @@ function applySwiftViewControllerChanges (fileContents, appDelegatePath, version
     } else {
       super.setRootView(rootView, toRootViewController: rootViewController)
     }
-  }`
-      
-      // Find the bundleURL method and add our methods before it
-      if (fileContents.includes('override func bundleURL()')) {
-        fileContents = fileContents.replace(
-          /(\n\s*override func bundleURL\(\))/,
-          `${createRootViewControllerMethod}$1`
-        )
-      } else if (fileContents.includes('override func sourceURL(for bridge: RCTBridge)')) {
-        // Fallback: add before sourceURL method
-        fileContents = fileContents.replace(
-          /(\n\s*override func sourceURL\(for bridge: RCTBridge\))/,
-          `${createRootViewControllerMethod}$1`
-        )
-      }
-    }
-  } else {
-    // For 0.78: RCTAppDelegate pattern
-    if (!fileContents.includes('override func createRootViewController()')) {
-      const createRootViewControllerMethod = `
-  override func createRootViewController() -> UIViewController {
-    return BSGViewController() // Custom view controller for view load instrumentation
   }
+`
   
-  override func setRootView(_ rootView: UIView, toRootViewController rootViewController: UIViewController) {
-    if let viewController = rootViewController as? BSGViewController {
-      viewController.viewFactory = {
-        return rootView
-      }
-    } else {
-      super.setRootView(rootView, toRootViewController: rootViewController)
-    }
-  }`
-      
-      // Add methods after the application method
-      if (fileContents.includes('return super.application(application, didFinishLaunchingWithOptions: launchOptions)')) {
-        fileContents = fileContents.replace(
-          /(return super\.application\(application, didFinishLaunchingWithOptions: launchOptions\)\s*\n\s*\})/,
-          `$1${createRootViewControllerMethod}`
-        )
+  // Find an anchor point to insert the methods - try multiple common patterns
+  const anchors = [
+    'override func sourceURL(for bridge: RCTBridge)',
+    'override func bundleURL()',
+    'func application(_ application: UIApplication, didFinishLaunchingWithOptions'
+  ]
+  
+  for (const anchor of anchors) {
+    if (fileContents.includes(anchor)) {
+      const match = fileContents.match(new RegExp(`(\n\\s*${anchor.replace(/[()]/g, '\\$&')})`, 'm'))
+      if (match) {
+        replaceInFile(appDelegatePath, match[0], `${viewControllerMethods}${match[0]}`)
+        return
       }
     }
   }
-  
-  fs.writeFileSync(appDelegatePath, fileContents)
 }
 
 /**
- * Apply view controller changes for Objective-C AppDelegate files (0.64-0.76)
+ * Apply view controller changes for modern Objective-C AppDelegate files (0.74-0.76)
  */
-function applyObjectiveCViewControllerChanges (fileContents, appDelegatePath, version) {
-  // Add BugsnagTestUtils import if not present
-  if (!fileContents.includes('#import <BugsnagTestUtils/BSGViewController.h>')) {
-    // Add import after AppDelegate.h import
-    fileContents = fileContents.replace(
-      /#import "AppDelegate\.h"/,
-      '#import "AppDelegate.h"\n#import <BugsnagTestUtils/BSGViewController.h>'
-    )
+function applyObjectiveCModernViewControllerChanges (appDelegatePath, fileContents) {
+  if (fileContents.includes('- (UIViewController *)createRootViewController')) {
+    return // Already configured
   }
   
-  // Skip 0.72 as it doesn't expose a setRootView method for us to override.
-  if (version >= 0.74) {
-    // For 0.74-0.76: RCTAppDelegate pattern - add methods after existing methods
-    if (!fileContents.includes('- (UIViewController *)createRootViewController')) {
-      const viewControllerMethods = `
+  const viewControllerMethods = `
 - (UIViewController *)createRootViewController
 {
   return [BSGViewController new]; // Custom view controller for view load instrumentation
@@ -234,42 +197,46 @@ function applyObjectiveCViewControllerChanges (fileContents, appDelegatePath, ve
     } else {
         [super setRootView:rootView toRootViewController:rootViewController];
     }
-}`
-      
-      // Add methods before the sourceURLForBridge method
-      if (fileContents.includes('- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge')) {
-        fileContents = fileContents.replace(
-          /(\n- \(NSURL \*\)sourceURLForBridge:\(RCTBridge \*\)bridge)/,
-          `${viewControllerMethods}\n$1`
-        )
-      } else {
-        // Fallback: add at the end before @end
-        fileContents = fileContents.replace(
-          /(\n@end\s*)$/,
-          `${viewControllerMethods}\n$1`
-        )
-      }
+}
+`
+  
+  // Insert before sourceURLForBridge or at the end before @end
+  if (fileContents.includes('- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge')) {
+    const match = fileContents.match(/(\n- \(NSURL \*\)sourceURLForBridge:\(RCTBridge \*\)bridge)/)
+    if (match) {
+      replaceInFile(appDelegatePath, match[0], `${viewControllerMethods}${match[0]}`)
     }
   } else {
-    // For 0.64: Old architecture - replace the root view controller creation
-    if (!fileContents.includes('[BSGViewController new]')) {
-      // Replace the generic UIViewController with our custom BSGViewController
-      fileContents = fileContents.replace(
-        /UIViewController \*rootViewController = \[UIViewController new\];/,
-        'BSGViewController *rootViewController = [BSGViewController new];'
-      )
-      
-      // Replace the direct view assignment with our viewFactory pattern
-      fileContents = fileContents.replace(
-        /rootViewController\.view = rootView;/,
-        `rootViewController.viewFactory = ^UIView *{
-    return rootView;
-  };`
-      )
+    const match = fileContents.match(/(\n@end\s*)$/)
+    if (match) {
+      replaceInFile(appDelegatePath, match[0], `${viewControllerMethods}${match[0]}`)
     }
   }
+}
+
+/**
+ * Apply view controller changes for legacy Objective-C AppDelegate files (0.64-0.71)
+ */
+function applyObjectiveCLegacyViewControllerChanges (appDelegatePath, fileContents) {
+  if (fileContents.includes('[BSGViewController new]')) {
+    return // Already configured
+  }
   
-  fs.writeFileSync(appDelegatePath, fileContents)
+  // Replace UIViewController with BSGViewController
+  replaceInFile(
+    appDelegatePath,
+    'UIViewController *rootViewController = [UIViewController new];',
+    'BSGViewController *rootViewController = [BSGViewController new];'
+  )
+  
+  // Replace direct view assignment with viewFactory pattern
+  replaceInFile(
+    appDelegatePath,
+    'rootViewController.view = rootView;',
+    `rootViewController.viewFactory = ^UIView *{
+    return rootView;
+  };`
+  )
 }
 
 module.exports = {
