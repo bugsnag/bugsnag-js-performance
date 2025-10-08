@@ -123,16 +123,7 @@ class ScenarioLauncherImpl {
         return null;
       }
 
-      WritableMap startupConfig = Arguments.createMap();
-      startupConfig.putString("apiKey", (String) config.getOrDefault("apiKey", ""));
-      startupConfig.putString("endpoint", (String) config.getOrDefault("endpoint", ""));
-      startupConfig.putBoolean("autoInstrumentAppStarts", (Boolean) config.getOrDefault("autoInstrumentAppStarts", false));
-      startupConfig.putBoolean("autoInstrumentNetworkRequests", (Boolean) config.getOrDefault("autoInstrumentNetworkRequests", false));
-      startupConfig.putInt("maximumBatchSize", (Integer) config.getOrDefault("maximumBatchSize", 100));
-      startupConfig.putBoolean("useWrapperComponentProvider", (Boolean) config.getOrDefault("useWrapperComponentProvider", false));
-      startupConfig.putString("scenario", (String) config.getOrDefault("scenario", ""));
-      startupConfig.putBoolean("attach", (Boolean) config.getOrDefault("attach", false));
-      return startupConfig;
+      return Arguments.makeNativeMap(config);
     } finally {
       // make sure we don't leave this config around for the next startup
       BugsnagTestUtils.clearStartupConfig(this.reactContext.getApplicationContext());

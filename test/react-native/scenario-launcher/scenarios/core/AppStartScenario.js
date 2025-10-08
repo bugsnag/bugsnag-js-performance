@@ -4,11 +4,13 @@ import { NativeScenarioLauncher } from '../../lib/native'
 
 export const initialise = async (config) => {
   const startupConfig = {
-    apiKey: config.apiKey,
-    endpoint: config.endpoint,
-    autoInstrumentAppStarts: true,
-    autoInstrumentNetworkRequests: false,
-    maximumBatchSize: 1
+    reactNative: {
+      apiKey: config.apiKey,
+      endpoint: config.endpoint,
+      autoInstrumentAppStarts: true,
+      autoInstrumentNetworkRequests: false,
+      maximumBatchSize: 1
+    }
   }
 
   NativeScenarioLauncher.saveStartupConfig(startupConfig)

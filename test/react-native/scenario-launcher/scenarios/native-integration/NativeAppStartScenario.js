@@ -10,7 +10,13 @@ export const initialise = async (config) => {
       autoInstrumentAppStarts: true,
       autoInstrumentNetworkRequests: false,
       maximumBatchSize: 1,
-      scenario: 'AppStartSpanControlScenario'
+      attach: true,
+    },
+    native: {
+      apiKey: config.apiKey,
+      endpoint: config.endpoint,
+      autoInstrumentAppStarts: true,
+      autoInstrumentViewLoads: true,
     }
   }
 
@@ -22,7 +28,7 @@ export const App = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.scenario}>
-        <Text>AutomaticCustomAppStartScenario</Text>
+        <Text>NativeAppStartScenario</Text>
       </View>
     </SafeAreaView>
   )

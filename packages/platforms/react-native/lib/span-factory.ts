@@ -100,7 +100,7 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
       this.appStartSpan = undefined
 
       if (this.nativeParentContext) {
-        NativeBugsnagPerformance.endNativeAppStart(endTime)
+        NativeBugsnagPerformance.endNativeAppStart(this.clock.toUnixNanoseconds(endTime))
       }
     }
   }

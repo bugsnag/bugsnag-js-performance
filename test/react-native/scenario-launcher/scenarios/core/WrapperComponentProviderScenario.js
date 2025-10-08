@@ -15,12 +15,14 @@ export const wrapperComponentProvider = () =>  ({ children }) => {
 
 export const initialise = async (config) => {
   const startupConfig = {
-    apiKey: config.apiKey,
-    endpoint: config.endpoint,
-    autoInstrumentAppStarts: true,
-    autoInstrumentNetworkRequests: false,
-    maximumBatchSize: 1,
-    useWrapperComponentProvider: true,
+    reactNative: {
+      apiKey: config.apiKey,
+      endpoint: config.endpoint,
+      autoInstrumentAppStarts: true,
+      autoInstrumentNetworkRequests: false,
+      maximumBatchSize: 1,
+      useWrapperComponentProvider: true,
+    }
   }
 
   NativeScenarioLauncher.saveStartupConfig(startupConfig)
