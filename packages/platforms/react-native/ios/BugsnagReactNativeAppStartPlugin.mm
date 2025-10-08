@@ -16,24 +16,6 @@ static const NSTimeInterval kSpanBlockTimeoutInterval = 0.5; // 500ms timeout
 
 static BugsnagReactNativeAppStartPlugin *_sharedInstance = nil;
 
-// + (instancetype)sharedInstance {
-//     static dispatch_once_t onceToken;
-//     dispatch_once(&onceToken, ^{
-//         _sharedInstance = [[BugsnagReactNativeAppStartPlugin alloc] init];
-//     });
-//     return _sharedInstance;
-// }
-
-// - (instancetype)init {
-//     self = [super init];
-//     if (self) {
-//         _appStartComplete = NO;
-//         _currentSpanId = nil;
-//         _currentCondition = nil;
-//     }
-//     return self;
-// }
-
 + (id)singleton {
     return _sharedInstance;
 }
