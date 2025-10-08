@@ -1,7 +1,7 @@
 const fs = require('fs')
 const { resolve } = require('path')
 const { ROOT_DIR } = require('./constants')
-const { replaceInFile, appendToFileIfNotExists } = require('./file-utils')
+const { replaceInFile, appendToFileIfNotExists, prependToFileIfNotExists } = require('./file-utils')
 
 /**
  * Configure iOS project settings
@@ -82,59 +82,21 @@ function configureAppDelegateForTestUtils (fixtureDir, reactNativeVersion) {
     return
   }
   
-  let fileContents = fs.readFileSync(appDelegatePath, 'utf8')
+  const fileContents = fs.readFileSync(appDelegatePath, 'utf8')
+  const importStatement = isSwift ? 'import BugsnagTestUtils' : '#import <BugsnagTestUtils/BugsnagTestUtils.h>'
+  const methodCall = isSwift ? 'BugsnagTestUtils.startNativePerformanceIfConfigured()' : '[BugsnagTestUtils startNativePerformanceIfConfigured];'
+  const indentation = isSwift ? '    ' : '  '
   
-  if (isSwift) {
-    // Add import for Swift files
-    const importStatement = 'import BugsnagTestUtils'
-    if (!fileContents.includes(importStatement)) {
-      // Find the last import statement and add our import after it
-      const lastImportMatch = fileContents.match(/import\s+[^\n]+/g)
-      if (lastImportMatch) {
-        const lastImport = lastImportMatch[lastImportMatch.length - 1]
-        fileContents = fileContents.replace(lastImport, `${lastImport}\n${importStatement}`)
-      }
-    }
-    
-    // Add BugsnagTestUtils.startNativePerformanceIfConfigured() call in didFinishLaunchingWithOptions
-    const methodCall = 'BugsnagTestUtils.startNativePerformanceIfConfigured()'
-    if (!fileContents.includes(methodCall)) {
-      // For 0.78 pattern: find after self.initialProps = [:]
-      if (fileContents.includes('self.initialProps = [:]')) {
-        const pattern = /self\.initialProps = \[:]/
-        fileContents = fileContents.replace(pattern, `self.initialProps = [:]\n\n    ${methodCall}`)
-      }
-      // For 0.79+ pattern: find after delegate.dependencyProvider = RCTAppDependencyProvider()
-      else if (fileContents.includes('delegate.dependencyProvider = RCTAppDependencyProvider()')) {
-        const pattern = /delegate\.dependencyProvider = RCTAppDependencyProvider\(\)/
-        fileContents = fileContents.replace(pattern, `delegate.dependencyProvider = RCTAppDependencyProvider()\n\n    ${methodCall}`)
-      }
-    }
-  } else {
-    // Add import for Objective-C files
-    const importStatement = '#import <BugsnagTestUtils/BugsnagTestUtils.h>'
-    if (!fileContents.includes(importStatement)) {
-      // Add the import statement at the top of the file
-      fileContents = `${importStatement}\n${fileContents}`
-    }
-    
-    // Add [BugsnagTestUtils startNativePerformanceIfConfigured] call in didFinishLaunchingWithOptions
-    const methodCall = '[BugsnagTestUtils startNativePerformanceIfConfigured];'
-    if (!fileContents.includes(methodCall)) {
-      // For .m files: find after #ifdef FB_SONARKIT_ENABLED block
-      if (fileContents.includes('#ifdef FB_SONARKIT_ENABLED')) {
-        const pattern = /(#ifdef FB_SONARKIT_ENABLED\s+InitializeFlipper\(application\);\s+#endif)/
-        fileContents = fileContents.replace(pattern, `$1\n\n  ${methodCall}`)
-      }
-      // For .mm files: find after self.initialProps = @{};
-      else if (fileContents.includes('self.initialProps = @{};')) {
-        const pattern = /self\.initialProps = @\{\};/
-        fileContents = fileContents.replace(pattern, `self.initialProps = @{};\n\n  ${methodCall}`)
-      }
+  // Add import statement at the top
+  prependToFileIfNotExists(appDelegatePath, `${importStatement}\n`)
+  
+  // Add method call at the start of didFinishLaunchingWithOptions
+  if (!fileContents.includes(methodCall)) {
+    const didFinishMatch = fileContents.match(/didFinishLaunchingWithOptions[^{]*{\n/)
+    if (didFinishMatch) {
+      replaceInFile(appDelegatePath, didFinishMatch[0], `${didFinishMatch[0]}${indentation}${methodCall}\n\n`)
     }
   }
-  
-  fs.writeFileSync(appDelegatePath, fileContents)
 }
 
 /**
