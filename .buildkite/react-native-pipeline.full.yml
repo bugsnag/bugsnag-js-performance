@@ -254,7 +254,7 @@ steps:
       #
       # End-to-end tests
       #
-      - label: ":bitbar: :android: RN {{matrix}} Android 12 (Old Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix}} Android 13 (Old Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-old-arch-full"
         timeout_in_minutes: 30
         plugins:
@@ -268,7 +268,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/old-arch/{{matrix}}/reactnative.apk
               - --farm=bb
-              - --device=ANDROID_12
+              - --device=ANDROID_13
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
@@ -298,7 +298,7 @@ steps:
           - "0.78"
           - "0.79"
 
-      - label: ":bitbar: :android: RN {{matrix}} Android 12 (New Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix}} Android 13 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-new-arch-full"
         timeout_in_minutes: 30
         plugins:
@@ -312,7 +312,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/new-arch/{{matrix}}/reactnative.apk
               - --farm=bb
-              - --device=ANDROID_12
+              - --device=ANDROID_13
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
@@ -342,7 +342,7 @@ steps:
           - "0.78"
           - "0.79"
 
-      - label: ":bitbar: :android: RN {{matrix}} native integration Android 12 (Old Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix}} native integration Android 13 (Old Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-native-integration-old-arch-full"
         timeout_in_minutes: 20
         plugins:
@@ -356,7 +356,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/native-integration/old-arch/{{matrix}}/reactnative.apk
               - --farm=bb
-              - --device=ANDROID_12
+              - --device=ANDROID_13
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
@@ -388,7 +388,7 @@ steps:
           - "0.78"
           - "0.79"
 
-      - label: ":bitbar: :android: RN {{matrix}} native integration Android 12 (New Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix}} native integration Android 13 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-native-integration-new-arch-full"
         timeout_in_minutes: 20
         plugins:
@@ -402,7 +402,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/native-integration/new-arch/{{matrix}}/reactnative.apk
               - --farm=bb
-              - --device=ANDROID_12
+              - --device=ANDROID_13
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
