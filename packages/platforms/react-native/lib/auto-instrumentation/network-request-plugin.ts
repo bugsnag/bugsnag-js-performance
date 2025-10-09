@@ -21,7 +21,7 @@ export interface ReactNativeNetworkRequestInfo extends NetworkRequestInfo {
   readonly type: 'xmlhttprequest'
 }
 
-export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
+export class NetworkRequestPlugin<C extends ReactNativeConfiguration = ReactNativeConfiguration> implements Plugin<C> {
   private ignoredUrls: string[] = [NET_INFO_REACHABILITY_URL]
   private tracePropagationUrls: RegExp[] = []
   private networkRequestCallback: NetworkRequestCallback<ReactNativeNetworkRequestInfo> = defaultNetworkRequestCallback
@@ -29,12 +29,12 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
   private enabled: boolean = false
 
   constructor (
-    private spanFactory: SpanFactory<ReactNativeConfiguration>,
+    private spanFactory: SpanFactory<C>,
     private readonly spanContextStorage: SpanContextStorage,
     private xhrTracker: RequestTracker
   ) {}
 
-  install (context: PluginContext<ReactNativeConfiguration>) {
+  install (context: PluginContext<C>) {
     if (!context.configuration.autoInstrumentNetworkRequests) {
       return
     }
