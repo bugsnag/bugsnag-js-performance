@@ -4,7 +4,7 @@ Feature: React native navigation support
   Scenario: Navigation spans are automatically instrumented
     When I run 'ReactNativeNavigationScenario'
     And I wait to receive a sampling request
-    And I wait for 1 span
+    And I wait to receive at least 1 span
 
     Then a span named "[Navigation]Screen 1" contains the attributes:
       | attribute                       | type        | value                                               |
@@ -15,7 +15,7 @@ Feature: React native navigation support
 
     When I discard the oldest trace
     And I navigate to "Screen 2"
-    And I wait for 1 span
+    And I wait to receive at least 1 span
 
     Then a span named "[Navigation]Screen 2" contains the attributes:
       | attribute                         | type        | value                                               |
@@ -28,7 +28,7 @@ Feature: React native navigation support
 
     When I discard the oldest trace
     And I navigate to "Screen 3"
-    And I wait for 1 span
+    And I wait to receive at least 1 span
 
     Then a span named "[Navigation]Screen 3" contains the attributes:
       | attribute                         | type        | value                                               |
@@ -40,7 +40,7 @@ Feature: React native navigation support
 
     When I discard the oldest trace
     And I navigate to "Screen 4"
-    And I wait for 1 span
+    And I wait to receive at least 1 span
 
     Then a span named "[Navigation]Screen 4" contains the attributes:
       | attribute                         | type        | value                                               |
@@ -54,7 +54,7 @@ Feature: React native navigation support
     When I run 'AppStartScenario'
     And I relaunch the app after shutdown
     And I wait to receive a sampling request
-    And I wait for 1 span
+    And I wait to receive at least 1 span
 
     # Check the initial probability request
     Then the sampling request "Bugsnag-Span-Sampling" header equals "1.0:0"

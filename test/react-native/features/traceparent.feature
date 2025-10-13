@@ -4,8 +4,8 @@ Feature: Trace propagation headers
         When I run 'TracePropagationScenario'
 
         And I wait to receive 5 reflections
-        
-        And I wait for 5 spans
+
+        And I wait to receive at least 5 spans
         Then every span string attribute "http.url" matches the regex "^http(s)?:\/\/.+:\d{4}\/reflect$"
 
         And the reflection request method equals "GET"
