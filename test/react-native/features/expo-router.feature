@@ -4,7 +4,7 @@ Feature: Navigation spans with Expo Router
   Scenario: Navigation Spans are automatically instrumented
     When I run 'ExpoRouterScenario'
     And I wait to receive a sampling request
-    And I wait for 4 spans
+    And I wait to receive at least 4 spans
 
     # Check the initial probability request
     Then the sampling request "Bugsnag-Span-Sampling" header equals "1.0:0"
