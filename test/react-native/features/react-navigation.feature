@@ -5,7 +5,7 @@ Feature: Navigation spans with React Navigation
   Scenario: Navigation Spans are automatically instrumented
     When I run 'ReactNavigationScenario'
     And I wait to receive a sampling request
-    And I wait for 5 spans
+    And I wait to receive at least 5 spans
 
     # Check the initial probability request
     Then the sampling request "Bugsnag-Span-Sampling" header equals "1.0:0"

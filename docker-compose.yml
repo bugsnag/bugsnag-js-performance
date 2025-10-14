@@ -72,7 +72,7 @@ services:
       - ./reports/:/app/reports/
 
   react-native-maze-runner:
-    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v9-cli
+    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v10-cli
     environment:
       <<: *common-environment
       BITBAR_USERNAME:
