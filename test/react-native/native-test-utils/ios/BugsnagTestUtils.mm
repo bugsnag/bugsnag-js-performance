@@ -6,6 +6,7 @@
 #import <BugsnagPerformance/BugsnagPerformanceSpanContext.h>
 #import "BugsnagNativeSpansPlugin.h"
 #import "BugsnagJavascriptSpansPlugin.h"
+#import "BugsnagReactNativeAppStartPlugin.h"
 #endif
 
 @implementation BugsnagTestUtils
@@ -86,7 +87,7 @@
 
             [config addPlugin:[BugsnagNativeSpansPlugin new]];
             [config addPlugin:[BugsnagJavascriptSpansPlugin new]];
-            // [config addPlugin:[ReactNativeAppStartPlugin new]];
+            [config addPlugin:[BugsnagReactNativeAppStartPlugin new]];
 
             [BugsnagPerformance startWithConfiguration:config];
             

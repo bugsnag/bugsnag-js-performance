@@ -15,16 +15,21 @@ const {
 } = require('./utils/dependency-utils')
 const {
   replaceGeneratedFixtureFiles,
-  configureIOSProject,
+  configureReactNativeNavigation
+} = require('./utils/react-native-config')
+const {
   configureAndroidProject,
   installAndroidPerformance,
-  installCocoaPerformance,
-  configureReactNativeNavigation,
   installNativeTestUtilsAndroid,
+  configureMainApplicationForTestUtils
+} = require('./utils/android-utils')
+const {
+  configureIOSProject,
+  installCocoaPerformance,
   installNativeTestUtilsIOS,
-  configureMainApplicationForTestUtils,
-  configureAppDelegateForTestUtils
-} = require('./utils/react-native-config')
+  configureAppDelegateForTestUtils,
+  applyViewControllerChanges
+} = require('./utils/ios-utils')
 const { configureRN064Fixture } = require('./utils/rn-064-config')
 const { buildAndroidFixture, buildIOSFixture } = require('./utils/platform-builds')
 
@@ -125,6 +130,8 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
     configureMainApplicationForTestUtils(fixtureDir, reactNativeVersion)
     configureAppDelegateForTestUtils(fixtureDir, reactNativeVersion)
+
+    applyViewControllerChanges(fixtureDir, reactNativeVersion)
   }
 
   // Configure React Native Navigation if needed

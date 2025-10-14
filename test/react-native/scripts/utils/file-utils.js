@@ -46,6 +46,18 @@ function appendToFileIfNotExists (filePath, content, checkString) {
   }
 }
 
+function prependToFileIfNotExists (filePath, content) {
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`File not found: ${filePath}`)
+  }
+
+  let fileContent = fs.readFileSync(filePath, 'utf8')
+  if (!fileContent.includes(content)) {
+    fileContent = `${content}\n${fileContent}`
+    fs.writeFileSync(filePath, fileContent)
+  }
+}
+
 /**
  * Copies file with error handling
  */
@@ -70,6 +82,7 @@ module.exports = {
   ensureDirectory,
   replaceInFile,
   appendToFileIfNotExists,
+  prependToFileIfNotExists,
   safeCopyFile,
   removeFileIfExists
 }
