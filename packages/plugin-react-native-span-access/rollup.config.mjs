@@ -1,4 +1,3 @@
-import jsx from 'acorn-jsx'
 import fs from 'fs'
 import createRollupConfig from '../../.rollup/index.mjs'
 
@@ -25,6 +24,5 @@ const config = createRollupConfig({
 })
 
 config.plugins = config.plugins.concat([reactNativeSpecPlugin()])
-config.acornInjectPlugins = [jsx()]
 
 export default config

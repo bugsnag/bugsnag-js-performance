@@ -43,6 +43,7 @@ function createRollupConfig (options = defaultOptions()) {
           declarationMap: true,
           emitDeclarationOnly: true,
           declarationDir: 'dist/types',
+          jsx: 'react-jsx',
         },
       }),
     ],

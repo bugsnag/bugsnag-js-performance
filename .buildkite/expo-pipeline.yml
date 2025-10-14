@@ -41,7 +41,7 @@ steps:
       #
       # End-to-end tests
       #
-      - label: ":bitbar: :android: Expo {{matrix}} Android 15 end-to-end tests"
+      - label: ":bitbar: :android: Expo {{matrix}} Android 13 end-to-end tests"
         depends_on: "build-expo-apk"
         timeout_in_minutes: 20
         plugins:
@@ -55,7 +55,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.apk
               - --farm=bb
-              - --device=ANDROID_15
+              - --device=ANDROID_13
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
