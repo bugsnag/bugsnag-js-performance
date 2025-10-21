@@ -36,3 +36,16 @@ global.XMLHttpRequest = XMLHttpRequestFake as unknown as typeof globalThis.XMLHt
 // Trick the client into thinking it's not running in the remote debugger
 // @ts-expect-error 'typeof globalThis' has no index signature
 global.nativeCallSyncHook = () => {}
+
+const RESPONSE_TIME = 100
+
+const response = {
+  status: 200,
+  headers: new Headers({ 'Bugsnag-Sampling-Probability': '1.0' })
+}
+
+global.fetch = jest.fn().mockImplementation(() => new Promise((resolve) => {
+  setTimeout(() => {
+    resolve(response)
+  }, RESPONSE_TIME)
+}))

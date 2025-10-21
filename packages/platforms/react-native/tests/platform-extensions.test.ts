@@ -17,26 +17,10 @@ jest.useFakeTimers()
 
 let client: BugsnagPerformance<ReactNativeConfiguration, PlatformExtensions>
 let turboModule: Spec
-const RESPONSE_TIME = 100
-
-const response = {
-  status: 200,
-  headers: new Headers({ 'Bugsnag-Sampling-Probability': '1.0' })
-}
-
-const createMockFetch = () => jest.fn().mockImplementation(() => new Promise((resolve) => {
-  setTimeout(() => {
-    resolve(response)
-  }, RESPONSE_TIME)
-}))
-
-let mockFetch: ReturnType<typeof createMockFetch>
 
 beforeEach(() => {
   jest.resetModules()
   jest.clearAllMocks()
-  mockFetch = createMockFetch()
-  global.fetch = mockFetch
   turboModule = require('../lib/native').default
 })
 
