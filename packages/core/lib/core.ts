@@ -34,7 +34,7 @@ interface Constructor<T> { new(): T, prototype: T }
 
 export interface Client<C extends Configuration> {
   appState: AppState
-  start: (config: C | string) => void
+  start: (config?: C | string) => void
   startSpan: (name: string, options?: SpanOptions) => Span
   startNetworkSpan: (options: NetworkSpanOptions) => NetworkSpan
   readonly currentSpanContext: SpanContext | undefined

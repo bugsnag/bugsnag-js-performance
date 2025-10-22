@@ -12,6 +12,7 @@ import {
   createEndedSpan
 } from '@bugsnag/js-performance-test-utilities'
 import type { Span } from '../lib/span'
+import type { Configuration } from '../lib/config'
 
 jest.useFakeTimers()
 
@@ -30,7 +31,7 @@ describe('BatchProcessor', () => {
       { add: jest.fn(), flush: jest.fn() },
       new Sampler(1.0),
       minimalProbabilityManager,
-      new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
+      new TracePayloadEncoder<Configuration>(clock, createConfiguration<Configuration>(), resourceAttributesSource)
     )
 
     // add 99 spans
@@ -97,7 +98,7 @@ describe('BatchProcessor', () => {
   it('prevents delivery if releaseStage not in enabledReleaseStages', async () => {
     const delivery = new InMemoryDelivery()
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
-    const configuration = createConfiguration({ enabledReleaseStages: ['production'], releaseStage: 'test' })
+    const configuration = createConfiguration<Configuration>({ enabledReleaseStages: ['production'], releaseStage: 'test' })
     const batchProcessor = new BatchProcessor(
       delivery,
       configuration,
@@ -118,11 +119,12 @@ describe('BatchProcessor', () => {
     const delivery = new InMemoryDelivery()
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
-    const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
+
+    const config = createConfiguration()
 
     const batchProcessor = new BatchProcessor(
       delivery,
-      createConfiguration({ logger }),
+      config,
       retryQueue,
       new Sampler(1.0),
       minimalProbabilityManager,
@@ -138,18 +140,18 @@ describe('BatchProcessor', () => {
     expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).toHaveBeenCalled()
     expect(retryQueue.flush).not.toHaveBeenCalled()
-    expect(logger.info).toHaveBeenCalledWith('delivery failed, adding to retry queue')
+    expect(config.logger.info).toHaveBeenCalledWith('delivery failed, adding to retry queue')
   })
 
   it('does not add delivery payload to a retry queue if delivery fails and response code is not retryable', async () => {
     const delivery = new InMemoryDelivery()
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
-    const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
+    const config = createConfiguration()
 
     const batchProcessor = new BatchProcessor(
       delivery,
-      createConfiguration({ logger }),
+      config,
       retryQueue,
       new Sampler(1.0),
       minimalProbabilityManager,
@@ -165,18 +167,18 @@ describe('BatchProcessor', () => {
     expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).not.toHaveBeenCalled()
     expect(retryQueue.flush).not.toHaveBeenCalled()
-    expect(logger.warn).toHaveBeenCalledWith('delivery failed')
+    expect(config.logger.warn).toHaveBeenCalledWith('delivery failed')
   })
 
   it('flushes retry queue after a successful delivery', async () => {
     const delivery = new InMemoryDelivery()
     const clock = new IncrementingClock('1970-01-01T00:00:00Z')
     const retryQueue = { add: jest.fn(), flush: jest.fn() }
-    const logger = { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
+    const config = createConfiguration()
 
     const batchProcessor = new BatchProcessor(
       delivery,
-      createConfiguration({ logger }),
+      config,
       retryQueue,
       new Sampler(1.0),
       minimalProbabilityManager,
@@ -190,7 +192,7 @@ describe('BatchProcessor', () => {
     expect(delivery.requests).toHaveLength(1)
     expect(retryQueue.add).not.toHaveBeenCalled()
     expect(retryQueue.flush).toHaveBeenCalled()
-    expect(logger.warn).not.toHaveBeenCalled()
+    expect(config.logger.warn).not.toHaveBeenCalled()
   })
 
   it('updates the sampling probability when the response returns a new probability', async () => {
@@ -340,13 +342,15 @@ describe('BatchProcessor', () => {
       (span: Span) => { span.setAttribute('callback.true', 'this callback returned true'); return true }
     ]
 
+    const config = createConfiguration<Configuration>({ logger, onSpanEnd })
+
     const batchProcessor = new BatchProcessor(
       delivery,
-      createConfiguration({ logger, onSpanEnd }),
+      config,
       retryQueue,
       new Sampler(1.0),
       minimalProbabilityManager,
-      new TracePayloadEncoder(clock, createConfiguration(), resourceAttributesSource)
+      new TracePayloadEncoder(clock, config, resourceAttributesSource)
     )
 
     batchProcessor.add(createEndedSpan())

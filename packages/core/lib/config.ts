@@ -46,7 +46,7 @@ export type OnSpanStartCallback = (span: Span) => void
 export type OnSpanStartCallbacks = OnSpanStartCallback[]
 
 export interface Configuration {
-  apiKey: string
+  apiKey?: string
   endpoint?: string
   releaseStage?: string
   logger?: Logger
@@ -200,7 +200,15 @@ if (typeof __ENABLE_BUGSNAG_TEST_CONFIGURATION__ !== 'undefined' && __ENABLE_BUG
 }
 
 export function validateConfig<S extends CoreSchema, C extends Configuration> (config: unknown, schema: S, isDevelopment = false): InternalConfiguration<C> {
-  if (typeof config === 'string') { config = { apiKey: config } }
+  // Normalize config to an object with an apiKey property
+  // If no api key is set, try to use the default value from the provided schema
+  if (typeof config === 'string') {
+    config = { apiKey: config }
+  } else if (config === null || config === undefined) {
+    config = { apiKey: schema.apiKey.defaultValue }
+  } else if (isObject(config) && config.apiKey === undefined) {
+    config.apiKey = schema.apiKey.defaultValue
+  }
 
   if (!isObject(config) || !isString(config.apiKey) || config.apiKey.length === 0) {
     throw new Error('No Bugsnag API Key set')
