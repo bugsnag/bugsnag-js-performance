@@ -132,10 +132,9 @@ describe('Core', () => {
           expect(logger.warn).toHaveBeenCalledWith(`Invalid configuration\n  - endpoint should be a string, got ${type}\n  - releaseStage should be a string, got ${type}`)
         })
 
-        it('throws if no configuration is provided', () => {
+        it('throws if no API key is set', () => {
           const client = createTestClient()
 
-          // @ts-expect-error no configuration provided
           expect(() => { client.start() }).toThrow('No Bugsnag API Key set')
         })
 
