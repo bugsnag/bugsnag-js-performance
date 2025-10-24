@@ -212,7 +212,9 @@ steps:
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/old-arch/{{matrix}}/reactnative.apk"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.7.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -251,7 +253,9 @@ steps:
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/new-arch/{{matrix}}/reactnative.apk"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.7.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -291,7 +295,9 @@ steps:
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/native-integration/old-arch/{{matrix}}/reactnative.apk"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.7.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -332,7 +338,9 @@ steps:
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/native-integration/new-arch/{{matrix}}/reactnative.apk"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.7.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -374,7 +382,9 @@ steps:
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/old-arch/{{matrix}}/output/reactnative.ipa"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.12.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -413,7 +423,9 @@ steps:
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/new-arch/{{matrix}}/output/reactnative.ipa"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.12.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -453,7 +465,9 @@ steps:
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/native-integration/old-arch/{{matrix}}/output/reactnative.ipa"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.12.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -494,7 +508,9 @@ steps:
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/native-integration/new-arch/{{matrix}}/output/reactnative.ipa"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.12.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
