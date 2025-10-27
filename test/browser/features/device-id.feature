@@ -11,5 +11,5 @@ Feature: Device ID persistence
     When I navigate to the test URL "/docs/retry-scenario"
     And I wait to receive a sampling request
     And I click the element "send-first-span"
-    And I wait for 1 span
+    And I wait to receive at least 1 span
     Then the trace payload field "resourceSpans.0.resource" string attribute "device.id" equals "c1234567890abcdefghijklmnop"

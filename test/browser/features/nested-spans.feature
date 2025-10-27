@@ -2,7 +2,7 @@ Feature: Nested spans
 
   Scenario: Spans are nested under the correct parent context
     Given I navigate to the test URL "/docs/nested-spans"
-    And I wait for 5 spans
+    And I wait to receive at least 5 spans
 
     # Root span should have no parent
     Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.4.name" equals "RootSpan"

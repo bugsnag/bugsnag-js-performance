@@ -11,7 +11,7 @@ Feature: Navigation changes
 
         When I click the element "go-to-another-page"
         Then I wait to receive 1 trace
-        Then I wait for 2 spans
+        Then I wait to receive at least 2 spans
 
         And a span name equals "Span 1"
         And a span name equals "Span 2"
@@ -28,7 +28,7 @@ Feature: Navigation changes
 
         When I navigate to the test URL "/"
         Then I wait to receive 1 trace
-        Then I wait for 3 spans
+        Then I wait to receive at least 3 spans
 
         And a span name equals "Span 1"
         And a span name equals "Span 2"
@@ -47,7 +47,7 @@ Feature: Navigation changes
 
         When I minimise the browser window
         Then I wait to receive 1 trace
-        Then I wait for 4 spans
+        Then I wait to receive at least 4 spans
 
         And a span name equals "Span 1"
         And a span name equals "Span 2"
