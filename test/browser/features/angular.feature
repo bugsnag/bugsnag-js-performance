@@ -7,7 +7,8 @@ Feature: Angular
     Scenario: Angular route change spans are automatically instrumented
         Given I navigate to the test URL "/docs/angular/dist"
         And I click the element "customers"
-        When I wait to receive 1 trace
+        And I wait to receive a span named "[FullPageLoad]/"
+        And I wait to receive a span named "[RouteChange]/customers/:customerId"
 
         Then a span named "[FullPageLoad]/" contains the attributes:
             | attribute                         | type             | value                    |
@@ -15,8 +16,8 @@ Feature: Angular
             | bugsnag.browser.page.title        | stringValue      | Angular                  |
             | bugsnag.browser.page.route        | stringValue      | /                        |
 
-        And a span named "[RouteChange]/customers/:customerId" contains the attributes: 
-            | attribute                                 | type         | value                  | 
+        And a span named "[RouteChange]/customers/:customerId" contains the attributes:
+            | attribute                                 | type         | value                  |
             | bugsnag.span.category                     | stringValue  | route_change           |
             | bugsnag.browser.page.title                | stringValue  | Customer 1             |
             | bugsnag.browser.page.route                | stringValue  | /customers/:customerId |
@@ -26,10 +27,10 @@ Feature: Angular
     Scenario: Route with a custom URL matcher
         Given I navigate to the test URL "/docs/angular/dist"
         And I click the element "customMatching"
-        When I wait to receive 1 trace
 
-        And a span named "[RouteChange]/<custom URL matcher>" contains the attributes: 
-            | attribute                                 | type         | value                  | 
+        Then I wait to receive a span named "[RouteChange]/<custom URL matcher>"
+        And a span named "[RouteChange]/<custom URL matcher>" contains the attributes:
+            | attribute                                 | type         | value                  |
             | bugsnag.span.category                     | stringValue  | route_change           |
             | bugsnag.browser.page.title                | stringValue  | Angular                |
             | bugsnag.browser.page.route                | stringValue  | /<custom URL matcher>  |
