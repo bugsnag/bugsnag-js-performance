@@ -217,7 +217,7 @@ steps:
 
       # iOS Test
       # ------------------------------
-      - label: ":bitbar: :mac: react-native-navigation end-to-end tests - RN {{matrix.rn_version}} (Old Arch) / iOS {{matrix.ios_version}}"
+      - label: ":bitbar: :mac: react-native-navigation end-to-end tests - RN {{matrix.rn_version}} (Old Arch) / iOS
         depends_on: "build-react-native-navigation-ios-fixture-old-arch"
         timeout_in_minutes: 30
         env:
@@ -236,7 +236,7 @@ steps:
               - features/react-native-navigation.feature
               - --app=/app/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/output/reactnative.ipa
               - --farm=bb
-              - --device=IOS_{{matrix.ios_version}}
+              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
@@ -258,8 +258,6 @@ steps:
         concurrency_method: eager
         matrix:
           setup:
-            ios_version:
-              - "14"
             rn_version:
               - "0.72"
 

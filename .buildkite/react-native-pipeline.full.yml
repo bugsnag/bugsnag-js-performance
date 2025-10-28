@@ -442,7 +442,7 @@ steps:
           - "0.78"
           - "0.79"
 
-      - label: ":bitbar: :mac: RN {{matrix}} iOS 15 (Old Arch) end-to-end tests"
+      - label: ":bitbar: :mac: RN {{matrix}} iOS (Old Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-old-arch-full"
         timeout_in_minutes: 30
         plugins:
@@ -458,7 +458,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/old-arch/{{matrix}}/output/reactnative.ipa
               - --farm=bb
-              - --device=IOS_15
+              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
@@ -488,7 +488,7 @@ steps:
           - "0.78"
           - "0.79"
 
-      - label: ":bitbar: :mac: RN {{matrix}} iOS 15 (New Arch) end-to-end tests"
+      - label: ":bitbar: :mac: RN {{matrix}} iOS (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-new-arch-full"
         timeout_in_minutes: 30
         plugins:
@@ -504,7 +504,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/new-arch/{{matrix}}/output/reactnative.ipa
               - --farm=bb
-              - --device=IOS_15
+              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
@@ -534,7 +534,7 @@ steps:
           - "0.78"
           - "0.79"
 
-      - label: ":bitbar: :mac: RN {{matrix}} native integration iOS 15 (Old Arch) end-to-end tests"
+      - label: ":bitbar: :mac: RN {{matrix}} native integration iOS (Old Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-native-integration-old-arch-full"
         timeout_in_minutes: 20
         plugins:
@@ -550,7 +550,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/native-integration/old-arch/{{matrix}}/output/reactnative.ipa
               - --farm=bb
-              - --device=IOS_15
+              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
@@ -582,7 +582,7 @@ steps:
           - "0.78"
           - "0.79"
 
-      - label: ":bitbar: :mac: RN {{matrix}} native integration iOS 15 (New Arch) end-to-end tests"
+      - label: ":bitbar: :mac: RN {{matrix}} native integration iOS (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-native-integration-new-arch-full"
         timeout_in_minutes: 20
         plugins:
@@ -598,7 +598,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/native-integration/new-arch/{{matrix}}/output/reactnative.ipa
               - --farm=bb
-              - --device=IOS_15
+              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
