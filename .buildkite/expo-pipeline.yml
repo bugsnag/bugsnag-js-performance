@@ -82,7 +82,7 @@ steps:
         matrix:
           - "52"
 
-      - label: ":bitbar: :mac: Expo {{matrix}} iOS 16 end-to-end tests"
+      - label: ":bitbar: :mac: Expo {{matrix}} iOS end-to-end tests"
         depends_on: "build-expo-ipa"
         timeout_in_minutes: 20
         plugins:
@@ -98,7 +98,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.ipa
               - --farm=bb
-              - --device=IOS_16
+              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
