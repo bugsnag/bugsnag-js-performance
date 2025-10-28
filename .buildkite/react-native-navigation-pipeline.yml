@@ -217,7 +217,7 @@ steps:
 
       # iOS Test
       # ------------------------------
-      - label: ":bitbar: :mac: react-native-navigation end-to-end tests - RN {{matrix.rn_version}} (Old Arch) / iOS
+      - label: ":bitbar: :mac: react-native-navigation end-to-end tests - RN {{matrix.rn_version}} (Old Arch) / iOS"
         depends_on: "build-react-native-navigation-ios-fixture-old-arch"
         timeout_in_minutes: 30
         env:
