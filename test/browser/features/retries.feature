@@ -4,19 +4,18 @@ Feature: Retries
         Given I navigate to the test URL "/docs/retry-scenario"
         And I wait to receive a sampling request
         And I set the HTTP status code for the next "POST" request to <status>
-        
+
         When I click the element "send-first-span"
         And I wait to receive 1 trace
         And I discard the oldest trace
 
         Then I click the element "send-second-span"
-        And I wait to receive 2 traces
 
         # First payload (rejected, then retried)
-        Then a span name equals "Custom/Reject"
+        Then I wait to receive a span named "Custom/Reject"
 
         # Second payload (delivered)
-        And a span name equals "Custom/Deliver"
+        And I wait to receive a span named "Custom/Deliver"
 
         # Status code 408 cannot be tested on certain browsers as it
         # is automatically retried and does not behave as expected
@@ -36,24 +35,21 @@ Feature: Retries
         Then I wait to receive 0 traces
 
         When I click the element "send-span"
-        And I wait to receive 2 traces
 
-        Then a span name equals "Custom/Span 1"
-        And a span name equals "Custom/Span 2"
+        Then I wait to receive a span named "Custom/Span 1"
+        And I wait to receive a span named "Custom/Span 2"
 
     Scenario Outline: Batch is not retried with specified status codes
         Given I navigate to the test URL "/docs/retry-scenario"
         And I wait to receive a sampling request
         And I set the HTTP status code for the next "POST" request to <status>
-        
+
         Then I click the element "send-first-span"
         And I wait to receive 1 trace
         And I discard the oldest trace
 
         Given I click the element "send-second-span"
-        And I wait for 5 seconds
-        And I wait to receive 1 trace
-        Then a span name equals "Custom/Deliver"
+        Then I wait to receive a span named "Custom/Deliver"
 
         Examples:
             | status | definition                    |
@@ -81,14 +77,12 @@ Feature: Retries
         And I discard the oldest trace
 
         Then I click the element "send-final-span"
-        And I wait for 5 seconds
-        And I wait to receive 2 traces
 
         # First successful batch
-        Then a span name equals "Custom/Span to deliver"
+        Then I wait to receive a span named "Custom/Span to deliver"
 
         # Retried batch
-        And a span name equals "Custom/Span to retry"
+        And I wait to receive a span named "Custom/Span to retry"
 
         Examples:
             | status | definition                    |

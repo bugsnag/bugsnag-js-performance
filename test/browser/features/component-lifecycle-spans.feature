@@ -5,10 +5,10 @@ Feature: Component lifecycle spans
         And I click the element "update-props"
         And I click the element "hide-component"
         And I click the element "stop-clock"
-        When I wait to receive 1 trace
-        Then a span name equals "[ViewLoad/Component]Component"
-        And a span name equals "[ViewLoadPhase/Mount]Component"
-        And a span name equals "[ViewLoadPhase/Unmount]Component"
+        When I wait to receive a span named "[ViewLoadPhase/Update]Component"
+        And I wait to receive a span named "[ViewLoad/Component]Component"
+        And I wait to receive a span named "[ViewLoadPhase/Mount]Component"
+        And I wait to receive a span named "[ViewLoadPhase/Unmount]Component"
         And a span named "[ViewLoadPhase/Update]Component" contains the string array attribute "bugsnag.component.update.props":
             | count |
 
@@ -20,9 +20,8 @@ Feature: Component lifecycle spans
         And I click the element "update-props"
         And I click the element "hide-component"
         And I click the element "stop-clock"
-        When I wait to receive 1 trace
-        Then a span name equals "[ViewLoad/Component]Component"
-        And a span name equals "[ViewLoadPhase/Mount]Component"
-        And a span name equals "[ViewLoadPhase/Unmount]Component"
+        When I wait to receive a span named "[ViewLoad/Component]Component"
+        And I wait to receive a span named "[ViewLoadPhase/Mount]Component"
+        And I wait to receive a span named "[ViewLoadPhase/Unmount]Component"
         And a span named "[ViewLoadPhase/Update]Component" contains the string array attribute "bugsnag.component.update.props":
             | count |

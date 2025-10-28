@@ -21,11 +21,11 @@ Feature: Error Correlation
 
     # End the span
     Then I click the element "end-span"
-    And I wait for 1 span
+    And I wait to receive a span named "Custom/ErrorCorrelationScenario"
 
     # Assert on the span, and store the trace id and span id
-    Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.spanId" is stored as the value "spanId"
-    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.traceId" is stored as the value "traceId"
+    Then the "spanId" field of the span named "Custom/ErrorCorrelationScenario" is stored as the value "spanId"
+    And the "traceId" field of the span named "Custom/ErrorCorrelationScenario" is stored as the value "traceId"
 
     # Check span id is included in the error
     And the error payload field "events.0.correlation" is not null
@@ -47,19 +47,19 @@ Feature: Error Correlation
 
     # End the span
     Then I click the element "end-span"
-    And I wait for 1 span
+    And I wait to receive a span named "Custom/ErrorCorrelationScenario"
 
     # Assert on the span, and store the trace id and span id
-    Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.spanId" is stored as the value "spanId"
-    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.traceId" is stored as the value "traceId"
+    Then the "spanId" field of the span named "Custom/ErrorCorrelationScenario" is stored as the value "spanId"
+    And the "traceId" field of the span named "Custom/ErrorCorrelationScenario" is stored as the value "traceId"
 
     # End the child span
     Then I discard the oldest trace
     And I click the element "end-nested-span"
-    And I wait for 1 span
+    And I wait to receive a span named "Custom/ChildSpan"
 
     # Store the child span id
-    Then the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.spanId" is stored as the value "childSpanId"
+    Then the "spanId" field of the span named "Custom/ChildSpan" is stored as the value "childSpanId"
 
     # Check span id is included in the error
     And the error payload field "events.0.correlation" is not null

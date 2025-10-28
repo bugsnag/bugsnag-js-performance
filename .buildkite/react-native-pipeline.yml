@@ -212,7 +212,9 @@ steps:
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/old-arch/{{matrix}}/reactnative.apk"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.7.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -251,7 +253,9 @@ steps:
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/new-arch/{{matrix}}/reactnative.apk"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.7.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -291,7 +295,9 @@ steps:
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/native-integration/old-arch/{{matrix}}/reactnative.apk"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.7.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -332,7 +338,9 @@ steps:
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/native-integration/new-arch/{{matrix}}/reactnative.apk"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.7.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -368,13 +376,15 @@ steps:
         matrix:
           - "0.80"
 
-      - label: ":bitbar: :mac: RN {{matrix}} iOS 16 (Old Arch) end-to-end tests"
+      - label: ":bitbar: :mac: RN {{matrix}} iOS (Old Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-old-arch"
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/old-arch/{{matrix}}/output/reactnative.ipa"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.12.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -382,7 +392,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/old-arch/{{matrix}}/output/reactnative.ipa
               - --farm=bb
-              - --device=IOS_16
+              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
@@ -407,13 +417,15 @@ steps:
         matrix:
           - "0.80"
 
-      - label: ":bitbar: :mac: RN {{matrix}} iOS 16 (New Arch) end-to-end tests"
+      - label: ":bitbar: :mac: RN {{matrix}} iOS (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-new-arch"
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/new-arch/{{matrix}}/output/reactnative.ipa"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.12.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -421,7 +433,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/new-arch/{{matrix}}/output/reactnative.ipa
               - --farm=bb
-              - --device=IOS_16
+              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
@@ -447,13 +459,15 @@ steps:
         matrix:
           - "0.80"
 
-      - label: ":bitbar: :mac: RN {{matrix}} native integration iOS 16 (Old Arch) end-to-end tests"
+      - label: ":bitbar: :mac: RN {{matrix}} native integration iOS (Old Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-native-integration-old-arch"
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/native-integration/old-arch/{{matrix}}/output/reactnative.ipa"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.12.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -461,7 +475,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/native-integration/old-arch/{{matrix}}/output/reactnative.ipa
               - --farm=bb
-              - --device=IOS_16
+              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
@@ -488,13 +502,15 @@ steps:
         matrix:
           - "0.80"
 
-      - label: ":bitbar: :mac: RN {{matrix}} native integration iOS 16 (New Arch) end-to-end tests"
+      - label: ":bitbar: :mac: RN {{matrix}} native integration iOS (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-native-integration-new-arch"
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/native-integration/new-arch/{{matrix}}/output/reactnative.ipa"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.12.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -502,7 +518,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/native-integration/new-arch/{{matrix}}/output/reactnative.ipa
               - --farm=bb
-              - --device=IOS_16
+              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
