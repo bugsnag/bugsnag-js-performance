@@ -52,7 +52,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   browser-maze-runner-bs:
-    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner:tms-implicit-wait-cli
+    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v10-cli
     environment: &browser-maze-runner-environment
       <<: *common-environment
       BROWSER_STACK_USERNAME:
