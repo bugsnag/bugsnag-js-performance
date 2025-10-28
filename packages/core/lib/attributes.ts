@@ -1,5 +1,5 @@
 import type { Configuration, InternalConfiguration, Logger } from './config'
-import { ATTRIBUTE_KEY_LENGTH_LIMIT, defaultResourceAttributeLimits } from './custom-attribute-limits'
+import { ATTRIBUTE_KEY_LENGTH_LIMIT } from './custom-attribute-limits'
 import type { SpanInternal } from './span'
 import { isNumber } from './validation'
 
@@ -49,8 +49,33 @@ function truncateString (value: string, limit: number) {
   return `${newString} *** ${originalLength - truncatedLength} CHARS TRUNCATED`
 }
 
-export class SpanAttributes {
-  private readonly attributes: Map<string, SpanAttribute>
+class Attributes {
+  protected readonly attributes: Map<string, SpanAttribute>
+
+  constructor (initialValues: Map<string, SpanAttribute>) {
+    this.attributes = initialValues
+  }
+
+  set (name: string, value: SpanAttribute) {
+    if (typeof name === 'string' && (typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value))) {
+      this.attributes.set(name, value)
+    }
+  }
+
+  remove (name: string) {
+    this.attributes.delete(name)
+  }
+
+  toJson () {
+    return Array.from(this.attributes).map(([key, value]) => attributeToJson(key, value))
+  }
+
+  toObject () {
+    return Object.fromEntries(this.attributes)
+  }
+}
+
+export class SpanAttributes extends Attributes {
   private readonly logger: Logger
   private readonly spanAttributeLimits: SpanAttributesLimits
   private readonly spanName: string
@@ -61,7 +86,7 @@ export class SpanAttributes {
   }
 
   constructor (initialValues: Map<string, SpanAttribute>, spanAttributeLimits: SpanAttributesLimits, spanName: string, logger: Logger) {
-    this.attributes = initialValues
+    super(initialValues)
     this.spanAttributeLimits = spanAttributeLimits
     this.spanName = spanName
     this.logger = logger
@@ -77,12 +102,6 @@ export class SpanAttributes {
       const truncatedValue = value.slice(0, this.spanAttributeLimits.attributeArrayLengthLimit)
       this.attributes.set(name, truncatedValue)
       this.logger.warn(`Span attribute ${name} in span ${this.spanName} was truncated as the array exceeds the ${this.spanAttributeLimits.attributeArrayLengthLimit} element limit set by attributeArrayLengthLimit.`)
-    }
-  }
-
-  set (name: string, value: SpanAttribute) {
-    if (typeof name === 'string' && (typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value))) {
-      this.attributes.set(name, value)
     }
   }
 
@@ -105,22 +124,14 @@ export class SpanAttributes {
     }
   }
 
-  remove (name: string) {
-    this.attributes.delete(name)
-  }
-
   toJson () {
     Array.from(this.attributes).forEach(([key, value]) => { this.validateAttribute(key, value) })
     return Array.from(this.attributes).map(([key, value]) => attributeToJson(key, value))
   }
-
-  toObject () {
-    return Object.fromEntries(this.attributes)
-  }
 }
 
-export class ResourceAttributes extends SpanAttributes {
-  constructor (releaseStage: string, appVersion: string, serviceName: string, sdkName: string, sdkVersion: string, logger: Logger) {
+export class ResourceAttributes extends Attributes {
+  constructor (releaseStage: string, appVersion: string, serviceName: string, sdkName: string, sdkVersion: string) {
     const initialValues = new Map([
       ['deployment.environment', releaseStage],
       ['telemetry.sdk.name', sdkName],
@@ -132,9 +143,7 @@ export class ResourceAttributes extends SpanAttributes {
       initialValues.set('service.version', appVersion)
     }
 
-    // TODO: this class should be refactored to use a common base class instead of SpanAttributes
-    // since we don't need a span name and logger for resource attributes - see PLAT-12820
-    super(initialValues, defaultResourceAttributeLimits, 'resource-attributes', logger)
+    super(initialValues)
   }
 }
 
