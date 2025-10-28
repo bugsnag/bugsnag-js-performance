@@ -124,7 +124,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(requestEntropy) {
 }
 
 RCT_EXPORT_METHOD(requestEntropyAsync:(RCTPromiseResolveBlock)resolve
-                   rejecter:(RCTPromiseRejectBlock)reject) {
+                   reject:(RCTPromiseRejectBlock)reject) {
     NSString *hexStr = getRandomBytes();
     resolve(hexStr);
 }
@@ -318,8 +318,8 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(startNativeSpan:(NSString *)name
     BugsnagPerformanceSpan *nativeSpan = [BugsnagReactNativePerformanceCrossTalkAPIClient.sharedInstance startSpan:name options:spanOptions];
     [nativeSpan.attributes removeAllObjects];
     
-    NSString *spanId = [NSString stringWithFormat:@"%llx", nativeSpan.spanId];
-    NSString *traceId = [NSString stringWithFormat:@"%llx%llx", nativeSpan.traceIdHi, nativeSpan.traceIdLo];
+    NSString *spanId = [NSString stringWithFormat:@"%016llx", nativeSpan.spanId];
+    NSString *traceId = [NSString stringWithFormat:@"%016llx%016llx", nativeSpan.traceIdHi, nativeSpan.traceIdLo];
 
     @synchronized (openSpans) {
         openSpans[[spanId stringByAppendingString:traceId]] = nativeSpan;
@@ -331,7 +331,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(startNativeSpan:(NSString *)name
     span[@"traceId"] = traceId;
     span[@"startTime"] = [NSNumber numberWithDouble: [nativeSpan.startTime timeIntervalSince1970] * NSEC_PER_SEC];
     if (nativeSpan.parentId > 0) {
-        span[@"parentSpanId"] = [NSString stringWithFormat:@"%llx", nativeSpan.parentId];
+        span[@"parentSpanId"] = [NSString stringWithFormat:@"%016llx", nativeSpan.parentId];
     }
     
     return span;

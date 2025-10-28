@@ -48,8 +48,8 @@ describe('FullPageLoadPlugin', () => {
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+      schema: createSchema(new MockRoutingProvider()),
+      plugins: (spanFactory, _spanContextStorage) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -57,9 +57,7 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           new ControllableBackgroundingListener(),
-          performance,
-          setAppState,
-          appState
+          performance
         )
       ]
     })
@@ -120,9 +118,9 @@ describe('FullPageLoadPlugin', () => {
     const Observer = manager.createPerformanceObserverFakeClass()
     const webVitals = new WebVitals(new PerformanceFake(), clock, Observer)
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
-      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      schema: createSchema(new MockRoutingProvider()),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+      plugins: (spanFactory, _spanContextStorage) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -130,9 +128,7 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           new ControllableBackgroundingListener(),
-          performance,
-          setAppState,
-          appState
+          performance
         )
       ]
     })
@@ -155,10 +151,10 @@ describe('FullPageLoadPlugin', () => {
     const performance = new PerformanceFake()
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
-      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      schema: createSchema(new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+      plugins: (spanFactory, _spanContextStorage) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -166,9 +162,7 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           backgroundingListener,
-          performance,
-          setAppState,
-          appState
+          performance
         )
       ]
     })
@@ -193,10 +187,10 @@ describe('FullPageLoadPlugin', () => {
     const performance = new PerformanceFake()
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
-      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      schema: createSchema(new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+      plugins: (spanFactory, _spanContextStorage) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -204,9 +198,7 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           backgroundingListener,
-          performance,
-          setAppState,
-          appState
+          performance
         )
       ]
     })
@@ -234,10 +226,10 @@ describe('FullPageLoadPlugin', () => {
     const backgroundingListener = new ControllableBackgroundingListener()
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
-      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      schema: createSchema(new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+      plugins: (spanFactory, _spanContextStorage) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -245,9 +237,7 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           backgroundingListener,
-          performance,
-          setAppState,
-          appState
+          performance
         )
       ]
     })
@@ -274,10 +264,10 @@ describe('FullPageLoadPlugin', () => {
     const performance = new PerformanceFake()
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
-      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      schema: createSchema(new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+      plugins: (spanFactory, _spanContextStorage) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -285,9 +275,7 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           backgroundingListener,
-          performance,
-          setAppState,
-          appState
+          performance
         )
       ]
     })
@@ -315,10 +303,10 @@ describe('FullPageLoadPlugin', () => {
     const performance = new PerformanceFake()
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
-      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      schema: createSchema(new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+      plugins: (spanFactory, _spanContextStorage) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -326,9 +314,7 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           backgroundingListener,
-          performance,
-          setAppState,
-          appState
+          performance
         )
       ]
     })
@@ -359,10 +345,10 @@ describe('FullPageLoadPlugin', () => {
     const performance = new PerformanceFake()
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
-      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      schema: createSchema(new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+      plugins: (spanFactory, _spanContextStorage) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -370,9 +356,7 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           backgroundingListener,
-          performance,
-          setAppState,
-          appState
+          performance
         )
       ]
     })
@@ -410,10 +394,10 @@ describe('FullPageLoadPlugin', () => {
     const performance = new PerformanceFake()
 
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
-      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      schema: createSchema(new MockRoutingProvider()),
       deliveryFactory: () => delivery,
       backgroundingListener,
-      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+      plugins: (spanFactory, _spanContextStorage) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -421,9 +405,7 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           backgroundingListener,
-          performance,
-          setAppState,
-          appState
+          performance
         )
       ]
     })
@@ -460,9 +442,9 @@ describe('FullPageLoadPlugin', () => {
     const webVitals = new WebVitals(performance, clock, Observer)
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       idGenerator: new IncrementingIdGenerator(),
-      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      schema: createSchema(new MockRoutingProvider()),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+      plugins: (spanFactory, _spanContextStorage) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -470,9 +452,7 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           new ControllableBackgroundingListener(),
-          performance,
-          setAppState,
-          appState
+          performance
         )
       ]
     })
@@ -482,7 +462,7 @@ describe('FullPageLoadPlugin', () => {
     expect(testClient.currentSpanContext).not.toBeUndefined()
 
     // we're using the incrementing ID generator so the page load span should have an ID and trace ID of 1
-    const pageLoadSpanContext = { id: 'span ID 1', traceId: 'trace ID 1', isValid: () => true, samplingRate: 0.1 }
+    const pageLoadSpanContext = { id: 'span ID 1', traceId: 'trace ID 1', isValid: () => true, samplingRate: 0.1, samplingProbability: 1 }
     expect(spanContextEquals(pageLoadSpanContext, testClient.currentSpanContext)).toBe(true)
 
     // start and end a new span - this should become a child of the page load span
@@ -519,9 +499,9 @@ describe('FullPageLoadPlugin', () => {
     const webVitals = new WebVitals(performance, clock, Observer)
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       idGenerator: new IncrementingIdGenerator(),
-      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+      schema: createSchema(new MockRoutingProvider()),
       deliveryFactory: () => delivery,
-      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+      plugins: (spanFactory, _spanContextStorage) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -529,9 +509,7 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           new ControllableBackgroundingListener(),
-          performance,
-          setAppState,
-          appState
+          performance
         )
       ]
     })
@@ -574,8 +552,8 @@ describe('FullPageLoadPlugin', () => {
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-      plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+      schema: createSchema(new MockRoutingProvider()),
+      plugins: (spanFactory, _spanContextStorage) => [
         new FullPageLoadPlugin(
           document,
           window.location,
@@ -583,9 +561,7 @@ describe('FullPageLoadPlugin', () => {
           webVitals,
           onSettle,
           new ControllableBackgroundingListener(),
-          performance,
-          setAppState,
-          appState
+          performance
         )
       ]
     })
@@ -621,8 +597,8 @@ describe('FullPageLoadPlugin', () => {
         const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
           clock,
           deliveryFactory: () => delivery,
-          schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-          plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+          schema: createSchema(new MockRoutingProvider()),
+          plugins: (spanFactory, _spanContextStorage) => [
             new FullPageLoadPlugin(
               document,
               window.location,
@@ -630,9 +606,7 @@ describe('FullPageLoadPlugin', () => {
               webVitals,
               onSettle,
               new ControllableBackgroundingListener(),
-              performance,
-              setAppState,
-              appState
+              performance
             )
           ]
         })
@@ -669,8 +643,8 @@ describe('FullPageLoadPlugin', () => {
         const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
           clock,
           deliveryFactory: () => delivery,
-          schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-          plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+          schema: createSchema(new MockRoutingProvider()),
+          plugins: (spanFactory, _spanContextStorage) => [
             new FullPageLoadPlugin(
               document,
               window.location,
@@ -678,9 +652,7 @@ describe('FullPageLoadPlugin', () => {
               webVitals,
               onSettle,
               new ControllableBackgroundingListener(),
-              performance,
-              setAppState,
-              appState
+              performance
             )
           ]
         })
@@ -724,8 +696,8 @@ describe('FullPageLoadPlugin', () => {
         const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
           clock,
           deliveryFactory: () => delivery,
-          schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-          plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+          schema: createSchema(new MockRoutingProvider()),
+          plugins: (spanFactory, _spanContextStorage) => [
             new FullPageLoadPlugin(
               document,
               window.location,
@@ -733,9 +705,7 @@ describe('FullPageLoadPlugin', () => {
               webVitals,
               onSettle,
               new ControllableBackgroundingListener(),
-              performance,
-              setAppState,
-              appState
+              performance
             )
           ]
         })
@@ -768,8 +738,8 @@ describe('FullPageLoadPlugin', () => {
       const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         clock,
         deliveryFactory: () => delivery,
-        schema: createSchema(window.location.hostname, new MockRoutingProvider()),
-        plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+        schema: createSchema(new MockRoutingProvider()),
+        plugins: (spanFactory, _spanContextStorage) => [
           new FullPageLoadPlugin(
             document,
             window.location,
@@ -777,9 +747,7 @@ describe('FullPageLoadPlugin', () => {
             webVitals,
             onSettle,
             new ControllableBackgroundingListener(),
-            performance,
-            setAppState,
-            appState
+            performance
           )
         ]
       })
@@ -813,9 +781,9 @@ describe('FullPageLoadPlugin', () => {
       const webVitals = new WebVitals(performance, clock, Observer)
       const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         idGenerator: new IncrementingIdGenerator(),
-        schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+        schema: createSchema(new MockRoutingProvider()),
         deliveryFactory: () => delivery,
-        plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+        plugins: (spanFactory, _spanContextStorage) => [
           new FullPageLoadPlugin(
             document,
             window.location,
@@ -823,9 +791,7 @@ describe('FullPageLoadPlugin', () => {
             webVitals,
             onSettle,
             new ControllableBackgroundingListener(),
-            performance,
-            setAppState,
-            appState
+            performance
           )
         ]
       })
@@ -840,7 +806,8 @@ describe('FullPageLoadPlugin', () => {
         traceId: 'd2b0a64e3730b6ca065236508b85e069',
         parentSpanId: '6647406222c42487',
         isValid: () => true,
-        samplingRate: 0.1
+        samplingRate: 0.1,
+        samplingProbability: 1
       }
 
       expect(spanContextEquals(pageLoadSpanContext, testClient.currentSpanContext)).toBe(true)
@@ -875,9 +842,9 @@ describe('FullPageLoadPlugin', () => {
       const webVitals = new WebVitals(performance, clock, Observer)
       const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         idGenerator: new IncrementingIdGenerator(),
-        schema: createSchema(window.location.hostname, new MockRoutingProvider()),
+        schema: createSchema(new MockRoutingProvider()),
         deliveryFactory: () => delivery,
-        plugins: (spanFactory, _spanContextStorage, setAppState, appState) => [
+        plugins: (spanFactory, _spanContextStorage) => [
           new FullPageLoadPlugin(
             document,
             window.location,
@@ -885,9 +852,7 @@ describe('FullPageLoadPlugin', () => {
             webVitals,
             onSettle,
             new ControllableBackgroundingListener(),
-            performance,
-            setAppState,
-            appState
+            performance
           )
         ]
       })
@@ -902,7 +867,8 @@ describe('FullPageLoadPlugin', () => {
         traceId: 'trace ID 1',
         parentSpanId: undefined,
         isValid: () => true,
-        samplingRate: 0.1
+        samplingRate: 0.1,
+        samplingProbability: 1
       }
 
       expect(spanContextEquals(pageLoadSpanContext, testClient.currentSpanContext)).toBe(true)

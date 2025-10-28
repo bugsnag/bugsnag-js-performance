@@ -7,14 +7,14 @@ import { SpanEvents } from './events'
 import type { SpanContext } from './span-context'
 import type { Time } from './time'
 import traceIdToSamplingRate from './trace-id-to-sampling-rate'
-import { isBoolean, isSpanContext, isTime } from './validation'
+import { isBoolean, isParentContext, isTime } from './validation'
 
 const HOUR_IN_MILLISECONDS = 60 * 60 * 1000
 
 export interface Span extends SpanContext {
   readonly name: string
   end: (endTime?: Time) => void
-  setAttribute: (name: string, value: SpanAttribute) => void
+  setAttribute: (name: string, value: SpanAttribute | null | undefined) => void
 }
 
 export const enum Kind {
@@ -79,6 +79,9 @@ export function spanEndedToSpan (span: SpanEnded): Span {
     get samplingRate () {
       return span.samplingRate
     },
+    get samplingProbability () {
+      return span.samplingProbability.raw
+    },
     get name () {
       return span.name
     },
@@ -89,7 +92,7 @@ export function spanEndedToSpan (span: SpanEnded): Span {
 }
 
 export async function runSpanEndCallbacks (spanEnded: SpanEnded, logger: Logger, callbacks?: OnSpanEndCallbacks) {
-  if (!callbacks) return true
+  if (!callbacks || callbacks.length === 0) return true
 
   const span = spanEndedToSpan(spanEnded)
   const callbackStartTime = performance.now()
@@ -123,6 +126,7 @@ export class SpanInternal implements SpanContext {
   readonly traceId: string
   readonly parentSpanId?: string
   readonly samplingRate: number
+  readonly samplingProbability: number
   private readonly startTime: number
   private readonly kind = Kind.Client // TODO: How do we define the initial Kind?
   private readonly events = new SpanEvents()
@@ -131,7 +135,7 @@ export class SpanInternal implements SpanContext {
   name: string
   private endTime?: number
 
-  constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes, clock: Clock, parentSpanId?: string) {
+  constructor (id: string, traceId: string, name: string, startTime: number, attributes: SpanAttributes, clock: Clock, samplingProbability: number, parentSpanId?: string) {
     this.id = id
     this.traceId = traceId
     this.parentSpanId = parentSpanId
@@ -139,6 +143,7 @@ export class SpanInternal implements SpanContext {
     this.startTime = startTime
     this.attributes = attributes
     this.samplingRate = traceIdToSamplingRate(this.traceId)
+    this.samplingProbability = samplingProbability
     this.clock = clock
   }
 
@@ -146,11 +151,11 @@ export class SpanInternal implements SpanContext {
     this.events.add(name, time)
   }
 
-  setAttribute (name: string, value: SpanAttribute) {
+  setAttribute (name: string, value: SpanAttribute | null | undefined) {
     this.attributes.set(name, value)
   }
 
-  setCustomAttribute (name: string, value: SpanAttribute) {
+  setCustomAttribute (name: string, value: SpanAttribute | null | undefined) {
     this.attributes.setCustom(name, value)
   }
 
@@ -218,9 +223,9 @@ export const coreSpanOptionSchema: SpanOptionSchema = {
     validate: isTime
   },
   parentContext: {
-    message: 'should be a SpanContext',
+    message: 'should be a ParentContext',
     getDefaultValue: () => undefined,
-    validate: (value): value is SpanContext => value === null || isSpanContext(value)
+    validate: (value): value is ParentContext => value === null || isParentContext(value)
   },
   makeCurrentContext: {
     message: 'should be true|false',

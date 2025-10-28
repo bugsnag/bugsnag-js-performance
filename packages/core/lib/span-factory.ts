@@ -2,7 +2,7 @@ import type { SpanAttribute, SpanAttributesLimits, SpanAttributesSource } from '
 import { SpanAttributes } from './attributes'
 import type { BackgroundingListener, BackgroundingListenerState } from './backgrounding-listener'
 import type { Clock } from './clock'
-import type { Configuration, InternalConfiguration, Logger, OnSpanEndCallbacks } from './config'
+import type { Configuration, InternalConfiguration, Logger, OnSpanEndCallbacks, OnSpanStartCallbacks } from './config'
 import { defaultSpanAttributeLimits } from './custom-attribute-limits'
 import type { IdGenerator } from './id-generator'
 import type { NetworkSpanOptions } from './network-span'
@@ -29,6 +29,7 @@ export class SpanFactory<C extends Configuration> {
   private readonly spanContextStorage: SpanContextStorage
   protected logger: Logger
   private spanAttributeLimits: SpanAttributesLimits = defaultSpanAttributeLimits
+  protected onSpanStartCallbacks?: OnSpanStartCallbacks
   protected onSpanEndCallbacks?: OnSpanEndCallbacks
 
   private openSpans: WeakSet<SpanInternal> = new WeakSet<SpanInternal>()
@@ -87,7 +88,22 @@ export class SpanFactory<C extends Configuration> {
       }
     }
 
+    this.onSpanStart(span)
+
     return span
+  }
+
+  private onSpanStart (spanInternal: SpanInternal) {
+    if (this.onSpanStartCallbacks) {
+      const span = this.toPublicApi(spanInternal)
+      for (const onSpanStart of this.onSpanStartCallbacks) {
+        try {
+          onSpanStart(span)
+        } catch (err) {
+          this.logger.error('Error in onSpanStart callback: ' + err)
+        }
+      }
+    }
   }
 
   protected createSpanInternal (
@@ -99,7 +115,7 @@ export class SpanFactory<C extends Configuration> {
     const parentSpanId = options.parentContext ? options.parentContext.id : undefined
     const traceId = options.parentContext ? options.parentContext.traceId : this.idGenerator.generate(128)
 
-    return new SpanInternal(spanId, traceId, name, safeStartTime, attributes, this.clock, parentSpanId)
+    return new SpanInternal(spanId, traceId, name, safeStartTime, attributes, this.clock, this.sampler.probability, parentSpanId)
   }
 
   startNetworkSpan (options: NetworkSpanOptions) {
@@ -116,11 +132,15 @@ export class SpanFactory<C extends Configuration> {
 
   configure (configuration: InternalConfiguration<C>) {
     this.logger = configuration.logger
+    this.spanAttributesSource.configure(configuration)
+
     this.spanAttributeLimits = {
       attributeArrayLengthLimit: configuration.attributeArrayLengthLimit,
       attributeCountLimit: configuration.attributeCountLimit,
       attributeStringValueLimit: configuration.attributeStringValueLimit
     }
+
+    this.onSpanStartCallbacks = configuration.onSpanStart
     this.onSpanEndCallbacks = configuration.onSpanEnd
   }
 
@@ -189,6 +209,9 @@ export class SpanFactory<C extends Configuration> {
       },
       get samplingRate () {
         return span.samplingRate
+      },
+      get samplingProbability () {
+        return span.samplingProbability
       },
       get name () {
         return span.name

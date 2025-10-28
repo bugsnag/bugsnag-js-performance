@@ -7,13 +7,16 @@ const paths = {
   '@bugsnag/core-performance': ['./packages/core/lib/index.ts'],
   '@bugsnag/browser-performance': ['./packages/platforms/browser/lib/index.ts'],
   '@bugsnag/delivery-fetch-performance': ['./packages/delivery-fetch/lib/delivery.ts'],
+  '@bugsnag/react-native-performance': ['./packages/platforms/react-native/lib/index.ts'],
   '@bugsnag/request-tracker-performance': ['./packages/request-tracker/lib/index.ts'],
   '@bugsnag/react-router-performance': ['./packages/react-router/lib/index.ts'],
   '@bugsnag/vue-router-performance': ['./packages/vue-router/lib/index.ts'],
   '@bugsnag/angular-performance': ['./packages/angular/lib/index.ts'],
   '@bugsnag/plugin-react-native-navigation-performance': ['./packages/plugin-react-native-navigation/lib/index.ts'],
   '@bugsnag/plugin-react-navigation-performance': ['./packages/plugin-react-navigation/lib/index.ts'],
-  '@bugsnag/plugin-react-performance': ['./packages/plugin-react-performance/lib/index.ts']
+  '@bugsnag/plugin-react-performance': ['./packages/plugin-react-performance/lib/index.ts'],
+  '@bugsnag/plugin-named-spans-performance': ['./packages/plugin-named-spans/lib/index.ts'],
+  '@bugsnag/plugin-react-native-span-access': ['./packages/plugin-react-native-span-access/lib/index.ts']
 }
 
 // convert the tsconfig "paths" option into Jest's "moduleNameMapper" option
@@ -70,6 +73,11 @@ module.exports = {
       ...defaultModuleConfig
     },
     {
+      displayName: 'svelte-kit',
+      testMatch: ['<rootDir>/packages/svelte-kit/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
+    {
       displayName: 'plugin-react-performance',
       testEnvironment: 'jsdom',
       setupFilesAfterEnv: ['<rootDir>/jest/setup/react.ts'],
@@ -104,8 +112,38 @@ module.exports = {
     {
       displayName: 'react-native',
       preset: 'react-native',
+      setupFilesAfterEnv: ['<rootDir>/jest/setup/react-native.ts'],
       testMatch: ['<rootDir>/packages/platforms/react-native/tests/**/*.test.ts'],
       coveragePathIgnorePatterns: ['<rootDir>/packages/core', '<rootDir>/packages/platforms/browser', '<rootDir>/packages/delivery-fetch'],
+      moduleNameMapper,
+      transform: {
+        '^.+\\.jsx?$': [
+          'babel-jest',
+          {
+            presets: ['module:metro-react-native-babel-preset']
+          }
+        ],
+        '^.+\\.m?tsx?$': [
+          'ts-jest',
+          {
+            tsconfig: { paths },
+            babelConfig: {
+              presets: ['module:metro-react-native-babel-preset']
+            }
+          }
+        ]
+      }
+    },
+    {
+      displayName: 'plugin-named-spans',
+      testMatch: ['<rootDir>/packages/plugin-named-spans/**/*.test.ts'],
+      ...defaultModuleConfig
+    },
+    {
+      displayName: 'plugin-react-native-span-access',
+      preset: 'react-native',
+      testMatch: ['<rootDir>/packages/plugin-react-native-span-access/tests/**/*.test.ts'],
+      coveragePathIgnorePatterns: ['<rootDir>/packages/core'],
       moduleNameMapper,
       transform: {
         '^.+\\.jsx?$': [

@@ -43,8 +43,8 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-      plugins: (spanFactory, _spanContextStorage, setAppState) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
+      schema: createSchema(new DefaultRoutingProvider()),
+      plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
     })
 
     document.title = 'Title 1'
@@ -88,8 +88,8 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-      plugins: (spanFactory, _spanContextStorage, setAppState) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
+      schema: createSchema(new DefaultRoutingProvider()),
+      plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
     })
 
     history.pushState({}, '', '/first-route')
@@ -153,8 +153,8 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-      plugins: (spanFactory, _spanContextStorage, setAppState) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
+      schema: createSchema(new DefaultRoutingProvider()),
+      plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY })
@@ -175,8 +175,8 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-      plugins: (spanFactory, _spanContextStorage, setAppState) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
+      schema: createSchema(new DefaultRoutingProvider()),
+      plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, autoInstrumentRouteChanges: false })
@@ -215,8 +215,8 @@ describe('RouteChangePlugin', () => {
       const delivery = new InMemoryDelivery()
       const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         deliveryFactory: () => delivery,
-        schema: createSchema(window.location.hostname, routingProvider),
-        plugins: (spanFactory, _spanContextStorage, setAppState) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
+        schema: createSchema(routingProvider),
+        plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
       })
 
       testClient.start({ apiKey: VALID_API_KEY, logger: jestLogger })
@@ -261,8 +261,8 @@ describe('RouteChangePlugin', () => {
       const delivery = new InMemoryDelivery()
       const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
         deliveryFactory: () => delivery,
-        schema: createSchema(window.location.hostname, routingProvider),
-        plugins: (spanFactory, _spanContextStorage, setAppState) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
+        schema: createSchema(routingProvider),
+        plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
       })
 
       testClient.start({ apiKey: VALID_API_KEY, logger: jestLogger })
@@ -299,8 +299,8 @@ describe('RouteChangePlugin', () => {
     const delivery = new InMemoryDelivery()
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, routingProvider),
-      plugins: (spanFactory, _spanContextStorage, setAppState) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
+      schema: createSchema(routingProvider),
+      plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, logger: jestLogger })
@@ -334,8 +334,8 @@ describe('RouteChangePlugin', () => {
     const testClient = createTestClient<BrowserSchema, BrowserConfiguration>({
       clock,
       deliveryFactory: () => delivery,
-      schema: createSchema(window.location.hostname, new DefaultRoutingProvider()),
-      plugins: (spanFactory, _spanContextStorage, setAppState) => [new RouteChangePlugin(spanFactory, window.location, document, setAppState)]
+      schema: createSchema(new DefaultRoutingProvider()),
+      plugins: (spanFactory, _spanContextStorage) => [new RouteChangePlugin(spanFactory, window.location, document)]
     })
 
     testClient.start({ apiKey: VALID_API_KEY, sendPageAttributes: { url: false, title: false } })

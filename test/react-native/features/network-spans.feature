@@ -3,7 +3,7 @@ Feature: Network spans
     Scenario: Network spans are automatically instrumented for completed fetch and xhr requests
         When I run 'NetworkRequestScenario'
         And I wait to receive a sampling request
-        And I wait for 2 spans
+        And I wait to receive at least 2 spans
 
         Then a span named "[HTTP/GET]" contains the attributes:
             | attribute             | type        | value                             |

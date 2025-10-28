@@ -1,34 +1,12 @@
-import BugsnagPerformance from '@bugsnag/react-native-performance'
-import Bugsnag from '@bugsnag/react-native'
-import { REACT_APP_API_KEY, REACT_APP_ENDPOINT, REACT_APP_SCENARIO_NAME } from '@env'
-import React from 'react'
-import { AppRegistry, SafeAreaView } from 'react-native'
 import * as Scenarios from '../scenarios'
 import { getCurrentCommand } from './CommandRunner'
 import { clearPersistedState, setDeviceId, setSamplingProbability } from './Persistence'
-import { ScenarioContext } from './ScenarioContext'
 import { NativeScenarioLauncher } from './native'
+import { wrapperComponentProvider } from '../scenarios/core/WrapperComponentProviderScenario'
+import React from 'react'
+import BugsnagPerformance from '@bugsnag/react-native-performance'
 
-const isTurboModuleEnabled = () => global.RN$Bridgeless || global.__turboModuleProxy != null
-
-async function loadReactNavigationScenario (scenario) {
-  if (typeof scenario.registerScreens === 'function') {
-    scenario.registerScreens()
-  } else {
-    import('react-native-navigation').then(({ Navigation }) => {
-      Navigation.registerComponent('Scenario', () => scenario.App)
-      Navigation.setRoot({
-        root: {
-          component: {
-            name: 'Scenario'
-          }
-        }
-      })
-    })
-  }
-}
-
-async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
+async function runScenario (setScenario, scenarioName, apiKey, endpoint) {
   console.error(`[BugsnagPerformance] Launching scenario: ${scenarioName}`)
   const scenario = Scenarios[scenarioName]
 
@@ -55,90 +33,65 @@ async function runScenario (rootTag, scenarioName, apiKey, endpoint) {
     BugsnagPerformance.start(scenarioConfig)
   }
   
-  if (process.env.REACT_NATIVE_NAVIGATION) {
-    loadReactNavigationScenario(scenario)
-  } else {
-    const appParams = { rootTag }
-    if (isTurboModuleEnabled()) {
-      appParams.fabric = true
-      appParams.initialProps = { concurrentRoot: true }
-    }
-
-    const reflectEndpoint = endpoint.replace('traces', 'reflect')
-
-    console.error(`[BugsnagPerformance] Reflect endpoint: ${reflectEndpoint}`)
-
-    const Scenario = () => 
-      <ScenarioContext.Provider value={{ reflectEndpoint }}>
-        <SafeAreaView>
-          <scenario.App />
-        </SafeAreaView>
-      </ScenarioContext.Provider>
-
-    const App = scenario.withInstrumentedAppStarts ? BugsnagPerformance.withInstrumentedAppStarts(Scenario) : Scenario
-  
-    AppRegistry.registerComponent(scenarioName, () => App)
-    AppRegistry.runApplication(scenarioName, appParams)
-  }
+  setScenario({ name: scenarioName, config: scenarioConfig })
 }
 
-export async function launchScenario (rootTag, clearPersistedData = true) {
+export async function launchScenario (setScenario, clearPersistedData = true) {
   if (clearPersistedData) {
     await clearPersistedState()
   }
 
-  let command
-
-  if (REACT_APP_SCENARIO_NAME && REACT_APP_API_KEY) {
-    command = {
-      action: 'run-scenario',
-      scenario_name: REACT_APP_SCENARIO_NAME,
-      api_key: REACT_APP_API_KEY,
-      endpoint: REACT_APP_ENDPOINT
-    }
-  } else {
-    command = await getCurrentCommand()
-  }
-
+  const command = await getCurrentCommand()
   switch (command.action) {
     case 'run-scenario':
       return await runScenario(
-        rootTag,
+        setScenario,
         command.scenario_name,
         command.api_key,
         command.endpoint
       )
 
     case 'clear-all-persistent-data':
-      return await launchScenario(rootTag, true)
+      return await launchScenario(setScenario, true)
 
     case 'set-sampling-probability-to-0':
       await setSamplingProbability(0)
 
-      return await launchScenario(rootTag, false)
+      return await launchScenario(setScenario, false)
 
     case 'set-device-id':
       await setDeviceId('c1234567890abcdefghijklmnop')
 
-      return await launchScenario(rootTag, false)
+      return await launchScenario(setScenario, false)
 
     case 'set-invalid-sampling-probability':
       await setSamplingProbability('this is not a valid sampling probability')
 
-      return await launchScenario(rootTag, false)
+      return await launchScenario(setScenario, false)
 
     case 'set-expired-sampling-probability':
       // Friday February 13th 2009 23:31:30
       await setSamplingProbability(0, 1234567890)
 
-      return await launchScenario(rootTag, false)
+      return await launchScenario(setScenario, false)
 
     case 'set-invalid-device-id':
       await setDeviceId('this is not a valid device ID')
 
-      return await launchScenario(rootTag, false)
+      return await launchScenario(setScenario, false)
 
     default:
       throw new Error(`Unknown action '${command.action}'`)
   }
+}
+
+export function launchFromStartupConfig () {
+  const startupConfig = NativeScenarioLauncher.readStartupConfig()
+
+  if (startupConfig) {
+    startupConfig.wrapperComponentProvider = startupConfig.useWrapperComponentProvider ? wrapperComponentProvider : null
+    BugsnagPerformance.start(startupConfig)
+  }
+
+  return startupConfig
 }

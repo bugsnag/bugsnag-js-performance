@@ -1,33 +1,38 @@
-import { AppRegistry, SafeAreaView, StyleSheet, View, Text, RootTagContext, unstable_RootTagContext } from 'react-native'
-import React, { useContext, useEffect } from 'react'
+import { AppRegistry, SafeAreaView, StyleSheet, Text } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { name as appName } from './app.json';
-import BugsnagPerformance from '@bugsnag/react-native-performance';
-import { launchScenario, NativeScenarioLauncher } from '@bugsnag/react-native-performance-scenarios'
+import { launchScenario, launchFromStartupConfig, ScenarioContext, ScenarioComponent } from '@bugsnag/react-native-performance-scenarios'
 
-const startupConfig = NativeScenarioLauncher.readStartupConfig()
-if (startupConfig) {
-  BugsnagPerformance.start(startupConfig)
-}
+const startupConfig = launchFromStartupConfig()
+
+const initialScenario = startupConfig?.scenario ? { name: startupConfig.scenario } : null
 
 const App = () => {
-  const rootTag = useContext(RootTagContext || unstable_RootTagContext)
+
+  const [currentScenario, setCurrentScenario] = useState(initialScenario)
 
   useEffect(() => {
-    if (!startupConfig) launchScenario(rootTag)
-  }, [rootTag])
+    if (!startupConfig) {
+      launchScenario(setCurrentScenario)
+    }
+  }, [])
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View>
-        <Text>React Native Performance Test App</Text>
-      </View>
-    </SafeAreaView>
+    <ScenarioContext.Provider value={ currentScenario }>
+      <SafeAreaView style={styles.container}>
+        <Text accessibilityLabel='app-component' testID='app-component'>React Native Performance Test App</Text>
+        <ScenarioComponent />
+      </SafeAreaView>
+    </ScenarioContext.Provider>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 100
   }
 })
 

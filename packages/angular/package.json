@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/angular-performance",
-  "version": "2.7.1",
+  "version": "3.0.0",
   "description": "BugSnag performance monitoring for angular applications",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
@@ -23,6 +23,10 @@
     "@angular/core": "*",
     "@angular/router": "*",
     "@bugsnag/browser-performance": "*"
+  },
+  "devDependencies": {
+    "@angular/platform-browser-dynamic": "^18.1.0",
+    "jest-preset-angular": "^14.1.1"
   },
   "type": "module",
   "main": "dist/index.js",

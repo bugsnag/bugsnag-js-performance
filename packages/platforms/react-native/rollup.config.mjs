@@ -1,4 +1,3 @@
-import jsx from 'acorn-jsx'
 import fs from 'fs'
 import createRollupConfig from '../../../.rollup/index.mjs'
 import noTreeShakingPlugin from '../../../.rollup/no-tree-shaking.plugin.mjs'
@@ -25,10 +24,10 @@ const config = createRollupConfig({
     '@react-native-community/netinfo',
     'react',
     'react-native',
+    'react/jsx-runtime',
   ]
 })
 
 config.plugins = config.plugins.concat([noTreeShakingPlugin(['app-start-plugin.tsx']), reactNativeSpecPlugin()])
-config.acornInjectPlugins = [jsx()]
 
 export default config

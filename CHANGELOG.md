@@ -1,10 +1,69 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- (react-native): Added `createReactNativeClient` factory method for internal use by upstream libraries [#730](https://github.com/bugsnag/bugsnag-js-performance/pull/730)
+
+## [v3.1.0] (2025-09-24)
+
+### Added
+
+- (react-native) Added `AppStartSpanControl` and `AppStartSpanQuery` to allow custom categorization of app start spans [#700](https://github.com/bugsnag/bugsnag-js-performance/pull/700)
+
+## [v3.0.1] (2025-08-14)
+
+### Fixed
+
+- Bump peer dependencies to v3.0.0 [#694](https://github.com/bugsnag/bugsnag-js-performance/pull/694)
+
+## [v3.0.0] (2025-08-13)
+
+*Breaking change*: For React Native apps integrating with the native Android/iOS Performance SDKs, the minimum required versions are now: 
+- Bugsnag Android Performance [v2.0.0](https://github.com/bugsnag/bugsnag-android-performance/releases/tag/v2.0.0) 
+- Bugsnag Cocoa Performance [v1.14.0](https://github.com/bugsnag/bugsnag-cocoa-performance/releases/tag/v1.14.0)
+
+Upgrading these versions is required for continued compatibility with the React Native integration. Please refer to the linked release notes for details on changes in the native SDKs.
+
+### Added
+
+- (react-native) Added `BugsnagJavascriptSpansPlugin` to `@bugsnag/plugin-react-native-span-access` to support accessing JavaScript span controls from native code [#682](https://github.com/bugsnag/bugsnag-js-performance/pull/682)
+
+## [v2.15.0] (2025-08-12)
+
+### Changed
+
+- Reduce batch time in development environment [#673](https://github.com/bugsnag/bugsnag-js-performance/pull/673)
+- Calling `setAttribute` with a `null` or `undefined` attribute value now clears the attribute from the span [#679](https://github.com/bugsnag/bugsnag-js-performance/pull/679)
+
+### Fixed
+
+- (react-native) Added a short debounce during app start to allow backgrounded apps to come to the foreground [#665](https://github.com/bugsnag/bugsnag-js-performance/pull/665)
+- (react-native) Fix a crash when refreshing the entropy pool on iOS [#667](https://github.com/bugsnag/bugsnag-js-performance/pull/667)
+- (ract-native) Fix span and trace ID encoding in the iOS native integration [#683](https://github.com/bugsnag/bugsnag-js-performance/pull/683)
+
+## [v2.14.0] (2025-06-25)
+
+### Added
+- Set default endpoints based on API key [#643](https://github.com/bugsnag/bugsnag-js-performance/pull/643)
+- (core) Added `onSpanStart` callbacks config option to allow spans to be inspected and modified on creation. [#631](https://github.com/bugsnag/bugsnag-js-performance/pull/631)
+- (svelte-kit-performance) Added new routing provider for instrumenting route change spans with [SvelteKit](https://svelte.dev/docs/kit/introduction) [#632](https://github.com/bugsnag/bugsnag-js-performance/pull/632)
+- (core) Introduced `SpanControlProvider` interface and `BugsnagPerformance.getSpanControls` method to allow access to a registered `SpanControlProvider`. [#634](https://github.com/bugsnag/bugsnag-js-performance/pull/634)
+- (browser, react-native) Added `@bugsnag/plugin-named-spans` package for tracking and accessing open spans by name [#644](https://github.com/bugsnag/bugsnag-js-performance/pull/644)
+- (react-native) Added `@bugsnag/plugin-react-native-span-access` package for accessing native spans from Javascript [#633](https://github.com/bugsnag/bugsnag-js-performance/pull/633) [#636](https://github.com/bugsnag/bugsnag-js-performance/pull/636) [#639](https://github.com/bugsnag/bugsnag-js-performance/pull/639) [#645](https://github.com/bugsnag/bugsnag-js-performance/pull/645)
+
+## [v2.13.0] (2025-05-15)
+
+### Added
+
+- (core) Introduced `RemoteParentContext` to allow cross-layer parenting of spans, along with easy encoding of `traceparent` headers [#620](https://github.com/bugsnag/bugsnag-js-performance/pull/620)
+
 ## [v2.12.0] (2025-03-26)
 
 This release adds support for React Native 0.77 to `@bugsnag/react-native-performance`
 
-### Added 
+### Added
 
 - (plugin-react-performance) Added new react library with `withInstrumentedComponent` higher order component to instrument component rendering spans [#584](https://github.com/bugsnag/bugsnag-js-performance/pull/584)
 
@@ -146,7 +205,7 @@ This release adds support for React Native 0.77 to `@bugsnag/react-native-perfor
 
 This release adds support for instrumenting navigation spans when using the [react-native-navigation](https://github.com/wix/react-native-navigation) library
 
-### Added 
+### Added
 
 - (react-native-navigation) Added `@bugsnag/react-native-navigation-performance` package [#404](https://github.com/bugsnag/bugsnag-js-performance/pull/404)
 

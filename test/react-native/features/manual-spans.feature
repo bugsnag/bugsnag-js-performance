@@ -3,7 +3,7 @@ Feature: Manual spans
   Scenario: Manual Spans can be logged
     When I run 'ManualSpanScenario'
     And I wait to receive a sampling request
-    And I wait for 1 span
+    And I wait to receive at least 1 span
 
     # Check the initial probability request
     Then the sampling request "Bugsnag-Span-Sampling" header equals "1.0:0"
@@ -16,7 +16,9 @@ Feature: Manual spans
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.startTimeUnixNano" matches the regex "^[0-9]+$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0.endTimeUnixNano" matches the regex "^[0-9]+$"
     And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "bugsnag.span.category" equals "custom"
-    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "net.host.connection.type" equals "wifi"
+    And the trace payload field "resourceSpans.0.scopeSpans.0.spans.0" string attribute "net.host.connection.type" is one of:
+      | wifi    |
+      | unknown |
 
     And the trace payload field "resourceSpans.0.resource" string attribute "telemetry.sdk.name" equals "bugsnag.performance.reactnative"
     And the trace payload field "resourceSpans.0.resource" string attribute "deployment.environment" equals "production"
@@ -42,8 +44,10 @@ Feature: Manual spans
   Scenario: Native resource attributes are recorded
     When I run 'ManualSpanScenario'
     And I wait to receive a sampling request
-    And I wait for 1 span
-    Then the trace payload field "resourceSpans.0.resource" string attribute "service.name" equals "com.bugsnag.fixtures.reactnative.performance"
+    And I wait to receive at least 1 span
+    Then the trace payload field "resourceSpans.0.resource" string attribute "service.name" is one of:
+      | com.bugsnag.fixtures.reactnative.performance |
+      | com.bugsnag.expo.fixture                     |
     And the trace payload field "resourceSpans.0.resource" string attribute "host.arch" exists
     And the trace payload field "resourceSpans.0.resource" string attribute "device.model.identifier" exists
     And the trace payload field "resourceSpans.0.resource" string attribute "bugsnag.app.version_code" equals the platform-dependent string:

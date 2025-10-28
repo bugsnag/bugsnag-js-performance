@@ -4,10 +4,10 @@ class ControllableBackgroundingListener implements BackgroundingListener {
   private state: BackgroundingListenerState = 'in-foreground'
   private callbacks: BackgroundingListenerCallback[] = []
 
-  onStateChange (callback: BackgroundingListenerCallback) {
+  onStateChange = jest.fn((callback: BackgroundingListenerCallback) => {
     this.callbacks.push(callback)
     if (this.state === 'in-background') callback(this.state)
-  }
+  })
 
   sendToBackground () {
     this.state = 'in-background'

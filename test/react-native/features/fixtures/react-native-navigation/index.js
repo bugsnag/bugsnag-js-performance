@@ -1,31 +1,41 @@
-import { launchScenario, NativeScenarioLauncher } from '@bugsnag/react-native-performance-scenarios'
-import { useContext, useEffect } from 'react'
-import { RootTagContext, SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { launchScenario, launchFromStartupConfig, Scenarios } from '@bugsnag/react-native-performance-scenarios'
+import { useEffect, useState } from 'react'
+import { SafeAreaView, StyleSheet, Text } from 'react-native'
 import { Navigation } from 'react-native-navigation'
-import BugsnagPerformance from '@bugsnag/react-native-performance';
 
 console.reportErrorsAsExceptions = false
 
-const startupConfig = NativeScenarioLauncher.readStartupConfig()
-if (startupConfig) {
-  BugsnagPerformance.start(startupConfig)
+const isStartupTest = launchFromStartupConfig()
+
+const setScenario = (scenarioContext) => {
+  const scenario = Scenarios[scenarioContext.name]
+  if (typeof scenario.registerScreens === 'function') {
+      scenario.registerScreens()
+      return
+  }
+
+  Navigation.registerComponent('Scenario', () => scenario.App)
+    Navigation.setRoot({
+      root: {
+        component: {
+          name: 'Scenario'
+        }
+      }
+    })
 }
 
-const App = () => {
-    const rootTag = useContext(RootTagContext)
 
+const App = () => {
     useEffect(() => {
-        if (!startupConfig) launchScenario(rootTag)
-    }, [rootTag])
+        if (!isStartupTest) launchScenario(setScenario)
+    }, [])
 
     return (
         <SafeAreaView style={styles.container}>
-            <View>
-                <Text>React Native Performance Test App</Text>
-                <Text>react-native-navigation</Text>
-            </View>
+            <Text>React Native Performance Test App</Text>
+            <Text>react-native-navigation</Text>
         </SafeAreaView>
-    )
+      )
 }
 
 Navigation.registerComponent('App', () => App)
@@ -41,6 +51,9 @@ Navigation.events().registerAppLaunchedListener(async () => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: 100
     }
 })

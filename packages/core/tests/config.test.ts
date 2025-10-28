@@ -1,6 +1,14 @@
 import { schema as coreSchema, validateConfig } from '../lib/config'
 import type { CoreSchema } from '../lib/config'
 import { VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
+import {
+  ATTRIBUTE_ARRAY_LENGTH_LIMIT_DEFAULT,
+  ATTRIBUTE_COUNT_LIMIT_DEFAULT,
+  ATTRIBUTE_STRING_VALUE_LIMIT_DEFAULT,
+  ATTRIBUTE_ARRAY_LENGTH_LIMIT_MAX,
+  ATTRIBUTE_COUNT_LIMIT_MAX,
+  ATTRIBUTE_STRING_VALUE_LIMIT_MAX
+} from '../lib/custom-attribute-limits'
 
 describe('Schema validation', () => {
   it('logs a warning if a config option is invalid', () => {
@@ -102,6 +110,82 @@ describe('Schema validation', () => {
       jest.restoreAllMocks()
     })
 
+    describe('apiKey', () => {
+      it('accepts a valid value (string)', () => {
+        const validConfig = validateConfig(VALID_API_KEY, coreSchema)
+        expect(validConfig.apiKey).toBe(VALID_API_KEY)
+      })
+
+      it('accepts a valid value (object)', () => {
+        const validConfig = validateConfig({ apiKey: VALID_API_KEY }, coreSchema)
+        expect(validConfig.apiKey).toBe(VALID_API_KEY)
+      })
+
+      it.each([
+        { type: 'undefined', apiKey: undefined },
+        { type: 'null', apiKey: null }
+      ])('throws an error when apiKey is $type and no default value in schema', ({ apiKey }) => {
+        expect(() => { validateConfig(apiKey, coreSchema) }).toThrow('No Bugsnag API Key set')
+      })
+
+      it('throws an error when apiKey is an empty string', () => {
+        expect(() => { validateConfig('', coreSchema) }).toThrow('No Bugsnag API Key set')
+      })
+
+      it.each([
+        { type: 'undefined', apiKey: undefined },
+        { type: 'null', apiKey: null },
+        { type: 'empty string', apiKey: '' }
+      ])('throws an error when config.apiKey is $type and no default value in schema', ({ apiKey }) => {
+        expect(() => { validateConfig({ apiKey }, coreSchema) }).toThrow('No Bugsnag API Key set')
+      })
+
+      it.each([
+        { type: 'null', config: { apiKey: null } },
+        { type: 'empty string', config: { apiKey: '' } }
+      ])('throws an error when config.apiKey is $type (even with default value)', ({ config }) => {
+        const schema = {
+          ...coreSchema,
+          apiKey: {
+            ...coreSchema.apiKey,
+            defaultValue: VALID_API_KEY
+          }
+        }
+
+        expect(() => { validateConfig(config, schema) }).toThrow('No Bugsnag API Key set')
+      })
+
+      it.each([
+        { type: 'undefined', config: undefined },
+        { type: 'null', config: null },
+        { type: 'empty object', config: {} }
+      ])('uses the default value when config is $type', ({ config }) => {
+        const schema = {
+          ...coreSchema,
+          apiKey: {
+            ...coreSchema.apiKey,
+            defaultValue: VALID_API_KEY
+          }
+        }
+
+        const validConfig = validateConfig(config, schema)
+        expect(validConfig.apiKey).toBe(VALID_API_KEY)
+      })
+
+      it('uses the default value when config.apiKey is undefined', () => {
+        const schema = {
+          ...coreSchema,
+          apiKey: {
+            ...coreSchema.apiKey,
+            defaultValue: VALID_API_KEY
+          }
+        }
+
+        const validConfig = validateConfig({ apiKey: undefined }, schema)
+        expect(validConfig.apiKey).toBe(VALID_API_KEY)
+      })
+    })
+
     describe('appVersion', () => {
       it('accepts a valid value', () => {
         const config = {
@@ -159,6 +243,175 @@ describe('Schema validation', () => {
 
         const validConfig = validateConfig(config, coreSchema)
         expect(validConfig.samplingProbability).toBe(undefined)
+      })
+    })
+
+    describe('attributeStringValueLimit', () => {
+      it('accepts a valid value', () => {
+        const config = {
+          apiKey: VALID_API_KEY,
+          attributeStringValueLimit: 100
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.attributeStringValueLimit).toBe(100)
+      })
+
+      it('replaces an invalid value with the default', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
+        const config = {
+          apiKey: VALID_API_KEY,
+          attributeStringValueLimit: 'abc'
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.attributeStringValueLimit).toBe(ATTRIBUTE_STRING_VALUE_LIMIT_DEFAULT)
+      })
+
+      it('uses the default if the value is out of range', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
+        const config = {
+          apiKey: VALID_API_KEY,
+          attributeStringValueLimit: ATTRIBUTE_STRING_VALUE_LIMIT_MAX + 1
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.attributeStringValueLimit).toBe(ATTRIBUTE_STRING_VALUE_LIMIT_DEFAULT)
+      })
+    })
+
+    describe('attributeArrayLengthLimit', () => {
+      it('accepts a valid value', () => {
+        const config = {
+          apiKey: VALID_API_KEY,
+          attributeArrayLengthLimit: 50
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.attributeArrayLengthLimit).toBe(50)
+      })
+
+      it('replaces an invalid value with the default', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
+        const config = {
+          apiKey: VALID_API_KEY,
+          attributeArrayLengthLimit: 'abc'
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.attributeArrayLengthLimit).toBe(ATTRIBUTE_ARRAY_LENGTH_LIMIT_DEFAULT)
+      })
+
+      it('uses the default if the value is out of range', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
+        const config = {
+          apiKey: VALID_API_KEY,
+          attributeArrayLengthLimit: ATTRIBUTE_ARRAY_LENGTH_LIMIT_MAX + 1
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.attributeArrayLengthLimit).toBe(ATTRIBUTE_ARRAY_LENGTH_LIMIT_DEFAULT)
+      })
+    })
+
+    describe('attributeCountLimit', () => {
+      it('accepts a valid value', () => {
+        const config = {
+          apiKey: VALID_API_KEY,
+          attributeCountLimit: 50
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.attributeCountLimit).toBe(50)
+      })
+
+      it('replaces an invalid value with the default', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
+        const config = {
+          apiKey: VALID_API_KEY,
+          attributeCountLimit: 'abc'
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.attributeCountLimit).toBe(ATTRIBUTE_COUNT_LIMIT_DEFAULT)
+      })
+
+      it('uses the default if the value is out of range', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
+        const config = {
+          apiKey: VALID_API_KEY,
+          attributeCountLimit: ATTRIBUTE_COUNT_LIMIT_MAX + 1
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.attributeCountLimit).toBe(ATTRIBUTE_COUNT_LIMIT_DEFAULT)
+      })
+    })
+
+    describe('onSpanStart', () => {
+      it('accepts valid callbacks', () => {
+        const callbacks = [() => {}, () => {}]
+        const config = {
+          apiKey: VALID_API_KEY,
+          onSpanStart: callbacks
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.onSpanStart).toBe(callbacks)
+      })
+
+      it('replaces invalid callbacks with undefined', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
+        const config = {
+          apiKey: VALID_API_KEY,
+          onSpanStart: [() => {}, 'not a function']
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.onSpanStart).toBe(undefined)
+      })
+    })
+
+    describe('onSpanEnd', () => {
+      it('accepts valid callbacks', () => {
+        const callbacks = [() => true, () => false]
+        const config = {
+          apiKey: VALID_API_KEY,
+          onSpanEnd: callbacks
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.onSpanEnd).toBe(callbacks)
+      })
+
+      it('replaces invalid callbacks with undefined', () => {
+        jest.spyOn(console, 'warn').mockImplementationOnce(() => {})
+
+        const config = {
+          apiKey: VALID_API_KEY,
+          onSpanEnd: [() => true, 'not a function']
+        }
+
+        const validConfig = validateConfig(config, coreSchema)
+        expect(validConfig.onSpanEnd).toBe(undefined)
+      })
+    })
+
+    describe('releaseStage', () => {
+      it('reduces the batch time in development environments', () => {
+        const config = {
+          apiKey: VALID_API_KEY
+        }
+
+        const validConfig = validateConfig(config, coreSchema, true)
+        expect(validConfig.batchInactivityTimeoutMs).toBe(5000)
       })
     })
   })

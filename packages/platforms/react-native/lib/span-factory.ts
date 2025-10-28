@@ -2,7 +2,6 @@ import { runSpanEndCallbacks, SpanFactory, SpanInternal, timeToNumber } from '@b
 import type { SpanAttributes, SpanOptions } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from './config'
 import NativeBugsnagPerformance from './native'
-import type { ReactNativeClock } from './clock'
 
 class NativeSpanInternal extends SpanInternal {
   public readonly isNativeSpan: boolean = true
@@ -12,8 +11,13 @@ interface ReactNativeSpanOptions extends SpanOptions {
   doNotDelegateToNativeSDK?: boolean
 }
 
-export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration> {
+export const APP_START_BASE_NAME = '[AppStart/ReactNativeInit]'
+const NAVIGATION_BASE_NAME = '[Navigation]'
+
+export class ReactNativeSpanFactory<C extends ReactNativeConfiguration = ReactNativeConfiguration> extends SpanFactory<C> {
   private attachedToNative = false
+  appStartSpan?: SpanInternal
+  private appStartSpanCreated = false
 
   onAttach () {
     this.attachedToNative = true
@@ -29,10 +33,10 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     }
 
     const safeStartTime = timeToNumber(this.clock, options.startTime)
-    const unixStartTimeNanos = (this.clock as ReactNativeClock).toUnixNanoseconds(safeStartTime)
+    const unixStartTimeNanos = this.clock.toUnixNanoseconds(safeStartTime)
     const nativeParentContext = options.parentContext ? { id: options.parentContext.id, traceId: options.parentContext.traceId } : undefined
     const nativeSpan = NativeBugsnagPerformance.startNativeSpan(name, { startTime: unixStartTimeNanos, parentContext: nativeParentContext })
-    return new NativeSpanInternal(nativeSpan.id, nativeSpan.traceId, name, safeStartTime, attributes, this.clock, nativeSpan.parentSpanId)
+    return new NativeSpanInternal(nativeSpan.id, nativeSpan.traceId, name, safeStartTime, attributes, this.clock, this.sampler.probability, nativeSpan.parentSpanId)
   }
 
   protected discardSpan (span: NativeSpanInternal) {
@@ -52,7 +56,7 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     const shouldSend = await runSpanEndCallbacks(spanEnded, this.logger, this.onSpanEndCallbacks)
 
     if (shouldSend) {
-      const unixEndTimeNanos = (this.clock as ReactNativeClock).toUnixNanoseconds(endTime)
+      const unixEndTimeNanos = this.clock.toUnixNanoseconds(endTime)
       const attributes = spanEnded.attributes.toObject()
       delete attributes['bugsnag.sampling.p']
       NativeBugsnagPerformance.endNativeSpan(spanEnded.id, spanEnded.traceId, unixEndTimeNanos, attributes)
@@ -62,10 +66,11 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
   }
 
   startNavigationSpan (routeName: string, spanOptions: ReactNativeSpanOptions) {
-    // Navigation spans are always first class
+    // Navigation spans are always first class, but are not delegated to the native SDK
     spanOptions.isFirstClass = true
+    spanOptions.doNotDelegateToNativeSDK = true
 
-    const spanName = '[Navigation]' + routeName
+    const spanName = NAVIGATION_BASE_NAME + routeName
     const span = this.startSpan(spanName, spanOptions)
 
     // Default navigation span attributes
@@ -73,5 +78,22 @@ export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration
     span.setAttribute('bugsnag.navigation.route', routeName)
 
     return span
+  }
+
+  startAppStartSpan (appStartTime: number) {
+    // Ensure we only ever create one app start span
+    if (!this.appStartSpan && !this.appStartSpanCreated) {
+      this.appStartSpan = this.startSpan(APP_START_BASE_NAME, { startTime: appStartTime, parentContext: null })
+      this.appStartSpan.setAttribute('bugsnag.span.category', 'app_start')
+      this.appStartSpan.setAttribute('bugsnag.app_start.type', 'ReactNativeInit')
+      this.appStartSpanCreated = true
+    }
+  }
+
+  endAppStartSpan (endTime: number) {
+    if (this.appStartSpan?.isValid()) {
+      this.endSpan(this.appStartSpan, endTime)
+      this.appStartSpan = undefined
+    }
   }
 }

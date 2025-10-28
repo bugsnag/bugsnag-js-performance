@@ -28,11 +28,7 @@ services:
       - .:/scan
 
   browser-maze-runner-bb:
-    build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.browser-feature-builder
-      args:
-        USE_CDN_BUILD:
+    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v9-cli
     environment:
       <<: *common-environment
       BITBAR_USERNAME:
@@ -40,6 +36,8 @@ services:
       HOST: "${HOST:-maze-runner}"
       API_HOST: "${API_HOST:-maze-runner}"
       MAZE_REPEATER_API_KEY: "${MAZE_REPEATER_API_KEY_JS:-}"
+      MAZE_HUB_REPEATER_API_KEY: "${MAZE_HUB_REPEATER_API_KEY_JS:-}"
+      SKIP_BUILD_PACKAGES: 1
     networks:
       default:
         aliases:
@@ -48,16 +46,13 @@ services:
       - "9000-9499:9339"
       - "9000-9499:9340"
     volumes:
-      - ./test/browser/maze_output:/app/test/browser/maze_output
+      - ./test/browser/maze_output:/app/maze_output
+      - ./test/browser/features:/app/features
+      - ./reports/:/app/reports/
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./reports/:/app/test/browser/reports/
 
   browser-maze-runner-bs:
-    build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.browser-feature-builder
-      args:
-        USE_CDN_BUILD:
+    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v9-cli
     environment: &browser-maze-runner-environment
       <<: *common-environment
       BROWSER_STACK_USERNAME:
@@ -65,25 +60,30 @@ services:
       HOST: "${HOST:-maze-runner}"
       API_HOST: "${API_HOST:-maze-runner}"
       MAZE_REPEATER_API_KEY: "${MAZE_REPEATER_API_KEY_JS:-}"
+      MAZE_HUB_REPEATER_API_KEY: "${MAZE_HUB_REPEATER_API_KEY_JS:-}"
+      SKIP_BUILD_PACKAGES: 1
     networks:
       default:
         aliases:
           - maze-runner
     volumes:
-      - ./test/browser/maze_output:/app/test/browser/maze_output
-      - ./reports/:/app/test/browser/reports/
+      - ./test/browser/maze_output:/app/maze_output
+      - ./test/browser/features:/app/features
+      - ./reports/:/app/reports/
 
   react-native-maze-runner:
-    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v9-cli
+    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v10-cli
     environment:
       <<: *common-environment
       BITBAR_USERNAME:
       BITBAR_ACCESS_KEY:
       RN_VERSION:
+      EXPO_VERSION:
       RCT_NEW_ARCH_ENABLED:
       REACT_NATIVE_NAVIGATION:
       NATIVE_INTEGRATION:
       MAZE_REPEATER_API_KEY: "${MAZE_REPEATER_API_KEY_RN:-}"
+      MAZE_HUB_REPEATER_API_KEY: "${MAZE_HUB_REPEATER_API_KEY_RN:-}"
     ports:
       - "9000-9499:9339"
     networks:

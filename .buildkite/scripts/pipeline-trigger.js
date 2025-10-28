@@ -8,6 +8,7 @@ const ignoredFiles = ["README.md", "LICENSE.txt", ".gitignore", "TESTING.md", "o
 const baseBranch = process.env.BUILDKITE_PULL_REQUEST_BASE_BRANCH;
 const currentBranch = process.env.BUILDKITE_BRANCH;
 const commitMessage = process.env.BUILDKITE_MESSAGE || "";
+const isFullBuild = process.env.FULL_SCHEDULED_BUILD === "1";
 
 if (baseBranch) {
   console.log(`Fetching latest changes from ${baseBranch}`);
@@ -17,14 +18,22 @@ if (baseBranch) {
   execSync(`git --no-pager diff --name-only origin/${baseBranch}`, { stdio: 'inherit' });
 }
 
-packages.forEach(({ paths, block, pipeline }) => {
+packages.reverse().forEach(({ paths, block, pipeline, environment, skip }) => {
   let upload = false;
+  const env = environment || "";
 
+  if (skip) {
+    console.log(`Skipping pipeline ${pipeline} as per configuration.`);
+    return;
+  }
+
+  // Upload all pipelines if specified in the commit message
   if (commitMessage.includes("[full ci]") ||
-    ["next", "main"].includes(currentBranch) ||
-    ["main"].includes(baseBranch)) {
-    console.log(`Upload pipeline file: ${pipeline}`);
-    execSync(`buildkite-agent pipeline upload ${pipeline}`);
+    isFullBuild ||
+    currentBranch === "main" ||
+    baseBranch === "main") {
+    console.log(`Upload pipeline file: ${pipeline} with environment: '${env}'`);
+    execSync(`${env} buildkite-agent pipeline upload ${pipeline}`);
     return;
   }
 
@@ -54,8 +63,8 @@ packages.forEach(({ paths, block, pipeline }) => {
   }
 
   if (upload) {
-    console.log(`Upload pipeline file: ${pipeline}`);
-    execSync(`buildkite-agent pipeline upload ${pipeline}`);
+    console.log(`Upload pipeline file: ${pipeline} with environment: '${env}'`);
+    execSync(`${env} buildkite-agent pipeline upload ${pipeline}`);
   } else {
     console.log(`Upload blocker file: ${block}`);
     execSync(`buildkite-agent pipeline upload ${block}`);

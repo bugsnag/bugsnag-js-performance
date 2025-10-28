@@ -18,25 +18,39 @@ const jestLogger = {
   warn: jest.fn()
 }
 
+const defaultOptions = () => {
+  const backgroundingListener = new ControllableBackgroundingListener()
+
+  return {
+    processor: new InMemoryProcessor(),
+    sampler: new Sampler(1.0),
+    idGenerator: new StableIdGenerator(),
+    spanAttributesSource,
+    clock: new IncrementingClock(),
+    backgroundingListener,
+    logger: jestLogger,
+    spanContextStorage: new DefaultSpanContextStorage(backgroundingListener)
+  }
+}
+
 class MockSpanFactory <C extends Configuration> extends SpanFactory<C> {
   public createdSpans: SpanEnded[]
 
-  constructor () {
-    const processor = new InMemoryProcessor()
-    const backgroundingListener = new ControllableBackgroundingListener()
+  constructor (overrides: Partial<ReturnType<typeof defaultOptions>> = {}) {
+    const options = { ...defaultOptions(), ...overrides }
 
     super(
-      processor,
-      new Sampler(1.0),
-      new StableIdGenerator(),
-      spanAttributesSource,
-      new IncrementingClock(),
-      backgroundingListener,
-      jestLogger,
-      new DefaultSpanContextStorage(backgroundingListener)
+      options.processor,
+      options.sampler,
+      options.idGenerator,
+      options.spanAttributesSource,
+      options.clock,
+      options.backgroundingListener,
+      options.logger,
+      options.spanContextStorage
     )
 
-    this.createdSpans = processor.spans
+    this.createdSpans = options.processor.spans
   }
 
   startSpan = jest.fn((name: string, options: SpanOptions) => {
@@ -80,6 +94,30 @@ class MockReactNativeSpanFactory extends ReactNativeSpanFactory {
   startNavigationSpan = jest.fn((name: string, options: SpanOptions) => {
     return super.startNavigationSpan(name, options)
   })
+
+  startAppStartSpan = jest.fn((startTime: number) => {
+    super.startAppStartSpan(startTime)
+  })
+
+  endAppStartSpan = jest.fn((endTime: number) => {
+    super.endAppStartSpan(endTime)
+  })
+
+  reset () {
+    this.startSpan.mockClear()
+    this.endSpan.mockClear()
+    this.startNavigationSpan.mockClear()
+    this.startAppStartSpan.mockClear()
+    this.endAppStartSpan.mockClear()
+
+    const processor = new InMemoryProcessor()
+    this.createdSpans = processor.spans
+    // @ts-expect-error processor is private
+    this.processor = processor
+
+    // @ts-expect-error spanContextStorage is private
+    this.spanContextStorage.contextStack.length = 0
+  }
 }
 
 export { MockSpanFactory, MockReactNativeSpanFactory }

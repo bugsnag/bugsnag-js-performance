@@ -1,13 +1,12 @@
 import { ReactNativeSpanFactory } from '../lib/span-factory'
 import NativeBugsnagPerformance from '../lib/native'
-import { ControllableBackgroundingListener, InMemoryProcessor, spanAttributesSource, StableIdGenerator } from '@bugsnag/js-performance-test-utilities'
+import { ControllableBackgroundingListener, InMemoryProcessor, spanAttributesSource, IncrementingIdGenerator } from '@bugsnag/js-performance-test-utilities'
 import { DefaultSpanContextStorage, Sampler, DISCARD_END_TIME } from '@bugsnag/core-performance'
-import type { InternalConfiguration } from '@bugsnag/core-performance'
+import type { Clock, InternalConfiguration } from '@bugsnag/core-performance'
 import createClock from '../lib/clock'
-import type { ReactNativeClock } from '../lib/clock'
 import type { ReactNativeConfiguration } from '../lib/config'
 
-let clock: ReactNativeClock
+let clock: Clock
 let spanFactory: ReactNativeSpanFactory
 let processor: InMemoryProcessor
 let contextStorage: DefaultSpanContextStorage
@@ -25,7 +24,7 @@ beforeEach(() => {
   spanFactory = new ReactNativeSpanFactory(
     processor,
     new Sampler(1.0),
-    new StableIdGenerator(),
+    new IncrementingIdGenerator(),
     spanAttributesSource,
     clock,
     backgroundingListener,
@@ -174,6 +173,21 @@ describe('ReactNativeSpanFactory', () => {
 
       expect(processor.spans.length).toBe(0)
     })
+
+    it('runs onSpanStart callbacks for native spans', async () => {
+      spanFactory.onAttach()
+
+      const onSpanStartCallback = jest.fn((span) => {
+        span.setAttribute('start_callback', true)
+      })
+
+      spanFactory.configure({ logger: jestLogger, onSpanStart: [onSpanStartCallback] } as unknown as InternalConfiguration<ReactNativeConfiguration>)
+      const startTime = clock.now()
+      const span = spanFactory.startSpan('native span', { startTime, isFirstClass: true })
+      expect(NativeBugsnagPerformance.startNativeSpan).toHaveBeenCalledWith('native span', expect.objectContaining({ startTime: clock.toUnixNanoseconds(startTime) }))
+      // @ts-expect-error 'attributes' is private but very awkward to test otherwise
+      expect(span.attributes.attributes.get('start_callback')).toBe(true)
+    })
   })
 
   describe('discardSpan', () => {
@@ -230,6 +244,66 @@ describe('ReactNativeSpanFactory', () => {
       const endedSpan = span.end(12345, spanFactory.sampler.spanProbability)
 
       expect(endedSpan.attributes.toJson()).toContainEqual({ key: 'bugsnag.navigation.route', value: { stringValue: 'testRoute' } })
+    })
+  })
+
+  describe('startAppStartSpan', () => {
+    it('creates an app start span with the supplied start time', () => {
+      spanFactory.startAppStartSpan(12345)
+      spanFactory.endAppStartSpan(54321)
+
+      expect(processor.spans[0].name).toBe('[AppStart/ReactNativeInit]')
+      expect(processor.spans[0].startTime).toBe(12345)
+    })
+
+    it('sets the parent context to null', () => {
+      spanFactory.startSpan('should not become parent', { startTime: 12345 })
+
+      spanFactory.startAppStartSpan(12345)
+      spanFactory.endAppStartSpan(54321)
+
+      expect(processor.spans[0].parentSpanId).toBeUndefined()
+    })
+
+    it('sets the required attributes', () => {
+      spanFactory.startAppStartSpan(12345)
+      spanFactory.endAppStartSpan(54321)
+
+      expect(processor.spans[0].attributes.toJson()).toStrictEqual([
+        { key: 'bugsnag.span.category', value: { stringValue: 'app_start' } },
+        { key: 'bugsnag.app_start.type', value: { stringValue: 'ReactNativeInit' } },
+        { key: 'bugsnag.sampling.p', value: { doubleValue: 1 } }
+      ])
+    })
+
+    it('prevents multiple app start spans from being created', () => {
+      spanFactory.startAppStartSpan(123)
+      const appStartSpanId = spanFactory.appStartSpan?.id
+
+      // calling while span is open should have no effect
+      spanFactory.startAppStartSpan(321)
+
+      spanFactory.endAppStartSpan(456)
+
+      // calling after span is ended should have no effect
+      spanFactory.startAppStartSpan(789)
+      spanFactory.endAppStartSpan(987)
+
+      expect(processor.spans.length).toBe(1)
+      expect(processor.spans[0].id).toBe(appStartSpanId)
+      expect(processor.spans[0].startTime).toBe(123)
+      expect(processor.spans[0].endTime).toBe(456)
+    })
+  })
+
+  describe('endAppStartSpan', () => {
+    it('ends the app start span with the supplied end time and clears the span reference', () => {
+      spanFactory.startAppStartSpan(12345)
+      expect(spanFactory.appStartSpan?.isValid()).toBe(true)
+
+      spanFactory.endAppStartSpan(54321)
+      expect(processor.spans[0].endTime).toBe(54321)
+      expect(spanFactory.appStartSpan).toBeUndefined()
     })
   })
 })

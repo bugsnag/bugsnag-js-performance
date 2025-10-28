@@ -1,12 +1,8 @@
 import type { Configuration, SpanAttributesSource } from '@bugsnag/core-performance'
 
 const spanAttributesSource: SpanAttributesSource<Configuration> = {
-  configure () {
-
-  },
-  requestAttributes () {
-
-  }
+  configure: jest.fn(),
+  requestAttributes: jest.fn()
 }
 
 export default spanAttributesSource

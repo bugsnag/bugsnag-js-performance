@@ -8,7 +8,7 @@ import {
 } from './custom-attribute-limits'
 import type { Plugin } from './plugin'
 import type { Span } from './span'
-import { isLogger, isNumber, isObject, isOnSpanEndCallbacks, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
+import { isLogger, isNumber, isObject, isCallbackArray, isPluginArray, isString, isStringArray, isStringWithLength } from './validation'
 
 type SetTraceCorrelation = (traceId: string, spanId: string) => void
 
@@ -42,8 +42,11 @@ export interface Logger {
 export type OnSpanEndCallback = (span: Span) => boolean | Promise<boolean>
 export type OnSpanEndCallbacks = OnSpanEndCallback[]
 
+export type OnSpanStartCallback = (span: Span) => void
+export type OnSpanStartCallbacks = OnSpanStartCallback[]
+
 export interface Configuration {
-  apiKey: string
+  apiKey?: string
   endpoint?: string
   releaseStage?: string
   logger?: Logger
@@ -52,6 +55,7 @@ export interface Configuration {
   plugins?: Array<Plugin<Configuration>>
   bugsnag?: BugsnagErrorStatic
   samplingProbability?: number
+  onSpanStart?: OnSpanStartCallbacks
   onSpanEnd?: OnSpanEndCallbacks
   attributeStringValueLimit?: number
   attributeArrayLengthLimit?: number
@@ -137,10 +141,15 @@ export const schema: CoreSchema = {
     message: 'should be a number between 0 and 1',
     validate: (value: unknown): value is number | undefined => value === undefined || (isNumber(value) && value >= 0 && value <= 1)
   },
+  onSpanStart: {
+    defaultValue: undefined,
+    message: 'should be an array of functions',
+    validate: isCallbackArray
+  },
   onSpanEnd: {
     defaultValue: undefined,
     message: 'should be an array of functions',
-    validate: isOnSpanEndCallbacks
+    validate: isCallbackArray
   },
   attributeStringValueLimit: {
     defaultValue: ATTRIBUTE_STRING_VALUE_LIMIT_DEFAULT,
@@ -190,8 +199,16 @@ if (typeof __ENABLE_BUGSNAG_TEST_CONFIGURATION__ !== 'undefined' && __ENABLE_BUG
   }
 }
 
-export function validateConfig<S extends CoreSchema, C extends Configuration> (config: unknown, schema: S): InternalConfiguration<C> {
-  if (typeof config === 'string') { config = { apiKey: config } }
+export function validateConfig<S extends CoreSchema, C extends Configuration> (config: unknown, schema: S, isDevelopment = false): InternalConfiguration<C> {
+  // Normalize config to an object with an apiKey property
+  // If no api key is set, try to use the default value from the provided schema
+  if (typeof config === 'string') {
+    config = { apiKey: config }
+  } else if (config === null || config === undefined) {
+    config = { apiKey: schema.apiKey.defaultValue }
+  } else if (isObject(config) && config.apiKey === undefined) {
+    config.apiKey = schema.apiKey.defaultValue
+  }
 
   if (!isObject(config) || !isString(config.apiKey) || config.apiKey.length === 0) {
     throw new Error('No Bugsnag API Key set')
@@ -213,10 +230,13 @@ export function validateConfig<S extends CoreSchema, C extends Configuration> (c
     }
   }
 
+  // Set default batch time based on release stage
+  const defaultBatchTime = isDevelopment ? 5 * 1000 : 30 * 1000
+
   // If apiKey is set but not valid we should still use it, despite the validation warning.
   cleanConfiguration.apiKey = config.apiKey
   cleanConfiguration.maximumBatchSize = config.maximumBatchSize || 100
-  cleanConfiguration.batchInactivityTimeoutMs = config.batchInactivityTimeoutMs || 30 * 1000
+  cleanConfiguration.batchInactivityTimeoutMs = config.batchInactivityTimeoutMs || defaultBatchTime
 
   if (warnings.length > 0) {
     (cleanConfiguration as unknown as InternalConfiguration<Configuration>).logger.warn(`Invalid configuration${warnings}`)

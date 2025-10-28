@@ -1,11 +1,5 @@
-import type {
-  InternalConfiguration,
-  Logger,
-  Plugin,
-  SpanContextStorage,
-  SpanFactory,
-  SpanInternal
-} from '@bugsnag/core-performance'
+import { RemoteParentContext } from '@bugsnag/core-performance'
+import type { Logger, Plugin, PluginContext, SpanContextStorage, SpanFactory } from '@bugsnag/core-performance'
 import type {
   NetworkRequestCallback,
   NetworkRequestInfo,
@@ -27,28 +21,42 @@ export interface ReactNativeNetworkRequestInfo extends NetworkRequestInfo {
   readonly type: 'xmlhttprequest'
 }
 
-export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
+export class NetworkRequestPlugin<C extends ReactNativeConfiguration = ReactNativeConfiguration> implements Plugin<C> {
   private ignoredUrls: string[] = [NET_INFO_REACHABILITY_URL]
   private tracePropagationUrls: RegExp[] = []
   private networkRequestCallback: NetworkRequestCallback<ReactNativeNetworkRequestInfo> = defaultNetworkRequestCallback
   private logger: Logger = { debug: console.debug, warn: console.warn, info: console.info, error: console.error }
+  private enabled: boolean = false
 
   constructor (
-    private spanFactory: SpanFactory<ReactNativeConfiguration>,
+    private spanFactory: SpanFactory<C>,
     private readonly spanContextStorage: SpanContextStorage,
     private xhrTracker: RequestTracker
   ) {}
 
-  configure (configuration: InternalConfiguration<ReactNativeConfiguration>) {
-    this.logger = configuration.logger
+  install (context: PluginContext<C>) {
+    if (!context.configuration.autoInstrumentNetworkRequests) {
+      return
+    }
 
-    if (configuration.autoInstrumentNetworkRequests) {
-      this.ignoredUrls.push(configuration.endpoint)
-      this.xhrTracker.onStart(this.trackRequest)
-      this.networkRequestCallback = configuration.networkRequestCallback
-      this.tracePropagationUrls = configuration.tracePropagationUrls.map(
+    const { endpoint, logger, networkRequestCallback, tracePropagationUrls } = context.configuration
+
+    if (logger) this.logger = logger
+    if (endpoint) this.ignoredUrls.push(endpoint)
+    if (networkRequestCallback) this.networkRequestCallback = networkRequestCallback
+
+    if (tracePropagationUrls) {
+      this.tracePropagationUrls = tracePropagationUrls.map(
         (url: string | RegExp): RegExp => typeof url === 'string' ? RegExp(url) : url
       )
+    }
+
+    this.enabled = true
+  }
+
+  start () {
+    if (this.enabled) {
+      this.xhrTracker.onStart(this.trackRequest)
     }
   }
 
@@ -114,29 +122,12 @@ export class NetworkRequestPlugin implements Plugin<ReactNativeConfiguration> {
     return this.tracePropagationUrls.some(regexp => regexp.test(url))
   }
 
-  private getExtraRequestHeaders (span?: SpanInternal): Record<string, string> {
+  private getExtraRequestHeaders (spanContext = this.spanContextStorage.current): Record<string, string> {
     const extraRequestHeaders: Record<string, string> = {}
-
-    if (span) {
-      const traceId = span.traceId
-      const parentSpanId = span.id
-      const sampled = this.spanFactory.sampler.shouldSample(span.samplingRate)
-
-      extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)
-    } else if (this.spanContextStorage.current) {
-      const currentSpanContext = this.spanContextStorage.current
-
-      const traceId = currentSpanContext.traceId
-      const parentSpanId = currentSpanContext.id
-      const sampled = this.spanFactory.sampler.shouldSample(currentSpanContext.samplingRate)
-
-      extraRequestHeaders.traceparent = buildTraceparentHeader(traceId, parentSpanId, sampled)
+    if (spanContext) {
+      extraRequestHeaders.traceparent = RemoteParentContext.toTraceParentString(spanContext)
     }
 
     return extraRequestHeaders
   }
-}
-
-function buildTraceparentHeader (traceId: string, parentSpanId: string, sampled: boolean): string {
-  return `00-${traceId}-${parentSpanId}-${sampled ? '01' : '00'}`
 }

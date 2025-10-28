@@ -5,8 +5,8 @@ import { Platform } from 'react-native'
 import type { DeviceInfo } from './NativeBugsnagPerformance'
 import type { ReactNativeConfiguration } from './config'
 
-export default function resourceAttributesSourceFactory (persistence: Persistence, deviceInfo?: DeviceInfo): ResourceAttributeSource<ReactNativeConfiguration> {
-  return function resourceAttributesSource (config: InternalConfiguration<ReactNativeConfiguration>): Promise<ResourceAttributes> {
+export default function resourceAttributesSourceFactory<C extends ReactNativeConfiguration = ReactNativeConfiguration> (persistence: Persistence, deviceInfo?: DeviceInfo): ResourceAttributeSource<C> {
+  return function resourceAttributesSource (config: InternalConfiguration<C>): Promise<ResourceAttributes> {
     let getDeviceId: Promise<string> | undefined
     let deviceId: string | undefined
 

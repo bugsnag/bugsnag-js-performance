@@ -1,75 +1,119 @@
+import { VALID_API_KEY } from '@bugsnag/js-performance-test-utilities'
+import BugsnagPerformance from '@bugsnag/react-native-performance'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import React, { useState } from 'react'
-import { Button } from 'react-native'
+import { Button, View } from 'react-native'
 import { CompleteNavigation } from '../lib/complete-navigation'
-import { NavigationContext } from '../lib/navigation-context'
-jest.useFakeTimers()
+import BugsnagPluginReactNavigationNativePerformance from '../lib/react-navigation-native-plugin'
+
+beforeEach(() => {
+  jest.useFakeTimers()
+})
+
+afterEach(() => {
+  jest.clearAllMocks()
+  jest.useRealTimers()
+})
+
 describe('CompleteNavigation', () => {
-  it('calls the appropriate methods on mount', () => {
-    const blockNavigationEnd = jest.fn()
-    const unblockNavigationEnd = jest.fn()
-    const triggerNavigationEnd = jest.fn()
+  describe('getPlugin', () => {
+    it('gets the plugin instance from BugsnagPerformance', () => {
+      const plugin = new BugsnagPluginReactNavigationNativePerformance()
 
-    render(
-      <NavigationContext.Provider value={{ blockNavigationEnd, unblockNavigationEnd, triggerNavigationEnd }} >
+      BugsnagPerformance.start({
+        apiKey: VALID_API_KEY,
+        plugins: [plugin]
+      })
+
+      render(
+      <View>
         <CompleteNavigation on='mount' />
-      </NavigationContext.Provider>
-    )
+      </View>
+      )
 
-    expect(blockNavigationEnd).toHaveBeenCalled()
+      expect(jest.mocked(BugsnagPerformance.getPlugin)).toHaveBeenCalledWith(BugsnagPluginReactNavigationNativePerformance)
+      expect(jest.mocked(BugsnagPerformance.getPlugin).mock.results[0].value).toBe(plugin)
+    })
 
-    // wait for next tick
-    jest.advanceTimersByTime(1)
+    it('handles missing plugin gracefully', () => {
+      jest.spyOn(BugsnagPerformance, 'getPlugin').mockReturnValue(undefined)
 
-    expect(unblockNavigationEnd).toHaveBeenCalledWith('mount')
+      render(
+    <CompleteNavigation on="mount">
+      <View testID='view' />
+    </CompleteNavigation>
+      )
+
+      // Should not throw and should render children
+      expect(screen.getByTestId('view')).toBeTruthy()
+    })
   })
 
-  it('calls the appropriate methods on unmount', () => {
-    const blockNavigationEnd = jest.fn()
-    const unblockNavigationEnd = jest.fn()
-    const triggerNavigationEnd = jest.fn()
-    function TestApp () {
-      const [showComponent, setShowComponent] = useState(true)
+  describe('conditions', () => {
+    let plugin: BugsnagPluginReactNavigationNativePerformance
 
-      return (
-        <NavigationContext.Provider value={{ blockNavigationEnd, unblockNavigationEnd, triggerNavigationEnd }} >
+    beforeEach(() => {
+      plugin = new BugsnagPluginReactNavigationNativePerformance()
+      jest.spyOn(plugin, 'blockNavigationEnd')
+      jest.spyOn(plugin, 'unblockNavigationEnd')
+      jest.spyOn(BugsnagPerformance, 'getPlugin').mockReturnValue(plugin)
+    })
+
+    it('calls the appropriate methods on mount', () => {
+      render(
+      <View>
+        <CompleteNavigation on='mount' />
+      </View>
+      )
+
+      expect(plugin.blockNavigationEnd).toHaveBeenCalled()
+
+      // wait for next tick
+      jest.advanceTimersByTime(1)
+
+      expect(plugin.unblockNavigationEnd).toHaveBeenCalledWith('mount')
+    })
+
+    it('calls the appropriate methods on unmount', () => {
+      function TestApp () {
+        const [showComponent, setShowComponent] = useState(true)
+
+        return (
+        <View>
           {showComponent && <CompleteNavigation on='unmount' />}
           <Button title='Unmount component' onPress={() => { setShowComponent(false) }} />
-        </NavigationContext.Provider>
-      )
-    }
-    render(<TestApp />)
-    expect(blockNavigationEnd).toHaveBeenCalled()
-    // wait for next tick
-    jest.advanceTimersByTime(1)
-    expect(unblockNavigationEnd).not.toHaveBeenCalled()
+        </View>
+        )
+      }
+      render(<TestApp />)
+      expect(plugin.blockNavigationEnd).toHaveBeenCalled()
+      // wait for next tick
+      jest.advanceTimersByTime(1)
+      expect(plugin.unblockNavigationEnd).not.toHaveBeenCalled()
 
-    fireEvent.press(screen.getByText('Unmount component'))
+      fireEvent.press(screen.getByText('Unmount component'))
 
-    expect(unblockNavigationEnd).toHaveBeenCalledWith('unmount')
-  })
+      expect(plugin.unblockNavigationEnd).toHaveBeenCalledWith('unmount')
+    })
 
-  it('calls the appropriate method when the "on" condition changes to true', () => {
-    const blockNavigationEnd = jest.fn()
-    const unblockNavigationEnd = jest.fn()
-    const triggerNavigationEnd = jest.fn()
+    it('calls the appropriate method when the "on" condition changes to true', () => {
+      function TestApp () {
+        const [loaded, setLoaded] = useState(false)
 
-    function TestApp () {
-      const [loaded, setLoaded] = useState(false)
-
-      return (
-        <NavigationContext.Provider value={{ blockNavigationEnd, unblockNavigationEnd, triggerNavigationEnd }} >
+        return (
+        <View >
           {<CompleteNavigation on={loaded} />}
           <Button title='Finish loading' onPress={() => { setLoaded(true) }} />
-        </NavigationContext.Provider>
-      )
-    }
+        </View>
+        )
+      }
 
-    render(<TestApp />)
-    expect(blockNavigationEnd).toHaveBeenCalled()
-    jest.advanceTimersByTime(100)
-    expect(unblockNavigationEnd).not.toHaveBeenCalled()
-    fireEvent.press(screen.getByText('Finish loading'))
-    expect(unblockNavigationEnd).toHaveBeenCalledWith('condition')
+      render(<TestApp />)
+      expect(plugin.blockNavigationEnd).toHaveBeenCalled()
+      jest.advanceTimersByTime(100)
+      expect(plugin.unblockNavigationEnd).not.toHaveBeenCalled()
+      fireEvent.press(screen.getByText('Finish loading'))
+      expect(plugin.unblockNavigationEnd).toHaveBeenCalledWith('condition')
+    })
   })
 })

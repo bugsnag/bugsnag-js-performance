@@ -5,7 +5,7 @@ import url from 'url'
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url))
 
-export const isCdnBuild = process.env.USE_CDN_BUILD === "1" || process.env.USE_CDN_BUILD === "true"
+export const isCdnBuild = process.env.BUILD_MODE.toUpperCase() === "CDN"
 
 const cdnOutputOptions = {
   // import BugsnagPerformance from the CDN build

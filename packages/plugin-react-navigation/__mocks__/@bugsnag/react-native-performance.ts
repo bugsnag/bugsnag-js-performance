@@ -1,20 +1,27 @@
-import type { Configuration, Plugin } from '@bugsnag/core-performance'
-import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
+import { createTestClient, IncrementingClock, MockReactNativeSpanFactory } from '@bugsnag/js-performance-test-utilities'
+import { createDefaultPlatformExtensions } from '@bugsnag/react-native-performance/lib/platform-extensions'
 
-const plugins: Array<Plugin<Configuration>> = []
+const clock = new IncrementingClock()
 
-const BugsnagPerformance = {
-  start: jest.fn((configuration: ReactNativeConfiguration) => {
-    plugins.length = 0
-    configuration.plugins?.forEach(plugin => plugins.push(plugin))
-  }),
-  getPlugin: jest.fn((Constructor) => {
-    for (const plugin of plugins) {
-      if (plugin instanceof Constructor) {
-        return plugin
-      }
+const BugsnagPerformance = createTestClient({
+  clock,
+  spanFactory: MockReactNativeSpanFactory,
+  platformExtensions: (spanFactory, spanContextStorage) => {
+    const reactNativeExtensions = createDefaultPlatformExtensions(0, clock, spanFactory as unknown as MockReactNativeSpanFactory, spanContextStorage)
+
+    return {
+      ...reactNativeExtensions,
+      spanFactory
     }
-  })
-}
+  }
+})
+
+// Spy on all methods
+Object.keys(BugsnagPerformance).forEach(key => {
+  const client = BugsnagPerformance as any
+  if (typeof client[key] === 'function') {
+    jest.spyOn(client, key)
+  }
+})
 
 export default BugsnagPerformance

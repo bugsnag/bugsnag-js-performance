@@ -5,8 +5,8 @@ import {
   createTestClient
 } from '@bugsnag/js-performance-test-utilities'
 import type { BackgroundingListener } from '../lib/backgrounding-listener'
-import type { AppState } from '../lib/core'
 import { createNoopClient } from '../lib/core'
+import { setAppState } from '../lib/app-state'
 import { InMemoryPersistence } from '../lib/persistence'
 import { DefaultSpanContextStorage } from '../lib/span-context'
 
@@ -23,7 +23,8 @@ describe('Core', () => {
         startNetworkSpan: expect.any(Function),
         currentSpanContext: undefined,
         appState: 'starting',
-        getPlugin: expect.any(Function)
+        getPlugin: expect.any(Function),
+        getSpanControls: expect.any(Function)
       })
     })
 
@@ -77,7 +78,7 @@ describe('Core', () => {
         const invalidParameters = [
           { type: 'bigint', value: BigInt(9007199254740991) },
           { type: 'boolean', value: true },
-          { type: 'function', value: () => {} },
+          { type: 'function', value: () => { } },
           { type: 'number', value: 12345 },
           { type: 'object', value: { property: 'test' } },
           { type: 'object', value: [] },
@@ -131,10 +132,9 @@ describe('Core', () => {
           expect(logger.warn).toHaveBeenCalledWith(`Invalid configuration\n  - endpoint should be a string, got ${type}\n  - releaseStage should be a string, got ${type}`)
         })
 
-        it('throws if no configuration is provided', () => {
+        it('throws if no API key is set', () => {
           const client = createTestClient()
 
-          // @ts-expect-error no configuration provided
           expect(() => { client.start() }).toThrow('No Bugsnag API Key set')
         })
 
@@ -162,7 +162,7 @@ describe('Core', () => {
 
         it.each([
           { type: 'a bigint', config: BigInt(9007199254740991) },
-          { type: 'a function', config: () => {} },
+          { type: 'a function', config: () => { } },
           { type: 'a number', config: 12345 },
           { type: 'a date', config: new Date() },
           { type: 'boolean (true)', config: true },
@@ -369,7 +369,7 @@ describe('Core', () => {
           const spanContextStorage = new DefaultSpanContextStorage(new ControllableBackgroundingListener())
           const client = createTestClient({ spanContextStorage })
 
-          const spanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1 }
+          const spanContext = { id: '0123456789abcdef', traceId: '0123456789abcdeffedcba9876543210', isValid: () => true, samplingRate: 0.1, samplingProbability: 1 }
           spanContextStorage.push(spanContext)
           expect(client.currentSpanContext).toBe(spanContext)
         })
@@ -377,27 +377,12 @@ describe('Core', () => {
 
       describe('appState', () => {
         it('updates the current appState', () => {
-          class AppStatePlugin {
-            setAppState?: (appState: AppState) => void
-
-            configure (configuration: any, spanFactory: any, setAppState: (appState: AppState) => void) {
-              this.setAppState = setAppState
-            }
-
-            updateState (appState: AppState) {
-              if (this.setAppState) {
-                this.setAppState(appState)
-              }
-            }
-          }
-
-          const plugin = new AppStatePlugin()
           const client = createTestClient()
 
-          client.start({ apiKey: VALID_API_KEY, plugins: [plugin] })
+          client.start({ apiKey: VALID_API_KEY })
           expect(client.appState).toBe('starting')
 
-          plugin.updateState('navigating')
+          setAppState('navigating')
           expect(client.appState).toBe('navigating')
         })
       })
@@ -407,7 +392,9 @@ describe('Core', () => {
           const listener = jest.fn()
 
           class TestPlugin {
-            configure () {}
+            install () {}
+
+            start () {}
 
             test () {
               listener()
@@ -431,11 +418,13 @@ describe('Core', () => {
 
         it('does not return a plugin if it has not been provided', () => {
           class TestPlugin {
-            configure () {}
+            install () {}
+            start () {}
           }
 
           class AnotherPlugin {
-            configure () {}
+            install () {}
+            start () {}
           }
 
           const client = createTestClient()
@@ -484,13 +473,15 @@ describe('Core', () => {
     })
 
     it('creates and configures a given plugin', () => {
-      const plugin = { configure: jest.fn() }
+      const plugin = { install: jest.fn(), start: jest.fn() }
       const createPlugins = jest.fn(() => [plugin])
       const client = createTestClient({ plugins: createPlugins })
       expect(createPlugins).toHaveBeenCalled()
-      expect(plugin.configure).not.toHaveBeenCalled()
+      expect(plugin.install).not.toHaveBeenCalled()
+      expect(plugin.start).not.toHaveBeenCalled()
       client.start(VALID_API_KEY)
-      expect(plugin.configure).toHaveBeenCalled()
+      expect(plugin.install).toHaveBeenCalled()
+      expect(plugin.start).toHaveBeenCalled()
     })
   })
 
@@ -517,6 +508,57 @@ describe('Core', () => {
         const span = client.startSpan('name', { startTime: new Date() })
         span.end()
       }).not.toThrow()
+    })
+  })
+
+  describe('endpoint', () => {
+    const HUB_PREFIX = '00000'
+    const HUB_ENDPOINT = 'https://otlp.insighthub.smartbear.com/v1/traces'
+    const BUGSNAG_ENDPOINT = 'https://otlp.bugsnag.com/v1/traces'
+
+    const HUB_KEY = `${HUB_PREFIX}abcdefabcdefabcdefabcdefabcd`
+    const BS_KEY = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6'
+
+    describe('automatic InsightHub switch', () => {
+      it('swaps to InsightHub when apiKey starts with 00000', async () => {
+        const delivery = new InMemoryDelivery()
+        const deliveryFactory = jest.fn(() => delivery)
+        const client = createTestClient({ deliveryFactory })
+
+        client.start(HUB_KEY)
+
+        // allow async configuration to complete
+        await jest.runOnlyPendingTimersAsync()
+
+        expect(deliveryFactory).toHaveBeenCalledWith(HUB_ENDPOINT)
+      })
+
+      it('keeps Bugsnag host + apiKey sub-domain for a normal key', async () => {
+        const delivery = new InMemoryDelivery()
+        const deliveryFactory = jest.fn(() => delivery)
+        const client = createTestClient({ deliveryFactory })
+
+        client.start(BS_KEY)
+
+        await jest.runOnlyPendingTimersAsync()
+
+        expect(deliveryFactory).toHaveBeenCalledWith(
+          `https://${BS_KEY}.${BUGSNAG_ENDPOINT.slice('https://'.length)}`
+        )
+      })
+
+      it('does NOT override a custom endpoint, even for a Hub key', async () => {
+        const CUSTOM_ENDPOINT = 'https://my-otel-proxy.example.com/traces'
+        const delivery = new InMemoryDelivery()
+        const deliveryFactory = jest.fn(() => delivery)
+        const client = createTestClient({ deliveryFactory })
+
+        client.start({ apiKey: HUB_KEY, endpoint: CUSTOM_ENDPOINT })
+
+        await jest.runOnlyPendingTimersAsync()
+
+        expect(deliveryFactory).toHaveBeenCalledWith(CUSTOM_ENDPOINT)
+      })
     })
   })
 })

@@ -92,7 +92,7 @@ export class SpanAttributes extends Attributes {
     this.logger = logger
   }
 
-  private validateAttribute (name: string, value: SpanAttribute) {
+  private truncateAttribute (name: string, value: SpanAttribute) {
     if (typeof value === 'string' && value.length > this.spanAttributeLimits.attributeStringValueLimit) {
       this.attributes.set(name, truncateString(value, this.spanAttributeLimits.attributeStringValueLimit))
       this.logger.warn(`Span attribute ${name} in span ${this.spanName} was truncated as the string exceeds the ${this.spanAttributeLimits.attributeStringValueLimit} character limit set by attributeStringValueLimit.`)
@@ -105,9 +105,38 @@ export class SpanAttributes extends Attributes {
     }
   }
 
+  private isValidAttributeValue (value: unknown): boolean {
+    return typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value)
+  }
+
+  private isValidAttributeName (name: string): boolean {
+    return typeof name === 'string' && name.length > 0
+  }
+
+  // Used to set internal attributes
+  set (name: string, value: SpanAttribute | null | undefined) {
+    if (!this.isValidAttributeName(name)) return
+
+    if (value === null || value === undefined) {
+      this.remove(name)
+      return
+    }
+
+    if (this.isValidAttributeValue(value)) {
+      this.attributes.set(name, value)
+    }
+  }
+
   // Used by the public API to set custom attributes
-  setCustom (name: string, value: SpanAttribute) {
-    if (typeof name === 'string' && (typeof value === 'string' || typeof value === 'boolean' || isNumber(value) || Array.isArray(value))) {
+  setCustom (name: string, value: SpanAttribute | null | undefined) {
+    if (!this.isValidAttributeName(name)) return
+
+    if (value === null || value === undefined) {
+      this.remove(name)
+      return
+    }
+
+    if (this.isValidAttributeValue(value)) {
       if (!this.attributes.has(name) && this.attributes.size >= this.spanAttributeLimits.attributeCountLimit) {
         this._droppedAttributesCount++
         this.logger.warn(`Span attribute ${name} in span ${this.spanName} was dropped as the number of attributes exceeds the ${this.spanAttributeLimits.attributeCountLimit} attribute limit set by attributeCountLimit.`)
@@ -125,8 +154,10 @@ export class SpanAttributes extends Attributes {
   }
 
   toJson () {
-    Array.from(this.attributes).forEach(([key, value]) => { this.validateAttribute(key, value) })
-    return Array.from(this.attributes).map(([key, value]) => attributeToJson(key, value))
+    Array.from(this.attributes).forEach(([key, value]) => { this.truncateAttribute(key, value) })
+    return Array.from(this.attributes)
+      .map(([key, value]) => attributeToJson(key, value))
+      .filter(attr => attr !== undefined)
   }
 }
 

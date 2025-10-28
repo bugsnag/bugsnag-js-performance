@@ -1,15 +1,14 @@
 import createRollupConfig from '../../.rollup/index.mjs'
 import noTreeShakingPlugin from '../../.rollup/no-tree-shaking.plugin.mjs'
-import jsx from 'acorn-jsx'
 
 const config = createRollupConfig({
   external: [
     '@bugsnag/browser-performance',
-    'react'
+    'react',
+    'react/jsx-runtime'
   ]
 })
 
-config.acornInjectPlugins = [jsx()]
 config.plugins = config.plugins.concat([
   noTreeShakingPlugin('with-instrumented-component.tsx')
 ])
