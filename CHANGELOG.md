@@ -6,6 +6,10 @@
 
 - (react-native): Added `createReactNativeClient` factory method for internal use by upstream libraries [#730](https://github.com/bugsnag/bugsnag-js-performance/pull/730)
 
+### Changed
+
+- (core) Refactored `ResourceAttributes` and `SpanAttributes` to extend a shared base `Attributes` class, removing the need for unused logger parameter in `ResourceAttributes`. [#736](https://github.com/bugsnag/bugsnag-js-performance/pull/736)
+
 ## [v3.1.0] (2025-09-24)
 
 ### Added
