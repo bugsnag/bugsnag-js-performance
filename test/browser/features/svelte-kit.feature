@@ -6,10 +6,11 @@ Feature: SvelteKit router
         And I click the element "contact"
         And I wait for 1 second
         And I click the element "profile"
-        And I wait to receive 2 spans
+        And I wait to receive a span named "[RouteChange]/contact/[contactId]"
+        And I wait to receive a span named "[RouteChange]/contact/[contactId]/profile"
 
-        Then a span named "[RouteChange]/contact/[contactId]" contains the attributes: 
-            | attribute                                 | type         | value                          | 
+        Then a span named "[RouteChange]/contact/[contactId]" contains the attributes:
+            | attribute                                 | type         | value                          |
             | bugsnag.span.category                     | stringValue  | route_change                   |
             | bugsnag.browser.page.route                | stringValue  | /contact/[contactId]           |
             | bugsnag.browser.page.previous_route       | stringValue  | /                              |
@@ -17,8 +18,8 @@ Feature: SvelteKit router
             | bugsnag.browser.page.title                | stringValue  | Contact 1                      |
             | bugsnag.sampling.p                        | doubleValue  | 1                              |
 
-        And a span named "[RouteChange]/contact/[contactId]/profile" contains the attributes: 
-            | attribute                                 | type         | value                          | 
+        And a span named "[RouteChange]/contact/[contactId]/profile" contains the attributes:
+            | attribute                                 | type         | value                          |
             | bugsnag.span.category                     | stringValue  | route_change                   |
             | bugsnag.browser.page.route                | stringValue  | /contact/[contactId]/profile   |
             | bugsnag.browser.page.previous_route       | stringValue  | /contact/[contactId]           |
