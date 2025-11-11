@@ -16,7 +16,7 @@ steps:
           JAVA_VERSION: "{{matrix.java}}"
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix.reactnative}}"
-          NOTIFIER_VERSION: '8.0.0'
+          NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "0"
           BUILD_ANDROID: "true"
         artifact_paths:
@@ -51,7 +51,7 @@ steps:
           JAVA_VERSION: "17"
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
-          NOTIFIER_VERSION: '8.0.0'
+          NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "1"
           BUILD_ANDROID: "true"
         artifact_paths:
@@ -78,7 +78,7 @@ steps:
           JAVA_VERSION: "{{matrix.java}}"
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix.reactnative}}"
-          NOTIFIER_VERSION: '8.0.0'
+          NOTIFIER_VERSION: "8.0.0"
           BUILD_ANDROID: "true"
           RCT_NEW_ARCH_ENABLED: "0"
           NATIVE_INTEGRATION: "1"
@@ -115,7 +115,7 @@ steps:
           JAVA_VERSION: "17"
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
-          NOTIFIER_VERSION: '8.0.0'
+          NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "1"
           BUILD_ANDROID: "true"
           NATIVE_INTEGRATION: "1"
@@ -143,7 +143,7 @@ steps:
         env:
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
-          NOTIFIER_VERSION: '8.0.0'
+          NOTIFIER_VERSION: "8.0.0"
           BUILD_IOS: "true"
           RCT_NEW_ARCH_ENABLED: "0"
           XCODE_VERSION: "16.2.0"
@@ -172,7 +172,7 @@ steps:
         env:
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
-          NOTIFIER_VERSION: '8.0.0'
+          NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "1"
           BUILD_IOS: "true"
           XCODE_VERSION: "16.2.0"
@@ -200,7 +200,7 @@ steps:
         env:
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
-          NOTIFIER_VERSION: '8.0.0'
+          NOTIFIER_VERSION: "8.0.0"
           BUILD_IOS: "true"
           RCT_NEW_ARCH_ENABLED: "0"
           XCODE_VERSION: "16.2.0"
@@ -231,7 +231,7 @@ steps:
           NODE_VERSION: "18"
           RN_VERSION: "{{matrix}}"
           RCT_NEW_ARCH_ENABLED: "1"
-          NOTIFIER_VERSION: '8.0.0'
+          NOTIFIER_VERSION: "8.0.0"
           BUILD_IOS: "true"
           XCODE_VERSION: "16.2.0"
           NATIVE_INTEGRATION: "1"
