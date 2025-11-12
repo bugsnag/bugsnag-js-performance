@@ -5,6 +5,7 @@ RUN if [ -f /usr/local/share/ca-certificates/zscaler-root-ca.crt ]; then cat /us
 
 RUN apk add --update git bash python3 py3-setuptools make gcc g++ openssh-client curl
 
+ENV NODE_EXTRA_CA_CERTS=/usr/local/share/ca-certificates/zscaler-root-ca.crt
 RUN addgroup -S admins
 RUN adduser -S releaser -G admins
 
