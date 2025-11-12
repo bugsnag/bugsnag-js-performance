@@ -9,7 +9,6 @@
 ### Changed
 
 - Amend secondary endpoint to `bugsnag.smartbear.com` [#737](https://github.com/bugsnag/bugsnag-js/pull/737)
-- (core) Refactored `ResourceAttributes` and `SpanAttributes` to extend a shared base `Attributes` class, removing the need for unused logger parameter in `ResourceAttributes`. [#736](https://github.com/bugsnag/bugsnag-js-performance/pull/736)
 
 ## [v3.1.0] (2025-09-24)
 
