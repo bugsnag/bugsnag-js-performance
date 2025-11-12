@@ -1,4 +1,4 @@
-import { SpanAttributes, ResourceAttributes, attributeToJson } from '../lib/attributes'
+import { ResourceAttributes, SpanAttributes, attributeToJson } from '../lib/attributes'
 import { defaultSpanAttributeLimits } from '../lib/custom-attribute-limits'
 
 describe('SpanAttributes', () => {
@@ -370,14 +370,8 @@ describe('attributeToJson', () => {
 })
 
 describe('ResourceAttributes', () => {
-  const jestLogger = { warn: jest.fn(), error: jest.fn(), debug: jest.fn(), info: jest.fn() }
-
-  beforeEach(() => {
-    jestLogger.warn.mockClear()
-  })
-
   it('creates resource attributes with all required fields', () => {
-    const resourceAttributes = new ResourceAttributes('production', '1.2.3', 'my-service', 'bugsnag-js-performance', '2.0.0', jestLogger)
+    const resourceAttributes = new ResourceAttributes('production', '1.2.3', 'my-service', 'bugsnag-js-performance', '2.0.0')
 
     const attributes = resourceAttributes.toObject()
     expect(attributes).toEqual({
@@ -390,7 +384,7 @@ describe('ResourceAttributes', () => {
   })
 
   it('creates resource attributes without service.version when appVersion is empty', () => {
-    const resourceAttributes = new ResourceAttributes('staging', '', 'my-service', 'bugsnag-js-performance', '2.0.0', jestLogger)
+    const resourceAttributes = new ResourceAttributes('staging', '', 'my-service', 'bugsnag-js-performance', '2.0.0')
 
     const attributes = resourceAttributes.toObject()
     expect(attributes).toEqual({
