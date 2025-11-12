@@ -12,7 +12,7 @@ steps:
         key: "build-react-native-navigation-android-fixture-old-arch"
         timeout_in_minutes: 15
         agents:
-          queue: macos-12-arm
+          queue: macos-15
         env:
           BUILD_ANDROID: "true"
           JAVA_VERSION: "17"
@@ -20,7 +20,7 @@ steps:
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "0"
           RN_VERSION: "{{matrix.rn_version}}"
-          NOTIFIER_VERSION: '8.0.0'
+          NOTIFIER_VERSION: "8.0.0"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
@@ -39,7 +39,7 @@ steps:
         key: "build-react-native-navigation-android-fixture-new-arch"
         timeout_in_minutes: 15
         agents:
-          queue: macos-12-arm
+          queue: macos-15
         env:
           BUILD_ANDROID: "true"
           JAVA_VERSION: "17"
@@ -47,7 +47,7 @@ steps:
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "1"
           RN_VERSION: "{{matrix.rn_version}}"
-          NOTIFIER_VERSION: '8.0.0'
+          NOTIFIER_VERSION: "8.0.0"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.apk"
         commands:
@@ -68,7 +68,7 @@ steps:
         key: "build-react-native-navigation-ios-fixture-old-arch"
         timeout_in_minutes: 15
         agents:
-          queue: "macos-12-arm"
+          queue: "macos-15"
         env:
           BUILD_IOS: "true"
           NODE_VERSION: "18"
@@ -76,7 +76,8 @@ steps:
           RCT_NEW_ARCH_ENABLED: "0"
           RN_VERSION: "{{matrix.rn_version}}"
           DEVELOPER_DIR: "/Applications/Xcode14.app"
-          NOTIFIER_VERSION: '8.0.0'
+          NOTIFIER_VERSION: "8.0.0"
+          XCODE_VERSION: "16.2.0"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
         commands:
@@ -97,7 +98,7 @@ steps:
       #   key: "build-react-native-navigation-ios-fixture-new-arch"
       #   timeout_in_minutes: 15
       #   agents:
-      #     queue: "macos-12-arm"
+      #     queue: "macos-15"
       #   env:
       #     BUILD_IOS: "true"
       #     NODE_VERSION: "18"
@@ -105,7 +106,8 @@ steps:
       #     RCT_NEW_ARCH_ENABLED: "1"
       #     RN_VERSION: "{{matrix.rn_version}}"
       #     DEVELOPER_DIR: "/Applications/Xcode14.app"
-      #     NOTIFIER_VERSION: '8.0.0'
+      #     NOTIFIER_VERSION: "8.0.0"
+      #     XCODE_VERSION: "16.2.0"
       #   artifact_paths:
       #     - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
       #   commands:
