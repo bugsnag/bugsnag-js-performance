@@ -1,5 +1,5 @@
 import { MockReactNativeSpanFactory, createTestClient, IncrementingClock } from '@bugsnag/js-performance-test-utilities'
-import { platformExtensions } from '@bugsnag/react-native-performance/lib/platform-extensions'
+import { createDefaultPlatformExtensions } from '@bugsnag/react-native-performance/lib/platform-extensions'
 
 const clock = new IncrementingClock()
 
@@ -7,7 +7,7 @@ const BugsnagPerformance = createTestClient({
   clock,
   spanFactory: MockReactNativeSpanFactory,
   platformExtensions: (spanFactory, spanContextStorage) => {
-    const reactNativeExtensions = platformExtensions(0, clock, spanFactory as unknown as MockReactNativeSpanFactory, spanContextStorage)
+    const reactNativeExtensions = createDefaultPlatformExtensions(0, clock, spanFactory as unknown as MockReactNativeSpanFactory, spanContextStorage)
 
     return {
       ...reactNativeExtensions,

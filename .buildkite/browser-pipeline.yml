@@ -40,7 +40,9 @@ steps:
               - "fixture-packages-${BUILD_MODE}.zip"
               - from: "test/browser/features/fixtures/.bugsnag-browser-version-${BUILD_MODE}"
                 to: "test/browser/features/fixtures/.bugsnag-browser-version"
-            upload: "./test/browser/maze_output/failed/**/*"
+            upload:
+              - "./test/browser/maze_output/failed/*"
+              - "./test/browser/maze_output/maze_output.zip"
           improbable-eng/metahook:
             pre-command: "unzip -o fixture-packages-${BUILD_MODE}.zip"
           docker-compose#v4.12.0:
@@ -80,7 +82,9 @@ steps:
               - "fixture-packages-${BUILD_MODE}.zip"
               - from: "test/browser/features/fixtures/.bugsnag-browser-version-${BUILD_MODE}"
                 to: "test/browser/features/fixtures/.bugsnag-browser-version"
-            upload: "./test/browser/maze_output/failed/**/*"
+            upload:
+              - "./test/browser/maze_output/failed/*"
+              - "./test/browser/maze_output/maze_output.zip"
           improbable-eng/metahook:
             pre-command: "unzip -o fixture-packages-${BUILD_MODE}.zip"
           docker-compose#v4.12.0:
@@ -118,7 +122,9 @@ steps:
               - "fixture-packages-${BUILD_MODE}.zip"
               - from: "test/browser/features/fixtures/.bugsnag-browser-version-${BUILD_MODE}"
                 to: "test/browser/features/fixtures/.bugsnag-browser-version"
-            upload: "./test/browser/maze_output/failed/**/*"
+            upload:
+              - "./test/browser/maze_output/failed/*"
+              - "./test/browser/maze_output/maze_output.zip"
           improbable-eng/metahook:
             pre-command: "unzip -o fixture-packages-${BUILD_MODE}.zip"
           docker-compose#v4.12.0:

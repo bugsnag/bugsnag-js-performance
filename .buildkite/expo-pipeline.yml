@@ -21,7 +21,7 @@ steps:
           - bundle install
           - ./bin/generate-expo-fixture
         matrix:
-          - "52"
+          - "54"
 
       - label:  ':mac: Build Expo {{matrix}} IPA'
         key: "build-expo-ipa"
@@ -36,18 +36,20 @@ steps:
           - bundle install
           - ./bin/generate-expo-fixture
         matrix:
-          - "52"
+          - "54"
 
       #
       # End-to-end tests
       #
-      - label: ":bitbar: :android: Expo {{matrix}} Android 15 end-to-end tests"
+      - label: ":bitbar: :android: Expo {{matrix}} Android 13 end-to-end tests"
         depends_on: "build-expo-apk"
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.apk"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.7.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -55,7 +57,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.apk
               - --farm=bb
-              - --device=ANDROID_15
+              - --device=ANDROID_13
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
@@ -78,15 +80,17 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "52"
+          - "54"
 
-      - label: ":bitbar: :mac: Expo {{matrix}} iOS 16 end-to-end tests"
+      - label: ":bitbar: :mac: Expo {{matrix}} iOS end-to-end tests"
         depends_on: "build-expo-ipa"
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.ipa"
-            upload: ./test/react-native/maze_output/**/*
+            upload:
+              - "./test/react-native/maze_output/failed/*"
+              - "./test/react-native/maze_output/maze_output.zip"
           docker-compose#v4.12.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
@@ -94,7 +98,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.ipa
               - --farm=bb
-              - --device=IOS_16
+              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
               - --appium-version=1.22
@@ -117,4 +121,4 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "52"
+          - "54"

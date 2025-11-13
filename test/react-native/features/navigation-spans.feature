@@ -3,7 +3,7 @@ Feature: Navigation spans
   Scenario: Manual Navigation Spans can be logged
     When I run 'NavigationSpanScenario'
     And I wait to receive a sampling request
-    And I wait for 1 span
+    And I wait to receive at least 1 span
 
     # Check the initial probability request
     Then the sampling request "Bugsnag-Span-Sampling" header equals "1.0:0"

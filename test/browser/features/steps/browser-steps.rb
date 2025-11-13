@@ -166,7 +166,7 @@ Then('if a span named {string} exists, it contains the attributes:') do |span_na
         break
       end
     end
-  
+
     unless match
       raise Test::Unit::AssertionFailedError.new "No spans were found containing all of the given attributes"
     end
@@ -182,11 +182,11 @@ Then('if a span named {string} exists, it has a parent named {string}') do |chil
   if !child_spans.empty?
     parent_spans = spans.find_all { |span| span['name'].eql?(parent_name) }
     raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{parent_name}" if parent_spans.empty?
-  
+
     expected_parent_ids = child_spans.map { |span| span['parentSpanId'] }
     parent_ids = parent_spans.map { |span| span['spanId'] }
     match = expected_parent_ids.any? { |expected_id| parent_ids.include?(expected_id) }
-  
+
     unless match
       raise Test::Unit::AssertionFailedError.new "No child span named #{child_name} was found with a parent named #{parent_name}"
     end
@@ -220,7 +220,7 @@ Then('a span named {string} does not contain the attribute {string}') do |span_n
   named_spans = spans.find_all { |span| span['name'].eql?(span_name) }
   raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{span_name}" if named_spans.empty?
 
-  named_spans.each do |span|    
+  named_spans.each do |span|
     if span['attributes'].any? { |attribute| attribute['key'].eql?(expected_attribute) }
       raise Test::Unit::AssertionFailedError.new "Attribute #{expected_attribute} was present on span #{span_name}"
     end
@@ -238,9 +238,9 @@ Then("the span named {string} was delivered approximately {int} seconds after en
   # Get all spans to find the target span
   spans = spans_from_request_list(Maze::Server.list_for('traces'))
   target_span = spans.find { |span| span['name'].eql?(span_name) }
-  
+
   raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{span_name}" if target_span.nil?
-  
+
   # Find the request that contains the span by iterating through remaining requests
   target_request = nil
   Maze::Server.list_for('traces').remaining.each do |request|
@@ -252,47 +252,55 @@ Then("the span named {string} was delivered approximately {int} seconds after en
           scope_span['spans']&.any? { |span| span['name'].eql?(span_name) }
         end
       end
-      
+
       if has_target_span
         target_request = request
         break
       end
     end
   end
-  
+
   raise Test::Unit::AssertionFailedError.new "No requests found containing span #{span_name}" if target_request.nil?
-  
+
   # Get the bugsnag-sent-at header from the request
   sent_at_header = target_request[:request]['bugsnag-sent-at']
   raise Test::Unit::AssertionFailedError.new "bugsnag-sent-at header not found in request" if sent_at_header.nil?
-  
+
   # Parse the sent-at time (ISO format) and convert to nanoseconds
   delivery_time = Time.parse(sent_at_header)
   delivery_time_ns = (delivery_time.to_f * 1_000_000_000).to_i
-  
+
   # Get the span's end time
   span_end_time = Integer(target_span["endTimeUnixNano"])
-  
+
   # Calculate the time difference between sent-at and span end
   time_difference_ns = delivery_time_ns - span_end_time
   time_difference_seconds = time_difference_ns / 1_000_000_000.0
-  
+
   # Check if the difference is approximately the expected number of seconds (±1 second tolerance)
   tolerance = 1.0
   expected_min = expected_seconds - tolerance
   expected_max = expected_seconds + tolerance
-  
+
   Maze.check.operator(
     time_difference_seconds,
     :>=,
     expected_min,
     "Span '#{span_name}' was delivered #{time_difference_seconds.round(2)} seconds after its end time (based on bugsnag-sent-at), expected at least #{expected_min} seconds"
   )
-  
+
   Maze.check.operator(
     time_difference_seconds,
     :<=,
     expected_max,
     "Span '#{span_name}' was delivered #{time_difference_seconds.round(2)} seconds after its end time (based on bugsnag-sent-at), expected at most #{expected_max} seconds"
   )
+end
+
+def spans_from_request_list(list)
+  list.remaining
+      .flat_map { |req| req[:body]['resourceSpans'] }
+      .flat_map { |r| r['scopeSpans'] }
+      .flat_map { |s| s['spans'] }
+      .select { |s| !s.nil? }
 end

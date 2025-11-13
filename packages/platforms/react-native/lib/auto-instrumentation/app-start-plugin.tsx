@@ -21,9 +21,9 @@ export interface AppStartSpanControl {
 
 export class AppStartSpanQuery extends SpanQuery<AppStartSpanControl> {}
 
-export class AppStartPlugin implements Plugin<ReactNativeConfiguration>, SpanControlProvider<AppStartSpanControl> {
+export class AppStartPlugin<C extends ReactNativeConfiguration = ReactNativeConfiguration> implements Plugin<C>, SpanControlProvider<AppStartSpanControl> {
   private readonly appStartTime: number
-  private readonly spanFactory: ReactNativeSpanFactory
+  private readonly spanFactory: ReactNativeSpanFactory<C>
   private readonly clock: Clock
   private readonly appRegistry: typeof AppRegistry
 
@@ -32,7 +32,7 @@ export class AppStartPlugin implements Plugin<ReactNativeConfiguration>, SpanCon
 
   constructor (
     appStartTime: number,
-    spanFactory: ReactNativeSpanFactory,
+    spanFactory: ReactNativeSpanFactory<C>,
     clock: Clock,
     appRegistry: typeof AppRegistry
   ) {

@@ -116,8 +116,9 @@ verdaccio-config.yml
 #rbenv
 .ruby-version
 
-# Maze runner output
+# Maze runner
 maze_output.zip
+Gemfile.lock
 
 # React Native test fixure
 test/react-native/features/fixtures/generated/
@@ -131,3 +132,6 @@ test/react-native/features/fixtures/generated/
 # IDE files
 .idea/
 *.iml
+
+# Zscaler root CA
+zscaler-root-ca.crt

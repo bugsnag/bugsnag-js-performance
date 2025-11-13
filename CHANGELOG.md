@@ -1,5 +1,15 @@
 # Changelog
 
+## [v3.2.0] (2025-11-13)
+
+### Added
+
+- (react-native): Added `createReactNativeClient` factory method for internal use by upstream libraries [#730](https://github.com/bugsnag/bugsnag-js-performance/pull/730)
+
+### Changed
+
+- Amend secondary endpoint to `bugsnag.smartbear.com` [#737](https://github.com/bugsnag/bugsnag-js/pull/737)
+
 ## [v3.1.0] (2025-09-24)
 
 ### Added

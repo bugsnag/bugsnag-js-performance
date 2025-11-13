@@ -3,7 +3,7 @@ Feature: Span callbacks
   Scenario: Span attributes can be modified in callbacks
     When I run 'SpanCallbacksScenario'
     And I wait to receive a sampling request
-    And I wait for 2 spans
+    And I wait to receive at least 2 spans
 
     Then a span named "Span 1" contains the attributes:
       | attribute                         | type        | value                                        |
