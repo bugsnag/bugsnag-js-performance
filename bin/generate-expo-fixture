@@ -49,9 +49,10 @@ const PACKAGE_DIRECTORIES = [
 
 const DEPENDENCIES = [
   `@bugsnag/react-native`,
-  `@react-native-community/netinfo@11`,
-  `react-native-file-access@3`,
-  'expo-build-properties'
+  `@react-native-community/netinfo`,
+  `react-native-file-access`,
+  'expo-build-properties',
+  'expo-constants'
 ]
 
 if (!process.env.SKIP_BUILD_PACKAGES) {
@@ -76,7 +77,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   fs.mkdirSync(fixtureDir, { recursive: true })
 
   // create the test fixture
-  const expoInitArgs = ['create-expo-app', 'test-fixture', '--no-install', '--template', `tabs@${expoVersion}`]
+  const expoInitArgs = ['create-expo-app', 'test-fixture', '--template', `tabs@${expoVersion}`]
   execFileSync('npx', expoInitArgs, { cwd: buildDir, stdio: 'inherit' })
 
   // install the required packages
@@ -166,7 +167,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   fs.copyFileSync(keyStorePath, resolve(fixtureDir, 'fakekeys.jks'))
 
   // add .npmrc
-  fs.writeFileSync(resolve(fixtureDir, '.npmrc'), 'registry=https://registry.npmjs.org/\nlegacy-peer-deps=true\n')
+  fs.writeFileSync(resolve(fixtureDir, '.npmrc'), 'registry=https://registry.npmjs.org/\n')
 
   // copy credentials to the fixture directory
   const credentialsFiles = fs.readdirSync(process.env.EXPO_CREDENTIALS_DIR)
@@ -196,8 +197,10 @@ function installFixtureDependencies() {
     execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
   }
 
-  const fixtureDependencyArgs = DEPENDENCIES.join(' ')
+  // install the fixture dependencies using expo install
+  const installArgs = ['expo', 'install', ...DEPENDENCIES]
+  execFileSync('npx', installArgs, { cwd: fixtureDir, stdio: 'inherit' })
 
-  // install test fixture dependencies and local packages
-  execSync(`npm install ${fixtureDependencyArgs} *.tgz --save --no-audit --legacy-peer-deps`, { cwd: fixtureDir, stdio: 'inherit' })
+  // install local packages with npm
+  execSync(`npm install *.tgz --save --no-audit`, { cwd: fixtureDir, stdio: 'inherit' })
 }
