@@ -21,7 +21,7 @@ steps:
           - bundle install
           - ./bin/generate-expo-fixture
         matrix:
-          - "52"
+          - "54"
 
       - label:  ':mac: Build Expo {{matrix}} IPA'
         key: "build-expo-ipa"
@@ -36,7 +36,7 @@ steps:
           - bundle install
           - ./bin/generate-expo-fixture
         matrix:
-          - "52"
+          - "54"
 
       #
       # End-to-end tests
@@ -80,7 +80,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "52"
+          - "54"
 
       - label: ":bitbar: :mac: Expo {{matrix}} iOS end-to-end tests"
         depends_on: "build-expo-ipa"
@@ -121,4 +121,4 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "52"
+          - "54"
