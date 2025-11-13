@@ -29,7 +29,6 @@ const fixtureDir = `${buildDir}/test-fixture`
 const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
   '@bugsnag/delivery-fetch-performance',
-  '@bugsnag/plugin-react-native-navigation-performance',
   '@bugsnag/plugin-react-navigation-performance',
   '@bugsnag/react-native-performance',
   '@bugsnag/request-tracker-performance',
@@ -41,7 +40,6 @@ const PACKAGE_DIRECTORIES = [
   `${ROOT_DIR}/packages/core`,
   `${ROOT_DIR}/packages/delivery-fetch`,
   `${ROOT_DIR}/packages/platforms/react-native`,
-  `${ROOT_DIR}/packages/plugin-react-native-navigation`,
   `${ROOT_DIR}/packages/plugin-react-navigation`,
   `${ROOT_DIR}/packages/request-tracker`,
   `${ROOT_DIR}/packages/plugin-named-spans`,
@@ -132,7 +130,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   // eas init
   const easInitArgs = ['eas-cli@latest', 'init', '--id', `${process.env.EXPO_EAS_PROJECT_ID}`]
   execFileSync('npx', easInitArgs, { cwd: fixtureDir, stdio: 'inherit' })
-  
+
   // eas build configure
   const easBuildConfigArgs = ['eas-cli@latest', 'build:configure', '--platform', 'all']
   execFileSync('npx', easBuildConfigArgs, { cwd: fixtureDir, stdio: 'inherit', env: { ...process.env, EAS_NO_VCS: 1 } })
@@ -162,7 +160,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   const replacementTabsDir = resolve(ROOT_DIR, `test/react-native/features/fixtures/expo/tabs`)
   fs.cpSync(replacementTabsDir, fixtureTabsDir, { recursive: true })
-  
+
   // copy keystore to the fixture directory
   const keyStorePath = resolve(ROOT_DIR, `test/react-native/features/fixtures/expo/fakekeys.jks`)
   fs.copyFileSync(keyStorePath, resolve(fixtureDir, 'fakekeys.jks'))
