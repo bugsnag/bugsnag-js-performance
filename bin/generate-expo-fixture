@@ -166,7 +166,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   fs.copyFileSync(keyStorePath, resolve(fixtureDir, 'fakekeys.jks'))
 
   // add .npmrc
-  fs.writeFileSync(resolve(fixtureDir, '.npmrc'), 'registry=https://registry.npmjs.org/\n')
+  fs.writeFileSync(resolve(fixtureDir, '.npmrc'), 'registry=https://registry.npmjs.org/\nlegacy-peer-deps=true\n')
 
   // copy credentials to the fixture directory
   const credentialsFiles = fs.readdirSync(process.env.EXPO_CREDENTIALS_DIR)
