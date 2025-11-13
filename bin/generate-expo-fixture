@@ -29,7 +29,6 @@ const fixtureDir = `${buildDir}/test-fixture`
 const PACKAGE_NAMES = [
   '@bugsnag/core-performance',
   '@bugsnag/delivery-fetch-performance',
-  '@bugsnag/plugin-react-native-navigation-performance',
   '@bugsnag/plugin-react-navigation-performance',
   '@bugsnag/react-native-performance',
   '@bugsnag/request-tracker-performance',
@@ -41,7 +40,6 @@ const PACKAGE_DIRECTORIES = [
   `${ROOT_DIR}/packages/core`,
   `${ROOT_DIR}/packages/delivery-fetch`,
   `${ROOT_DIR}/packages/platforms/react-native`,
-  `${ROOT_DIR}/packages/plugin-react-native-navigation`,
   `${ROOT_DIR}/packages/plugin-react-navigation`,
   `${ROOT_DIR}/packages/request-tracker`,
   `${ROOT_DIR}/packages/plugin-named-spans`,
@@ -51,9 +49,10 @@ const PACKAGE_DIRECTORIES = [
 
 const DEPENDENCIES = [
   `@bugsnag/react-native`,
-  `@react-native-community/netinfo@11`,
-  `react-native-file-access@3`,
-  'expo-build-properties'
+  `@react-native-community/netinfo`,
+  `react-native-file-access`,
+  'expo-build-properties',
+  'expo-constants'
 ]
 
 if (!process.env.SKIP_BUILD_PACKAGES) {
@@ -78,7 +77,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   fs.mkdirSync(fixtureDir, { recursive: true })
 
   // create the test fixture
-  const expoInitArgs = ['create-expo-app', 'test-fixture', '--no-install', '--template', `tabs@${expoVersion}`]
+  const expoInitArgs = ['create-expo-app', 'test-fixture', '--template', `tabs@${expoVersion}`]
   execFileSync('npx', expoInitArgs, { cwd: buildDir, stdio: 'inherit' })
 
   // install the required packages
@@ -132,7 +131,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   // eas init
   const easInitArgs = ['eas-cli@latest', 'init', '--id', `${process.env.EXPO_EAS_PROJECT_ID}`]
   execFileSync('npx', easInitArgs, { cwd: fixtureDir, stdio: 'inherit' })
-  
+
   // eas build configure
   const easBuildConfigArgs = ['eas-cli@latest', 'build:configure', '--platform', 'all']
   execFileSync('npx', easBuildConfigArgs, { cwd: fixtureDir, stdio: 'inherit', env: { ...process.env, EAS_NO_VCS: 1 } })
@@ -162,7 +161,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   const replacementTabsDir = resolve(ROOT_DIR, `test/react-native/features/fixtures/expo/tabs`)
   fs.cpSync(replacementTabsDir, fixtureTabsDir, { recursive: true })
-  
+
   // copy keystore to the fixture directory
   const keyStorePath = resolve(ROOT_DIR, `test/react-native/features/fixtures/expo/fakekeys.jks`)
   fs.copyFileSync(keyStorePath, resolve(fixtureDir, 'fakekeys.jks'))
@@ -198,8 +197,10 @@ function installFixtureDependencies() {
     execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
   }
 
-  const fixtureDependencyArgs = DEPENDENCIES.join(' ')
+  // install the fixture dependencies using expo install
+  const installArgs = ['expo', 'install', ...DEPENDENCIES]
+  execFileSync('npx', installArgs, { cwd: fixtureDir, stdio: 'inherit' })
 
-  // install test fixture dependencies and local packages
-  execSync(`npm install ${fixtureDependencyArgs} *.tgz --save --no-audit --legacy-peer-deps`, { cwd: fixtureDir, stdio: 'inherit' })
+  // install local packages with npm
+  execSync(`npm install *.tgz --save --no-audit`, { cwd: fixtureDir, stdio: 'inherit' })
 }
