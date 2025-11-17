@@ -150,7 +150,9 @@ RCT_EXPORT_METHOD(startNativePerformance:(NSDictionary *)configuration resolve:(
     config.autoInstrumentAppStarts = NO;
     config.autoInstrumentViewControllers = NO;
     config.autoInstrumentNetworkRequests = NO;
-    config.autoInstrumentRendering = YES;
+    config.enabledMetrics.cpu = YES;
+    config.enabledMetrics.memory = YES;
+    config.enabledMetrics.rendering = YES;
     config.internal.autoTriggerExportOnBatchSize = 1;
     config.internal.clearPersistenceOnStart = YES;
 
