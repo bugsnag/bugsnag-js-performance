@@ -21,6 +21,7 @@ import { ReactNativeSpanFactory } from './span-factory'
 
 // Options type for createReactNativeClient allowing additional plugins and customized platform extensions
 export interface ReactNativeClientOptions<S extends ReactNativeSchema, C extends ReactNativeConfiguration, T> extends Partial<Omit<ClientOptions<S, C, T>, 'platformExtensions'>> {
+  appStartTime?: number
   createPlatformExtensions?: (appStartTime: number, clock: Clock, spanFactory: ReactNativeSpanFactory<C>, spanContextStorage: SpanContextStorage) => T
 }
 
@@ -35,7 +36,7 @@ export function createReactNativeClient<S extends ReactNativeSchema = ReactNativ
   const isDebuggingRemotely = !global.nativeCallSyncHook && !global.RN$Bridgeless
 
   const clock = options?.clock || createClock(performance)
-  const appStartTime = clock.now()
+  const appStartTime = options?.appStartTime || clock.now()
   const isDevelopment = options?.isDevelopment || __DEV__
   const schema = options?.schema || createSchema(isDevelopment) as S
 

@@ -81,7 +81,8 @@ describe('Platform Extensions', () => {
 
     it('starts the client using the native configuration', () => {
       const nativeConfig = turboModule.attachToNativeSDK()
-      client = require('../lib/client').default
+      const { createReactNativeClient } = require('../lib/create-client')
+      client = createReactNativeClient()
       const startSpy = jest.spyOn(client, 'start')
 
       client.attach({
@@ -114,7 +115,8 @@ describe('Platform Extensions', () => {
 
     it('does not overwrite native configuration with JS values', () => {
       const nativeConfig = turboModule.attachToNativeSDK()
-      client = require('../lib/client').default
+      const { createReactNativeClient } = require('../lib/create-client')
+      client = createReactNativeClient()
       const startSpy = jest.spyOn(client, 'start')
 
       client.attach({
