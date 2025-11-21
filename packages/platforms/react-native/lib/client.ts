@@ -19,22 +19,28 @@ export function registerClient<C extends ReactNativeConfiguration = ReactNativeC
 const clock = createClock(performance)
 const appStartTime = clock.now()
 
-// Proxy wrapper that provides lazy initialization of the BugsnagPerformance client.
-// How it works:
-// 1. If registerClient() was called (e.g., by Expo), the proxy delegates to that pre-configured instance
-// 2. Otherwise, on first property access, it creates a default client via createReactNativeClient()
-// 3. All subsequent accesses use the same singleton instance, ensuring one client per app
-// The Proxy intercepts all property accesses and forwards them to the actual client instance.
+// Proxy wrapper for lazy initialization of the BugsnagPerformance client.
+// On first property access:
+// - Uses pre-configured client from registerClient() if available, otherwise creates a new client
+// - Copies all client properties to the proxy target and removes the get trap
+// - All subsequent accesses go directly to the target, bypassing the proxy for optimal performance
 const client = new Proxy({} as BugsnagPerformance<ReactNativeConfiguration, PlatformExtensions>, {
-  get (_target, prop) {
+  get (target, prop) {
     // React uses the $$typeof property to identify React elements - we return undefined
     // to avoid triggering client creation during React's internal type checking
     if (prop === '$$typeof') return undefined
 
+    // initialize the client instance here if it hasn't already been set via registerClient()
     if (!clientInstance) {
       clientInstance = createReactNativeClient({ appStartTime, clock })
     }
+
+    // Now that the client has been initialized, we can add all its properties to the proxy target
+    // and remove the get trap in order to bypass the proxy for future accesses
     const client = clientInstance as BugsnagPerformance<ReactNativeConfiguration, PlatformExtensions>
+    Object.defineProperties(target, Object.getOwnPropertyDescriptors(client))
+    delete this.get
+
     return client[prop as keyof typeof client]
   }
 })
