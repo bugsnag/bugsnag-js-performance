@@ -4,17 +4,29 @@
 #import "BugsnagPerformanceSpanContext.h"
 #import "BugsnagReactNativeAppStartPlugin+Private.h"
 
-static const NSTimeInterval kSpanBlockTimeoutInterval = 0.5; // 500ms timeout
+static const NSTimeInterval kDefaultSpanBlockTimeoutInterval = 5; // 5s default timeout
 
 @interface BugsnagReactNativeAppStartPlugin ()
 @property (nonatomic, strong) NSString *currentSpanId;
 @property (nonatomic, strong) BugsnagPerformanceSpanCondition *currentCondition;
 @property (atomic, assign) BOOL appStartComplete;
+@property (nonatomic, assign) NSTimeInterval spanBlockTimeoutInterval;
 @end
 
 @implementation BugsnagReactNativeAppStartPlugin
 
 static BugsnagReactNativeAppStartPlugin *_sharedInstance = nil;
+
+- (instancetype)init {
+    return [self initWithTimeout:kDefaultSpanBlockTimeoutInterval];
+}
+
+- (instancetype)initWithTimeout:(NSTimeInterval)timeout {
+    if (self = [super init]) {
+        _spanBlockTimeoutInterval = timeout;
+    }
+    return self;
+}
 
 + (id)singleton {
     return _sharedInstance;
@@ -84,7 +96,7 @@ static BugsnagReactNativeAppStartPlugin *_sharedInstance = nil;
     }
     
     // Block the span (outside synchronized block)
-    BugsnagPerformanceSpanCondition *spanCondition = [span blockWithTimeout:kSpanBlockTimeoutInterval];
+    BugsnagPerformanceSpanCondition *spanCondition = [span blockWithTimeout:_spanBlockTimeoutInterval];
     
     // Update shared state atomically
     @synchronized (self) {
