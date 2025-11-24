@@ -9,5 +9,6 @@ export { ReactNativeSpanFactory } from './span-factory'
 export { createSchema as createReactNativeSchema } from './config'
 export { createReactNativeClient } from './create-client'
 export type { ReactNativeClientOptions } from './create-client'
+export { registerClient } from './client'
 
 export default BugsnagPerformance
