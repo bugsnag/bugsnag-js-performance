@@ -1,10 +1,16 @@
 # Changelog
 
+## [v3.3.0] (2025-11-24)
+
+### Changed
+
+- (react-native) Introduced a lazy-loading singleton client to ensure a single client instance per app [#748](https://github.com/bugsnag/bugsnag-js-performance/pull/748)
+
 ## [v3.2.0] (2025-11-13)
 
 ### Added
 
-- (react-native): Added `createReactNativeClient` factory method for internal use by upstream libraries [#730](https://github.com/bugsnag/bugsnag-js-performance/pull/730)
+- (react-native) Added `createReactNativeClient` factory method for internal use by upstream libraries [#730](https://github.com/bugsnag/bugsnag-js-performance/pull/730)
 
 ### Changed
 
