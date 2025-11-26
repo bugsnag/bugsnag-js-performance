@@ -1,4 +1,4 @@
-import createSchema from '../lib/config'
+import { createSchema } from '../lib/config'
 
 const stringValidation = [
   { expected: false, value: true },

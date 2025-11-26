@@ -1,16 +1,17 @@
 const { execFileSync } = require('child_process')
 const { readdirSync } = require('fs')
-const { PACKAGE_DIRECTORIES, ROOT_DIR } = require('./constants')
+const { ROOT_DIR } = require('./constants')
 
 /**
  * Packs and installs local packages and dependencies
  * @param {string} fixtureDir - Directory where the fixture is located
+ * @param {Array} packageDirectories - Array of absolute paths to package directories to pack
  * @param {Array} additionalDependencies - Array of dependency strings
  * @param {Array} additionalInstallArgs - Array of additional npm install arguments
  */
-function installFixtureDependencies (fixtureDir, additionalDependencies, additionalInstallArgs = []) {
+function installFixtureDependencies(fixtureDir, packageDirectories, additionalDependencies = [], additionalInstallArgs = []) {
   // pack the required packages into the fixture directory
-  for (const packageDir of PACKAGE_DIRECTORIES) {
+  for (const packageDir of packageDirectories) {
     const libraryPackArgs = ['pack', packageDir, '--pack-destination', fixtureDir]
     execFileSync('npm', libraryPackArgs, { cwd: ROOT_DIR, stdio: 'inherit' })
   }
@@ -26,7 +27,7 @@ function installFixtureDependencies (fixtureDir, additionalDependencies, additio
 /**
  * Gets compatible dependency versions based on React Native version
  */
-function getReactNativeDependencies (reactNativeVersion, notifierVersion) {
+function getReactNativeDependencies(reactNativeVersion, notifierVersion) {
   const reactNativeFileAccessVersion = parseFloat(reactNativeVersion) <= 0.64 ? '1.7.1' : '3.1.1'
   const netinfoVersion = parseFloat(reactNativeVersion) <= 0.64 ? '10.0.0' : '11.3.2'
 
@@ -40,7 +41,7 @@ function getReactNativeDependencies (reactNativeVersion, notifierVersion) {
 /**
  * Gets React Navigation dependencies based on React Native version
  */
-function getReactNavigationDependencies (reactNativeVersion) {
+function getReactNavigationDependencies(reactNativeVersion) {
   let reactNavigationVersion = '6.1.18'
   let reactNavigationNativeStackVersion = '6.11.0'
   let reactNativeScreensVersion = '3.35.0'
@@ -68,7 +69,7 @@ function getReactNavigationDependencies (reactNativeVersion) {
 /**
  * Gets React Native Navigation (Wix) dependencies
  */
-function getReactNativeNavigationDependencies () {
+function getReactNativeNavigationDependencies() {
   return [
     'react-native-navigation@7.37.2' // INVESTIGATE: higher than 7.37.2 causes a build error
   ]
@@ -77,12 +78,13 @@ function getReactNativeNavigationDependencies () {
 /**
  * Gets Expo dependencies
  */
-function getExpoDependencies () {
+function getExpoDependencies() {
   return [
     '@bugsnag/react-native',
-    '@react-native-community/netinfo@11',
-    'react-native-file-access@3',
-    'expo-build-properties'
+    '@react-native-community/netinfo',
+    'react-native-file-access',
+    'expo-build-properties',
+    'expo-constants'
   ]
 }
 

@@ -9,6 +9,10 @@ graph TD;
     release/v1.2.3-. PR .->main;
 ```
 
+### Prerequisites
+
+- Add the `zscaler-root-ca.crt` certificate to the root of the repository (see Zscaler documentation for details)
+
 ### Enhancements and bug fixes
 
 - decide on a new version number, following [semantic versioning](https://semver.org/)

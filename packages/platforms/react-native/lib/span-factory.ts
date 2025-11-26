@@ -14,7 +14,7 @@ interface ReactNativeSpanOptions extends SpanOptions {
 export const APP_START_BASE_NAME = '[AppStart/ReactNativeInit]'
 const NAVIGATION_BASE_NAME = '[Navigation]'
 
-export class ReactNativeSpanFactory extends SpanFactory<ReactNativeConfiguration> {
+export class ReactNativeSpanFactory<C extends ReactNativeConfiguration = ReactNativeConfiguration> extends SpanFactory<C> {
   private attachedToNative = false
   appStartSpan?: SpanInternal
   private appStartSpanCreated = false

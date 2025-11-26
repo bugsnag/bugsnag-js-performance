@@ -7,12 +7,25 @@ const { ROOT_DIR } = require('./utils/constants')
 const { validateEnvironment, isTruthy, isBooleanString } = require('./utils/env-validation')
 const { buildPackages } = require('./utils/build-utils')
 const { cleanDirectory } = require('./utils/file-utils')
-const { 
-  installFixtureDependencies, 
-  getReactNativeDependencies, 
+const {
+  installFixtureDependencies,
+  getReactNativeDependencies,
   getReactNavigationDependencies,
-  getReactNativeNavigationDependencies 
+  getReactNativeNavigationDependencies
 } = require('./utils/dependency-utils')
+
+// Bugsnag packages to install
+const bugsnagPackages = [
+  `${ROOT_DIR}/packages/core`,
+  `${ROOT_DIR}/packages/delivery-fetch`,
+  `${ROOT_DIR}/packages/platforms/react-native`,
+  `${ROOT_DIR}/packages/plugin-react-native-navigation`,
+  `${ROOT_DIR}/packages/plugin-react-native-span-access`,
+  `${ROOT_DIR}/packages/plugin-react-navigation`,
+  `${ROOT_DIR}/packages/request-tracker`,
+  `${ROOT_DIR}/packages/plugin-named-spans`,
+  `${ROOT_DIR}/test/react-native/scenario-launcher`
+]
 const {
   replaceGeneratedFixtureFiles,
   configureReactNativeNavigation
@@ -91,17 +104,17 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   // Create the test fixture
   const RNInitArgs = [
-    '@react-native-community/cli@16', 
-    'init', 
-    'reactnative', 
-    '--package-name', 
-    'com.bugsnag.fixtures.reactnative.performance', 
-    '--directory', 
-    fixtureDir, 
-    '--version', 
-    reactNativeVersion, 
-    '--pm', 
-    'npm', 
+    '@react-native-community/cli@16',
+    'init',
+    'reactnative',
+    '--package-name',
+    'com.bugsnag.fixtures.reactnative.performance',
+    '--directory',
+    fixtureDir,
+    '--version',
+    reactNativeVersion,
+    '--pm',
+    'npm',
     '--skip-install'
   ]
   execFileSync('npx', RNInitArgs, { stdio: 'inherit' })
@@ -116,7 +129,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   installNativeTestUtilsIOS(fixtureDir)
 
   // Install dependencies
-  installFixtureDependencies(fixtureDir, fixtureDeps)
+  installFixtureDependencies(fixtureDir, bugsnagPackages, fixtureDeps)
 
   // Apply RN 0.64 specific configuration
   if (parseFloat(reactNativeVersion) === 0.64) {

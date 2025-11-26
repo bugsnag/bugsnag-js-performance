@@ -18,6 +18,8 @@ x-common-environment: &common-environment
   MAZE_BUGSNAG_API_KEY:
   MAZE_APPIUM_BUGSNAG_API_KEY:
   MAZE_NO_FAIL_FAST:
+  NATIVE_INTEGRATION:
+  RCT_NEW_ARCH_ENABLED:
 
 services:
   license-finder:
@@ -28,7 +30,7 @@ services:
       - .:/scan
 
   browser-maze-runner-bb:
-    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v9-cli
+    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v10-cli
     environment:
       <<: *common-environment
       BITBAR_USERNAME:
@@ -52,7 +54,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   browser-maze-runner-bs:
-    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v9-cli
+    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v10-cli
     environment: &browser-maze-runner-environment
       <<: *common-environment
       BROWSER_STACK_USERNAME:
@@ -79,9 +81,7 @@ services:
       BITBAR_ACCESS_KEY:
       RN_VERSION:
       EXPO_VERSION:
-      RCT_NEW_ARCH_ENABLED:
       REACT_NATIVE_NAVIGATION:
-      NATIVE_INTEGRATION:
       MAZE_REPEATER_API_KEY: "${MAZE_REPEATER_API_KEY_RN:-}"
       MAZE_HUB_REPEATER_API_KEY: "${MAZE_HUB_REPEATER_API_KEY_RN:-}"
     ports:

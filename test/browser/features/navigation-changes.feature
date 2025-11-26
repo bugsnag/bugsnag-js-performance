@@ -10,11 +10,8 @@ Feature: Navigation changes
         Then I wait to receive 0 traces
 
         When I click the element "go-to-another-page"
-        Then I wait to receive 1 trace
-        Then I wait for 2 spans
-
-        And a span name equals "Span 1"
-        And a span name equals "Span 2"
+        Then I wait to receive a span named "Span 1"
+        And I wait to receive a span named "Span 2"
 
     @skip_span_time_validation
     Scenario: Batch is sent when navigating to a new page by entering a new URL
@@ -27,12 +24,9 @@ Feature: Navigation changes
         Then I wait to receive 0 traces
 
         When I navigate to the test URL "/"
-        Then I wait to receive 1 trace
-        Then I wait for 3 spans
-
-        And a span name equals "Span 1"
-        And a span name equals "Span 2"
-        And a span name equals "Span 3"
+        Then I wait to receive a span named "Span 1"
+        And I wait to receive a span named "Span 2"
+        And I wait to receive a span named "Span 3"
 
     @minimises_window
     Scenario: Batch is sent when the window is minimised
@@ -46,10 +40,7 @@ Feature: Navigation changes
         Then I wait to receive 0 traces
 
         When I minimise the browser window
-        Then I wait to receive 1 trace
-        Then I wait for 4 spans
-
-        And a span name equals "Span 1"
-        And a span name equals "Span 2"
-        And a span name equals "Span 3"
-        And a span name equals "Span 4"
+        Then I wait to receive a span named "Span 1"
+        And I wait to receive a span named "Span 2"
+        And I wait to receive a span named "Span 3"
+        And I wait to receive a span named "Span 4"

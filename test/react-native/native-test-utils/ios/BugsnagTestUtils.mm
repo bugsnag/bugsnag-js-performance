@@ -81,7 +81,9 @@
             config.autoInstrumentAppStarts = autoInstrumentAppStarts;
             config.autoInstrumentViewControllers = autoInstrumentViewLoads;
             config.autoInstrumentNetworkRequests = NO;
-            config.autoInstrumentRendering = YES;
+            config.enabledMetrics.cpu = YES;
+            config.enabledMetrics.memory = YES;
+            config.enabledMetrics.rendering = YES;
             config.internal.autoTriggerExportOnBatchSize = 1;
             config.internal.clearPersistenceOnStart = YES;
 
