@@ -148,3 +148,14 @@ Feature: Native Integration
         | 1.1 |
         | 2.2 |
         | 3.3 |
+
+  @ios_only
+  Scenario: System metrics are collected and attached to native spans
+    When I run 'NativeIntegrationJsParentScenario'
+    And I wait to receive 2 sampling requests
+    And I wait to receive 2 traces
+
+    And the "Native child span" span has int attribute named "bugsnag.system.memory.spaces.device.size"
+    And the "Native child span" span has int attribute named "bugsnag.system.memory.spaces.device.mean"
+    And the "Native child span" span has array attribute named "bugsnag.system.memory.spaces.device.used"
+    And the "Native child span" span has array attribute named "bugsnag.system.memory.timestamps"
