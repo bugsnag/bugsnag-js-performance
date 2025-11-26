@@ -1,4 +1,4 @@
-import type { NavigationContainerProps, NavigationContainerRefWithCurrent } from '@react-navigation/native'
+import type { NavigationContainerRefWithCurrent } from '@react-navigation/native'
 import { useNavigationContainerRef, NavigationContainer } from '@react-navigation/native'
 import React from 'react'
 import type { NavigationTracker } from './navigation-tracker'
@@ -7,16 +7,22 @@ type CreateNavigationContainer = (NavigationContainerComponent: typeof Navigatio
 type NavigationContainerRef = NavigationContainerRefWithCurrent<ReactNavigation.RootParamList>
 
 export const createNavigationContainer: CreateNavigationContainer = (NavigationContainerComponent = NavigationContainer, navigationTracker: NavigationTracker) => {
-  return React.forwardRef<NavigationContainerRef, NavigationContainerProps>((props, _ref) => {
-    const navigationContainerRef = _ref as NavigationContainerRef || useNavigationContainerRef()
+  return React.forwardRef<NavigationContainerRef, React.ComponentPropsWithoutRef<typeof NavigationContainer>>((props, ref) => {
+    const navigationContainerRef = ref as NavigationContainerRef || useNavigationContainerRef()
 
-    navigationTracker.configure(navigationContainerRef)
+    const wrappedOnReady = () => {
+      navigationTracker.configure(navigationContainerRef)
+      if (typeof props.onReady === 'function') {
+        props.onReady()
+      }
+    }
 
     return (
-        <NavigationContainerComponent
-          {...props}
-          ref={navigationContainerRef}
-        />
+      <NavigationContainerComponent
+        {...props}
+        ref={navigationContainerRef}
+        onReady={wrappedOnReady}
+      />
     )
   }) as typeof NavigationContainerComponent
 }
