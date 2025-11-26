@@ -10,6 +10,18 @@ const { cleanDirectory, ensureDirectory } = require('./utils/file-utils')
 const { installFixtureDependencies, getExpoDependencies } = require('./utils/dependency-utils')
 const { buildExpoAndroidFixture, buildExpoIOSFixture } = require('./utils/platform-builds')
 
+// Bugsnag packages to install (excludes react-native-navigation)
+const bugsnagPackages = [
+  `${ROOT_DIR}/packages/core`,
+  `${ROOT_DIR}/packages/delivery-fetch`,
+  `${ROOT_DIR}/packages/platforms/react-native`,
+  `${ROOT_DIR}/packages/plugin-react-native-span-access`,
+  `${ROOT_DIR}/packages/plugin-react-navigation`,
+  `${ROOT_DIR}/packages/request-tracker`,
+  `${ROOT_DIR}/packages/plugin-named-spans`,
+  `${ROOT_DIR}/test/react-native/scenario-launcher`
+]
+
 // Validate environment variables
 validateEnvironment({
   EXPO_VERSION: {
@@ -48,7 +60,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   execFileSync('npx', expoInstallArgs, { cwd: fixtureDir, stdio: 'inherit' })
 
   // install local packages using npm install
-  installFixtureDependencies(fixtureDir)
+  installFixtureDependencies(fixtureDir, bugsnagPackages)
 
   // modify the app.json file
   const appConfig = require(`${fixtureDir}/app.json`)
