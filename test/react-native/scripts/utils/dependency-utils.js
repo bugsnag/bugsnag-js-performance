@@ -8,7 +8,7 @@ const { PACKAGE_DIRECTORIES, ROOT_DIR } = require('./constants')
  * @param {Array} additionalDependencies - Array of dependency strings
  * @param {Array} additionalInstallArgs - Array of additional npm install arguments
  */
-function installFixtureDependencies (fixtureDir, additionalDependencies, additionalInstallArgs = []) {
+function installFixtureDependencies (fixtureDir, additionalDependencies = [], additionalInstallArgs = []) {
   // pack the required packages into the fixture directory
   for (const packageDir of PACKAGE_DIRECTORIES) {
     const libraryPackArgs = ['pack', packageDir, '--pack-destination', fixtureDir]
@@ -80,9 +80,10 @@ function getReactNativeNavigationDependencies () {
 function getExpoDependencies () {
   return [
     '@bugsnag/react-native',
-    '@react-native-community/netinfo@11',
-    'react-native-file-access@3',
-    'expo-build-properties'
+    '@react-native-community/netinfo',
+    'react-native-file-access',
+    'expo-build-properties',
+    'expo-constants'
   ]
 }
 

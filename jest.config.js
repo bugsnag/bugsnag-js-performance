@@ -112,6 +112,7 @@ module.exports = {
     {
       displayName: 'react-native',
       preset: 'react-native',
+      setupFilesAfterEnv: ['<rootDir>/jest/setup/react-native.ts'],
       testMatch: ['<rootDir>/packages/platforms/react-native/tests/**/*.test.ts'],
       coveragePathIgnorePatterns: ['<rootDir>/packages/core', '<rootDir>/packages/platforms/browser', '<rootDir>/packages/delivery-fetch'],
       moduleNameMapper,

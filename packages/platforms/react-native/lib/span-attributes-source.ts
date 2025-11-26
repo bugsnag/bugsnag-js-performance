@@ -4,7 +4,7 @@ import type { ReactNativeConfiguration } from './config'
 import type { CellularGeneration, NetworkConnectionType } from './get-network-connection-type'
 import getNetworkConnectionType from './get-network-connection-type'
 
-export function createSpanAttributesSource () {
+export function createSpanAttributesSource<C extends ReactNativeConfiguration = ReactNativeConfiguration> () {
   let connectionType: NetworkConnectionType = 'unknown'
   let cellularGeneration: CellularGeneration
 
@@ -15,7 +15,7 @@ export function createSpanAttributesSource () {
     cellularGeneration = state.details?.cellularGeneration
   })
 
-  const spanAttributesSource: SpanAttributesSource<ReactNativeConfiguration> = {
+  const spanAttributesSource: SpanAttributesSource<C> = {
     configure (configuration) {},
     requestAttributes (span) {
       span.setAttribute('net.host.connection.type', connectionType)

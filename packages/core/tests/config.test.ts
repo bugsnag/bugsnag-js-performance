@@ -110,6 +110,82 @@ describe('Schema validation', () => {
       jest.restoreAllMocks()
     })
 
+    describe('apiKey', () => {
+      it('accepts a valid value (string)', () => {
+        const validConfig = validateConfig(VALID_API_KEY, coreSchema)
+        expect(validConfig.apiKey).toBe(VALID_API_KEY)
+      })
+
+      it('accepts a valid value (object)', () => {
+        const validConfig = validateConfig({ apiKey: VALID_API_KEY }, coreSchema)
+        expect(validConfig.apiKey).toBe(VALID_API_KEY)
+      })
+
+      it.each([
+        { type: 'undefined', apiKey: undefined },
+        { type: 'null', apiKey: null }
+      ])('throws an error when apiKey is $type and no default value in schema', ({ apiKey }) => {
+        expect(() => { validateConfig(apiKey, coreSchema) }).toThrow('No Bugsnag API Key set')
+      })
+
+      it('throws an error when apiKey is an empty string', () => {
+        expect(() => { validateConfig('', coreSchema) }).toThrow('No Bugsnag API Key set')
+      })
+
+      it.each([
+        { type: 'undefined', apiKey: undefined },
+        { type: 'null', apiKey: null },
+        { type: 'empty string', apiKey: '' }
+      ])('throws an error when config.apiKey is $type and no default value in schema', ({ apiKey }) => {
+        expect(() => { validateConfig({ apiKey }, coreSchema) }).toThrow('No Bugsnag API Key set')
+      })
+
+      it.each([
+        { type: 'null', config: { apiKey: null } },
+        { type: 'empty string', config: { apiKey: '' } }
+      ])('throws an error when config.apiKey is $type (even with default value)', ({ config }) => {
+        const schema = {
+          ...coreSchema,
+          apiKey: {
+            ...coreSchema.apiKey,
+            defaultValue: VALID_API_KEY
+          }
+        }
+
+        expect(() => { validateConfig(config, schema) }).toThrow('No Bugsnag API Key set')
+      })
+
+      it.each([
+        { type: 'undefined', config: undefined },
+        { type: 'null', config: null },
+        { type: 'empty object', config: {} }
+      ])('uses the default value when config is $type', ({ config }) => {
+        const schema = {
+          ...coreSchema,
+          apiKey: {
+            ...coreSchema.apiKey,
+            defaultValue: VALID_API_KEY
+          }
+        }
+
+        const validConfig = validateConfig(config, schema)
+        expect(validConfig.apiKey).toBe(VALID_API_KEY)
+      })
+
+      it('uses the default value when config.apiKey is undefined', () => {
+        const schema = {
+          ...coreSchema,
+          apiKey: {
+            ...coreSchema.apiKey,
+            defaultValue: VALID_API_KEY
+          }
+        }
+
+        const validConfig = validateConfig({ apiKey: undefined }, schema)
+        expect(validConfig.apiKey).toBe(VALID_API_KEY)
+      })
+    })
+
     describe('appVersion', () => {
       it('accepts a valid value', () => {
         const config = {

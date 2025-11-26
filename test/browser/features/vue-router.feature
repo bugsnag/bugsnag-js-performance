@@ -5,18 +5,19 @@ Feature: Vue router
         And I click the element "contact"
         And I wait for 2 seconds
         And I click the element "profile"
-        When I wait to receive 2 spans
+        When I wait to receive a span named "[RouteChange]/contacts/:contactId()"
+        When I wait to receive a span named "[RouteChange]/contacts/:contactId()/profile"
 
-        Then a span named "[RouteChange]/contacts/:contactId()" contains the attributes: 
-            | attribute                                 | type         | value                          | 
+        Then a span named "[RouteChange]/contacts/:contactId()" contains the attributes:
+            | attribute                                 | type         | value                          |
             | bugsnag.span.category                     | stringValue  | route_change                   |
             | bugsnag.browser.page.title                | stringValue  | Contact 1                      |
             | bugsnag.browser.page.route                | stringValue  | /contacts/:contactId()         |
             | bugsnag.browser.page.previous_route       | stringValue  | /                              |
             | bugsnag.browser.page.route_change.trigger | stringValue  | beforeResolve                  |
 
-        And a span named "[RouteChange]/contacts/:contactId()/profile" contains the attributes: 
-            | attribute                                 | type         | value                          | 
+        And a span named "[RouteChange]/contacts/:contactId()/profile" contains the attributes:
+            | attribute                                 | type         | value                          |
             | bugsnag.span.category                     | stringValue  | route_change                   |
             | bugsnag.browser.page.title                | stringValue  | Contact Profile                |
             | bugsnag.browser.page.route                | stringValue  | /contacts/:contactId()/profile |

@@ -29,9 +29,6 @@ const buildDir = resolve(ROOT_DIR, `test/react-native/features/fixtures/generate
 const easWorkingDir = `${buildDir}/build`
 const fixtureDir = `${buildDir}/test-fixture`
 
-// Dependencies
-const fixtureDeps = getExpoDependencies()
-
 // Build packages
 buildPackages()
 
@@ -43,11 +40,15 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   ensureDirectory(fixtureDir)
 
   // create the test fixture
-  const expoInitArgs = ['create-expo-app', 'test-fixture', '--no-install', '--template', `tabs@${expoVersion}`]
+  const expoInitArgs = ['create-expo-app', 'test-fixture', '--template', `tabs@${expoVersion}`]
   execFileSync('npx', expoInitArgs, { cwd: buildDir, stdio: 'inherit' })
 
-  // install the required packages
-  installFixtureDependencies(fixtureDir, fixtureDeps, ['--legacy-peer-deps'])
+  // install expo dependencies using expo install
+  const expoInstallArgs = ['expo', 'install', ...getExpoDependencies()]
+  execFileSync('npx', expoInstallArgs, { cwd: fixtureDir, stdio: 'inherit' })
+
+  // install local packages using npm install
+  installFixtureDependencies(fixtureDir)
 
   // modify the app.json file
   const appConfig = require(`${fixtureDir}/app.json`)
@@ -110,7 +111,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   // eas init
   const easInitArgs = ['eas-cli@latest', 'init', '--id', `${process.env.EXPO_EAS_PROJECT_ID}`]
   execFileSync('npx', easInitArgs, { cwd: fixtureDir, stdio: 'inherit' })
-  
+
   // eas build configure
   const easBuildConfigArgs = ['eas-cli@latest', 'build:configure', '--platform', 'all']
   execFileSync('npx', easBuildConfigArgs, { cwd: fixtureDir, stdio: 'inherit', env: { ...process.env, EAS_NO_VCS: 1 } })
@@ -140,7 +141,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   const replacementTabsDir = resolve(ROOT_DIR, `test/react-native/features/fixtures/expo/tabs`)
   fs.cpSync(replacementTabsDir, fixtureTabsDir, { recursive: true })
-  
+
   // copy keystore to the fixture directory
   const keyStorePath = resolve(ROOT_DIR, `test/react-native/features/fixtures/expo/fakekeys.jks`)
   fs.copyFileSync(keyStorePath, resolve(fixtureDir, 'fakekeys.jks'))

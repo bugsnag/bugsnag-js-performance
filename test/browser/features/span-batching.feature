@@ -1,9 +1,8 @@
 Feature: Span batching
 
-  Scenario: Batch is successfully delivered after timeout 
+  Scenario: Batch is successfully delivered after timeout
     Given I navigate to the test URL "/docs/batch-timeout"
-    When I wait to receive 1 trace
-    Then a span name equals "Custom/Batch Timeout"
+    When I wait to receive a span named "Custom/Batch Timeout"
 
   Scenario: Batch is successfully delivered after reaching max batch size
     Given I navigate to the test URL "/docs/batch-max-limit"

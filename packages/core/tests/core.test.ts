@@ -132,10 +132,9 @@ describe('Core', () => {
           expect(logger.warn).toHaveBeenCalledWith(`Invalid configuration\n  - endpoint should be a string, got ${type}\n  - releaseStage should be a string, got ${type}`)
         })
 
-        it('throws if no configuration is provided', () => {
+        it('throws if no API key is set', () => {
           const client = createTestClient()
 
-          // @ts-expect-error no configuration provided
           expect(() => { client.start() }).toThrow('No Bugsnag API Key set')
         })
 
@@ -513,25 +512,25 @@ describe('Core', () => {
   })
 
   describe('endpoint', () => {
-    const HUB_PREFIX = '00000'
-    const HUB_ENDPOINT = 'https://otlp.insighthub.smartbear.com/v1/traces'
-    const BUGSNAG_ENDPOINT = 'https://otlp.bugsnag.com/v1/traces'
+    const API_KEY_PREFIX = '00000'
+    const PRIMARY_ENDPOINT = 'https://otlp.bugsnag.com/v1/traces'
+    const SECONDARY_ENDPOINT = 'https://otlp.bugsnag.smartbear.com/v1/traces'
 
-    const HUB_KEY = `${HUB_PREFIX}abcdefabcdefabcdefabcdefabcd`
+    const API_KEY = `${API_KEY_PREFIX}abcdefabcdefabcdefabcdefabcd`
     const BS_KEY = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6'
 
-    describe('automatic InsightHub switch', () => {
-      it('swaps to InsightHub when apiKey starts with 00000', async () => {
+    describe('automatic endpoint switch', () => {
+      it('swaps to secondary endpoint when apiKey starts with 00000', async () => {
         const delivery = new InMemoryDelivery()
         const deliveryFactory = jest.fn(() => delivery)
         const client = createTestClient({ deliveryFactory })
 
-        client.start(HUB_KEY)
+        client.start(API_KEY)
 
         // allow async configuration to complete
         await jest.runOnlyPendingTimersAsync()
 
-        expect(deliveryFactory).toHaveBeenCalledWith(HUB_ENDPOINT)
+        expect(deliveryFactory).toHaveBeenCalledWith(SECONDARY_ENDPOINT)
       })
 
       it('keeps Bugsnag host + apiKey sub-domain for a normal key', async () => {
@@ -544,17 +543,17 @@ describe('Core', () => {
         await jest.runOnlyPendingTimersAsync()
 
         expect(deliveryFactory).toHaveBeenCalledWith(
-          `https://${BS_KEY}.${BUGSNAG_ENDPOINT.slice('https://'.length)}`
+          `https://${BS_KEY}.${PRIMARY_ENDPOINT.slice('https://'.length)}`
         )
       })
 
-      it('does NOT override a custom endpoint, even for a Hub key', async () => {
+      it('does NOT override a custom endpoint, even for a key starting with 000000', async () => {
         const CUSTOM_ENDPOINT = 'https://my-otel-proxy.example.com/traces'
         const delivery = new InMemoryDelivery()
         const deliveryFactory = jest.fn(() => delivery)
         const client = createTestClient({ deliveryFactory })
 
-        client.start({ apiKey: HUB_KEY, endpoint: CUSTOM_ENDPOINT })
+        client.start({ apiKey: API_KEY, endpoint: CUSTOM_ENDPOINT })
 
         await jest.runOnlyPendingTimersAsync()
 

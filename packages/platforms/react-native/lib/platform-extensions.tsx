@@ -7,7 +7,7 @@ import type { ReactNativeSpanFactory } from './span-factory'
 
 type NavigationSpanOptions = Omit<SpanOptions, 'isFirstClass'>
 
-export const platformExtensions = (appStartTime: number, clock: Clock, spanFactory: ReactNativeSpanFactory, spanContextStorage: SpanContextStorage) => ({
+export const createDefaultPlatformExtensions = <C extends ReactNativeConfiguration = ReactNativeConfiguration>(appStartTime: number, clock: Clock, spanFactory: ReactNativeSpanFactory<C>, spanContextStorage: SpanContextStorage) => ({
   startNavigationSpan: function (routeName: string, spanOptions?: NavigationSpanOptions) {
     const cleanOptions = spanFactory.validateSpanOptions(routeName, spanOptions)
     const span = spanFactory.startNavigationSpan(cleanOptions.name, cleanOptions.options)
@@ -47,4 +47,4 @@ export const platformExtensions = (appStartTime: number, clock: Clock, spanFacto
   }
 })
 
-export type PlatformExtensions = ReturnType<typeof platformExtensions>
+export type PlatformExtensions = ReturnType<typeof createDefaultPlatformExtensions>
