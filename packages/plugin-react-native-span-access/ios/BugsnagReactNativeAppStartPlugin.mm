@@ -1,8 +1,9 @@
-#import "BugsnagPerformancePluginContext.h"
-#import "BugsnagPerformanceSpan.h"
-#import "BugsnagPerformanceSpanCondition.h"
-#import "BugsnagPerformanceSpanContext.h"
-#import "BugsnagReactNativeAppStartPlugin+Private.h"
+
+#import "BugsnagReactNativeAppStartPlugin.h"
+#import <BugsnagPerformance/BugsnagPerformancePluginContext.h>
+#import <BugsnagPerformance/BugsnagPerformanceSpan.h>
+#import <BugsnagPerformance/BugsnagPerformanceSpanCondition.h>
+#import <BugsnagPerformance/BugsnagPerformanceSpanContext.h>
 
 static const NSTimeInterval kDefaultSpanBlockTimeoutInterval = 5; // 5s default timeout
 
@@ -11,6 +12,12 @@ static const NSTimeInterval kDefaultSpanBlockTimeoutInterval = 5; // 5s default 
 @property (nonatomic, strong) BugsnagPerformanceSpanCondition *currentCondition;
 @property (atomic, assign) BOOL appStartComplete;
 @property (nonatomic, assign) NSTimeInterval spanBlockTimeoutInterval;
+@end
+
+// Attributes are in the private header for BugsnagPerformanceSpan, 
+// but are needed to check span category, so we declare them here
+@interface BugsnagPerformanceSpan ()
+@property (nonatomic,readonly) NSMutableDictionary *attributes;
 @end
 
 @implementation BugsnagReactNativeAppStartPlugin

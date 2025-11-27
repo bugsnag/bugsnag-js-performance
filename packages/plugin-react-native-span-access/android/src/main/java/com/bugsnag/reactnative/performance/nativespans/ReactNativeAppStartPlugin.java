@@ -1,4 +1,4 @@
-package com.bugsnag.reactnative.performance;
+package com.bugsnag.reactnative.performance.nativespans;
 
 import com.bugsnag.android.performance.Span;
 import com.bugsnag.android.performance.SpanContext;

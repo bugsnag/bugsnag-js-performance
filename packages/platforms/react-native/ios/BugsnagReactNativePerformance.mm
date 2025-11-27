@@ -1,4 +1,3 @@
-#import "BugsnagReactNativeAppStartPlugin+Private.h"
 #import "BugsnagReactNativePerformance.h"
 #import "BugsnagReactNativePerformanceCrossTalkAPIClient.h"
 #import "ReactNativeSpanAttributes.h"
@@ -7,6 +6,14 @@
 #ifdef RCT_NEW_ARCH_ENABLED
 #import "BugsnagReactNativePerformanceSpec.h"
 #endif
+
+// Forward declaration for optional dependency on plugin-react-native-span-access
+// Declare the class and methods we need without importing the header
+@interface BugsnagReactNativeAppStartPlugin : NSObject
++ (id _Nullable)singleton;
+- (NSString * _Nullable)getAppStartParent;
+- (void)endAppStart:(NSDate *)endTime;
+@end
 
 @implementation BugsnagReactNativePerformance
 
