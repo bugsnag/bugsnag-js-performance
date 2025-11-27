@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ReactNativeAppStartPlugin implements Plugin {
 
-  private static final int SPAN_BLOCK_TIMEOUT_MS = 500;
+  private static final long DEFAULT_SPAN_BLOCK_TIMEOUT_MS = 5000;
 
   // Container class to ensure atomic updates of related fields
   private static class ViewLoadCondition {
@@ -34,6 +34,15 @@ public class ReactNativeAppStartPlugin implements Plugin {
 
   private final AtomicReference<ViewLoadCondition> viewLoadCondition = new AtomicReference<>(null);
   private volatile boolean appStartComplete = false;
+  private final long spanBlockTimeoutMs;
+
+  public ReactNativeAppStartPlugin() {
+    this(DEFAULT_SPAN_BLOCK_TIMEOUT_MS);
+  }
+
+  public ReactNativeAppStartPlugin(long timeoutMs) {
+    this.spanBlockTimeoutMs = timeoutMs;
+  }
 
   static ReactNativeAppStartPlugin getInstance() {
     return INSTANCE;
@@ -100,7 +109,7 @@ public class ReactNativeAppStartPlugin implements Plugin {
     }
 
     // Only set viewLoadCondition if block() returned a non-null value
-    Condition spanCondition = spanImpl.block(SPAN_BLOCK_TIMEOUT_MS);
+    Condition spanCondition = spanImpl.block(spanBlockTimeoutMs);
     if (spanCondition != null) {
       String spanId = RemoteSpanContext.encodeAsTraceParent(spanImpl);
       viewLoadCondition.set(new ViewLoadCondition(spanId, spanCondition));
