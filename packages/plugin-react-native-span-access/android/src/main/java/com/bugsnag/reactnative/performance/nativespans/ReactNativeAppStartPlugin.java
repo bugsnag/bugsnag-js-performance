@@ -1,5 +1,7 @@
 package com.bugsnag.reactnative.performance.nativespans;
 
+import androidx.annotation.Nullable;
+
 import com.bugsnag.android.performance.Span;
 import com.bugsnag.android.performance.SpanContext;
 import com.bugsnag.android.performance.OnSpanEndCallback;
@@ -12,10 +14,12 @@ import com.bugsnag.android.performance.internal.SpanImpl.Condition;
 import com.bugsnag.android.performance.internal.SpanCategory;
 import com.bugsnag.android.performance.internal.SpanImpl;
 
+import com.bugsnag.reactnative.performance.NativeBugsnagPerformanceImpl;
+
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ReactNativeAppStartPlugin implements Plugin {
+public class ReactNativeAppStartPlugin implements Plugin, NativeBugsnagPerformanceImpl.AppStartProvider {
 
   private static final long DEFAULT_SPAN_BLOCK_TIMEOUT_MS = 5000;
 
@@ -52,6 +56,8 @@ public class ReactNativeAppStartPlugin implements Plugin {
   public void install(PluginContext ctx) {
     if (INSTANCE == null) {
       INSTANCE = this;
+      // Register this plugin as the AppStartProvider with the core React Native Performance module
+      NativeBugsnagPerformanceImpl.setAppStartProvider(this);
     }
 
     ctx.addOnSpanStartCallback(PluginContext.NORM_PRIORITY + 1, new OnSpanStartCallback() {
@@ -72,6 +78,8 @@ public class ReactNativeAppStartPlugin implements Plugin {
   @Override
   public void start() {}
 
+  @Nullable
+  @Override
   public String getAppStartParent() {
     ViewLoadCondition currentCondition = viewLoadCondition.get();
     if (currentCondition != null) {
@@ -84,6 +92,7 @@ public class ReactNativeAppStartPlugin implements Plugin {
     return null;
   }
 
+  @Override
   public void endAppStart(long endTime) {
     ViewLoadCondition currentCondition = viewLoadCondition.getAndSet(null);
     if (currentCondition != null) {
