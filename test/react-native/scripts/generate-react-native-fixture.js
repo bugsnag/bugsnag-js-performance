@@ -144,7 +144,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     configureMainApplicationForTestUtils(fixtureDir, reactNativeVersion)
     configureAppDelegateForTestUtils(fixtureDir, reactNativeVersion)
 
-    applyViewControllerChanges(fixtureDir, reactNativeVersion)
+    // applyViewControllerChanges(fixtureDir, reactNativeVersion)
   }
 
   // Configure React Native Navigation if needed
