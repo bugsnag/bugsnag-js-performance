@@ -35,7 +35,9 @@ export function App() {
 function Screen1({ navigation }) {
     useEffect(() => {
         parentSpan = BugsnagPerformance.startSpan('ParentSpan')
-        navigation.navigate('Screen2')
+        setTimeout(() => {
+            navigation.navigate('Screen2')
+        }, 250)
     }, [])
 
     return (

@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- (plugin-react-navigation) Ensure navigation container is ready before initializing tracking [#755](https://github.com/bugsnag/bugsnag-js-performance/pull/755)
+
 ## [v3.3.0] (2025-11-24)
 
 ### Changed
