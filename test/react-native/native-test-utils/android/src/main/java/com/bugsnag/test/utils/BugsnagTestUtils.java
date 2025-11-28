@@ -13,9 +13,9 @@ import com.bugsnag.android.performance.AutoInstrument;
 import com.bugsnag.android.performance.BugsnagPerformance;
 import com.bugsnag.android.performance.PerformanceConfiguration;
 
-import com.bugsnag.reactnative.performance.ReactNativeAppStartPlugin;
 import com.bugsnag.reactnative.performance.nativespans.BugsnagJavascriptSpansPlugin;
 import com.bugsnag.reactnative.performance.nativespans.BugsnagNativeSpansPlugin;
+import com.bugsnag.reactnative.performance.nativespans.BugsnagReactNativeAppStartPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -126,7 +126,7 @@ public class BugsnagTestUtils {
             config.setAutoInstrumentRendering(true);
             config.addPlugin(new BugsnagNativeSpansPlugin());
             config.addPlugin(new BugsnagJavascriptSpansPlugin());
-            config.addPlugin(new ReactNativeAppStartPlugin());
+            config.addPlugin(new BugsnagReactNativeAppStartPlugin());
 
             BugsnagPerformance.start(config);
             Log.d(TAG, "Native performance started successfully");

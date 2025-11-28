@@ -19,7 +19,7 @@ import com.bugsnag.reactnative.performance.NativeBugsnagPerformanceImpl;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ReactNativeAppStartPlugin implements Plugin, NativeBugsnagPerformanceImpl.AppStartProvider {
+public class BugsnagReactNativeAppStartPlugin implements Plugin, NativeBugsnagPerformanceImpl.AppStartProvider {
 
   private static final long DEFAULT_SPAN_BLOCK_TIMEOUT_MS = 5000;
 
@@ -34,21 +34,21 @@ public class ReactNativeAppStartPlugin implements Plugin, NativeBugsnagPerforman
     }
   }
 
-  private static ReactNativeAppStartPlugin INSTANCE;
+  private static BugsnagReactNativeAppStartPlugin INSTANCE;
 
   private final AtomicReference<ViewLoadCondition> viewLoadCondition = new AtomicReference<>(null);
   private volatile boolean appStartComplete = false;
   private final long spanBlockTimeoutMs;
 
-  public ReactNativeAppStartPlugin() {
+  public BugsnagReactNativeAppStartPlugin() {
     this(DEFAULT_SPAN_BLOCK_TIMEOUT_MS);
   }
 
-  public ReactNativeAppStartPlugin(long timeoutMs) {
+  public BugsnagReactNativeAppStartPlugin(long timeoutMs) {
     this.spanBlockTimeoutMs = timeoutMs;
   }
 
-  static ReactNativeAppStartPlugin getInstance() {
+  static BugsnagReactNativeAppStartPlugin getInstance() {
     return INSTANCE;
   }
 
@@ -63,14 +63,14 @@ public class ReactNativeAppStartPlugin implements Plugin, NativeBugsnagPerforman
     ctx.addOnSpanStartCallback(PluginContext.NORM_PRIORITY + 1, new OnSpanStartCallback() {
       @Override
       public void onSpanStart(Span span) {
-        ReactNativeAppStartPlugin.this.onSpanStart(span);
+        BugsnagReactNativeAppStartPlugin.this.onSpanStart(span);
       }
     });
 
     ctx.addOnSpanEndCallback(PluginContext.NORM_PRIORITY - 1, new OnSpanEndCallback() {
       @Override
       public boolean onSpanEnd(Span span) {
-        return ReactNativeAppStartPlugin.this.onSpanEnd(span);
+        return BugsnagReactNativeAppStartPlugin.this.onSpanEnd(span);
       }
     });
   }

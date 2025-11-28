@@ -64,7 +64,7 @@ public class NativeBugsnagPerformanceImpl {
 
   /**
    * Registers an AppStartProvider to handle app start span operations.
-   * This should be called by the ReactNativeAppStartPlugin during its install phase.
+   * This should be called by the BugsnagReactNativeAppStartPlugin during its install phase.
    * @param provider the provider to register, or null to unregister
    */
   public static void setAppStartProvider(@Nullable AppStartProvider provider) {
