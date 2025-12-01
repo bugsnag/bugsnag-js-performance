@@ -14,12 +14,13 @@ import com.bugsnag.android.performance.internal.SpanImpl.Condition;
 import com.bugsnag.android.performance.internal.SpanCategory;
 import com.bugsnag.android.performance.internal.SpanImpl;
 
-import com.bugsnag.reactnative.performance.NativeBugsnagPerformanceImpl;
+import com.bugsnag.reactnative.performance.AppStartProvider;
+import com.bugsnag.reactnative.performance.AppStartRegistry;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class BugsnagReactNativeAppStartPlugin implements Plugin, NativeBugsnagPerformanceImpl.AppStartProvider {
+public class BugsnagReactNativeAppStartPlugin implements Plugin, AppStartProvider {
 
   private static final long DEFAULT_SPAN_BLOCK_TIMEOUT_MS = 5000;
 
@@ -34,8 +35,6 @@ public class BugsnagReactNativeAppStartPlugin implements Plugin, NativeBugsnagPe
     }
   }
 
-  private static BugsnagReactNativeAppStartPlugin INSTANCE;
-
   private final AtomicReference<ViewLoadCondition> viewLoadCondition = new AtomicReference<>(null);
   private volatile boolean appStartComplete = false;
   private final long spanBlockTimeoutMs;
@@ -48,17 +47,10 @@ public class BugsnagReactNativeAppStartPlugin implements Plugin, NativeBugsnagPe
     this.spanBlockTimeoutMs = timeoutMs;
   }
 
-  static BugsnagReactNativeAppStartPlugin getInstance() {
-    return INSTANCE;
-  }
-
   @Override
   public void install(PluginContext ctx) {
-    if (INSTANCE == null) {
-      INSTANCE = this;
-      // Register this plugin as the AppStartProvider with the core React Native Performance module
-      NativeBugsnagPerformanceImpl.setAppStartProvider(this);
-    }
+    // Register this plugin as the AppStartProvider with the core React Native Performance module
+    AppStartRegistry.register(this);
 
     ctx.addOnSpanStartCallback(PluginContext.NORM_PRIORITY + 1, new OnSpanStartCallback() {
       @Override

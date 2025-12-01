@@ -39,37 +39,7 @@ import com.bugsnag.android.performance.internal.BugsnagPerformanceImpl;
 import com.bugsnag.android.performance.internal.processing.ImmutableConfig;
 
 @SuppressLint("RestrictedApi")
-public class NativeBugsnagPerformanceImpl {
-
-  /**
-   * Interface for providing app start span context and handling app start completion.
-   * This allows the optional plugin-react-native-span-access package to register itself
-   * without creating a circular dependency.
-   */
-  public interface AppStartProvider {
-    /**
-     * Returns the app start parent context as a trace parent string, or null if not available.
-     */
-    @Nullable
-    String getAppStartParent();
-
-    /**
-     * Ends the app start span at the specified time.
-     * @param endTime the end time in elapsed realtime nanos
-     */
-    void endAppStart(long endTime);
-  }
-
-  private static volatile AppStartProvider appStartProvider;
-
-  /**
-   * Registers an AppStartProvider to handle app start span operations.
-   * This should be called by the BugsnagReactNativeAppStartPlugin during its install phase.
-   * @param provider the provider to register, or null to unregister
-   */
-  public static void setAppStartProvider(@Nullable AppStartProvider provider) {
-    appStartProvider = provider;
-  }
+class NativeBugsnagPerformanceImpl {
 
   static final String MODULE_NAME = "BugsnagReactNativePerformance";
 
@@ -203,7 +173,7 @@ public class NativeBugsnagPerformanceImpl {
       result.putArray("enabledReleaseStages", Arguments.fromArray(enabledReleaseStages.toArray(new String[0])));
     }
 
-    AppStartProvider provider = appStartProvider;
+    AppStartProvider provider = AppStartRegistry.get();
     if (provider != null) {
       String appStartParent = provider.getAppStartParent();
       if (appStartParent != null) {
@@ -276,7 +246,7 @@ public class NativeBugsnagPerformanceImpl {
 
   void endNativeAppStart(double endTime, Promise promise) {
     long nativeEndTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)endTime);
-    AppStartProvider provider = appStartProvider;
+    AppStartProvider provider = AppStartRegistry.get();
     if (provider != null) {
       provider.endAppStart(nativeEndTime);
     }
