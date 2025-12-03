@@ -1,11 +1,6 @@
 // Copied from BugsnagPerformanceConfiguration.h in bugsnag-cocoa-performance
-#import "BugsnagPerformanceSpan.h"
 
 NS_ASSUME_NONNULL_BEGIN
-
-typedef void (^ BugsnagPerformanceSpanStartCallback)(BugsnagPerformanceSpan *span);
-
-typedef BOOL (^ BugsnagPerformanceSpanEndCallback)(BugsnagPerformanceSpan *span);
 
 @interface BugsnagPerformanceConfiguration : NSObject
 

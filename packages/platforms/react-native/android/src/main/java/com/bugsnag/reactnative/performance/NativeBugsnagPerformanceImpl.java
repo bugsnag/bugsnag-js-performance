@@ -173,9 +173,9 @@ class NativeBugsnagPerformanceImpl {
       result.putArray("enabledReleaseStages", Arguments.fromArray(enabledReleaseStages.toArray(new String[0])));
     }
 
-    ReactNativeAppStartPlugin appStartPlugin = ReactNativeAppStartPlugin.getInstance();
-    if (appStartPlugin != null) {
-      String appStartParent = appStartPlugin.getAppStartParent();
+    AppStartProvider provider = AppStartRegistry.get();
+    if (provider != null) {
+      String appStartParent = provider.getAppStartParent();
       if (appStartParent != null) {
         result.putString("appStartParentContext", appStartParent);
       }
@@ -246,8 +246,10 @@ class NativeBugsnagPerformanceImpl {
 
   void endNativeAppStart(double endTime, Promise promise) {
     long nativeEndTime = BugsnagClock.INSTANCE.unixNanoTimeToElapsedRealtime((long)endTime);
-    ReactNativeAppStartPlugin appStartPlugin = ReactNativeAppStartPlugin.getInstance();
-    appStartPlugin.endAppStart(nativeEndTime);
+    AppStartProvider provider = AppStartRegistry.get();
+    if (provider != null) {
+      provider.endAppStart(nativeEndTime);
+    }
     promise.resolve(null);
   }
 

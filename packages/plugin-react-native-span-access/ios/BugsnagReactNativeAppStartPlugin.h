@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-#import "BugsnagPerformancePlugin.h"
+#import <BugsnagPerformance/BugsnagPerformancePlugin.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

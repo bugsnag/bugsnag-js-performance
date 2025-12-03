@@ -1,4 +1,6 @@
-package com.bugsnag.reactnative.performance;
+package com.bugsnag.reactnative.performance.nativespans;
+
+import androidx.annotation.Nullable;
 
 import com.bugsnag.android.performance.Span;
 import com.bugsnag.android.performance.SpanContext;
@@ -12,10 +14,13 @@ import com.bugsnag.android.performance.internal.SpanImpl.Condition;
 import com.bugsnag.android.performance.internal.SpanCategory;
 import com.bugsnag.android.performance.internal.SpanImpl;
 
+import com.bugsnag.reactnative.performance.AppStartProvider;
+import com.bugsnag.reactnative.performance.AppStartRegistry;
+
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ReactNativeAppStartPlugin implements Plugin {
+public class BugsnagReactNativeAppStartPlugin implements Plugin, AppStartProvider {
 
   private static final long DEFAULT_SPAN_BLOCK_TIMEOUT_MS = 5000;
 
@@ -30,41 +35,34 @@ public class ReactNativeAppStartPlugin implements Plugin {
     }
   }
 
-  private static ReactNativeAppStartPlugin INSTANCE;
-
   private final AtomicReference<ViewLoadCondition> viewLoadCondition = new AtomicReference<>(null);
   private volatile boolean appStartComplete = false;
   private final long spanBlockTimeoutMs;
 
-  public ReactNativeAppStartPlugin() {
+  public BugsnagReactNativeAppStartPlugin() {
     this(DEFAULT_SPAN_BLOCK_TIMEOUT_MS);
   }
 
-  public ReactNativeAppStartPlugin(long timeoutMs) {
+  public BugsnagReactNativeAppStartPlugin(long timeoutMs) {
     this.spanBlockTimeoutMs = timeoutMs;
-  }
-
-  static ReactNativeAppStartPlugin getInstance() {
-    return INSTANCE;
   }
 
   @Override
   public void install(PluginContext ctx) {
-    if (INSTANCE == null) {
-      INSTANCE = this;
-    }
+    // Register this plugin as the AppStartProvider with the core React Native Performance module
+    AppStartRegistry.register(this);
 
     ctx.addOnSpanStartCallback(PluginContext.NORM_PRIORITY + 1, new OnSpanStartCallback() {
       @Override
       public void onSpanStart(Span span) {
-        ReactNativeAppStartPlugin.this.onSpanStart(span);
+        BugsnagReactNativeAppStartPlugin.this.onSpanStart(span);
       }
     });
 
     ctx.addOnSpanEndCallback(PluginContext.NORM_PRIORITY - 1, new OnSpanEndCallback() {
       @Override
       public boolean onSpanEnd(Span span) {
-        return ReactNativeAppStartPlugin.this.onSpanEnd(span);
+        return BugsnagReactNativeAppStartPlugin.this.onSpanEnd(span);
       }
     });
   }
@@ -72,6 +70,8 @@ public class ReactNativeAppStartPlugin implements Plugin {
   @Override
   public void start() {}
 
+  @Nullable
+  @Override
   public String getAppStartParent() {
     ViewLoadCondition currentCondition = viewLoadCondition.get();
     if (currentCondition != null) {
@@ -84,6 +84,7 @@ public class ReactNativeAppStartPlugin implements Plugin {
     return null;
   }
 
+  @Override
   public void endAppStart(long endTime) {
     ViewLoadCondition currentCondition = viewLoadCondition.getAndSet(null);
     if (currentCondition != null) {

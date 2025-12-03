@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		DA3192AA2E0AE8B7009B1271 /* BugsnagNativeSpans.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA3192A62E0AE8B7009B1271 /* BugsnagNativeSpans.mm */; };
 		DA3192AB2E0AE8B7009B1271 /* BugsnagNativeSpansPlugin.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA3192A82E0AE8B7009B1271 /* BugsnagNativeSpansPlugin.mm */; };
+		DA862E902ED89F1700F95EAD /* BugsnagReactNativeAppStartPlugin.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA862E8F2ED89F1700F95EAD /* BugsnagReactNativeAppStartPlugin.mm */; };
 		DAADC7312E1EBBFC0085E633 /* BugsnagJavascriptSpansPlugin.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAADC7302E1EBBFC0085E633 /* BugsnagJavascriptSpansPlugin.mm */; };
 		DAADC7352E1EBE750085E633 /* BugsnagJavascriptSpanControlProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAADC7342E1EBE750085E633 /* BugsnagJavascriptSpanControlProvider.mm */; };
 		DAADC73A2E1F2E080085E633 /* BugsnagJavascriptSpanControl.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAADC7392E1F2E080085E633 /* BugsnagJavascriptSpanControl.mm */; };
@@ -34,6 +35,8 @@
 		DA3192A72E0AE8B7009B1271 /* BugsnagNativeSpansPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagNativeSpansPlugin.h; sourceTree = "<group>"; };
 		DA3192A82E0AE8B7009B1271 /* BugsnagNativeSpansPlugin.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BugsnagNativeSpansPlugin.mm; sourceTree = "<group>"; };
 		DA3192A92E0AE8B7009B1271 /* BugsnagNativeSpansPlugin+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BugsnagNativeSpansPlugin+Private.h"; sourceTree = "<group>"; };
+		DA862E8E2ED89F1700F95EAD /* BugsnagReactNativeAppStartPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagReactNativeAppStartPlugin.h; sourceTree = "<group>"; };
+		DA862E8F2ED89F1700F95EAD /* BugsnagReactNativeAppStartPlugin.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BugsnagReactNativeAppStartPlugin.mm; sourceTree = "<group>"; };
 		DAADC72F2E1EBB9D0085E633 /* BugsnagJavascriptSpansPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagJavascriptSpansPlugin.h; sourceTree = "<group>"; };
 		DAADC7302E1EBBFC0085E633 /* BugsnagJavascriptSpansPlugin.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BugsnagJavascriptSpansPlugin.mm; sourceTree = "<group>"; };
 		DAADC7322E1EBCA00085E633 /* BugsnagJavascriptSpansPlugin+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BugsnagJavascriptSpansPlugin+Private.h"; sourceTree = "<group>"; };
@@ -60,6 +63,8 @@
 		DA31928B2E0AE7D4009B1271 = {
 			isa = PBXGroup;
 			children = (
+				DA862E8E2ED89F1700F95EAD /* BugsnagReactNativeAppStartPlugin.h */,
+				DA862E8F2ED89F1700F95EAD /* BugsnagReactNativeAppStartPlugin.mm */,
 				DAADC73E2E1FF0040085E633 /* BugsnagJavascriptSpanControl+Private.h */,
 				DAADC7372E1F2AD40085E633 /* BugsnagJavascriptSpanControl.h */,
 				DAADC7332E1EBE5B0085E633 /* BugsnagJavascriptSpanControlProvider.h */,
@@ -147,6 +152,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA862E902ED89F1700F95EAD /* BugsnagReactNativeAppStartPlugin.mm in Sources */,
 				DAADC73A2E1F2E080085E633 /* BugsnagJavascriptSpanControl.mm in Sources */,
 				DAADC7312E1EBBFC0085E633 /* BugsnagJavascriptSpansPlugin.mm in Sources */,
 				DAADC7352E1EBE750085E633 /* BugsnagJavascriptSpanControlProvider.mm in Sources */,
