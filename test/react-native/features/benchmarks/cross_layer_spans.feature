@@ -1,4 +1,4 @@
-@native_integration @android_only
+@benchmark @native_integration @android_only
 Feature: Cross-Layer Spans
 
   Scenario Outline:
