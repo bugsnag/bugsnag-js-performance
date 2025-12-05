@@ -13,7 +13,8 @@ android {
 }
 
 dependencies {
-    compileOnly("com.bugsnag:bugsnag-android-performance:1.16.0")
+    compileOnly("com.bugsnag:bugsnag-android-performance:2.0.0")
+    compileOnly("com.bugsnag:bugsnag-android-performance-impl:2.0.0")
     implementation project(':bugsnag_react-native-performance')
     implementation project(':bugsnag_plugin-react-native-span-access')
 }
