@@ -6,6 +6,7 @@ Feature: Cross-Layer Spans
     And I wait for 30 seconds
     And I wait to receive at least 1 metrics
     And I discard the oldest metric
+    And I relaunch the app after shutdown
 
     Examples:
       | options                                           |

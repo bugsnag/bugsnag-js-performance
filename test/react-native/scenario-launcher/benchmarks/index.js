@@ -101,4 +101,6 @@ export const runBenchmark = async (name, config, apiKey, endpoint, mazeAddress) 
   results.configFlags = configFlags
 
   await reportBenchmarkResults(results, mazeAddress)
+
+  NativeScenarioLauncher.exitApp()
 }
