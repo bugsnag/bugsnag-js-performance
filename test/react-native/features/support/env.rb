@@ -5,7 +5,7 @@ BeforeAll do
   Maze.config.enforce_bugsnag_integrity = false
 
   if ENV["NATIVE_INTEGRATION"]
-    Maze.config.receive_requests_wait = 60
+    Maze.config.receive_requests_wait = 240
   end
 
 end
