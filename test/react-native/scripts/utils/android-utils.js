@@ -69,7 +69,7 @@ class MainActivity : ReactActivity() {
  */
 function installAndroidPerformance (fixtureDir) {
   const appGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
-  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:1.16.0")'
+  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:2.0.0")'
   const dependenciesSection = 'dependencies {'
 
   replaceInFile(appGradlePath, dependenciesSection, `${dependenciesSection}\n    ${performanceDependency}`)
