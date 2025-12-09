@@ -530,7 +530,7 @@ describe('Core', () => {
         // allow async configuration to complete
         await jest.runOnlyPendingTimersAsync()
 
-        expect(deliveryFactory).toHaveBeenCalledWith(SECONDARY_ENDPOINT)
+        expect(deliveryFactory).toHaveBeenCalledWith(SECONDARY_ENDPOINT, false)
       })
 
       it('keeps Bugsnag host + apiKey sub-domain for a normal key', async () => {
@@ -543,7 +543,8 @@ describe('Core', () => {
         await jest.runOnlyPendingTimersAsync()
 
         expect(deliveryFactory).toHaveBeenCalledWith(
-          `https://${BS_KEY}.${PRIMARY_ENDPOINT.slice('https://'.length)}`
+          `https://${BS_KEY}.${PRIMARY_ENDPOINT.slice('https://'.length)}`,
+          false
         )
       })
 
@@ -557,7 +558,7 @@ describe('Core', () => {
 
         await jest.runOnlyPendingTimersAsync()
 
-        expect(deliveryFactory).toHaveBeenCalledWith(CUSTOM_ENDPOINT)
+        expect(deliveryFactory).toHaveBeenCalledWith(CUSTOM_ENDPOINT, false)
       })
     })
   })
