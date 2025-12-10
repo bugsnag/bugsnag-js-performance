@@ -86,7 +86,7 @@ export const createBenchmarkRunner = (config = {}) => {
   const {
     configFlags = new Set(),
     warmupIterations = 1000,
-    iterationsPerRun = 100_000,
+    iterationsPerRun = 25000,
     numberOfRuns = 5
   } = config
 
