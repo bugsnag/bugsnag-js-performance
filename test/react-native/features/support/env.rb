@@ -5,7 +5,11 @@ BeforeAll do
   Maze.config.enforce_bugsnag_integrity = false
 
   if ENV["NATIVE_INTEGRATION"]
-    Maze.config.receive_requests_wait = 320
+    Maze.config.receive_requests_wait = 60
+  end
+
+  if ENV["BENCHMARKS"]
+    Maze.config.receive_requests_wait = 180
   end
 
 end
@@ -59,4 +63,8 @@ Before('@native_app_starts') do |scenario|
   current_version = ENV['RN_VERSION'].nil? ? 0 : ENV['RN_VERSION'].to_f
   skip_this_scenario("Skipping scenario: Not running native integration fixture") unless ENV["NATIVE_INTEGRATION"]
   skip_this_scenario("Skipping scenario: Not supported in 0.72") if Maze::Helper.get_current_platform == 'ios' && current_version == 0.72
+end
+
+Before('@benchmark') do |scenario|
+  skip_this_scenario("Skipping scenario: Not running benchmark tests") unless ENV["BENCHMARKS"]
 end
