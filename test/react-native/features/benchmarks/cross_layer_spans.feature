@@ -1,4 +1,4 @@
-@benchmark @native_integration
+@benchmark @native_integration @ios_only
 Feature: Cross-Layer Spans
 
   Scenario Outline:
