@@ -81,15 +81,33 @@
             config.autoInstrumentAppStarts = autoInstrumentAppStarts;
             config.autoInstrumentViewControllers = autoInstrumentViewLoads;
             config.autoInstrumentNetworkRequests = NO;
-            config.enabledMetrics.cpu = YES;
-            config.enabledMetrics.memory = YES;
-            config.enabledMetrics.rendering = YES;
             config.internal.autoTriggerExportOnBatchSize = 1;
             config.internal.clearPersistenceOnStart = YES;
 
-            [config addPlugin:[BugsnagNativeSpansPlugin new]];
-            [config addPlugin:[BugsnagJavascriptSpansPlugin new]];
-            [config addPlugin:[BugsnagReactNativeAppStartPlugin new]];
+            if (configuration[@"samplingProbability"]) {
+                config.samplingProbability = configuration[@"samplingProbability"];
+            }
+
+            if (configuration[@"enabledMetrics"]) {
+                NSDictionary *metricsConfig = configuration[@"enabledMetrics"];
+                config.enabledMetrics.rendering = [metricsConfig[@"rendering"] boolValue];
+                config.enabledMetrics.cpu = [metricsConfig[@"cpu"] boolValue];
+                config.enabledMetrics.memory = [metricsConfig[@"memory"] boolValue];
+            } else {
+                config.enabledMetrics.cpu = YES;
+                config.enabledMetrics.memory = YES;
+                config.enabledMetrics.rendering = YES;
+            }
+
+            if (!configuration[@"nativeSpans"] || [configuration[@"nativeSpans"] boolValue]) {
+                [config addPlugin:[BugsnagNativeSpansPlugin new]];
+            }
+            if (!configuration[@"jsSpans"] || [configuration[@"jsSpans"] boolValue]) {
+                [config addPlugin:[BugsnagJavascriptSpansPlugin new]];
+            }
+            if (!configuration[@"nativeAppStarts"] || [configuration[@"nativeAppStarts"] boolValue]) {
+                [config addPlugin:[BugsnagReactNativeAppStartPlugin new]];
+            }
 
             [BugsnagPerformance startWithConfiguration:config];
             

@@ -11,6 +11,7 @@ import java.util.Iterator;
 
 import com.bugsnag.android.performance.AutoInstrument;
 import com.bugsnag.android.performance.BugsnagPerformance;
+import com.bugsnag.android.performance.EnabledMetrics;
 import com.bugsnag.android.performance.PerformanceConfiguration;
 
 import com.bugsnag.reactnative.performance.nativespans.BugsnagJavascriptSpansPlugin;
@@ -124,9 +125,31 @@ public class BugsnagTestUtils {
             config.setAutoInstrumentAppStarts(autoInstrumentAppStarts);
             config.setAutoInstrumentActivities(autoInstrumentViewLoads ? AutoInstrument.FULL : AutoInstrument.OFF);
             config.setAutoInstrumentRendering(true);
-            config.addPlugin(new BugsnagNativeSpansPlugin());
-            config.addPlugin(new BugsnagJavascriptSpansPlugin());
-            config.addPlugin(new BugsnagReactNativeAppStartPlugin());
+
+            if (configuration.containsKey("samplingProbability")) {
+                config.setSamplingProbability((Double)configuration.get("samplingProbability"));
+            }
+
+            if (configuration.containsKey("enabledMetrics")) {
+                Map<String, Object> metricsConfig = (Map<String, Object>)configuration.get("enabledMetrics");
+                EnabledMetrics enabledMetrics = new EnabledMetrics(
+                Boolean.TRUE.equals(metricsConfig.get("rendering")),
+                Boolean.TRUE.equals(metricsConfig.get("cpu")),
+                Boolean.TRUE.equals(metricsConfig.get("memory"))
+                );
+
+                config.setEnabledMetrics(enabledMetrics);
+            }
+
+            if (!configuration.containsKey("nativeSpans") || Boolean.TRUE.equals(configuration.get("nativeSpans"))) {
+                config.addPlugin(new BugsnagNativeSpansPlugin());
+            }
+            if (!configuration.containsKey("jsSpans") || Boolean.TRUE.equals(configuration.get("jsSpans"))) {
+                config.addPlugin(new BugsnagJavascriptSpansPlugin());
+            }
+            if (!configuration.containsKey("nativeAppStarts") || Boolean.TRUE.equals(configuration.get("nativeAppStarts"))) {
+				config.addPlugin(new BugsnagReactNativeAppStartPlugin());
+            }
 
             BugsnagPerformance.start(config);
             Log.d(TAG, "Native performance started successfully");

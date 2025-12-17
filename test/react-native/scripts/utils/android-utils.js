@@ -9,7 +9,7 @@ const { replaceInFile, appendToFileIfNotExists } = require('./file-utils')
 function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersion) {
   // set android:usesCleartextTraffic="true" in AndroidManifest.xml
   const androidManifestPath = `${fixtureDir}/android/app/src/main/AndroidManifest.xml`
-  replaceInFile(androidManifestPath, '<application', '<application android:usesCleartextTraffic="true"')
+  replaceInFile(androidManifestPath, '<application', '<application android:usesCleartextTraffic="true" android:largeHeap="true"')
 
   // enable/disable the new architecture in gradle.properties
   const gradlePropertiesPath = `${fixtureDir}/android/gradle.properties`
@@ -69,7 +69,7 @@ class MainActivity : ReactActivity() {
  */
 function installAndroidPerformance (fixtureDir) {
   const appGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
-  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:1.16.0")'
+  const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:2.0.0")'
   const dependenciesSection = 'dependencies {'
 
   replaceInFile(appGradlePath, dependenciesSection, `${dependenciesSection}\n    ${performanceDependency}`)

@@ -1,7 +1,8 @@
 import * as Scenarios from '../scenarios'
-import { getCurrentCommand } from './CommandRunner'
+import { getCurrentCommand, getMazeRunnerAddress } from './CommandRunner'
 import { clearPersistedState, setDeviceId, setSamplingProbability } from './Persistence'
 import { NativeScenarioLauncher } from './native'
+import { runBenchmark } from '../benchmarks'
 import { wrapperComponentProvider } from '../scenarios/core/WrapperComponentProviderScenario'
 import React from 'react'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
@@ -32,7 +33,7 @@ async function runScenario (setScenario, scenarioName, apiKey, endpoint) {
   if (!scenario.doNotStartBugsnagPerformance) {
     BugsnagPerformance.start(scenarioConfig)
   }
-  
+
   setScenario({ name: scenarioName, config: scenarioConfig })
 }
 
@@ -49,6 +50,15 @@ export async function launchScenario (setScenario, clearPersistedData = true) {
         command.scenario_name,
         command.api_key,
         command.endpoint
+      )
+
+    case 'run-benchmark':
+      return await runBenchmark(
+        command.benchmark_name,
+        command.config,
+        command.api_key,
+        command.endpoint,
+        await getMazeRunnerAddress()
       )
 
     case 'clear-all-persistent-data':
