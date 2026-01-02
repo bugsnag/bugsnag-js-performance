@@ -104,7 +104,7 @@ const REACT_NATIVE_NAVIGATION_DEPENDENCIES = [
 // add dependencies for react-native-navigation (wix)
 if (process.env.REACT_NATIVE_NAVIGATION === 'true' || process.env.REACT_NATIVE_NAVIGATION === '1') {
   DEPENDENCIES.push(...REACT_NATIVE_NAVIGATION_DEPENDENCIES)
-} else if (!isNewArchEnabled) {
+} else {
   // add dependencies for @react-navigation
   DEPENDENCIES.push(...REACT_NAVIGATION_DEPENDENCIES)
 }
