@@ -6,6 +6,8 @@
 
 - (plugin-react-navigation) Ensure navigation container is ready before initializing tracking [#755](https://github.com/bugsnag/bugsnag-js-performance/pull/755)
 
+- (react-native) Add proguard rules for React Native Android module [#766](https://github.com/bugsnag/bugsnag-js-performance/pull/766)
+
 ## [v3.3.0] (2025-11-24)
 
 ### Changed
