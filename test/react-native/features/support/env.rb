@@ -58,3 +58,7 @@ end
 Before('@android_only') do |scenario|
   skip_this_scenario("Skipping scenario") unless Maze::Helper.get_current_platform == 'android'
 end
+
+Before('@react_navigation') do |scenario|
+  skip_this_scenario("Skipping scenario: Not running react-navigation fixture") unless ENV["REACT_NAVIGATION"] == 'true'
+end

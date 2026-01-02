@@ -22,6 +22,11 @@ if (process.env.REACT_NATIVE_NAVIGATION) {
   scenarioExports += "\nexport * from './react-native-navigation'"
 }
 
+if (process.env.REACT_NAVIGATION === 'true' || process.env.REACT_NAVIGATION === '1') {
+  pkg.files.push('/scenarios/react-navigation')
+  scenarioExports += "\nexport * from './react-navigation'"
+}
+
 if (process.env.NATIVE_INTEGRATION) {
   pkg.files.push('/scenarios/native-integration')
   scenarioExports += "\nexport * from './native-integration'"

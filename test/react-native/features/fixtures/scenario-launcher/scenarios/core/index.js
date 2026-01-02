@@ -18,5 +18,3 @@ export * as FixedSamplingProbabilityScenario from './FixedSamplingProbabilitySce
 export * as SpanCallbacksScenario from './SpanCallbacksScenario'
 export * as NamedSpansPluginScenario from './NamedSpansPluginScenario'
 
-// React Navigation Scenarios
-export * as ReactNavigationScenario from './ReactNavigationScenario'
