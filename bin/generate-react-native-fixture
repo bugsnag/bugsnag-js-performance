@@ -115,8 +115,8 @@ switch (true) {
   case rnVersion >= 0.79:
     reactNativeScreensVersion = '~4.14.0'
     break
-  case rnVersion >= 0.77:
-    reactNativeScreensVersion = '~4.5.0'
+  case rnVersion >= 0.78:
+    reactNativeScreensVersion = '~4.11.0'
     break
   case rnVersion >= 0.76:
     reactNativeScreensVersion = '~4.0.0'
@@ -155,7 +155,7 @@ if (rnVersion < 0.76) {
 if (rnVersion >= 0.74) {
   reactNativeSafeAreaContextVersion = '^5.0.0'
 } else {
-  reactNativeSafeAreaContextVersion = '^4.0.0'
+  reactNativeSafeAreaContextVersion = '4.14.0'
 }
 
 const REACT_NAVIGATION_DEPENDENCIES = [
