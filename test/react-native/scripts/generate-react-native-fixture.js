@@ -19,9 +19,7 @@ const bugsnagPackages = [
   `${ROOT_DIR}/packages/core`,
   `${ROOT_DIR}/packages/delivery-fetch`,
   `${ROOT_DIR}/packages/platforms/react-native`,
-  `${ROOT_DIR}/packages/plugin-react-native-navigation`,
   `${ROOT_DIR}/packages/plugin-react-native-span-access`,
-  `${ROOT_DIR}/packages/plugin-react-navigation`,
   `${ROOT_DIR}/packages/request-tracker`,
   `${ROOT_DIR}/packages/plugin-named-spans`,
   `${ROOT_DIR}/test/react-native/scenario-launcher`
@@ -64,6 +62,7 @@ validateEnvironment({
 const reactNativeVersion = process.env.RN_VERSION
 const isNewArchEnabled = process.env.RCT_NEW_ARCH_ENABLED === '1'
 const isReactNativeNavigation = isTruthy(process.env.REACT_NATIVE_NAVIGATION)
+const isReactNavigation = isTruthy(process.env.REACT_NAVIGATION)
 const isNativeIntegration = isTruthy(process.env.NATIVE_INTEGRATION)
 
 // Build fixture path
@@ -87,10 +86,12 @@ const fixtureDir = resolve(ROOT_DIR, fixturePath, reactNativeVersion)
 // Build dependencies
 const fixtureDeps = getReactNativeDependencies(reactNativeVersion, process.env.NOTIFIER_VERSION)
 
-// Add navigation dependencies
+// Add navigation packages and dependencies
 if (isReactNativeNavigation) {
+  bugsnagPackages.push(`${ROOT_DIR}/packages/plugin-react-native-navigation`)
   fixtureDeps.push(...getReactNativeNavigationDependencies())
-} else if (!isNewArchEnabled) {
+} else if (isReactNavigation) {
+  bugsnagPackages.push(`${ROOT_DIR}/packages/plugin-react-navigation`)
   fixtureDeps.push(...getReactNavigationDependencies(reactNativeVersion))
 }
 
