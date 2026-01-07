@@ -68,3 +68,7 @@ end
 Before('@benchmark') do |scenario|
   skip_this_scenario("Skipping scenario: Not running benchmark tests") unless ENV["BENCHMARKS"]
 end
+
+Before('@react_navigation') do |scenario|
+  skip_this_scenario("Skipping scenario: Not running react-navigation fixture") unless ENV["REACT_NAVIGATION"] == 'true'
+end

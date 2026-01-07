@@ -19,6 +19,7 @@ steps:
           NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "0"
           BUILD_ANDROID: "true"
+          REACT_NAVIGATION: "true"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/old-arch/**/reactnative.apk"
         commands:
@@ -43,6 +44,7 @@ steps:
           NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "1"
           BUILD_ANDROID: "true"
+          REACT_NAVIGATION: "true"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/new-arch/**/reactnative.apk"
         commands:
@@ -117,6 +119,7 @@ steps:
           NOTIFIER_VERSION: "8.0.0"
           BUILD_IOS: "true"
           XCODE_VERSION: "16.2.0"
+          REACT_NAVIGATION: "true"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/old-arch/**/output/reactnative.ipa"
         commands:
@@ -141,6 +144,7 @@ steps:
           NOTIFIER_VERSION: "8.0.0"
           BUILD_IOS: "true"
           XCODE_VERSION: "16.2.0"
+          REACT_NAVIGATION: "true"
         artifact_paths:
           - "test/react-native/features/fixtures/generated/new-arch/**/output/reactnative.ipa"
         commands:
@@ -235,6 +239,7 @@ steps:
             api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         env:
           RN_VERSION: "{{matrix}}"
+          REACT_NAVIGATION: "true"
         retry:
           manual:
             permit_on_passed: true
@@ -277,6 +282,7 @@ steps:
         env:
           RCT_NEW_ARCH_ENABLED: "1"
           RN_VERSION: "{{matrix}}"
+          REACT_NAVIGATION: "true"
         retry:
           manual:
             permit_on_passed: true
@@ -405,6 +411,7 @@ steps:
             api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
         env:
           RN_VERSION: "{{matrix}}"
+          REACT_NAVIGATION: "true"
         retry:
           manual:
             permit_on_passed: true
@@ -447,6 +454,7 @@ steps:
         env:
           RCT_NEW_ARCH_ENABLED: "1"
           RN_VERSION: "{{matrix}}"
+          REACT_NAVIGATION: "true"
         retry:
           manual:
             permit_on_passed: true
