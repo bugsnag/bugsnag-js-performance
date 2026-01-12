@@ -11,8 +11,6 @@
   "author": "",
   "license": "MIT",
   "peerDependencies": {
-    "@react-navigation/native": "*",
-    "@react-navigation/native-stack": "*",
     "react": "*",
     "react-native": "*",
     "react-native-file-access": "*"
