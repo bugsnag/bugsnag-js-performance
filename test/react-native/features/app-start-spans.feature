@@ -110,6 +110,7 @@ Feature: App Start spans
     And I wait to receive 2 sampling requests
     And I wait to receive 2 traces
     And a span named '[AppStart/ReactNativeInit]' has a parent named '[ViewLoad/Activity]MainActivity'
+    And a span named '[ViewLoad/Activity]MainActivity' has a parent named '[AppStart/AndroidCold]'
 
   @native_integration @native_app_starts  @android_only
   Scenario: Manual app start spans can be nested under native view load spans
@@ -119,6 +120,7 @@ Feature: App Start spans
     And I wait to receive 2 sampling requests
     And I wait to receive 2 traces
     And a span named '[AppStart/ReactNativeInit]' has a parent named '[ViewLoad/Activity]MainActivity'
+    And a span named '[ViewLoad/Activity]MainActivity' has a parent named '[AppStart/AndroidCold]'
 
   @native_integration @native_app_starts  @ios_only
   Scenario: Automatic app start spans can be nested under native view load spans
@@ -128,6 +130,8 @@ Feature: App Start spans
     And I wait to receive 2 sampling requests
     And I wait to receive 2 traces
     And a span named '[AppStart/ReactNativeInit]' has a parent named '[ViewLoad/UIKit]/BSGViewController'
+    And a span named '[ViewLoad/UIKit]/BSGViewController' has a parent named '[AppStartPhase/App launching - post main()]'
+    And a span named '[AppStartPhase/App launching - post main()]' has a parent named '[AppStart/iOSWarm]'
 
   @native_integration @native_app_starts  @ios_only
   Scenario: Manual app start spans can be nested under native view load spans
@@ -137,3 +141,5 @@ Feature: App Start spans
     And I wait to receive 2 sampling requests
     And I wait to receive 2 traces
     And a span named '[AppStart/ReactNativeInit]' has a parent named '[ViewLoad/UIKit]/BSGViewController'
+    And a span named '[ViewLoad/UIKit]/BSGViewController' has a parent named '[AppStartPhase/App launching - post main()]'
+    And a span named '[AppStartPhase/App launching - post main()]' has a parent named '[AppStart/iOSWarm]'
