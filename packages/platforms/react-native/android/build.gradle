@@ -14,6 +14,10 @@ if (isNewArchitectureEnabled()) {
 android {
   compileSdkVersion safeExtGet('compileSdkVersion', 29)
 
+  defaultConfig {
+    consumerProguardFiles 'proguard-rules.pro'
+  }
+
   if (android.hasProperty('namespace')) {
     namespace 'com.bugsnag.reactnative.performance'
   }
