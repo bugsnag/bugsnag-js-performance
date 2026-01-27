@@ -25,7 +25,7 @@ function useCommandRunner(componentId) {
                     console.error(`[Bugsnag] Navigating to route ${command.payload}`)
                     Navigation.push(componentId, {
                         component: {
-                            name: command.payload
+                            name: command.screen
                         }
                     })
                     break

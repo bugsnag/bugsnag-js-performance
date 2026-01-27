@@ -64,6 +64,7 @@ const isNewArchEnabled = process.env.RCT_NEW_ARCH_ENABLED === '1'
 const isReactNativeNavigation = isTruthy(process.env.REACT_NATIVE_NAVIGATION)
 const isReactNavigation = isTruthy(process.env.REACT_NAVIGATION)
 const isNativeIntegration = isTruthy(process.env.NATIVE_INTEGRATION)
+const isBenchmark = isTruthy(process.env.BENCHMARKS)
 
 // Build fixture path
 let fixturePath = 'test/react-native/features/fixtures/generated/'
@@ -73,6 +74,10 @@ if (isReactNativeNavigation) {
 
 if (isNativeIntegration) {
   fixturePath += 'native-integration/'
+}
+
+if (isBenchmark) {
+  fixturePath += 'benchmarks/'
 }
 
 if (isNewArchEnabled) {

@@ -87,8 +87,10 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     }
   }
 
-  // set usesCleartextTraffic to true for Android and install ios test utils pod
-  appConfig.expo.plugins.push([
+  // Add expo-build-properties plugin config for:
+  // - enabling cleartext traffic for android
+  // - adding BugsnagTestUtils pod for iOS
+  const expoBuildPropertiesPluginConfig = [
     'expo-build-properties',
     {
       android: {
@@ -103,7 +105,15 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
         ]
       }
     }
-  ])
+  ]
+
+  // expo-build-properties should have an existing entry added on install - if it does, replace it, otherwise add it
+  const pluginIndex = appConfig.expo.plugins.findIndex(plugin => plugin === 'expo-build-properties')
+  if (pluginIndex === -1) {
+    appConfig.expo.plugins.push(expoBuildPropertiesPluginConfig)
+  } else {
+    appConfig.expo.plugins[pluginIndex] = expoBuildPropertiesPluginConfig
+  }
 
   // install android test utils module
   const configPlugin = resolve(ROOT_DIR, `test/react-native/features/fixtures/expo/withNativeTestUtilsAndroid.js`)

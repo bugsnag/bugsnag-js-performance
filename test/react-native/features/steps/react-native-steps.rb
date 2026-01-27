@@ -18,7 +18,9 @@ When('I clear all persistent data') do
 end
 
 When('I navigate to {string}') do |screen|
-  execute_command 'navigate', screen
+  execute_command 'navigate', {
+    screen: screen
+  }
 end
 
 Then('the trace payload field {string} string attribute {string} equals the platform-dependent string:') do |field, attribute, platform_values|

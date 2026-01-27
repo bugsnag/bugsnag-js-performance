@@ -20,8 +20,9 @@ steps:
           RCT_NEW_ARCH_ENABLED: "1"
           BUILD_ANDROID: "true"
           NATIVE_INTEGRATION: "1"
+          BENCHMARKS: "1"
         artifact_paths:
-          - "test/react-native/features/fixtures/generated/native-integration/new-arch/**/reactnative.apk"
+          - "test/react-native/features/fixtures/generated/native-integration/benchmarks/new-arch/**/reactnative.apk"
         commands:
           - bundle install
           - node test/react-native/scripts/generate-react-native-fixture.js
@@ -45,8 +46,9 @@ steps:
           BUILD_IOS: "true"
           XCODE_VERSION: "16.2.0"
           NATIVE_INTEGRATION: "1"
+          BENCHMARKS: "1"
         artifact_paths:
-          - "test/react-native/features/fixtures/generated/native-integration/new-arch/**/output/reactnative.ipa"
+          - "test/react-native/features/fixtures/generated/native-integration/benchmarks/new-arch/**/output/reactnative.ipa"
         commands:
           - bundle install
           - node test/react-native/scripts/generate-react-native-fixture.js
@@ -65,7 +67,7 @@ steps:
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
-            download: "test/react-native/features/fixtures/generated/native-integration/new-arch/{{matrix}}/reactnative.apk"
+            download: "test/react-native/features/fixtures/generated/native-integration/benchmarks/new-arch/{{matrix}}/reactnative.apk"
             upload:
               - "./test/react-native/maze_output/failed/*"
               - "./test/react-native/maze_output/maze_output.zip"
@@ -75,7 +77,7 @@ steps:
             run: react-native-maze-runner
             service-ports: true
             command:
-              - --app=/app/features/fixtures/generated/native-integration/new-arch/{{matrix}}/reactnative.apk
+              - --app=/app/features/fixtures/generated/native-integration/benchmarks/new-arch/{{matrix}}/reactnative.apk
               - --farm=bb
               - --device=ANDROID_13
               - --a11y-locator
@@ -111,7 +113,7 @@ steps:
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
-            download: "test/react-native/features/fixtures/generated/native-integration/new-arch/{{matrix}}/output/reactnative.ipa"
+            download: "test/react-native/features/fixtures/generated/native-integration/benchmarks/new-arch/{{matrix}}/output/reactnative.ipa"
             upload:
               - "./test/react-native/maze_output/failed/*"
               - "./test/react-native/maze_output/maze_output.zip"
@@ -121,7 +123,7 @@ steps:
             run: react-native-maze-runner
             service-ports: true
             command:
-              - --app=/app/features/fixtures/generated/native-integration/new-arch/{{matrix}}/output/reactnative.ipa
+              - --app=/app/features/fixtures/generated/native-integration/benchmarks/new-arch/{{matrix}}/output/reactnative.ipa
               - --farm=bb
               - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
