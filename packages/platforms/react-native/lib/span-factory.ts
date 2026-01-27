@@ -1,4 +1,4 @@
-import { runSpanEndCallbacks, SpanFactory, SpanInternal, timeToNumber } from '@bugsnag/core-performance'
+import { RemoteParentContext, runSpanEndCallbacks, SpanFactory, SpanInternal, timeToNumber } from '@bugsnag/core-performance'
 import type { SpanAttributes, SpanOptions } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from './config'
 import NativeBugsnagPerformance from './native'
@@ -18,9 +18,13 @@ export class ReactNativeSpanFactory<C extends ReactNativeConfiguration = ReactNa
   private attachedToNative = false
   appStartSpan?: SpanInternal
   private appStartSpanCreated = false
+  private nativeParentContext?: RemoteParentContext
 
-  onAttach () {
+  onAttach (nativeParentContext?: string) {
     this.attachedToNative = true
+    if (nativeParentContext) {
+      this.nativeParentContext = RemoteParentContext.parseTraceParent(nativeParentContext)
+    }
   }
 
   startSpan (name: string, options: ReactNativeSpanOptions) {
@@ -83,7 +87,7 @@ export class ReactNativeSpanFactory<C extends ReactNativeConfiguration = ReactNa
   startAppStartSpan (appStartTime: number) {
     // Ensure we only ever create one app start span
     if (!this.appStartSpan && !this.appStartSpanCreated) {
-      this.appStartSpan = this.startSpan(APP_START_BASE_NAME, { startTime: appStartTime, parentContext: null })
+      this.appStartSpan = this.startSpan(APP_START_BASE_NAME, { startTime: appStartTime, parentContext: this.nativeParentContext || null })
       this.appStartSpan.setAttribute('bugsnag.span.category', 'app_start')
       this.appStartSpan.setAttribute('bugsnag.app_start.type', 'ReactNativeInit')
       this.appStartSpanCreated = true
@@ -94,6 +98,10 @@ export class ReactNativeSpanFactory<C extends ReactNativeConfiguration = ReactNa
     if (this.appStartSpan?.isValid()) {
       this.endSpan(this.appStartSpan, endTime)
       this.appStartSpan = undefined
+
+      if (this.nativeParentContext) {
+        NativeBugsnagPerformance.endNativeAppStart(this.clock.toUnixNanoseconds(endTime))
+      }
     }
   }
 }

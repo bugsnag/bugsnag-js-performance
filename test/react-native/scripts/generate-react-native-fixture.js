@@ -1,0 +1,164 @@
+const { execFileSync } = require('child_process')
+const { resolve } = require('path')
+const fs = require('fs')
+
+// Import utilities
+const { ROOT_DIR } = require('./utils/constants')
+const { validateEnvironment, isTruthy, isBooleanString } = require('./utils/env-validation')
+const { buildPackages } = require('./utils/build-utils')
+const { cleanDirectory } = require('./utils/file-utils')
+const {
+  installFixtureDependencies,
+  getReactNativeDependencies,
+  getReactNavigationDependencies,
+  getReactNativeNavigationDependencies
+} = require('./utils/dependency-utils')
+
+// Bugsnag packages to install
+const bugsnagPackages = [
+  `${ROOT_DIR}/packages/core`,
+  `${ROOT_DIR}/packages/delivery-fetch`,
+  `${ROOT_DIR}/packages/platforms/react-native`,
+  `${ROOT_DIR}/packages/plugin-react-native-span-access`,
+  `${ROOT_DIR}/packages/request-tracker`,
+  `${ROOT_DIR}/packages/plugin-named-spans`,
+  `${ROOT_DIR}/test/react-native/scenario-launcher`
+]
+const {
+  replaceGeneratedFixtureFiles,
+  configureReactNativeNavigation
+} = require('./utils/react-native-config')
+const {
+  configureAndroidProject,
+  installAndroidPerformance,
+  installNativeTestUtilsAndroid,
+  configureMainApplicationForTestUtils
+} = require('./utils/android-utils')
+const {
+  configureIOSProject,
+  installCocoaPerformance,
+  installNativeTestUtilsIOS,
+  configureAppDelegateForTestUtils,
+  applyViewControllerChanges
+} = require('./utils/ios-utils')
+const { configureRN064Fixture } = require('./utils/rn-064-config')
+const { buildAndroidFixture, buildIOSFixture } = require('./utils/platform-builds')
+
+// Validate environment variables
+validateEnvironment({
+  RN_VERSION: {
+    message: 'Please provide a React Native version'
+  },
+  NOTIFIER_VERSION: {
+    message: 'Please provide a Notifier version'
+  },
+  RCT_NEW_ARCH_ENABLED: {
+    message: 'RCT_NEW_ARCH_ENABLED must be set to 1 or 0',
+    validate: isBooleanString
+  }
+})
+
+// Configuration
+const reactNativeVersion = process.env.RN_VERSION
+const isNewArchEnabled = process.env.RCT_NEW_ARCH_ENABLED === '1'
+const isReactNativeNavigation = isTruthy(process.env.REACT_NATIVE_NAVIGATION)
+const isReactNavigation = isTruthy(process.env.REACT_NAVIGATION)
+const isNativeIntegration = isTruthy(process.env.NATIVE_INTEGRATION)
+const isBenchmark = isTruthy(process.env.BENCHMARKS)
+
+// Build fixture path
+let fixturePath = 'test/react-native/features/fixtures/generated/'
+if (isReactNativeNavigation) {
+  fixturePath += 'react-native-navigation/'
+}
+
+if (isNativeIntegration) {
+  fixturePath += 'native-integration/'
+}
+
+if (isBenchmark) {
+  fixturePath += 'benchmarks/'
+}
+
+if (isNewArchEnabled) {
+  fixturePath += 'new-arch/'
+} else {
+  fixturePath += 'old-arch/'
+}
+
+const fixtureDir = resolve(ROOT_DIR, fixturePath, reactNativeVersion)
+
+// Build dependencies
+const fixtureDeps = getReactNativeDependencies(reactNativeVersion, process.env.NOTIFIER_VERSION)
+
+// Add navigation packages and dependencies
+if (isReactNativeNavigation) {
+  bugsnagPackages.push(`${ROOT_DIR}/packages/plugin-react-native-navigation`)
+  fixtureDeps.push(...getReactNativeNavigationDependencies())
+} else if (isReactNavigation) {
+  bugsnagPackages.push(`${ROOT_DIR}/packages/plugin-react-navigation`)
+  fixtureDeps.push(...getReactNavigationDependencies(reactNativeVersion))
+}
+
+// Build packages
+buildPackages()
+
+// Generate fixture
+if (!process.env.SKIP_GENERATE_FIXTURE) {
+  // Remove existing fixture directory
+  cleanDirectory(fixtureDir)
+
+  // Create the test fixture
+  const RNInitArgs = [
+    '@react-native-community/cli@16',
+    'init',
+    'reactnative',
+    '--package-name',
+    'com.bugsnag.fixtures.reactnative.performance',
+    '--directory',
+    fixtureDir,
+    '--version',
+    reactNativeVersion,
+    '--pm',
+    'npm',
+    '--skip-install'
+  ]
+  execFileSync('npx', RNInitArgs, { stdio: 'inherit' })
+
+  // Configure fixture files and projects
+  replaceGeneratedFixtureFiles(fixtureDir, isReactNativeNavigation)
+  configureAndroidProject(fixtureDir, isNewArchEnabled, reactNativeVersion)
+  configureIOSProject(fixtureDir, reactNativeVersion)
+
+  // install native test utils
+  installNativeTestUtilsAndroid(fixtureDir)
+  installNativeTestUtilsIOS(fixtureDir)
+
+  // Install dependencies
+  installFixtureDependencies(fixtureDir, bugsnagPackages, fixtureDeps)
+
+  // Apply RN 0.64 specific configuration
+  if (parseFloat(reactNativeVersion) === 0.64) {
+    configureRN064Fixture(fixtureDir)
+  }
+
+  // Install native performance SDKs if needed
+  if (isNativeIntegration) {
+    installAndroidPerformance(fixtureDir)
+    installCocoaPerformance(fixtureDir)
+
+    configureMainApplicationForTestUtils(fixtureDir, reactNativeVersion)
+    configureAppDelegateForTestUtils(fixtureDir, reactNativeVersion)
+
+    applyViewControllerChanges(fixtureDir, reactNativeVersion)
+  }
+
+  // Configure React Native Navigation if needed
+  if (isReactNativeNavigation) {
+    configureReactNativeNavigation(fixtureDir)
+  }
+}
+
+// Build platform fixtures
+buildAndroidFixture(fixtureDir, isNewArchEnabled)
+buildIOSFixture(fixtureDir)

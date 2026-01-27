@@ -2,13 +2,13 @@
 
 ## Building the test fixture
 
-To generate a test fixture, from the root directory run the `./bin/generate-react-native-fixture` script, specifying the following environment variables:
+To generate a test fixture, from the root directory run the `generate-react-native-fixture.js` script, specifying the following environment variables:
 -  `RN_VERSION` - React Native version, e.g. 0.77
 -  `NOTIFIER_VERSION` - Notifier version, e.g. 8.0.0
 -  `RCT_NEW_ARCH_ENABLED` - 1 (new architecture) or 0 (old architecture)
 
 ```sh
-RN_VERSION=0.77 NOTIFIER_VERSION=8.0.0 RCT_NEW_ARCH_ENABLED=1 ./bin/generate-react-native-fixture
+RN_VERSION=0.77 NOTIFIER_VERSION=8.0.0 RCT_NEW_ARCH_ENABLED=1 node test/react-native/scripts/generate-react-native-fixture.js
 ```
 
 This will generate a React Native project in `test/react-native/features/fixtures/generated/<old-arch|new-arch>/<RN_VERSION>`, and will also package the performance libraries and scenarios and install them into the test fixture project
@@ -53,7 +53,7 @@ End-to-end tests in CI run on both Android and iOS, for both old and new archite
 
 ## Expo testing
 
-To generate an Expo test fixture, from the root directory run the `./bin/generate-expo-fixture` script. You will need to make sure the following environment variables are set:
+To generate an Expo test fixture, from the root directory run the `test/react-native/scripts/generate-react-native-fixture.js` script. You will need to make sure the following environment variables are set:
 
 __Note: only SmartBear employees can build the Expo test fixture.__ The build requires private credentials which can't be shared outside of the organisation.
 

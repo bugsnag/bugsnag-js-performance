@@ -1,5 +1,17 @@
 # Changelog
 
+## [v3.4.0] (2026-01-27)
+
+### Added
+
+- (plugin-react-native-span-access) Added `BugsnagReactNativeAppStartPlugin` to support React Native app starts as child spans of native view loads [#705](https://github.com/bugsnag/bugsnag-js-performance/pull/705) [#705](https://github.com/bugsnag/bugsnag-js-performance/pull/721) [#749](https://github.com/bugsnag/bugsnag-js-performance/pull/749) [#757](https://github.com/bugsnag/bugsnag-js-performance/pull/757)
+
+### Fixed
+
+- (plugin-react-navigation) Ensure navigation container is ready before initializing tracking [#755](https://github.com/bugsnag/bugsnag-js-performance/pull/755)
+
+- (react-native) Add proguard rules for React Native Android module [#766](https://github.com/bugsnag/bugsnag-js-performance/pull/766)
+
 ## [v3.3.0] (2025-11-24)
 
 ### Changed

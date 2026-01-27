@@ -1,5 +1,12 @@
 When('I run {string}') do |scenario_name|
-  execute_command 'run-scenario', scenario_name
+  run_scenario scenario_name
+end
+
+When('I run benchmark {string} configured as {string}') do |benchmark_name, config|
+  execute_command 'run-benchmark', {
+    benchmark_name: benchmark_name,
+    config: config
+  }
 end
 
 When('I execute the command {string}') do |command|
@@ -11,7 +18,9 @@ When('I clear all persistent data') do
 end
 
 When('I navigate to {string}') do |screen|
-  execute_command 'navigate', screen
+  execute_command 'navigate', {
+    screen: screen
+  }
 end
 
 Then('the trace payload field {string} string attribute {string} equals the platform-dependent string:') do |field, attribute, platform_values|
@@ -19,6 +28,20 @@ Then('the trace payload field {string} string attribute {string} equals the plat
   if !expected_value.eql?('@skip')
     check_attribute_equal_with_nullability field, attribute, 'stringValue', expected_value
   end
+end
+
+Then('the {string} span has {word} attribute named {string}') do |span_name, attribute_type, attribute|
+  spans = spans_from_request_list(Maze::Server.list_for('traces'))
+  found_spans = spans.find_all { |span| span['name'].eql?(span_name) }
+  raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{span_name}" if found_spans.empty?
+  raise Test::Unit::AssertionFailedError.new "found #{found_spans.size} spans named #{span_name}, expected exactly one" unless found_spans.size == 1
+
+  attributes = found_spans.first['attributes']
+  attribute = attributes.find { |a| a['key'] == attribute }
+
+  value = attribute&.dig 'value', "#{attribute_type}Value"
+
+  Maze.check.not_nil value
 end
 
 When("I relaunch the app after shutdown") do
@@ -99,7 +122,14 @@ When("the span named {string} was delivered approximately {int} seconds after en
   )
 end
 
-def execute_command(action, scenario_name = '')
+def run_scenario(scenario_name = '')
+  execute_command 'run-scenario', {
+    scenario_name: scenario_name,
+    payload: scenario_name
+  }
+end
+
+def execute_command(action, command_hash = nil)
   address = if Maze.config.farm == :bb
               if Maze.config.aws_public_ip
                 Maze.public_address
@@ -108,20 +138,22 @@ def execute_command(action, scenario_name = '')
               end
             else
               case Maze::Helper.get_current_platform
-                when 'android'
-                  'localhost:9339'
-                else
-                  'bs-local.com:9339'
+              when 'android'
+                'localhost:9339'
+              else
+                'bs-local.com:9339'
               end
             end
 
   command = {
     action: action,
-    scenario_name: scenario_name,
-    payload: scenario_name,
     endpoint: "http://#{address}/traces",
     api_key: $api_key,
   }
+
+  unless command_hash.nil?
+    command.merge! command_hash
+  end
 
   $logger.debug("Queuing command: #{command}")
   Maze::Server.commands.add command

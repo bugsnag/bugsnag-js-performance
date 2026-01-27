@@ -1,7 +1,7 @@
 import { ReactNativeSpanFactory } from '../lib/span-factory'
 import NativeBugsnagPerformance from '../lib/native'
 import { ControllableBackgroundingListener, InMemoryProcessor, spanAttributesSource, IncrementingIdGenerator } from '@bugsnag/js-performance-test-utilities'
-import { DefaultSpanContextStorage, Sampler, DISCARD_END_TIME } from '@bugsnag/core-performance'
+import { DefaultSpanContextStorage, Sampler, DISCARD_END_TIME, RemoteParentContext } from '@bugsnag/core-performance'
 import type { Clock, InternalConfiguration } from '@bugsnag/core-performance'
 import createClock from '../lib/clock'
 import type { ReactNativeConfiguration } from '../lib/config'
@@ -294,6 +294,38 @@ describe('ReactNativeSpanFactory', () => {
       expect(processor.spans[0].startTime).toBe(123)
       expect(processor.spans[0].endTime).toBe(456)
     })
+
+    it('uses the native parent context when set', () => {
+      const nativeParentSpan = { id: '1234567890123456', traceId: 'abcdef1234567890abcdef1234567890' }
+      const nativeParentContext = RemoteParentContext.toTraceParentString(nativeParentSpan)
+      spanFactory.onAttach(nativeParentContext)
+
+      spanFactory.startAppStartSpan(123)
+      spanFactory.endAppStartSpan(321)
+
+      expect(processor.spans[0].parentSpanId).toBe(nativeParentSpan.id)
+      expect(processor.spans[0].traceId).toBe(nativeParentSpan.traceId)
+    })
+
+    it('sets the parent context to null if native context is undefined', () => {
+      spanFactory.onAttach()
+
+      spanFactory.startAppStartSpan(123)
+      spanFactory.endAppStartSpan(321)
+
+      expect(processor.spans[0].parentSpanId).toBeUndefined()
+      expect(processor.spans[0].traceId).toBe('trace ID 1')
+    })
+
+    it('sets the parent context to null if native context is invalid', () => {
+      spanFactory.onAttach('invalid traceparent string')
+
+      spanFactory.startAppStartSpan(123)
+      spanFactory.endAppStartSpan(321)
+
+      expect(processor.spans[0].parentSpanId).toBeUndefined()
+      expect(processor.spans[0].traceId).toBe('trace ID 1')
+    })
   })
 
   describe('endAppStartSpan', () => {
@@ -304,6 +336,30 @@ describe('ReactNativeSpanFactory', () => {
       spanFactory.endAppStartSpan(54321)
       expect(processor.spans[0].endTime).toBe(54321)
       expect(spanFactory.appStartSpan).toBeUndefined()
+    })
+
+    it('calls endNativeAppStart when native context is set', () => {
+      const nativeParentSpan = { id: '1234567890123456', traceId: 'abcdef1234567890abcdef1234567890' }
+      const nativeParentContext = RemoteParentContext.toTraceParentString(nativeParentSpan)
+      spanFactory.onAttach(nativeParentContext)
+
+      spanFactory.startAppStartSpan(123)
+      spanFactory.endAppStartSpan(321)
+      expect(NativeBugsnagPerformance.endNativeAppStart).toHaveBeenCalledWith(clock.toUnixNanoseconds(321))
+    })
+
+    it('does not call endNativeAppStart when native context is undefined', () => {
+      spanFactory.onAttach()
+      spanFactory.startAppStartSpan(123)
+      spanFactory.endAppStartSpan(321)
+      expect(NativeBugsnagPerformance.endNativeAppStart).not.toHaveBeenCalled()
+    })
+
+    it('does not call endNativeAppStart when native context is invalid', () => {
+      spanFactory.onAttach('invalid traceparent string')
+      spanFactory.startAppStartSpan(123)
+      spanFactory.endAppStartSpan(321)
+      expect(NativeBugsnagPerformance.endNativeAppStart).not.toHaveBeenCalled()
     })
   })
 })

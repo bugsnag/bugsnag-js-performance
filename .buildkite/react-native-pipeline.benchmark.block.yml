@@ -1,0 +1,10 @@
+steps:
+  - block: "Trigger react native benchmark pipeline"
+    key: "trigger-react-native-benchmark-pipeline"
+
+  - label: ":pipeline_upload: React native benchmark pipeline"
+    depends_on: "trigger-react-native-benchmark-pipeline"
+    agents:
+      queue: macos
+    timeout_in_minutes: 2
+    command: buildkite-agent pipeline upload .buildkite/react-native-pipeline.benchmark.yml
