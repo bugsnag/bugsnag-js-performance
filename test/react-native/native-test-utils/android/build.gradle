@@ -1,0 +1,20 @@
+apply plugin: 'com.android.library'
+
+def safeExtGet(prop, fallback) {
+  rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+android {
+    compileSdkVersion safeExtGet('compileSdkVersion', 29)
+
+    if (android.hasProperty('namespace')) {
+        namespace 'com.bugsnag.test.utils'
+    }
+}
+
+dependencies {
+    compileOnly("com.bugsnag:bugsnag-android-performance:2.0.0")
+    compileOnly("com.bugsnag:bugsnag-android-performance-impl:2.0.0")
+    implementation project(':bugsnag_react-native-performance')
+    implementation project(':bugsnag_plugin-react-native-span-access')
+}

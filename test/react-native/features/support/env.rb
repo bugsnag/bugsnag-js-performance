@@ -8,6 +8,10 @@ BeforeAll do
     Maze.config.receive_requests_wait = 60
   end
 
+  if ENV["BENCHMARKS"]
+    Maze.config.receive_requests_wait = 180
+  end
+
 end
 
 Before('@skip') do
@@ -38,11 +42,6 @@ Before('@native_integration') do |scenario|
   skip_this_scenario("Skipping scenario: Not running native integration fixture") unless ENV["NATIVE_INTEGRATION"]
 end
 
-Before('@skip_android_old_arch_079') do |scenario|
-  current_version = ENV['RN_VERSION'].nil? ? 0 : ENV['RN_VERSION'].to_f
-  skip_this_scenario("Skipping scenario") if Maze::Helper.get_current_platform == 'android' && !ENV['RCT_NEW_ARCH_ENABLED'].eql?('1') && current_version == 0.79
-end
-
 Before('@skip_expo') do |scenario|
   skip_this_scenario("Skipping scenario: Not supported in Expo") if ENV["EXPO_VERSION"]
 end
@@ -52,11 +51,22 @@ Before('@expo') do |scenario|
 end
 
 Before('@ios_only') do |scenario|
-  skip_this_scenario("Skipping scenario") unless Maze::Helper.get_current_platform == 'ios'
+  skip_this_scenario("Skipping scenario: Not running iOS fixture") unless Maze::Helper.get_current_platform == 'ios'
 end
 
 Before('@android_only') do |scenario|
-  skip_this_scenario("Skipping scenario") unless Maze::Helper.get_current_platform == 'android'
+  skip_this_scenario("Skipping scenario: Not running Android fixture") unless Maze::Helper.get_current_platform == 'android'
+end
+
+# native app start tests are skipped on RN 0.72 iOS due to absence of the RCTAppDelegate methods we override to set a custom root view controller
+Before('@native_app_starts') do |scenario|
+  current_version = ENV['RN_VERSION'].nil? ? 0 : ENV['RN_VERSION'].to_f
+  skip_this_scenario("Skipping scenario: Not running native integration fixture") unless ENV["NATIVE_INTEGRATION"]
+  skip_this_scenario("Skipping scenario: Not supported in 0.72") if Maze::Helper.get_current_platform == 'ios' && current_version == 0.72
+end
+
+Before('@benchmark') do |scenario|
+  skip_this_scenario("Skipping scenario: Not running benchmark tests") unless ENV["BENCHMARKS"]
 end
 
 Before('@react_navigation') do |scenario|

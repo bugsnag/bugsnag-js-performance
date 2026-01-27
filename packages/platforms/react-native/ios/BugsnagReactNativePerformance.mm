@@ -7,6 +7,14 @@
 #import "BugsnagReactNativePerformanceSpec.h"
 #endif
 
+// Forward declaration for optional dependency on plugin-react-native-span-access
+// Declare the class and methods we need without importing the header
+@interface BugsnagReactNativeAppStartPlugin : NSObject
++ (id _Nullable)singleton;
+- (NSString * _Nullable)getAppStartParent;
+- (void)endAppStart:(NSDate *)endTime;
+@end
+
 @implementation BugsnagReactNativePerformance
 
 static NSUInteger traceIdMidpoint = 16;
@@ -286,6 +294,14 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(attachToNativeSDK) {
         config[@"enabledReleaseStages"] = [nativeConfig.enabledReleaseStages allObjects];
     }
 
+    BugsnagReactNativeAppStartPlugin *plugin = [BugsnagReactNativeAppStartPlugin singleton];
+    if (plugin != nil) {
+        NSString *appStartParent = [plugin getAppStartParent];
+        if (appStartParent != nil) {
+            config[@"appStartParentContext"] = appStartParent;
+        }
+    }
+
     return config;
 }
 
@@ -397,6 +413,17 @@ RCT_EXPORT_METHOD(discardNativeSpan:(NSString *)spanId
         }
     }
 
+    resolve(nil);
+}
+
+RCT_EXPORT_METHOD(endNativeAppStart:(double)endTime
+                resolve:(RCTPromiseResolveBlock)resolve
+                reject:(RCTPromiseRejectBlock)reject) {
+    BugsnagReactNativeAppStartPlugin *plugin = [BugsnagReactNativeAppStartPlugin singleton];
+    if (plugin != nil) {
+        NSDate *nativeEndTime = [NSDate dateWithTimeIntervalSince1970: endTime / NSEC_PER_SEC];
+        [plugin endAppStart:nativeEndTime];
+    }
     resolve(nil);
 }
 

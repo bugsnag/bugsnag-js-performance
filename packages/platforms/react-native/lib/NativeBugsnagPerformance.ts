@@ -27,6 +27,7 @@ export type NativeConfiguration = {
   attributeCountLimit: number
   attributeStringValueLimit: number
   attributeArrayLengthLimit: number
+  appStartParentContext: string | undefined
 }
 
 export type ParentContext = {
@@ -60,6 +61,7 @@ export interface Spec extends TurboModule {
   endNativeSpan: (spanId: string, traceId: string, endTime: number, attributes: UnsafeObject) => Promise<void>
   markNativeSpanEndTime: (spanId: string, traceId: string, endTime: number) => void
   discardNativeSpan: (spanId: string, traceId: string) => Promise<void>
+  endNativeAppStart: (endTime: number) => Promise<void>
 }
 
 export default TurboModuleRegistry.get<Spec>(

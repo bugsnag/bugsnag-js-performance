@@ -41,7 +41,7 @@ export const createDefaultPlatformExtensions = <C extends ReactNativeConfigurati
       ...nativeConfig
     }
 
-    spanFactory.onAttach()
+    spanFactory.onAttach(nativeConfig.appStartParentContext)
     const client = this as unknown as Client<ReactNativeConfiguration>
     client.start(finalConfig)
   }
