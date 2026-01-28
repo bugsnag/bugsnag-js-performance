@@ -1,6 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [v3.4.0] (2026-01-27)
+
+### Added
+
+- (plugin-react-native-span-access) Added `BugsnagReactNativeAppStartPlugin` to support React Native app starts as child spans of native view loads [#705](https://github.com/bugsnag/bugsnag-js-performance/pull/705) [#705](https://github.com/bugsnag/bugsnag-js-performance/pull/721) [#749](https://github.com/bugsnag/bugsnag-js-performance/pull/749) [#757](https://github.com/bugsnag/bugsnag-js-performance/pull/757)
 
 ### Fixed
 
