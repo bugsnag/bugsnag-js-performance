@@ -28,10 +28,10 @@ packages.reverse().forEach(({ paths, block, pipeline, environment, skip }) => {
   }
 
   // Upload all pipelines if specified in the commit message
-  if (pipeline && commitMessage.includes("[full ci]") ||
+  if (pipeline && (commitMessage.includes("[full ci]") ||
     isFullBuild ||
     currentBranch === "main" ||
-    baseBranch === "main") {
+    baseBranch === "main")) {
     console.log(`Upload pipeline file: ${pipeline} with environment: '${env}'`);
     execSync(`${env} buildkite-agent pipeline upload ${pipeline}`);
     return;
