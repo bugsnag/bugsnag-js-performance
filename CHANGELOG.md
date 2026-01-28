@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- (browser) Fix TLS PageLoadPhase span start times when `secureConnectionStart` is 0 [#781](https://github.com/bugsnag/bugsnag-js-performance/pull/781)
+
 ## [v3.4.0] (2026-01-27)
 
 ### Added
