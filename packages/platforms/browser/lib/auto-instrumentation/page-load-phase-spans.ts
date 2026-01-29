@@ -50,7 +50,7 @@ export const instrumentPageLoadPhaseSpans = (
     const TCPHandshakeEnd = entry.secureConnectionStart || entry.connectEnd
     createPageLoadPhaseSpan('TCPHandshake', entry.connectStart, TCPHandshakeEnd)
 
-    createPageLoadPhaseSpan('TLS', entry.secureConnectionStart, entry.connectEnd)
+    createPageLoadPhaseSpan('TLS', TCPHandshakeEnd, entry.connectEnd)
     createPageLoadPhaseSpan('HTTPRequest', entry.requestStart, entry.responseStart)
     createPageLoadPhaseSpan('HTTPResponse', entry.responseStart, entry.responseEnd)
     createPageLoadPhaseSpan('DomContentLoadedEvent', entry.domContentLoadedEventStart, entry.domContentLoadedEventEnd)
