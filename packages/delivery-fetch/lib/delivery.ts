@@ -1,7 +1,4 @@
-import {
-
-  responseStateFromStatusCode
-} from '@bugsnag/core-performance'
+import { responseStateFromStatusCode } from '@bugsnag/core-performance'
 import type { BackgroundingListener, Clock, Delivery, DeliveryFactory, TracePayload } from '@bugsnag/core-performance'
 
 export type Fetch = typeof fetch
@@ -40,7 +37,7 @@ function createFetchDeliveryFactory (
     })
   }
 
-  return function fetchDeliveryFactory (endpoint: string): Delivery {
+  return function fetchDeliveryFactory (endpoint: string, sendPayloadChecksums?: boolean): Delivery {
     return {
       async send (payload: TracePayload) {
         const body = JSON.stringify(payload.body)
@@ -48,6 +45,12 @@ function createFetchDeliveryFactory (
         payload.headers['Bugsnag-Sent-At'] = clock.date().toISOString()
 
         try {
+          const integrityHeaderValue = await getIntegrityHeaderValue(sendPayloadChecksums ?? false, window, body)
+
+          if (integrityHeaderValue) {
+            payload.headers['Bugsnag-Integrity'] = integrityHeaderValue
+          }
+
           const response = await fetch(endpoint, {
             method: 'POST',
             keepalive,
@@ -72,3 +75,19 @@ function createFetchDeliveryFactory (
 }
 
 export default createFetchDeliveryFactory
+
+function getIntegrityHeaderValue (sendPayloadChecksums: boolean, windowOrWorkerGlobalScope: Window, requestBody: string) {
+  if (sendPayloadChecksums && windowOrWorkerGlobalScope.isSecureContext && windowOrWorkerGlobalScope.crypto && windowOrWorkerGlobalScope.crypto.subtle && windowOrWorkerGlobalScope.crypto.subtle.digest && typeof TextEncoder === 'function') {
+    const msgUint8 = new TextEncoder().encode(requestBody)
+    return windowOrWorkerGlobalScope.crypto.subtle.digest('SHA-1', msgUint8).then((hashBuffer) => {
+      const hashArray = Array.from(new Uint8Array(hashBuffer))
+      const hashHex = hashArray
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
+
+      return 'sha1 ' + hashHex
+    })
+  }
+
+  return Promise.resolve()
+}

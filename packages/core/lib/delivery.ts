@@ -5,7 +5,7 @@ import type { JsonEvent } from './events'
 import type { Kind, SpanEnded } from './span'
 import { spanToJson } from './span'
 
-export type DeliveryFactory = (endpoint: string) => Delivery
+export type DeliveryFactory = (endpoint: string, sendPayloadChecksums: boolean) => Delivery
 
 export type ResponseState = 'success' | 'failure-discard' | 'failure-retryable'
 
@@ -60,6 +60,8 @@ export interface TracePayload {
     // therefore it's 'undefined' when passed to delivery, which adds a value
     // immediately before initiating the request
     'Bugsnag-Sent-At'?: string
+    // 'undefined' when passed to delivery, which adds a value before initiating the request
+    'Bugsnag-Integrity'?: string
   }
 }
 
