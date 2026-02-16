@@ -7,13 +7,7 @@
 #import "BugsnagReactNativePerformanceSpec.h"
 #endif
 
-// Forward declaration for optional dependency on plugin-react-native-span-access
-// Declare the class and methods we need without importing the header
-@interface BugsnagReactNativeAppStartPlugin : NSObject
-+ (id _Nullable)singleton;
-- (NSString * _Nullable)getAppStartParent;
-- (void)endAppStart:(NSDate *)endTime;
-@end
+#import "BugsnagPerformanceAppStartRegistry.h"
 
 @implementation BugsnagReactNativePerformance
 
@@ -294,9 +288,9 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(attachToNativeSDK) {
         config[@"enabledReleaseStages"] = [nativeConfig.enabledReleaseStages allObjects];
     }
 
-    BugsnagReactNativeAppStartPlugin *plugin = [BugsnagReactNativeAppStartPlugin singleton];
-    if (plugin != nil) {
-        NSString *appStartParent = [plugin getAppStartParent];
+    id<BugsnagPerformanceAppStartProvider> appStartProvider = [BugsnagPerformanceAppStartRegistry provider];
+    if (appStartProvider != nil) {
+        NSString *appStartParent = [appStartProvider getAppStartParent];
         if (appStartParent != nil) {
             config[@"appStartParentContext"] = appStartParent;
         }
@@ -419,10 +413,10 @@ RCT_EXPORT_METHOD(discardNativeSpan:(NSString *)spanId
 RCT_EXPORT_METHOD(endNativeAppStart:(double)endTime
                 resolve:(RCTPromiseResolveBlock)resolve
                 reject:(RCTPromiseRejectBlock)reject) {
-    BugsnagReactNativeAppStartPlugin *plugin = [BugsnagReactNativeAppStartPlugin singleton];
-    if (plugin != nil) {
+    id<BugsnagPerformanceAppStartProvider> appStartProvider = [BugsnagPerformanceAppStartRegistry provider];
+    if (appStartProvider != nil) {
         NSDate *nativeEndTime = [NSDate dateWithTimeIntervalSince1970: endTime / NSEC_PER_SEC];
-        [plugin endAppStart:nativeEndTime];
+        [appStartProvider endAppStart:nativeEndTime];
     }
     resolve(nil);
 }

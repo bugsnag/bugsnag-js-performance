@@ -11,6 +11,7 @@
 		DAC36AB22D0CA66E0076A039 /* ReactNativeSpanAttributes.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAC36AB12D0CA66E0076A039 /* ReactNativeSpanAttributes.mm */; };
 		DAE18DD42C58DF2500D52529 /* BugsnagReactNativePerformance.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAE18DD32C58DF2500D52529 /* BugsnagReactNativePerformance.mm */; };
 		DAE18DD72C58E02C00D52529 /* BugsnagReactNativePerformance.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = DAE18DD22C58DF2500D52529 /* BugsnagReactNativePerformance.h */; };
+		DAF7A51A2F4473510021ABE1 /* BugsnagPerformanceAppStartRegistry.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAF7A5192F4473510021ABE1 /* BugsnagPerformanceAppStartRegistry.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -38,6 +39,9 @@
 		DAC36AB12D0CA66E0076A039 /* ReactNativeSpanAttributes.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ReactNativeSpanAttributes.mm; sourceTree = "<group>"; };
 		DAE18DD22C58DF2500D52529 /* BugsnagReactNativePerformance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BugsnagReactNativePerformance.h; sourceTree = "<group>"; };
 		DAE18DD32C58DF2500D52529 /* BugsnagReactNativePerformance.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BugsnagReactNativePerformance.mm; sourceTree = "<group>"; };
+		DAF7A5172F4473510021ABE1 /* BugsnagPerformanceAppStartProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagPerformanceAppStartProvider.h; sourceTree = "<group>"; };
+		DAF7A5182F4473510021ABE1 /* BugsnagPerformanceAppStartRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BugsnagPerformanceAppStartRegistry.h; sourceTree = "<group>"; };
+		DAF7A5192F4473510021ABE1 /* BugsnagPerformanceAppStartRegistry.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = BugsnagPerformanceAppStartRegistry.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +66,9 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				DAF7A5172F4473510021ABE1 /* BugsnagPerformanceAppStartProvider.h */,
+				DAF7A5182F4473510021ABE1 /* BugsnagPerformanceAppStartRegistry.h */,
+				DAF7A5192F4473510021ABE1 /* BugsnagPerformanceAppStartRegistry.mm */,
 				DAC36AB12D0CA66E0076A039 /* ReactNativeSpanAttributes.mm */,
 				DAC36AB02D0CA64F0076A039 /* ReactNativeSpanAttributes.h */,
 				DA434CE02D09ACE000C62B2F /* BugsnagPerformanceSpanOptions.h */,
@@ -135,6 +142,7 @@
 			files = (
 				DAC36AB22D0CA66E0076A039 /* ReactNativeSpanAttributes.mm in Sources */,
 				DA396E142CCFD327009B37C2 /* BugsnagReactNativePerformanceCrossTalkAPIClient.mm in Sources */,
+				DAF7A51A2F4473510021ABE1 /* BugsnagPerformanceAppStartRegistry.mm in Sources */,
 				DAE18DD42C58DF2500D52529 /* BugsnagReactNativePerformance.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
