@@ -6,6 +6,8 @@
 
 - (browser) Fix TLS PageLoadPhase span start times when `secureConnectionStart` is 0 [#781](https://github.com/bugsnag/bugsnag-js-performance/pull/781)
 
+- (react-native) Fix linker error when `plugin-react-native-span-access` is not installed [#787](https://github.com/bugsnag/bugsnag-js-performance/pull/787)
+
 ## [v3.4.0] (2026-01-27)
 
 ### Added
