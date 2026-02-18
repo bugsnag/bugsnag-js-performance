@@ -4,6 +4,7 @@
 #import <BugsnagPerformance/BugsnagPerformanceSpan.h>
 #import <BugsnagPerformance/BugsnagPerformanceSpanCondition.h>
 #import <BugsnagPerformance/BugsnagPerformanceSpanContext.h>
+#import <BugsnagReactNativePerformance/BugsnagPerformanceAppStartRegistry.h>
 
 static const NSTimeInterval kDefaultSpanBlockTimeoutInterval = 5; // 5s default timeout
 
@@ -22,8 +23,6 @@ static const NSTimeInterval kDefaultSpanBlockTimeoutInterval = 5; // 5s default 
 
 @implementation BugsnagReactNativeAppStartPlugin
 
-static BugsnagReactNativeAppStartPlugin *_sharedInstance = nil;
-
 - (instancetype)init {
     return [self initWithTimeout:kDefaultSpanBlockTimeoutInterval];
 }
@@ -35,12 +34,9 @@ static BugsnagReactNativeAppStartPlugin *_sharedInstance = nil;
     return self;
 }
 
-+ (id)singleton {
-    return _sharedInstance;
-}
-
 - (void)installWithContext:(BugsnagPerformancePluginContext *)context {
-     _sharedInstance = self;
+    // Register this plugin as the AppStartProvider with the core React Native Performance module
+    [BugsnagPerformanceAppStartRegistry registerProvider:self];
     __weak BugsnagReactNativeAppStartPlugin *weakSelf = self;
     
     // Add span start callback with high priority (equivalent to NORM_PRIORITY + 1)
