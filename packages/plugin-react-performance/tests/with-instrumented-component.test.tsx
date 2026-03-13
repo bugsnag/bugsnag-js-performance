@@ -11,10 +11,13 @@ jest.doMock('@bugsnag/browser-performance', () => {
   return mockClient
 })
 
-jest.useFakeTimers()
+beforeEach(() => {
+  jest.useFakeTimers()
+})
 
 afterEach(() => {
   jest.clearAllMocks()
+  jest.useRealTimers()
 })
 
 describe('withInstrumentedComponent', () => {
