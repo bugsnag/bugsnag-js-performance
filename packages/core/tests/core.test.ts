@@ -34,7 +34,7 @@ describe('Core', () => {
           jest.restoreAllMocks()
           jest.spyOn(console, 'debug')
           jest.spyOn(console, 'info')
-          jest.spyOn(console, 'warn')
+          jest.spyOn(console, 'warn').mockImplementation(() => {})
           jest.spyOn(console, 'error')
         })
 
