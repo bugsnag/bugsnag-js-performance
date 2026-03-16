@@ -7,30 +7,30 @@ steps:
       #
       # Test fixtures
       #
-      - label: ':android: Build RN {{matrix}} test fixture APK (Old Arch)'
-        key: "build-react-native-android-fixture-old-arch"
-        timeout_in_minutes: 30
-        agents:
-          queue: macos-15
-        env:
-          JAVA_VERSION: "17"
-          NODE_VERSION: "18"
-          RN_VERSION: "{{matrix}}"
-          NOTIFIER_VERSION: "8.0.0"
-          RCT_NEW_ARCH_ENABLED: "0"
-          BUILD_ANDROID: "true"
-          REACT_NAVIGATION: "true"
-        artifact_paths:
-          - "test/react-native/features/fixtures/generated/old-arch/**/reactnative.apk"
-        commands:
-          - bundle install
-          - node test/react-native/scripts/generate-react-native-fixture.js
-        matrix:
-          - "0.80"
-        retry:
-          automatic:
-            - exit_status: "*"
-              limit: 1
+      # - label: ':android: Build RN {{matrix}} test fixture APK (Old Arch)'
+      #   key: "build-react-native-android-fixture-old-arch"
+      #   timeout_in_minutes: 30
+      #   agents:
+      #     queue: macos-15
+      #   env:
+      #     JAVA_VERSION: "17"
+      #     NODE_VERSION: "18"
+      #     RN_VERSION: "{{matrix}}"
+      #     NOTIFIER_VERSION: "8.0.0"
+      #     RCT_NEW_ARCH_ENABLED: "0"
+      #     BUILD_ANDROID: "true"
+      #     REACT_NAVIGATION: "true"
+      #   artifact_paths:
+      #     - "test/react-native/features/fixtures/generated/old-arch/**/reactnative.apk"
+      #   commands:
+      #     - bundle install
+      #     - node test/react-native/scripts/generate-react-native-fixture.js
+      #   matrix:
+      #     - "0.80"
+      #   retry:
+      #     automatic:
+      #       - exit_status: "*"
+      #         limit: 1
 
       - label: ':android: Build RN {{matrix}} test fixture APK (New Arch)'
         key: "build-react-native-android-fixture-new-arch"
@@ -51,36 +51,36 @@ steps:
           - bundle install
           - node test/react-native/scripts/generate-react-native-fixture.js
         matrix:
-          - "0.80"
+          - "0.84"
         retry:
           automatic:
             - exit_status: "*"
               limit: 1
 
-      - label: ':android: Build RN {{matrix}} native integration test fixture APK (Old Arch)'
-        key: "build-react-native-android-fixture-native-integration-old-arch"
-        timeout_in_minutes: 30
-        agents:
-          queue: macos-15
-        env:
-          JAVA_VERSION: "17"
-          NODE_VERSION: "18"
-          RN_VERSION: "{{matrix}}"
-          NOTIFIER_VERSION: "8.0.0"
-          RCT_NEW_ARCH_ENABLED: "0"
-          BUILD_ANDROID: "true"
-          NATIVE_INTEGRATION: "1"
-        artifact_paths:
-          - "test/react-native/features/fixtures/generated/native-integration/old-arch/**/reactnative.apk"
-        commands:
-          - bundle install
-          - node test/react-native/scripts/generate-react-native-fixture.js
-        matrix:
-          - "0.80"
-        retry:
-          automatic:
-            - exit_status: "*"
-              limit: 1
+      # - label: ':android: Build RN {{matrix}} native integration test fixture APK (Old Arch)'
+      #   key: "build-react-native-android-fixture-native-integration-old-arch"
+      #   timeout_in_minutes: 30
+      #   agents:
+      #     queue: macos-15
+      #   env:
+      #     JAVA_VERSION: "17"
+      #     NODE_VERSION: "18"
+      #     RN_VERSION: "{{matrix}}"
+      #     NOTIFIER_VERSION: "8.0.0"
+      #     RCT_NEW_ARCH_ENABLED: "0"
+      #     BUILD_ANDROID: "true"
+      #     NATIVE_INTEGRATION: "1"
+      #   artifact_paths:
+      #     - "test/react-native/features/fixtures/generated/native-integration/old-arch/**/reactnative.apk"
+      #   commands:
+      #     - bundle install
+      #     - node test/react-native/scripts/generate-react-native-fixture.js
+      #   matrix:
+      #     - "0.80"
+      #   retry:
+      #     automatic:
+      #       - exit_status: "*"
+      #         limit: 1
 
       - label: ':android: Build RN {{matrix}} native integration test fixture APK (New Arch)'
         key: "build-react-native-android-fixture-native-integration-new-arch"
@@ -101,36 +101,36 @@ steps:
           - bundle install
           - node test/react-native/scripts/generate-react-native-fixture.js
         matrix:
-          - "0.80"
+          - "0.84"
         retry:
           automatic:
             - exit_status: "*"
               limit: 1
 
-      - label: ':mac: Build RN {{matrix}} test fixture ipa (Old Arch)'
-        key: "build-react-native-ios-fixture-old-arch"
-        timeout_in_minutes: 30
-        agents:
-          queue: "macos-15"
-        env:
-          NODE_VERSION: "18"
-          RN_VERSION: "{{matrix}}"
-          RCT_NEW_ARCH_ENABLED: "0"
-          NOTIFIER_VERSION: "8.0.0"
-          BUILD_IOS: "true"
-          XCODE_VERSION: "16.2.0"
-          REACT_NAVIGATION: "true"
-        artifact_paths:
-          - "test/react-native/features/fixtures/generated/old-arch/**/output/reactnative.ipa"
-        commands:
-          - bundle install
-          - node test/react-native/scripts/generate-react-native-fixture.js
-        matrix:
-          - "0.80"
-        retry:
-          automatic:
-            - exit_status: "*"
-              limit: 1
+      # - label: ':mac: Build RN {{matrix}} test fixture ipa (Old Arch)'
+      #   key: "build-react-native-ios-fixture-old-arch"
+      #   timeout_in_minutes: 30
+      #   agents:
+      #     queue: "macos-15"
+      #   env:
+      #     NODE_VERSION: "18"
+      #     RN_VERSION: "{{matrix}}"
+      #     RCT_NEW_ARCH_ENABLED: "0"
+      #     NOTIFIER_VERSION: "8.0.0"
+      #     BUILD_IOS: "true"
+      #     XCODE_VERSION: "16.2.0"
+      #     REACT_NAVIGATION: "true"
+      #   artifact_paths:
+      #     - "test/react-native/features/fixtures/generated/old-arch/**/output/reactnative.ipa"
+      #   commands:
+      #     - bundle install
+      #     - node test/react-native/scripts/generate-react-native-fixture.js
+      #   matrix:
+      #     - "0.80"
+      #   retry:
+      #     automatic:
+      #       - exit_status: "*"
+      #         limit: 1
 
       - label: ':mac: Build RN {{matrix}} test fixture ipa (New Arch)'
         key: "build-react-native-ios-fixture-new-arch"
@@ -151,36 +151,36 @@ steps:
           - bundle install
           - node test/react-native/scripts/generate-react-native-fixture.js
         matrix:
-          - "0.80"
+          - "0.84"
         retry:
           automatic:
             - exit_status: "*"
               limit: 1
 #
-      - label: ':mac: Build RN {{matrix}} native integration test fixture ipa (Old Arch)'
-        key: "build-react-native-ios-fixture-native-integration-old-arch"
-        timeout_in_minutes: 30
-        agents:
-          queue: "macos-15"
-        env:
-          NODE_VERSION: "18"
-          RN_VERSION: "{{matrix}}"
-          RCT_NEW_ARCH_ENABLED: "0"
-          NOTIFIER_VERSION: "8.0.0"
-          BUILD_IOS: "true"
-          XCODE_VERSION: "16.2.0"
-          NATIVE_INTEGRATION: "1"
-        artifact_paths:
-          - "test/react-native/features/fixtures/generated/native-integration/old-arch/**/output/reactnative.ipa"
-        commands:
-          - bundle install
-          - node test/react-native/scripts/generate-react-native-fixture.js
-        matrix:
-          - "0.80"
-        retry:
-          automatic:
-            - exit_status: "*"
-              limit: 1
+      # - label: ':mac: Build RN {{matrix}} native integration test fixture ipa (Old Arch)'
+      #   key: "build-react-native-ios-fixture-native-integration-old-arch"
+      #   timeout_in_minutes: 30
+      #   agents:
+      #     queue: "macos-15"
+      #   env:
+      #     NODE_VERSION: "18"
+      #     RN_VERSION: "{{matrix}}"
+      #     RCT_NEW_ARCH_ENABLED: "0"
+      #     NOTIFIER_VERSION: "8.0.0"
+      #     BUILD_IOS: "true"
+      #     XCODE_VERSION: "16.2.0"
+      #     NATIVE_INTEGRATION: "1"
+      #   artifact_paths:
+      #     - "test/react-native/features/fixtures/generated/native-integration/old-arch/**/output/reactnative.ipa"
+      #   commands:
+      #     - bundle install
+      #     - node test/react-native/scripts/generate-react-native-fixture.js
+      #   matrix:
+      #     - "0.80"
+      #   retry:
+      #     automatic:
+      #       - exit_status: "*"
+      #         limit: 1
 
       - label: ':mac: Build RN {{matrix}} native integration test fixture ipa (New Arch)'
         key: "build-react-native-ios-fixture-native-integration-new-arch"
@@ -201,7 +201,7 @@ steps:
           - bundle install
           - node test/react-native/scripts/generate-react-native-fixture.js
         matrix:
-          - "0.80"
+          - "0.84"
         retry:
           automatic:
             - exit_status: "*"
@@ -210,47 +210,47 @@ steps:
         #
         # End-to-end tests
         #
-      - label: ":bitbar: :android: RN {{matrix}} Android 13 (Old Arch) end-to-end tests"
-        depends_on: "build-react-native-android-fixture-old-arch"
-        timeout_in_minutes: 20
-        plugins:
-          artifacts#v1.9.0:
-            download: "test/react-native/features/fixtures/generated/old-arch/{{matrix}}/reactnative.apk"
-            upload:
-              - "./test/react-native/maze_output/failed/*"
-              - "./test/react-native/maze_output/maze_output.zip"
-          docker-compose#v4.7.0:
-            pull: react-native-maze-runner
-            run: react-native-maze-runner
-            service-ports: true
-            command:
-              - --app=/app/features/fixtures/generated/old-arch/{{matrix}}/reactnative.apk
-              - --farm=bb
-              - --device=ANDROID_13
-              - --a11y-locator
-              - --fail-fast
-              - --appium-version=1.22
-              - --no-tunnel
-              - --aws-public-ip
-          test-collector#v1.10.2:
-            files: "reports/TEST-*.xml"
-            format: "junit"
-            branch: "^main|next$$"
-            api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
-        env:
-          RN_VERSION: "{{matrix}}"
-          REACT_NAVIGATION: "true"
-        retry:
-          manual:
-            permit_on_passed: true
-          automatic:
-            - exit_status: 103  # Appium session failed
-              limit: 2
-        concurrency: 25
-        concurrency_group: "bitbar"
-        concurrency_method: eager
-        matrix:
-          - "0.80"
+      # - label: ":bitbar: :android: RN {{matrix}} Android 13 (Old Arch) end-to-end tests"
+      #   depends_on: "build-react-native-android-fixture-old-arch"
+      #   timeout_in_minutes: 20
+      #   plugins:
+      #     artifacts#v1.9.0:
+      #       download: "test/react-native/features/fixtures/generated/old-arch/{{matrix}}/reactnative.apk"
+      #       upload:
+      #         - "./test/react-native/maze_output/failed/*"
+      #         - "./test/react-native/maze_output/maze_output.zip"
+      #     docker-compose#v4.7.0:
+      #       pull: react-native-maze-runner
+      #       run: react-native-maze-runner
+      #       service-ports: true
+      #       command:
+      #         - --app=/app/features/fixtures/generated/old-arch/{{matrix}}/reactnative.apk
+      #         - --farm=bb
+      #         - --device=ANDROID_13
+      #         - --a11y-locator
+      #         - --fail-fast
+      #         - --appium-version=1.22
+      #         - --no-tunnel
+      #         - --aws-public-ip
+      #     test-collector#v1.10.2:
+      #       files: "reports/TEST-*.xml"
+      #       format: "junit"
+      #       branch: "^main|next$$"
+      #       api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
+      #   env:
+      #     RN_VERSION: "{{matrix}}"
+      #     REACT_NAVIGATION: "true"
+      #   retry:
+      #     manual:
+      #       permit_on_passed: true
+      #     automatic:
+      #       - exit_status: 103  # Appium session failed
+      #         limit: 2
+      #   concurrency: 25
+      #   concurrency_group: "bitbar"
+      #   concurrency_method: eager
+      #   matrix:
+      #     - "0.80"
 
       - label: ":bitbar: :android: RN {{matrix}} Android 13 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-new-arch"
@@ -293,50 +293,50 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.80"
+          - "0.84"
 
-      - label: ":bitbar: :android: RN {{matrix}} native integration Android 13 (Old Arch) end-to-end tests"
-        depends_on: "build-react-native-android-fixture-native-integration-old-arch"
-        timeout_in_minutes: 20
-        plugins:
-          artifacts#v1.9.0:
-            download: "test/react-native/features/fixtures/generated/native-integration/old-arch/{{matrix}}/reactnative.apk"
-            upload:
-              - "./test/react-native/maze_output/failed/*"
-              - "./test/react-native/maze_output/maze_output.zip"
-          docker-compose#v4.7.0:
-            pull: react-native-maze-runner
-            run: react-native-maze-runner
-            service-ports: true
-            command:
-              - --app=/app/features/fixtures/generated/native-integration/old-arch/{{matrix}}/reactnative.apk
-              - --farm=bb
-              - --device=ANDROID_13
-              - --a11y-locator
-              - --fail-fast
-              - --appium-version=1.22
-              - --no-tunnel
-              - --aws-public-ip
-              - --tags=@native_integration
-          test-collector#v1.10.2:
-            files: "reports/TEST-*.xml"
-            format: "junit"
-            branch: "^main|next$$"
-            api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
-        env:
-          NATIVE_INTEGRATION: "1"
-          RN_VERSION: "{{matrix}}"
-        retry:
-          manual:
-            permit_on_passed: true
-          automatic:
-            - exit_status: 103  # Appium session failed
-              limit: 2
-        concurrency: 25
-        concurrency_group: "bitbar"
-        concurrency_method: eager
-        matrix:
-          - "0.80"
+      # - label: ":bitbar: :android: RN {{matrix}} native integration Android 13 (Old Arch) end-to-end tests"
+      #   depends_on: "build-react-native-android-fixture-native-integration-old-arch"
+      #   timeout_in_minutes: 20
+      #   plugins:
+      #     artifacts#v1.9.0:
+      #       download: "test/react-native/features/fixtures/generated/native-integration/old-arch/{{matrix}}/reactnative.apk"
+      #       upload:
+      #         - "./test/react-native/maze_output/failed/*"
+      #         - "./test/react-native/maze_output/maze_output.zip"
+      #     docker-compose#v4.7.0:
+      #       pull: react-native-maze-runner
+      #       run: react-native-maze-runner
+      #       service-ports: true
+      #       command:
+      #         - --app=/app/features/fixtures/generated/native-integration/old-arch/{{matrix}}/reactnative.apk
+      #         - --farm=bb
+      #         - --device=ANDROID_13
+      #         - --a11y-locator
+      #         - --fail-fast
+      #         - --appium-version=1.22
+      #         - --no-tunnel
+      #         - --aws-public-ip
+      #         - --tags=@native_integration
+      #     test-collector#v1.10.2:
+      #       files: "reports/TEST-*.xml"
+      #       format: "junit"
+      #       branch: "^main|next$$"
+      #       api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
+      #   env:
+      #     NATIVE_INTEGRATION: "1"
+      #     RN_VERSION: "{{matrix}}"
+      #   retry:
+      #     manual:
+      #       permit_on_passed: true
+      #     automatic:
+      #       - exit_status: 103  # Appium session failed
+      #         limit: 2
+      #   concurrency: 25
+      #   concurrency_group: "bitbar"
+      #   concurrency_method: eager
+      #   matrix:
+      #     - "0.80"
 
       - label: ":bitbar: :android: RN {{matrix}} native integration Android 13 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-native-integration-new-arch"
@@ -380,49 +380,49 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.80"
+          - "0.84"
 
-      - label: ":bitbar: :mac: RN {{matrix}} iOS (Old Arch) end-to-end tests"
-        depends_on: "build-react-native-ios-fixture-old-arch"
-        timeout_in_minutes: 20
-        plugins:
-          artifacts#v1.9.0:
-            download: "test/react-native/features/fixtures/generated/old-arch/{{matrix}}/output/reactnative.ipa"
-            upload:
-              - "./test/react-native/maze_output/failed/*"
-              - "./test/react-native/maze_output/maze_output.zip"
-          docker-compose#v4.12.0:
-            pull: react-native-maze-runner
-            run: react-native-maze-runner
-            service-ports: true
-            command:
-              - --app=/app/features/fixtures/generated/old-arch/{{matrix}}/output/reactnative.ipa
-              - --farm=bb
-              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
-              - --a11y-locator
-              - --fail-fast
-              - --appium-version=1.22
-              - --no-tunnel
-              - --aws-public-ip
-          test-collector#v1.10.2:
-            files: "reports/TEST-*.xml"
-            format: "junit"
-            branch: "^main|next$$"
-            api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
-        env:
-          RN_VERSION: "{{matrix}}"
-          REACT_NAVIGATION: "true"
-        retry:
-          manual:
-            permit_on_passed: true
-          automatic:
-            - exit_status: 103  # Appium session failed
-              limit: 2
-        concurrency: 25
-        concurrency_group: "bitbar"
-        concurrency_method: eager
-        matrix:
-          - "0.80"
+      #  - label: ":bitbar: :mac: RN {{matrix}} iOS (Old Arch) end-to-end tests"
+      #   depends_on: "build-react-native-ios-fixture-old-arch"
+      #   timeout_in_minutes: 20
+      #   plugins:
+      #     artifacts#v1.9.0:
+      #       download: "test/react-native/features/fixtures/generated/old-arch/{{matrix}}/output/reactnative.ipa"
+      #       upload:
+      #         - "./test/react-native/maze_output/failed/*"
+      #         - "./test/react-native/maze_output/maze_output.zip"
+      #     docker-compose#v4.12.0:
+      #       pull: react-native-maze-runner
+      #       run: react-native-maze-runner
+      #       service-ports: true
+      #       command:
+      #         - --app=/app/features/fixtures/generated/old-arch/{{matrix}}/output/reactnative.ipa
+      #         - --farm=bb
+      #         - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
+      #         - --a11y-locator
+      #         - --fail-fast
+      #         - --appium-version=1.22
+      #         - --no-tunnel
+      #         - --aws-public-ip
+      #     test-collector#v1.10.2:
+      #       files: "reports/TEST-*.xml"
+      #       format: "junit"
+      #       branch: "^main|next$$"
+      #       api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
+      #   env:
+      #     RN_VERSION: "{{matrix}}"
+      #     REACT_NAVIGATION: "true"
+      #   retry:
+      #     manual:
+      #       permit_on_passed: true
+      #     automatic:
+      #       - exit_status: 103  # Appium session failed
+      #         limit: 2
+      #   concurrency: 25
+      #   concurrency_group: "bitbar"
+      #   concurrency_method: eager
+      #   matrix:
+      #     - "0.80"
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-new-arch"
@@ -465,50 +465,50 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.80"
+          - "0.84"
 
-      - label: ":bitbar: :mac: RN {{matrix}} native integration iOS (Old Arch) end-to-end tests"
-        depends_on: "build-react-native-ios-fixture-native-integration-old-arch"
-        timeout_in_minutes: 20
-        plugins:
-          artifacts#v1.9.0:
-            download: "test/react-native/features/fixtures/generated/native-integration/old-arch/{{matrix}}/output/reactnative.ipa"
-            upload:
-              - "./test/react-native/maze_output/failed/*"
-              - "./test/react-native/maze_output/maze_output.zip"
-          docker-compose#v4.12.0:
-            pull: react-native-maze-runner
-            run: react-native-maze-runner
-            service-ports: true
-            command:
-              - --app=/app/features/fixtures/generated/native-integration/old-arch/{{matrix}}/output/reactnative.ipa
-              - --farm=bb
-              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
-              - --a11y-locator
-              - --fail-fast
-              - --appium-version=1.22
-              - --no-tunnel
-              - --aws-public-ip
-              - --tags=@native_integration
-          test-collector#v1.10.2:
-            files: "reports/TEST-*.xml"
-            format: "junit"
-            branch: "^main|next$$"
-            api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
-        env:
-          NATIVE_INTEGRATION: "1"
-          RN_VERSION: "{{matrix}}"
-        retry:
-          manual:
-            permit_on_passed: true
-          automatic:
-            - exit_status: 103  # Appium session failed
-              limit: 2
-        concurrency: 25
-        concurrency_group: "bitbar"
-        concurrency_method: eager
-        matrix:
-          - "0.80"
+      # - label: ":bitbar: :mac: RN {{matrix}} native integration iOS (Old Arch) end-to-end tests"
+      #   depends_on: "build-react-native-ios-fixture-native-integration-old-arch"
+      #   timeout_in_minutes: 20
+      #   plugins:
+      #     artifacts#v1.9.0:
+      #       download: "test/react-native/features/fixtures/generated/native-integration/old-arch/{{matrix}}/output/reactnative.ipa"
+      #       upload:
+      #         - "./test/react-native/maze_output/failed/*"
+      #         - "./test/react-native/maze_output/maze_output.zip"
+      #     docker-compose#v4.12.0:
+      #       pull: react-native-maze-runner
+      #       run: react-native-maze-runner
+      #       service-ports: true
+      #       command:
+      #         - --app=/app/features/fixtures/generated/native-integration/old-arch/{{matrix}}/output/reactnative.ipa
+      #         - --farm=bb
+      #         - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
+      #         - --a11y-locator
+      #         - --fail-fast
+      #         - --appium-version=1.22
+      #         - --no-tunnel
+      #         - --aws-public-ip
+      #         - --tags=@native_integration
+      #     test-collector#v1.10.2:
+      #       files: "reports/TEST-*.xml"
+      #       format: "junit"
+      #       branch: "^main|next$$"
+      #       api-token-env-name: "REACT_NATIVE_PERFORMANCE_BUILDKITE_ANALYTICS_TOKEN"
+      #   env:
+      #     NATIVE_INTEGRATION: "1"
+      #     RN_VERSION: "{{matrix}}"
+      #   retry:
+      #     manual:
+      #       permit_on_passed: true
+      #     automatic:
+      #       - exit_status: 103  # Appium session failed
+      #         limit: 2
+      #   concurrency: 25
+      #   concurrency_group: "bitbar"
+      #   concurrency_method: eager
+      #   matrix:
+      #     - "0.80"
 
       - label: ":bitbar: :mac: RN {{matrix}} native integration iOS (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-native-integration-new-arch"
@@ -552,4 +552,4 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.80"
+          - "0.84"

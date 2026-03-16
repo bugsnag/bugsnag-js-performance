@@ -31,7 +31,8 @@ steps:
               - "0.74"
               - "0.76"
               - "0.78"
-              - "0.79"
+              - "0.80"
+              - "0.81"
             java:
               - "17"
           adjustments:
@@ -66,7 +67,9 @@ steps:
               - "0.74"
               - "0.76"
               - "0.78"
-              - "0.79"
+              - "0.80"
+              - "0.82"
+              - "0.83"
             reactnavigation:
               - "true"
           adjustments:
@@ -104,7 +107,9 @@ steps:
               - "0.74"
               - "0.76"
               - "0.78"
-              - "0.79"
+              - "0.80"
+              - "0.81"
+             
             java:
               - "17"
           adjustments:
@@ -140,7 +145,9 @@ steps:
             - "0.74"
             - "0.76"
             - "0.78"
-            - "0.79"
+            - "0.80"
+            - "0.82"
+            - "0.83"
         retry:
           automatic:
             - exit_status: "*"
@@ -170,7 +177,8 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.81"
         retry:
           automatic:
             - exit_status: "*"
@@ -200,7 +208,9 @@ steps:
               - "0.74"
               - "0.76"
               - "0.78"
-              - "0.79"
+              - "0.80"
+              - "0.82"
+              - "0.83"
             reactnavigation:
               - "true"
           adjustments:
@@ -237,7 +247,8 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.81"
         retry:
           automatic:
             - exit_status: "*"
@@ -267,7 +278,9 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.82"
+          - "0.83"
         retry:
           automatic:
             - exit_status: "*"
@@ -321,7 +334,9 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.81"
+             
 
       - label: ":bitbar: :android: RN {{matrix.reactnative}} Android 13 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-new-arch-full"
@@ -369,7 +384,9 @@ steps:
               - "0.74"
               - "0.76"
               - "0.78"
-              - "0.79"
+              - "0.80"
+              - "0.82"
+              - "0.83"
             reactnavigation:
               - "true"
           adjustments:
@@ -423,7 +440,8 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.81"
 
       - label: ":bitbar: :android: RN {{matrix}} native integration Android 13 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-native-integration-new-arch-full"
@@ -471,7 +489,9 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.82"
+          - "0.83"
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS (Old Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-old-arch-full"
@@ -518,7 +538,9 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.81"
+         
 
       - label: ":bitbar: :mac: RN {{matrix.reactnative}} iOS (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-new-arch-full"
@@ -566,7 +588,9 @@ steps:
               - "0.74"
               - "0.76"
               - "0.78"
-              - "0.79"
+              - "0.80"
+              - "0.82"
+              - "0.83"
             reactnavigation:
               - "true"
           adjustments:
@@ -620,7 +644,8 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.81"
 
       - label: ":bitbar: :mac: RN {{matrix}} native integration iOS (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-native-integration-new-arch-full"
@@ -668,4 +693,6 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.82"
+          - "0.83"
