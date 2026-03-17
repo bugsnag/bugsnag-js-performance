@@ -14,7 +14,7 @@ steps:
           queue: macos-15
         env:
           JAVA_VERSION: "{{matrix.java}}"
-          NODE_VERSION: "18"
+          NODE_VERSION: "{{matrix.node}}"
           RN_VERSION: "{{matrix.reactnative}}"
           NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "0"
@@ -35,6 +35,8 @@ steps:
               - "0.81"
             java:
               - "17"
+            node:
+              - "22"
           adjustments:
             - with:
                 reactnative: "0.64"
@@ -51,7 +53,7 @@ steps:
           queue: macos-15
         env:
           JAVA_VERSION: "17"
-          NODE_VERSION: "18"
+          NODE_VERSION: "22"
           RN_VERSION: "{{matrix.reactnative}}"
           NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "1"
@@ -88,7 +90,7 @@ steps:
           queue: macos-15
         env:
           JAVA_VERSION: "{{matrix.java}}"
-          NODE_VERSION: "18"
+          NODE_VERSION: {{matrix.node}}
           RN_VERSION: "{{matrix.reactnative}}"
           NOTIFIER_VERSION: "8.0.0"
           BUILD_ANDROID: "true"
@@ -112,6 +114,8 @@ steps:
              
             java:
               - "17"
+            node:
+              - "22"
           adjustments:
             - with:
                 reactnative: "0.64"
@@ -128,7 +132,7 @@ steps:
           queue: macos-15
         env:
           JAVA_VERSION: "17"
-          NODE_VERSION: "18"
+          NODE_VERSION: "22"
           RN_VERSION: "{{matrix}}"
           NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "1"
@@ -159,7 +163,7 @@ steps:
         agents:
           queue: "macos-15"
         env:
-          NODE_VERSION: "18"
+          NODE_VERSION: "22"
           RN_VERSION: "{{matrix}}"
           NOTIFIER_VERSION: "8.0.0"
           BUILD_IOS: "true"
@@ -190,7 +194,7 @@ steps:
         agents:
           queue: "macos-15"
         env:
-          NODE_VERSION: "18"
+          NODE_VERSION: "22"
           RN_VERSION: "{{matrix.reactnative}}"
           NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "1"
@@ -228,7 +232,7 @@ steps:
         agents:
           queue: "macos-15"
         env:
-          NODE_VERSION: "18"
+          NODE_VERSION: "22"
           RN_VERSION: "{{matrix}}"
           NOTIFIER_VERSION: "8.0.0"
           BUILD_IOS: "true"
@@ -260,7 +264,7 @@ steps:
         agents:
           queue: "macos-15"
         env:
-          NODE_VERSION: "18"
+          NODE_VERSION: "22"
           RN_VERSION: "{{matrix}}"
           RCT_NEW_ARCH_ENABLED: "1"
           NOTIFIER_VERSION: "8.0.0"
