@@ -90,7 +90,7 @@ steps:
           queue: macos-15
         env:
           JAVA_VERSION: "{{matrix.java}}"
-          NODE_VERSION: {{matrix.node}}
+          NODE_VERSION: "{{matrix.node}}"
           RN_VERSION: "{{matrix.reactnative}}"
           NOTIFIER_VERSION: "8.0.0"
           BUILD_ANDROID: "true"
