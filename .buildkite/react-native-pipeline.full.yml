@@ -41,6 +41,7 @@ steps:
             - with:
                 reactnative: "0.64"
                 java: "11"
+                node: "18"
         retry:
           automatic:
             - exit_status: "*"
@@ -120,6 +121,7 @@ steps:
             - with:
                 reactnative: "0.64"
                 java: "11"
+                node: "18"
         retry:
           automatic:
             - exit_status: "*"
