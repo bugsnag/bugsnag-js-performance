@@ -14,7 +14,7 @@ steps:
           queue: macos-15
         env:
           JAVA_VERSION: "17"
-          NODE_VERSION: "18"
+          NODE_VERSION: "22"
           RN_VERSION: "{{matrix}}"
           NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "1"
@@ -27,7 +27,7 @@ steps:
           - bundle install
           - node test/react-native/scripts/generate-react-native-fixture.js
         matrix:
-          - "0.80"
+          - "0.84"
         retry:
           automatic:
             - exit_status: "*"
@@ -39,7 +39,7 @@ steps:
         agents:
           queue: "macos-15"
         env:
-          NODE_VERSION: "18"
+          NODE_VERSION: "22"
           RN_VERSION: "{{matrix}}"
           RCT_NEW_ARCH_ENABLED: "1"
           NOTIFIER_VERSION: "8.0.0"
@@ -53,7 +53,7 @@ steps:
           - bundle install
           - node test/react-native/scripts/generate-react-native-fixture.js
         matrix:
-          - "0.80"
+          - "0.84"
         retry:
           automatic:
             - exit_status: "*"
@@ -106,7 +106,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.80"
+          - "0.84"
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS Benchmarks"
         depends_on: "build-react-native-ios-fixture-benchmark-new-arch"
@@ -152,4 +152,4 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "0.80"
+          - "0.84"
