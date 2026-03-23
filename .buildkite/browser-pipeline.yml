@@ -67,7 +67,7 @@ steps:
         concurrency_method: eager
         matrix:
           setup:
-            browser: [chrome, firefox]
+            browser: [] # Skipped chrome and firefox pending PLAT-15947
             version: [latest]
           adjustments:
             - with: { browser: safari, version: 18 }
@@ -111,6 +111,8 @@ steps:
             - with: { browser: firefox, version: 60 }
             - with: { browser: edge, version: 80 }
             - with: { browser: edge, version: latest }
+            - with: { browser: firefox, version: latest } # Remove after resolving PLAT-15947
+            - with: { browser: chrome, version: latest } # Remove after resolving PLAT-15947
 
       # BrowserStack non-https
       - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser non-https tests - ${BUILD_MODE}"
