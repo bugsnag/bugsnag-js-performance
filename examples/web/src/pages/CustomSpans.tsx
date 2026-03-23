@@ -5,7 +5,7 @@ function CustomSpans() {
   const [spanCreated, setSpanCreated] = useState(false)
 
   useEffect(() => {
-    const span = BugsnagPerformance.startSpan('Custom Spans Page', { parentContext: null })
+    const span = BugsnagPerformance.startSpan('Custom Spans Page', { parentContext: null })      //parentContext: null pass this parameter when we want new trace id
     return () => span.end()
   }, [])
 

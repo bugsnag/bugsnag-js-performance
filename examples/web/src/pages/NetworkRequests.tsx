@@ -16,7 +16,7 @@ function NetworkRequests() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const span = BugsnagPerformance.startSpan('Network Requests Page', { parentContext: null })
+    const span = BugsnagPerformance.startSpan('Network Requests Page')
     return () => span.end()
   }, [])
 

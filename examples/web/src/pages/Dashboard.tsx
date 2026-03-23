@@ -24,7 +24,7 @@ function Dashboard() {
   const [spans, setSpans] = useState<string[]>([])
 
   useEffect(() => {
-    const span = BugsnagPerformance.startSpan('Dashboard Page', { parentContext: null })
+    const span = BugsnagPerformance.startSpan('Dashboard Page')
 
     // Collect performance metrics
     const collectMetrics = () => {
