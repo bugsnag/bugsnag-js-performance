@@ -131,7 +131,7 @@ function getExpoDependencies() {
   return [
     '@bugsnag/react-native',
     '@react-native-community/netinfo',
-    'react-native-file-access',
+    'react-native-file-access@^3.2.0',
     'expo-build-properties',
     'expo-constants'
   ]
