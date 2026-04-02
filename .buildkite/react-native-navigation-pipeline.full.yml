@@ -17,7 +17,7 @@ steps:
         env:
           BUILD_ANDROID: "true"
           JAVA_VERSION: "17"
-          NODE_VERSION: "18"
+          NODE_VERSION: "24"
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "0"
           RN_VERSION: "{{matrix.rn_version}}"
@@ -44,7 +44,7 @@ steps:
         env:
           BUILD_ANDROID: "true"
           JAVA_VERSION: "17"
-          NODE_VERSION: "18"
+          NODE_VERSION: "24"
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "1"
           RN_VERSION: "{{matrix.rn_version}}"
@@ -72,7 +72,7 @@ steps:
           queue: "macos-15"
         env:
           BUILD_IOS: "true"
-          NODE_VERSION: "18"
+          NODE_VERSION: "24"
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "0"
           RN_VERSION: "{{matrix.rn_version}}"
@@ -102,7 +102,7 @@ steps:
       #     queue: "macos-15"
       #   env:
       #     BUILD_IOS: "true"
-      #     NODE_VERSION: "18"
+      #     NODE_VERSION: "24"
       #     REACT_NATIVE_NAVIGATION: "true"
       #     RCT_NEW_ARCH_ENABLED: "1"
       #     RN_VERSION: "{{matrix.rn_version}}"

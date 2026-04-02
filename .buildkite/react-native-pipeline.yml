@@ -12,7 +12,7 @@ steps:
           queue: macos-15
         env:
           JAVA_VERSION: "17"
-          NODE_VERSION: "22"
+          NODE_VERSION: "24"
           RN_VERSION: "{{matrix}}"
           NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "1"
@@ -39,7 +39,7 @@ steps:
           queue: macos-15
         env:
           JAVA_VERSION: "17"
-          NODE_VERSION: "22"
+          NODE_VERSION: "24"
           RN_VERSION: "{{matrix}}"
           NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "1"
@@ -65,7 +65,7 @@ steps:
         agents:
           queue: "macos-15"
         env:
-          NODE_VERSION: "22"
+          NODE_VERSION: "24"
           RN_VERSION: "{{matrix}}"
           RCT_NEW_ARCH_ENABLED: "1"
           NOTIFIER_VERSION: "8.0.0"
@@ -91,7 +91,7 @@ steps:
         agents:
           queue: "macos-15"
         env:
-          NODE_VERSION: "22"
+          NODE_VERSION: "24"
           RN_VERSION: "{{matrix}}"
           RCT_NEW_ARCH_ENABLED: "1"
           NOTIFIER_VERSION: "8.0.0"
