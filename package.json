@@ -15,6 +15,9 @@
     "test:coverage": "jest --coverage",
     "test:test-container-registry-login": "aws ecr get-login-password --profile=opensource --region=us-west-1 | docker login --username AWS --password-stdin 855461928731.dkr.ecr.us-west-1.amazonaws.com"
   },
+  "overrides": {
+    "axios": "^1.15.0"
+  },
   "devDependencies": {
     "@aws-sdk/client-cloudfront": "^3.360.0",
     "@aws-sdk/client-s3": "^3.360.0",
