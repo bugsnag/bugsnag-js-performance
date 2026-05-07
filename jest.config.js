@@ -104,7 +104,7 @@ module.exports = {
     {
       displayName: 'angular',
       preset: 'jest-preset-angular',
-      setupFilesAfterEnv: ['<rootDir>/jest/setup/angular.ts'],
+      // setupFilesAfterEnv removed: not needed for latest jest-preset-angular
       testMatch: ['<rootDir>/packages/angular/**/*.test.ts'],
       ...defaultModuleConfig,
       transformIgnorePatterns: ['/node_modules/(?!(@angular)/)']
