@@ -24,6 +24,9 @@
     "@bugsnag/browser-performance": "*",
     "react-router-dom": "^6.0.0"
   },
+  "devDependencies": {
+    "react-router-dom": "^6.30.0"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
