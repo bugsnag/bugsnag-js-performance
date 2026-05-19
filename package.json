@@ -16,7 +16,8 @@
     "test:test-container-registry-login": "aws ecr get-login-password --profile=opensource --region=us-west-1 | docker login --username AWS --password-stdin 855461928731.dkr.ecr.us-west-1.amazonaws.com"
   },
   "overrides": {
-    "axios": "^1.15.0"
+    "axios": "^1.15.0",
+    "flatted": "^3.4.2"
   },
   "devDependencies": {
     "@aws-sdk/client-cloudfront": "^3.360.0",

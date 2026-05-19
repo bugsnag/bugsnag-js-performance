@@ -35,6 +35,9 @@
     "react-test-renderer": "19.0.0",
     "typescript": "5.0.4"
   },
+  "overrides": {
+    "flatted": "^3.4.2"
+  },
   "engines": {
     "node": ">=18"
   }
