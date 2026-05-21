@@ -104,9 +104,7 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
           if (httpFlavor) {
             span.setAttribute('http.flavor', httpFlavor)
           }
-
-          if (entry.encodedBodySize && entry.decodedBodySize) {
-            span.setAttribute('http.response.header.content-length', entry.encodedBodySize)
+          if (entry.decodedBodySize) {
             span.setAttribute('http.response.body.size', entry.decodedBodySize)
           }
 
