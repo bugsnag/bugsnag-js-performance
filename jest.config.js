@@ -163,7 +163,39 @@ module.exports = {
         ]
       }
     },
-    '<rootDir>/jest/config/react-navigation.js',
+    // '<rootDir>/jest/config/react-navigation.js',
+    {
+  displayName: 'react-navigation',
+  preset: 'react-native',
+  setupFilesAfterEnv: [
+    '<rootDir>/jest/setup/react-native.ts',
+    '<rootDir>/jest/setup/react-navigation.ts'   // ✅ ADD THIS
+  ],
+  testMatch: [
+    '<rootDir>/packages/plugin-react-navigation/**/*.test.ts'
+  ],
+  moduleNameMapper,
+  transform: {
+    '^.+\\.jsx?$': [
+      'babel-jest',
+      {
+        presets: ['module:metro-react-native-babel-preset']
+      }
+    ],
+    '^.+\\.m?tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: { paths },
+        babelConfig: {
+          presets: ['module:metro-react-native-babel-preset']
+        }
+      }
+    ]
+  },
+  transformIgnorePatterns: [
+    'node_modules/(?!(@react-native|react-native|@react-navigation|react-native-screens)/)'  // ✅ ADD THIS
+  ]
+},
     '<rootDir>/jest/config/react-native-navigation.js'
   ],
   collectCoverageFrom: [
