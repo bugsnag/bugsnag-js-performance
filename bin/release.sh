@@ -15,6 +15,7 @@ if [[ -z ${VERSION:-} ]]; then error_missing_field "VERSION"; fi
 if [[ -z ${AWS_ACCESS_KEY_ID:-} ]]; then error_missing_field "AWS_ACCESS_KEY_ID"; fi
 if [[ -z ${AWS_SECRET_ACCESS_KEY:-} ]]; then error_missing_field "AWS_SECRET_ACCESS_KEY"; fi
 if [[ -z ${AWS_SESSION_TOKEN:-} ]]; then error_missing_field "AWS_SESSION_TOKEN"; fi
+if [[ -z ${NPM_TOKEN:-} ]]; then error_missing_field "NPM_TOKEN"; fi
 if [[ -z ${AWS_REGION:-} ]]; then error_missing_field "AWS_REGION"; fi
 if [[ -z ${BUCKET_NAME:-} ]]; then error_missing_field "BUCKET_NAME"; fi
 if [[ -z ${DISTRIBUTION_ID:-} ]]; then error_missing_field "DISTRIBUTION_ID"; fi
