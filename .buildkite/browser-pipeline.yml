@@ -72,7 +72,7 @@ steps:
             browser: [chrome, firefox]
             version: [latest]
           adjustments:
-            - with: { browser: safari, version: latest }
+            - with: { browser: safari, version: 18 }
 
       # BrowserStack
       - label: ":browserstack: :{{ matrix.browser }}: {{ matrix.version }} Browser tests - ${BUILD_MODE}"
