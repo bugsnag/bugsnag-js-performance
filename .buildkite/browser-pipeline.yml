@@ -55,8 +55,6 @@ steps:
               - --farm=bb
               - --browser={{ matrix.browser }}_{{ matrix.version }}
               - --appium-version=1.22
-              - --os=macOS
-              - --os-version=14
               - --aws-public-ip
               - --no-tunnel
           test-collector#v1.10.2:
