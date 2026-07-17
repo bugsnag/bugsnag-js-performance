@@ -32,7 +32,11 @@
     "react-test-renderer": "18.2.0",
     "react-native": "0.74.4",
     "vue-router": "4.2.5",
-    "vite": "5.4.10"
+    "vite": "5.4.10",
+    "sigstore": ">=4.1.1"
+  },
+  "engines": {
+  "node": "^20.17.0 || >=22.9.0"
   },
   "devDependencies": {
     "@aws-sdk/client-cloudfront": "^3.360.0",
