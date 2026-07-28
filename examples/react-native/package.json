@@ -39,6 +39,7 @@
     "node": ">=18"
   },
   "overrides": {
-    "minimatch": "^10.0.0"
+    "minimatch": "^10.0.0",
+    "js-yaml": "^4.1.1"
   }
 }
