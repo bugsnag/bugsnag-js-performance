@@ -2,7 +2,7 @@ FROM node:24-alpine@sha256:01743339035a5c3c11a373cd7c83aeab6ed1457b55da6a69e014a
 
 RUN apk update && apk add ruby ruby-dev build-base
 
-RUN gem install racc && gem install license_finder -v 7.1.0
+RUN gem install racc csv && gem install license_finder -v 7.1.0
 
 WORKDIR /scan
 
