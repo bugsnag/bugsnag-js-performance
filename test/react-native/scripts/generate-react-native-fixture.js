@@ -61,8 +61,8 @@ function sanitizePodfile(fixtureDir, rnVersion) {
   const podfilePath = resolve(fixtureDir, 'ios', 'Podfile')
   if (minor <= 72 && fs.existsSync(podfilePath)) {
     let podfile = fs.readFileSync(podfilePath, 'utf8')
-    // Remove :quirks_mode keyword argument if present
-    podfile = podfile.replace(/,?\s*:quirks_mode\s*=>\s*[^,\n\)]+/g, '')
+    // Remove :quirks_mode keyword argument (including multiline block/hash syntax)
+    podfile = podfile.replace(/,?\s*:quirks_mode\s*=>\s*(\{[^}]*\}|:[a-zA-Z0-9_]+|flags\[:[a-zA-Z0-9_]+\]|[^,\n\)]+)/g, '')
     fs.writeFileSync(podfilePath, podfile, 'utf8')
   }
 }
@@ -157,9 +157,6 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   execFileSync('npx', RNInitArgs, { stdio: 'inherit' })
 
-  // Clean unsupported Podfile parameters for older React Native versions
-  sanitizePodfile(fixtureDir, reactNativeVersion)
-
   // Configure fixture files and projects
   replaceGeneratedFixtureFiles(fixtureDir, isReactNativeNavigation)
   configureAndroidProject(fixtureDir, isNewArchEnabled, reactNativeVersion)
@@ -193,6 +190,9 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     configureReactNativeNavigation(fixtureDir)
   }
 }
+
+// Clean unsupported Podfile parameters right before pod install
+sanitizePodfile(fixtureDir, reactNativeVersion)
 
 // Build platform fixtures
 buildAndroidFixture(fixtureDir, isNewArchEnabled)

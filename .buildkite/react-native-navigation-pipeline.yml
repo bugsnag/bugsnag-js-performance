@@ -166,7 +166,7 @@ steps:
         matrix:
           setup:
             android_version:
-              - "12"
+              - "15"
             rn_version:
               - "0.72"
 
@@ -213,7 +213,7 @@ steps:
         matrix:
           setup:
             android_version:
-              - "12"
+              - "15"
             rn_version:
               - "0.72"
 
