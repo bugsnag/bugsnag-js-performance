@@ -61,7 +61,7 @@ function sanitizePodfile(fixtureDir, rnVersion) {
   const podfilePath = resolve(fixtureDir, 'ios', 'Podfile')
   if (minor <= 72 && fs.existsSync(podfilePath)) {
     let podfile = fs.readFileSync(podfilePath, 'utf8')
-    // Remove :quirks_mode keyword argument if injected by newer CLI templates
+    // Remove :quirks_mode keyword argument if present
     podfile = podfile.replace(/,?\s*:quirks_mode\s*=>\s*[^,\n\)]+/g, '')
     fs.writeFileSync(podfilePath, podfile, 'utf8')
   }
@@ -131,8 +131,9 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   // Remove existing fixture directory
   cleanDirectory(fixtureDir)
 
-  // Determine appropriate CLI version for the target React Native version
+  // Determine appropriate CLI version and arguments
   const cliVersion = getCliVersion(reactNativeVersion)
+  const minor = parseInt(reactNativeVersion.split('.')[1], 10)
 
   // Create the test fixture
   const RNInitArgs = [
@@ -145,10 +146,15 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     fixtureDir,
     '--version',
     reactNativeVersion,
-    '--pm',
-    'npm',
     '--skip-install'
   ]
+
+  if (minor >= 74) {
+    RNInitArgs.push('--pm', 'npm')
+  } else {
+    RNInitArgs.push('--npm')
+  }
+
   execFileSync('npx', RNInitArgs, { stdio: 'inherit' })
 
   // Clean unsupported Podfile parameters for older React Native versions
