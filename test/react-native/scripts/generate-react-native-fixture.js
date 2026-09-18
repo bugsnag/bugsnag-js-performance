@@ -55,7 +55,7 @@ function getCliVersion(rnVersion) {
   return '16'
 }
 
-// Helper to clean unsupported Podfile options in older RN versions (< 0.73)
+// Clean unsupported Podfile parameters for older React Native versions (< 0.73)
 function sanitizePodfile(fixtureDir, rnVersion) {
   const minor = parseInt(rnVersion.split('.')[1], 10)
   const podfilePath = resolve(fixtureDir, 'ios', 'Podfile')
@@ -63,24 +63,13 @@ function sanitizePodfile(fixtureDir, rnVersion) {
   if (minor <= 72 && fs.existsSync(podfilePath)) {
     let podfile = fs.readFileSync(podfilePath, 'utf8')
 
-    // 1. Remove static quirks_mode keyword arguments (hash rocket and symbol syntax)
-    podfile = podfile.replace(/,?\s*:?quirks_mode(:|\s*=>)\s*(\{[^}]*\}|:[a-zA-Z0-9_]+|flags\[:[a-zA-Z0-9_]+\]|[^,\n\)]+)/g, '')
-
-    // 2. Remove standalone lines referencing quirks_mode
+    // 1. Remove all lines referencing quirks_mode
     podfile = podfile
       .split('\n')
       .filter(line => !line.includes('quirks_mode'))
       .join('\n')
 
-    // 3. Inject Ruby deletion guard right before use_react_native! so runtime flags hash has quirks_mode removed
-    if (!podfile.includes('flags.delete(:quirks_mode)')) {
-      podfile = podfile.replace(
-        /use_react_native!\(/,
-        'flags.delete(:quirks_mode) if defined?(flags) && flags.respond_to?(:delete)\n    use_react_native!('
-      )
-    }
-
-    // 4. Clean up any resulting trailing commas before closing parentheses
+    // 2. Remove any dangling commas before closing parentheses
     podfile = podfile.replace(/,(\s*\))/g, '$1')
 
     fs.writeFileSync(podfilePath, podfile, 'utf8')
@@ -211,7 +200,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   }
 }
 
-// Clean unsupported Podfile parameters and inject Ruby flag guard right before building
+// Clean unsupported Podfile parameters right before pod install
 sanitizePodfile(fixtureDir, reactNativeVersion)
 
 // Build platform fixtures
