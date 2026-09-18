@@ -55,14 +55,26 @@ function getCliVersion(rnVersion) {
   return '16'
 }
 
-// Helper to clean unsupported Podfile options in older RN versions
+// Helper to clean unsupported Podfile options in older RN versions (< 0.73)
 function sanitizePodfile(fixtureDir, rnVersion) {
   const minor = parseInt(rnVersion.split('.')[1], 10)
   const podfilePath = resolve(fixtureDir, 'ios', 'Podfile')
+
   if (minor <= 72 && fs.existsSync(podfilePath)) {
     let podfile = fs.readFileSync(podfilePath, 'utf8')
-    // Remove :quirks_mode keyword argument (including multiline block/hash syntax)
+
+    // 1. Remove hash rocket syntax: :quirks_mode => <value/hash>
     podfile = podfile.replace(/,?\s*:quirks_mode\s*=>\s*(\{[^}]*\}|:[a-zA-Z0-9_]+|flags\[:[a-zA-Z0-9_]+\]|[^,\n\)]+)/g, '')
+
+    // 2. Remove standard Ruby keyword syntax: quirks_mode: <value/hash>
+    podfile = podfile.replace(/,?\s*quirks_mode:\s*(\{[^}]*\}|:[a-zA-Z0-9_]+|flags\[:[a-zA-Z0-9_]+\]|[^,\n\)]+)/g, '')
+
+    // 3. Remove standalone line definitions
+    podfile = podfile.replace(/^\s*(:?quirks_mode:?)\s*(=>)?.*$/gm, '')
+
+    // 4. Clean up trailing commas before closing parentheses
+    podfile = podfile.replace(/,\s*\)/g, '\n  )')
+
     fs.writeFileSync(podfilePath, podfile, 'utf8')
   }
 }
@@ -149,6 +161,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     '--skip-install'
   ]
 
+  // CLI version compatibility for package manager flag
   if (minor >= 74) {
     RNInitArgs.push('--pm', 'npm')
   } else {
@@ -162,7 +175,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   configureAndroidProject(fixtureDir, isNewArchEnabled, reactNativeVersion)
   configureIOSProject(fixtureDir, reactNativeVersion)
 
-  // install native test utils
+  // Install native test utils
   installNativeTestUtilsAndroid(fixtureDir)
   installNativeTestUtilsIOS(fixtureDir)
 
@@ -191,7 +204,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   }
 }
 
-// Clean unsupported Podfile parameters right before pod install
+// Clean unsupported Podfile parameters right before pod install is executed
 sanitizePodfile(fixtureDir, reactNativeVersion)
 
 // Build platform fixtures
