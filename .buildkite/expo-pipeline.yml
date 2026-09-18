@@ -13,6 +13,7 @@ steps:
         agents:
           queue: "macos-15"
         env:
+          EAS_BUILD_NO_EXPO_GO_WARNING: true
           JAVA_VERSION: "17"
           EXPO_VERSION: "{{matrix}}"
           BUILD_ANDROID: 1
@@ -21,7 +22,7 @@ steps:
           - bundle install
           - node test/react-native/scripts/generate-expo-fixture.js
         matrix:
-          - "54"
+          - "57"
 
       - label:  ':mac: Build Expo {{matrix}} IPA'
         key: "build-expo-ipa"
@@ -29,6 +30,7 @@ steps:
         agents:
           queue: "macos-15"
         env:
+          EAS_BUILD_NO_EXPO_GO_WARNING: true
           EXPO_VERSION: "{{matrix}}"
           BUILD_IOS: 1
         artifact_paths: test/react-native/features/fixtures/generated/expo/**/test-fixture/output.ipa
@@ -36,7 +38,7 @@ steps:
           - bundle install
           - node test/react-native/scripts/generate-expo-fixture.js
         matrix:
-          - "54"
+          - "57"
 
       #
       # End-to-end tests
@@ -80,7 +82,7 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "54"
+          - "57"
 
       - label: ":bitbar: :mac: Expo {{matrix}} iOS end-to-end tests"
         depends_on: "build-expo-ipa"
@@ -121,4 +123,4 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "54"
+          - "57"

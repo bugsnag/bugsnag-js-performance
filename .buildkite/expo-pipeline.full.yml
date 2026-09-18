@@ -15,6 +15,7 @@ steps:
         env:
           JAVA_VERSION: "17"
           EXPO_VERSION: "{{matrix}}"
+          EAS_BUILD_NO_EXPO_GO_WARNING: true
           BUILD_ANDROID: 1
         artifact_paths: test/react-native/features/fixtures/generated/expo/**/test-fixture/output.apk
         commands:
@@ -30,6 +31,7 @@ steps:
         agents:
           queue: "macos-15"
         env:
+          EAS_BUILD_NO_EXPO_GO_WARNING: true
           EXPO_VERSION: "{{matrix}}"
           XCODE_VERSION: "16.2.0"
           BUILD_IOS: 1

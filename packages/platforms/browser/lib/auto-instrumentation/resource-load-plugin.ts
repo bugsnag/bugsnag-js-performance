@@ -4,9 +4,7 @@ import { defaultNetworkRequestCallback } from '@bugsnag/request-tracker-performa
 import type { NetworkRequestCallback } from '@bugsnag/request-tracker-performance'
 import type { BrowserNetworkRequestInfo } from './network-request-plugin'
 
-interface ResourceTiming extends PerformanceResourceTiming {
-  responseStatus?: number // https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming/responseStatus
-}
+type ResourceTiming = PerformanceResourceTiming
 
 export function getHttpVersion (protocol: string) {
   switch (protocol) {
@@ -105,12 +103,11 @@ export class ResourceLoadPlugin implements Plugin<BrowserConfiguration> {
             span.setAttribute('http.flavor', httpFlavor)
           }
 
-          if (entry.encodedBodySize && entry.decodedBodySize) {
-            span.setAttribute('http.response_content_length', entry.encodedBodySize)
-            span.setAttribute('http.response_content_length_uncompressed', entry.decodedBodySize)
+          if (entry.decodedBodySize) {
+            span.setAttribute('http.response.body.size', entry.decodedBodySize)
           }
 
-          if (entry.responseStatus) {
+          if (typeof entry.responseStatus === 'number') {
             span.setAttribute('http.status_code', entry.responseStatus)
           }
 

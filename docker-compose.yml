@@ -1,3 +1,4 @@
+
 version: '3.6'
 
 x-common-environment: &common-environment
@@ -30,7 +31,7 @@ services:
       - .:/scan
 
   browser-maze-runner-bb:
-    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v10-cli
+    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v11-cli
     environment:
       <<: *common-environment
       BITBAR_USERNAME:
@@ -54,7 +55,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   browser-maze-runner-bs:
-    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v10-cli
+    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v11-cli
     environment: &browser-maze-runner-environment
       <<: *common-environment
       BROWSER_STACK_USERNAME:
@@ -74,7 +75,7 @@ services:
       - ./reports/:/app/reports/
 
   react-native-maze-runner:
-    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v10-cli
+    image: 855461928731.dkr.ecr.us-west-1.amazonaws.com/maze-runner-releases:latest-v11-cli
     environment:
       <<: *common-environment
       BITBAR_USERNAME:
@@ -112,6 +113,7 @@ services:
       AWS_ACCESS_KEY_ID:
       AWS_SESSION_TOKEN:
       AWS_SECRET_ACCESS_KEY:
+      NPM_TOKEN:
       AWS_REGION:
       BUCKET_NAME:
       DISTRIBUTION_ID:

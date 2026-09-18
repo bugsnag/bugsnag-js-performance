@@ -9,8 +9,17 @@ const { replaceInFile, appendToFileIfNotExists } = require('./file-utils')
 function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersion) {
   // set android:usesCleartextTraffic="true" in AndroidManifest.xml
   const androidManifestPath = `${fixtureDir}/android/app/src/main/AndroidManifest.xml`
-  replaceInFile(androidManifestPath, '<application', '<application android:usesCleartextTraffic="true" android:largeHeap="true"')
-
+  //replaceInFile(androidManifestPath, '<application', '<application android:usesCleartextTraffic="true" android:largeHeap="true"')
+        let androidManifestContents = fs.readFileSync(androidManifestPath, 'utf8')
+         // RN 0.82+ uses a manifest placeholder that's autoconfigured by the RN gradle plugin
+    // eslint-disable-next-line no-template-curly-in-string
+    if (androidManifestContents.includes('${usesCleartextTraffic}')) {
+      // eslint-disable-next-line no-template-curly-in-string
+      androidManifestContents = androidManifestContents.replace('${usesCleartextTraffic}', 'true')
+    } else {
+      androidManifestContents = androidManifestContents.replace('<application', '<application android:usesCleartextTraffic="true" android:largeHeap="true"')
+    }
+        fs.writeFileSync(androidManifestPath, androidManifestContents)
   // enable/disable the new architecture in gradle.properties
   const gradlePropertiesPath = `${fixtureDir}/android/gradle.properties`
   replaceInFile(gradlePropertiesPath, /newArchEnabled\s*=\s*(true|false)/, `newArchEnabled=${isNewArchEnabled}`)

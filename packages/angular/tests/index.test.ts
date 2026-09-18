@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+import '@angular/compiler'
 
 import { NavigationEnd, NavigationStart } from '@angular/router'
 import type { Router } from '@angular/router'
