@@ -144,6 +144,7 @@ steps:
               - --app=/app/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative.apk
               - --farm=bb
               - --device=ANDROID_{{matrix.android_version}}
+              - --app-id=com.bugsnag.fixtures.reactnative.performance
               - --a11y-locator
               - --fail-fast
               - --appium-version=2.19
