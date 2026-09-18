@@ -63,17 +63,25 @@ function sanitizePodfile(fixtureDir, rnVersion) {
   if (minor <= 72 && fs.existsSync(podfilePath)) {
     let podfile = fs.readFileSync(podfilePath, 'utf8')
 
-    // 1. Remove hash rocket syntax: :quirks_mode => <value/hash>
-    podfile = podfile.replace(/,?\s*:quirks_mode\s*=>\s*(\{[^}]*\}|:[a-zA-Z0-9_]+|flags\[:[a-zA-Z0-9_]+\]|[^,\n\)]+)/g, '')
+    // 1. Remove static quirks_mode keyword arguments (hash rocket and symbol syntax)
+    podfile = podfile.replace(/,?\s*:?quirks_mode(:|\s*=>)\s*(\{[^}]*\}|:[a-zA-Z0-9_]+|flags\[:[a-zA-Z0-9_]+\]|[^,\n\)]+)/g, '')
 
-    // 2. Remove standard Ruby keyword syntax: quirks_mode: <value/hash>
-    podfile = podfile.replace(/,?\s*quirks_mode:\s*(\{[^}]*\}|:[a-zA-Z0-9_]+|flags\[:[a-zA-Z0-9_]+\]|[^,\n\)]+)/g, '')
+    // 2. Remove standalone lines referencing quirks_mode
+    podfile = podfile
+      .split('\n')
+      .filter(line => !line.includes('quirks_mode'))
+      .join('\n')
 
-    // 3. Remove standalone line definitions
-    podfile = podfile.replace(/^\s*(:?quirks_mode:?)\s*(=>)?.*$/gm, '')
+    // 3. Inject Ruby deletion guard right before use_react_native! so runtime flags hash has quirks_mode removed
+    if (!podfile.includes('flags.delete(:quirks_mode)')) {
+      podfile = podfile.replace(
+        /use_react_native!\(/,
+        'flags.delete(:quirks_mode) if defined?(flags) && flags.respond_to?(:delete)\n    use_react_native!('
+      )
+    }
 
-    // 4. Clean up trailing commas before closing parentheses
-    podfile = podfile.replace(/,\s*\)/g, '\n  )')
+    // 4. Clean up any resulting trailing commas before closing parentheses
+    podfile = podfile.replace(/,(\s*\))/g, '$1')
 
     fs.writeFileSync(podfilePath, podfile, 'utf8')
   }
@@ -161,7 +169,6 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     '--skip-install'
   ]
 
-  // CLI version compatibility for package manager flag
   if (minor >= 74) {
     RNInitArgs.push('--pm', 'npm')
   } else {
@@ -204,7 +211,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   }
 }
 
-// Clean unsupported Podfile parameters right before pod install is executed
+// Clean unsupported Podfile parameters and inject Ruby flag guard right before building
 sanitizePodfile(fixtureDir, reactNativeVersion)
 
 // Build platform fixtures
