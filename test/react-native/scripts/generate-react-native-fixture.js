@@ -44,6 +44,38 @@ const {
 const { configureRN064Fixture } = require('./utils/rn-064-config')
 const { buildAndroidFixture, buildIOSFixture } = require('./utils/platform-builds')
 
+// Helper to determine the matching @react-native-community/cli version
+function getCliVersion(rnVersion) {
+  const minor = parseInt(rnVersion.split('.')[1], 10)
+  if (minor <= 72) return '11'
+  if (minor === 73) return '12'
+  if (minor === 74) return '13'
+  if (minor === 75) return '14'
+  if (minor === 76) return '15'
+  return '16'
+}
+
+// Clean unsupported Podfile parameters for older React Native versions (< 0.73)
+function sanitizePodfile(fixtureDir, rnVersion) {
+  const minor = parseInt(rnVersion.split('.')[1], 10)
+  const podfilePath = resolve(fixtureDir, 'ios', 'Podfile')
+
+  if (minor <= 72 && fs.existsSync(podfilePath)) {
+    let podfile = fs.readFileSync(podfilePath, 'utf8')
+
+    // 1. Remove all lines referencing quirks_mode
+    podfile = podfile
+      .split('\n')
+      .filter(line => !line.includes('quirks_mode'))
+      .join('\n')
+
+    // 2. Remove any dangling commas before closing parentheses
+    podfile = podfile.replace(/,(\s*\))/g, '$1')
+
+    fs.writeFileSync(podfilePath, podfile, 'utf8')
+  }
+}
+
 // Validate environment variables
 validateEnvironment({
   RN_VERSION: {
@@ -108,9 +140,13 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   // Remove existing fixture directory
   cleanDirectory(fixtureDir)
 
+  // Determine appropriate CLI version and arguments
+  const cliVersion = getCliVersion(reactNativeVersion)
+  const minor = parseInt(reactNativeVersion.split('.')[1], 10)
+
   // Create the test fixture
   const RNInitArgs = [
-    '@react-native-community/cli@16',
+    `@react-native-community/cli@${cliVersion}`,
     'init',
     'reactnative',
     '--package-name',
@@ -119,10 +155,15 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     fixtureDir,
     '--version',
     reactNativeVersion,
-    '--pm',
-    'npm',
     '--skip-install'
   ]
+
+  if (minor >= 74) {
+    RNInitArgs.push('--pm', 'npm')
+  } else {
+    RNInitArgs.push('--npm')
+  }
+
   execFileSync('npx', RNInitArgs, { stdio: 'inherit' })
 
   // Configure fixture files and projects
@@ -130,7 +171,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   configureAndroidProject(fixtureDir, isNewArchEnabled, reactNativeVersion)
   configureIOSProject(fixtureDir, reactNativeVersion)
 
-  // install native test utils
+  // Install native test utils
   installNativeTestUtilsAndroid(fixtureDir)
   installNativeTestUtilsIOS(fixtureDir)
 
@@ -158,6 +199,9 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     configureReactNativeNavigation(fixtureDir)
   }
 }
+
+// Clean unsupported Podfile parameters right before pod install
+sanitizePodfile(fixtureDir, reactNativeVersion)
 
 // Build platform fixtures
 buildAndroidFixture(fixtureDir, isNewArchEnabled)

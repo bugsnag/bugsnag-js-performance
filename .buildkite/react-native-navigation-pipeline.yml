@@ -144,9 +144,10 @@ steps:
               - --app=/app/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative.apk
               - --farm=bb
               - --device=ANDROID_{{matrix.android_version}}
+              - --app-id=com.bugsnag.fixtures.reactnative.performance
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
+              - --appium-version=2.19
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -166,7 +167,7 @@ steps:
         matrix:
           setup:
             android_version:
-              - "12"
+              - "15"
             rn_version:
               - "0.72"
 
@@ -193,7 +194,7 @@ steps:
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
+              - --appium-version=2.19
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -213,7 +214,7 @@ steps:
         matrix:
           setup:
             android_version:
-              - "12"
+              - "15"
             rn_version:
               - "0.72"
 
@@ -241,7 +242,7 @@ steps:
               - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
+              - --appium-version=2.19s
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:

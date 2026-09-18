@@ -7,25 +7,54 @@ const { replaceInFile, appendToFileIfNotExists } = require('./file-utils')
  * Configure Android project settings
  */
 function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersion) {
-  // set android:usesCleartextTraffic="true" in AndroidManifest.xml
   const androidManifestPath = `${fixtureDir}/android/app/src/main/AndroidManifest.xml`
-  //replaceInFile(androidManifestPath, '<application', '<application android:usesCleartextTraffic="true" android:largeHeap="true"')
-        let androidManifestContents = fs.readFileSync(androidManifestPath, 'utf8')
-         // RN 0.82+ uses a manifest placeholder that's autoconfigured by the RN gradle plugin
+  
+  if (fs.existsSync(androidManifestPath)) {
+    let androidManifestContents = fs.readFileSync(androidManifestPath, 'utf8')
+
+    // 1. Configure cleartext traffic & largeHeap
+    // RN 0.82+ uses a manifest placeholder that's autoconfigured by the RN gradle plugin
     // eslint-disable-next-line no-template-curly-in-string
     if (androidManifestContents.includes('${usesCleartextTraffic}')) {
       // eslint-disable-next-line no-template-curly-in-string
       androidManifestContents = androidManifestContents.replace('${usesCleartextTraffic}', 'true')
-    } else {
-      androidManifestContents = androidManifestContents.replace('<application', '<application android:usesCleartextTraffic="true" android:largeHeap="true"')
+    } else if (!androidManifestContents.includes('android:usesCleartextTraffic="true"')) {
+      androidManifestContents = androidManifestContents.replace(
+        '<application',
+        '<application android:usesCleartextTraffic="true" android:largeHeap="true"'
+      )
     }
-        fs.writeFileSync(androidManifestPath, androidManifestContents)
-  // enable/disable the new architecture in gradle.properties
+
+    // 2. Ensure MainActivity is explicitly exported for Android 12+ / Android 15 compatibility
+    if (!androidManifestContents.includes('android:exported="true"')) {
+      androidManifestContents = androidManifestContents.replace(
+        /<activity\s+android:name="\.MainActivity"/,
+        '<activity\n        android:name=".MainActivity"\n        android:exported="true"'
+      )
+    }
+
+    // 3. Ensure MAIN/LAUNCHER intent filter exists on MainActivity if missing
+    if (!androidManifestContents.includes('android.intent.action.MAIN')) {
+      const launcherIntentFilter = `
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>`
+      androidManifestContents = androidManifestContents.replace(
+        /(<activity[^>]*android:name="\.MainActivity"[^>]*>)/,
+        `$1\n${launcherIntentFilter}`
+      )
+    }
+
+    fs.writeFileSync(androidManifestPath, androidManifestContents, 'utf8')
+  }
+
+  // Enable/disable the new architecture in gradle.properties
   const gradlePropertiesPath = `${fixtureDir}/android/gradle.properties`
   replaceInFile(gradlePropertiesPath, /newArchEnabled\s*=\s*(true|false)/, `newArchEnabled=${isNewArchEnabled}`)
 
   if (!isNewArchEnabled) {
-    // react navigation setup
+    // React navigation setup
     configureReactNavigationAndroid(fixtureDir, reactNativeVersion)
   }
 }

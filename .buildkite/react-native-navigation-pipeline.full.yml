@@ -147,7 +147,8 @@ steps:
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
+              - --appium-version=2.19
+              - --app-id=com.bugsnag.fixtures.reactnative.performance
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -167,7 +168,7 @@ steps:
         matrix:
           setup:
             android_version:
-              - "12"
+              - "15"
             rn_version:
               - "0.71"
 
@@ -194,7 +195,7 @@ steps:
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
+              - --appium-version=2.19
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -214,7 +215,7 @@ steps:
         matrix:
           setup:
             android_version:
-              - "12"
+              - "15"
             rn_version:
               - "0.71"
 
