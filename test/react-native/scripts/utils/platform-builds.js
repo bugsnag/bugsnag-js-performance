@@ -3,6 +3,18 @@ const fs = require('fs')
 const { isTruthy } = require('./env-validation')
 
 /**
+ * Ensures compatible Ruby gems (specifically json < 3.0.0) are installed
+ * to prevent CocoaPods/ActiveSupport 'unknown keyword: quirks_mode' errors.
+ */
+function ensureRubyDependencies () {
+  try {
+    execFileSync('gem', ['install', 'json', '-v', '< 3.0.0', '--no-document'], { stdio: 'inherit' })
+  } catch (error) {
+    console.warn('Warning: Could not install json < 3.0.0 gem:', error.message)
+  }
+}
+
+/**
  * Build Android fixture
  */
 function buildAndroidFixture (fixtureDir, isNewArchEnabled) {
@@ -22,6 +34,8 @@ function buildIOSFixture (fixtureDir) {
   if (!isTruthy(process.env.BUILD_IOS)) {
     return
   }
+
+  ensureRubyDependencies()
 
   fs.rmSync(`${fixtureDir}/reactnative.xcarchive`, { recursive: true, force: true })
 
@@ -76,6 +90,7 @@ function buildExpoAndroidFixture (fixtureDir, easWorkingDir) {
     stdio: 'inherit',
     env: {
       ...process.env,
+      NODE_ENV: process.env.NODE_ENV || 'production',
       EAS_LOCAL_BUILD_WORKINGDIR: easWorkingDir,
       EAS_LOCAL_BUILD_SKIP_CLEANUP: 1,
       EAS_NO_VCS: 1,
@@ -92,12 +107,16 @@ function buildExpoIOSFixture (fixtureDir, easWorkingDir) {
     return
   }
 
+  ensureRubyDependencies()
+
   const easBuildArgs = ['eas-cli@latest', 'build', '--local', '--platform', 'ios', '--profile', 'production', '--output', 'output.ipa', '--non-interactive']
   execFileSync('npx', easBuildArgs, {
     cwd: fixtureDir,
     stdio: 'inherit',
     env: {
       ...process.env,
+      NODE_ENV: process.env.NODE_ENV || 'production',
+      EXPO_USE_PRECOMPILED_MODULES: '0',
       EAS_LOCAL_BUILD_WORKINGDIR: easWorkingDir,
       EAS_LOCAL_BUILD_SKIP_CLEANUP: 1,
       EAS_NO_VCS: 1,
