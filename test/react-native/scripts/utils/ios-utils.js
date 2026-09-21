@@ -22,11 +22,12 @@ function configureIOSProject (fixtureDir, reactNativeVersion) {
 
   fs.writeFileSync(`${fixtureDir}/ios/Podfile`, podfileContents)
 
-  // pin xcodeproj version to < 1.26.0
+  // pin xcodeproj, concurrent-ruby, and json versions to prevent breaking changes in pod install
   const gemfilePath = resolve(fixtureDir, 'Gemfile')
   if (fs.existsSync(gemfilePath)) {
     appendToFileIfNotExists(gemfilePath, "gem 'xcodeproj', '< 1.26.0'", 'xcodeproj')
     appendToFileIfNotExists(gemfilePath, "gem 'concurrent-ruby', '<= 1.3.4'", 'concurrent-ruby')
+    appendToFileIfNotExists(gemfilePath, "gem 'json', '< 3.0.0'", 'json')
   }
 
   // set NSAllowsArbitraryLoads to allow http traffic for all domains (bitbar public IP + bs-local.com)
