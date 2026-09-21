@@ -1,6 +1,7 @@
 BeforeAll do
   if Maze.config.farm == :bb
     Maze.config.android_app_files_directory = '/data/local/tmp'
+    Maze.config.app_id ||= 'com.bugsnag.fixtures.reactnative.performance'
   end
   Maze.config.enforce_bugsnag_integrity = false
 
@@ -11,7 +12,13 @@ BeforeAll do
   if ENV["BENCHMARKS"]
     Maze.config.receive_requests_wait = 180
   end
+end
 
+Before do
+  # Ensure Maze.driver has the correct app_id for activate_app lifecycle hooks
+  if Maze.driver && (Maze.driver.app_id.nil? || Maze.driver.app_id.empty?)
+    Maze.driver.app_id = Maze.config.app_id || 'com.bugsnag.fixtures.reactnative.performance'
+  end
 end
 
 Before('@skip') do
