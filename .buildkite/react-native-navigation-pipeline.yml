@@ -17,6 +17,7 @@ steps:
           BUILD_ANDROID: "true"
           JAVA_VERSION: "17"
           NODE_VERSION: "24"
+          NODE_OPTIONS: "--openssl-legacy-provider"
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "0"
           RN_VERSION: "{{matrix.rn_version}}"
@@ -44,6 +45,7 @@ steps:
           BUILD_ANDROID: "true"
           JAVA_VERSION: "17"
           NODE_VERSION: "24"
+          NODE_OPTIONS: "--openssl-legacy-provider"
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "1"
           RN_VERSION: "{{matrix.rn_version}}"
@@ -72,6 +74,7 @@ steps:
         env:
           BUILD_IOS: "true"
           NODE_VERSION: "24"
+          NODE_OPTIONS: "--openssl-legacy-provider"
           REACT_NATIVE_NAVIGATION: "true"
           RCT_NEW_ARCH_ENABLED: "0"
           RN_VERSION: "{{matrix.rn_version}}"
@@ -92,39 +95,9 @@ steps:
             - exit_status: "*"
               limit: 1
 
-      # Skipped due to issues with react-native-navigation when new arch is enabled
-      # TODO: Investigate and try to re-enable when we add tests for more recent React Native versions
-      # - label: ":building_construction: :mac: Build react-native-navigation test fixture - RN {{matrix.rn_version}} (New Arch)"
-      #   key: "build-react-native-navigation-ios-fixture-new-arch"
-      #   timeout_in_minutes: 15
-      #   agents:
-      #     queue: "macos-15"
-      #   env:
-      #     BUILD_IOS: "true"
-      #     NODE_VERSION: "24"
-      #     REACT_NATIVE_NAVIGATION: "true"
-      #     RCT_NEW_ARCH_ENABLED: "1"
-      #     RN_VERSION: "{{matrix.rn_version}}"
-      #     DEVELOPER_DIR: "/Applications/Xcode14.app"
-      #     NOTIFIER_VERSION: "8.0.0"
-      #     XCODE_VERSION: "16.2.0"
-      #   artifact_paths:
-      #     - "test/react-native/features/fixtures/generated/react-native-navigation/**/reactnative.ipa"
-      #   commands:
-      #     - bundle install
-      #     - node test/react-native/scripts/generate-react-native-fixture.js
-      #   matrix:
-      #     setup:
-      #       rn_version:
-      #         - "0.72"
-      #   retry:
-      #     automatic:
-      #       - exit_status: "*"
-      #         limit: 1
-
       # Android Test
       # ------------------------------
-      - label: ":bitbar: :android: react-native-navigation end-to-end tests - RN {{matrix.rn_version}} (Old Arch) / Android {{matrix.android_version}} "
+      - label: ":bitbar: :android: react-native-navigation end-to-end tests - RN {{matrix.rn_version}} (Old Arch) / Android {{matrix.android_version}}"
         depends_on: "build-react-native-navigation-android-fixture-old-arch"
         timeout_in_minutes: 30
         env:
@@ -135,13 +108,14 @@ steps:
             upload:
               - "./test/react-native/maze_output/failed/*"
               - "./test/react-native/maze_output/maze_output.zip"
-          docker-compose#v4.7.0:
+          docker-compose#v4.12.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
             service-ports: true
             command:
               - features/react-native-navigation.feature
               - --app=/app/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative.apk
+              - --app-id=com.bugsnag.fixtures.reactnative.performance
               - --farm=bb
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
@@ -166,6 +140,7 @@ steps:
         matrix:
           setup:
             android_version:
+              - "12"
               - "13"
             rn_version:
               - "0.72"
@@ -182,13 +157,14 @@ steps:
             upload:
               - "./test/react-native/maze_output/failed/*"
               - "./test/react-native/maze_output/maze_output.zip"
-          docker-compose#v4.7.0:
+          docker-compose#v4.12.0:
             pull: react-native-maze-runner
             run: react-native-maze-runner
             service-ports: true
             command:
               - features/react-native-navigation.feature
               - --app=/app/features/fixtures/generated/react-native-navigation/new-arch/{{matrix.rn_version}}/reactnative.apk
+              - --app-id=com.bugsnag.fixtures.reactnative.performance
               - --farm=bb
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
@@ -213,6 +189,7 @@ steps:
         matrix:
           setup:
             android_version:
+              - "12"
               - "13"
             rn_version:
               - "0.72"
