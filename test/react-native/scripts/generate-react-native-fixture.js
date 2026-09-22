@@ -51,19 +51,21 @@ const { buildAndroidFixture, buildIOSFixture } = require('./utils/platform-build
 // Helper to determine the matching @react-native-community/cli version
 function getCliVersion (rnVersion) {
   const parts = rnVersion.split('.')
-  const minor = parseInt(parts[1], 10)
+  const minor = parseInt(parts[1] || parts[0], 10)
+
   if (minor <= 72) return '11'
   if (minor === 73) return '12'
   if (minor === 74) return '13'
   if (minor === 75) return '14'
   if (minor === 76) return '15'
   if (minor === 77) return '16'
-  return 'latest'
+  if (minor === 78) return '17'
+  return '18'
 }
 
 // Clean unsupported Podfile parameters for older React Native versions (< 0.73)
 function sanitizePodfile (fixtureDir, rnVersion) {
-  const minor = parseInt(rnVersion.split('.')[1], 10)
+  const minor = parseInt(rnVersion.split('.')[1] || rnVersion.split('.')[0], 10)
   const podfilePath = resolve(fixtureDir, 'ios', 'Podfile')
 
   if (minor <= 72 && fs.existsSync(podfilePath)) {
@@ -144,7 +146,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   // Determine appropriate CLI version and arguments
   const cliVersion = getCliVersion(reactNativeVersion)
-  const minor = parseInt(reactNativeVersion.split('.')[1], 10)
+  const minor = parseInt(reactNativeVersion.split('.')[1] || reactNativeVersion.split('.')[0], 10)
 
   // Create the test fixture with explicit package identifier
   const RNInitArgs = [
