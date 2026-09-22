@@ -100,7 +100,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.ipa
               - --farm=bb
-              - --device=IOS_16|IOS_17|IOS_18|IOS_26
+              - --device=IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
               - --appium-version=2.19
