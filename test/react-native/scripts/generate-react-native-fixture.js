@@ -24,16 +24,19 @@ const bugsnagPackages = [
   `${ROOT_DIR}/packages/plugin-named-spans`,
   `${ROOT_DIR}/test/react-native/scenario-launcher`
 ]
+
 const {
   replaceGeneratedFixtureFiles,
   configureReactNativeNavigation
 } = require('./utils/react-native-config')
+
 const {
   configureAndroidProject,
   installAndroidPerformance,
   installNativeTestUtilsAndroid,
   configureMainApplicationForTestUtils
 } = require('./utils/android-utils')
+
 const {
   configureIOSProject,
   installCocoaPerformance,
@@ -41,22 +44,25 @@ const {
   configureAppDelegateForTestUtils,
   applyViewControllerChanges
 } = require('./utils/ios-utils')
+
 const { configureRN064Fixture } = require('./utils/rn-064-config')
 const { buildAndroidFixture, buildIOSFixture } = require('./utils/platform-builds')
 
 // Helper to determine the matching @react-native-community/cli version
-function getCliVersion(rnVersion) {
-  const minor = parseInt(rnVersion.split('.')[1], 10)
+function getCliVersion (rnVersion) {
+  const parts = rnVersion.split('.')
+  const minor = parseInt(parts[1], 10)
   if (minor <= 72) return '11'
   if (minor === 73) return '12'
   if (minor === 74) return '13'
   if (minor === 75) return '14'
   if (minor === 76) return '15'
-  return '16'
+  if (minor === 77) return '16'
+  return 'latest'
 }
 
 // Clean unsupported Podfile parameters for older React Native versions (< 0.73)
-function sanitizePodfile(fixtureDir, rnVersion) {
+function sanitizePodfile (fixtureDir, rnVersion) {
   const minor = parseInt(rnVersion.split('.')[1], 10)
   const podfilePath = resolve(fixtureDir, 'ios', 'Podfile')
 
@@ -102,13 +108,9 @@ const isBenchmark = isTruthy(process.env.BENCHMARKS)
 let fixturePath = 'test/react-native/features/fixtures/generated/'
 if (isReactNativeNavigation) {
   fixturePath += 'react-native-navigation/'
-}
-
-if (isNativeIntegration) {
+} else if (isNativeIntegration) {
   fixturePath += 'native-integration/'
-}
-
-if (isBenchmark) {
+} else if (isBenchmark) {
   fixturePath += 'benchmarks/'
 }
 
@@ -144,7 +146,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   const cliVersion = getCliVersion(reactNativeVersion)
   const minor = parseInt(reactNativeVersion.split('.')[1], 10)
 
-  // Create the test fixture
+  // Create the test fixture with explicit package identifier
   const RNInitArgs = [
     `@react-native-community/cli@${cliVersion}`,
     'init',
@@ -164,7 +166,12 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     RNInitArgs.push('--npm')
   }
 
-  execFileSync('npx', RNInitArgs, { stdio: 'inherit' })
+  const initEnv = {
+    ...process.env,
+    NODE_OPTIONS: process.env.NODE_OPTIONS || '--openssl-legacy-provider'
+  }
+
+  execFileSync('npx', RNInitArgs, { stdio: 'inherit', env: initEnv })
 
   // Configure fixture files and projects
   replaceGeneratedFixtureFiles(fixtureDir, isReactNativeNavigation)

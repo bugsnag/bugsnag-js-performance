@@ -1,5 +1,9 @@
+env:
+  NODE_OPTIONS: "--openssl-legacy-provider"
+  JAVA_VERSION: "17"
+
 agents:
-  queue: macos
+  queue: macos-15
 
 steps:
 
@@ -19,6 +23,6 @@ steps:
   #
   - label: ":git: Detect changed packages"
     agents:
-      queue: "macos-node-18"
-    timeout_in_minutes: 5
+      queue: "macos-15"
+    timeout_in_minutes: 10
     command: node .buildkite/scripts/pipeline-trigger.js
