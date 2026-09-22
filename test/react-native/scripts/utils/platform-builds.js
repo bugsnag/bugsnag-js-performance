@@ -1,17 +1,48 @@
 const { execFileSync } = require('child_process')
 const fs = require('fs')
+const path = require('path')
 const { isTruthy } = require('./env-validation')
 
 /**
- * Ensures compatible Ruby gems (specifically json < 3.0.0) are installed
- * to prevent CocoaPods/ActiveSupport 'unknown keyword: quirks_mode' errors.
+ * Patch Android Manifest and Network Security Config for Android 13
  */
-function ensureRubyDependencies () {
-  try {
-    execFileSync('gem', ['install', 'json', '-v', '< 3.0.0', '--no-document'], { stdio: 'inherit' })
-  } catch (error) {
-    console.warn('Warning: Could not install json < 3.0.0 gem:', error.message)
+function patchAndroidFixture (fixtureDir) {
+  const mainDir = path.join(fixtureDir, 'android', 'app', 'src', 'main')
+  const manifestPath = path.join(mainDir, 'AndroidManifest.xml')
+  const resXmlDir = path.join(mainDir, 'res', 'xml')
+  const networkConfigPath = path.join(resXmlDir, 'network_security_config.xml')
+
+  if (!fs.existsSync(manifestPath)) return
+
+  fs.mkdirSync(resXmlDir, { recursive: true })
+  fs.writeFileSync(networkConfigPath, `<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
+`, 'utf8')
+
+  let manifest = fs.readFileSync(manifestPath, 'utf8')
+
+  if (!manifest.includes('android:networkSecurityConfig')) {
+    manifest = manifest.replace(
+      '<application',
+      '<application\n      android:networkSecurityConfig="@xml/network_security_config"\n      android:usesCleartextTraffic="true"'
+    )
   }
+
+  if (manifest.includes('<activity') && !manifest.includes('android:exported="true"')) {
+    manifest = manifest.replace(
+      /(<activity\b(?![^>]*\bandroid:exported=)[^>]*)/g,
+      '$1\n      android:exported="true"'
+    )
+  }
+
+  fs.writeFileSync(manifestPath, manifest, 'utf8')
 }
 
 /**
@@ -21,6 +52,8 @@ function buildAndroidFixture (fixtureDir, isNewArchEnabled) {
   if (!isTruthy(process.env.BUILD_ANDROID)) {
     return
   }
+
+  patchAndroidFixture(fixtureDir)
 
   const buildArgs = isNewArchEnabled ? ['generateCodegenArtifactsFromSchema', 'assembleRelease'] : ['assembleRelease']
   execFileSync('./gradlew', buildArgs, { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
@@ -35,11 +68,9 @@ function buildIOSFixture (fixtureDir) {
     return
   }
 
-  ensureRubyDependencies()
-
   fs.rmSync(`${fixtureDir}/reactnative.xcarchive`, { recursive: true, force: true })
 
-  // install pods
+  // install pods with bundler
   execFileSync('bundle', ['install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
   execFileSync('bundle', ['exec', 'pod', 'install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
 
@@ -107,7 +138,8 @@ function buildExpoIOSFixture (fixtureDir, easWorkingDir) {
     return
   }
 
-  ensureRubyDependencies()
+  // Find root Gemfile to force Bundler setup inside EAS subprocesses
+  const rootGemfilePath = path.resolve(__dirname, '../../../../Gemfile')
 
   const easBuildArgs = ['eas-cli@latest', 'build', '--local', '--platform', 'ios', '--profile', 'production', '--output', 'output.ipa', '--non-interactive']
   execFileSync('npx', easBuildArgs, {
@@ -117,6 +149,8 @@ function buildExpoIOSFixture (fixtureDir, easWorkingDir) {
       ...process.env,
       NODE_ENV: process.env.NODE_ENV || 'production',
       EXPO_USE_PRECOMPILED_MODULES: '0',
+      RUBYOPT: '-rbundler/setup',
+      BUNDLE_GEMFILE: fs.existsSync(rootGemfilePath) ? rootGemfilePath : process.env.BUNDLE_GEMFILE,
       EAS_LOCAL_BUILD_WORKINGDIR: easWorkingDir,
       EAS_LOCAL_BUILD_SKIP_CLEANUP: 1,
       EAS_NO_VCS: 1,
