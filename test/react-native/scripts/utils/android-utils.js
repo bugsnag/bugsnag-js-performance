@@ -12,20 +12,29 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
   if (fs.existsSync(androidManifestPath)) {
     let androidManifestContents = fs.readFileSync(androidManifestPath, 'utf8')
 
-    // 1. Configure cleartext traffic & largeHeap
-    // RN 0.82+ uses a manifest placeholder that's autoconfigured by the RN gradle plugin
+    // 1. Configure cleartext traffic & largeHeap safely without inserting duplicate attributes
+    // Handle RN 0.82+ placeholder
     // eslint-disable-next-line no-template-curly-in-string
     if (androidManifestContents.includes('${usesCleartextTraffic}')) {
       // eslint-disable-next-line no-template-curly-in-string
       androidManifestContents = androidManifestContents.replace('${usesCleartextTraffic}', 'true')
-    } else if (!androidManifestContents.includes('android:usesCleartextTraffic="true"')) {
+    }
+
+    if (!androidManifestContents.includes('android:usesCleartextTraffic=')) {
       androidManifestContents = androidManifestContents.replace(
         '<application',
-        '<application android:usesCleartextTraffic="true" android:largeHeap="true"'
+        '<application android:usesCleartextTraffic="true"'
       )
     }
 
-    // 2. Ensure MainActivity is explicitly exported for Android 12+ / Android 15 compatibility
+    if (!androidManifestContents.includes('android:largeHeap=')) {
+      androidManifestContents = androidManifestContents.replace(
+        '<application',
+        '<application android:largeHeap="true"'
+      )
+    }
+
+    // 2. Ensure MainActivity is explicitly exported for Android 12+ compatibility
     if (!androidManifestContents.includes('android:exported="true"')) {
       androidManifestContents = androidManifestContents.replace(
         /<activity\s+android:name="\.MainActivity"/,
@@ -113,7 +122,7 @@ function installAndroidPerformance (fixtureDir) {
   replaceInFile(appGradlePath, dependenciesSection, `${dependenciesSection}\n    ${performanceDependency}`)
 }
 
-function installNativeTestUtilsAndroid(fixtureDir) {
+function installNativeTestUtilsAndroid (fixtureDir) {
   const appGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
   const testUtilsDependency = 'implementation project(":bugsnag-test-utils")'
   const dependenciesSection = 'dependencies {'

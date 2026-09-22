@@ -4,7 +4,7 @@ const path = require('path')
 const { isTruthy } = require('./env-validation')
 
 /**
- * Patch Android Manifest and Network Security Config for Android 13
+ * Patch Android Manifest and Network Security Config for Android 13+
  */
 function patchAndroidFixture (fixtureDir) {
   const mainDir = path.join(fixtureDir, 'android', 'app', 'src', 'main')
@@ -28,17 +28,27 @@ function patchAndroidFixture (fixtureDir) {
 
   let manifest = fs.readFileSync(manifestPath, 'utf8')
 
-  if (!manifest.includes('android:networkSecurityConfig')) {
+  // 1. Add networkSecurityConfig only if not already present
+  if (!manifest.includes('android:networkSecurityConfig=')) {
     manifest = manifest.replace(
       '<application',
-      '<application\n      android:networkSecurityConfig="@xml/network_security_config"\n      android:usesCleartextTraffic="true"'
+      '<application\n      android:networkSecurityConfig="@xml/network_security_config"'
     )
   }
 
-  if (manifest.includes('<activity') && !manifest.includes('android:exported="true"')) {
+  // 2. Add usesCleartextTraffic only if not already present (prevents duplicate attribute XML parse errors)
+  if (!manifest.includes('android:usesCleartextTraffic=')) {
     manifest = manifest.replace(
-      /(<activity\b(?![^>]*\bandroid:exported=)[^>]*)/g,
-      '$1\n      android:exported="true"'
+      '<application',
+      '<application\n      android:usesCleartextTraffic="true"'
+    )
+  }
+
+  // 3. Ensure MainActivity has android:exported="true" for Android 12+ compatibility
+  if (!manifest.includes('android:exported="true"')) {
+    manifest = manifest.replace(
+      /<activity\s+android:name="\.MainActivity"/,
+      '<activity\n        android:name=".MainActivity"\n        android:exported="true"'
     )
   }
 
