@@ -148,7 +148,6 @@ steps:
               - --a11y-locator
               - --fail-fast
               - --appium-version=2.19
-              - --app-id=com.bugsnag.fixtures.reactnative.performance
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
