@@ -7,34 +7,54 @@ const { replaceInFile, appendToFileIfNotExists } = require('./file-utils')
  * Configure Android project settings
  */
 function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersion) {
-  const androidManifestPath = `${fixtureDir}/android/app/src/main/AndroidManifest.xml`
-  
+  const androidManifestPath = resolve(fixtureDir, 'android/app/src/main/AndroidManifest.xml')
+
   if (fs.existsSync(androidManifestPath)) {
     let androidManifestContents = fs.readFileSync(androidManifestPath, 'utf8')
 
-    // 1. Configure cleartext traffic & largeHeap safely without inserting duplicate attributes
-    // Handle RN 0.82+ placeholder
+    // 1. Ensure INTERNET & ACCESS_NETWORK_STATE permissions exist
+    if (!androidManifestContents.includes('android.permission.INTERNET')) {
+      androidManifestContents = androidManifestContents.replace(
+        '<manifest',
+        '<manifest\n    xmlns:tools="http://schemas.android.com/tools"'
+      )
+      androidManifestContents = androidManifestContents.replace(
+        /<application/,
+        '    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <application'
+      )
+    }
+
+    // 2. Configure cleartext traffic & largeHeap safely without inserting duplicate attributes
+    // Handle RN 0.82+ placeholder if present
     // eslint-disable-next-line no-template-curly-in-string
     if (androidManifestContents.includes('${usesCleartextTraffic}')) {
       // eslint-disable-next-line no-template-curly-in-string
-      androidManifestContents = androidManifestContents.replace('${usesCleartextTraffic}', 'true')
+      androidManifestContents = androidManifestContents.replace(/\$\{usesCleartextTraffic\}/g, 'true')
     }
 
     if (!androidManifestContents.includes('android:usesCleartextTraffic=')) {
       androidManifestContents = androidManifestContents.replace(
         '<application',
-        '<application android:usesCleartextTraffic="true"'
+        '<application\n      android:usesCleartextTraffic="true"'
       )
     }
 
     if (!androidManifestContents.includes('android:largeHeap=')) {
       androidManifestContents = androidManifestContents.replace(
         '<application',
-        '<application android:largeHeap="true"'
+        '<application\n      android:largeHeap="true"'
       )
     }
 
-    // 2. Ensure MainActivity is explicitly exported for Android 12+ compatibility
+    // 3. Link network_security_config if present
+    if (!androidManifestContents.includes('android:networkSecurityConfig=')) {
+      androidManifestContents = androidManifestContents.replace(
+        '<application',
+        '<application\n      android:networkSecurityConfig="@xml/network_security_config"'
+      )
+    }
+
+    // 4. Ensure MainActivity is explicitly exported for Android 12+ / Appium compatibility
     if (!androidManifestContents.includes('android:exported="true"')) {
       androidManifestContents = androidManifestContents.replace(
         /<activity\s+android:name="\.MainActivity"/,
@@ -42,7 +62,7 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
       )
     }
 
-    // 3. Ensure MAIN/LAUNCHER intent filter exists on MainActivity if missing
+    // 5. Ensure MAIN/LAUNCHER intent filter exists on MainActivity if missing
     if (!androidManifestContents.includes('android.intent.action.MAIN')) {
       const launcherIntentFilter = `
         <intent-filter>
@@ -58,9 +78,34 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
     fs.writeFileSync(androidManifestPath, androidManifestContents, 'utf8')
   }
 
-  // Enable/disable the new architecture in gradle.properties
-  const gradlePropertiesPath = `${fixtureDir}/android/gradle.properties`
-  replaceInFile(gradlePropertiesPath, /newArchEnabled\s*=\s*(true|false)/, `newArchEnabled=${isNewArchEnabled}`)
+  // 6. Ensure res/xml/network_security_config.xml permits cleartext HTTP for Maze Runner
+  const resXmlDir = resolve(fixtureDir, 'android/app/src/main/res/xml')
+  if (!fs.existsSync(resXmlDir)) {
+    fs.mkdirSync(resXmlDir, { recursive: true })
+  }
+  const networkSecPath = resolve(resXmlDir, 'network_security_config.xml')
+  const networkSecContent = `<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
+`
+  fs.writeFileSync(networkSecPath, networkSecContent, 'utf8')
+
+  // 7. Enable/disable the new architecture in gradle.properties
+  const gradlePropertiesPath = resolve(fixtureDir, 'android/gradle.properties')
+  if (fs.existsSync(gradlePropertiesPath)) {
+    const gradleProps = fs.readFileSync(gradlePropertiesPath, 'utf8')
+    if (/newArchEnabled\s*=/.test(gradleProps)) {
+      replaceInFile(gradlePropertiesPath, /newArchEnabled\s*=\s*(true|false)/, `newArchEnabled=${isNewArchEnabled}`)
+    } else {
+      appendToFileIfNotExists(gradlePropertiesPath, `\nnewArchEnabled=${isNewArchEnabled}\n`, 'newArchEnabled')
+    }
+  }
 
   if (!isNewArchEnabled) {
     // React navigation setup
@@ -72,43 +117,55 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
  * Configure React Navigation for Android
  */
 function configureReactNavigationAndroid (fixtureDir, reactNativeVersion) {
-  const fileExtension = parseFloat(reactNativeVersion) < 0.73 ? 'java' : 'kt'
-  let mainActivityPattern, mainActivityReplacement
-  if (fileExtension === 'java') {
-    mainActivityPattern = 'public class MainActivity extends ReactActivity {'
-    mainActivityReplacement = `
-import android.os.Bundle;
+  const basePath = resolve(fixtureDir, 'android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance')
+  const javaPath = resolve(basePath, 'MainActivity.java')
+  const ktPath = resolve(basePath, 'MainActivity.kt')
 
-public class MainActivity extends ReactActivity {
+  const isJava = fs.existsSync(javaPath)
+  const isKt = fs.existsSync(ktPath)
 
-  /**
-   * Required for react-navigation/native implementation
-   * https://reactnavigation.org/docs/getting-started/#installing-dependencies-into-a-bare-react-native-project
-   */
+  if (isJava) {
+    let content = fs.readFileSync(javaPath, 'utf8')
+    if (!content.includes('import android.os.Bundle;')) {
+      content = content.replace(
+        'package com.bugsnag.fixtures.reactnative.performance;',
+        'package com.bugsnag.fixtures.reactnative.performance;\n\nimport android.os.Bundle;'
+      )
+    }
+    if (!content.includes('savedInstanceState')) {
+      const onCreateJava = `
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(null);
   }
 `
-  } else if (fileExtension === 'kt') {
-    mainActivityPattern = 'class MainActivity : ReactActivity() {'
-    mainActivityReplacement = `
-import android.os.Bundle
-
-class MainActivity : ReactActivity() {
-
-  /**
-   * Required for react-navigation/native implementation
-   * https://reactnavigation.org/docs/getting-started/#installing-dependencies-into-a-bare-react-native-project
-   */
+      content = content.replace(
+        /(public class MainActivity extends ReactActivity\s*\{)/,
+        `$1\n${onCreateJava}`
+      )
+    }
+    fs.writeFileSync(javaPath, content, 'utf8')
+  } else if (isKt) {
+    let content = fs.readFileSync(ktPath, 'utf8')
+    if (!content.includes('import android.os.Bundle')) {
+      content = content.replace(
+        'package com.bugsnag.fixtures.reactnative.performance',
+        'package com.bugsnag.fixtures.reactnative.performance\n\nimport android.os.Bundle'
+      )
+    }
+    if (!content.includes('savedInstanceState')) {
+      const onCreateKt = `
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(null)
   }
 `
+      content = content.replace(
+        /(class MainActivity : ReactActivity\(\)\s*\{)/,
+        `$1\n${onCreateKt}`
+      )
+    }
+    fs.writeFileSync(ktPath, content, 'utf8')
   }
-
-  const mainActivityPath = `${fixtureDir}/android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainActivity.${fileExtension}`
-  replaceInFile(mainActivityPath, mainActivityPattern, mainActivityReplacement)
 }
 
 /**
@@ -119,15 +176,28 @@ function installAndroidPerformance (fixtureDir) {
   const performanceDependency = 'implementation("com.bugsnag:bugsnag-android-performance:2.2.0")'
   const dependenciesSection = 'dependencies {'
 
-  replaceInFile(appGradlePath, dependenciesSection, `${dependenciesSection}\n    ${performanceDependency}`)
+  if (fs.existsSync(appGradlePath)) {
+    const content = fs.readFileSync(appGradlePath, 'utf8')
+    if (!content.includes('bugsnag-android-performance')) {
+      replaceInFile(appGradlePath, dependenciesSection, `${dependenciesSection}\n    ${performanceDependency}`)
+    }
+  }
 }
 
+/**
+ * Install Native Test Utils Android module
+ */
 function installNativeTestUtilsAndroid (fixtureDir) {
   const appGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
   const testUtilsDependency = 'implementation project(":bugsnag-test-utils")'
   const dependenciesSection = 'dependencies {'
 
-  replaceInFile(appGradlePath, dependenciesSection, `${dependenciesSection}\n    ${testUtilsDependency}`)
+  if (fs.existsSync(appGradlePath)) {
+    const content = fs.readFileSync(appGradlePath, 'utf8')
+    if (!content.includes('project(":bugsnag-test-utils")')) {
+      replaceInFile(appGradlePath, dependenciesSection, `${dependenciesSection}\n    ${testUtilsDependency}`)
+    }
+  }
 
   const settingsGradlePath = resolve(fixtureDir, 'android/settings.gradle')
   const includeDependency = 'include("bugsnag-test-utils")'
@@ -140,32 +210,60 @@ function installNativeTestUtilsAndroid (fixtureDir) {
  * Configure MainApplication to import BugsnagTestUtils and call startNativePerformance
  */
 function configureMainApplicationForTestUtils (fixtureDir, reactNativeVersion) {
-  const fileExtension = parseFloat(reactNativeVersion) < 0.73 ? 'java' : 'kt'
-  const mainApplicationPath = `${fixtureDir}/android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance/MainApplication.${fileExtension}`
-  
-  if (!fs.existsSync(mainApplicationPath)) {
-    console.warn(`MainApplication file not found at ${mainApplicationPath}`)
+  const basePath = resolve(fixtureDir, 'android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance')
+  const javaPath = resolve(basePath, 'MainApplication.java')
+  const ktPath = resolve(basePath, 'MainApplication.kt')
+
+  const isJava = fs.existsSync(javaPath)
+  const isKt = fs.existsSync(ktPath)
+
+  if (!isJava && !isKt) {
+    console.warn(`[android-utils] MainApplication file not found in ${basePath}`)
     return
   }
-  
+
+  const mainApplicationPath = isJava ? javaPath : ktPath
   let fileContents = fs.readFileSync(mainApplicationPath, 'utf8')
 
-  const importStatement = fileExtension === 'java' ? 'import com.bugsnag.test.utils.BugsnagTestUtils;' : 'import com.bugsnag.test.utils.BugsnagTestUtils'
-  const lastImportMatch = fileExtension === 'java' ? fileContents.match(/import\s+[^;]+;/g) : fileContents.match(/import\s+[^\n]+/g)
+  const importStatement = isJava
+    ? 'import com.bugsnag.test.utils.BugsnagTestUtils;'
+    : 'import com.bugsnag.test.utils.BugsnagTestUtils'
 
-  const superOnCreateMatch = fileExtension === 'java' ? fileContents.match(/super\.onCreate\(\);/) : fileContents.match(/super\.onCreate\(\)/)
-  const methodCall = fileExtension === 'java' ? 'BugsnagTestUtils.startNativePerformanceIfConfigured(this);' : 'BugsnagTestUtils.startNativePerformanceIfConfigured(this)'
+  const methodCall = isJava
+    ? 'BugsnagTestUtils.startNativePerformanceIfConfigured(this);'
+    : 'BugsnagTestUtils.startNativePerformanceIfConfigured(this)'
 
-  if (lastImportMatch && !fileContents.includes(importStatement)) {
-    // Find the last import statement and add our import after it
-    const lastImport = lastImportMatch[lastImportMatch.length - 1]
-    replaceInFile(mainApplicationPath, lastImport, `${lastImport}\n${importStatement}`)
+  if (!fileContents.includes(importStatement)) {
+    if (isJava) {
+      const lastImportMatch = fileContents.match(/import\s+[^;]+;/g)
+      if (lastImportMatch) {
+        const lastImport = lastImportMatch[lastImportMatch.length - 1]
+        fileContents = fileContents.replace(lastImport, `${lastImport}\n${importStatement}`)
+      }
+    } else {
+      const lastImportMatch = fileContents.match(/import\s+[^\n]+/g)
+      if (lastImportMatch) {
+        const lastImport = lastImportMatch[lastImportMatch.length - 1]
+        fileContents = fileContents.replace(lastImport, `${lastImport}\n${importStatement}`)
+      }
+    }
   }
 
-  if (superOnCreateMatch && !fileContents.includes(methodCall)) {
-    const superOnCreateCall = superOnCreateMatch[0]
-    replaceInFile(mainApplicationPath, superOnCreateCall, `${superOnCreateCall}\n    ${methodCall}`)
+  if (!fileContents.includes(methodCall)) {
+    if (isJava) {
+      fileContents = fileContents.replace(
+        /(super\.onCreate\(\);)/,
+        `$1\n    ${methodCall}`
+      )
+    } else {
+      fileContents = fileContents.replace(
+        /(super\.onCreate\(\))/,
+        `$1\n    ${methodCall}`
+      )
+    }
   }
+
+  fs.writeFileSync(mainApplicationPath, fileContents, 'utf8')
 }
 
 module.exports = {

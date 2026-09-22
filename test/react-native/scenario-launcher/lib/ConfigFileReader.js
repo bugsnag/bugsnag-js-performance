@@ -1,7 +1,7 @@
 import { Platform } from 'react-native'
 import { Dirs, FileSystem } from 'react-native-file-access'
 
-const TIMEOUT = 60000
+const TIMEOUT = 10000 // 10 seconds polling max
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 /**
