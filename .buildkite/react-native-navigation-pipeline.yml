@@ -115,7 +115,6 @@ steps:
             command:
               - features/react-native-navigation.feature
               - --app=/app/features/fixtures/generated/react-native-navigation/old-arch/{{matrix.rn_version}}/reactnative.apk
-              - --app-id=com.bugsnag.fixtures.reactnative.performance
               - --farm=bb
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
@@ -140,7 +139,6 @@ steps:
         matrix:
           setup:
             android_version:
-              - "12"
               - "13"
             rn_version:
               - "0.72"
@@ -164,7 +162,6 @@ steps:
             command:
               - features/react-native-navigation.feature
               - --app=/app/features/fixtures/generated/react-native-navigation/new-arch/{{matrix.rn_version}}/reactnative.apk
-              - --app-id=com.bugsnag.fixtures.reactnative.performance
               - --farm=bb
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
@@ -189,7 +186,6 @@ steps:
         matrix:
           setup:
             android_version:
-              - "12"
               - "13"
             rn_version:
               - "0.72"
