@@ -3,7 +3,6 @@ import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 import { NativeScenarioLauncher } from '../../lib/native'
 
 export const initialise = async (config) => {
-  // Derive the sampling endpoint from config or fallback by replacing /traces with /sampling
   const endpoint = config.endpoint
   const samplingEndpoint = config.samplingEndpoint ||
     config.sampling_endpoint ||

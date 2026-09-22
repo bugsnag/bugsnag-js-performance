@@ -110,7 +110,6 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
   }
 
   if (!isNewArchEnabled) {
-    // React navigation setup
     configureReactNavigationAndroid(fixtureDir, reactNativeVersion)
   }
 }
