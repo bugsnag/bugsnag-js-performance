@@ -103,7 +103,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.ipa
               - --farm=bb
-              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
+              - --device=IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --appium-version=2.19
               - --no-tunnel
