@@ -4,7 +4,7 @@ const path = require('path')
 const { isTruthy } = require('./env-validation')
 
 /**
- * Patch Android Manifest and Network Security Config for Android 13+ & Modern React Native
+ * Patch Android Manifest and Network Security Config for Android 13+
  */
 function patchAndroidFixture (fixtureDir) {
   const mainDir = path.join(fixtureDir, 'android', 'app', 'src', 'main')
@@ -14,7 +14,6 @@ function patchAndroidFixture (fixtureDir) {
 
   if (!fs.existsSync(manifestPath)) return
 
-  // 1. Create network_security_config.xml
   fs.mkdirSync(resXmlDir, { recursive: true })
   fs.writeFileSync(networkConfigPath, `<?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
@@ -29,7 +28,7 @@ function patchAndroidFixture (fixtureDir) {
 
   let manifest = fs.readFileSync(manifestPath, 'utf8')
 
-  // 2. Add networkSecurityConfig only if not already present
+  // 1. Add networkSecurityConfig only if not already present
   if (!manifest.includes('android:networkSecurityConfig=')) {
     manifest = manifest.replace(
       '<application',
@@ -37,7 +36,7 @@ function patchAndroidFixture (fixtureDir) {
     )
   }
 
-  // 3. Add usesCleartextTraffic only if not already present
+  // 2. Add usesCleartextTraffic only if not already present (prevents duplicate attribute XML parse errors)
   if (!manifest.includes('android:usesCleartextTraffic=')) {
     manifest = manifest.replace(
       '<application',
@@ -45,19 +44,12 @@ function patchAndroidFixture (fixtureDir) {
     )
   }
 
-  // 4. Ensure MainActivity has android:exported="true" for Android 12+ compatibility
+  // 3. Ensure MainActivity has android:exported="true" for Android 12+ compatibility
   if (!manifest.includes('android:exported="true"')) {
-    if (manifest.includes('android:name=".MainActivity"')) {
-      manifest = manifest.replace(
-        /(<activity[^>]*android:name="\.MainActivity"[^>]*?)(\/?>)/,
-        (match, p1, p2) => {
-          if (!p1.includes('android:exported')) {
-            return `${p1}\n        android:exported="true"${p2}`
-          }
-          return match
-        }
-      )
-    }
+    manifest = manifest.replace(
+      /<activity\s+android:name="\.MainActivity"/,
+      '<activity\n        android:name=".MainActivity"\n        android:exported="true"'
+    )
   }
 
   fs.writeFileSync(manifestPath, manifest, 'utf8')
@@ -73,33 +65,9 @@ function buildAndroidFixture (fixtureDir, isNewArchEnabled) {
 
   patchAndroidFixture(fixtureDir)
 
-  const buildArgs = isNewArchEnabled 
-    ? ['generateCodegenArtifactsFromSchema', 'assembleRelease', '--stacktrace', '--console=plain']
-    : ['assembleRelease', '--stacktrace', '--console=plain']
-
-  const buildEnv = {
-    ...process.env,
-    // Ensures OpenSSL legacy provider is available when running on Node 22/24
-    NODE_OPTIONS: process.env.NODE_OPTIONS || '--openssl-legacy-provider'
-  }
-
-  execFileSync('./gradlew', buildArgs, { 
-    cwd: path.join(fixtureDir, 'android'), 
-    stdio: 'inherit',
-    env: buildEnv
-  })
-
-  const standardApkPath = path.join(fixtureDir, 'android', 'app', 'build', 'outputs', 'apk', 'release', 'app-release.apk')
-  const unsignedApkPath = path.join(fixtureDir, 'android', 'app', 'build', 'outputs', 'apk', 'release', 'app-release-unsigned.apk')
-  const destinationApkPath = path.join(fixtureDir, 'reactnative.apk')
-
-  if (fs.existsSync(standardApkPath)) {
-    fs.copyFileSync(standardApkPath, destinationApkPath)
-  } else if (fs.existsSync(unsignedApkPath)) {
-    fs.copyFileSync(unsignedApkPath, destinationApkPath)
-  } else {
-    throw new Error(`[buildAndroidFixture] Could not find built APK at '${standardApkPath}'`)
-  }
+  const buildArgs = isNewArchEnabled ? ['generateCodegenArtifactsFromSchema', 'assembleRelease'] : ['assembleRelease']
+  execFileSync('./gradlew', buildArgs, { cwd: `${fixtureDir}/android`, stdio: 'inherit' })
+  fs.copyFileSync(`${fixtureDir}/android/app/build/outputs/apk/release/app-release.apk`, `${fixtureDir}/reactnative.apk`)
 }
 
 /**
@@ -110,11 +78,11 @@ function buildIOSFixture (fixtureDir) {
     return
   }
 
-  fs.rmSync(path.join(fixtureDir, 'reactnative.xcarchive'), { recursive: true, force: true })
+  fs.rmSync(`${fixtureDir}/reactnative.xcarchive`, { recursive: true, force: true })
 
   // install pods with bundler
-  execFileSync('bundle', ['install'], { cwd: path.join(fixtureDir, 'ios'), stdio: 'inherit' })
-  execFileSync('bundle', ['exec', 'pod', 'install'], { cwd: path.join(fixtureDir, 'ios'), stdio: 'inherit' })
+  execFileSync('bundle', ['install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
+  execFileSync('bundle', ['exec', 'pod', 'install'], { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
 
   // build the iOS app
   const archiveArgs = [
@@ -127,12 +95,12 @@ function buildIOSFixture (fixtureDir) {
     '-configuration',
     'Release',
     '-archivePath',
-    path.join(fixtureDir, 'reactnative.xcarchive'),
+    `${fixtureDir}/reactnative.xcarchive`,
     '-allowProvisioningUpdates',
     'archive'
   ]
 
-  execFileSync('xcrun', archiveArgs, { cwd: path.join(fixtureDir, 'ios'), stdio: 'inherit' })
+  execFileSync('xcrun', archiveArgs, { cwd: `${fixtureDir}/ios`, stdio: 'inherit' })
 
   // export the archive
   const exportArgs = [
