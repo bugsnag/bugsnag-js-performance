@@ -14,18 +14,20 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
 
     // 1. Ensure INTERNET & ACCESS_NETWORK_STATE permissions exist
     if (!androidManifestContents.includes('android.permission.INTERNET')) {
-      androidManifestContents = androidManifestContents.replace(
-        '<manifest',
-        '<manifest\n    xmlns:tools="http://schemas.android.com/tools"'
-      )
+      if (!androidManifestContents.includes('xmlns:tools=')) {
+        androidManifestContents = androidManifestContents.replace(
+          '<manifest',
+          '<manifest\n    xmlns:tools="http://schemas.android.com/tools"'
+        )
+      }
       androidManifestContents = androidManifestContents.replace(
         /<application/,
         '    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <application'
       )
     }
 
-    // 2. Configure cleartext traffic & largeHeap safely without inserting duplicate attributes
-    // Handle RN 0.82+ placeholder if present
+    // 2. Configure cleartext traffic & largeHeap safely without duplicate attributes
+    // Handle RN 0.82+ template placeholder
     // eslint-disable-next-line no-template-curly-in-string
     if (androidManifestContents.includes('${usesCleartextTraffic}')) {
       // eslint-disable-next-line no-template-curly-in-string
@@ -46,7 +48,7 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
       )
     }
 
-    // 3. Link network_security_config if present
+    // 3. Link network_security_config for HTTP traffic to Maze Runner
     if (!androidManifestContents.includes('android:networkSecurityConfig=')) {
       androidManifestContents = androidManifestContents.replace(
         '<application',

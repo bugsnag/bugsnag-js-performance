@@ -54,7 +54,18 @@ When("I relaunch the app after shutdown") do
     state = manager.state
     sleep 0.5
   end
-  $logger.warn "App state #{state} instead of not_running after 10s" unless state == :not_running
+
+  if state != :not_running
+    $logger.warn "App state #{state} instead of not_running after 10s — forcing stop"
+    if Maze::Helper.get_current_platform == 'android'
+      app_id = Maze.driver.session_capabilities['appPackage'] || 'com.bugsnag.fixtures.reactnative.performance'
+      begin
+        Maze.driver.terminate_app(app_id)
+      rescue => e
+        $logger.warn "Failed to terminate app: #{e.message}"
+      end
+    end
+  end
 
   manager.activate
 end
@@ -148,6 +159,7 @@ def execute_command(action, command_hash = nil)
   command = {
     action: action,
     endpoint: "http://#{address}/traces",
+    sampling_endpoint: "http://#{address}/sampling",
     api_key: $api_key,
   }
 
