@@ -294,7 +294,7 @@ steps:
       #
       # End-to-end tests
       #
-      - label: ":bitbar: :android: RN {{matrix}} Android 13 (Old Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix}} Android 15 (Old Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-old-arch-full"
         timeout_in_minutes: 30
         plugins:
@@ -341,7 +341,7 @@ steps:
           - "0.80"
           - "0.81"
 
-      - label: ":bitbar: :android: RN {{matrix.reactnative}} Android 13 (New Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix.reactnative}} 15 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-new-arch-full"
         timeout_in_minutes: 30
         plugins:
@@ -396,7 +396,7 @@ steps:
                 reactnative: "0.72"
                 reactnavigation: "false"
 
-      - label: ":bitbar: :android: RN {{matrix}} native integration Android 13 (Old Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix}} native integration Android 15 (Old Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-native-integration-old-arch-full"
         timeout_in_minutes: 20
         plugins:
@@ -444,7 +444,7 @@ steps:
           - "0.80"
           - "0.81"
 
-      - label: ":bitbar: :android: RN {{matrix}} native integration Android 13 (New Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix}} native integration Android 15 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-native-integration-new-arch-full"
         timeout_in_minutes: 20
         plugins:

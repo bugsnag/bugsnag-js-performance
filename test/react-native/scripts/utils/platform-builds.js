@@ -4,7 +4,7 @@ const path = require('path')
 const { isTruthy } = require('./env-validation')
 
 /**
- * Patch Android Manifest and Network Security Config for Android 13+
+ * Patch Android Manifest and Network Security Config for Android 15+
  */
 function patchAndroidFixture (fixtureDir) {
   const mainDir = path.join(fixtureDir, 'android', 'app', 'src', 'main')
