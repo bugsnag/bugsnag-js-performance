@@ -19,14 +19,12 @@ const paths = {
   '@bugsnag/plugin-react-native-span-access': ['./packages/plugin-react-native-span-access/lib/index.ts']
 }
 
-// convert the tsconfig "paths" option into Jest's "moduleNameMapper" option
-// e.g.: "{ 'path': ['./a/b'] }" -> "{ '^path$': ['<rootDir>/a/b'] }"
+// convert tsconfig paths → jest moduleNameMapper
 const moduleNameMapper = Object.fromEntries(
-  Object.entries(paths)
-    .map(([name, directories]) => [
-          `^${name}$`,
-          directories.map(directory => directory.replace('./', '<rootDir>/'))
-    ])
+  Object.entries(paths).map(([name, directories]) => [
+    `^${name}$`,
+    directories.map(directory => directory.replace('./', '<rootDir>/'))
+  ])
 )
 
 const defaultModuleConfig = {
@@ -35,7 +33,9 @@ const defaultModuleConfig = {
   transform: {
     '^.+\\.m?[tj]sx?$': [
       'ts-jest',
-      { tsconfig: { paths, allowJs: true } }
+      {
+        tsconfig: { paths, allowJs: true }
+      }
     ]
   }
 }
@@ -104,7 +104,6 @@ module.exports = {
     {
       displayName: 'angular',
       preset: 'jest-preset-angular',
-      setupFilesAfterEnv: ['<rootDir>/jest/setup/angular.ts'],
       testMatch: ['<rootDir>/packages/angular/**/*.test.ts'],
       ...defaultModuleConfig,
       transformIgnorePatterns: ['/node_modules/(?!(@angular)/)']
@@ -114,7 +113,11 @@ module.exports = {
       preset: 'react-native',
       setupFilesAfterEnv: ['<rootDir>/jest/setup/react-native.ts'],
       testMatch: ['<rootDir>/packages/platforms/react-native/tests/**/*.test.ts'],
-      coveragePathIgnorePatterns: ['<rootDir>/packages/core', '<rootDir>/packages/platforms/browser', '<rootDir>/packages/delivery-fetch'],
+      coveragePathIgnorePatterns: [
+        '<rootDir>/packages/core',
+        '<rootDir>/packages/platforms/browser',
+        '<rootDir>/packages/delivery-fetch'
+      ],
       moduleNameMapper,
       transform: {
         '^.+\\.jsx?$': [
@@ -142,7 +145,9 @@ module.exports = {
     {
       displayName: 'plugin-react-native-span-access',
       preset: 'react-native',
-      testMatch: ['<rootDir>/packages/plugin-react-native-span-access/tests/**/*.test.ts'],
+      testMatch: [
+        '<rootDir>/packages/plugin-react-native-span-access/tests/**/*.test.ts'
+      ],
       coveragePathIgnorePatterns: ['<rootDir>/packages/core'],
       moduleNameMapper,
       transform: {
@@ -163,7 +168,38 @@ module.exports = {
         ]
       }
     },
-    '<rootDir>/jest/config/react-navigation.js',
+    {
+      displayName: 'react-navigation',
+      preset: 'react-native',
+      setupFilesAfterEnv: [
+        '<rootDir>/jest/setup/react-native.ts',
+        '<rootDir>/jest/setup/react-navigation.ts'
+      ],
+      testMatch: [
+        '<rootDir>/packages/plugin-react-navigation/**/*.test.ts'
+      ],
+      moduleNameMapper,
+      transform: {
+        '^.+\\.jsx?$': [
+          'babel-jest',
+          {
+            presets: ['module:metro-react-native-babel-preset']
+          }
+        ],
+        '^.+\\.m?tsx?$': [
+          'ts-jest',
+          {
+            tsconfig: { paths },
+            babelConfig: {
+              presets: ['module:metro-react-native-babel-preset']
+            }
+          }
+        ]
+      },
+      transformIgnorePatterns: [
+        'node_modules/(?!(@react-native|react-native|@react-navigation|react-native-screens)/)'
+      ]
+    },
     '<rootDir>/jest/config/react-native-navigation.js'
   ],
   collectCoverageFrom: [

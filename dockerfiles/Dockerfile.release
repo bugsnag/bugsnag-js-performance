@@ -1,4 +1,4 @@
-FROM node:18-alpine@sha256:e0340f26173b41066d68e3fe9bfbdb6571ab3cad0a4272919a52e36f4ae56925
+FROM node:24-alpine@sha256:01743339035a5c3c11a373cd7c83aeab6ed1457b55da6a69e014a95ac4e4700b
 
 COPY ./zscaler-root-ca.crt* /usr/local/share/ca-certificates/
 RUN if [ -f /usr/local/share/ca-certificates/zscaler-root-ca.crt ]; then cat /usr/local/share/ca-certificates/zscaler-root-ca.crt >> /etc/ssl/certs/ca-certificates.crt; fi

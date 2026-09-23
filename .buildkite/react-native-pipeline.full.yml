@@ -14,7 +14,7 @@ steps:
           queue: macos-15
         env:
           JAVA_VERSION: "{{matrix.java}}"
-          NODE_VERSION: "18"
+          NODE_VERSION: "{{matrix.node}}"
           RN_VERSION: "{{matrix.reactnative}}"
           NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "0"
@@ -31,13 +31,17 @@ steps:
               - "0.74"
               - "0.76"
               - "0.78"
-              - "0.79"
+              - "0.80"
+              - "0.81"
             java:
               - "17"
+            node:
+              - "24"
           adjustments:
             - with:
                 reactnative: "0.64"
                 java: "11"
+                node: "24"
         retry:
           automatic:
             - exit_status: "*"
@@ -50,7 +54,7 @@ steps:
           queue: macos-15
         env:
           JAVA_VERSION: "17"
-          NODE_VERSION: "18"
+          NODE_VERSION: "24"
           RN_VERSION: "{{matrix.reactnative}}"
           NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "1"
@@ -66,7 +70,9 @@ steps:
               - "0.74"
               - "0.76"
               - "0.78"
-              - "0.79"
+              - "0.80"
+              - "0.82"
+              - "0.83"
             reactnavigation:
               - "true"
           adjustments:
@@ -85,7 +91,7 @@ steps:
           queue: macos-15
         env:
           JAVA_VERSION: "{{matrix.java}}"
-          NODE_VERSION: "18"
+          NODE_VERSION: "{{matrix.node}}"
           RN_VERSION: "{{matrix.reactnative}}"
           NOTIFIER_VERSION: "8.0.0"
           BUILD_ANDROID: "true"
@@ -104,13 +110,18 @@ steps:
               - "0.74"
               - "0.76"
               - "0.78"
-              - "0.79"
+              - "0.80"
+              - "0.81"
+             
             java:
               - "17"
+            node:
+              - "24"
           adjustments:
             - with:
                 reactnative: "0.64"
                 java: "11"
+                node: "24"
         retry:
           automatic:
             - exit_status: "*"
@@ -123,7 +134,7 @@ steps:
           queue: macos-15
         env:
           JAVA_VERSION: "17"
-          NODE_VERSION: "18"
+          NODE_VERSION: "24"
           RN_VERSION: "{{matrix}}"
           NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "1"
@@ -140,7 +151,9 @@ steps:
             - "0.74"
             - "0.76"
             - "0.78"
-            - "0.79"
+            - "0.80"
+            - "0.82"
+            - "0.83"
         retry:
           automatic:
             - exit_status: "*"
@@ -152,7 +165,7 @@ steps:
         agents:
           queue: "macos-15"
         env:
-          NODE_VERSION: "18"
+          NODE_VERSION: "24"
           RN_VERSION: "{{matrix}}"
           NOTIFIER_VERSION: "8.0.0"
           BUILD_IOS: "true"
@@ -170,7 +183,8 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.81"
         retry:
           automatic:
             - exit_status: "*"
@@ -182,7 +196,7 @@ steps:
         agents:
           queue: "macos-15"
         env:
-          NODE_VERSION: "18"
+          NODE_VERSION: "24"
           RN_VERSION: "{{matrix.reactnative}}"
           NOTIFIER_VERSION: "8.0.0"
           RCT_NEW_ARCH_ENABLED: "1"
@@ -200,7 +214,9 @@ steps:
               - "0.74"
               - "0.76"
               - "0.78"
-              - "0.79"
+              - "0.80"
+              - "0.82"
+              - "0.83"
             reactnavigation:
               - "true"
           adjustments:
@@ -218,7 +234,7 @@ steps:
         agents:
           queue: "macos-15"
         env:
-          NODE_VERSION: "18"
+          NODE_VERSION: "24"
           RN_VERSION: "{{matrix}}"
           NOTIFIER_VERSION: "8.0.0"
           BUILD_IOS: "true"
@@ -237,7 +253,8 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.81"
         retry:
           automatic:
             - exit_status: "*"
@@ -249,7 +266,7 @@ steps:
         agents:
           queue: "macos-15"
         env:
-          NODE_VERSION: "18"
+          NODE_VERSION: "24"
           RN_VERSION: "{{matrix}}"
           RCT_NEW_ARCH_ENABLED: "1"
           NOTIFIER_VERSION: "8.0.0"
@@ -267,7 +284,9 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.82"
+          - "0.83"
         retry:
           automatic:
             - exit_status: "*"
@@ -276,7 +295,7 @@ steps:
       #
       # End-to-end tests
       #
-      - label: ":bitbar: :android: RN {{matrix}} Android 13 (Old Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix}} Android 15 (Old Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-old-arch-full"
         timeout_in_minutes: 30
         plugins:
@@ -292,10 +311,9 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/old-arch/{{matrix}}/reactnative.apk
               - --farm=bb
-              - --device=ANDROID_13
+              - --device=ANDROID_15
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -321,9 +339,11 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.81"
+             
 
-      - label: ":bitbar: :android: RN {{matrix.reactnative}} Android 13 (New Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix.reactnative}} Android 15 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-new-arch-full"
         timeout_in_minutes: 30
         plugins:
@@ -339,10 +359,9 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/new-arch/{{matrix.reactnative}}/reactnative.apk
               - --farm=bb
-              - --device=ANDROID_13
+              - --device=ANDROID_15
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -369,7 +388,9 @@ steps:
               - "0.74"
               - "0.76"
               - "0.78"
-              - "0.79"
+              - "0.80"
+              - "0.82"
+              - "0.83"
             reactnavigation:
               - "true"
           adjustments:
@@ -377,7 +398,7 @@ steps:
                 reactnative: "0.72"
                 reactnavigation: "false"
 
-      - label: ":bitbar: :android: RN {{matrix}} native integration Android 13 (Old Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix}} native integration Android 15 (Old Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-native-integration-old-arch-full"
         timeout_in_minutes: 20
         plugins:
@@ -393,10 +414,9 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/native-integration/old-arch/{{matrix}}/reactnative.apk
               - --farm=bb
-              - --device=ANDROID_13
+              - --device=ANDROID_15
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
               - --tags=@native_integration
@@ -423,9 +443,10 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.81"
 
-      - label: ":bitbar: :android: RN {{matrix}} native integration Android 13 (New Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix}} native integration Android 15 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-native-integration-new-arch-full"
         timeout_in_minutes: 20
         plugins:
@@ -441,10 +462,9 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/native-integration/new-arch/{{matrix}}/reactnative.apk
               - --farm=bb
-              - --device=ANDROID_13
+              - --device=ANDROID_15
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
               - --tags=@native_integration
@@ -471,7 +491,9 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.82"
+          - "0.83"
 
       - label: ":bitbar: :mac: RN {{matrix}} iOS (Old Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-old-arch-full"
@@ -492,7 +514,6 @@ steps:
               - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -518,7 +539,9 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.81"
+         
 
       - label: ":bitbar: :mac: RN {{matrix.reactnative}} iOS (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-new-arch-full"
@@ -539,7 +562,6 @@ steps:
               - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -566,7 +588,9 @@ steps:
               - "0.74"
               - "0.76"
               - "0.78"
-              - "0.79"
+              - "0.80"
+              - "0.82"
+              - "0.83"
             reactnavigation:
               - "true"
           adjustments:
@@ -593,7 +617,6 @@ steps:
               - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
               - --tags=@native_integration
@@ -620,7 +643,8 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.81"
 
       - label: ":bitbar: :mac: RN {{matrix}} native integration iOS (New Arch) end-to-end tests"
         depends_on: "build-react-native-ios-fixture-native-integration-new-arch-full"
@@ -641,7 +665,6 @@ steps:
               - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
               - --tags=@native_integration
@@ -668,4 +691,6 @@ steps:
           - "0.74"
           - "0.76"
           - "0.78"
-          - "0.79"
+          - "0.80"
+          - "0.82"
+          - "0.83"

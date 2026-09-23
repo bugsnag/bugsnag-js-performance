@@ -80,11 +80,13 @@ function getReactNavigationDependencies(reactNativeVersion) {
     case rnVersion >= 0.75:
       reactNavigationVersion = '^6.0.0'
       reactNavigationNativeStackVersion = '^6.0.0'
+      reactNativeSafeAreaContextVersion = '4.14.0'
       reactNativeScreensVersion = '~3.33.0'
       break
     case rnVersion >= 0.74:
       reactNavigationVersion = '^6.0.0'
       reactNavigationNativeStackVersion = '^6.0.0'
+      reactNativeSafeAreaContextVersion = '4.14.0'
       reactNativeScreensVersion = '~3.32.0'
       break
     case rnVersion >= 0.73:
@@ -131,7 +133,7 @@ function getExpoDependencies() {
   return [
     '@bugsnag/react-native',
     '@react-native-community/netinfo',
-    'react-native-file-access',
+    'react-native-file-access@^3.2.0',
     'expo-build-properties',
     'expo-constants'
   ]
