@@ -1,31 +1,17 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Text, View, StyleSheet } from 'react-native'
 import { Navigation } from 'react-native-navigation'
-import BugsnagPerformance from '@bugsnag/react-native-performance'
 import BugsnagPluginReactNativeNavigationPerformance, { CompleteNavigation } from '@bugsnag/plugin-react-native-navigation-performance'
 import { getCurrentCommand } from '../../lib/CommandRunner'
 
 export const initialise = async (config) => {
-  // 1. Explicitly configure sampling endpoint to route to Maze Runner
-  const endpoint = config.endpoint
-  const samplingEndpoint = config.samplingEndpoint ||
-    config.sampling_endpoint ||
-    (endpoint ? endpoint.replace(/\/traces\/?$/, '/sampling') : undefined)
-
-  config.samplingEndpoint = samplingEndpoint
   config.maximumBatchSize = 1
   config.batchInactivityTimeoutMs = 1000
+  config.plugins = [
+    new BugsnagPluginReactNativeNavigationPerformance(Navigation)
+  ]
 
-  // 2. Initialize the RNN plugin and start BugsnagPerformance
-  const rnnPlugin = new BugsnagPluginReactNativeNavigationPerformance(Navigation)
-  config.plugins = [rnnPlugin]
-
-  BugsnagPerformance.start(config)
-
-  // 3. Register all screen components
   registerScreens()
-
-  // 4. Set the root immediately (do NOT wait for registerAppLaunchedListener as it already fired)
   setRootNavigation()
 }
 
@@ -55,7 +41,7 @@ function registerScreens () {
 }
 
 const COMMAND_INTERVAL = 250
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 function useCommandRunner (componentId) {
   const isMounted = useRef(true)
