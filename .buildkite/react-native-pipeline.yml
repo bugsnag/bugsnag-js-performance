@@ -128,7 +128,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/new-arch/{{matrix}}/reactnative.apk
               - --farm=bb
-              - --device=ANDROID_13
+              - --device=ANDROID_15
               - --a11y-locator
               - --fail-fast
               - --no-tunnel
@@ -172,7 +172,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/native-integration/new-arch/{{matrix}}/reactnative.apk
               - --farm=bb
-              - --device=ANDROID_13
+              - --device=ANDROID_15
               - --a11y-locator
               - --fail-fast
               - --no-tunnel
