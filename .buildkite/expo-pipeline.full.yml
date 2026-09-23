@@ -64,7 +64,6 @@ steps:
               - --farm=bb
               - --device=ANDROID_13
               - --a11y-locator
-              - --appium-version=2.19
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -105,7 +104,6 @@ steps:
               - --farm=bb
               - --device=IOS_17|IOS_18|IOS_26
               - --a11y-locator
-              - --appium-version=2.19
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
