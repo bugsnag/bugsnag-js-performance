@@ -1,26 +1,61 @@
-import BugsnagPluginReactNativeNavigationPerformance, { CompleteNavigation } from '@bugsnag/plugin-react-native-navigation-performance'
 import React, { useEffect, useState, useRef } from 'react'
-import { Text, View } from 'react-native'
+import { Text, View, StyleSheet } from 'react-native'
 import { Navigation } from 'react-native-navigation'
+import BugsnagPerformance from '@bugsnag/react-native-performance'
+import BugsnagPluginReactNativeNavigationPerformance, { CompleteNavigation } from '@bugsnag/plugin-react-native-navigation-performance'
 import { getCurrentCommand } from '../../lib/CommandRunner'
 
 export const initialise = async (config) => {
-  // 1. Derive the sampling endpoint so Maze Runner receives sampling requests on BitBar
+  // 1. Explicitly configure sampling endpoint to route to Maze Runner
   const endpoint = config.endpoint
-  config.samplingEndpoint = config.samplingEndpoint ||
+  const samplingEndpoint = config.samplingEndpoint ||
     config.sampling_endpoint ||
     (endpoint ? endpoint.replace(/\/traces\/?$/, '/sampling') : undefined)
 
+  config.samplingEndpoint = samplingEndpoint
   config.maximumBatchSize = 1
-  config.batchInactivityTimeoutMs = 5000
-  config.plugins = [new BugsnagPluginReactNativeNavigationPerformance(Navigation)]
+  config.batchInactivityTimeoutMs = 1000
 
-  // 2. Register screens and set root on AppLaunched
+  // 2. Initialize the RNN plugin and start BugsnagPerformance
+  const rnnPlugin = new BugsnagPluginReactNativeNavigationPerformance(Navigation)
+  config.plugins = [rnnPlugin]
+
+  BugsnagPerformance.start(config)
+
+  // 3. Register all screen components
   registerScreens()
+
+  // 4. Set the root immediately (do NOT wait for registerAppLaunchedListener as it already fired)
+  setRootNavigation()
 }
 
-const COMMAND_INTERVAL = 500
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+function setRootNavigation () {
+  Navigation.setRoot({
+    root: {
+      stack: {
+        children: [
+          {
+            component: {
+              name: 'Screen 1'
+            }
+          }
+        ]
+      }
+    }
+  }).catch((err) => {
+    console.error('[Bugsnag] Failed to set navigation root:', err)
+  })
+}
+
+function registerScreens () {
+  Navigation.registerComponent('Screen 1', () => Screen1)
+  Navigation.registerComponent('Screen 2', () => Screen2)
+  Navigation.registerComponent('Screen 3', () => Screen3)
+  Navigation.registerComponent('Screen 4', () => Screen4)
+}
+
+const COMMAND_INTERVAL = 250
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 function useCommandRunner (componentId) {
   const isMounted = useRef(true)
@@ -28,35 +63,31 @@ function useCommandRunner (componentId) {
   useEffect(() => {
     isMounted.current = true
 
-    async function commandRunner () {
-      if (!isMounted.current) return
+    async function pollCommands () {
+      while (isMounted.current) {
+        try {
+          const command = await getCurrentCommand(Infinity)
+          if (!isMounted.current) break
 
-      console.error(`[Bugsnag] ReactNativeNavigationScenario (${componentId}) waiting for command...`)
-      const command = await getCurrentCommand(Infinity)
-
-      if (!isMounted.current) return
-
-      switch (command.action) {
-        case 'navigate': {
-          const targetScreen = command.screen || command.payload
-          console.error(`[Bugsnag] Navigating to screen: ${targetScreen}`)
-          Navigation.push(componentId, {
-            component: {
-              name: targetScreen
+          if (command && (command.action === 'navigate' || command.command === 'navigate')) {
+            const targetScreen = command.screen || command.payload || command.target
+            if (targetScreen) {
+              await Navigation.push(componentId, {
+                component: {
+                  name: targetScreen
+                }
+              })
+              break
             }
-          })
-          break
-        }
-        default:
-          console.error(`[Bugsnag] Unknown command received: ${JSON.stringify(command)}`)
-          await delay(COMMAND_INTERVAL)
-          if (isMounted.current) {
-            commandRunner()
           }
+        } catch (e) {
+          // Retry polling on timeout or error
+        }
+        await delay(COMMAND_INTERVAL)
       }
     }
 
-    commandRunner()
+    pollCommands()
 
     return () => {
       isMounted.current = false
@@ -64,46 +95,11 @@ function useCommandRunner (componentId) {
   }, [componentId])
 }
 
-export function registerScreens () {
-  Navigation.registerComponent('Screen 1', () => Screen1)
-  Navigation.registerComponent('Screen 2', () => Screen2)
-  Navigation.registerComponent('Screen 3', () => Screen3)
-  Navigation.registerComponent('Screen 4', () => Screen4)
-
-  const setAppRoot = () => {
-    Navigation.setRoot({
-      root: {
-        stack: {
-          children: [
-            {
-              component: {
-                name: 'Screen 1'
-              }
-            }
-          ]
-        }
-      }
-    })
-  }
-
-  // Register listener for initial launch or immediately set root if already launched
-  Navigation.events().registerAppLaunchedListener(() => {
-    setAppRoot()
-  })
-
-  // Also call setAppRoot directly in case the event already fired before initialise
-  try {
-    setAppRoot()
-  } catch (e) {
-    // Ignore if native bridge is still waiting for app launch
-  }
-}
-
 function Screen1 (props) {
   useCommandRunner(props.componentId)
 
   return (
-    <View>
+    <View style={styles.container}>
       <Text>Screen 1</Text>
     </View>
   )
@@ -122,7 +118,7 @@ function Screen2 (props) {
   }, [])
 
   return (
-    <View>
+    <View style={styles.container}>
       <Text>Screen 2</Text>
       <CompleteNavigation on={loaded} />
     </View>
@@ -142,7 +138,7 @@ function Screen3 (props) {
   }, [])
 
   return (
-    <View>
+    <View style={styles.container}>
       <Text>Screen 3</Text>
       {loaded ? <CompleteNavigation on='mount' /> : null}
     </View>
@@ -162,9 +158,17 @@ function Screen4 (props) {
   }, [])
 
   return (
-    <View>
+    <View style={styles.container}>
       <Text>Screen 4</Text>
       {loaded ? null : <CompleteNavigation on='unmount' />}
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
+})
