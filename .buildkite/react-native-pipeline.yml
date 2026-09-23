@@ -112,7 +112,7 @@ steps:
 
        
 
-      - label: ":bitbar: :android: RN {{matrix}} Android 13 (New Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix}} Android 15 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-new-arch"
         timeout_in_minutes: 20
         plugins:
@@ -156,7 +156,7 @@ steps:
 
      
 
-      - label: ":bitbar: :android: RN {{matrix}} native integration Android 13 (New Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix}} native integration Android 15 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-native-integration-new-arch"
         timeout_in_minutes: 20
         plugins:

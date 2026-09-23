@@ -43,7 +43,7 @@ steps:
       #
       # End-to-end tests
       #
-      - label: ":bitbar: :android: Expo {{matrix}} Android 13 end-to-end tests"
+      - label: ":bitbar: :android: Expo {{matrix}} Android 15 end-to-end tests"
         depends_on: "build-expo-apk"
         timeout_in_minutes: 20
         plugins:
