@@ -13,28 +13,30 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
   if (fs.existsSync(androidManifestPath)) {
     let androidManifestContents = fs.readFileSync(androidManifestPath, 'utf8')
 
-    // 1. Ensure INTERNET & ACCESS_NETWORK_STATE permissions exist
+    // 1. Ensure tools namespace exists
+    if (!androidManifestContents.includes('xmlns:tools=')) {
+      androidManifestContents = androidManifestContents.replace(
+        '<manifest',
+        '<manifest\n    xmlns:tools="http://schemas.android.com/tools"'
+      )
+    }
+
+    // 2. Ensure INTERNET & ACCESS_NETWORK_STATE permissions exist
     if (!androidManifestContents.includes('android.permission.INTERNET')) {
-      if (!androidManifestContents.includes('xmlns:tools=')) {
-        androidManifestContents = androidManifestContents.replace(
-          '<manifest',
-          '<manifest\n    xmlns:tools="http://schemas.android.com/tools"'
-        )
-      }
       androidManifestContents = androidManifestContents.replace(
         /<application/,
         '    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <application'
       )
     }
 
-    // 2. Configure cleartext traffic & largeHeap safely without duplicate attributes
-    // Handle RN 0.82+ template placeholder
+    // 3. Handle React Native template placeholder if present
     // eslint-disable-next-line no-template-curly-in-string
     if (androidManifestContents.includes('${usesCleartextTraffic}')) {
       // eslint-disable-next-line no-template-curly-in-string
       androidManifestContents = androidManifestContents.replace(/\$\{usesCleartextTraffic\}/g, 'true')
     }
 
+    // 4. Ensure usesCleartextTraffic="true" is set on <application>
     if (!androidManifestContents.includes('android:usesCleartextTraffic=')) {
       androidManifestContents = androidManifestContents.replace(
         '<application',
@@ -42,6 +44,7 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
       )
     }
 
+    // 5. Ensure largeHeap="true" is set on <application>
     if (!androidManifestContents.includes('android:largeHeap=')) {
       androidManifestContents = androidManifestContents.replace(
         '<application',
@@ -49,7 +52,7 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
       )
     }
 
-    // 3. Link network_security_config for HTTP traffic to Maze Runner (Android 9+)
+    // 6. Ensure networkSecurityConfig is set on <application>
     if (!androidManifestContents.includes('android:networkSecurityConfig=')) {
       androidManifestContents = androidManifestContents.replace(
         '<application',
@@ -57,7 +60,7 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
       )
     }
 
-    // 4. Ensure MainActivity is explicitly exported for Android 12+ / Appium compatibility
+    // 7. Ensure MainActivity is explicitly exported for Android 12+ (API 31+) / Appium 2.x
     if (!androidManifestContents.includes('android:exported="true"')) {
       androidManifestContents = androidManifestContents.replace(
         /<activity\s+android:name="\.MainActivity"/,
@@ -65,7 +68,7 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
       )
     }
 
-    // 5. Ensure MAIN/LAUNCHER intent filter exists on MainActivity if missing
+    // 8. Ensure MAIN & LAUNCHER intent filter is present on MainActivity
     if (!androidManifestContents.includes('android.intent.action.MAIN')) {
       const launcherIntentFilter = `
         <intent-filter>
@@ -81,7 +84,7 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
     fs.writeFileSync(androidManifestPath, androidManifestContents, 'utf8')
   }
 
-  // 6. Ensure res/xml/network_security_config.xml permits cleartext HTTP for Maze Runner
+  // 9. Create res/xml/network_security_config.xml to allow cleartext HTTP to Maze Runner
   const resXmlDir = resolve(fixtureDir, 'android/app/src/main/res/xml')
   if (!fs.existsSync(resXmlDir)) {
     fs.mkdirSync(resXmlDir, { recursive: true })
@@ -99,7 +102,7 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
 `
   fs.writeFileSync(networkSecPath, networkSecContent, 'utf8')
 
-  // 7. Enable/disable the new architecture in gradle.properties
+  // 10. Configure new architecture flag in gradle.properties
   const gradlePropertiesPath = resolve(fixtureDir, 'android/gradle.properties')
   if (fs.existsSync(gradlePropertiesPath)) {
     const gradleProps = fs.readFileSync(gradlePropertiesPath, 'utf8')
@@ -116,7 +119,7 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
 }
 
 /**
- * Configure React Navigation for Android
+ * Configure React Navigation for Android (Old Architecture)
  */
 function configureReactNavigationAndroid (fixtureDir, reactNativeVersion) {
   const basePath = resolve(fixtureDir, 'android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance')
@@ -171,7 +174,7 @@ function configureReactNavigationAndroid (fixtureDir, reactNativeVersion) {
 }
 
 /**
- * Install Android Performance dependency
+ * Install Android Performance dependency into app/build.gradle
  */
 function installAndroidPerformance (fixtureDir) {
   const appGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
@@ -187,7 +190,7 @@ function installAndroidPerformance (fixtureDir) {
 }
 
 /**
- * Install Native Test Utils Android module
+ * Install Native Test Utils module into app/build.gradle and settings.gradle
  */
 function installNativeTestUtilsAndroid (fixtureDir) {
   const appGradlePath = resolve(fixtureDir, 'android/app/build.gradle')
@@ -209,7 +212,7 @@ function installNativeTestUtilsAndroid (fixtureDir) {
 }
 
 /**
- * Configure MainApplication to import BugsnagTestUtils and call startNativePerformance
+ * Configure MainApplication (Java or Kotlin) to import BugsnagTestUtils and initialize native performance
  */
 function configureMainApplicationForTestUtils (fixtureDir, reactNativeVersion) {
   const basePath = resolve(fixtureDir, 'android/app/src/main/java/com/bugsnag/fixtures/reactnative/performance')
