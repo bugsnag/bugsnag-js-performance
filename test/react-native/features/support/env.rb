@@ -1,7 +1,10 @@
 BeforeAll do
-  if Maze.config.farm == :bb
-    Maze.config.android_app_files_directory = '/data/local/tmp'
-  end
+  # Maze Runner defaults to pushing app files into the app's own external files
+  # directory (/sdcard/Android/data/<app id>/files), which the app can always
+  # read. /data/local/tmp was used previously, but it is labelled
+  # shell_data_file under SELinux and is not readable by an untrusted_app
+  # process on recent Android releases, so the fixture never finds the config
+  # and falls back to localhost - meaning no requests ever reach Maze Runner.
   Maze.config.enforce_bugsnag_integrity = false
 
   if ENV["NATIVE_INTEGRATION"]
