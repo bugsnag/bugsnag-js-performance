@@ -29,7 +29,8 @@ const getConfigFileDirectories = () => {
   // MainBundleDir is applicationInfo.dataDir, e.g. '/data/user/0/com.example'
   const packageName = (Dirs.MainBundleDir || '').split('/').filter(Boolean).pop()
 
-  const directories = []
+  // the app's own internal directories are always readable, so try them first
+  const directories = [Dirs.DocumentDir, Dirs.CacheDir].filter(Boolean)
 
   if (packageName) {
     directories.push(`/sdcard/Android/data/${packageName}/files`)
