@@ -1,7 +1,11 @@
 import { Platform } from 'react-native'
 import { Dirs, FileSystem } from 'react-native-file-access'
 
-const TIMEOUT = 60000
+// Keep this below Maze Runner's receive_requests_wait (30s by default) so
+// that, when the config file can't be read, the fallback below is logged
+// while the scenario is still running. At 60s the step timed out first and
+// the log never appeared, which made this failure mode silent.
+const TIMEOUT = 20000
 const CONFIG_FILE_NAME = 'fixture_config.json'
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
