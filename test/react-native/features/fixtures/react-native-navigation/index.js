@@ -1,7 +1,7 @@
-import { launchScenario, launchFromStartupConfig, Scenarios } from '@bugsnag/react-native-performance-scenarios'
 import React, { useEffect } from 'react'
 import { SafeAreaView, StyleSheet, Text } from 'react-native'
 import { Navigation } from 'react-native-navigation'
+import { launchScenario, launchFromStartupConfig, Scenarios } from '@bugsnag/react-native-performance-scenarios'
 
 console.reportErrorsAsExceptions = false
 
@@ -10,7 +10,7 @@ const isStartupTest = launchFromStartupConfig()
 
 const setScenario = (scenarioContext) => {
   const scenario = Scenarios[scenarioContext.name]
-  if (typeof scenario.registerScreens === 'function') {
+  if (typeof scenario?.registerScreens === 'function') {
     scenario.registerScreens()
     return
   }
@@ -22,16 +22,10 @@ const setScenario = (scenarioContext) => {
         name: 'Scenario'
       }
     }
-  })
+  }).catch((err) => console.error('[Bugsnag] Failed to set scenario root:', err))
 }
 
 const App = () => {
-  useEffect(() => {
-    if (!isStartupTest) {
-      launchScenario(setScenario)
-    }
-  }, [])
-
   return (
     <SafeAreaView style={styles.container}>
       <Text>React Native Performance Test App</Text>
@@ -40,17 +34,24 @@ const App = () => {
   )
 }
 
+// 1. Register base component immediately
 Navigation.registerComponent('App', () => App)
 
-Navigation.events().registerAppLaunchedListener(async () => {
+// 2. Set root on app launch
+Navigation.events().registerAppLaunchedListener(() => {
   Navigation.setRoot({
     root: {
       component: {
         name: 'App'
       }
     }
-  })
+  }).catch((err) => console.error('[Bugsnag] Failed to set initial root:', err))
 })
+
+// 3. Always trigger launchScenario outside the listener so command polling starts reliably
+if (!isStartupTest) {
+  launchScenario(setScenario)
+}
 
 const styles = StyleSheet.create({
   container: {

@@ -4,6 +4,13 @@ import { Navigation } from 'react-native-navigation'
 import BugsnagPluginReactNativeNavigationPerformance, { CompleteNavigation } from '@bugsnag/plugin-react-native-navigation-performance'
 import { getCurrentCommand } from '../../lib/CommandRunner'
 
+export function registerScreens () {
+  Navigation.registerComponent('Screen 1', () => Screen1)
+  Navigation.registerComponent('Screen 2', () => Screen2)
+  Navigation.registerComponent('Screen 3', () => Screen3)
+  Navigation.registerComponent('Screen 4', () => Screen4)
+}
+
 export const initialise = async (config) => {
   config.maximumBatchSize = 1
   config.batchInactivityTimeoutMs = 1000
@@ -33,13 +40,6 @@ function setRootNavigation () {
   })
 }
 
-function registerScreens () {
-  Navigation.registerComponent('Screen 1', () => Screen1)
-  Navigation.registerComponent('Screen 2', () => Screen2)
-  Navigation.registerComponent('Screen 3', () => Screen3)
-  Navigation.registerComponent('Screen 4', () => Screen4)
-}
-
 const COMMAND_INTERVAL = 250
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -67,7 +67,7 @@ function useCommandRunner (componentId) {
             }
           }
         } catch (e) {
-          // Retry polling on timeout or error
+          // ignore & retry
         }
         await delay(COMMAND_INTERVAL)
       }
