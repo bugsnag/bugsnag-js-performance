@@ -1,50 +1,74 @@
 import BugsnagPluginReactNativeNavigationPerformance, { CompleteNavigation } from '@bugsnag/plugin-react-native-navigation-performance'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Text, View } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 import { getCurrentCommand } from '../../lib/CommandRunner'
 
 export const initialise = async (config) => {
+    // 1. Explicitly configure sampling endpoint for Maze Runner BitBar / CI
+    const endpoint = config.endpoint
+    config.samplingEndpoint = config.samplingEndpoint ||
+        config.sampling_endpoint ||
+        (endpoint ? endpoint.replace(/\/traces\/?$/, '/sampling') : undefined)
+
     config.maximumBatchSize = 1
     config.batchInactivityTimeoutMs = 5000
     config.plugins = [new BugsnagPluginReactNativeNavigationPerformance(Navigation)]
+
+    // 2. Register all screens and set the initial root stack
+    registerScreens()
 }
 
 const COMMAND_INTERVAL = 500
-
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 function useCommandRunner(componentId) {
+    const isMounted = useRef(true)
+
     useEffect(() => {
+        isMounted.current = true
+
         async function commandRunner() {
-            console.error(`[Bugsnag] ReactNativeNavigationScenario waiting for command...`)
+            if (!isMounted.current) return
+
+            console.error(`[Bugsnag] ReactNativeNavigationScenario (${componentId}) waiting for command...`)
             const command = await getCurrentCommand(Infinity)
 
+            if (!isMounted.current) return
+
             switch (command.action) {
-                case 'navigate':
-                    console.error(`[Bugsnag] Navigating to route ${command.payload}`)
+                case 'navigate': {
+                    const targetScreen = command.screen || command.payload
+                    console.error(`[Bugsnag] Navigating to screen: ${targetScreen}`)
                     Navigation.push(componentId, {
                         component: {
-                            name: command.screen
+                            name: targetScreen
                         }
                     })
                     break
+                }
                 default:
-                    console.error(`Unknown command: ${JSON.stringify(command)}`)
+                    console.error(`[Bugsnag] Unknown command received: ${JSON.stringify(command)}`)
                     await delay(COMMAND_INTERVAL)
-                    commandRunner()
+                    if (isMounted.current) {
+                        commandRunner()
+                    }
             }
         }
 
         commandRunner()
-    }, [])
+
+        return () => {
+            isMounted.current = false
+        }
+    }, [componentId])
 }
 
 export function registerScreens() {
-    Navigation.registerComponent('Screen 1', () => Screen1);
-    Navigation.registerComponent('Screen 2', () => Screen2);
-    Navigation.registerComponent('Screen 3', () => Screen3);
-    Navigation.registerComponent('Screen 4', () => Screen4);
+    Navigation.registerComponent('Screen 1', () => Screen1)
+    Navigation.registerComponent('Screen 2', () => Screen2)
+    Navigation.registerComponent('Screen 3', () => Screen3)
+    Navigation.registerComponent('Screen 4', () => Screen4)
 
     Navigation.setRoot({
         root: {
@@ -77,9 +101,10 @@ function Screen2(props) {
     const [loaded, setLoaded] = useState(false)
 
     useEffect(() => {
-        setTimeout(() => {
+        const timer = setTimeout(() => {
             setLoaded(true)
         }, 50)
+        return () => clearTimeout(timer)
     }, [])
 
     return (
@@ -96,9 +121,10 @@ function Screen3(props) {
     const [loaded, setLoaded] = useState(false)
 
     useEffect(() => {
-        setTimeout(() => {
+        const timer = setTimeout(() => {
             setLoaded(true)
         }, 50)
+        return () => clearTimeout(timer)
     }, [])
 
     return (
@@ -115,9 +141,10 @@ function Screen4(props) {
     const [loaded, setLoaded] = useState(false)
 
     useEffect(() => {
-        setTimeout(() => {
+        const timer = setTimeout(() => {
             setLoaded(true)
         }, 50)
+        return () => clearTimeout(timer)
     }, [])
 
     return (

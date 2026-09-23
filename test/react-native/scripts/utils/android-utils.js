@@ -4,7 +4,8 @@ const { ROOT_DIR } = require('./constants')
 const { replaceInFile, appendToFileIfNotExists } = require('./file-utils')
 
 /**
- * Configure Android project settings
+ * Configure Android project settings including permissions, cleartext HTTP,
+ * network security config for Maze Runner, exported activity flags, and architecture.
  */
 function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersion) {
   const androidManifestPath = resolve(fixtureDir, 'android/app/src/main/AndroidManifest.xml')
@@ -48,7 +49,7 @@ function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersi
       )
     }
 
-    // 3. Link network_security_config for HTTP traffic to Maze Runner
+    // 3. Link network_security_config for HTTP traffic to Maze Runner (Android 9+)
     if (!androidManifestContents.includes('android:networkSecurityConfig=')) {
       androidManifestContents = androidManifestContents.replace(
         '<application',

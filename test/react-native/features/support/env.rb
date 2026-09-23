@@ -20,7 +20,7 @@ BeforeAll do
 end
 
 Before do
-  # Fallback for BitBar when Maze Runner cannot infer app_id from the artifact
+  # Fallback for BitBar / Appium 2.x when Maze Runner cannot infer app_id from the artifact
   if Maze.driver && Maze.driver.respond_to?(:app_id=)
     current_app_id = Maze.driver.respond_to?(:app_id) ? Maze.driver.app_id : nil
     if current_app_id.nil? || current_app_id.empty?
@@ -73,6 +73,7 @@ Before('@android_only') do |_scenario|
   skip_this_scenario('Skipping scenario: Not running Android fixture') unless Maze::Helper.get_current_platform == 'android'
 end
 
+# Native app start tests are skipped on RN 0.72 iOS due to absence of the RCTAppDelegate methods overridden for custom root view controller
 Before('@native_app_starts') do |_scenario|
   current_version = ENV['RN_VERSION'].nil? ? 0 : ENV['RN_VERSION'].to_f
   skip_this_scenario('Skipping scenario: Not running native integration fixture') unless env_truthy?('NATIVE_INTEGRATION')
