@@ -7,6 +7,7 @@ import { Dirs, FileSystem } from 'react-native-file-access'
 // the log never appeared, which made this failure mode silent.
 const TIMEOUT = 20000
 const CONFIG_FILE_NAME = 'fixture_config.json'
+const FALLBACK_ADDRESS = 'localhost:9339'
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -64,26 +65,37 @@ const findConfigFile = async directories => {
   return null
 }
 
-const getMazeRunnerAddress = async () => {
+const getMazeRunnerAddress = async (timeout = TIMEOUT) => {
   const directories = getConfigFileDirectories()
   const startTime = Date.now()
 
-  // poll for the config file to exist
-  while (Date.now() - startTime < TIMEOUT) {
+  // poll for the config file to exist. A timeout of 0 still checks once, which
+  // lets callers re-read the file cheaply to pick up a newer address
+  while (true) {
     const configFilePath = await findConfigFile(directories)
 
     if (configFilePath) {
-      const configFile = await FileSystem.readFile(configFilePath)
-      console.error(`[BugsnagPerformance] found config file at '${configFilePath}'. contents: ${configFile}`)
-      const config = JSON.parse(configFile)
-      return `${config.maze_address}`
+      try {
+        const configFile = await FileSystem.readFile(configFilePath)
+        const config = JSON.parse(configFile)
+
+        if (config && config.maze_address) {
+          console.error(`[BugsnagPerformance] found config file at '${configFilePath}'. contents: ${configFile}`)
+          return `${config.maze_address}`
+        }
+      } catch (e) {
+        // unreadable or malformed - fall through and try again
+      }
     }
+
+    if (Date.now() - startTime >= timeout) break
 
     await delay(500)
   }
 
-  console.error(`[BugsnagPerformance] no config file found in any of ${directories.join(', ')}, falling back to 'localhost:9339'`)
-  return 'localhost:9339'
+  console.error(`[BugsnagPerformance] no config file found in any of ${directories.join(', ')}, falling back to '${FALLBACK_ADDRESS}'`)
+  return FALLBACK_ADDRESS
 }
 
 module.exports.getMazeRunnerAddress = getMazeRunnerAddress
+module.exports.FALLBACK_ADDRESS = FALLBACK_ADDRESS
