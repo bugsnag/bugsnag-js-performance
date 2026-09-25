@@ -11,6 +11,10 @@ export function registerScreens () {
   Navigation.registerComponent('Screen 4', () => Screen4)
 }
 
+export function startScenario () {
+  setRootNavigation()
+}
+
 export const initialise = async (config) => {
   config.maximumBatchSize = 1
   config.batchInactivityTimeoutMs = 1000
@@ -19,6 +23,9 @@ export const initialise = async (config) => {
   ]
 
   registerScreens()
+}
+
+export const postInitialise = async () => {
   setRootNavigation()
 }
 
@@ -67,7 +74,7 @@ function useCommandRunner (componentId) {
             }
           }
         } catch (e) {
-          // ignore & retry
+          // retry
         }
         await delay(COMMAND_INTERVAL)
       }

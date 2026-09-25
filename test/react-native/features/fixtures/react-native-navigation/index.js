@@ -1,17 +1,25 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { SafeAreaView, StyleSheet, Text } from 'react-native'
 import { Navigation } from 'react-native-navigation'
 import { launchScenario, launchFromStartupConfig, Scenarios } from '@bugsnag/react-native-performance-scenarios'
 
 console.reportErrorsAsExceptions = false
 
-// Check if launched from a saved startup config (e.g. cold relaunch in AppStartScenario)
 const isStartupTest = launchFromStartupConfig()
 
 const setScenario = (scenarioContext) => {
   const scenario = Scenarios[scenarioContext.name]
   if (typeof scenario?.registerScreens === 'function') {
     scenario.registerScreens()
+  }
+
+  if (typeof scenario?.postInitialise === 'function') {
+    scenario.postInitialise()
+    return
+  }
+
+  if (typeof scenario?.startScenario === 'function') {
+    scenario.startScenario()
     return
   }
 
@@ -34,10 +42,8 @@ const App = () => {
   )
 }
 
-// 1. Register base component immediately
 Navigation.registerComponent('App', () => App)
 
-// 2. Set root on app launch
 Navigation.events().registerAppLaunchedListener(() => {
   Navigation.setRoot({
     root: {
@@ -48,7 +54,6 @@ Navigation.events().registerAppLaunchedListener(() => {
   }).catch((err) => console.error('[Bugsnag] Failed to set initial root:', err))
 })
 
-// 3. Always trigger launchScenario outside the listener so command polling starts reliably
 if (!isStartupTest) {
   launchScenario(setScenario)
 }
