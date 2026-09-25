@@ -4,17 +4,25 @@ import { NativeScenarioLauncher } from '../../lib/native'
 
 export const initialise = async (config) => {
   const startupConfig = {
+    native: {
+      apiKey: config.apiKey,
+      endpoint: config.endpoint,
+      autoInstrumentAppStarts: true,
+      autoInstrumentViewLoads: false,
+      ...(config.native || {})
+    },
     reactNative: {
       apiKey: config.apiKey,
       endpoint: config.endpoint,
       autoInstrumentAppStarts: true,
       autoInstrumentNetworkRequests: false,
-      maximumBatchSize: 1
+      maximumBatchSize: 1,
+      ...(config.reactNative || {})
     }
   }
 
-  NativeScenarioLauncher.saveStartupConfig(startupConfig)
-  NativeScenarioLauncher.exitApp()
+  await NativeScenarioLauncher.saveStartupConfig(startupConfig)
+  await NativeScenarioLauncher.exitApp()
 }
 
 export const App = () => {
