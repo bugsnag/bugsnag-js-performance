@@ -1,20 +1,27 @@
 import React from 'react'
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 import { NativeScenarioLauncher } from '../../lib/native'
+import BugsnagPerformance from '@bugsnag/react-native-performance'
 
 export const initialise = async (config) => {
-  const startupConfig = {
-    reactNative: {
-      apiKey: config.apiKey,
-      endpoint: config.endpoint,
-      autoInstrumentAppStarts: true,
-      autoInstrumentNetworkRequests: false,
-      maximumBatchSize: 1
-    }
+const startupConfig = {
+  scenario: 'AppStartScenario',
+  native: {
+    apiKey: config.apiKey,
+    endpoint: config.endpoint,
+    autoInstrumentAppStarts: true,
+    autoInstrumentViewLoads: false
+  },
+  reactNative: {
+    apiKey: config.apiKey,
+    endpoint: config.endpoint,
+    autoInstrumentAppStarts: true,
+    maximumBatchSize: 1
   }
+}
 
-  NativeScenarioLauncher.saveStartupConfig(startupConfig)
-  NativeScenarioLauncher.exitApp()
+  await NativeScenarioLauncher.saveStartupConfig(startupConfig)
+  await NativeScenarioLauncher.exitApp()
 }
 
 export const App = () => {

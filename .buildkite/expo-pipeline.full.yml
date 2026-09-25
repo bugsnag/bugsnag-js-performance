@@ -22,8 +22,8 @@ steps:
           - bundle install
           - node test/react-native/scripts/generate-expo-fixture.js
         matrix:
-          - "53"
-          - "52"
+          - "57"
+          - "56"
 
       - label:  ':mac: Build Expo {{matrix}} IPA'
         key: "build-expo-ipa-full"
@@ -40,13 +40,13 @@ steps:
           - bundle install
           - node test/react-native/scripts/generate-expo-fixture.js
         matrix:
-          - "53"
-          - "52"
+          - "57"
+          - "56"
 
       #
       # End-to-end tests
       #
-      - label: ":bitbar: :android: Expo {{matrix}} Android 13 end-to-end tests"
+      - label: ":bitbar: :android: Expo {{matrix}} Android 15 end-to-end tests"
         depends_on: "build-expo-apk-full"
         timeout_in_minutes: 20
         plugins:
@@ -64,7 +64,6 @@ steps:
               - --farm=bb
               - --device=ANDROID_13
               - --a11y-locator
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -84,8 +83,8 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "53"
-          - "52"
+          - "56"
+          - "57"
 
       - label: ":bitbar: :mac: Expo {{matrix}} iOS end-to-end tests"
         depends_on: "build-expo-ipa-full"
@@ -103,9 +102,8 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.ipa
               - --farm=bb
-              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
+              - --device=IOS_17|IOS_18|IOS_26
               - --a11y-locator
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -125,5 +123,5 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "53"
-          - "52"
+          - "57"
+          - "56"

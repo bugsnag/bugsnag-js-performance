@@ -7,19 +7,24 @@ const { replaceInFile, appendToFileIfNotExists } = require('./file-utils')
  * Configure Android project settings
  */
 function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersion) {
-  // set android:usesCleartextTraffic="true" in AndroidManifest.xml
+  // set android:usesCleartextTraffic="true" and android:largeHeap="true" in AndroidManifest.xml
   const androidManifestPath = `${fixtureDir}/android/app/src/main/AndroidManifest.xml`
-  //replaceInFile(androidManifestPath, '<application', '<application android:usesCleartextTraffic="true" android:largeHeap="true"')
-        let androidManifestContents = fs.readFileSync(androidManifestPath, 'utf8')
-         // RN 0.82+ uses a manifest placeholder that's autoconfigured by the RN gradle plugin
+  let androidManifestContents = fs.readFileSync(androidManifestPath, 'utf8')
+
+  // RN 0.82+ declares usesCleartextTraffic via a manifest placeholder that the
+  // RN gradle plugin fills in, so the attribute is already present and has to
+  // be set through the placeholder rather than added to the <application> tag
+  // eslint-disable-next-line no-template-curly-in-string
+  if (androidManifestContents.includes('${usesCleartextTraffic}')) {
     // eslint-disable-next-line no-template-curly-in-string
-    if (androidManifestContents.includes('${usesCleartextTraffic}')) {
-      // eslint-disable-next-line no-template-curly-in-string
-      androidManifestContents = androidManifestContents.replace('${usesCleartextTraffic}', 'true')
-    } else {
-      androidManifestContents = androidManifestContents.replace('<application', '<application android:usesCleartextTraffic="true" android:largeHeap="true"')
-    }
-        fs.writeFileSync(androidManifestPath, androidManifestContents)
+    androidManifestContents = androidManifestContents.replace('${usesCleartextTraffic}', 'true')
+    androidManifestContents = androidManifestContents.replace('<application', '<application android:largeHeap="true"')
+  } else {
+    androidManifestContents = androidManifestContents.replace('<application', '<application android:usesCleartextTraffic="true" android:largeHeap="true"')
+  }
+
+  fs.writeFileSync(androidManifestPath, androidManifestContents)
+
   // enable/disable the new architecture in gradle.properties
   const gradlePropertiesPath = `${fixtureDir}/android/gradle.properties`
   replaceInFile(gradlePropertiesPath, /newArchEnabled\s*=\s*(true|false)/, `newArchEnabled=${isNewArchEnabled}`)

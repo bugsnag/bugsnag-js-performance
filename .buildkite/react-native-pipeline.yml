@@ -112,7 +112,7 @@ steps:
 
        
 
-      - label: ":bitbar: :android: RN {{matrix}} Android 13 (New Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix}} Android 14 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-new-arch"
         timeout_in_minutes: 20
         plugins:
@@ -128,10 +128,9 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/new-arch/{{matrix}}/reactnative.apk
               - --farm=bb
-              - --device=ANDROID_13
+              - --device=ANDROID_14
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -157,7 +156,7 @@ steps:
 
      
 
-      - label: ":bitbar: :android: RN {{matrix}} native integration Android 13 (New Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix}} native integration Android 14 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-native-integration-new-arch"
         timeout_in_minutes: 20
         plugins:
@@ -173,10 +172,9 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/native-integration/new-arch/{{matrix}}/reactnative.apk
               - --farm=bb
-              - --device=ANDROID_13
+              - --device=ANDROID_14
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
               - --tags=@native_integration
@@ -219,10 +217,9 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/new-arch/{{matrix}}/output/reactnative.ipa
               - --farm=bb
-              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
+              - --device=IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -264,10 +261,9 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/native-integration/new-arch/{{matrix}}/output/reactnative.ipa
               - --farm=bb
-              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
+              - --device=IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
               - --tags=@native_integration
