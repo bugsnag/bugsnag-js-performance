@@ -89,11 +89,27 @@ export async function getCurrentCommand (allowedRetries = DEFAULT_RETRY_COUNT) {
       const text = await response.text()
       console.error(`[BugsnagPerformance] Response from maze runner: ${text}`)
 
-      const command = JSON.parse(text)
-      lastCommandUuid = command.uuid
+      if (!response.ok) {
+        // maze runner answers 400 when it no longer knows the uuid we are
+        // following on from, e.g. because its command list was reset while
+        // this process kept running. Start again from the front of the queue
+        // rather than repeating a request that can never succeed
+        if (response.status === 400 && lastCommandUuid) {
+          console.error(`[BugsnagPerformance] maze runner does not recognise command '${lastCommandUuid}', restarting from the first command`)
+          lastCommandUuid = undefined
+        }
 
-      // keep polling until a scenario command is received
+        throw new Error(`unexpected ${response.status} response: ${text}`)
+      }
+
+      const command = JSON.parse(text)
+
+      // keep polling until a scenario command is received. A 'noop' has no uuid,
+      // so the cursor must not be touched here: clearing it would make the next
+      // poll ask for everything 'after' nothing, and maze runner would replay
+      // the very first command of the scenario
       if (command.action !== 'noop') {
+        lastCommandUuid = command.uuid
         console.error(`[BugsnagPerformance] Received command from maze runner: ${JSON.stringify(command)}`)
 
         return command
