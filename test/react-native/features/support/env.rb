@@ -1,3 +1,5 @@
+require 'fileutils'
+
 FIXTURE_CONFIG_FILENAME = 'fixture_config.json'
 
 # Where Maze Runner pushes fixture_config.json on Android devices in BitBar.
@@ -61,6 +63,43 @@ Maze.hooks.before do |_scenario|
   if Maze.config.farm == :bb
     run_android_shell_command('chmod', ['644', "#{ANDROID_FIXTURE_CONFIG_DIRECTORY}/#{FIXTURE_CONFIG_FILENAME}"])
   end
+end
+
+# When an Appium scenario fails, capture what the automation layer could see at
+# the time so that element lookup failures can be diagnosed from the Buildkite
+# artifacts rather than guessed at: the page source, a summary of the
+# accessibility ids and resource ids it contains, and a screenshot. All of it is
+# best-effort and can never fail the run.
+def capture_failure_diagnostics(scenario)
+  return unless Maze.mode == :appium
+  return if Maze.driver.nil? || Maze.driver.failed?
+
+  folder = Maze::MazeOutput.new(scenario).output_folder
+  FileUtils.makedirs(folder)
+
+  begin
+    source = Maze.driver.page_source
+    File.write(File.join(folder, 'page_source.xml'), source)
+
+    accessibility_ids = source.scan(/content-desc="([^"]+)"/).flatten.uniq
+    resource_ids = source.scan(/resource-id="([^"]+)"/).flatten.uniq
+    $logger.info "Accessibility ids visible to Appium when the scenario failed: #{accessibility_ids.empty? ? '(none)' : accessibility_ids.join(', ')}"
+    $logger.info "Resource ids visible to Appium when the scenario failed: #{resource_ids.empty? ? '(none)' : resource_ids.join(', ')}"
+  rescue StandardError => e
+    $logger.warn "Unable to capture the page source: #{e.message}"
+  end
+
+  begin
+    # Maze::Driver::Appium does not expose the underlying Selenium driver
+    Maze.driver.instance_variable_get(:@driver).save_screenshot(File.join(folder, 'screenshot.png'))
+    $logger.info "Screenshot saved to #{folder}"
+  rescue StandardError => e
+    $logger.warn "Unable to capture a screenshot: #{e.message}"
+  end
+end
+
+Maze.hooks.after do |scenario|
+  capture_failure_diagnostics(scenario) if scenario.failed?
 end
 
 BeforeAll do
