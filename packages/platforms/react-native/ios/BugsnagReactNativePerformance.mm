@@ -370,9 +370,14 @@ RCT_EXPORT_METHOD(endNativeSpan:(NSString *)spanId
         // We need to reinstate the bugsnag.sampling.p attribute here as it might not be re-populated on span end
         nativeSpan.attributes[@"bugsnag.sampling.p"] = @(nativeSpan.samplingProbability);
         
-        // If the end time is later than the current end time, update it
+        // If the span has no end time yet, or the end time is later than the current end time, update it.
+        // Since BugsnagPerformance 3.0.0 a span that has not been ended reports an invalid (NaN) end time
+        // rather than a zero one, and any comparison involving NaN is false - so it has to be checked for
+        // explicitly, otherwise the span is sent for processing with no end time at all
         NSDate *nativeEndTime = [NSDate dateWithTimeIntervalSince1970: endTime / NSEC_PER_SEC];
-        if ([nativeEndTime timeIntervalSinceDate:nativeSpan.endTime] > 0) {
+        NSDate *currentEndTime = nativeSpan.endTime;
+        BOOL hasEndTime = currentEndTime != nil && !isnan([currentEndTime timeIntervalSinceReferenceDate]);
+        if (!hasEndTime || [nativeEndTime timeIntervalSinceDate:currentEndTime] > 0) {
             [nativeSpan markEndTime:nativeEndTime];
         }
         
