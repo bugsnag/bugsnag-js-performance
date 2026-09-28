@@ -117,6 +117,7 @@ steps:
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
+            step: "build-react-native-android-fixture-new-arch"
             download: "test/react-native/features/fixtures/generated/new-arch/{{matrix}}/reactnative.apk"
             upload:
               - "./test/react-native/maze_output/failed/*"
@@ -161,6 +162,7 @@ steps:
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
+            step: "build-react-native-android-fixture-native-integration-new-arch"
             download: "test/react-native/features/fixtures/generated/native-integration/new-arch/{{matrix}}/reactnative.apk"
             upload:
               - "./test/react-native/maze_output/failed/*"
@@ -206,6 +208,7 @@ steps:
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
+            step: "build-react-native-ios-fixture-new-arch"
             download: "test/react-native/features/fixtures/generated/new-arch/{{matrix}}/output/reactnative.ipa"
             upload:
               - "./test/react-native/maze_output/failed/*"
@@ -250,6 +253,7 @@ steps:
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
+            step: "build-react-native-ios-fixture-native-integration-new-arch"
             download: "test/react-native/features/fixtures/generated/native-integration/new-arch/{{matrix}}/output/reactnative.ipa"
             upload:
               - "./test/react-native/maze_output/failed/*"
