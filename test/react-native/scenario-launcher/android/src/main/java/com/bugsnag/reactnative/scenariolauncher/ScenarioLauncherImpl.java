@@ -1,7 +1,11 @@
 package com.bugsnag.reactnative.scenariolauncher;
 
-import android.util.Log;
+import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Process;
+import android.util.Log;
 
 import com.bugsnag.android.Bugsnag;
 import com.bugsnag.android.Configuration;
@@ -131,7 +135,22 @@ class ScenarioLauncherImpl {
   }
 
   public void exitApp() {
-    System.exit(0);
+    new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          Activity currentActivity = reactContext.getCurrentActivity();
+          if (currentActivity != null) {
+            currentActivity.finishAffinity();
+          }
+        } catch (Exception e) {
+          Log.e(MODULE_NAME, "Failed to finish activity", e);
+        } finally {
+          Process.killProcess(Process.myPid());
+          System.exit(0);
+        }
+      }
+    }, 100);
   }
 
   public void startNativePerformance(ReadableMap configuration, Promise promise) {

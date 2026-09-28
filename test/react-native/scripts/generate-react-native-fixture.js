@@ -44,6 +44,61 @@ const {
 const { configureRN064Fixture } = require('./utils/rn-064-config')
 const { buildAndroidFixture, buildIOSFixture } = require('./utils/platform-builds')
 
+// Helper to determine the matching @react-native-community/cli version
+function getCliVersion(rnVersion) {
+  const minor = parseInt(rnVersion.split('.')[1], 10)
+  if (minor <= 72) return '11'
+  if (minor === 73) return '12'
+  if (minor === 74) return '13'
+  if (minor === 75) return '14'
+  if (minor === 76) return '15'
+  if (minor === 77) return '16'
+  if (minor === 78 || minor === 79) return '17'
+  if (minor >= 80 && minor <= 83) return '18'
+  return '19' // RN 0.84+
+}
+
+// Clean and patch Podfile for target React Native versions
+function patchPodfile(fixtureDir, rnVersion) {
+  const minor = parseInt(rnVersion.split('.')[1], 10)
+  const podfilePath = resolve(fixtureDir, 'ios', 'Podfile')
+
+  if (!fs.existsSync(podfilePath)) return
+
+  let podfile = fs.readFileSync(podfilePath, 'utf8')
+
+  // 1. Older RN versions (< 0.73): Clean unsupported parameters
+  if (minor <= 72) {
+    podfile = podfile
+      .split('\n')
+      .filter(line => !line.includes('quirks_mode'))
+      .join('\n')
+      .replace(/,(\s*\))/g, '$1')
+  }
+
+  // 2. Modern RN versions (>= 0.80): Ensure deployment target is >= 15.1 and script sandboxing is disabled
+  if (minor >= 80) {
+    const postInstallTargetBlock = `
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1'
+        config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+      end
+    end`
+
+    if (podfile.includes('post_install do |installer|')) {
+      if (!podfile.includes("IPHONEOS_DEPLOYMENT_TARGET")) {
+        podfile = podfile.replace(
+          'post_install do |installer|',
+          `post_install do |installer|${postInstallTargetBlock}`
+        )
+      }
+    }
+  }
+
+  fs.writeFileSync(podfilePath, podfile, 'utf8')
+}
+
 // Validate environment variables
 validateEnvironment({
   RN_VERSION: {
@@ -108,9 +163,13 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   // Remove existing fixture directory
   cleanDirectory(fixtureDir)
 
+  // Determine appropriate CLI version and arguments
+  const cliVersion = getCliVersion(reactNativeVersion)
+  const minor = parseInt(reactNativeVersion.split('.')[1], 10)
+
   // Create the test fixture
   const RNInitArgs = [
-    '@react-native-community/cli@16',
+    `@react-native-community/cli@${cliVersion}`,
     'init',
     'reactnative',
     '--package-name',
@@ -119,10 +178,15 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     fixtureDir,
     '--version',
     reactNativeVersion,
-    '--pm',
-    'npm',
     '--skip-install'
   ]
+
+  if (minor >= 74) {
+    RNInitArgs.push('--pm', 'npm')
+  } else {
+    RNInitArgs.push('--npm')
+  }
+
   execFileSync('npx', RNInitArgs, { stdio: 'inherit' })
 
   // Configure fixture files and projects
@@ -130,7 +194,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   configureAndroidProject(fixtureDir, isNewArchEnabled, reactNativeVersion)
   configureIOSProject(fixtureDir, reactNativeVersion)
 
-  // install native test utils
+  // Install native test utils
   installNativeTestUtilsAndroid(fixtureDir)
   installNativeTestUtilsIOS(fixtureDir)
 
@@ -158,6 +222,9 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     configureReactNativeNavigation(fixtureDir)
   }
 }
+
+// Patch Podfile for target RN version before building
+patchPodfile(fixtureDir, reactNativeVersion)
 
 // Build platform fixtures
 buildAndroidFixture(fixtureDir, isNewArchEnabled)

@@ -4,9 +4,18 @@
 #import <BugsnagPerformance/BugsnagPerformance.h>
 #import <BugsnagPerformance/BugsnagPerformanceConfiguration+Private.h>
 #import <BugsnagPerformance/BugsnagPerformanceSpanContext.h>
+
+// Support both framework modular imports and local header search paths
+#if __has_include(<BugsnagReactNativePerformance/BugsnagNativeSpansPlugin.h>)
+#import <BugsnagReactNativePerformance/BugsnagNativeSpansPlugin.h>
+#import <BugsnagReactNativePerformance/BugsnagJavascriptSpansPlugin.h>
+#import <BugsnagReactNativePerformance/BugsnagReactNativeAppStartPlugin.h>
+#else
 #import "BugsnagNativeSpansPlugin.h"
 #import "BugsnagJavascriptSpansPlugin.h"
 #import "BugsnagReactNativeAppStartPlugin.h"
+#endif
+
 #endif
 
 @implementation BugsnagTestUtils
@@ -36,23 +45,43 @@
         return nil;
     }
     
-    NSDictionary *config = [defaults dictionaryForKey:@"startupConfig"];
-    if (!config) {
-        NSLog(@"[BugsnagTestUtils] Configuration flag set but no configuration dictionary found");
+    id configObj = [defaults objectForKey:@"startupConfig"];
+    if (!configObj) {
+        NSLog(@"[BugsnagTestUtils] Configuration flag set but no configuration found in NSUserDefaults");
         return nil;
     }
     
-    NSLog(@"[BugsnagTestUtils] Read startup configuration: %@", config);
-
-    return config;
+    // Handle both NSDictionary and JSON NSString representations
+    if ([configObj isKindOfClass:[NSDictionary class]]) {
+        NSLog(@"[BugsnagTestUtils] Read startup configuration dictionary: %@", configObj);
+        return (NSDictionary *)configObj;
+    } else if ([configObj isKindOfClass:[NSString class]]) {
+        NSData *data = [(NSString *)configObj dataUsingEncoding:NSUTF8StringEncoding];
+        if (data) {
+            NSError *error = nil;
+            id parsed = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+            if ([parsed isKindOfClass:[NSDictionary class]]) {
+                NSLog(@"[BugsnagTestUtils] Read startup configuration from JSON string: %@", parsed);
+                return (NSDictionary *)parsed;
+            } else if (error) {
+                NSLog(@"[BugsnagTestUtils] Error parsing startup configuration JSON: %@", error);
+            }
+        }
+    }
+    
+    return nil;
 }
 
 + (void)saveStartupConfig:(NSDictionary *)configuration {
+    if (!configuration || ![configuration isKindOfClass:[NSDictionary class]]) {
+        return;
+    }
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
     [defaults setBool:YES forKey:@"configured"];
     [defaults setObject:configuration forKey:@"startupConfig"];
     [defaults synchronize];
+    NSLog(@"[BugsnagTestUtils] Saved startup configuration: %@", configuration);
 }
 
 + (void)clearStartupConfig {
@@ -60,69 +89,85 @@
     [defaults setBool:NO forKey:@"configured"];
     [defaults removeObjectForKey:@"startupConfig"];
     [defaults synchronize];
+    NSLog(@"[BugsnagTestUtils] Cleared startup configuration");
 }
 
 + (BOOL)startNativePerformanceWithConfiguration:(NSDictionary *)configuration {
-    #ifdef NATIVE_INTEGRATION
-        @try {
-            NSLog(@"[BugsnagTestUtils] Starting native performance with configuration: %@", configuration);
-            
-            BugsnagPerformanceConfiguration *config = [BugsnagPerformanceConfiguration loadConfig];
-
-            NSString *apiKey = configuration[@"apiKey"];
-            NSString *endpoint = configuration[@"endpoint"];
-
-            // get autoInstrumentAppStarts boolean value from configuration dictionary
-            BOOL autoInstrumentAppStarts = [configuration[@"autoInstrumentAppStarts"] boolValue];
-            BOOL autoInstrumentViewLoads = [configuration[@"autoInstrumentViewLoads"] boolValue];
-
-            config.apiKey = apiKey;
-            config.endpoint = [[NSURL alloc] initWithString:endpoint];
-            config.autoInstrumentAppStarts = autoInstrumentAppStarts;
-            config.autoInstrumentViewControllers = autoInstrumentViewLoads;
-            config.autoInstrumentNetworkRequests = NO;
-            config.internal.autoTriggerExportOnBatchSize = 1;
-            config.internal.clearPersistenceOnStart = YES;
-
-            if (configuration[@"samplingProbability"]) {
-                config.samplingProbability = configuration[@"samplingProbability"];
-            }
-
-            if (configuration[@"enabledMetrics"]) {
-                NSDictionary *metricsConfig = configuration[@"enabledMetrics"];
-                config.enabledMetrics.rendering = [metricsConfig[@"rendering"] boolValue];
-                config.enabledMetrics.cpu = [metricsConfig[@"cpu"] boolValue];
-                config.enabledMetrics.memory = [metricsConfig[@"memory"] boolValue];
-            } else {
-                config.enabledMetrics.cpu = YES;
-                config.enabledMetrics.memory = YES;
-                config.enabledMetrics.rendering = YES;
-            }
-
-            if (!configuration[@"nativeSpans"] || [configuration[@"nativeSpans"] boolValue]) {
-                [config addPlugin:[BugsnagNativeSpansPlugin new]];
-            }
-            if (!configuration[@"jsSpans"] || [configuration[@"jsSpans"] boolValue]) {
-                [config addPlugin:[BugsnagJavascriptSpansPlugin new]];
-            }
-            if (!configuration[@"nativeAppStarts"] || [configuration[@"nativeAppStarts"] boolValue]) {
-                [config addPlugin:[BugsnagReactNativeAppStartPlugin new]];
-            }
-
-            [BugsnagPerformance startWithConfiguration:config];
-            
-            NSLog(@"[BugsnagTestUtils] Native performance started successfully");
-            
-            return YES;
-        } @catch (NSException *exception) {
-            NSLog(@"[BugsnagTestUtils] Failed to start native performance: %@", exception);
+#ifdef NATIVE_INTEGRATION
+    @try {
+        if (!configuration || ![configuration isKindOfClass:[NSDictionary class]]) {
+            NSLog(@"[BugsnagTestUtils] Invalid or null configuration passed to startNativePerformance");
             return NO;
         }
-    #else
-        NSLog(@"[BugsnagTestUtils] Native integration not enabled, cannot start native performance");
+
+        NSLog(@"[BugsnagTestUtils] Starting native performance with configuration: %@", configuration);
+        
+        BugsnagPerformanceConfiguration *config = [BugsnagPerformanceConfiguration loadConfig];
+
+        id apiKey = configuration[@"apiKey"];
+        if ([apiKey isKindOfClass:[NSString class]] && [(NSString *)apiKey length] > 0) {
+            config.apiKey = (NSString *)apiKey;
+        }
+
+        id endpoint = configuration[@"endpoint"];
+        if ([endpoint isKindOfClass:[NSString class]] && [(NSString *)endpoint length] > 0) {
+            config.endpoint = [NSURL URLWithString:(NSString *)endpoint];
+        }
+
+        if (configuration[@"autoInstrumentAppStarts"] != nil && configuration[@"autoInstrumentAppStarts"] != [NSNull null]) {
+            config.autoInstrumentAppStarts = [configuration[@"autoInstrumentAppStarts"] boolValue];
+        } else {
+            config.autoInstrumentAppStarts = YES;
+        }
+
+        if (configuration[@"autoInstrumentViewLoads"] != nil && configuration[@"autoInstrumentViewLoads"] != [NSNull null]) {
+            config.autoInstrumentViewControllers = [configuration[@"autoInstrumentViewLoads"] boolValue];
+        } else {
+            config.autoInstrumentViewControllers = NO;
+        }
+
+        config.autoInstrumentNetworkRequests = NO;
+        config.internal.autoTriggerExportOnBatchSize = 1;
+        config.internal.clearPersistenceOnStart = YES;
+
+        if (configuration[@"samplingProbability"] != nil && configuration[@"samplingProbability"] != [NSNull null]) {
+            config.samplingProbability = [configuration[@"samplingProbability"] doubleValue];
+        }
+
+        if ([configuration[@"enabledMetrics"] isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *metricsConfig = (NSDictionary *)configuration[@"enabledMetrics"];
+            config.enabledMetrics.rendering = [metricsConfig[@"rendering"] boolValue];
+            config.enabledMetrics.cpu = [metricsConfig[@"cpu"] boolValue];
+            config.enabledMetrics.memory = [metricsConfig[@"memory"] boolValue];
+        } else {
+            config.enabledMetrics.cpu = YES;
+            config.enabledMetrics.memory = YES;
+            config.enabledMetrics.rendering = YES;
+        }
+
+        if (!configuration[@"nativeSpans"] || [configuration[@"nativeSpans"] boolValue]) {
+            [config addPlugin:[[BugsnagNativeSpansPlugin alloc] init]];
+        }
+        if (!configuration[@"jsSpans"] || [configuration[@"jsSpans"] boolValue]) {
+            [config addPlugin:[[BugsnagJavascriptSpansPlugin alloc] init]];
+        }
+        if (!configuration[@"nativeAppStarts"] || [configuration[@"nativeAppStarts"] boolValue]) {
+            [config addPlugin:[[BugsnagReactNativeAppStartPlugin alloc] init]];
+        }
+
+        [BugsnagPerformance startWithConfiguration:config];
+        
+        NSLog(@"[BugsnagTestUtils] Native performance started successfully");
+        
+        return YES;
+    } @catch (NSException *exception) {
+        NSLog(@"[BugsnagTestUtils] Failed to start native performance: %@", exception);
         return NO;
-    #endif
+    }
+#else
+    NSLog(@"[BugsnagTestUtils] Native integration not enabled (NATIVE_INTEGRATION not defined), cannot start native performance");
+    return NO;
+#endif
 }
 
 @end
-

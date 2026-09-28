@@ -1,10 +1,17 @@
 source 'https://rubygems.org'
 
+# Pin json gem to < 3.0.0 (json 3.0+ removed 'quirks_mode', breaking ActiveSupport / CocoaPods)
+gem 'json', '< 3.0'
+
+# CocoaPods toolchain
+gem 'cocoapods', '~> 1.16'
+gem 'activesupport', '< 8.0'
+
 # You can run against local Maze Runner branches and uncommitted changes:
 # gem 'bugsnag-maze-runner', path: '../../../maze-runner'
 
 # Or a specific release:
-gem 'bugsnag-maze-runner', '~>11.3.0'
+gem 'bugsnag-maze-runner', '~> 11.3.0'
 
 # Or a branch
 # gem 'bugsnag-maze-runner', git: 'https://github.com/bugsnag/maze-runner', branch: 'integration/v8'

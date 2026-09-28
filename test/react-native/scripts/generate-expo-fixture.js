@@ -55,8 +55,8 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   const expoInitArgs = ['create-expo-app', 'test-fixture', '--template', `tabs@${expoVersion}`]
   execFileSync('npx', expoInitArgs, { cwd: buildDir, stdio: 'inherit' })
 
-  // install expo dependencies using expo install
-  const expoInstallArgs = ['expo', 'install', ...getExpoDependencies()]
+  // install expo dependencies using expo install (including @expo/vector-icons for tabs layout)
+  const expoInstallArgs = ['expo', 'install', '@expo/vector-icons', ...getExpoDependencies()]
   execFileSync('npx', expoInstallArgs, { cwd: fixtureDir, stdio: 'inherit' })
 
   // install local packages using npm install
@@ -186,5 +186,3 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 // Build platform fixtures
 buildExpoAndroidFixture(fixtureDir, easWorkingDir)
 buildExpoIOSFixture(fixtureDir, easWorkingDir)
-
-

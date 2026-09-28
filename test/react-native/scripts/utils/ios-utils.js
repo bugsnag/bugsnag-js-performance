@@ -7,54 +7,77 @@ const { replaceInFile, appendToFileIfNotExists, prependToFileIfNotExists } = req
  * Configure iOS project settings
  */
 function configureIOSProject (fixtureDir, reactNativeVersion) {
-  // disable Flipper
-  let podfileContents = fs.readFileSync(`${fixtureDir}/ios/Podfile`, 'utf8')
+  const podfilePath = `${fixtureDir}/ios/Podfile`
+  if (!fs.existsSync(podfilePath)) return
+
+  let podfileContents = fs.readFileSync(podfilePath, 'utf8')
+
+  // Disable Flipper
   if (podfileContents.includes('use_flipper!')) {
     podfileContents = podfileContents.replace(/use_flipper!/, '# use_flipper!')
   } else if (podfileContents.includes(':flipper_configuration')) {
     podfileContents = podfileContents.replace(/:flipper_configuration/, '# :flipper_configuration')
   }
 
-  // for RN versions < 0.73, bump the minimum iOS version to 13 (required for Cocoa Performance)
-  if (parseFloat(reactNativeVersion) < 0.73) {
+  const version = parseFloat(reactNativeVersion)
+
+  // For RN versions < 0.73, bump the minimum iOS version to 13.0 (required for Cocoa Performance)
+  if (version < 0.73) {
     podfileContents = podfileContents.replace(/platform\s*:ios,\s*(?:'[\d.]+'|min_ios_version_supported)/, "platform :ios, '13.0'")
+  } else if (version >= 0.84) {
+    // For RN 0.84+, ensure platform is at least 15.1
+    podfileContents = podfileContents.replace(/platform\s*:ios,\s*(?:'[\d.]+'|min_ios_version_supported)/, "platform :ios, '15.1'")
   }
 
-  fs.writeFileSync(`${fixtureDir}/ios/Podfile`, podfileContents)
+  fs.writeFileSync(podfilePath, podfileContents)
 
-  // pin xcodeproj version to < 1.26.0
+  // Pin gems to prevent breaking changes in pod install
   const gemfilePath = resolve(fixtureDir, 'Gemfile')
   if (fs.existsSync(gemfilePath)) {
     appendToFileIfNotExists(gemfilePath, "gem 'xcodeproj', '< 1.26.0'", 'xcodeproj')
     appendToFileIfNotExists(gemfilePath, "gem 'concurrent-ruby', '<= 1.3.4'", 'concurrent-ruby')
+    appendToFileIfNotExists(gemfilePath, "gem 'json', '< 3.0.0'", 'json')
   }
 
-  // set NSAllowsArbitraryLoads to allow http traffic for all domains (bitbar public IP + bs-local.com)
+  // Set NSAllowsArbitraryLoads to allow http traffic for all domains (bitbar public IP + bs-local.com)
   const plistpath = `${fixtureDir}/ios/reactnative/Info.plist`
-  let plistContents = fs.readFileSync(plistpath, 'utf8')
-  const allowArbitraryLoads = '<key>NSAllowsArbitraryLoads</key>\n\t\t<true/>'
-  let searchPattern, replacement
-  if (plistContents.includes('<key>NSAllowsArbitraryLoads</key>')) {
-    searchPattern = '<key>NSAllowsArbitraryLoads</key>\n\t\t<false/>'
-    replacement = allowArbitraryLoads
-  } else {
-    searchPattern = '<key>NSAppTransportSecurity</key>\n\t<dict>'
-    replacement = `${searchPattern}\n\t\t${allowArbitraryLoads}`
+  if (fs.existsSync(plistpath)) {
+    let plistContents = fs.readFileSync(plistpath, 'utf8')
+    const allowArbitraryLoads = '<key>NSAllowsArbitraryLoads</key>\n\t\t<true/>'
+    let searchPattern, replacement
+
+    if (plistContents.includes('<key>NSAllowsArbitraryLoads</key>')) {
+      searchPattern = '<key>NSAllowsArbitraryLoads</key>\n\t\t<false/>'
+      replacement = allowArbitraryLoads
+    } else {
+      searchPattern = '<key>NSAppTransportSecurity</key>\n\t<dict>'
+      replacement = `${searchPattern}\n\t\t${allowArbitraryLoads}`
+    }
+
+    // Remove NSAllowsLocalNetworking key if it exists
+    const allowLocalNetworking = '<key>NSAllowsLocalNetworking</key>\n\t\t<true/>'
+    plistContents = plistContents.replace(allowLocalNetworking, '')
+
+    fs.writeFileSync(plistpath, plistContents.replace(searchPattern, replacement))
   }
-
-  // remove the NSAllowsLocalNetworking key if it exists as this causes NSAllowsArbitraryLoads to be ignored
-  const allowLocalNetworking = '<key>NSAllowsLocalNetworking</key>\n\t\t<true/>'
-  plistContents = plistContents.replace(allowLocalNetworking, '')
-
-  fs.writeFileSync(plistpath, plistContents.replace(searchPattern, replacement))
 }
 
+/**
+ * Install Native Test Utils CocoaPod dependency
+ */
 function installNativeTestUtilsIOS(fixtureDir) {
   const podfilePath = resolve(fixtureDir, 'ios/Podfile')
-  const testUtilsPod = `pod 'BugsnagTestUtils', :path => '${resolve(ROOT_DIR, 'test/react-native/native-test-utils/ios/BugsnagTestUtils.podspec')}'`
-  const targetSection = 'target \'reactnative\' do'
-  
-  replaceInFile(podfilePath, targetSection, `${targetSection}\n  ${testUtilsPod}`)
+  if (!fs.existsSync(podfilePath)) return
+
+  // Point :path to directory containing BugsnagTestUtils.podspec
+  const testUtilsDir = resolve(ROOT_DIR, 'test/react-native/native-test-utils/ios')
+  const testUtilsPod = `pod 'BugsnagTestUtils', :path => '${testUtilsDir}'`
+  const targetSection = "target 'reactnative' do"
+
+  let podfile = fs.readFileSync(podfilePath, 'utf8')
+  if (!podfile.includes("'BugsnagTestUtils'")) {
+    replaceInFile(podfilePath, targetSection, `${targetSection}\n  ${testUtilsPod}`)
+  }
 }
 
 /**
@@ -62,37 +85,43 @@ function installNativeTestUtilsIOS(fixtureDir) {
  */
 function installCocoaPerformance (fixtureDir) {
   const podfilePath = resolve(fixtureDir, 'ios/Podfile')
-  const performancePod = "pod 'BugsnagPerformance'"
-  const targetSection = 'target \'reactnative\' do'
+  if (!fs.existsSync(podfilePath)) return
 
-  replaceInFile(podfilePath, targetSection, `${targetSection}\n  ${performancePod}`)
+  const performancePod = "pod 'BugsnagPerformance'"
+  const targetSection = "target 'reactnative' do"
+
+  let podfile = fs.readFileSync(podfilePath, 'utf8')
+  if (!podfile.includes("'BugsnagPerformance'")) {
+    replaceInFile(podfilePath, targetSection, `${targetSection}\n  ${performancePod}`)
+  }
 }
 
 /**
  * Configure AppDelegate to import BugsnagTestUtils and call startNativePerformance
  */
 function configureAppDelegateForTestUtils (fixtureDir, reactNativeVersion) {
-  // Determine file type based on React Native version
   const isSwift = parseFloat(reactNativeVersion) >= 0.78
   const fileExtension = isSwift ? 'swift' : (parseFloat(reactNativeVersion) >= 0.72 ? 'mm' : 'm')
   const appDelegatePath = `${fixtureDir}/ios/reactnative/AppDelegate.${fileExtension}`
-  
+
   if (!fs.existsSync(appDelegatePath)) {
     console.warn(`AppDelegate file not found at ${appDelegatePath}`)
     return
   }
-  
+
   const fileContents = fs.readFileSync(appDelegatePath, 'utf8')
   const importStatement = isSwift ? 'import BugsnagTestUtils' : '#import <BugsnagTestUtils/BugsnagTestUtils.h>'
   const methodCall = isSwift ? 'BugsnagTestUtils.startNativePerformanceIfConfigured()' : '[BugsnagTestUtils startNativePerformanceIfConfigured];'
   const indentation = isSwift ? '    ' : '  '
-  
-  // Add import statement at the top
-  prependToFileIfNotExists(appDelegatePath, `${importStatement}\n`)
-  
+
+  // Add import statement at the top if missing
+  if (!fileContents.includes(importStatement)) {
+    prependToFileIfNotExists(appDelegatePath, `${importStatement}\n`)
+  }
+
   // Add method call at the start of didFinishLaunchingWithOptions
   if (!fileContents.includes(methodCall)) {
-    const didFinishMatch = fileContents.match(/didFinishLaunchingWithOptions[^{]*{\n/)
+    const didFinishMatch = fileContents.match(/didFinishLaunchingWithOptions[\s\S]*?\{\n/)
     if (didFinishMatch) {
       replaceInFile(appDelegatePath, didFinishMatch[0], `${didFinishMatch[0]}${indentation}${methodCall}\n\n`)
     }
@@ -101,27 +130,26 @@ function configureAppDelegateForTestUtils (fixtureDir, reactNativeVersion) {
 
 /**
  * Apply view controller changes for view load instrumentation compatibility
- * This adds the necessary overrides to make React Native work with Cocoa Performance view load instrumentation
  */
 function applyViewControllerChanges (fixtureDir, reactNativeVersion) {
   const version = parseFloat(reactNativeVersion)
   const isSwift = version >= 0.78
   const fileExtension = isSwift ? 'swift' : (version >= 0.72 ? 'mm' : 'm')
   const appDelegatePath = `${fixtureDir}/ios/reactnative/AppDelegate.${fileExtension}`
-  
+
   if (!fs.existsSync(appDelegatePath)) {
     console.warn(`AppDelegate file not found at ${appDelegatePath}`)
     return
   }
-  
+
   const fileContents = fs.readFileSync(appDelegatePath, 'utf8')
-  
-  // Add import for BSGViewController
+
+  // In Swift, 'import BugsnagTestUtils' exposes BSGViewController directly
   const importStatement = isSwift ? 'import BugsnagTestUtils' : '#import <BugsnagTestUtils/BSGViewController.h>'
   if (!fileContents.includes(importStatement)) {
     prependToFileIfNotExists(appDelegatePath, `${importStatement}\n`)
   }
-  
+
   if (isSwift) {
     applySwiftViewControllerChanges(appDelegatePath, fileContents)
   } else if (version >= 0.74) {
@@ -129,7 +157,6 @@ function applyViewControllerChanges (fixtureDir, reactNativeVersion) {
   } else if (version < 0.72) {
     applyObjectiveCLegacyViewControllerChanges(appDelegatePath, fileContents)
   }
-  // Skip 0.72-0.73 as they don't expose a setRootView method for us to override
 }
 
 /**
@@ -139,12 +166,12 @@ function applySwiftViewControllerChanges (appDelegatePath, fileContents) {
   if (fileContents.includes('override func createRootViewController()')) {
     return // Already configured
   }
-  
+
   const viewControllerMethods = `
   override func createRootViewController() -> UIViewController {
     return BSGViewController() // Custom view controller for view load instrumentation
   }
-  
+
   override func setRootView(_ rootView: UIView, toRootViewController rootViewController: UIViewController) {
     if let viewController = rootViewController as? BSGViewController {
       viewController.viewFactory = {
@@ -155,14 +182,14 @@ function applySwiftViewControllerChanges (appDelegatePath, fileContents) {
     }
   }
 `
-  
-  // Find an anchor point to insert the methods - try multiple common patterns
+
+  // Anchors for inserting methods in Swift AppDelegate
   const anchors = [
     'override func sourceURL(for bridge: RCTBridge)',
     'override func bundleURL()',
-    'func application(_ application: UIApplication, didFinishLaunchingWithOptions'
+    'override func application('
   ]
-  
+
   for (const anchor of anchors) {
     if (fileContents.includes(anchor)) {
       const escapedAnchor = anchor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -182,7 +209,7 @@ function applyObjectiveCModernViewControllerChanges (appDelegatePath, fileConten
   if (fileContents.includes('- (UIViewController *)createRootViewController')) {
     return // Already configured
   }
-  
+
   const viewControllerMethods = `
 - (UIViewController *)createRootViewController
 {
@@ -200,8 +227,7 @@ function applyObjectiveCModernViewControllerChanges (appDelegatePath, fileConten
     }
 }
 `
-  
-  // Insert before sourceURLForBridge or at the end before @end
+
   if (fileContents.includes('- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge')) {
     const match = fileContents.match(/(\n- \(NSURL \*\)sourceURLForBridge:\(RCTBridge \*\)bridge)/)
     if (match) {
@@ -222,15 +248,13 @@ function applyObjectiveCLegacyViewControllerChanges (appDelegatePath, fileConten
   if (fileContents.includes('[BSGViewController new]')) {
     return // Already configured
   }
-  
-  // Replace UIViewController with BSGViewController
+
   replaceInFile(
     appDelegatePath,
     'UIViewController *rootViewController = [UIViewController new];',
     'BSGViewController *rootViewController = [BSGViewController new];'
   )
-  
-  // Replace direct view assignment with viewFactory pattern
+
   replaceInFile(
     appDelegatePath,
     'rootViewController.view = rootView;',
