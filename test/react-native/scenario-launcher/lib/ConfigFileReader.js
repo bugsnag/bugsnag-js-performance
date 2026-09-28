@@ -17,10 +17,12 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
  *
  * On Android, Maze Runner writes to the app's own external files directory
  * (/sdcard/Android/data/<app id>/files) unless the test suite overrides
- * Maze.config.android_app_files_directory. That default is readable by the app
- * on every Android version, whereas /data/local/tmp is labelled shell_data_file
- * and is unreadable to an untrusted_app process on recent releases - so the
- * legacy location is only kept as a fallback.
+ * Maze.config.android_app_files_directory. Our BitBar runs override it to
+ * /data/local/tmp (see features/support/env.rb): on Android 15 devices a push
+ * to the external files directory is rejected by scoped storage and the app
+ * never sees the file, whereas /data/local/tmp can always be pushed to with
+ * adb and is readable by the app. Every location is checked so that the same
+ * fixture works whichever one the test suite pushes to.
  */
 const getConfigFileDirectories = () => {
   if (Platform.OS !== 'android') {
@@ -42,8 +44,7 @@ const getConfigFileDirectories = () => {
     }
   }
 
-  // kept for compatibility with suites that still set
-  // Maze.config.android_app_files_directory = '/data/local/tmp'
+  // where our BitBar runs push the config (Maze.config.android_app_files_directory)
   directories.push('/data/local/tmp')
 
   return directories
