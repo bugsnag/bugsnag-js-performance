@@ -52,28 +52,51 @@ function getCliVersion(rnVersion) {
   if (minor === 74) return '13'
   if (minor === 75) return '14'
   if (minor === 76) return '15'
-  return '16'
+  if (minor === 77) return '16'
+  if (minor === 78 || minor === 79) return '17'
+  if (minor >= 80 && minor <= 83) return '18'
+  return '19' // RN 0.84+
 }
 
-// Clean unsupported Podfile parameters for older React Native versions (< 0.73)
-function sanitizePodfile(fixtureDir, rnVersion) {
+// Clean and patch Podfile for target React Native versions
+function patchPodfile(fixtureDir, rnVersion) {
   const minor = parseInt(rnVersion.split('.')[1], 10)
   const podfilePath = resolve(fixtureDir, 'ios', 'Podfile')
 
-  if (minor <= 72 && fs.existsSync(podfilePath)) {
-    let podfile = fs.readFileSync(podfilePath, 'utf8')
+  if (!fs.existsSync(podfilePath)) return
 
-    // 1. Remove all lines referencing quirks_mode
+  let podfile = fs.readFileSync(podfilePath, 'utf8')
+
+  // 1. Older RN versions (< 0.73): Clean unsupported parameters
+  if (minor <= 72) {
     podfile = podfile
       .split('\n')
       .filter(line => !line.includes('quirks_mode'))
       .join('\n')
-
-    // 2. Remove any dangling commas before closing parentheses
-    podfile = podfile.replace(/,(\s*\))/g, '$1')
-
-    fs.writeFileSync(podfilePath, podfile, 'utf8')
+      .replace(/,(\s*\))/g, '$1')
   }
+
+  // 2. Modern RN versions (>= 0.80): Ensure deployment target is >= 15.1 and script sandboxing is disabled
+  if (minor >= 80) {
+    const postInstallTargetBlock = `
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.1'
+        config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+      end
+    end`
+
+    if (podfile.includes('post_install do |installer|')) {
+      if (!podfile.includes("IPHONEOS_DEPLOYMENT_TARGET")) {
+        podfile = podfile.replace(
+          'post_install do |installer|',
+          `post_install do |installer|${postInstallTargetBlock}`
+        )
+      }
+    }
+  }
+
+  fs.writeFileSync(podfilePath, podfile, 'utf8')
 }
 
 // Validate environment variables
@@ -200,8 +223,8 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   }
 }
 
-// Clean unsupported Podfile parameters right before pod install
-sanitizePodfile(fixtureDir, reactNativeVersion)
+// Patch Podfile for target RN version before building
+patchPodfile(fixtureDir, reactNativeVersion)
 
 // Build platform fixtures
 buildAndroidFixture(fixtureDir, isNewArchEnabled)

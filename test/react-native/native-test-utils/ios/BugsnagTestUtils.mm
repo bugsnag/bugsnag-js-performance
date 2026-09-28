@@ -4,9 +4,18 @@
 #import <BugsnagPerformance/BugsnagPerformance.h>
 #import <BugsnagPerformance/BugsnagPerformanceConfiguration+Private.h>
 #import <BugsnagPerformance/BugsnagPerformanceSpanContext.h>
+
+// Support both framework modular imports and local header search paths
+#if __has_include(<BugsnagReactNativePerformance/BugsnagNativeSpansPlugin.h>)
+#import <BugsnagReactNativePerformance/BugsnagNativeSpansPlugin.h>
+#import <BugsnagReactNativePerformance/BugsnagJavascriptSpansPlugin.h>
+#import <BugsnagReactNativePerformance/BugsnagReactNativeAppStartPlugin.h>
+#else
 #import "BugsnagNativeSpansPlugin.h"
 #import "BugsnagJavascriptSpansPlugin.h"
 #import "BugsnagReactNativeAppStartPlugin.h"
+#endif
+
 #endif
 
 @implementation BugsnagTestUtils
@@ -64,7 +73,7 @@
 }
 
 + (void)saveStartupConfig:(NSDictionary *)configuration {
-    if (!configuration) {
+    if (!configuration || ![configuration isKindOfClass:[NSDictionary class]]) {
         return;
     }
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -84,81 +93,81 @@
 }
 
 + (BOOL)startNativePerformanceWithConfiguration:(NSDictionary *)configuration {
-    #ifdef NATIVE_INTEGRATION
-        @try {
-            if (!configuration || ![configuration isKindOfClass:[NSDictionary class]]) {
-                NSLog(@"[BugsnagTestUtils] Invalid or null configuration passed to startNativePerformance");
-                return NO;
-            }
-
-            NSLog(@"[BugsnagTestUtils] Starting native performance with configuration: %@", configuration);
-            
-            BugsnagPerformanceConfiguration *config = [BugsnagPerformanceConfiguration loadConfig];
-
-            NSString *apiKey = configuration[@"apiKey"];
-            if ([apiKey isKindOfClass:[NSString class]] && apiKey.length > 0) {
-                config.apiKey = apiKey;
-            }
-
-            NSString *endpoint = configuration[@"endpoint"];
-            if ([endpoint isKindOfClass:[NSString class]] && endpoint.length > 0) {
-                config.endpoint = [NSURL URLWithString:endpoint];
-            }
-
-            if (configuration[@"autoInstrumentAppStarts"] != nil && configuration[@"autoInstrumentAppStarts"] != [NSNull null]) {
-                config.autoInstrumentAppStarts = [configuration[@"autoInstrumentAppStarts"] boolValue];
-            } else {
-                config.autoInstrumentAppStarts = YES;
-            }
-
-            if (configuration[@"autoInstrumentViewLoads"] != nil && configuration[@"autoInstrumentViewLoads"] != [NSNull null]) {
-                config.autoInstrumentViewControllers = [configuration[@"autoInstrumentViewLoads"] boolValue];
-            } else {
-                config.autoInstrumentViewControllers = NO;
-            }
-
-            config.autoInstrumentNetworkRequests = NO;
-            config.internal.autoTriggerExportOnBatchSize = 1;
-            config.internal.clearPersistenceOnStart = YES;
-
-            if (configuration[@"samplingProbability"] != nil && configuration[@"samplingProbability"] != [NSNull null]) {
-                config.samplingProbability = [configuration[@"samplingProbability"] doubleValue];
-            }
-
-            if ([configuration[@"enabledMetrics"] isKindOfClass:[NSDictionary class]]) {
-                NSDictionary *metricsConfig = configuration[@"enabledMetrics"];
-                config.enabledMetrics.rendering = [metricsConfig[@"rendering"] boolValue];
-                config.enabledMetrics.cpu = [metricsConfig[@"cpu"] boolValue];
-                config.enabledMetrics.memory = [metricsConfig[@"memory"] boolValue];
-            } else {
-                config.enabledMetrics.cpu = YES;
-                config.enabledMetrics.memory = YES;
-                config.enabledMetrics.rendering = YES;
-            }
-
-            if (!configuration[@"nativeSpans"] || [configuration[@"nativeSpans"] boolValue]) {
-                [config addPlugin:[[BugsnagNativeSpansPlugin alloc] init]];
-            }
-            if (!configuration[@"jsSpans"] || [configuration[@"jsSpans"] boolValue]) {
-                [config addPlugin:[[BugsnagJavascriptSpansPlugin alloc] init]];
-            }
-            if (!configuration[@"nativeAppStarts"] || [configuration[@"nativeAppStarts"] boolValue]) {
-                [config addPlugin:[[BugsnagReactNativeAppStartPlugin alloc] init]];
-            }
-
-            [BugsnagPerformance startWithConfiguration:config];
-            
-            NSLog(@"[BugsnagTestUtils] Native performance started successfully");
-            
-            return YES;
-        } @catch (NSException *exception) {
-            NSLog(@"[BugsnagTestUtils] Failed to start native performance: %@", exception);
+#ifdef NATIVE_INTEGRATION
+    @try {
+        if (!configuration || ![configuration isKindOfClass:[NSDictionary class]]) {
+            NSLog(@"[BugsnagTestUtils] Invalid or null configuration passed to startNativePerformance");
             return NO;
         }
-    #else
-        NSLog(@"[BugsnagTestUtils] Native integration not enabled (NATIVE_INTEGRATION not defined), cannot start native performance");
+
+        NSLog(@"[BugsnagTestUtils] Starting native performance with configuration: %@", configuration);
+        
+        BugsnagPerformanceConfiguration *config = [BugsnagPerformanceConfiguration loadConfig];
+
+        id apiKey = configuration[@"apiKey"];
+        if ([apiKey isKindOfClass:[NSString class]] && [(NSString *)apiKey length] > 0) {
+            config.apiKey = (NSString *)apiKey;
+        }
+
+        id endpoint = configuration[@"endpoint"];
+        if ([endpoint isKindOfClass:[NSString class]] && [(NSString *)endpoint length] > 0) {
+            config.endpoint = [NSURL URLWithString:(NSString *)endpoint];
+        }
+
+        if (configuration[@"autoInstrumentAppStarts"] != nil && configuration[@"autoInstrumentAppStarts"] != [NSNull null]) {
+            config.autoInstrumentAppStarts = [configuration[@"autoInstrumentAppStarts"] boolValue];
+        } else {
+            config.autoInstrumentAppStarts = YES;
+        }
+
+        if (configuration[@"autoInstrumentViewLoads"] != nil && configuration[@"autoInstrumentViewLoads"] != [NSNull null]) {
+            config.autoInstrumentViewControllers = [configuration[@"autoInstrumentViewLoads"] boolValue];
+        } else {
+            config.autoInstrumentViewControllers = NO;
+        }
+
+        config.autoInstrumentNetworkRequests = NO;
+        config.internal.autoTriggerExportOnBatchSize = 1;
+        config.internal.clearPersistenceOnStart = YES;
+
+        if (configuration[@"samplingProbability"] != nil && configuration[@"samplingProbability"] != [NSNull null]) {
+            config.samplingProbability = [configuration[@"samplingProbability"] doubleValue];
+        }
+
+        if ([configuration[@"enabledMetrics"] isKindOfClass:[NSDictionary class]]) {
+            NSDictionary *metricsConfig = (NSDictionary *)configuration[@"enabledMetrics"];
+            config.enabledMetrics.rendering = [metricsConfig[@"rendering"] boolValue];
+            config.enabledMetrics.cpu = [metricsConfig[@"cpu"] boolValue];
+            config.enabledMetrics.memory = [metricsConfig[@"memory"] boolValue];
+        } else {
+            config.enabledMetrics.cpu = YES;
+            config.enabledMetrics.memory = YES;
+            config.enabledMetrics.rendering = YES;
+        }
+
+        if (!configuration[@"nativeSpans"] || [configuration[@"nativeSpans"] boolValue]) {
+            [config addPlugin:[[BugsnagNativeSpansPlugin alloc] init]];
+        }
+        if (!configuration[@"jsSpans"] || [configuration[@"jsSpans"] boolValue]) {
+            [config addPlugin:[[BugsnagJavascriptSpansPlugin alloc] init]];
+        }
+        if (!configuration[@"nativeAppStarts"] || [configuration[@"nativeAppStarts"] boolValue]) {
+            [config addPlugin:[[BugsnagReactNativeAppStartPlugin alloc] init]];
+        }
+
+        [BugsnagPerformance startWithConfiguration:config];
+        
+        NSLog(@"[BugsnagTestUtils] Native performance started successfully");
+        
+        return YES;
+    } @catch (NSException *exception) {
+        NSLog(@"[BugsnagTestUtils] Failed to start native performance: %@", exception);
         return NO;
-    #endif
+    }
+#else
+    NSLog(@"[BugsnagTestUtils] Native integration not enabled (NATIVE_INTEGRATION not defined), cannot start native performance");
+    return NO;
+#endif
 }
 
 @end
