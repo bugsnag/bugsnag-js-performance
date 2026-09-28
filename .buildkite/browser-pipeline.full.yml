@@ -6,7 +6,7 @@ steps:
     steps:
       - label: ":browserstack: {{ matrix }} Mobile Browser tests"
         matrix:
-          - ANDROID_15
+          - android_13
           - ios_13
           - ios_18
         depends_on: "build-browser-fixtures-NPM"
