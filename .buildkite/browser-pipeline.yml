@@ -54,7 +54,6 @@ steps:
               - --https
               - --farm=bb
               - --browser={{ matrix.browser }}_{{ matrix.version }}
-              - --appium-version=1.22
               - --aws-public-ip
               - --no-tunnel
           test-collector#v1.10.2:
@@ -103,6 +102,15 @@ steps:
         concurrency: 2
         concurrency_group: "browserstack"
         concurrency_method: eager
+        retry:
+          automatic:
+            # 11 is Maze Runner's "element not found" exit code. Every so often a
+            # BrowserStack session or its Local tunnel drops part way through a
+            # run, after which no page loads and every remaining scenario fails
+            # this way (most recently build 6335, which passed on an identical
+            # commit in build 6334). Genuine failures still fail on the retry.
+            - exit_status: 11
+              limit: 1
         matrix:
           setup:
             browser: [chrome]
@@ -142,6 +150,15 @@ steps:
         concurrency: 2
         concurrency_group: "browserstack"
         concurrency_method: eager
+        retry:
+          automatic:
+            # 11 is Maze Runner's "element not found" exit code. Every so often a
+            # BrowserStack session or its Local tunnel drops part way through a
+            # run, after which no page loads and every remaining scenario fails
+            # this way (most recently build 6335, which passed on an identical
+            # commit in build 6334). Genuine failures still fail on the retry.
+            - exit_status: 11
+              limit: 1
         matrix:
           setup:
             browser: [safari]

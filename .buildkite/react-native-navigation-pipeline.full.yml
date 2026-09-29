@@ -147,7 +147,6 @@ steps:
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -194,7 +193,6 @@ steps:
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
