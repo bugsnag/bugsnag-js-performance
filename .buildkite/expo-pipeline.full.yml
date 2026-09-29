@@ -49,6 +49,11 @@ steps:
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
+            # scope the download to this pipeline's build step: the basic and
+            # full Expo pipelines both run in a pull request build and both
+            # build the same SDK versions, so without this the download matches
+            # the artifact from both and Buildkite rejects it as ambiguous
+            step: "build-expo-apk-full"
             download: "test/react-native/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.apk"
             upload:
               - "./test/react-native/maze_output/failed/*"
@@ -88,6 +93,11 @@ steps:
         timeout_in_minutes: 20
         plugins:
           artifacts#v1.9.0:
+            # scope the download to this pipeline's build step: the basic and
+            # full Expo pipelines both run in a pull request build and both
+            # build the same SDK versions, so without this the download matches
+            # the artifact from both and Buildkite rejects it as ambiguous
+            step: "build-expo-ipa-full"
             download: "test/react-native/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.ipa"
             upload:
               - "./test/react-native/maze_output/failed/*"
@@ -121,4 +131,3 @@ steps:
         concurrency_method: eager
         matrix:
           - "57"
-      
