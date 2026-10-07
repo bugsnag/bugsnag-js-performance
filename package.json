@@ -17,7 +17,7 @@
   },
   "overrides": {
     "axios": "^1.16.0",
-    "@remix-run/router": "1.23.2",
+    "@remix-run/router": "1.23.3",
     "react-router": "^6.30.0",
     "react-router-dom": "^6.30.0",
     "react-dom": "18.2.0",
