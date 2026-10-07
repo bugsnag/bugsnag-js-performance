@@ -12,7 +12,7 @@
     "clean": "rm -f build/* && lerna run --stream --parallel clean",
     "test:lint": "eslint --max-warnings=0 .",
     "test:unit": "node --max-old-space-size=3072 node_modules/jest/bin/jest.js --maxWorkers=2 --workerIdleMemoryLimit=1073741824",
-    "test:coverage": "node --max-old-space-size=4096 node_modules/jest/bin/jest.js --coverage --maxWorkers=1",
+    "test:coverage": "node --max-old-space-size=6144 node_modules/jest/bin/jest.js --coverage --maxWorkers=1",
     "test:test-container-registry-login": "aws ecr get-login-password --profile=opensource --region=us-west-1 | docker login --username AWS --password-stdin 855461928731.dkr.ecr.us-west-1.amazonaws.com"
   },
   "overrides": {
