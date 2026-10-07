@@ -21,4 +21,4 @@ jest.mock('react-native-screens', () => {
     ScreenStackHeaderTitleView: View,
     ScreenStackHeaderCenterView: View
   }
-}, { virtual: true })
+})
