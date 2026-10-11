@@ -2,33 +2,27 @@ import React from 'react'
 import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 import { NativeScenarioLauncher } from '../../lib/native'
 
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
 export const initialise = async (config) => {
   const startupConfig = {
-    reactNative: {
-      apiKey: config.apiKey,
-      endpoint: config.endpoint,
-      autoInstrumentAppStarts: true,
-      autoInstrumentNetworkRequests: false,
-      maximumBatchSize: 1,
-      attach: true,
-    },
-    native: {
-      apiKey: config.apiKey,
-      endpoint: config.endpoint,
-      autoInstrumentAppStarts: true,
-      autoInstrumentViewLoads: true,
-    }
+    apiKey: config.apiKey,
+    endpoint: config.endpoint,
+    autoInstrumentAppStarts: true,
+    maximumBatchSize: 1,
+    batchInactivityTimeoutMs: 1000
   }
 
-  NativeScenarioLauncher.saveStartupConfig(startupConfig)
-  NativeScenarioLauncher.exitApp()
+  await NativeScenarioLauncher.saveStartupConfig(startupConfig)
+  await delay(250) // Allow synchronous disk flush before terminating
+  await NativeScenarioLauncher.exitApp()
 }
 
 export const App = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.scenario}>
-        <Text>NativeAppStartScenario</Text>
+        <Text>AppStartScenario</Text>
       </View>
     </SafeAreaView>
   )
