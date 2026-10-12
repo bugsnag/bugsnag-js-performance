@@ -39,7 +39,8 @@
     "esbuild": "0.28.1",
     "ip-address": "^10.3.1",
     "nx": "^22.7.7",
-    "image-size": "^2.0.1"
+    "image-size": "^2.0.1",
+    "smol-toml": "^1.7.1"
   },
   "engines": {
   "node": "^20.17.0 || >=22.9.0"
