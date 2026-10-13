@@ -7,6 +7,8 @@ import { wrapperComponentProvider } from '../scenarios/core/WrapperComponentProv
 import React from 'react'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
 
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 async function runScenario (setScenario, scenarioName, apiKey, endpoint) {
   console.error(`[BugsnagPerformance] Launching scenario: ${scenarioName}`)
   const scenario = Scenarios[scenarioName]
@@ -37,12 +39,40 @@ async function runScenario (setScenario, scenarioName, apiKey, endpoint) {
   setScenario({ name: scenarioName, config: scenarioConfig })
 }
 
+// time to allow the failure to be logged before the process is killed
+const EXIT_DELAY = 1000
+
+// Once the command poll has exhausted its retries the fixture can never receive
+// a scenario, so there is no point staying open: an idle fixture in the
+// foreground just leaves maze runner waiting for its full timeout with nothing
+// in the device log to explain why. Fail fast instead so the cause is obvious
+// and maze runner's relaunch of the app starts from a clean process.
+async function exitAfterCommandFailure (error) {
+  console.error(`[BugsnagPerformance] Failed to receive a command from maze runner after all retries, exiting the app: ${error.message}`, error)
+
+  await delay(EXIT_DELAY)
+
+  if (NativeScenarioLauncher && typeof NativeScenarioLauncher.exitApp === 'function') {
+    NativeScenarioLauncher.exitApp()
+  } else {
+    console.error('[BugsnagPerformance] NativeScenarioLauncher.exitApp is not available, the app will remain open')
+  }
+}
+
 export async function launchScenario (setScenario, clearPersistedData = true) {
   if (clearPersistedData) {
     await clearPersistedState()
   }
 
-  const command = await getCurrentCommand()
+  let command
+
+  try {
+    command = await getCurrentCommand()
+  } catch (error) {
+    await exitAfterCommandFailure(error)
+    return
+  }
+
   switch (command.action) {
     case 'run-scenario':
       return await runScenario(
