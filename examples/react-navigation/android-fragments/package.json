@@ -22,5 +22,8 @@
     "devDependencies": {
         "@react-native/metro-config": "^0.74.83",
         "patch-package": "^8.0.0"
+    },
+    "overrides": {
+        "image-size": "^2.0.3"
     }
 }
