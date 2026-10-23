@@ -12,6 +12,7 @@ steps:
           queue: macos-15
         env:
           BUILD_MODE: "${BUILD_MODE}"
+          NODE_VERSION: "24"
           SKIP_FIXTURE_CLEANUP: "true"
         plugins:
           artifacts#v1.9.4:
