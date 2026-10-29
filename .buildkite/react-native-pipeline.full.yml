@@ -341,7 +341,7 @@ steps:
           - "0.80"
           - "0.81"
 
-      - label: ":bitbar: :android: RN {{matrix.reactnative}} 15 (New Arch) end-to-end tests"
+      - label: ":bitbar: :android: RN {{matrix.reactnative}} Android 15 (New Arch) end-to-end tests"
         depends_on: "build-react-native-android-fixture-new-arch-full"
         timeout_in_minutes: 30
         plugins:
