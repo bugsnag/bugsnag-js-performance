@@ -54,22 +54,37 @@ When("I relaunch the app after shutdown") do
     state = manager.state
     sleep 0.5
   end
-  $logger.warn "App state #{state} instead of not_running after 10s" unless state == :not_running
+
+  if state != :not_running
+    $logger.warn "App state #{state} instead of not_running after 10s — forcing stop"
+    if Maze::Helper.get_current_platform == 'android'
+      app_id = begin
+        (Maze.driver.respond_to?(:session_capabilities) && Maze.driver.session_capabilities['appPackage']) ||
+          (Maze.driver.respond_to?(:app_id) && Maze.driver.app_id) ||
+          'com.bugsnag.fixtures.reactnative.performance'
+      rescue StandardError
+        'com.bugsnag.fixtures.reactnative.performance'
+      end
+
+      begin
+        Maze.driver.terminate_app(app_id)
+      rescue StandardError => e
+        $logger.warn "Failed to terminate app: #{e.message}"
+      end
+    end
+  end
 
   manager.activate
 end
 
 When("the span named {string} was delivered approximately {int} seconds after ending") do |span_name, expected_seconds|
-  # Get all spans to find the target span
   spans = spans_from_request_list(Maze::Server.list_for('traces'))
   target_span = spans.find { |span| span['name'].eql?(span_name) }
 
   raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{span_name}" if target_span.nil?
 
-  # Find the request that contains the span by iterating through remaining requests
   target_request = nil
   Maze::Server.list_for('traces').remaining.each do |request|
-    # Check if this request contains spans with the target name by examining the request body
     request_body = request[:body]
     if request_body && request_body['resourceSpans']
       has_target_span = request_body['resourceSpans'].any? do |resource_span|
@@ -87,22 +102,16 @@ When("the span named {string} was delivered approximately {int} seconds after en
 
   raise Test::Unit::AssertionFailedError.new "No requests found containing span #{span_name}" if target_request.nil?
 
-  # Get the bugsnag-sent-at header from the request
   sent_at_header = target_request[:request]['bugsnag-sent-at']
   raise Test::Unit::AssertionFailedError.new "bugsnag-sent-at header not found in request" if sent_at_header.nil?
 
-  # Parse the sent-at time (ISO format) and convert to nanoseconds
   delivery_time = Time.parse(sent_at_header)
   delivery_time_ns = (delivery_time.to_f * 1_000_000_000).to_i
-
-  # Get the span's end time
   span_end_time = Integer(target_span["endTimeUnixNano"])
 
-  # Calculate the time difference between sent-at and span end
   time_difference_ns = delivery_time_ns - span_end_time
   time_difference_seconds = time_difference_ns / 1_000_000_000.0
 
-  # Check if the difference is approximately the expected number of seconds (±1 second tolerance)
   tolerance = 1.0
   expected_min = expected_seconds - tolerance
   expected_max = expected_seconds + tolerance
@@ -148,6 +157,7 @@ def execute_command(action, command_hash = nil)
   command = {
     action: action,
     endpoint: "http://#{address}/traces",
+    sampling_endpoint: "http://#{address}/sampling",
     api_key: $api_key,
   }
 
