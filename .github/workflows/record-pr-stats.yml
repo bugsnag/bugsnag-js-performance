@@ -46,9 +46,7 @@ jobs:
 
       - run: npm ci
       - run: npm run build
-      - run: npm run test:coverage -- --workerIdleMemoryLimit=2GB
-        env:
-          NODE_OPTIONS: --max-old-space-size=6144
+      - run: npm run test:coverage -- --maxWorkers=2 --workerIdleMemoryLimit=2GB
 
       - id: package
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
