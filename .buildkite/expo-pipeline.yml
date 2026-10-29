@@ -24,6 +24,10 @@ steps:
           - node test/react-native/scripts/generate-expo-fixture.js
         matrix:
           - "54"
+        retry:
+          automatic:
+            - exit_status: "*"
+              limit: 1
 
       - label:  ':mac: Build Expo {{matrix}} IPA'
         key: "build-expo-ipa"
@@ -42,6 +46,10 @@ steps:
           - node test/react-native/scripts/generate-expo-fixture.js
         matrix:
           - "54"
+        retry:
+          automatic:
+            - exit_status: "*"
+              limit: 1
 
       #
       # End-to-end tests
