@@ -14,6 +14,7 @@ steps:
           queue: "macos-15"
         env:
           JAVA_VERSION: "17"
+          NODE_VERSION: "24"
           EXPO_VERSION: "{{matrix}}"
           EAS_BUILD_NO_EXPO_GO_WARNING: true
           BUILD_ANDROID: 1
@@ -32,6 +33,7 @@ steps:
           queue: "macos-15"
         env:
           EAS_BUILD_NO_EXPO_GO_WARNING: true
+          NODE_VERSION: "24"
           EXPO_VERSION: "{{matrix}}"
           XCODE_VERSION: "16.2.0"
           BUILD_IOS: 1
