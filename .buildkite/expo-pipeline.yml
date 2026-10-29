@@ -15,6 +15,7 @@ steps:
         env:
           EAS_BUILD_NO_EXPO_GO_WARNING: true
           JAVA_VERSION: "17"
+          NODE_VERSION: "24"
           EXPO_VERSION: "{{matrix}}"
           BUILD_ANDROID: 1
         artifact_paths: test/react-native/features/fixtures/generated/expo/**/test-fixture/output.apk
@@ -32,6 +33,8 @@ steps:
         env:
           EAS_BUILD_NO_EXPO_GO_WARNING: true
           EXPO_VERSION: "{{matrix}}"
+          NODE_VERSION: "24"
+          XCODE_VERSION: "16.2.0"
           BUILD_IOS: 1
         artifact_paths: test/react-native/features/fixtures/generated/expo/**/test-fixture/output.ipa
         commands:
