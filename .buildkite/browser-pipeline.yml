@@ -55,8 +55,6 @@ steps:
               - --farm=bb
               - --browser={{ matrix.browser }}_{{ matrix.version }}
               - --appium-version=2.19
-              - --app-package=com.bugsnag.fixtures.reactnative.performance
-              - --app-activity=com.bugsnag.fixtures.reactnative.performance.MainActivity
               - --aws-public-ip
               - --no-tunnel
           test-collector#v1.10.2:

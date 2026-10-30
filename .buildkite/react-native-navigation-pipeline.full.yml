@@ -148,8 +148,8 @@ steps:
               - --a11y-locator
               - --fail-fast
               - --appium-version=2.19
-              - --app-package=com.bugsnag.fixtures.reactnative.navigation
-              - --app-activity=com.bugsnag.fixtures.reactnative.navigation.MainActivity
+              - --app-package=com.bugsnag.fixtures.reactnative.performance
+              - --app-activity=com.bugsnag.fixtures.reactnative.performance.MainActivity
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -197,8 +197,8 @@ steps:
               - --a11y-locator
               - --fail-fast
               - --appium-version=2.19
-              - --app-package=com.bugsnag.fixtures.reactnative.navigation
-              - --app-activity=com.bugsnag.fixtures.reactnative.navigation.MainActivity
+              - --app-package=com.bugsnag.fixtures.reactnative.performance
+              - --app-activity=com.bugsnag.fixtures.reactnative.performance.MainActivity
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:

@@ -227,8 +227,6 @@ steps:
               - --a11y-locator
               - --fail-fast
               - --appium-version=2.19
-              - --app-package=com.bugsnag.fixtures.reactnative.performance
-              - --app-activity=com.bugsnag.fixtures.reactnative.performance.MainActivity
               - --no-tunnel
               - --aws-public-ip
               - --tags=@new_arch
@@ -275,8 +273,6 @@ steps:
               - --a11y-locator
               - --fail-fast
               - --appium-version=2.19
-              - --app-package=com.bugsnag.fixtures.reactnative.performance
-              - --app-activity=com.bugsnag.fixtures.reactnative.performance.MainActivity
               - --no-tunnel
               - --aws-public-ip
               - --tags=@native_integration
