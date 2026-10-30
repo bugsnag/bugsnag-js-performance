@@ -9,7 +9,7 @@ steps:
       #
       - label:  ':android: Build Expo {{matrix}} APK'
         key: "build-expo-apk"
-        timeout_in_minutes: 20
+        timeout_in_minutes: 30
         agents:
           queue: "macos-15"
         env:
@@ -31,7 +31,7 @@ steps:
 
       - label:  ':mac: Build Expo {{matrix}} IPA'
         key: "build-expo-ipa"
-        timeout_in_minutes: 20
+        timeout_in_minutes: 30
         agents:
           queue: "macos-15"
         env:
@@ -89,6 +89,8 @@ steps:
           automatic:
             - exit_status: 103  # Appium session failed
               limit: 2
+            - exit_status: 102  # Appium driver failed to start
+              limit: 2
         concurrency: 25
         concurrency_group: "bitbar"
         concurrency_method: eager
@@ -129,6 +131,8 @@ steps:
             permit_on_passed: true
           automatic:
             - exit_status: 103  # Appium session failed
+              limit: 2
+            - exit_status: 102  # Appium driver failed to start
               limit: 2
         concurrency: 25
         concurrency_group: "bitbar"
