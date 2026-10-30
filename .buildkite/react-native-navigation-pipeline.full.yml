@@ -147,7 +147,9 @@ steps:
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
+              - --appium-version=2.19
+              - --app-package=com.bugsnag.fixtures.reactnative.navigation
+              - --app-activity=com.bugsnag.fixtures.reactnative.navigation.MainActivity
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -194,7 +196,9 @@ steps:
               - --device=ANDROID_{{matrix.android_version}}
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
+              - --appium-version=2.19
+              - --app-package=com.bugsnag.fixtures.reactnative.navigation
+              - --app-activity=com.bugsnag.fixtures.reactnative.navigation.MainActivity
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:

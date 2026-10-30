@@ -73,7 +73,9 @@ steps:
               - --device=ANDROID_15
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
+              - --appium-version=2.19
+              - --app-package=com.bugsnag.expo.fixture
+              - --app-activity=com.bugsnag.expo.fixture.MainActivity
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -116,7 +118,7 @@ steps:
               - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
+              - --appium-version=2.19
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:

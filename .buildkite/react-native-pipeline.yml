@@ -131,7 +131,9 @@ steps:
               - --device=ANDROID_15
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
+              - --appium-version=2.19
+              - --app-package=com.bugsnag.fixtures.reactnative.performance
+              - --app-activity=com.bugsnag.fixtures.reactnative.performance.MainActivity
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -176,7 +178,9 @@ steps:
               - --device=ANDROID_15
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
+              - --appium-version=2.19
+              - --app-package=com.bugsnag.fixtures.reactnative.performance
+              - --app-activity=com.bugsnag.fixtures.reactnative.performance.MainActivity
               - --no-tunnel
               - --aws-public-ip
               - --tags=@native_integration
@@ -222,9 +226,12 @@ steps:
               - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
+              - --appium-version=2.19
+              - --app-package=com.bugsnag.fixtures.reactnative.performance
+              - --app-activity=com.bugsnag.fixtures.reactnative.performance.MainActivity
               - --no-tunnel
               - --aws-public-ip
+              - --tags=@new_arch
           test-collector#v1.10.2:
             files: "reports/TEST-*.xml"
             format: "junit"
@@ -267,7 +274,9 @@ steps:
               - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
+              - --appium-version=2.19
+              - --app-package=com.bugsnag.fixtures.reactnative.performance
+              - --app-activity=com.bugsnag.fixtures.reactnative.performance.MainActivity
               - --no-tunnel
               - --aws-public-ip
               - --tags=@native_integration
