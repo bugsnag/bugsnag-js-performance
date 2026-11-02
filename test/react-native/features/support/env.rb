@@ -14,6 +14,21 @@ BeforeAll do
 
 end
 
+# Appium 2 launches the app when the session is created, before Maze Runner pushes
+# fixture_config.json in its Before hook. With noReset, the app can read a stale
+# config left on the device by a previous run and cache a dead Maze Runner address,
+# so restart it once after the first config push
+$app_restarted_after_config_push = false
+
+Maze.hooks.before do
+  next if $app_restarted_after_config_push || Maze.mode != :appium
+
+  manager = Maze::Api::Appium::AppManager.new
+  manager.terminate
+  manager.activate
+  $app_restarted_after_config_push = true
+end
+
 Before('@skip') do
   skip_this_scenario("Skipping scenario")
 end
