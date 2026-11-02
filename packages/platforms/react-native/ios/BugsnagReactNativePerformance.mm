@@ -370,10 +370,15 @@ RCT_EXPORT_METHOD(endNativeSpan:(NSString *)spanId
         // We need to reinstate the bugsnag.sampling.p attribute here as it might not be re-populated on span end
         nativeSpan.attributes[@"bugsnag.sampling.p"] = @(nativeSpan.samplingProbability);
         
-        // If the span has no end time yet, or the end time is later than the current end time, update it
-        // (comparing against a nil date is undefined and leaves the end time unset on some iOS versions)
+        // If the span has no valid end time yet, or the end time is later than the current end time, update it.
+        // An unset end time may be nil or a placeholder date (before the start time or in the future)
+        // depending on the native SDK version, and comparing against it would leave the end time unset
         NSDate *nativeEndTime = [NSDate dateWithTimeIntervalSince1970: endTime / NSEC_PER_SEC];
-        if (nativeSpan.endTime == nil || [nativeEndTime timeIntervalSinceDate:nativeSpan.endTime] > 0) {
+        NSDate *currentEndTime = nativeSpan.endTime;
+        BOOL hasValidEndTime = currentEndTime != nil
+            && [currentEndTime timeIntervalSinceDate:nativeSpan.startTime] >= 0
+            && [currentEndTime timeIntervalSinceNow] <= 0;
+        if (!hasValidEndTime || [nativeEndTime timeIntervalSinceDate:currentEndTime] > 0) {
             [nativeSpan markEndTime:nativeEndTime];
         }
         
