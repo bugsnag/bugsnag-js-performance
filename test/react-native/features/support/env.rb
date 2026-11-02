@@ -29,6 +29,18 @@ Maze.hooks.before do
   $app_restarted_after_config_push = true
 end
 
+# Log the screen hierarchy when an Appium scenario fails, while the app is still in its
+# failed state, so CI logs show what was on screen (e.g. for element lookup failures)
+Maze.hooks.pre_complete do |scenario|
+  next unless scenario.failed? && Maze.mode == :appium
+
+  begin
+    $logger.info "Page source at failure:\n#{Maze.driver.page_source}"
+  rescue => error
+    $logger.warn "Could not capture page source: #{error.message}"
+  end
+end
+
 Before('@skip') do
   skip_this_scenario("Skipping scenario")
 end
