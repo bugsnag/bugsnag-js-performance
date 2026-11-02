@@ -229,7 +229,6 @@ steps:
               - --appium-version=2.19
               - --no-tunnel
               - --aws-public-ip
-              - --tags=@new_arch
           test-collector#v1.10.2:
             files: "reports/TEST-*.xml"
             format: "junit"
