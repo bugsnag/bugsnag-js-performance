@@ -15,6 +15,11 @@ Pod::Spec.new do |s|
 
   s.source_files    = "ios/**/*.{h,m,mm,swift}"
 
+  # Supported BugsnagPerformance versions: >= 1.14.0 and < 6.0, the same range for CocoaPods and
+  # for the Swift package (where maximumVersion is exclusive). The newest release in the range is
+  # used, unless the app pins a version inside it; Podfile.lock or Package.resolved then keeps
+  # that version until the dependencies are updated.
+  #
   # 1.14.0 added the span control and plugin APIs used by this plugin. The upper bound makes
   # CocoaPods report a clear version conflict, rather than a build error, if a BugsnagPerformance
   # major version is incompatible.
