@@ -33,12 +33,13 @@ steps:
         key: "build-expo-ipa"
         timeout_in_minutes: 90
         agents:
-          queue: "macos-15"
+          queue: "macos-26"
         env:
           EAS_BUILD_NO_EXPO_GO_WARNING: true
           EXPO_VERSION: "{{matrix}}"
           NODE_VERSION: "24"
-          XCODE_VERSION: "16.2.0"
+          # Expo 57 requires Xcode 26.4+
+          XCODE_VERSION: "26.6.0"
           BUILD_IOS: 1
         artifact_paths: test/react-native/features/fixtures/generated/expo/**/test-fixture/output.ipa
         commands:

@@ -169,6 +169,12 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     }
   }
 
+  // from SDK 57, expo replaces the global fetch with expo/fetch, which bypasses XMLHttpRequest
+  // and so is not tracked by the SDK yet - keep React Native's (xhr based) fetch for now
+  if (parseInt(expoVersion) >= 57) {
+    easConfig.build.production.env = { EXPO_PUBLIC_USE_RN_FETCH: '1' }
+  }
+
   fs.writeFileSync(`${fixtureDir}/eas.json`, JSON.stringify(easConfig, null, 2))
 
   // replace the fixture's tabs directory with our own routes
