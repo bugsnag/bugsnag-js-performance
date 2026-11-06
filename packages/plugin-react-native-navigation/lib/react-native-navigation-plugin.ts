@@ -1,8 +1,9 @@
 import { setAppState } from '@bugsnag/core-performance'
 import type { Plugin, PluginContext, Span } from '@bugsnag/core-performance'
 import type { ReactNativeConfiguration } from '@bugsnag/react-native-performance'
-import type { NavigationDelegate } from 'react-native-navigation/lib/dist/src/NavigationDelegate'
+import type { Navigation } from 'react-native-navigation'
 import BugsnagPerformance from '@bugsnag/react-native-performance'
+type NavigationDelegate = typeof Navigation
 type Reason = 'immediate' | 'mount' | 'unmount' | 'condition'
 
 const NAVIGATION_START_TIMEOUT = 1000
