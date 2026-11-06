@@ -133,7 +133,13 @@ function getExpoDependencies() {
     '@react-native-community/netinfo',
     'react-native-file-access@^3.2.0',
     'expo-build-properties',
-    'expo-constants'
+    'expo-constants',
+    // @expo/metro-config resolves expo-asset from the project root, so it must be a direct dependency
+    // (otherwise it can end up nested under node_modules/expo and the JS bundle step fails)
+    'expo-asset',
+    // expo-router imports query-string without declaring it as a dependency - it was previously
+    // installed transitively via @react-navigation/core, which dropped it in 7.22.1
+    'query-string@^7.1.3'
   ]
 }
 
