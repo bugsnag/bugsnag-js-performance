@@ -136,11 +136,27 @@ function getExpoDependencies() {
     'expo-constants',
     // @expo/metro-config resolves expo-asset from the project root, so it must be a direct dependency
     // (otherwise it can end up nested under node_modules/expo and the JS bundle step fails)
-    'expo-asset',
-    // expo-router imports query-string without declaring it as a dependency - it was previously
-    // installed transitively via @react-navigation/core, which dropped it in 7.22.1
-    'query-string@^7.1.3'
+    'expo-asset'
   ]
+}
+
+/**
+ * npm overrides for Expo fixtures
+ *
+ * expo-router depends on @react-navigation/* with open ^7 ranges, but relies on react-navigation internals.
+ * The react-navigation releases from 2026-09-15 onwards (native 7.4.0 / core 7.22.x) are incompatible with
+ * the expo-router versions used by our fixtures (e.g. core dropped the query-string dependency that
+ * expo-router imports), so pin them to the last releases before that.
+ */
+function getExpoOverrides() {
+  return {
+    '@react-navigation/native': '7.3.18',
+    '@react-navigation/core': '7.21.13',
+    '@react-navigation/routers': '7.6.4',
+    '@react-navigation/elements': '2.9.40',
+    '@react-navigation/bottom-tabs': '7.18.18',
+    '@react-navigation/native-stack': '7.18.10'
+  }
 }
 
 module.exports = {
@@ -148,5 +164,6 @@ module.exports = {
   getReactNativeDependencies,
   getReactNavigationDependencies,
   getReactNativeNavigationDependencies,
-  getExpoDependencies
+  getExpoDependencies,
+  getExpoOverrides
 }

@@ -9,7 +9,7 @@ steps:
       #
       - label:  ':android: Build Expo {{matrix}} APK'
         key: "build-expo-apk"
-        timeout_in_minutes: 30
+        timeout_in_minutes: 90
         agents:
           queue: "macos-15"
         env:
@@ -23,7 +23,7 @@ steps:
           - bundle install
           - node test/react-native/scripts/generate-expo-fixture.js
         matrix:
-          - "54"
+          - "57"
         retry:
           automatic:
             - exit_status: "*"
@@ -31,7 +31,7 @@ steps:
 
       - label:  ':mac: Build Expo {{matrix}} IPA'
         key: "build-expo-ipa"
-        timeout_in_minutes: 30
+        timeout_in_minutes: 90
         agents:
           queue: "macos-15"
         env:
@@ -45,7 +45,7 @@ steps:
           - bundle install
           - node test/react-native/scripts/generate-expo-fixture.js
         matrix:
-          - "54"
+          - "57"
         retry:
           automatic:
             - exit_status: "*"
@@ -56,7 +56,7 @@ steps:
       #
       - label: ":bitbar: :android: Expo {{matrix}} Android 15 end-to-end tests"
         depends_on: "build-expo-apk"
-        timeout_in_minutes: 20
+        timeout_in_minutes: 40
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.apk"
@@ -97,11 +97,11 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "54"
+          - "57"
 
       - label: ":bitbar: :mac: Expo {{matrix}} iOS end-to-end tests"
         depends_on: "build-expo-ipa"
-        timeout_in_minutes: 20
+        timeout_in_minutes: 40
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.ipa"
@@ -140,4 +140,4 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "54"
+          - "57"

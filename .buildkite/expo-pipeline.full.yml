@@ -9,7 +9,7 @@ steps:
       #
       - label:  ':android: Build Expo {{matrix}} APK'
         key: "build-expo-apk-full"
-        timeout_in_minutes: 30
+        timeout_in_minutes: 60
         agents:
           queue: "macos-15"
         env:
@@ -28,7 +28,7 @@ steps:
 
       - label:  ':mac: Build Expo {{matrix}} IPA'
         key: "build-expo-ipa-full"
-        timeout_in_minutes: 30
+        timeout_in_minutes: 60
         agents:
           queue: "macos-15"
         env:
@@ -50,7 +50,7 @@ steps:
       #
       - label: ":bitbar: :android: Expo {{matrix}} Android 13 end-to-end tests"
         depends_on: "build-expo-apk-full"
-        timeout_in_minutes: 20
+        timeout_in_minutes: 40
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.apk"
@@ -95,7 +95,7 @@ steps:
 
       - label: ":bitbar: :mac: Expo {{matrix}} iOS end-to-end tests"
         depends_on: "build-expo-ipa-full"
-        timeout_in_minutes: 20
+        timeout_in_minutes: 40
         plugins:
           artifacts#v1.9.0:
             download: "test/react-native/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.ipa"
