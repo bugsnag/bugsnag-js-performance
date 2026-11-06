@@ -81,10 +81,13 @@ function getReactNavigationDependencies(reactNativeVersion) {
       reactNavigationVersion = '^6.0.0'
       reactNavigationNativeStackVersion = '^6.0.0'
       reactNativeScreensVersion = '~3.33.0'
+      // 5.9.0+ adopted the AGP 9 source set API (java.directories), which RN <= 0.75's AGP doesn't have
+      reactNativeSafeAreaContextVersion = '~5.8.1'
       break
     case rnVersion >= 0.74:
       reactNavigationVersion = '^6.0.0'
       reactNavigationNativeStackVersion = '^6.0.0'
+      reactNativeSafeAreaContextVersion = '~5.8.1'
       reactNativeScreensVersion = '~3.32.0'
       break
     case rnVersion >= 0.73:
