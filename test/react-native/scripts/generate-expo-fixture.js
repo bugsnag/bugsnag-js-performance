@@ -57,17 +57,19 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   // pin transitive dependencies that have broken compatibility with the template (see getExpoOverrides)
   // these are applied by the npm installs below and by the EAS build's own npm install
-  const fixturePackageJsonPath = resolve(fixtureDir, 'package.json')
-  const fixturePackageJson = JSON.parse(fs.readFileSync(fixturePackageJsonPath, 'utf8'))
-  const expoOverrides = getExpoOverrides()
-  fixturePackageJson.overrides = { ...fixturePackageJson.overrides, ...expoOverrides }
-  // npm rejects an override that conflicts with a direct dependency (EOVERRIDE), so pin those to the same version
-  for (const [name, version] of Object.entries(expoOverrides)) {
-    if (fixturePackageJson.dependencies?.[name]) {
-      fixturePackageJson.dependencies[name] = version
+  const expoOverrides = getExpoOverrides(expoVersion)
+  if (Object.keys(expoOverrides).length > 0) {
+    const fixturePackageJsonPath = resolve(fixtureDir, 'package.json')
+    const fixturePackageJson = JSON.parse(fs.readFileSync(fixturePackageJsonPath, 'utf8'))
+    fixturePackageJson.overrides = { ...fixturePackageJson.overrides, ...expoOverrides }
+    // npm rejects an override that conflicts with a direct dependency (EOVERRIDE), so pin those to the same version
+    for (const [name, version] of Object.entries(expoOverrides)) {
+      if (fixturePackageJson.dependencies?.[name]) {
+        fixturePackageJson.dependencies[name] = version
+      }
     }
+    fs.writeFileSync(fixturePackageJsonPath, JSON.stringify(fixturePackageJson, null, 2))
   }
-  fs.writeFileSync(fixturePackageJsonPath, JSON.stringify(fixturePackageJson, null, 2))
 
   // install expo dependencies using expo install
   const expoInstallArgs = ['expo', 'install', ...getExpoDependencies()]
