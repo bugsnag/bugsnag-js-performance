@@ -347,6 +347,18 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(startNativeSpan:(NSString *)name
     return span;
 }
 
+// Converts a JS end time (unix nanoseconds) to a date that is never before the span's start time.
+// Native spans may be started with the native clock and ended with the JS clock, which can be slightly
+// behind it, so a span ended immediately after it starts could otherwise end before it started
+static NSDate *endTimeNotBeforeStart(BugsnagPerformanceSpan *nativeSpan, double endTime) {
+    NSDate *nativeEndTime = [NSDate dateWithTimeIntervalSince1970: endTime / NSEC_PER_SEC];
+    NSDate *startTime = nativeSpan.startTime;
+    if (startTime != nil && [nativeEndTime timeIntervalSinceDate:startTime] < 0) {
+        return startTime;
+    }
+    return nativeEndTime;
+}
+
 RCT_EXPORT_METHOD(endNativeSpan:(NSString *)spanId
                 traceId:(NSString *)traceId
                 endTime:(double)endTime
@@ -373,7 +385,7 @@ RCT_EXPORT_METHOD(endNativeSpan:(NSString *)spanId
         // If the span has no valid end time yet, or the end time is later than the current end time, update it.
         // An unset end time may be nil or a placeholder date (before the start time or in the future)
         // depending on the native SDK version, and comparing against it would leave the end time unset
-        NSDate *nativeEndTime = [NSDate dateWithTimeIntervalSince1970: endTime / NSEC_PER_SEC];
+        NSDate *nativeEndTime = endTimeNotBeforeStart(nativeSpan, endTime);
         NSDate *currentEndTime = nativeSpan.endTime;
         BOOL hasValidEndTime = currentEndTime != nil
             && [currentEndTime timeIntervalSinceDate:nativeSpan.startTime] >= 0
@@ -392,7 +404,7 @@ RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(markNativeSpanEndTime:(NSString *)spanId 
     @synchronized (openSpans) {
         BugsnagPerformanceSpan *nativeSpan = openSpans[[spanId stringByAppendingString:traceId]];
         if (nativeSpan != nil) {
-            NSDate *nativeEndTime = [NSDate dateWithTimeIntervalSince1970: endTime / NSEC_PER_SEC];
+            NSDate *nativeEndTime = endTimeNotBeforeStart(nativeSpan, endTime);
             [nativeSpan markEndTime:nativeEndTime];
         }
     }

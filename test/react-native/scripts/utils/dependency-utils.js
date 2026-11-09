@@ -140,6 +140,10 @@ function getExpoDependencies() {
     // @expo/metro-config resolves expo-asset from the project root, so it must be a direct dependency
     // (otherwise it can end up nested under node_modules/expo and the JS bundle step fails)
     'expo-asset',
+    // expo-file-system provides the app directories native module that expo-asset needs to load fonts.
+    // it is only a dependency of the expo package, so it can end up nested under node_modules/expo,
+    // where it is not autolinked (the app then fails with "Module 'expo.modules.interfaces.filesystem.AppDirectories' not found")
+    'expo-file-system',
     // our replacement app/(tabs)/_layout.tsx uses FontAwesome icons, but the tabs template
     // no longer includes @expo/vector-icons from SDK 57 onwards
     '@expo/vector-icons'
