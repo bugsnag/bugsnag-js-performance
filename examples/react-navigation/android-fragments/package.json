@@ -25,6 +25,7 @@
     },
     "overrides": {
         "joi": "^17.13.9",
-        "brace-expansion@^1": "^1.1.21"
+        "brace-expansion@^1": "^1.1.21",
+        "node-forge": "^1.4.1"
     }
 }
