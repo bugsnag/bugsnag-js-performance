@@ -1,5 +1,4 @@
 #import <Foundation/Foundation.h>
-#import "BSGViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -16,14 +15,14 @@ NS_ASSUME_NONNULL_BEGIN
  * 
  * @return NSDictionary containing the startup configuration, or nil if no configuration is saved
  */
-+ (NSDictionary * _Nullable)readStartupConfig;
++ (nullable NSDictionary *)readStartupConfig;
 
 /**
  * Save the provided configuration for use on the next launch.
  * 
  * @param configuration Configuration dictionary to save
  */ 
-+ (void)saveStartupConfig:(NSDictionary * _Nonnull)configuration;
++ (void)saveStartupConfig:(NSDictionary *)configuration;
 
 /**
  * Clear any saved startup configuration.
@@ -36,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
  * @param configuration Configuration dictionary containing performance settings
  * @return YES if started successfully, NO otherwise
  */
-+ (BOOL)startNativePerformanceWithConfiguration:(NSDictionary * _Nonnull)configuration;
++ (BOOL)startNativePerformanceWithConfiguration:(NSDictionary *)configuration;
 
 @end
 
