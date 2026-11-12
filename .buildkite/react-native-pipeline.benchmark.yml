@@ -79,10 +79,9 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/native-integration/benchmarks/new-arch/{{matrix}}/reactnative.apk
               - --farm=bb
-              - --device=ANDROID_13
+              - --device=ANDROID_15
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
               - --tags=@benchmark
@@ -128,7 +127,6 @@ steps:
               - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
-              - --appium-version=1.22
               - --no-tunnel
               - --aws-public-ip
               - --tags=@benchmark

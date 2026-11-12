@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/browser-performance",
-  "version": "3.2.0",
+  "version": "3.4.1",
   "description": "BugSnag performance monitoring for browsers",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",

@@ -1,5 +1,7 @@
 const { execFileSync } = require('child_process')
 const fs = require('fs')
+const { resolve } = require('path')
+const { ROOT_DIR } = require('./constants')
 const { isTruthy } = require('./env-validation')
 
 /**
@@ -98,6 +100,10 @@ function buildExpoIOSFixture (fixtureDir, easWorkingDir) {
     stdio: 'inherit',
     env: {
       ...process.env,
+      // EAS local builds spawn `pod` directly rather than via `bundle exec`, so
+      // without this the Gemfile's `json < 3` pin never reaches the install pods
+      // phase and CocoaPods fails with "unknown keyword: quirks_mode"
+      BUNDLE_GEMFILE: resolve(ROOT_DIR, 'Gemfile'),
       EAS_LOCAL_BUILD_WORKINGDIR: easWorkingDir,
       EAS_LOCAL_BUILD_SKIP_CLEANUP: 1,
       EAS_NO_VCS: 1,
