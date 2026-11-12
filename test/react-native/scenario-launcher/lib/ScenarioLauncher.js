@@ -96,11 +96,18 @@ export async function launchScenario (setScenario, clearPersistedData = true) {
 }
 
 export function launchFromStartupConfig () {
-  const startupConfig = NativeScenarioLauncher.readStartupConfig()?.reactNative
+  const nativeConfig = NativeScenarioLauncher.readStartupConfig()?.reactNative
+
+  // copy the config rather than mutating it, as objects returned from native modules
+  // may not be writable (e.g. under the new architecture)
+  const startupConfig = nativeConfig
+    ? {
+        ...nativeConfig,
+        wrapperComponentProvider: nativeConfig.useWrapperComponentProvider ? wrapperComponentProvider : null
+      }
+    : nativeConfig
 
   if (startupConfig) {
-    startupConfig.wrapperComponentProvider = startupConfig.useWrapperComponentProvider ? wrapperComponentProvider : null
-
     if (startupConfig.attach) {
       BugsnagPerformance.attach(startupConfig)
     } else {
