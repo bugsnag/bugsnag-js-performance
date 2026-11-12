@@ -16,11 +16,7 @@ def get_test_url()
     maze_address = "#{host}:9339"
   end
 
-  if Maze.config.https
-    protocol = 'https'
-  else
-    protocol = 'http'
-  end
+  protocol = Maze.config.https ? 'https' : 'http'
 
   UrlGenerator.new(
     URI("#{protocol}://#{maze_address}"),
