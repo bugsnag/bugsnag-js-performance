@@ -5,6 +5,8 @@
 
 ### Fixed
 
+- (plugin-react-native-navigation) Fix TypeScript types for react-native-navigation v8 while keeping compatibility with v7 [#839](https://github.com/bugsnag/bugsnag-js-performance/pull/839)
+
 - (vue-router) Add support for Vue Router v5 while maintaining compatibility with v4 [#809](https://github.com/bugsnag/bugsnag-js-performance/pull/809)
 
 - (browser) Fix TLS PageLoadPhase span start times when `secureConnectionStart` is 0 [#781](https://github.com/bugsnag/bugsnag-js-performance/pull/781)
