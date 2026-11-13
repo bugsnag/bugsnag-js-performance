@@ -3,7 +3,17 @@
 
 ## [Unreleased]
 
+### Added
+
+- (plugin-react-native-span-access) Set `BUGSNAG_PERFORMANCE_SPM=1` when running `pod install` to take `BugsnagPerformance` from its Swift package instead of CocoaPods. This needs a React Native version that provides `spm_dependency`, and static linking (the default). The app must not also depend on the `BugsnagPerformance` pod, directly or through another pod such as `BugsnagPerformanceSwift`
+
+### Changed
+
+- (plugin-react-native-span-access) The `BugsnagNativeSpans` pod now declares the `BugsnagPerformance` versions it supports (`>= 1.14.0, < 6.0`), so that an unsupported version is reported by `pod install`
+
 ### Fixed
+
+- (react-native) Fix build errors with `use_frameworks!` when `BugsnagPerformance` is also installed (for example with `@bugsnag/plugin-react-native-span-access`), caused by copies of `BugsnagPerformance` headers being public headers of the `BugsnagReactNativePerformance` framework
 
 - (vue-router) Add support for Vue Router v5 while maintaining compatibility with v4 [#809](https://github.com/bugsnag/bugsnag-js-performance/pull/809)
 
