@@ -30,8 +30,11 @@ export const initialise = async (config) => {
 }
 
 const styles = StyleSheet.create({
+  // keep the wrapper text clear of the status bar, as Android 15 draws apps edge-to-edge
+  // and Appium won't find elements hidden behind it
   container: {
-    flex: 1
+    flex: 1,
+    paddingTop: 100
   },
   scenario: {
     flex: 1
