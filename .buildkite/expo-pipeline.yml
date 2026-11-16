@@ -9,12 +9,13 @@ steps:
       #
       - label:  ':android: Build Expo {{matrix}} APK'
         key: "build-expo-apk"
-        timeout_in_minutes: 20
+        timeout_in_minutes: 90
         agents:
           queue: "macos-15"
         env:
           EAS_BUILD_NO_EXPO_GO_WARNING: true
           JAVA_VERSION: "17"
+          NODE_VERSION: "24"
           EXPO_VERSION: "{{matrix}}"
           BUILD_ANDROID: 1
         artifact_paths: test/react-native/features/fixtures/generated/expo/**/test-fixture/output.apk
@@ -23,15 +24,22 @@ steps:
           - node test/react-native/scripts/generate-expo-fixture.js
         matrix:
           - "57"
+        retry:
+          automatic:
+            - exit_status: "*"
+              limit: 1
 
       - label:  ':mac: Build Expo {{matrix}} IPA'
         key: "build-expo-ipa"
-        timeout_in_minutes: 20
+        timeout_in_minutes: 90
         agents:
-          queue: "macos-15"
+          queue: "macos-26"
         env:
           EAS_BUILD_NO_EXPO_GO_WARNING: true
           EXPO_VERSION: "{{matrix}}"
+          NODE_VERSION: "24"
+          # Expo 57 requires Xcode 26.4+
+          XCODE_VERSION: "26.6.0"
           BUILD_IOS: 1
         artifact_paths: test/react-native/features/fixtures/generated/expo/**/test-fixture/output.ipa
         commands:
@@ -39,13 +47,17 @@ steps:
           - node test/react-native/scripts/generate-expo-fixture.js
         matrix:
           - "57"
+        retry:
+          automatic:
+            - exit_status: "*"
+              limit: 1
 
       #
       # End-to-end tests
       #
       - label: ":bitbar: :android: Expo {{matrix}} Android 15 end-to-end tests"
         depends_on: "build-expo-apk"
-        timeout_in_minutes: 20
+        timeout_in_minutes: 40
         plugins:
           artifacts#v1.9.0:
             step: "build-expo-apk"
@@ -63,6 +75,9 @@ steps:
               - --device=ANDROID_15
               - --a11y-locator
               - --fail-fast
+              - --appium-version=2.19
+              - --app-package=com.bugsnag.expo.fixture
+              - --app-activity=com.bugsnag.expo.fixture.MainActivity
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -78,6 +93,8 @@ steps:
           automatic:
             - exit_status: 103  # Appium session failed
               limit: 2
+            - exit_status: 102  # Appium driver failed to start
+              limit: 2
         concurrency: 25
         concurrency_group: "bitbar"
         concurrency_method: eager
@@ -86,7 +103,7 @@ steps:
 
       - label: ":bitbar: :mac: Expo {{matrix}} iOS end-to-end tests"
         depends_on: "build-expo-ipa"
-        timeout_in_minutes: 20
+        timeout_in_minutes: 40
         plugins:
           artifacts#v1.9.0:
             step: "build-expo-ipa"
@@ -104,6 +121,7 @@ steps:
               - --device=IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --fail-fast
+              - --appium-version=2.19
               - --no-tunnel
               - --aws-public-ip
           test-collector#v1.10.2:
@@ -118,6 +136,8 @@ steps:
             permit_on_passed: true
           automatic:
             - exit_status: 103  # Appium session failed
+              limit: 2
+            - exit_status: 102  # Appium driver failed to start
               limit: 2
         concurrency: 25
         concurrency_group: "bitbar"

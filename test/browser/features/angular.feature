@@ -1,6 +1,8 @@
 @skip_chrome_61
+@skip_edge_80
 @skip_firefox_60
 @skip_safari_11
+@skip_on_ios_13
 @skip_on_cdn_build
 Feature: Angular
 

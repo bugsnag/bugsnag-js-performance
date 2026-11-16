@@ -22,18 +22,12 @@ function configureIOSProject (fixtureDir, reactNativeVersion) {
 
   fs.writeFileSync(`${fixtureDir}/ios/Podfile`, podfileContents)
 
-  // pin xcodeproj version to < 1.26.0
+  // pin xcodeproj version to < 1.26.0; json 3.x removed quirks_mode, which older RN Podfile scripts still pass
   const gemfilePath = resolve(fixtureDir, 'Gemfile')
   if (fs.existsSync(gemfilePath)) {
     appendToFileIfNotExists(gemfilePath, "gem 'xcodeproj', '< 1.26.0'", 'xcodeproj')
     appendToFileIfNotExists(gemfilePath, "gem 'concurrent-ruby', '<= 1.3.4'", 'concurrent-ruby')
-
-    // json 3.0 removed the `quirks_mode` option, which the ActiveSupport
-    // version pulled in by the template's CocoaPods pin still passes, so
-    // `pod install` fails with "unknown keyword: quirks_mode". The pods are
-    // installed with the fixture's own Gemfile (see buildIOSFixture), so the
-    // matching pin in the repository root Gemfile does not apply here.
-    appendToFileIfNotExists(gemfilePath, "gem 'json', '< 3'", "gem 'json'")
+    appendToFileIfNotExists(gemfilePath, "gem 'json', '< 3.0'", "gem 'json'")
   }
 
   // set NSAllowsArbitraryLoads to allow http traffic for all domains (bitbar public IP + bs-local.com)

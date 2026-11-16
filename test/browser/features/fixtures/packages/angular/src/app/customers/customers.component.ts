@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-customers',
   templateUrl: './customers.component.html',
+  standalone: false,
 })
 export class CustomersComponent {
   constructor(private titleService: Title, private route: ActivatedRoute) {

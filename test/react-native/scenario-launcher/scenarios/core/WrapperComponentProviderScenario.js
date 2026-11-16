@@ -1,5 +1,5 @@
 import React from 'react'
-import { SafeAreaView, View, Text, StyleSheet, Platform, StatusBar } from 'react-native'
+import { SafeAreaView, View, Text, StyleSheet } from 'react-native'
 import { NativeScenarioLauncher } from '../../lib/native'
 
 export const wrapperComponentProvider = () =>  ({ children }) => {
@@ -29,18 +29,12 @@ export const initialise = async (config) => {
   NativeScenarioLauncher.exitApp()
 }
 
-// On Android, SafeAreaView is a plain View and applies no insets. Apps that
-// target SDK 35 or newer (React Native 0.78+) are drawn edge-to-edge on
-// Android 15, so without this the 'wrapper-component' text is laid out
-// entirely underneath the status bar. Android reports views that are fully
-// covered by another window as not visible to accessibility services, so
-// Appium cannot find the element and app-start-spans.feature fails.
-const androidStatusBarInset = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) + 16 : 0
-
 const styles = StyleSheet.create({
+  // keep the wrapper text clear of the status bar, as Android 15 draws apps edge-to-edge
+  // and Appium won't find elements hidden behind it
   container: {
     flex: 1,
-    paddingTop: androidStatusBarInset
+    paddingTop: 100
   },
   scenario: {
     flex: 1
