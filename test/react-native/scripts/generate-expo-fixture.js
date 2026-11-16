@@ -7,7 +7,7 @@ const { ROOT_DIR } = require('./utils/constants')
 const { validateEnvironment } = require('./utils/env-validation')
 const { buildPackages } = require('./utils/build-utils')
 const { cleanDirectory, ensureDirectory } = require('./utils/file-utils')
-const { installFixtureDependencies, getExpoDependencies } = require('./utils/dependency-utils')
+const { installFixtureDependencies, getExpoDependencies, getExpoOverrides } = require('./utils/dependency-utils')
 const { buildExpoAndroidFixture, buildExpoIOSFixture } = require('./utils/platform-builds')
 
 // Bugsnag packages to install (excludes react-native-navigation)
@@ -54,6 +54,22 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
   // create the test fixture
   const expoInitArgs = ['create-expo-app', 'test-fixture', '--template', `tabs@${expoVersion}`]
   execFileSync('npx', expoInitArgs, { cwd: buildDir, stdio: 'inherit' })
+
+  // pin transitive dependencies that have broken compatibility with the template (see getExpoOverrides)
+  // these are applied by the npm installs below and by the EAS build's own npm install
+  const expoOverrides = getExpoOverrides(expoVersion)
+  if (Object.keys(expoOverrides).length > 0) {
+    const fixturePackageJsonPath = resolve(fixtureDir, 'package.json')
+    const fixturePackageJson = JSON.parse(fs.readFileSync(fixturePackageJsonPath, 'utf8'))
+    fixturePackageJson.overrides = { ...fixturePackageJson.overrides, ...expoOverrides }
+    // npm rejects an override that conflicts with a direct dependency (EOVERRIDE), so pin those to the same version
+    for (const [name, version] of Object.entries(expoOverrides)) {
+      if (fixturePackageJson.dependencies?.[name]) {
+        fixturePackageJson.dependencies[name] = version
+      }
+    }
+    fs.writeFileSync(fixturePackageJsonPath, JSON.stringify(fixturePackageJson, null, 2))
+  }
 
   // install expo dependencies using expo install
   const expoInstallArgs = ['expo', 'install', ...getExpoDependencies()]
@@ -151,6 +167,12 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
     ios: {
       enterpriseProvisioning: 'universal'
     }
+  }
+
+  // from SDK 57, expo replaces the global fetch with expo/fetch, which bypasses XMLHttpRequest
+  // and so is not tracked by the SDK yet - keep React Native's (xhr based) fetch for now
+  if (parseInt(expoVersion) >= 57) {
+    easConfig.build.production.env = { EXPO_PUBLIC_USE_RN_FETCH: '1' }
   }
 
   fs.writeFileSync(`${fixtureDir}/eas.json`, JSON.stringify(easConfig, null, 2))
