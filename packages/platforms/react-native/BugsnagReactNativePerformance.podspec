@@ -26,7 +26,10 @@ Pod::Spec.new do |s|
     "ios/BugsnagReactNativePerformanceCrossTalkAPIClient.h",
   ]
 
-  if ENV["RCT_NEW_ARCH_ENABLED"] == "1"
+  # install_modules_dependencies is provided by React Native 0.71+ and adds the correct
+  # dependencies and compiler flags for both the old and new architecture. RN 0.82+ is
+  # new-architecture only, so we must not rely on apps setting RCT_NEW_ARCH_ENABLED.
+  if respond_to?(:install_modules_dependencies, true)
     install_modules_dependencies(s)
   else
     s.dependency "React-Core"

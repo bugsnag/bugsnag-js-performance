@@ -44,6 +44,8 @@ function getReactNativeDependencies(reactNativeVersion, notifierVersion) {
 function getReactNavigationDependencies(reactNativeVersion) {
   // react-native-screens new-arch support:
   // library version 	react-native version
+  // 4.26.0+ 	        0.84.0+
+  // 4.25.0+ 	        0.82.0+
   // 4.19.0+ 	        0.81.0+
   // 4.14.0+ 	        0.79.0+
   // 4.5.0+ 	        0.77.0+
@@ -65,6 +67,9 @@ function getReactNavigationDependencies(reactNativeVersion) {
   // Adjust versions based on React Native version
   const rnVersion = parseFloat(reactNativeVersion)
   switch (true) {
+    case rnVersion >= 0.86:
+      reactNativeScreensVersion = '~4.30.0'
+      break
     case rnVersion >= 0.81:
       reactNativeScreensVersion = '~4.19.0'
       break

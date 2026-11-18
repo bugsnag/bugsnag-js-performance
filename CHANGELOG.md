@@ -13,6 +13,8 @@
 
 ### Fixed
 
+- (react-native) Add support for React Native 0.88: the native module now always builds for the new architecture on React Native 0.82+, regardless of the `newArchEnabled` Gradle property or `RCT_NEW_ARCH_ENABLED` environment variable
+
 - (plugin-react-native-navigation) Fix TypeScript types for react-native-navigation v8 while keeping compatibility with v7 [#839](https://github.com/bugsnag/bugsnag-js-performance/pull/839)
 
 - (react-native) Fix build errors with `use_frameworks!` when `BugsnagPerformance` is also installed (for example with `@bugsnag/plugin-react-native-span-access`), caused by copies of `BugsnagPerformance` headers being public headers of the `BugsnagReactNativePerformance` framework
