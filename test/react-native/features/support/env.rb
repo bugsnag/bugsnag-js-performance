@@ -92,6 +92,19 @@ Before('@native_app_starts') do |scenario|
   skip_this_scenario("Skipping scenario: Not supported in 0.72") if Maze::Helper.get_current_platform == 'ios' && current_version == 0.72
 end
 
+# RN 0.88+ iOS templates use the UIScene lifecycle: the root view controller is created in
+# SceneDelegate's scene(_:willConnectTo:), which runs after didFinishLaunching. Cocoa Performance ends the
+# 'App launching - post main()' phase at didFinishLaunching, so the root view load is nested under 'UI init' instead
+Before('@ios_scene_lifecycle') do |scenario|
+  current_version = ENV['RN_VERSION'].nil? ? 0 : ENV['RN_VERSION'].to_f
+  skip_this_scenario("Skipping scenario: Requires RN 0.88+ (UIScene lifecycle)") unless current_version >= 0.88
+end
+
+Before('@skip_ios_scene_lifecycle') do |scenario|
+  current_version = ENV['RN_VERSION'].nil? ? 0 : ENV['RN_VERSION'].to_f
+  skip_this_scenario("Skipping scenario: Not supported with RN 0.88+ (UIScene lifecycle)") if current_version >= 0.88
+end
+
 Before('@benchmark') do |scenario|
   skip_this_scenario("Skipping scenario: Not running benchmark tests") unless ENV["BENCHMARKS"]
 end
