@@ -200,7 +200,7 @@ end
 
 # Like Maze Runner's 'a span named {string} has a parent named {string}', but passes if any of the listed spans is the parent
 Then('a span named {string} has a parent named one of:') do |child_name, table|
-  spans = SpanSupport.spans_from_request_list(Maze::Server.traces)
+  spans = spans_from_request_list(Maze::Server.list_for('traces'))
   child_spans = spans.select { |span| span['name'].eql?(child_name) }
   raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{child_name}" if child_spans.empty?
 
@@ -214,7 +214,7 @@ Then('a span named {string} has a parent named one of:') do |child_name, table|
 end
 
 Then('a span named {string} has a grandparent named {string}') do |child_name, grandparent_name|
-  spans = SpanSupport.spans_from_request_list(Maze::Server.traces)
+  spans = spans_from_request_list(Maze::Server.list_for('traces'))
   spans_by_id = spans.to_h { |span| [span['spanId'], span] }
   child_spans = spans.select { |span| span['name'].eql?(child_name) }
   raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{child_name}" if child_spans.empty?
