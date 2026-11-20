@@ -130,8 +130,11 @@ Feature: App Start spans
     And I wait to receive 2 sampling requests
     And I wait to receive 2 traces
     And a span named '[AppStart/ReactNativeInit]' has a parent named '[ViewLoad/UIKit]/BSGViewController'
-    And a span named '[ViewLoad/UIKit]/BSGViewController' has a parent named '[AppStartPhase/App launching - post main()]'
-    And a span named '[AppStartPhase/App launching - post main()]' has a parent named '[AppStart/iOSWarm]'
+    # The root view usually loads in didFinishLaunching ('post main()'), but on some devices (seen on iOS 26) it loads during 'UI init'
+    And a span named '[ViewLoad/UIKit]/BSGViewController' has a parent named one of:
+      | [AppStartPhase/App launching - post main()] |
+      | [AppStartPhase/UI init]                     |
+    And a span named '[ViewLoad/UIKit]/BSGViewController' has a grandparent named '[AppStart/iOSWarm]'
 
   @native_integration @native_app_starts  @ios_only @skip_ios_scene_lifecycle
   Scenario: Manual app start spans can be nested under native view load spans
@@ -141,8 +144,10 @@ Feature: App Start spans
     And I wait to receive 2 sampling requests
     And I wait to receive 2 traces
     And a span named '[AppStart/ReactNativeInit]' has a parent named '[ViewLoad/UIKit]/BSGViewController'
-    And a span named '[ViewLoad/UIKit]/BSGViewController' has a parent named '[AppStartPhase/App launching - post main()]'
-    And a span named '[AppStartPhase/App launching - post main()]' has a parent named '[AppStart/iOSWarm]'
+    And a span named '[ViewLoad/UIKit]/BSGViewController' has a parent named one of:
+      | [AppStartPhase/App launching - post main()] |
+      | [AppStartPhase/UI init]                     |
+    And a span named '[ViewLoad/UIKit]/BSGViewController' has a grandparent named '[AppStart/iOSWarm]'
 
   # RN 0.88+ creates the root view controller in SceneDelegate, after didFinishLaunching, so it loads during 'UI init'
   @native_integration @native_app_starts  @ios_only @ios_scene_lifecycle

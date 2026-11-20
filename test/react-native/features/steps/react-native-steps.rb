@@ -197,3 +197,35 @@ def spans_from_request_list(list)
       .flat_map { |s| s['spans'] }
       .select { |s| !s.nil? }
 end
+
+# Like Maze Runner's 'a span named {string} has a parent named {string}', but passes if any of the listed spans is the parent
+Then('a span named {string} has a parent named one of:') do |child_name, table|
+  spans = SpanSupport.spans_from_request_list(Maze::Server.traces)
+  child_spans = spans.select { |span| span['name'].eql?(child_name) }
+  raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{child_name}" if child_spans.empty?
+
+  parent_names = table.raw.flatten
+  parent_ids = spans.select { |span| parent_names.include?(span['name']) }.map { |span| span['spanId'] }
+  match = child_spans.any? { |span| parent_ids.include?(span['parentSpanId']) }
+
+  unless match
+    raise Test::Unit::AssertionFailedError.new "No child span named #{child_name} was found with a parent named any of #{parent_names}"
+  end
+end
+
+Then('a span named {string} has a grandparent named {string}') do |child_name, grandparent_name|
+  spans = SpanSupport.spans_from_request_list(Maze::Server.traces)
+  spans_by_id = spans.to_h { |span| [span['spanId'], span] }
+  child_spans = spans.select { |span| span['name'].eql?(child_name) }
+  raise Test::Unit::AssertionFailedError.new "No spans were found with the name #{child_name}" if child_spans.empty?
+
+  match = child_spans.any? do |span|
+    parent = spans_by_id[span['parentSpanId']]
+    grandparent = parent && spans_by_id[parent['parentSpanId']]
+    grandparent && grandparent['name'].eql?(grandparent_name)
+  end
+
+  unless match
+    raise Test::Unit::AssertionFailedError.new "No child span named #{child_name} was found with a grandparent named #{grandparent_name}"
+  end
+end
