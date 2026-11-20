@@ -5,6 +5,8 @@
 
 ### Added
 
+- (react-native) Add support for React Native 0.88: the native module now always builds for the new architecture on React Native 0.82+, regardless of the `newArchEnabled` Gradle property or `RCT_NEW_ARCH_ENABLED` environment variable [#841] (https://github.com/bugsnag/bugsnag-js-performance/pull/841)
+
 - (plugin-react-native-span-access) Set `BUGSNAG_PERFORMANCE_SPM=1` when running `pod install` to take `BugsnagPerformance` from its Swift package instead of CocoaPods. This needs a React Native version that provides `spm_dependency`, and static linking (the default). The app must not also depend on the `BugsnagPerformance` pod, directly or through another pod such as `BugsnagPerformanceSwift`
 
 ### Changed

@@ -29,6 +29,7 @@ const {
   configureReactNativeNavigation
 } = require('./utils/react-native-config')
 const {
+  ensureNotifierProguardRules,
   configureAndroidProject,
   installAndroidPerformance,
   installNativeTestUtilsAndroid,
@@ -136,6 +137,7 @@ if (!process.env.SKIP_GENERATE_FIXTURE) {
 
   // Install dependencies
   installFixtureDependencies(fixtureDir, bugsnagPackages, fixtureDeps)
+  ensureNotifierProguardRules(fixtureDir)
 
   // Apply RN 0.64 specific configuration
   if (parseFloat(reactNativeVersion) === 0.64) {
