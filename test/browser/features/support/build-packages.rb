@@ -83,12 +83,18 @@ begin
   Dir.chdir(ROOT) do
     run("ENABLE_TEST_CONFIGURATION=1 npm run build -- --scope #{PACKAGE_NAMES.join(" --scope ")}")
 
-    if BUILD_MODE == :npm
-      # in NPM mode pack each package into the fixture directory
-      PACKAGE_DIRECTORIES.each do |package|
-        run("npm pack #{package} --pack-destination #{FIXTURES_DIRECTORY}")
-      end
-    else
+    # pack each package into the fixture directory. This is required in both
+    # modes: fixtures bundled with rollup only resolve packages from within the
+    # fixture directory (see the nodeResolve "jail" option) but the Angular
+    # fixture is bundled by the Angular CLI, which has no such restriction. If
+    # the packages aren't installed locally it resolves them via the workspace
+    # symlink in the repo root and picks up the Angular version used to build
+    # @bugsnag/angular-performance rather than the one the fixture pins
+    PACKAGE_DIRECTORIES.each do |package|
+      run("npm pack #{package} --pack-destination #{FIXTURES_DIRECTORY}")
+    end
+
+    if BUILD_MODE == :cdn
       # in CDN mode copy the bundles & sourcemaps (for debugging) into the
       # fixture directory
       run("cp build/bugsnag-performance*.js* #{FIXTURES_DIRECTORY}/packages/")
@@ -102,10 +108,11 @@ begin
     install_command = "npm install --no-package-lock"
     build_command = "npm run build --workspaces"
 
-    if BUILD_MODE == :npm
-      # in NPM mode we need to also install the tarballs from 'npm pack'
-      run("npm install --no-package-lock --legacy-peer-deps *.tgz")
-    else
+    # install the tarballs from 'npm pack' so that the fixtures resolve the
+    # bugsnag packages (and their dependencies) from within the fixture directory
+    run("npm install --no-package-lock --legacy-peer-deps *.tgz")
+
+    if BUILD_MODE == :cdn
       # in CDN mode we need to tell the JS build to also use CDN mode
       build_command = "BUILD_MODE=CDN " + build_command
     end
