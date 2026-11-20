@@ -319,4 +319,73 @@ describe('Browser client integration tests', () => {
       await jest.runOnlyPendingTimersAsync()
     })
   })
+
+  describe('payload checksum behavior (Bugsnag-Integrity header)', () => {
+    beforeAll(() => {
+      // eslint-disable-next-line compat/compat
+      window.isSecureContext = true
+    })
+
+    afterAll(() => {
+      // eslint-disable-next-line compat/compat
+      window.isSecureContext = false
+    })
+
+    it('includes the integrity header by default', async () => {
+      client.start({
+        apiKey: VALID_API_KEY,
+        autoInstrumentFullPageLoads: false,
+        autoInstrumentNetworkRequests: false,
+        autoInstrumentRouteChanges: false
+      })
+
+      setNextSamplingProbability(0.2)
+      createSpans(100)
+      await jest.advanceTimersByTimeAsync(RESPONSE_TIME + 1)
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+
+      expect(mockFetch.mock.calls[1][1]).toEqual(expect.objectContaining({
+        headers: expect.objectContaining({ 'Bugsnag-Integrity': expect.stringMatching(/^sha1 (\d|[abcdef]){40}$/) })
+      }))
+    })
+
+    it('does not include the integrity header if endpoint configuration is supplied', async () => {
+      client.start({
+        apiKey: VALID_API_KEY,
+        endpoint: '/test',
+        autoInstrumentFullPageLoads: false,
+        autoInstrumentNetworkRequests: false,
+        autoInstrumentRouteChanges: false
+      })
+
+      setNextSamplingProbability(0.2)
+      createSpans(100)
+      await jest.advanceTimersByTimeAsync(RESPONSE_TIME + 1)
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+
+      expect(mockFetch.mock.calls[1][1]).toEqual(expect.objectContaining({
+        headers: expect.not.objectContaining({ 'Bugsnag-Integrity': expect.any(String) })
+      }))
+    })
+
+    it('can be enabled for a custom endpoint configuration by using sendPayloadChecksums', async () => {
+      client.start({
+        apiKey: VALID_API_KEY,
+        endpoint: '/test',
+        sendPayloadChecksums: true,
+        autoInstrumentFullPageLoads: false,
+        autoInstrumentNetworkRequests: false,
+        autoInstrumentRouteChanges: false
+      })
+
+      setNextSamplingProbability(0.2)
+      createSpans(100)
+      await jest.advanceTimersByTimeAsync(RESPONSE_TIME + 1)
+      expect(mockFetch).toHaveBeenCalledTimes(2)
+
+      expect(mockFetch.mock.calls[1][1]).toEqual(expect.objectContaining({
+        headers: expect.objectContaining({ 'Bugsnag-Integrity': expect.stringMatching(/^sha1 (\d|[abcdef]){40}$/) })
+      }))
+    })
+  })
 })
