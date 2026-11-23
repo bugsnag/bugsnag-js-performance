@@ -1,6 +1,5 @@
 # Changelog
 
-
 ## [Unreleased]
 
 ### Added
@@ -20,6 +19,10 @@
 - (react-native) Fix build errors with `use_frameworks!` when `BugsnagPerformance` is also installed (for example with `@bugsnag/plugin-react-native-span-access`), caused by copies of `BugsnagPerformance` headers being public headers of the `BugsnagReactNativePerformance` framework
 
 - (vue-router) Add support for Vue Router v5 while maintaining compatibility with v4 [#809](https://github.com/bugsnag/bugsnag-js-performance/pull/809)
+
+## [v3.4.1] (2026-02-18)
+
+### Fixed
 
 - (browser) Fix TLS PageLoadPhase span start times when `secureConnectionStart` is 0 [#781](https://github.com/bugsnag/bugsnag-js-performance/pull/781)
 
