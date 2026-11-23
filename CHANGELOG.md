@@ -1,6 +1,7 @@
 # Changelog
 
-## [Unreleased]
+
+## [v4.0.0] (2026-11-20)
 
 ### Added
 
