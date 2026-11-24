@@ -23,8 +23,7 @@ steps:
           - bundle install
           - node test/react-native/scripts/generate-expo-fixture.js
         matrix:
-          - "53"
-          - "52"
+          - "57"
 
       - label:  ':mac: Build Expo {{matrix}} IPA'
         key: "build-expo-ipa-full"
@@ -42,8 +41,7 @@ steps:
           - bundle install
           - node test/react-native/scripts/generate-expo-fixture.js
         matrix:
-          - "53"
-          - "52"
+          - "57"
 
       #
       # End-to-end tests
@@ -53,6 +51,11 @@ steps:
         timeout_in_minutes: 40
         plugins:
           artifacts#v1.9.0:
+            # scope the download to this pipeline's build step: the basic and
+            # full Expo pipelines both run in a pull request build and both
+            # build the same SDK versions, so without this the download matches
+            # the artifact from both and Buildkite rejects it as ambiguous
+            step: "build-expo-apk-full"
             download: "test/react-native/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.apk"
             upload:
               - "./test/react-native/maze_output/failed/*"
@@ -90,14 +93,18 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "53"
-          - "52"
+          - "57"
 
       - label: ":bitbar: :mac: Expo {{matrix}} iOS end-to-end tests"
         depends_on: "build-expo-ipa-full"
         timeout_in_minutes: 40
         plugins:
           artifacts#v1.9.0:
+            # scope the download to this pipeline's build step: the basic and
+            # full Expo pipelines both run in a pull request build and both
+            # build the same SDK versions, so without this the download matches
+            # the artifact from both and Buildkite rejects it as ambiguous
+            step: "build-expo-ipa-full"
             download: "test/react-native/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.ipa"
             upload:
               - "./test/react-native/maze_output/failed/*"
@@ -109,7 +116,7 @@ steps:
             command:
               - --app=/app/features/fixtures/generated/expo/{{matrix}}/test-fixture/output.ipa
               - --farm=bb
-              - --device=IOS_14|IOS_15|IOS_16|IOS_17|IOS_18|IOS_26
+              - --device=IOS_16|IOS_17|IOS_18|IOS_26
               - --a11y-locator
               - --appium-version=2.19
               - --no-tunnel
@@ -133,5 +140,4 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
         matrix:
-          - "53"
-          - "52"
+          - "57"
