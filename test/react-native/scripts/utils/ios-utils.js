@@ -22,11 +22,12 @@ function configureIOSProject (fixtureDir, reactNativeVersion) {
 
   fs.writeFileSync(`${fixtureDir}/ios/Podfile`, podfileContents)
 
-  // pin xcodeproj version to < 1.26.0
+  // pin xcodeproj version to < 1.26.0; json 3.x removed quirks_mode, which older RN Podfile scripts still pass
   const gemfilePath = resolve(fixtureDir, 'Gemfile')
   if (fs.existsSync(gemfilePath)) {
     appendToFileIfNotExists(gemfilePath, "gem 'xcodeproj', '< 1.26.0'", 'xcodeproj')
     appendToFileIfNotExists(gemfilePath, "gem 'concurrent-ruby', '<= 1.3.4'", 'concurrent-ruby')
+    appendToFileIfNotExists(gemfilePath, "gem 'json', '< 3.0'", "gem 'json'")
   }
 
   // set NSAllowsArbitraryLoads to allow http traffic for all domains (bitbar public IP + bs-local.com)
@@ -95,8 +96,31 @@ function configureAppDelegateForTestUtils (fixtureDir, reactNativeVersion) {
     const didFinishMatch = fileContents.match(/didFinishLaunchingWithOptions[^{]*{\n/)
     if (didFinishMatch) {
       replaceInFile(appDelegatePath, didFinishMatch[0], `${didFinishMatch[0]}${indentation}${methodCall}\n\n`)
+
+      // RN 0.88+ moved React Native setup into SceneDelegate.swift, leaving didFinishLaunchingWithOptions
+      // with a single implicit-return expression (`true`) - this needs an explicit return now that it isn't alone
+      if (isSwift) {
+        replaceInFile(appDelegatePath, new RegExp(`(${escapeRegExp(methodCall)}\\n\\n)(\\s*)true\\n`), '$1$2return true\n')
+      }
     }
   }
+}
+
+function escapeRegExp (string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
+ * Get the path of the file containing the React Native factory delegate (where the view controller overrides go)
+ * RN 0.88+ templates use a SceneDelegate, earlier versions configure React Native in the AppDelegate
+ */
+function getReactNativeDelegatePath (fixtureDir, fileExtension) {
+  const sceneDelegatePath = `${fixtureDir}/ios/reactnative/SceneDelegate.swift`
+  if (fileExtension === 'swift' && fs.existsSync(sceneDelegatePath)) {
+    return sceneDelegatePath
+  }
+
+  return `${fixtureDir}/ios/reactnative/AppDelegate.${fileExtension}`
 }
 
 /**
@@ -107,10 +131,10 @@ function applyViewControllerChanges (fixtureDir, reactNativeVersion) {
   const version = parseFloat(reactNativeVersion)
   const isSwift = version >= 0.78
   const fileExtension = isSwift ? 'swift' : (version >= 0.72 ? 'mm' : 'm')
-  const appDelegatePath = `${fixtureDir}/ios/reactnative/AppDelegate.${fileExtension}`
-  
+  const appDelegatePath = getReactNativeDelegatePath(fixtureDir, fileExtension)
+
   if (!fs.existsSync(appDelegatePath)) {
-    console.warn(`AppDelegate file not found at ${appDelegatePath}`)
+    console.warn(`React Native delegate file not found at ${appDelegatePath}`)
     return
   }
   
@@ -165,7 +189,7 @@ function applySwiftViewControllerChanges (appDelegatePath, fileContents) {
   
   for (const anchor of anchors) {
     if (fileContents.includes(anchor)) {
-      const escapedAnchor = anchor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const escapedAnchor = escapeRegExp(anchor)
       const match = fileContents.match(new RegExp(`(\n\\s*${escapedAnchor})`, 'm'))
       if (match) {
         replaceInFile(appDelegatePath, match[0], `${viewControllerMethods}${match[0]}`)

@@ -44,6 +44,8 @@ function getReactNativeDependencies(reactNativeVersion, notifierVersion) {
 function getReactNavigationDependencies(reactNativeVersion) {
   // react-native-screens new-arch support:
   // library version 	react-native version
+  // 4.26.0+ 	        0.84.0+
+  // 4.25.0+ 	        0.82.0+
   // 4.19.0+ 	        0.81.0+
   // 4.14.0+ 	        0.79.0+
   // 4.5.0+ 	        0.77.0+
@@ -65,6 +67,9 @@ function getReactNavigationDependencies(reactNativeVersion) {
   // Adjust versions based on React Native version
   const rnVersion = parseFloat(reactNativeVersion)
   switch (true) {
+    case rnVersion >= 0.86:
+      reactNativeScreensVersion = '~4.30.0'
+      break
     case rnVersion >= 0.81:
       reactNativeScreensVersion = '~4.19.0'
       break
@@ -81,10 +86,13 @@ function getReactNavigationDependencies(reactNativeVersion) {
       reactNavigationVersion = '^6.0.0'
       reactNavigationNativeStackVersion = '^6.0.0'
       reactNativeScreensVersion = '~3.33.0'
+      // 5.9.0+ adopted the AGP 9 source set API (java.directories), which RN <= 0.75's AGP doesn't have
+      reactNativeSafeAreaContextVersion = '~5.8.1'
       break
     case rnVersion >= 0.74:
       reactNavigationVersion = '^6.0.0'
       reactNavigationNativeStackVersion = '^6.0.0'
+      reactNativeSafeAreaContextVersion = '~5.8.1'
       reactNativeScreensVersion = '~3.32.0'
       break
     case rnVersion >= 0.73:
@@ -131,10 +139,44 @@ function getExpoDependencies() {
   return [
     '@bugsnag/react-native',
     '@react-native-community/netinfo',
-    'react-native-file-access',
+    'react-native-file-access@^3.2.0',
     'expo-build-properties',
-    'expo-constants'
+    'expo-constants',
+    // @expo/metro-config resolves expo-asset from the project root, so it must be a direct dependency
+    // (otherwise it can end up nested under node_modules/expo and the JS bundle step fails)
+    'expo-asset',
+    // expo-file-system provides the app directories native module that expo-asset needs to load fonts.
+    // it is only a dependency of the expo package, so it can end up nested under node_modules/expo,
+    // where it is not autolinked (the app then fails with "Module 'expo.modules.interfaces.filesystem.AppDirectories' not found")
+    'expo-file-system',
+    // our replacement app/(tabs)/_layout.tsx uses FontAwesome icons, but the tabs template
+    // no longer includes @expo/vector-icons from SDK 57 onwards
+    '@expo/vector-icons'
   ]
+}
+
+/**
+ * npm overrides for Expo fixtures
+ *
+ * expo-router depends on @react-navigation/* with open ^7 ranges, but relies on react-navigation internals.
+ * The react-navigation releases from 2026-09-15 onwards (native 7.4.0 / core 7.22.x) are incompatible with
+ * the expo-router versions used by SDK 52/53 (e.g. core dropped the query-string dependency that
+ * expo-router imports), so pin them to the last releases before that.
+ * SDK 54+ work with the newer releases, so no overrides are applied there.
+ */
+function getExpoOverrides(expoVersion) {
+  if (parseInt(expoVersion) >= 54) {
+    return {}
+  }
+
+  return {
+    '@react-navigation/native': '7.3.18',
+    '@react-navigation/core': '7.21.13',
+    '@react-navigation/routers': '7.6.4',
+    '@react-navigation/elements': '2.9.40',
+    '@react-navigation/bottom-tabs': '7.18.18',
+    '@react-navigation/native-stack': '7.18.10'
+  }
 }
 
 module.exports = {
@@ -142,5 +184,6 @@ module.exports = {
   getReactNativeDependencies,
   getReactNavigationDependencies,
   getReactNativeNavigationDependencies,
-  getExpoDependencies
+  getExpoDependencies,
+  getExpoOverrides
 }

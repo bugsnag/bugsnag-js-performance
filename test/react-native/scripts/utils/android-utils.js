@@ -9,8 +9,17 @@ const { replaceInFile, appendToFileIfNotExists } = require('./file-utils')
 function configureAndroidProject (fixtureDir, isNewArchEnabled, reactNativeVersion) {
   // set android:usesCleartextTraffic="true" in AndroidManifest.xml
   const androidManifestPath = `${fixtureDir}/android/app/src/main/AndroidManifest.xml`
-  replaceInFile(androidManifestPath, '<application', '<application android:usesCleartextTraffic="true" android:largeHeap="true"')
-
+  //replaceInFile(androidManifestPath, '<application', '<application android:usesCleartextTraffic="true" android:largeHeap="true"')
+        let androidManifestContents = fs.readFileSync(androidManifestPath, 'utf8')
+         // RN 0.82+ uses a manifest placeholder that's autoconfigured by the RN gradle plugin
+    // eslint-disable-next-line no-template-curly-in-string
+    if (androidManifestContents.includes('${usesCleartextTraffic}')) {
+      // eslint-disable-next-line no-template-curly-in-string
+      androidManifestContents = androidManifestContents.replace('${usesCleartextTraffic}', 'true')
+    } else {
+      androidManifestContents = androidManifestContents.replace('<application', '<application android:usesCleartextTraffic="true" android:largeHeap="true"')
+    }
+        fs.writeFileSync(androidManifestPath, androidManifestContents)
   // enable/disable the new architecture in gradle.properties
   const gradlePropertiesPath = `${fixtureDir}/android/gradle.properties`
   replaceInFile(gradlePropertiesPath, /newArchEnabled\s*=\s*(true|false)/, `newArchEnabled=${isNewArchEnabled}`)
@@ -121,7 +130,22 @@ function configureMainApplicationForTestUtils (fixtureDir, reactNativeVersion) {
   }
 }
 
+/**
+ * @bugsnag/react-native declares `consumerProguardFiles 'proguard-rules.pro'` but the file is missing from the
+ * published package (8.x and 9.x, up to at least 9.1.0). Older AGP versions ignore a missing consumer proguard file, but AGP 9
+ * (React Native 0.88+) fails the build, so create an empty one if it doesn't exist
+ */
+function ensureNotifierProguardRules (fixtureDir) {
+  const notifierAndroidDir = resolve(fixtureDir, 'node_modules/@bugsnag/react-native/android')
+  const proguardRulesPath = resolve(notifierAndroidDir, 'proguard-rules.pro')
+
+  if (fs.existsSync(notifierAndroidDir) && !fs.existsSync(proguardRulesPath)) {
+    fs.writeFileSync(proguardRulesPath, '')
+  }
+}
+
 module.exports = {
+  ensureNotifierProguardRules,
   configureAndroidProject,
   configureReactNavigationAndroid,
   installAndroidPerformance,

@@ -7,8 +7,10 @@ steps:
       - label: ":browserstack: {{ matrix }} Mobile Browser tests"
         matrix:
           - android_13
-          - ios_13
-          - ios_18
+          # BrowserStack deprecated iPhone 11-13 on 12 Nov 2026; Maze Runner's ios_13 (iPhone 11)
+          # and ios_18 (iPhone 13) map to those devices, so use the oldest/newest supported iOS instead
+          - ios_16
+          - ios_17
         depends_on: "build-browser-fixtures-NPM"
         timeout_in_minutes: 30
         plugins:

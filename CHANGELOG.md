@@ -1,6 +1,26 @@
 # Changelog
 
-## [v3.4.1] (2026-02-18)
+## [v4.0.0] (2026-11-24)
+
+### Added
+
+- (react-native) Add support for React Native 0.88: the native module now always builds for the new architecture on React Native 0.82+, regardless of the `newArchEnabled` Gradle property or `RCT_NEW_ARCH_ENABLED` environment variable [#841](https://github.com/bugsnag/bugsnag-js-performance/pull/841)
+
+- (plugin-react-native-span-access) Set `BUGSNAG_PERFORMANCE_SPM=1` when running `pod install` to take `BugsnagPerformance` from its Swift package instead of CocoaPods. This needs a React Native version that provides `spm_dependency`, and static linking (the default). The app must not also depend on the `BugsnagPerformance` pod, directly or through another pod such as `BugsnagPerformanceSwift` [#836](https://github.com/bugsnag/bugsnag-js-performance/pull/836)
+
+### Changed
+
+- (plugin-react-native-span-access) The `BugsnagNativeSpans` pod now declares the `BugsnagPerformance` versions it supports (`>= 1.14.0, < 6.0`), so that an unsupported version is reported by `pod install` [#836](https://github.com/bugsnag/bugsnag-js-performance/pull/836)
+
+### Fixed
+
+- (plugin-react-native-navigation) Fix TypeScript types for react-native-navigation v8 while keeping compatibility with v7 [#839](https://github.com/bugsnag/bugsnag-js-performance/pull/839)
+
+- (react-native) Fix build errors with `use_frameworks!` when `BugsnagPerformance` is also installed (for example with `@bugsnag/plugin-react-native-span-access`), caused by copies of `BugsnagPerformance` headers being public headers of the `BugsnagReactNativePerformance` framework [#836](https://github.com/bugsnag/bugsnag-js-performance/pull/836)
+
+- (vue-router) Add support for Vue Router v5 while maintaining compatibility with v4 [#809](https://github.com/bugsnag/bugsnag-js-performance/pull/809)
+
+## [v3.4.1] (2026-02-18)
 
 ### Fixed
 

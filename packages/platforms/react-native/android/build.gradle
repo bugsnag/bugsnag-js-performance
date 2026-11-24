@@ -1,4 +1,31 @@
+import groovy.json.JsonSlurper
+
+// Returns [major, minor] of the app's react-native dependency, or null if it can't be found
+def getReactNativeVersion() {
+  def candidates = [
+    // installed as node_modules/@bugsnag/react-native-performance/android
+    new File(projectDir, "../../../react-native/package.json"),
+    // standard app layout: <app>/android is the root project
+    new File(rootProject.projectDir, "../node_modules/react-native/package.json")
+  ]
+  def packageJson = candidates.find { it.exists() }
+  if (packageJson == null) {
+    return null
+  }
+  try {
+    def parts = new JsonSlurper().parse(packageJson).version.tokenize('.-')
+    return [parts[0].toInteger(), parts[1].toInteger()]
+  } catch (Exception ignored) {
+    return null
+  }
+}
+
 def isNewArchitectureEnabled() {
+  // React Native 0.82+ only supports the new architecture and ignores the newArchEnabled property
+  def rnVersion = getReactNativeVersion()
+  if (rnVersion != null && (rnVersion[0] > 0 || rnVersion[1] >= 82)) {
+    return true
+  }
   return project.hasProperty("newArchEnabled") && project.newArchEnabled == "true"
 }
 

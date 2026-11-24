@@ -15,7 +15,21 @@ Pod::Spec.new do |s|
 
   s.source_files    = "ios/**/*.{h,m,mm,swift}"
 
-  if ENV["RCT_NEW_ARCH_ENABLED"] == "1"
+  # Copies of BugsnagPerformance headers, and a header that imports them, used only by this pod.
+  # As public headers of a framework (use_frameworks!) they clash with the real BugsnagPerformance
+  # module.
+  s.private_header_files = [
+    "ios/BugsnagPerformanceConfiguration.h",
+    "ios/BugsnagPerformanceSpan.h",
+    "ios/BugsnagPerformanceSpanContext.h",
+    "ios/BugsnagPerformanceSpanOptions.h",
+    "ios/BugsnagReactNativePerformanceCrossTalkAPIClient.h",
+  ]
+
+  # install_modules_dependencies is provided by React Native 0.71+ and adds the correct
+  # dependencies and compiler flags for both the old and new architecture. RN 0.82+ is
+  # new-architecture only, so we must not rely on apps setting RCT_NEW_ARCH_ENABLED.
+  if respond_to?(:install_modules_dependencies, true)
     install_modules_dependencies(s)
   else
     s.dependency "React-Core"
