@@ -1,6 +1,6 @@
 {
   "name": "@bugsnag/angular-performance",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "BugSnag performance monitoring for angular applications",
   "homepage": "https://www.bugsnag.com/",
   "license": "MIT",
@@ -25,10 +25,10 @@
     "@bugsnag/browser-performance": "*"
   },
   "devDependencies": {
-    "@angular/core": "21.2.24",
     "@angular/common": "21.2.24",
     "@angular/compiler": "21.2.24",
     "@angular/compiler-cli": "21.2.24",
+    "@angular/core": "21.2.24",
     "@angular/platform-browser": "21.2.24",
     "@angular/platform-browser-dynamic": "21.2.24",
     "@angular/router": "21.2.24",
