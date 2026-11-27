@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Update peer dependencies for v4.0.0 [#842](https://github.com/bugsnag/bugsnag-js-performance/pull/842)
+- Update peer dependencies for v4.0.0 [#850](https://github.com/bugsnag/bugsnag-js-performance/pull/850)
 
 
 ## [v4.0.0] (2026-11-24)
